@@ -1,0 +1,113 @@
+#========================================================================
+#
+# Xpdf Makefile
+#
+# Copyright 1996 Derek B. Noonburg
+#
+# Heavily modified for pdftex by Thomas Esser, 1998, 1999
+#
+# $Id$
+#========================================================================
+
+VPATH = @srcdir@
+srcdir = @srcdir@
+
+goodir = $(srcdir)/../goo
+
+CXXFLAGS = @CXXFLAGS@
+ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ $(XCFLAGS) -I.. -I$(goodir) -I. -I$(srcdir) -DPDF_PARSER_ONLY -DNO_DECRYPTION
+
+CXX = @CXX@
+
+ac_include ../../texk/make/library.mk
+
+.SUFFIXES:
+.SUFFIXES: .cc .o
+.cc.o:
+	$(CXX) $(ALLCXXFLAGS) -c $<
+
+#------------------------------------------------------------------------
+
+CXX_SRC = \
+	$(srcdir)/Array.cc \
+	$(srcdir)/BuiltinFont.cc \
+	$(srcdir)/BuiltinFontTables.cc \
+	$(srcdir)/CMap.cc \
+	$(srcdir)/Catalog.cc \
+	$(srcdir)/CharCodeToUnicode.cc \
+	$(srcdir)/Decrypt.cc \
+	$(srcdir)/Dict.cc \
+	$(srcdir)/Error.cc \
+	$(srcdir)/FTFont.cc \
+	$(srcdir)/FontEncodingTables.cc \
+	$(srcdir)/FontFile.cc \
+	$(srcdir)/FormWidget.cc \
+	$(srcdir)/Function.cc \
+	$(srcdir)/Gfx.cc \
+	$(srcdir)/GfxFont.cc \
+	$(srcdir)/GfxState.cc \
+	$(srcdir)/GlobalParams.cc \
+	$(srcdir)/ImageOutputDev.cc \
+	$(srcdir)/JBIG2Stream.cc \
+	$(srcdir)/LTKOutputDev.cc \
+	$(srcdir)/Lexer.cc \
+	$(srcdir)/Link.cc \
+	$(srcdir)/NameToCharCode.cc \
+	$(srcdir)/Object.cc \
+	$(srcdir)/OutputDev.cc \
+	$(srcdir)/Outline.cc \
+	$(srcdir)/PBMOutputDev.cc \
+	$(srcdir)/PDFDoc.cc \
+	$(srcdir)/PDFDocEncoding.cc \
+	$(srcdir)/PSOutputDev.cc \
+	$(srcdir)/Page.cc \
+	$(srcdir)/Parser.cc \
+	$(srcdir)/SFont.cc \
+	$(srcdir)/Stream.cc \
+	$(srcdir)/T1Font.cc \
+	$(srcdir)/TTFont.cc \
+	$(srcdir)/TextOutputDev.cc \
+	$(srcdir)/UnicodeMap.cc \
+	$(srcdir)/XOutputDev.cc \
+	$(srcdir)/XRef.cc \
+	$(srcdir)/pdftops.cc \
+	$(srcdir)/pdftotext.cc \
+	$(srcdir)/pdfinfo.cc \
+	$(srcdir)/pdffonts.cc \
+	$(srcdir)/pdftopbm.cc \
+	$(srcdir)/pdfimages.cc \
+	$(srcdir)/xpdf.cc
+
+#------------------------------------------------------------------------
+PDFTOEPDF_OBJS = \
+	Array.o BuiltinFont.o BuiltinFontTables.o CMap.o Catalog.o \
+	CharCodeToUnicode.o Decrypt.o Dict.o Error.o FontEncodingTables.o \
+	FontFile.o Gfx.o GfxFont.o GfxState.o GlobalParams.o JBIG2Stream.o \
+	Lexer.o Link.o NameToCharCode.o Object.o OutputDev.o Outline.o PDFDoc.o \
+	Page.o Parser.o PDFDocEncoding.o Stream.o UnicodeMap.o XRef.o \
+	Function.o PSTokenizer.o
+
+libxpdf.a: $(PDFTOEPDF_OBJS)
+	rm -f $@
+	$(AR) $(ARFLAGS) $@  $(PDFTOEPDF_OBJS)
+	$(RANLIB) $@
+
+#------------------------------------------------------------------------
+
+mostlyclean clean:
+	rm -f $(PDFTOEPDF_OBJS) libxpdf.a
+	rm -f Makefile.bak
+
+distclean maintainer-clean extraclean: clean
+	rm -f Makefile c-auto.h
+
+#------------------------------------------------------------------------
+
+depend:
+	$(CXX) $(CXXFLAGS) -MM $(CXX_SRC) >Makefile.dep
+	cat Makefile.dep | sed 's|$(srcdir)|$$(srcdir)|' > $(srcdir)/depend.mk
+	cd ..; config.status
+
+#------------------------------------------------------------------------
+
+ac_include xpdf/depend.mk

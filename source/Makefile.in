@@ -1,0 +1,167 @@
+# Makefile for teTeX distribution.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+#### Start of system configuration section. ####
+
+srcdir = @srcdir@
+VPATH  = $(srcdir)
+
+SHELL = /bin/sh
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+scriptdir = $(bindir)
+texmf = @texmfmain@
+
+NCURSESDIR=libs/ncurses
+ZLIBDIR=libs/zlib
+LIBPNGDIR=libs/libpng
+LIBT1DIR=libs/t1lib
+LIBTYPE1DIR=$(LIBT1DIR)/../type1
+LIBWWWDIR=libs/libwww
+LIBXPDFDIR=libs/xpdf
+FREETYPEDIR=libs/freetype
+
+#### End of system configuration section. ####
+
+ALLPROGS = access afm2tfm bibtex ctangle cweave dmp dvicopy dvilj \
+  dvilj2p dvilj4 dvilj4l dvipdfm dvips dvitomp dvitype ebb eomega etex \
+  gftodvi gftopk gftype gsftopk info infokey install-info kpsestat \
+  kpsewhich mag makeindex makeinfo mf mf-nowin mft mpost mpto newer \
+  odvicopy odvips odvitype omega omfonts otangle otp2ocp outocp oxdvi.bin \
+  patgen pdfetex pdftex pdftosrc pfb2pfa pk2bm pktogf pktype pltotf \
+  pooltype ps2pk readlink tangle tcdialog tex texindex tftopl tie ttf2afm \
+  vftovp vptovf weave xdvi.bin
+
+# Subdirectories that have makefiles
+ESUBDIRS = @ESUBDIRS@ texk
+LIBSDIRS = @LIBSDIRS@
+
+default: all
+install: all 
+	for dir in $(ESUBDIRS); do \
+	   echo making $@ in $$dir; \
+	     (cd $$dir && PATH=$(scriptdir):$(bindir):$(PATH) \
+                $(MAKE) $@) || exit 1; \
+	done
+@FMU@
+@FMU@texmf-setup:
+	$(srcdir)/selfautofix "$(bindir)" "$(texmf)/web2c"
+	cd $(bindir); for i in $(ALLPROGS); do test -f $$i && echo strip $$i && strip $$i || true; done
+	if test -f $(scriptdir)/mktexlsr; then \
+	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
+	    $(scriptdir)/mktexlsr; \
+	else :; fi
+	if test -f $(scriptdir)/fmtutil; then \
+	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
+	    $(scriptdir)/fmtutil --all; \
+	else :; fi
+	if test -f $(scriptdir)/texlinks; then \
+	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
+	    $(scriptdir)/texlinks; \
+	else :; fi
+
+install-exec:
+	for dir in $(ESUBDIRS); do \
+	   echo making $@ in $$dir; \
+	   (cd $$dir && PATH=$(scriptdir):$(bindir):$(PATH) \
+              $(MAKE) $@) || exit 1; \
+	done
+	cd $(bindir); for i in $(ALLPROGS); do test -f $$i && echo strip $$i && strip $$i || true; done
+	if test -f $(scriptdir)/texlinks; then \
+	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
+	    $(scriptdir)/texlinks; \
+	else :; fi
+
+strip:
+
+check:
+	cd texk; TEXMF=$(texmf) TEXMFCNF=$(texmf)/web2c $(MAKE) $@
+
+uninstall:
+	for dir in $(ESUBDIRS); do \
+	  echo making $@ in $$dir; \
+	  (cd $$dir && $(MAKE) $@) || exit 1; \
+	done
+
+Makefile: Makefile.in config.status
+	$(SHELL) ./config.status
+
+all: @LIBSDEP@
+all clean mostlyclean:
+	for dir in $(ESUBDIRS); do \
+	  echo making $@ in $$dir; \
+	  (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) $@; else true; fi) || exit 1; \
+	done
+
+libsclean:
+	libsdirs="$(LIBSDIRS)"; \
+	  for dir in $$libsdirs; do \
+	    echo making clean in $$dir; \
+	    (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) clean; else true; fi) || exit 1; \
+	  done
+
+libsdistclean:
+	libsdirs="$(LIBSDIRS)"; \
+	  for dir in $$libsdirs; do \
+	    echo making distclean in $$dir; \
+	    (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) distclean; else true; fi) || exit 1; \
+	  done
+
+distclean: clean
+	for dir in $(ESUBDIRS); do \
+	  echo making $@ in $$dir; \
+	  (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) $@; else true; fi) || exit 1; \
+	done
+	rm -f Makefile *.status *.cache *.log dialogconfig.h TAGS
+	rm -f libs/klibtool.config libs/config.log libs/config.status libs/config.cache
+	rm -f utils/texinfo/info/funs.h utils/texinfo/info/doc.c utils/texinfo/info/key.c
+
+tags TAGS:
+	rm -f TAGS
+	find . -name '*.[ch]' -print | xargs etags --append -o TAGS
+
+
+clean mostlyclean: libsclean
+distclean: libsdistclean
+realclean: distclean
+world: all install
+pdftex:
+	cd texk/web2c; $(MAKE) pdftex
+	test -f texk/web2c/pdftex && ls -l texk/web2c/pdftex
+
+$(NCURSESDIR)/lib/libncurses.a:
+	cd $(NCURSESDIR); $(MAKE)
+$(ZLIBDIR)/libz.a:
+	cd $(ZLIBDIR); $(MAKE) libz.a
+$(LIBPNGDIR)/libpng.a:
+	cd $(LIBPNGDIR); $(MAKE) libpng.a
+$(LIBT1DIR)/libt1.a:
+	cd $(LIBT1DIR); $(MAKE) libt1.a
+$(LIBTYPE1DIR)/libtype1.a:
+	cd $(LIBTYPE1DIR); $(MAKE) libtype1.a
+$(LIBWWWDIR)/libwww.a:
+	cd $(LIBWWWDIR); $(MAKE) libwww.a
+$(LIBXPDFDIR)/xpdf/libxpdf.a:
+	cd $(LIBXPDFDIR)/xpdf; $(MAKE) libxpdf.a
+$(LIBXPDFDIR)/goo/libGoo.a:
+	cd $(LIBXPDFDIR)/goo; $(MAKE) libGoo.a
+$(FREETYPEDIR)/lib/.libs/libttf.a:
+	cd $(FREETYPEDIR); $(MAKE)
+
+# Prevent GNU make v3 from overflowing arg limit on SysV.
+.NOEXPORT:

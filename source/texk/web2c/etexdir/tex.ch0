@@ -1,0 +1,16 @@
+% Change file to assist in creating the web2c-specific change file.
+% This one comes first, resolves inconsistencies between the generated
+% etex.web and tex.ch
+% Public domain.
+
+@x [5.61] l.1556 - Print banner, eliminate misleading `(no format preloaded)'.
+wterm(eTeX_banner);
+@y
+wterm(banner);
+@z
+
+@x [29.536] l.10324 - Print banner.
+begin wlog(eTeX_banner);
+@y
+begin wlog(banner);
+@z
