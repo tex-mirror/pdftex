@@ -1,0 +1,42 @@
+% Change file to assist in creating the web2c-specific change file.
+% This one resolves inconsistencies between tex.ch and tex.ech.
+% Public domain.
+
+@x [1.2] l.188 - Web2C: extensions imply we're not TeX.
+@d eTeX_banner=='This is e-TeX, Version ',eTeX_version_string
+  {printed when \eTeX\ starts}
+@y
+@d eTeX_banner=='This is e-TeX, Version ',eTeX_version_string
+  {printed when \eTeX\ starts}
+@d eTeX_banner_k=='This is e-TeXk, Version ',eTeX_version_string
+@z
+
+@x - Change back to printing eTeX banners.
+  wterm(banner_k)
+@y
+  wterm(eTeX_banner_k)
+@z
+
+@x - Change back to printing eTeX banners.
+  wterm(banner);
+@y
+  wterm(eTeX_banner);
+@z
+
+@x - Change back to logging eTeX banners.
+  wlog(banner_k)
+@y
+  wlog(eTeX_banner_k)
+@z  
+
+@x - Change back to logging eTeX banners.
+  wlog(banner);
+@y
+  wlog(eTeX_banner);
+@z
+
+@x
+  line_stack:=xmalloc_array (integer, max_in_open);
+@y
+  xmalloc_array (line_stack, max_in_open);
+@z
