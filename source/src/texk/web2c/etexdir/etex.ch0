@@ -1,0 +1,104 @@
+% etex.ch0 - used by Web2C to adapt e-TeX 2.1 for TeX 3.141592.
+% This one comes between tex.web and etex.ch, resolving the new
+% inconsistencies between these two.
+% Public domain.
+
+@x
+@d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
+@y
+@d banner=='This is TeX, Version 3.14159' {printed when \TeX\ starts}
+@z
+
+@x
+@!glue_temp:real; {glue value before rounding}
+@!cur_glue:real; {glue seen so far}
+@!cur_g:scaled; {rounded equivalent of |cur_glue| times the glue ratio}
+begin cur_g:=0; cur_glue:=float_constant(0);
+this_box:=temp_ptr; g_order:=glue_order(this_box);
+@y
+@!glue_temp:real; {glue value before rounding}
+begin this_box:=temp_ptr; g_order:=glue_order(this_box);
+@z
+
+@x
+begin g:=glue_ptr(p); rule_wd:=width(g)-cur_g;
+if g_sign<>normal then
+  begin if g_sign=stretching then
+    begin if stretch_order(g)=g_order then
+      begin cur_glue:=cur_glue+stretch(g);
+      vet_glue(float(glue_set(this_box))*cur_glue);
+@^real multiplication@>
+      cur_g:=round(glue_temp);
+      end;
+    end
+  else if shrink_order(g)=g_order then
+      begin cur_glue:=cur_glue-shrink(g);
+      vet_glue(float(glue_set(this_box))*cur_glue);
+      cur_g:=round(glue_temp);
+      end;
+  end;
+rule_wd:=rule_wd+cur_g;
+@y
+begin g:=glue_ptr(p); rule_wd:=width(g);
+if g_sign<>normal then
+  begin if g_sign=stretching then
+    begin if stretch_order(g)=g_order then
+      begin vet_glue(float(glue_set(this_box))*stretch(g));
+@^real multiplication@>
+      rule_wd:=rule_wd+round(glue_temp);
+      end;
+    end
+  else if shrink_order(g)=g_order then
+    begin vet_glue(float(glue_set(this_box))*shrink(g));
+      rule_wd:=rule_wd-round(glue_temp);
+    end;
+  end;
+rule_wd:=rule_wd;
+@z
+
+@x
+@!glue_temp:real; {glue value before rounding}
+@!cur_glue:real; {glue seen so far}
+@!cur_g:scaled; {rounded equivalent of |cur_glue| times the glue ratio}
+begin cur_g:=0; cur_glue:=float_constant(0);
+this_box:=temp_ptr; g_order:=glue_order(this_box);
+@y
+@!glue_temp:real; {glue value before rounding}
+begin this_box:=temp_ptr; g_order:=glue_order(this_box);
+@z
+
+@x
+begin g:=glue_ptr(p); rule_ht:=width(g)-cur_g;
+if g_sign<>normal then
+  begin if g_sign=stretching then
+    begin if stretch_order(g)=g_order then
+      begin cur_glue:=cur_glue+stretch(g);
+      vet_glue(float(glue_set(this_box))*cur_glue);
+@^real multiplication@>
+      cur_g:=round(glue_temp);
+      end;
+    end
+  else if shrink_order(g)=g_order then
+      begin cur_glue:=cur_glue-shrink(g);
+      vet_glue(float(glue_set(this_box))*cur_glue);
+      cur_g:=round(glue_temp);
+      end;
+  end;
+rule_ht:=rule_ht+cur_g;
+@y
+begin g:=glue_ptr(p); rule_ht:=width(g);
+if g_sign<>normal then
+  begin if g_sign=stretching then
+    begin if stretch_order(g)=g_order then
+      begin vet_glue(float(glue_set(this_box))*stretch(g));
+@^real multiplication@>
+      rule_ht:=rule_ht+round(glue_temp);
+      end;
+    end
+  else if shrink_order(g)=g_order then
+    begin vet_glue(float(glue_set(this_box))*shrink(g));
+    rule_ht:=rule_ht-round(glue_temp);
+    end;
+  end;
+rule_ht:=rule_ht;
+@z
