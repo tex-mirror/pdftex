@@ -1,4 +1,5 @@
 /* main.c -- the main program for everything but TeX & MF.  */
+/* Public domain. */
 
 #include "config.h"
 

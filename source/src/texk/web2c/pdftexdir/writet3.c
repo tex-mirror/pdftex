@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet3.c#6 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet3.c#9 $
 */
 
 #include "ptexlib.h"
@@ -26,11 +26,8 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet3.c#6 $
 
 #define T3_BUF_SIZE   1024
 
-#define T3_TYPE_PK    0
-#define T3_TYPE_PGC   1
-
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet3.c#6 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet3.c#9 $";
 
 /* define t3_line_ptr, t3_line_array & t3_line_limit */
 typedef char t3_line_entry;
@@ -86,9 +83,9 @@ static void t3_putline(void)
         t3_putchar(*p++);
 }
 
-static void update_bbox(integer llx, integer lly, integer urx, integer ury)
+static void update_bbox(integer llx, integer lly, integer urx, integer ury, boolean is_first_glyph)
 {
-    if (t3_glyph_num == 0) {
+    if (is_first_glyph) {
         t3_b0 = llx;
         t3_b1 = lly;
         t3_b2 = urx;
@@ -134,7 +131,7 @@ static void t3_write_glyph(internalfontnumber f)
         }
         return;
     }
-    update_bbox(llx, lly, urx, ury);
+    update_bbox(llx, lly, urx, ury, t3_glyph_num == 0);
     t3_glyph_num++;
     pdfnewdict(0, 0);
     t3_char_procs[glyph_index] = objptr;
@@ -189,22 +186,19 @@ static boolean writepk(internalfontnumber f)
     halfword *row;
     char *name;
     chardesc cd;
-    boolean is_null_glyph;
+    boolean is_null_glyph, check_preamble;
     integer dpi;
     int e;
     dpi = kpse_magstep_fix(
              round(fixedpkresolution*(((float)pdffontsize[f])/fontdsize[f])),
              fixedpkresolution, NULL);
-    if ((e = pdffontexpandratio[f]) != 0)
-        cur_file_name = mk_exname(mk_basename(makecstring(fontname[f])), e);
-    else /* no expansion */
-        cur_file_name = makecstring(fontname[f]);
+    cur_file_name = makecstring(fontname[f]);
     name = kpse_find_pk(cur_file_name, (unsigned)dpi, &font_ret);
-    if (name == 0 ||
+    if (name == NULL ||
         !FILESTRCASEEQ(cur_file_name, font_ret.name) ||
         !kpse_bitmap_tolerance((float)font_ret.dpi, (float)dpi)) {
         pdftex_warn("Font %s at %i not found", cur_file_name, (int)dpi);
-        cur_file_name = 0;
+        cur_file_name = NULL;
         return false;
     }
     t3_file = xfopen(name, FOPEN_RBIN_MODE);
@@ -213,8 +207,9 @@ static boolean writepk(internalfontnumber f)
     tex_printf(" <%s", (char *)name);
     cd.rastersize = 256;
     cd.raster = xtalloc(cd.rastersize, halfword);
-    while (readchar((t3_glyph_num == 0), &cd) != 0) {
-        t3_glyph_num++;
+    check_preamble = true;
+    while (readchar(check_preamble, &cd) != 0) {
+        check_preamble = false;
         if (!pdfcharmarked(f, cd.charcode))
             continue;
         t3_char_widths[cd.charcode] = 
@@ -232,7 +227,8 @@ static boolean writepk(internalfontnumber f)
         lly = cd.yoff - cd.cheight + 1;
         urx = cd.cwidth + llx + 1;
         ury = cd.cheight + lly;
-        update_bbox(llx, lly, urx, ury);
+        update_bbox(llx, lly, urx, ury, t3_glyph_num == 0);
+        t3_glyph_num++;
         pdfnewdict(0, 0);
         t3_char_procs[cd.charcode] = objptr;
         pdfbeginstream();
@@ -265,7 +261,7 @@ end_stream:
         pdfendstream();
     }
     xfree(cd.raster);
-    cur_file_name = 0;
+    cur_file_name = NULL;
     return true;
 }
 
@@ -283,16 +279,13 @@ void writet3(int objnum, internalfontnumber f)
         t3_char_widths[i] = 0;
     }
     packfilename(fontname[f], getnullstr(), maketexstring(".pgc"));
-    if ((e = pdffontexpandratio[f]) != 0)
-        cur_file_name = mk_exname(mk_basename(makecstring(makenamestring())), e);
-    else /* no expansion */
-        cur_file_name = makecstring(makenamestring());
+    cur_file_name = makecstring(makenamestring());
     is_pk_font = false;
     if (!t3_open()) {
         if (writepk(f))
             goto write_font_dict;
         else {
-            cur_file_name = 0;
+            cur_file_name = NULL;
             return;
         }
     }
@@ -303,7 +296,7 @@ void writet3(int objnum, internalfontnumber f)
         t3_font_scale <= 0 || t3_font_scale > 1000 ) {
         pdftex_warn("missing or invalid font scale");
         t3_close();
-        cur_file_name = 0;
+        cur_file_name = NULL;
         return;
     }
     while (!t3_eof())
@@ -333,7 +326,7 @@ write_font_dict:
         pdf_puts(" 0 0]\n") ;
     }
     else
-        pdf_printf("/FontMatrix [%.5g 0 0 %.5g 0 0]\n", 
+        pdf_printf("/FontMatrix [%g 0 0 %g 0 0]\n", 
                    (double)t3_font_scale, (double)t3_font_scale);
     pdf_printf("/%s [ %i %i %i %i ]\n", 
                font_keys[FONTBBOX1_CODE].pdfname, 
@@ -392,5 +385,5 @@ write_font_dict:
     pdfenddict();
     t3_close();
     tex_printf(">");
-    cur_file_name = 0;
+    cur_file_name = NULL;
 }

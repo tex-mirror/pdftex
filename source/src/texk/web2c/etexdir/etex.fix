@@ -1,14 +1,2 @@
-% Bugfixes for etex.ch version 2.1
-% Public Domain.
-
-@x l.1163
-    begin cur_val:=int_val;
-@y
-    begin cur_val_level:=int_val;
-@z
-
-@x l.5503
-  if cur_ptr<>0 then
-@y
-  if cur_ptr<>null then
-@z
+% Late-breaking fixes for e-TeX.
+% Public domain.

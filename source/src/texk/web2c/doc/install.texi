@@ -103,10 +103,6 @@ Enable or disable the dynamic generation programs.  @xref{mktex
 configuration,,, kpathsea, Kpathsea}.  The defaults are the inverse of
 the options, i.e., everything is enabled except @code{mktextex}.
 
-@item --enable-auto-core
-Dump @file{core} if the input file is
-@file{HackyInputFileNameForCoreDump.tex}.  @xref{Preloaded executables}.
-
 @item --enable-shared
 Build Kpathsea as a shared library.  @xref{Shared library,,, kpathsea,
 Kpathsea}.
@@ -213,19 +209,20 @@ possibilities.
 @itemx install-fmts
 @cmindex fmts @r{Make target}
 @cmindex install-fmts @r{Make target}
-Make or install the @TeX{} @file{.fmt} files. @xref{initex invocation}.
+Make or install the @TeX{} @file{.fmt} files. @xref{Initial TeX}.
 
 @item bases
 @itemx install-bases
 @cmindex bases @r{Make target}
 @cmindex install-bases @r{Make target}
-Make or install the Metafont @file{.base} files.  @xref{inimf invocation}.
+
+Make or install the Metafont @file{.base} files.  @xref{Initial Metafont}.
 
 @item mems
 @itemx install-mems
 @cmindex mems @r{Make target}
 @cmindex install-mems @r{Make target}
-Make or install the MetaPost @file{.mem} files.  @xref{inimpost invocation}.
+Make or install the MetaPost @file{.mem} files.  @xref{Initial MetaPost}.
 
 @item triptrap
 @itemx trip

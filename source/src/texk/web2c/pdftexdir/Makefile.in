@@ -1,5 +1,5 @@
 # Makefile for libpdf - te@dbs.uni-hannover.de
-# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/Makefile.in#17 $
+# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/Makefile.in#19 $
 
 ac_include ../make/common.mk
 ac_include ../make/programs.mk
@@ -7,12 +7,13 @@ ac_include ../make/library.mk
 
 kpathsea_srcdir_parent = $(srcdir)/../..
 kpathsea_dir_parent = ../..
+
+ALL_CXXFLAGS = @CXXFLAGS@ @DEFS@ $(XXCFLAGS) -I. -I$(srcdir) -I$(kpathsea_dir_parent) -I$(kpathsea_srcdir_parent) @LIBXPDFCPPFLAGS@
+CXX = @CXX@
+
 .SUFFIXES: .cc .o
 .cc.o:
-	$(CXX) $(CXXFLAGS) -c $<
-
-CXXFLAGS = @CXXFLAGS@ @DEFS@ $(XXCFLAGS) -I. -I$(srcdir) -I$(kpathsea_dir_parent) -I$(kpathsea_srcdir_parent) @LIBXPDFCPPFLAGS@
-CXX = @CXX@
+	$(CXX) $(ALL_CXXFLAGS) -c $<
 
 # XCFLAGS=-Wstrict-prototypes -Wmissing-prototypes 
 

@@ -67,9 +67,9 @@ web2cdir = $(texmf)/web2c
 fontdir = $(texmf)/fonts
 
 # Memory dumps (.fmt/.base/.mem).
-fmtdir = $(web2cdir)
-basedir = $(fmtdir)
-memdir = $(fmtdir)
+fmtdir = $(web2cdir)/tex
+basedir = $(web2cdir)/metafont
+memdir = $(web2cdir)/metapost
 
 # Pool files.
 texpooldir = $(web2cdir)

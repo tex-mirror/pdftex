@@ -1,4 +1,4 @@
-.TH ETEX 1 "25 March 2004" "Web2C @VERSION@"
+.TH ETEX 1 "21 August 2004" "Web2C @VERSION@"
 .\"=====================================================================
 .if n .ds MF Metafont
 .if t .ds MF M\s-2ETAFONT\s0
@@ -81,7 +81,7 @@ implementation.
 .SH OPTIONS
 This version of e-\*(TX understands the following command line options.
 .TP
-.BI -efmt \ format
+.BI -fmt \ format
 .rb
 Use
 .I format
@@ -98,11 +98,27 @@ combination with
 For documentation of the enc\*(TX extensions see
 .BR http://www.olsak.net/enctex.html .
 .TP
-.B -file-line-error-style
+.B -file-line-error
 .rb
 Print error messages in the form
 .I file:line:error
 which is similar to the way many compilers format them.
+.TP
+.B -no-file-line-error
+.rb
+Disable printing error messages in the
+.I file:line:error
+style.
+.TP
+.B -file-line-error-style
+.rb
+This is the old name of the
+.B -file-line-error
+option.
+.TP
+.B -halt-on-error
+.rb
+Exit with an error code when an error is encountered during processing.
 .TP
 .B -help
 .rb
@@ -187,6 +203,13 @@ for the
 .I DVI
 file comment instead of the date.
 .TP
+.BI -output-directory \ directory
+.rb Write output files in
+.I directory
+instead of the current directory.  Look up input files in
+.I directory
+first, the along the normal search path.
+.TP
 .B -parse-first-line
 .rb
 If the first line of the main input file begins with
@@ -194,6 +217,10 @@ If the first line of the main input file begins with
 parse it to look for a dump name or a
 .B -translate-file
 option.
+.TP
+.B -no-parse-first-line
+.rb
+Disable parsing of the first line of the main input file.
 .TP
 .BI -progname \ name
 .rb
@@ -216,22 +243,23 @@ construct.  The
 can be any shell command.  This construct is normally
 disallowed for security reasons.
 .TP
+.B -no-shell-escape
+.rb
+Disable the
+.BI \ewrite18{ command }
+construct, even if it is enabled in the
+.I texmf.cnf
+file.
+.TP
 .B -src-specials
 .rb
-In
-.I DVI
-mode, insert source specials into the
+Insert source specials into the
 .I DVI
 file.
-This option is ignored in
-.I PDF
-mode.
 .TP
 .BI -src-specials \ where
 .rb
-In
-.I DVI
-mode, insert source specials in certain placed of the
+Insert source specials in certain placed of the
 .I DVI
 file.
 .I where
@@ -244,9 +272,6 @@ is a comma-separated value list:
 .IR parent ,
 or
 .IR vbox .
-This option is ignored in
-.I PDF
-mode.
 .TP
 .BI -translate-file \ tcxname
 .rb
@@ -341,8 +366,8 @@ Filename mapping definitions.
 .I *.tfm
 Metric files for e-\*(TX's fonts.
 .TP
-.I *.efmt
-Predigested e-\*(TX format (.\|efmt) files.
+.I *.fmt
+Predigested e-\*(TX format (.\|fmt) files.
 .br
 .\"=====================================================================
 .SH BUGS
@@ -365,7 +390,7 @@ file will be invalid.
 .BR mf (1).
 .\"=====================================================================
 .SH AUTHORS
-e-\*(TX was developed by the NTS team.
+e-\*(TX was developed by Peter Breitenlohner (and the NTS team).
 .PP
 \*(TX was designed by Donald E. Knuth,
 who implemented it using his \*(WB system for Pascal programs.

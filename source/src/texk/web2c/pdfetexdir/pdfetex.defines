@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.defines#9 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.defines#11 $
 }
 
 { pdftex.defines: additions for pdfTeX }
@@ -34,7 +34,6 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.defines#
 
 { functions from mapfile.c }
 @define function hasfmentry();
-@define function fmlookup();
 @define function tfmoffm();
 @define procedure checkextfm();
 @define procedure pdfmapfile();

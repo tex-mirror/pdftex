@@ -159,43 +159,47 @@ static void
 read_all_cnf P1H(void)
 {
   string *cnf_files;
+  string *cnf;
   const_string cnf_path = kpse_init_format (kpse_cnf_format);
 
   cnf_hash = hash_create (CNF_HASH_SIZE);
 
-  for (cnf_files = kpse_all_path_search (cnf_path, CNF_NAME);
-       cnf_files && *cnf_files; cnf_files++) {
-    string line;
-    string cnf_filename = *cnf_files;
-    FILE *cnf_file = xfopen (cnf_filename, FOPEN_R_MODE);
+  cnf_files = kpse_all_path_search (cnf_path, CNF_NAME);
+  if (cnf_files) {
+    for (cnf = cnf_files; *cnf; cnf++) {
+      string line;
+      FILE *cnf_file = xfopen (*cnf, FOPEN_R_MODE);
 
-    while ((line = read_line (cnf_file)) != NULL) {
-      unsigned len = strlen (line);
-      /* Strip trailing spaces. */
-      while (len > 0 && ISSPACE(line[len-1])) {
-        line[len - 1] = 0;
-        --len;
-      }
-      /* Concatenate consecutive lines that end with \.  */
-      while (len > 0 && line[len - 1] == '\\') {
-        string next_line = read_line (cnf_file);
-        line[len - 1] = 0;
-        if (!next_line) {
-          WARNING1 ("%s: Last line ends with \\", cnf_filename);
-        } else {
-          string new_line;
-          new_line = concat (line, next_line);
-          free (line);
-          line = new_line;
-          len = strlen (line);
+      while ((line = read_line (cnf_file)) != NULL) {
+        unsigned len = strlen (line);
+        /* Strip trailing spaces. */
+        while (len > 0 && ISSPACE(line[len-1])) {
+          line[len - 1] = 0;
+          --len;
         }
+        /* Concatenate consecutive lines that end with \.  */
+        while (len > 0 && line[len - 1] == '\\') {
+          string next_line = read_line (cnf_file);
+          line[len - 1] = 0;
+          if (!next_line) {
+            WARNING1 ("%s: Last line ends with \\", *cnf);
+          } else {
+            string new_line;
+            new_line = concat (line, next_line);
+            free (line);
+            line = new_line;
+            len = strlen (line);
+          }
+        }
+
+        do_line (line);
+        free (line);
       }
 
-      do_line (line);
-      free (line);
+      xfclose (cnf_file, *cnf);
+      free (*cnf);
     }
-
-    xfclose (cnf_file, cnf_filename);
+    free (cnf_files);
   }
 }
 

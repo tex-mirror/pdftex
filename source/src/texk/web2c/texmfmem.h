@@ -171,7 +171,7 @@ typedef union
 #define qqqq v.QQQQ
 #endif
 
-#else /* Omega || eOmega */
+#else /* Omega || eOmega || Aleph */
 
 typedef union
 {
@@ -247,4 +247,4 @@ typedef union
 
 #define gr gg.GLUE
 
-#endif /* Omega || eOmega */
+#endif /* Omega || eOmega || Aleph */

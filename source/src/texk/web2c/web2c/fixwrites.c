@@ -12,14 +12,6 @@ char *file, *argp, *as, *cmd;
 
 int tex = false;
 
-/* To implement -oem option on Win32, we have to emit the Oem version of
-   some print commands.  We do this by appending this string. */
-#ifdef OEM
-char *oem = "Oem";
-#else
-char *oem = "";
-#endif
-
 /* Replace the last (should be only) newline in S with a null.  */
 
 static void
@@ -31,7 +23,7 @@ remove_newline P1C(string, s)
       fprintf (stderr, "Lost newline somehow.\n");
       /* This is so the convert script can delete the output file on error.  */
       puts ("@error@");
-      uexit (1);
+      exit (1);
     }
 
   *temp = 0;
@@ -199,8 +191,6 @@ main P2C(int, argc,  string *, argv)
   int blanks_done, indent, i;
   char *program_name = "";
 
-  kpse_set_program_name (argv[0], NULL); /* In case we use FATAL.  */
-
   for (i = 1; i < argc; i++)
     {
       if (STREQ(argv[i],"-t"))
@@ -264,7 +254,7 @@ main P2C(int, argc,  string *, argv)
 	  if (sscanf (cp, "read ( input , %s )", variable_name) != 1)
             {
   	      fprintf (stderr, "sscanf failed\n");
-              uexit (1);
+              exit (1);
             }
 	  printf ("%s = getint();\n", variable_name);
 	  continue;
@@ -347,7 +337,7 @@ main P2C(int, argc,  string *, argv)
 	}
       if (*cp == ')')
 	{
-	  printf ("putc%s ('\\n', %s);\n", oem, filename);
+	  printf ("putc ('\\n', %s);\n", filename);
 	  continue;
 	}
       argp = ++cp;
@@ -448,12 +438,12 @@ main P2C(int, argc,  string *, argv)
 	  for (as = argp; *as; ++as) ;
 	  while (*--as != ')') ;
 	  *as = '\0';
-	  printf ("putc%s (%s, %s);\n", oem, argp, filename);
+	  printf ("putc (%s, %s);\n", argp, filename);
 	}
       else if (STREQ (args, "%s"))
-        printf ("Fputs%s (%s, %s\n", oem, filename, argp);
+        printf ("Fputs (%s, %s\n", filename, argp);
       else
-        printf ("fprintf%s (%s, \"%s\", %s\n", oem, filename, args, argp);
+        printf ("fprintf (%s, \"%s\", %s\n", filename, args, argp);
     }
 
   return EXIT_SUCCESS;

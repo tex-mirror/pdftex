@@ -267,15 +267,9 @@ extern boolean open_output P2H(FILE **, const_string fopen_mode);
 extern void aclose P1H(FILE *);
 extern void recorder_change_filename P1H(string);
 extern boolean recorder_enabled;
+extern string output_directory;
 
 /* version.c */
 extern string versionstring;
-
-/* oem.c */
-#ifdef OEM
-extern int fprintfOem(FILE *f, const char *fmt, ...);
-extern int FputsOem(FILE *f, char *s);
-extern int putcOem(int c, FILE *f);
-#endif
 
 #endif /* not CPASCAL_H */

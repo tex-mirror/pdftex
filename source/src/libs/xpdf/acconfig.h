@@ -1,8 +1,17 @@
-/* define if you have fseek64() and ftell64() */
-#undef HAVE_FSEEK64
+/* for --enable-a4-paper */
+#undef A4_PAPER
 
-/* define if you have mkstemp() and decl. in stdlib.h */
+/* for --enable-multithreaded */
+#undef MULTITHREADED
+
+/* for --enable-opi */
+#undef OPI_SUPPORT
+
+/* sysconfdir path, set by configure */
+#undef SYSTEM_XPDFRC
+
+/* Define if you have the mkstemp function. */
 #undef HAVE_MKSTEMP
 
-/* define if you have mkstemps() */
+/* Define if you have the mkstemps function. */
 #undef HAVE_MKSTEMPS

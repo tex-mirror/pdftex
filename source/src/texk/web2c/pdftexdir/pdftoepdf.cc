@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#47 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#49 $
 */
 
 #include <stdlib.h>
@@ -47,7 +47,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#47 $
 #include "avl.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#47 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#49 $";
 
 /* we avoid reading all necessary kpathsea headers, but we need xstrdup */
 #ifdef __cplusplus
@@ -134,12 +134,12 @@ struct InObj {
     InObj *next;        // next entry in list of indirect objects
     integer num;        // new object number in output PDF
     fm_entry * fontmap; // pointer to font map entry
-    integer encoding;   // Encoding for objFont      
+    integer enc_objnum;   // Encoding for objFont      
     int written;        // has it been written to output PDF?
 };
 
 struct UsedEncoding {
-    integer encoding;
+    integer enc_objnum;
     GfxFont *font;
     UsedEncoding *next;
 };
@@ -247,12 +247,12 @@ static int addEncoding(GfxFont *gfont)
     n->next = encodingList;
     encodingList = n;
     n->font = gfont;
-    n->encoding = pdfnewobjnum();
-    return n->encoding;
+    n->enc_objnum = pdfnewobjnum();
+    return n->enc_objnum;
 }
 
-#define addFont(ref, fontmap, encoding) \
-        addInObj(objFont, ref, fontmap, encoding)
+#define addFont(ref, fontmap, enc_objnum) \
+        addInObj(objFont, ref, fontmap, enc_objnum)
 
 #define addFontDesc(ref, fontmap) \
         addInObj(objFontDesc, ref, fontmap, 0)
@@ -269,7 +269,7 @@ static int addInObj(InObjType type, Ref ref, fm_entry *f, integer e)
     n->type = type;
     n->next = 0;
     n->fontmap = f;
-    n->encoding = e;
+    n->enc_objnum = e;
     n->written = 0;
     if (inObjList == 0)
         inObjList = n;
@@ -342,7 +342,7 @@ static void copyFontDict(Object *obj, InObj *r)
         }
         // write new BaseFont and Encoding
         pdf_printf("/BaseFont %i 0 R\n", (int)get_fontname(r->fontmap)); 
-        pdf_printf("/Encoding %i 0 R\n", (int)r->encoding); 
+        pdf_printf("/Encoding %i 0 R\n", (int)r->enc_objnum); 
     }
     else { // FontDescriptor dict
         for (i = 0, l = obj->dictGetLength(); i < l; ++i) {
@@ -660,7 +660,7 @@ static void writeEncodings()
       else
         glyphNames[i] = notdef;
       }
-        write_enc(glyphNames, r->encoding);
+        write_enc(glyphNames, NULL, r->enc_objnum);
     }
     for (r = encodingList; r != 0; r = n) {
         n = r->next;

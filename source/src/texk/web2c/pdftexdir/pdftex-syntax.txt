@@ -1,7 +1,9 @@
 %% This is the list of new or extended primitives provided by pdftex.
+%% Dont edit this file, as it is now auto-generated from the
+%% pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %% Used convention for syntax rules is borrowed from `TeXbook naruby' by
-%% Petr Olsak.
-%% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex-syntax.txt#14 $
+%% Petr Olsak, who also started this syntax file.
+%% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex-syntax.txt#16 $
 
 %% integer registers:
 \pdfoutput                                              (integer)
@@ -125,7 +127,7 @@
 <id spec> --> <numid> | <nameid>
 <file spec> --> file <general text>
 <page spec> --> page <number>
-<expand spec> --> <stretch> <shrink> <step>
+<expand spec> --> <stretch> <shrink> <step> [autoexpand]
 <stretch> --> <number>
 <shrink> --> <number>
 <step> --> <number>

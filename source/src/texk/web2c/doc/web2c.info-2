@@ -57,57 +57,6 @@ versions, except that this permission notice may be stated in a
 translation
 
 
-File: web2c.info,  Node: \charsubdef,  Next: \tracingcharsubdef,  Up: MLTeX
-
-`\charsubdef': Character substitutions
-......................................
-
-  The most important primitive MLTeX adds is `\charsubdef', used in a
-way reminiscent of `\chardef':
-     \charsubdef COMPOSITE [=] ACCENT BASE
-
-  Each of COMPOSITE, ACCENT, and BASE are font glyph numbers, expressed
-in the usual TeX syntax: `\e symbolically, '145 for octal, "65 for hex,
-101 for decimal.
-
-  MLTeX's `\charsubdef' declares how to construct an accented character
-glyph (not necessarily existing in the current font) using two
-character glyphs (that do exist).  Thus it defines whether a character
-glyph code, either typed as a single character or using the `\char'
-primitive, will be mapped to a font glyph or to an `\accent' glyph
-construction.
-
-  For example, if you assume glyph code 138 (decimal) for an
-e-circumflex and you are using the Computer Modern fonts, which have
-the circumflex accent in position 18 and lowercase `e' in the usual
-ASCII position 101 decimal, you would use `\charsubdef' as follows:
-
-     \charsubdef 138 = 18 101
-
-  For the plain TeX format to make use of this substitution, you have
-to redefine the circumflex accent macro `\^' in such a way that if its
-argument is character `e' the expansion `\char138 ' is used instead of
-`\accent18 e'.  Similar `\charsubdef' declaration and macro
-redefinitions have to be done for all other accented characters.
-
-  To disable a previous `\charsubdef C', redefine C as a pair of zeros.
-For example:
-     \charsubdef '321 = 0 0  % disable N tilde
-
-(Octal '321 is the ISO Latin-1 value for the Spanish N tilde.)
-
-  `\charsubdef' commands should only be given once.  Although in
-principle you can use `\charsubdef' at any time, the result is
-unspecified.  If `\charsubdef' declarations are changed, usually either
-incorrect character dimensions will be used or MLTeX will output
-missing character warnings.  (The substitution of a `\charsubdef' is
-used by TeX when appending the character node to the current horizontal
-list, to compute the width of a horizontal box when the box gets
-packed, and when building the `\accent' construction at
-`\shipout'-time.  In summary, the substitution is accessed often, so
-changing it is not desirable, nor generally useful.)
-
-
 File: web2c.info,  Node: \tracingcharsubdef,  Prev: \charsubdef,  Up: MLTeX
 
 `\tracingcharsubdef': Substitution diagnostics
@@ -135,7 +84,7 @@ code to the internal TeX character code (a superset of ASCII).
 
   Of the various proposals for handling more than one input encoding,
 TCX files were chosen because they follow Knuth's original ideas for
-the use of the `xhcr' and `xord' tables.  He ventured that these would
+the use of the `xchr' and `xord' tables.  He ventured that these would
 be changed in the WEB source in order to adjust the actual version to a
 given environment.  It turned out, however, that recompiling the WEB
 sources is not as simple task as Knuth predicted; therefore, TCX files,
@@ -183,8 +132,10 @@ files for Czech, Polish, and Slovak are also provided.
 
   3. Comments start with `%' and continue to the end of the line.
 
-  4. Otherwise, a line consists of one or two character codes:
-          SRC [DEST]
+  4. Otherwise, a line consists of one or two character codes,
+     optionally followed by 0 or 1.  The last number indicates whether
+     DEST is considered printable.
+          SRC [DEST [PRNT]]
 
   5. Each character code may be specified in octal with a leading `0',
      hexadecimal with a leading `0x', or decimal otherwise. Values must
@@ -213,6 +164,23 @@ in various ways.
 
   Thus, the idea is to specify the input (keyboard) character code for
 SRC, and the output (font) character code for DEST.
+
+  By default, only the printable ASCII characters are considered
+printable by TeX.  If you specify the `-8bit' option, all characters are
+considered printable by default.  If you specify both the `-8bit'
+option and a TCX file, then the TCX can set specific characters to be
+non-printable.
+
+  Both the active TCX encoding and whether characters are printable are
+saved in the dump files (like `tex.fmt').  So by giving these options
+in combination with `-ini' you set the defaults seen by anyone who uses
+the resulting dump file.
+
+  When loading a dump, if the `-8bit' option was given, then all
+characters become printable by default.
+
+  When loading a dump, if a TCX file was specified, then the TCX data
+from the dump is ignored and the data from the file used instead.
 
 
 File: web2c.info,  Node: patgen invocation,  Next: TCX files,  Prev: MLTeX,  Up: Languages and hyphenation
@@ -393,6 +361,7 @@ usual.  For example:
 `-base=BASENAME'
 `-progname=STRING'
 `-translate-file=TCXFILE'
+`-8bit'
      These options are common to TeX, Metafont, and MetaPost.  *Note
      Common options::.
 
@@ -860,6 +829,7 @@ opens a security hole.  *Note tex invocation::.
 `-mem=MEMNAME'
 `-progname=STRING'
 `-translate-file=TCXFILE'
+`-8bit'
      These options are common to TeX, Metafont, and MetaPost.  *Note
      Common options::.
 
@@ -1233,4 +1203,48 @@ searching for `.aux' files.
      A very large `.bib' and `.bst' collection, including references
      for all the standard TeX books and a complete bibliography for
      TUGboat.
+
+
+File: web2c.info,  Node: Basic BibTeX style files,  Prev: bibtex invocation,  Up: BibTeX
+
+Basic BibTeX style files
+========================
+
+  Here are descriptions of the four standard and four semi-standard
+basic BibTeX styles.  `CTAN:/biblio/bibtex' contains these and many
+more (for CTAN info, *note unixtex.ftp: (kpathsea)unixtex.ftp.).
+
+`plain'
+     Sorts entries alphabetically, with numeric labels.  Generally
+     formatted according to van Leunen's `A Handbook for Scholars'.
+     The other style files listed here are based on `plain'.
+
+`abbrv'
+     First names, month names, and journal names are abbreviated.
+
+`acm'
+     Names are printed in small caps.
+
+`alpha'
+     Alphanumeric labels, e.g., `Knu66'.
+
+`apalike'
+     No labels at all; instead, the year appears in parentheses after
+     the author.  Should be used in conjunction with `apalike.tex'
+     (plain TeX) or `apalike.sty' (LaTeX), which also changes the
+     citations in the text to be `(AUTHOR, YEAR)'.
+
+`ieeetr'
+     Numeric labels, entries in citation order, IEEE abbreviations,
+     article titles in quotes.
+
+`siam'
+     Numeric labels, alphabetic order, `Math. Reviews' abbreviations,
+     names in small caps.
+
+`unsrt'
+     Lists entries in citation order, i.e., unsorted.
+
+`btxbst.doc'
+     The template file and documentation for the standard styles.
 

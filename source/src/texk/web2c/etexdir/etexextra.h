@@ -23,14 +23,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #define COPYRIGHT_HOLDER "The NTS Team"
 #define AUTHOR NULL
 #define PROGRAM_HELP ETEXHELP
+#define BUG_ADDRESS "tex-k@mail.tug.org"
 #define DUMP_VAR TEXformatdefault
 #define DUMP_LENGTH_VAR formatdefaultlength
-#define DUMP_OPTION "efmt"
-#ifdef DOS
-#define DUMP_EXT ".efm"
-#else
-#define DUMP_EXT ".efmt"
-#endif
+#define DUMP_OPTION "fmt"
+#define DUMP_EXT ".fmt"
 #define INPUT_FORMAT kpse_tex_format
 #define INI_PROGRAM "einitex"
 #define VIR_PROGRAM "evirtex"

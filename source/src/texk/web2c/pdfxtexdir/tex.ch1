@@ -1,5 +1,5 @@
 %
-% Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+% Copyright (c) 2004 Han The Thanh, <thanh@pdftex.org>
 %
 % This file is part of pdfTeX.
 %
@@ -17,42 +17,29 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: tex.ch1,v 1.1 2004/02/26 13:40:37 thanh Exp $
+% $Id: tex.ch1,v 1.2 2004/07/30 07:04:19 olaf Exp $
 %
 % Change file to assist in creating the web2c-specific change file.
 % This one resolves inconsistencies between the etex changes for
 % web2c and pdftex changes for web2c.
 
-@x
-@d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
-@d banner_k=='This is TeXk, Version 3.141592' {printed when \TeX\ starts}
+@x [1] m.2 l.188 - Web2C: extensions imply we're not pdfxTeX
+@d pdfxTeX_banner=='This is pdfxTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
 @y
-@d banner=='This is pdfxTeX, Version 3.141592','-',pdftex_version_string,'-',eTeX_version_string
-   {printed when \pdfTeX\ starts}
-@d banner_k=='This is pdfxTeXk, Version 3.141592','-',pdftex_version_string,'-',eTeX_version_string
-   {printed when \pdfTeX\ starts}
+@d pdfxTeX_banner_k=='This is pdfxTeXk, Version 3.141592',pdftex_version_string,eTeX_version_string
+@d pdfxTeX_banner=='This is pdfxTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
 @z
 
-@x
-  wterm(eTeX_banner_k)
+@x [1] m.2 l.188 - banner
+@d banner==eTeX_banner
+@d banner_k==eTeX_banner_k
 @y
-  wterm(banner_k)
+@d banner==pdfxTeX_banner
+@d banner_k==pdfxTeX_banner_k
 @z
 
-@x
-  wterm(eTeX_banner);
+@x [17.236] l.4960 - first web2c, then pdfTeX, then e-TeX additional integer parameters
+@d etex_int_base=web2c_int_pars {base for \eTeX's integer parameters}
 @y
-  wterm(banner);
-@z
-
-@x
-  wlog(eTeX_banner_k)
-@y
-  wlog(banner_k)
-@z
-
-@x
-  wlog(eTeX_banner);
-@y
-  wlog(banner);
+@d pdftex_first_integer_code = web2c_int_pars {base for \pdfTeX's integer parameters}
 @z

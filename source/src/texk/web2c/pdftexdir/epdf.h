@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/epdf.h#12 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/epdf.h#14 $
 */
 
 extern "C" {
@@ -84,7 +84,7 @@ extern void pdfflush(void);
 extern void pdftex_fail(const char *fmt,...);
 extern void pdftex_warn(const char *fmt,...);
 extern void tex_printf(const char *, ...);
-extern void write_enc(char **, integer);
+extern void write_enc(char **, struct enc_entry *, integer);
 extern void write_epdf(void);
 extern void zpdfbegindict(integer);
 extern void zpdfbeginobj(integer);

@@ -29,29 +29,29 @@
 /* Some things are the same except for the name.  */
 #ifdef TeX
 #if defined (pdfeTeX)
-#define TEXPOOLNAME "pdfetex.pool"
-#define TEXENGINENAME "pdfetex"
+#define TEXMFPOOLNAME "pdfetex.pool"
+#define TEXMFENGINENAME "pdfetex"
 #elif defined (pdfxTeX)
-#define TEXPOOLNAME "pdfxtex.pool"
-#define TEXENGINENAME "pdfxtex"
+#define TEXMFPOOLNAME "pdfxtex.pool"
+#define TEXMFENGINENAME "pdfxtex"
 #elif defined (pdfTeX)
-#define TEXPOOLNAME "pdftex.pool"
-#define TEXENGINENAME "pdftex"
+#define TEXMFPOOLNAME "pdftex.pool"
+#define TEXMFENGINENAME "pdftex"
 #elif defined (eTeX)
-#define TEXPOOLNAME "etex.pool"
-#define TEXENGINENAME "etex"
+#define TEXMFPOOLNAME "etex.pool"
+#define TEXMFENGINENAME "etex"
 #elif defined (Omega)
-#define TEXPOOLNAME "omega.pool"
-#define TEXENGINENAME "omega"
+#define TEXMFPOOLNAME "omega.pool"
+#define TEXMFENGINENAME "omega"
 #elif defined (eOmega)
-#define TEXPOOLNAME "eomega.pool"
-#define TEXENGINENAME "eomega"
+#define TEXMFPOOLNAME "eomega.pool"
+#define TEXMFENGINENAME "eomega"
 #elif defined (Aleph)
-#define TEXPOOLNAME "aleph.pool"
-#define TEXENGINENAME "aleph"
+#define TEXMFPOOLNAME "aleph.pool"
+#define TEXMFENGINENAME "aleph"
 #else
-#define TEXPOOLNAME "tex.pool"
-#define TEXENGINENAME "tex"
+#define TEXMFPOOLNAME "tex.pool"
+#define TEXMFENGINENAME "tex"
 #endif
 #define DUMP_FILE fmtfile
 #define DUMP_FORMAT kpse_fmt_format
@@ -61,6 +61,8 @@
 #define OUT_BUF dvibuf
 #endif /* TeX */
 #ifdef MF
+#define TEXMFPOOLNAME "mf.pool"
+#define TEXMFENGINENAME "metafont"
 #define DUMP_FILE basefile
 #define DUMP_FORMAT kpse_base_format
 #define writegf write_out
@@ -68,6 +70,8 @@
 #define OUT_BUF gfbuf
 #endif /* MF */
 #ifdef MP
+#define TEXMFPOOLNAME "mp.pool"
+#define TEXMFENGINENAME "metapost"
 #define DUMP_FILE memfile
 #define DUMP_FORMAT kpse_mem_format
 #endif /* MP */
@@ -90,7 +94,7 @@ extern boolean openoutnameok P1H(const_string);
 
 /* All but the Omega family use this. */
 #if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
-extern void setupcharset P1H(void);
+extern void readtcxfile P1H(void);
 extern string translate_filename;
 #define translatefilename translate_filename
 #endif

@@ -64,7 +64,7 @@ Web2c
 
   This document describes how to install and use the programs in the
 Web2c implementation of the TeX system, especially for Unix systems.  It
-corresponds to Web2c version 7.5.2, released in February 2003.
+corresponds to Web2c version 7.5.3, released in May 2004.
 
 * Menu:
 
@@ -88,8 +88,8 @@ File: web2c.info,  Node: Introduction,  Next: Installation,  Prev: Top,  Up: Top
 Introduction
 ************
 
-  This manual corresponds to version 7.5.2 of Web2c, released in
-February 2003.
+  This manual corresponds to version 7.5.3 of Web2c, released in
+May 2004.
 
   "Web2c" is the name of a TeX implementation, originally for Unix, but
 now also running under DOS, Amiga, and other operating systems. By "TeX
@@ -226,11 +226,6 @@ is in the file `kpathsea/CONFIGURE'.
      configuration: (kpathsea)mktex configuration.  The defaults are
      the inverse of the options, i.e., everything is enabled except
      `mktextex'.
-
-`--enable-auto-core'
-     Dump `core' if the input file is
-     `HackyInputFileNameForCoreDump.tex'.  *Note Preloaded
-     executables::.
 
 `--enable-shared'
      Build Kpathsea as a shared library.  *Note Shared library:
@@ -435,7 +430,7 @@ program, so we describe all those pieces together, here.
 
 * Menu:
 
-* Option conventions::   Order doesn't matter, -- or -, = or ` ' for values.
+* Option conventions::   -- or -, = or ` ' for values.
 * Common options::       --help --version --verbose, and TeX/MF/MP options.
 * Path searching::       Features of the common path searching library.
 * Output file location:: TEXMFOUTPUT allows output in places other than `.'.
@@ -448,12 +443,11 @@ Option conventions
 ==================
 
   To provide a clean and consistent behavior, we chose to have all these
-programs use the GNU function `getopt_long_only' to parse command lines.
+programs use the GNU function `getopt_long_only' to parse command
+lines.  However, we do use in a restricted mode, where all the options
+have to come before the rest of the arguments.
 
   As a result, you can:
-   * give the options in any order, interspersed as you wish with
-     non-option arguments;
-
    * use `-' or `--' to start an option name;
 
    * use any unambiguous abbreviation for an option name;
@@ -536,6 +530,10 @@ here.
      `%&', and parse it if it does.  This line can be used specify the
      format and/or a TCX file.
 
+`-no-parse-first-line'
+     Disable parsing a `%&' construct in the first line of the main
+     input file, even if it is enabled in the `texmf.cnf' file.
+
 `-progname=STRING'
      Set program (and memory dump) name to STRING.  This may affect the
      search paths and other values used (*note Config files:
@@ -555,10 +553,24 @@ here.
      the main input file `%& -translate-file=TCXFILE'.  This is the
      recommended method for portability reasons.  *Note TCX files::.
 
-`-file-line-error-style'
+`-8bit'
+     This option specifies that by default all characters should be
+     considered printable.  If `-translate-file' was given as well,
+     then the TCX file may mark characters as non-printable.
+
+`-file-line-error'
      Change the way error messages are printed. The alternate style
      looks like error messages from many compilers and is easier to
-     parse for some editors that drive TeX compilers.
+     parse for some editors that drive TeX compilers.  This option used
+     to be called `-file-line-error-style'.
+
+`-no-file-line-error'
+     Disable the alternate style of printing error messages, even if it
+     is enabled in the `texmf.cnf' file.
+
+`-halt-on-error'
+     Stop processing and exit when an error occurs, as opposed to the
+     normal process of trying to recover and continue.
 
 `-oem'
      This option is specific to win32. When used, TeX engines will use
@@ -654,50 +666,6 @@ memory dump to use::), and then proceeds on with the main job.
 the next section).  It starts up more slowly than the virgin form,
 because it must do lengthy initializations that are encapsulated in the
 memory dump file.
-
-  In the past, there was a third form, "preloaded" executables.  This
-is no longer recommended or widely used; but see the section below if
-you're interested anyway.  In this case, the memory dump file was read
-in to the virgin form, a core dump of the running executable was done,
-and the `undump' program run to create a new binary.  Nowadays, reading
-memory dumps is fast enough that this is generally no longer worth the
-cost in disk space and unshared executables.
-
-* Menu:
-
-* Preloaded executables::
-
-
-File: web2c.info,  Node: Preloaded executables,  Up: Initial and virgin
-
-Preloaded executables
-.....................
-
-  Specifying `--enable-auto-core' to `configure' tells TeX, Metafont,
-and MetaPost to suicide with a `SIGQUIT' on an input filename of
-`HackyInputFileNameForCoreDump.tex' (all three programs use the `.tex'
-suffix). This produces a memory dump of the running executable in a
-file `core'.  (This is unrelated to the standard memory dump feature in
-these programs; *note Memory dumps::).
-
-  You don't actually need to do this to produce a core dump.  Just
-typing your quit character (usually <CTRL-\>) when the program is
-waiting for input (at `**') will have the same result.  But a few sites
-want to reliably generate a core dump without human intervention; that's
-what `--enable-auto-core' is for.
-
-  With the program `undump', you can use `core' to reconstitute a
-"preloaded" executable, which does not need to read a `.fmt' file to
-get started.  Although preloaded executables save startup time, they
-have a big disadvantage: neither the disk space to store them nor their
-code segments (at runtime) can be shared.  Therefore, if both `tex' and
-`latex' are running, twice as much memory will be consumed, to the
-general detriment of performance.
-
-  The `undump' program is not part of the Web2c distribution, but you
-can get it from the CTAN archives as `CTAN:/support/undump', and it is
-included in several TeX distributions (*note unixtex.ftp:
-(kpathsea)unixtex.ftp.).
 
 
 File: web2c.info,  Node: Memory dumps,  Next: Editor invocation,  Prev: Initial and virgin,  Up: Three programs
@@ -1025,6 +993,7 @@ suffice.)
 `-fmt=FMTNAME'
 `-progname=STRING'
 `-translate-file=TCXFILE'
+`-8bit'
      These options are common to TeX, Metafont, and MetaPost.  *Note
      Common options::.
 
@@ -1070,6 +1039,10 @@ suffice.)
      `\immediate' prefix, as usual for `\write'.  (If you as a TeX
      administrator wish to implement more stringent rules on what can
      be executed, you will need to modify `tex.ch'.)
+
+`-no-shell-escape'
+     Disable the `\write18{SHELL-COMMAND}' feature, even if it is
+     enabled in the `texmf.cnf' file.
 
 `-src-specials'
 `-src-specials=STRING'
@@ -1260,4 +1233,55 @@ Aside from these, MLTeX is completely compatible with standard TeX.
 
 * \charsubdef::                 Character substitution definitions.
 * \tracingcharsubdef::          Tracing substitutions.
+
+
+File: web2c.info,  Node: \charsubdef,  Next: \tracingcharsubdef,  Up: MLTeX
+
+`\charsubdef': Character substitutions
+......................................
+
+  The most important primitive MLTeX adds is `\charsubdef', used in a
+way reminiscent of `\chardef':
+     \charsubdef COMPOSITE [=] ACCENT BASE
+
+  Each of COMPOSITE, ACCENT, and BASE are font glyph numbers, expressed
+in the usual TeX syntax: `\e symbolically, '145 for octal, "65 for hex,
+101 for decimal.
+
+  MLTeX's `\charsubdef' declares how to construct an accented character
+glyph (not necessarily existing in the current font) using two
+character glyphs (that do exist).  Thus it defines whether a character
+glyph code, either typed as a single character or using the `\char'
+primitive, will be mapped to a font glyph or to an `\accent' glyph
+construction.
+
+  For example, if you assume glyph code 138 (decimal) for an
+e-circumflex and you are using the Computer Modern fonts, which have
+the circumflex accent in position 18 and lowercase `e' in the usual
+ASCII position 101 decimal, you would use `\charsubdef' as follows:
+
+     \charsubdef 138 = 18 101
+
+  For the plain TeX format to make use of this substitution, you have
+to redefine the circumflex accent macro `\^' in such a way that if its
+argument is character `e' the expansion `\char138 ' is used instead of
+`\accent18 e'.  Similar `\charsubdef' declaration and macro
+redefinitions have to be done for all other accented characters.
+
+  To disable a previous `\charsubdef C', redefine C as a pair of zeros.
+For example:
+     \charsubdef '321 = 0 0  % disable N tilde
+
+(Octal '321 is the ISO Latin-1 value for the Spanish N tilde.)
+
+  `\charsubdef' commands should only be given once.  Although in
+principle you can use `\charsubdef' at any time, the result is
+unspecified.  If `\charsubdef' declarations are changed, usually either
+incorrect character dimensions will be used or MLTeX will output
+missing character warnings.  (The substitution of a `\charsubdef' is
+used by TeX when appending the character node to the current horizontal
+list, to compute the width of a horizontal box when the box gets
+packed, and when building the `\accent' construction at
+`\shipout'-time.  In summary, the substitution is accessed often, so
+changing it is not desirable, nor generally useful.)
 

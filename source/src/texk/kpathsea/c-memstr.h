@@ -24,7 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #ifdef HAVE_STRING_H
 #include <string.h>
-#else
+#endif
+#ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
 
@@ -62,6 +63,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #if !defined(HAVE_BZERO) && !defined(bzero)
 #define bzero(s, len) memset ((s), 0, (len))
+#endif
+
+#if !defined(HAVE_INDEX) && !defined(index)
+#define index(s, c) strchr ((s), (c))
+#endif
+
+#if !defined(HAVE_RINDEX) && !defined(rindex)
+#define rindex(s, c) strrchr ((s), (c))
 #endif
 
 #if !defined(HAVE_STRING_H)

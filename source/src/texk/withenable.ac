@@ -16,6 +16,8 @@ AC_ARG_WITH(dviljk,
 	[  --without-dviljk           do not build the dviljk package])
 AC_ARG_WITH(dvipdfm,
 	[  --without-dvipdfm          do not build the dvipdfm package])
+AC_ARG_WITH(dvipng,
+	[  --without-dvipng           do not build the dvipng package])
 AC_ARG_WITH(dvipsk,
 	[  --without-dvipsk           do not build the dvipsk package])
 AC_ARG_WITH(gsftopk,

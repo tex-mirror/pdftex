@@ -2,7 +2,7 @@
 # Meant to be sourced after $usage, $version, and $MT_TEXMFMAIN have been set.
 # 
 # te@dbs.uni-hannover.de and kb@mail.tug.org. Public domain.
-# $Id: mktex.opt,v 1.32 2002/10/22 18:33:24 olaf Exp $
+# $Id: mktex.opt,v 1.35 2004/08/24 14:16:42 olaf Exp $
  
 if test "x$1" = x--help || test "x$1" = x-help; then
   echo "$usage"
@@ -24,9 +24,15 @@ elif test $# -gt ${mt_max_args-1}; then
 fi
 
 # MS-DOS and MS-Windows define $COMSPEC or $ComSpec and use `;' to separate
-# directories in path lists whereas Unix uses `:'.
+# directories in path lists whereas Unix uses `:'.  Make an exception for
+# Cygwin, which pretends to be UNIX.
 # Create a variable that holds the right character to be used by the scripts.
-if test -z "$COMSPEC" && test -z "$ComSpec"; then SEP=':'; else SEP=';'; fi
+DOSISH=no
+case `uname -s` in
+  CYGWIN*|Cygwin*|cygwin*) ;;
+  *) if test -n "$COMSPEC" || test -n "$ComSpec"; then DOSISH=yes; fi
+esac
+if test "$DOSISH" = "no"; then SEP=':'; else SEP=';';fi
 
 # TEMPDIR needs to be unique to each process because of the possibility of two
 # people running dvips (or whatever) simultaneously.
@@ -91,7 +97,7 @@ test -n "$MT_MKTEX_CNF" && test -r "$MT_MKTEX_CNF" && . "$MT_MKTEX_CNF"
 
 # Possible features: appendonlydir dosnames fontmaps nomfdrivers nomode
 #                    stripsupplier striptypeface varfonts.
-if test -n "$COMSPEC"; then
+if test "$DOSISH" = "yes"; then
   : ${MT_FEATURES=appendonlydir:dosnames}
 else
   : ${MT_FEATURES=appendonlydir}

@@ -10,7 +10,7 @@
    thing, the messages have a lot in common, so it's nice to have them
    in one place.)
 
-Copyright (C) 1995, 96 Karl Berry, 2001 O.Weber.
+Copyright (C) 1995, 96 Karl Berry, 2001, 03, 04 Olaf Weber.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

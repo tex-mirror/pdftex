@@ -56,6 +56,12 @@ the default, set by the installer, is typically 600.
 As
 .BR -D.
 .TP
+.BI -engine \ string
+.rb
+Set
+.I $engine
+in the environment, which is used in some search paths.
+.TP
 .BI -expand-braces \ string
 .rb
 Print variable and brace expansion of

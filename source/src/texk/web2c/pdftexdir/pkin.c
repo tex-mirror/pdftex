@@ -17,28 +17,28 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pkin.c#3 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pkin.c#4 $
 */
 
 /*
  * NAME
- *	pkin.c - implementation of readchar()
+ * pkin.c - implementation of readchar()
  * DESCRIPTION
- *	This implementation of readchar() uses parts of the program dvips
- *	written by Tomas Rokicki--the inventor of the pkformat--(loadfont.c,
- *	download.c and unpack.c). Dvips in turn is derived from pktype. 
- *	Pktype(TeX) is described in debt in ``The PKtype processor'', 
- *	which is available as pktype.weave as part of the METAFONTware.
- *	What was needed to implement readchar() is rearranged in pkfile.c to 
- *	get more modularity in the style of MODULA2.
+ * This implementation of readchar() uses parts of the program dvips
+ * written by Tomas Rokicki--the inventor of the pkformat--(loadfont.c,
+ * download.c and unpack.c). Dvips in turn is derived from pktype. 
+ * Pktype(TeX) is described in debt in ``The PKtype processor'', 
+ * which is available as pktype.weave as part of the METAFONTware.
+ * What was needed to implement readchar() is rearranged in pkfile.c to 
+ * get more modularity in the style of MODULA2.
  * BUGFIXES
  *      May 1997: Eric Delaunay <delaunay@lix.polytechnique.fr> reports a
  *      problem with huge fonts (greater than 1008 DPI). The code for
  *      handling PK characters in `extended format' was wrongly derived
  *      from dvips. Made some minor improvements regarding error handling.
  * REDESIGN
- *	Piet Tutelaers
- *	rcpt@urc.tue.nl
+ * Piet Tutelaers
+ * rcpt@urc.tue.nl
  *
  *  Modified for use with pdftex by Han The Thanh <thanh@fi.muni.cz>.
  */
@@ -311,7 +311,7 @@ static void unpack(chardesc *cd)
                   } 
                 } 
               turnon = ! turnon ; 
-	  }
+   }
           if ( ( rowsleft != 0 ) || ( (integer)hbit != cd->cwidth ) ) 
              pdftex_fail("error while unpacking; more bits than required"); 
         } 
@@ -344,12 +344,12 @@ int readchar(boolean check_preamble, chardesc *cd)
           pdftex_fail("bad pk file, expected pre") ;
        if (pkbyte()!=89)
           pdftex_fail("bad version of pk file") ;
-       for(i=pkbyte(); i>0; i--)	/* creator of pkfile */
-          (void)pkbyte() ; 		
+       for(i=pkbyte(); i>0; i--) /* creator of pkfile */
+          (void)pkbyte() ;   
        (void)pkquad(); /* design size */
        k = pkquad() ;  /* checksum    */
        k = pkquad() ;  /* hppp        */
-       k = pkquad() ;  /* vppp	  */
+       k = pkquad() ;  /* vppp   */
    }
 /*
  *   Now we skip to the desired character definition
@@ -360,7 +360,7 @@ int readchar(boolean check_preamble, chardesc *cd)
 case 0: case 1: case 2: case 3:
             length = (flagbyte & 7) * 256 + pkbyte() - 3;
             cd->charcode = pkbyte() ;
-            (void) pktrio() ;		/* TFMwidth */
+            (void) pktrio() ;  /* TFMwidth */
             cd->xescape = pkbyte() ;      /* pixel width */
             cd->cwidth = pkbyte() ;
             cd->cheight = pkbyte() ;
@@ -385,7 +385,7 @@ case 4: case 5: case 6:
 case 7:
             length = pkquad() - 9L;
             cd->charcode = pkquad();
-            (void) pkquad() ;		/* TFMwidth */
+            (void) pkquad() ;  /* TFMwidth */
             cd->xescape =  pkquad();      /* pixelwidth */
             k = pkquad() ;
             cd->cwidth = pkquad();

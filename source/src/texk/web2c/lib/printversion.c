@@ -2,8 +2,6 @@
 
    Written in 1996 by K. Berry.  Public domain.  */
 
-/* $Id: //depot/Build/source.development/TeX/texk/web2c/lib/printversion.c#6 $ */
-
 #include "config.h"
 
 /* We're passed in the original WEB banner string, which has the form

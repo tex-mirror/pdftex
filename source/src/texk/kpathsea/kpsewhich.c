@@ -1,7 +1,7 @@
 /* kpsewhich -- standalone path lookup and variable expansion for Kpathsea.
    Ideas from Thomas Esser and Pierre MacKay.
 
-Copyright (C) 1995 - 2002 Karl Berry & Olaf Weber.
+Copyright (C) 1995 - 2004 Karl Berry & Olaf Weber.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -61,6 +61,9 @@ string mode = NULL;
 
 /* The program name, for `.PROG' construct in texmf.cnf.  (-program) */
 string progname = NULL;
+
+/* The engine name, for '$engine' construct in texmf.cnf.  (-engine) */
+string engine = NULL;
 
 /* Return the <number> substring in `<name>.<number><stuff>', if S has
    that form.  If it doesn't, return 0.  */
@@ -217,6 +220,7 @@ lookup P1C(string, name)
 \n\
 -debug=NUM             set debugging flags.\n\
 -D, -dpi=NUM           use a base resolution of NUM; default 600.\n\
+-engine=STRING         set engine name to STRING.\n\
 -expand-braces=STRING  output variable and brace expansion of STRING.\n\
 -expand-path=STRING    output complete path expansion of STRING.\n\
 -expand-var=STRING     output variable expansion of STRING.\n\
@@ -245,6 +249,7 @@ static struct option long_options[]
       { "all",			0, (int *) &show_all, 1 },
       { "debug",		1, 0, 0 },
       { "dpi",			1, 0, 0 },
+      { "engine",		1, 0, 0 },
       { "expand-braces",	1, 0, 0 },
       { "expand-path",		1, 0, 0 },
       { "expand-var",		1, 0, 0 },
@@ -286,6 +291,9 @@ read_command_line P2C(int, argc,  string *, argv)
     } else if (ARGUMENT_IS ("dpi") || ARGUMENT_IS ("D")) {
       dpi = atoi (optarg);
 
+    } else if (ARGUMENT_IS ("engine")) {
+      engine = optarg;
+      
     } else if (ARGUMENT_IS ("expand-braces")) {
       braces_to_expand = optarg;
       
@@ -353,7 +361,7 @@ read_command_line P2C(int, argc,  string *, argv)
     } else if (ARGUMENT_IS ("version")) {
       extern KPSEDLL char *kpathsea_version_string; /* from version.c */
       puts (kpathsea_version_string);
-      puts ("Copyright (C) 1997 - 2002 K. Berry & O. Weber.\n\
+      puts ("Copyright (C) 1997 - 2004 K. Berry & O. Weber.\n\
 There is NO warranty.  You may redistribute this software\n\
 under the terms of the GNU General Public License.\n\
 For more information about these matters, see the files named COPYING.");
@@ -386,6 +394,9 @@ main P2C(int, argc,  string *, argv)
   read_command_line (argc, argv);
 
   kpse_set_program_name (argv[0], progname);
+
+  if (engine)
+    xputenv("engine", engine);
   
   /* NULL for no fallback font.  */
   kpse_init_prog (uppercasify (kpse_program_name), dpi, mode, NULL);

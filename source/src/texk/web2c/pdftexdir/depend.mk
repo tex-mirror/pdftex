@@ -2,6 +2,9 @@ epdf.o: epdf.c ptexlib.h ../pdftexd.h ../texmfmp.h ../cpascal.h \
  ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h ptexmac.h
 mapfile.o: mapfile.c ptexlib.h ../pdftexd.h ../texmfmp.h ../cpascal.h \
  ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h ptexmac.h
+papersiz.o: papersiz.c ptexlib.h ../pdftexd.h ../texmfmp.h \
+ ../cpascal.h ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h \
+ ptexmac.h
 utils.o: utils.c ptexlib.h ../pdftexd.h ../texmfmp.h ../cpascal.h \
  ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h ptexmac.h \
  ../../../libs/zlib/zlib.h ../../../libs/zlib/zconf.h \

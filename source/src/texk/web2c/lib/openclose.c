@@ -15,12 +15,15 @@ extern unsigned namelength;
 extern string fullnameoffile;
 /* For the filename recorder. */
 extern boolean recorder_enabled;
+/* For the output-dir option. */
+extern string output_directory;
 
 /* Define some variables. */
-string fullnameoffile = NULL;
-static string recorder_name = NULL;
-static FILE *recorder_file; /* Defaults to NULL. */
-boolean recorder_enabled;   /* Defaults to false. */
+string fullnameoffile;       /* Defaults to NULL.  */
+static string recorder_name; /* Defaults to NULL.  */
+static FILE *recorder_file;  /* Defaults to NULL.  */
+boolean recorder_enabled;    /* Defaults to false. */
+string output_directory;     /* Defaults to NULL.  */
 
 /* For TeX and MetaPost.  See below.  Always defined so we don't have to
    #ifdef, and thus this file can be compiled once and go in lib.a.  */
@@ -64,95 +67,117 @@ recorder_change_filename P1C(string, new_name)
 boolean
 open_input P3C(FILE **, f_ptr,  int, filefmt,  const_string, fopen_mode)
 {
+    string fname = NULL;
 #ifdef FUNNY_CORE_DUMP
-  /* This only applies if a preloaded TeX/Metafont is being made;
-     it allows automatic creation of the core dump (typing ^\ loses
-     since that requires manual intervention).  */
-  if ((filefmt == kpse_tex_format || filefmt == kpse_mf_format
-       || filefmt == kpse_mp_format)
-      && STREQ (nameoffile + 1, "HackyInputFileNameForCoreDump.tex"))
-    funny_core_dump ();
+    /* This only applies if a preloaded TeX/Metafont is being made;
+       it allows automatic creation of the core dump (typing ^\ loses
+       since that requires manual intervention).  */
+    if ((filefmt == kpse_tex_format || filefmt == kpse_mf_format
+         || filefmt == kpse_mp_format)
+        && STREQ (nameoffile + 1, "HackyInputFileNameForCoreDump.tex"))
+        funny_core_dump ();
 #endif
 
-  /* A negative FILEFMT means don't use a path.  */
-  if (filefmt < 0)
-    { /* no_file_path, for BibTeX .aux files and MetaPost things.  */
-      *f_ptr = fopen (nameoffile + 1, fopen_mode);
+    /* We havent found anything yet. */
+    *f_ptr = NULL;
+    if (fullnameoffile)
+        free(fullnameoffile);
+    fullnameoffile = NULL;
+    
+    /* Handle -output-directory.
+       FIXME: We assume that it is OK to look here first.  Possibly it
+       would be better to replace lookups in "." with lookups in the
+       output_directory followed by "." but to do this requires much more
+       invasive surgery in libkpathsea.  */
+    if (output_directory) {
+        fname = concat3(output_directory, DIR_SEP_STRING, nameoffile + 1);
+        *f_ptr = fopen(fname, fopen_mode);
+        if (*f_ptr) {
+            free(nameoffile);
+            namelength = strlen (fname);
+            nameoffile = (string)xmalloc (namelength + 2);
+            strcpy (nameoffile + 1, fname);
+            fullnameoffile = fname;
+        } else {
+            free(fname);
+        }
     }
-  else 
-    {
-      /* The only exception to `must_exist' being true is \openin, for
-         which we set `tex_input_type' to 0 in the change file.  */
-      /* According to the pdfTeX people, pounding the disk for .vf files
-         is overkill as well.  A more general solution would be nice. */
-      boolean must_exist = (filefmt != kpse_tex_format || texinputtype)
-              && (filefmt != kpse_vf_format);
-      string fname = kpse_find_file (nameoffile + 1,
-                                     (kpse_file_format_type)filefmt,
-                                     must_exist);
 
-      if (fullnameoffile) {
-          free(fullnameoffile);
-          fullnameoffile = NULL;
-      }
-      
-      if (fname)
-        {
-          if (recorder_enabled) {
-              if (!recorder_file)
-                  recorder_start();
-              fprintf(recorder_file, "INPUT %s\n", fname);
-          }
-
-          fullnameoffile = xstrdup(fname);
-          /* If we found the file in the current directory, don't leave
-             the `./' at the beginning of `nameoffile', since it looks
-             dumb when `tex foo' says `(./foo.tex ... )'.  On the other
-             hand, if the user said `tex ./foo', and that's what we
-             opened, then keep it -- the user specified it, so we
-             shouldn't remove it.  */
-          if (fname[0] == '.' && IS_DIR_SEP (fname[1])
-              && (nameoffile[1] != '.' || !IS_DIR_SEP (nameoffile[2])))
-            {
-              unsigned i = 0;
-              while (fname[i + 2] != 0)
+    /* No file means do the normal search. */
+    if (*f_ptr == NULL) {
+        /* A negative FILEFMT means don't use a path.  */
+        if (filefmt < 0) {
+            /* no_file_path, for BibTeX .aux files and MetaPost things.  */
+            *f_ptr = fopen(nameoffile + 1, fopen_mode);
+            /* FIXME... fullnameoffile = xstrdup(nameoffile + 1); */
+        } else {
+            /* The only exception to `must_exist' being true is \openin, for
+               which we set `tex_input_type' to 0 in the change file.  */
+            /* According to the pdfTeX people, pounding the disk for .vf files
+               is overkill as well.  A more general solution would be nice. */
+            boolean must_exist = (filefmt != kpse_tex_format || texinputtype)
+                    && (filefmt != kpse_vf_format);
+            fname = kpse_find_file (nameoffile + 1,
+                                    (kpse_file_format_type)filefmt,
+                                    must_exist);
+            if (fname) {
+                fullnameoffile = xstrdup(fname);
+                /* If we found the file in the current directory, don't leave
+                   the `./' at the beginning of `nameoffile', since it looks
+                   dumb when `tex foo' says `(./foo.tex ... )'.  On the other
+                   hand, if the user said `tex ./foo', and that's what we
+                   opened, then keep it -- the user specified it, so we
+                   shouldn't remove it.  */
+                if (fname[0] == '.' && IS_DIR_SEP (fname[1])
+                    && (nameoffile[1] != '.' || !IS_DIR_SEP (nameoffile[2])))
                 {
-                  fname[i] = fname[i + 2];
-                  i++;
+                    unsigned i = 0;
+                    while (fname[i + 2] != 0) {
+                        fname[i] = fname[i + 2];
+                        i++;
+                    }
+                    fname[i] = 0;
                 }
-              fname[i] = 0;
+
+                /* FIXME: Can kpse_find_file ever return the name it was
+                   given?  Otherwise the following can be unconditional. */
+                if (nameoffile + 1 != fname) {
+                    free (nameoffile);
+                    namelength = strlen (fname);
+                    nameoffile = (string)xmalloc (namelength + 2);
+                    strcpy (nameoffile + 1, fname);
+                    free (fname);
+                }
+
+                /* This fopen is not allowed to fail. */
+                *f_ptr = xfopen (nameoffile + 1, fopen_mode);
             }
-          
-          if (nameoffile + 1 != fname)
-            {
-              free (nameoffile);
-              namelength = strlen (fname);
-              nameoffile = (string)xmalloc (namelength + 2);
-              strcpy (nameoffile + 1, fname);
-              free (fname);
-            }
-          
-          *f_ptr = xfopen (nameoffile + 1, fopen_mode);
-          
-          /* If we just opened a TFM file, we have to read the first byte,
-             to pretend we're Pascal.  See tex.ch and mp.ch.  Ditto for
-             the ocp/ofm Omega file formats.  */
-          if (filefmt == kpse_tfm_format) {
+        }
+    }
+
+    if (*f_ptr) {
+        if (recorder_enabled) {
+            if (!recorder_file)
+                recorder_start();
+            fprintf(recorder_file, "INPUT %s\n", nameoffile + 1);
+        }
+
+        /* If we just opened a TFM file, we have to read the first
+           byte, to pretend we're Pascal.  See tex.ch and mp.ch.
+           Ditto for the ocp/ofm Omega file formats.  */
+        if (filefmt == kpse_tfm_format) {
             tfmtemp = getc (*f_ptr);
             /* We intentionally do not check for EOF here, i.e., an
                empty TFM file.  TeX will see the 255 byte and complain
                about a bad TFM file, which is what we want.  */
-          } else if (filefmt == kpse_ocp_format) {
+        } else if (filefmt == kpse_ocp_format) {
             ocptemp = getc (*f_ptr);
-          } else if (filefmt == kpse_ofm_format) {
+        } else if (filefmt == kpse_ofm_format) {
             tfmtemp = getc (*f_ptr);
-          }
         }
-      else
-        *f_ptr = NULL;
-    } /* search path case */
+    }            
 
-  return *f_ptr != NULL;
+    return *f_ptr != NULL;
 }
 
 /* Open an output file F either in the current directory or in
@@ -166,41 +191,45 @@ open_input P3C(FILE **, f_ptr,  int, filefmt,  const_string, fopen_mode)
 boolean
 open_output P2C(FILE **, f_ptr,  const_string, fopen_mode)
 {
-  /* Is the filename openable as given?  */
-  *f_ptr = fopen (nameoffile + 1, fopen_mode);
+    string fname;
+    boolean absolute = kpse_absolute_p(nameoffile+1, false);
 
-  if (! *f_ptr)
-    { /* Can't open as given.  Try the envvar.  */
-      string texmfoutput = kpse_var_value ("TEXMFOUTPUT");
+    /* If we have an explicit output directory, use it. */
+    if (output_directory && !absolute) {
+        fname = concat3(output_directory, DIR_SEP_STRING, nameoffile + 1);
+    } else {
+        fname = nameoffile + 1;
+    }
 
-      if (texmfoutput && *texmfoutput && !kpse_absolute_p(nameoffile+1, false))
-        {
-          string fname = concat3 (texmfoutput, DIR_SEP_STRING, nameoffile + 1);
-          *f_ptr = fopen (fname, fopen_mode);
-          
-          /* If this succeeded, change nameoffile accordingly.  */
-          if (*f_ptr)
-            {
-              free (nameoffile);
-              namelength = strlen (fname);
-              nameoffile = (string)xmalloc (namelength + 2);
-              strcpy (nameoffile + 1, fname);
-            }
+    /* Is the filename openable as given?  */
+    *f_ptr = fopen (fname, fopen_mode);
 
-          free (fname);
+    if (!*f_ptr) {
+        /* Can't open as given.  Try the envvar.  */
+        string texmfoutput = kpse_var_value("TEXMFOUTPUT");
+
+        if (texmfoutput && *texmfoutput && !absolute) {
+            string fname = concat3(texmfoutput, DIR_SEP_STRING, nameoffile+1);
+            *f_ptr = fopen(fname, fopen_mode);
         }
     }
-  else
-    {
-        /* FIXME: Shouldn't we be doing this always if we opened a file? */
+    /* If this succeeded, change nameoffile accordingly.  */
+    if (*f_ptr) {
+        if (fname != nameoffile + 1) {
+            free (nameoffile);
+            namelength = strlen (fname);
+            nameoffile = (string)xmalloc (namelength + 2);
+            strcpy (nameoffile + 1, fname);
+        }
         if (recorder_enabled) {
             if (!recorder_file)
                 recorder_start();
-            fprintf(recorder_file, "OUTPUT %s\n", nameoffile + 1);
+            fprintf(recorder_file, "OUTPUT %s\n", fname);
         }
     }
-        
-  return *f_ptr != NULL;
+    if (fname != nameoffile +1)
+        free(fname);
+    return *f_ptr != NULL;
 }
 
 /* Close F.  */

@@ -71,7 +71,6 @@ Index
 * - starts option names:                 Option conventions.
 * -- starts option names:                Option conventions.
 * --disable-dump-share configure option: Hardware and memory dumps.
-* --enable-auto-core configure option:   Preloaded executables.
 * --enable-ipc configure option:         tex invocation.
 * --help common option:                  Common options.
 * --verbose common option:               Common options.
@@ -89,6 +88,7 @@ Index
 * --with-x-toolkit=KIT:                  Online Metafont graphics.
 * --with-x11:                            Online Metafont graphics.
 * --with-x11win:                         Online Metafont graphics.
+* -8bit:                                 Common options.
 * -base=BASE:                            Determining the memory dump to use.
 * -base=DUMPNAME:                        Common options.
 * -change=CHFILE:                        mft invocation.
@@ -96,10 +96,12 @@ Index
 * -charcode-format=TYPE:                 tftopl invocation.
 * -D compiler options:                   Compile-time options.
 * -dpi=REAL:                             dvitype invocation.
+* -file-line-error:                      Common options.
 * -file-line-error-style:                Common options.
 * -fmt=DUMPNAME:                         Common options.
 * -fmt=FMT:                              Determining the memory dump to use.
 * -geometry, supported with Xt:          Online Metafont graphics.
+* -halt-on-error:                        Common options.
 * -images:                               gftype invocation.
 * -ini <1>:                              Initial and virgin.
 * -ini:                                  Common options.
@@ -123,8 +125,11 @@ Index
 * -mktex=FILETYPE:                       tex invocation.
 * -mltex:                                tex invocation.
 * -mnemonics:                            gftype invocation.
+* -no-file-line-error:                   Common options.
 * -no-mktex=FILETYPE <1>:                mf invocation.
 * -no-mktex=FILETYPE:                    tex invocation.
+* -no-parse-first-line:                  Common options.
+* -no-shell-escape:                      tex invocation.
 * -oem:                                  Common options.
 * -output-comment=STRING:                tex invocation.
 * -output-level=N:                       dvitype invocation.
@@ -171,6 +176,8 @@ Index
 * .Xdefaults:                            Online Metafont graphics.
 * .Xresources:                           Online Metafont graphics.
 * 2602gf:                                mf invocation.
+* 8 bit clean:                           Common options.
+* 8 bit clean output, specifying:        Common options.
 * 8-bit characters:                      TCX files.
 * \bibliography:                         bibtex invocation.
 * \bibliographystyle:                    bibtex invocation.
@@ -300,12 +307,10 @@ Index
 * conversion, TFM to property list:      tftopl invocation.
 * conversion, VF to VPL:                 vftovp invocation.
 * copyright notices:                     Legalisms.
-* core dump from filename:               Preloaded executables.
 * Cork encoding and ISO input:           TCX files.
 * creating memory dumps:                 Creating memory dumps.
 * cross-referenced bibliography items:   bibtex invocation.
 * cross-references, omitting:            weave invocation.
-* CTRL-\:                                Preloaded executables.
 * current directory, used for output:    Output file location.
 * Curtis, Pavel:                         Introduction.
 * CWEB:                                  WEB.
@@ -436,7 +441,6 @@ Index
 * gray font:                             gftodvi invocation.
 * Gruff, Billy Goat:                     Triptrap.
 * gsftopk:                               Font utilities available elsewhere.
-* HackyInputFileNameForCoreDump.tex:     Preloaded executables.
 * Harbison, Samuel P.:                   Hardware and memory dumps.
 * hardware and memory dumps:             Hardware and memory dumps.
 * hash table, increasing size of:        Runtime options.
@@ -482,6 +486,7 @@ Index
 * install-formats Make target:           Additional targets.
 * install-mems Make target:              Additional targets.
 * installation:                          Installation.
+* interaction between TCX files and -8bit.: TCX files.
 * interaction mode:                      Common options.
 * international characters:              TCX files.
 * introduction:                          Introduction.
@@ -682,8 +687,6 @@ Index
 * PostScript Type 1 font conversion:     Font utilities available elsewhere.
 * PostScript, and font scaling:          Font file formats.
 * predefined macros and memory dumps:    Memory dumps.
-* preloaded executables, creating:       Preloaded executables.
-* preloaded executables, not recommended: Initial and virgin.
 * prettyprinting Metafont source:        mft invocation.
 * prettyprinting WEB programs:           weave invocation.
 * primitives, new:                       TeX extensions.
@@ -705,7 +708,6 @@ Index
 * psfonts.map, read by MetaPost:         mpost invocation.
 * PXL files, explained:                  Font file formats.
 * pxtoch:                                Font utilities available elsewhere.
-* quit character:                        Preloaded executables.
 * Raichle, Bernd:                        MLTeX.
 * reading, additional:                   Introduction.
 * readonly directory, running TeX in:    Output file location.
@@ -734,14 +736,12 @@ Index
 * security, and shell escapes:           tex invocation.
 * SetColor ditroff command:              dmp invocation.
 * shapes:                                Metafont.
-* sharing executables, and preloading:   Preloaded executables.
 * sharing memory dumps:                  Hardware and memory dumps.
 * shell commands in TeX:                 tex invocation.
 * shell_escape enabling in TeX:          tex invocation.
 * siam.bst:                              Basic BibTeX style files.
 * side bearings <1>:                     gftype invocation.
 * side bearings:                         pktype invocation.
-* SIGQUIT:                               Preloaded executables.
 * slant font:                            gftodvi invocation.
 * slides, producing:                     Formats.
 * SliTeX:                                Formats.
@@ -754,6 +754,7 @@ Index
 * starting page <1>:                     dvitype invocation.
 * starting page:                         dvicopy invocation.
 * Steele Jr., Guy L.:                    Hardware and memory dumps.
+* stopping at the first error:           Common options.
 * strategy, overall:                     Introduction.
 * string numbers, displaying:            pooltype invocation.
 * string pool, writing:                  tangle invocation.
@@ -844,7 +845,6 @@ Index
 * typeface families:                     Metafont.
 * typeface specimen sheets:              Font utilities available elsewhere.
 * typesetting:                           TeX.
-* undump:                                Preloaded executables.
 * Unicode:                               TeX extensions.
 * uniterm:                               Online Metafont graphics.
 * unsrt.bst:                             Basic BibTeX style files.

@@ -1,11 +1,11 @@
 Xpdf
 ====
 
-version 2.02
-2003-mar-24
+version 3.00
+2004-jan-22
 
 The Xpdf software and documentation are
-copyright 1996-2003 Glyph & Cog, LLC.
+copyright 1996-2004 Glyph & Cog, LLC.
 
 Email: derekn@foolabs.com
 WWW: http://www.foolabs.com/xpdf/
@@ -38,9 +38,9 @@ different systems.
     --with-t1-includes=PATH
 
 * Install FreeType 2 (if desired).  WARNING: You must have version
-  2.0.5 or newer.  Recent versions of XFree86 ship with an older
-  version, which means you'll need to explicitly set include and
-  library paths to get the correct version:
+  2.0.5 or newer.  Some older versions of XFree86 ship with an older
+  version of FreeType, which means you'll need to explicitly set
+  include and library paths to get the correct version:
 
     --with-freetype2-library=PATH
     --with-freetype2-includes=PATH
@@ -48,15 +48,6 @@ different systems.
   (With the default installation, the library path is
   /usr/local/lib and the include path is
   /usr/local/include/freetype2.)
-
-* Alternatively, you can use FreeType 1.  The resulting library
-  (libttf) and include files (freetype/*.h) should be placed somewhere
-  on the standard search paths.  If not, when you configure xpdf, you
-  can use the following options to tell configure where to find the
-  FreeType files:
-
-    --with-freetype-library=PATH
-    --with-freetype-includes=PATH
 
 * If you have Motif (or Lesstif) installed in a non-standard place,
   you can use the following options to tell configure where to find
@@ -105,7 +96,7 @@ different systems.
     xpdf/pdftotext
     xpdf/pdfinfo
     xpdf/pdffonts
-    xpdf/pdftopbm
+    xpdf/pdftoppm
     xpdf/pdfimages
 
 * If desired, type 'make install' to install the binaries and man
@@ -160,8 +151,8 @@ configure script version.
 ***  Win32  ***
 ***************
 
-The non-X programs (pdftops, pdftotext, pdfinfo, pdffonts, and
-pdfimages) will compile with both gcc (from cygwin), djgpp (the
+The non-X programs (pdftops, pdftotext, pdfinfo, pdffonts, pdfimages,
+and pdftoppm) will compile with both gcc (from cygwin), djgpp (the
 Delorie port of gcc) and Microsoft Visual C++.
 
 With cygwin, the build procedure is the same as for Unix:
@@ -241,3 +232,6 @@ With the Microsoft tools:
     determined with Explorer.)
 
   * Type "ms_make"
+
+The dj_make and ms_make scripts don't build pdftoppm -- you'll need to
+install t1lib and FreeType 2 before you can compile pdftoppm.

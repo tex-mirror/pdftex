@@ -19,20 +19,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #ifndef KPATHSEA_C_PROTO_H
 #define KPATHSEA_C_PROTO_H
 
-#if defined(WIN32)
-#ifdef KPSE_DLL
+#if defined (KPSE_DLL) && (defined (WIN32) || defined (__CYGWIN__))
 #ifdef MAKE_KPSE_DLL
-#define KPSEDLL __declspec( dllexport)
-#else
-#define KPSEDLL __declspec( dllimport)
+#define KPSEDLL __declspec(dllexport)
+#else /* ! MAKE_KPSE_DLL */
+#define KPSEDLL __declspec(dllimport)
 #endif
-#else
+#else /* ! (KPSE_DLL && (WIN32 || __CYGWIN__)) */
 #define KPSEDLL
 #endif
-#else /* ! WIN32 */
-#define KPSEDLL
-#endif
-
 
 /* These macros munge function declarations to make them work in both
    cases.  The P?H macros are used for declarations, the P?C for

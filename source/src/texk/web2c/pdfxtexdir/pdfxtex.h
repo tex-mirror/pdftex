@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: pdfxtex.h,v 1.1 2004/02/26 13:40:36 thanh Exp $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfxtexdir/pdfxtex.h#1 $
 */
 
 /* Additions to texmfmp.h for pdfTeX */
@@ -34,13 +34,13 @@ $Id: pdfxtex.h,v 1.1 2004/02/26 13:40:36 thanh Exp $
                  (int) ((b) - (a) + 1), pdffile)
 
 #define getlpcode(f, c) \
-    (pdffontlpbase[f] < 0 ? 0 : pdfmem[pdffontlpbase[f] + c])
+    (pdffontlpbase[f] == 0 ? 0 : pdfmem[pdffontlpbase[f] + c])
 
 #define getrpcode(f, c) \
-    (pdffontrpbase[f] < 0 ? 0 : pdfmem[pdffontrpbase[f] + c])
+    (pdffontrpbase[f] == 0 ? 0 : pdfmem[pdffontrpbase[f] + c])
 
 #define getefcode(f, c) \
-    (pdffontefbase[f] < 0 ? 0 : pdfmem[pdffontefbase[f] + c])
+    (pdffontefbase[f] == 0 ? 1000 : pdfmem[pdffontefbase[f] + c])
 
 #define texbopenin(f) \
     open_input (&(f), kpse_tex_format, FOPEN_RBIN_MODE)

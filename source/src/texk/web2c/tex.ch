@@ -72,8 +72,11 @@ a modified \TeX{} version.
 @x [1.2] l.188
 @d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
 @y
-@d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
-@d banner_k=='This is TeXk, Version 3.141592' {printed when \TeX\ starts}
+@d TeX_banner_k=='This is TeXk, Version 3.141592' {printed when \TeX\ starts}
+@d TeX_banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
+@#
+@d banner==TeX_banner
+@d banner_k==TeX_banner_k
 @z
 
 @x [1.4] l.233 - program header
@@ -222,14 +225,14 @@ versions of the program.
   must be equal to |-trie_op_size|.}
 @!min_trie_op=0; {first possible trie op code for any language}
 @!max_trie_op=ssup_trie_opcode; {largest possible trie opcode for any language}
-@!pool_name=TEX_POOL_NAME; {this is configurable, for the sake of ML-\TeX}
+@!pool_name=TEXMF_POOL_NAME; {this is configurable, for the sake of ML-\TeX}
   {string of length |file_name_size|; tells where the string pool appears}
-@!engine_name=TEX_ENGINE_NAME; {the name of this engine}
+@!engine_name=TEXMF_ENGINE_NAME; {the name of this engine}
 @#
 @!inf_mem_bot = 0;
 @!sup_mem_bot = 1;
 
-@!inf_main_memory = 2999;
+@!inf_main_memory = 3000;
 @!sup_main_memory = 32000000;
 
 @!inf_trie_size = 8000;
@@ -356,6 +359,10 @@ message_printing: boolean; { true if message or errmessage prints to string }
 for i:=0 to @'37 do xchr[i]:=' ';
 for i:=@'177 to @'377 do xchr[i]:=' ';
 @y
+{Initialize |xchr| to the identity mapping.}
+for i:=0 to @'37 do xchr[i]:=i;
+for i:=@'177 to @'377 do xchr[i]:=i;
+{Initialize enc\TeX\ data.}
 for i:=0 to 255 do mubyte_read[i]:=null;
 for i:=0 to 255 do mubyte_write[i]:=0;
 for i:=0 to 128 do mubyte_cswrite[i]:=null;
@@ -366,19 +373,21 @@ no_convert := false; active_noconvert := false;
 @z
 
 @x [2.24] l.733 - Don't reinitialize xord.
-for i:=@'200 to @'377 do xord[xchr[i]]:=i;
 for i:=0 to @'176 do xord[xchr[i]]:=i;
 @y
+for i:=0 to @'176 do xord[xchr[i]]:=i;
+{Set |xprn| for printable ASCII, unless |eight_bit_p| is set.}
+for i:=0 to 255 do xprn[i]:=(eight_bit_p or ((i>=" ")and(i<="~")));
+
 {The idea for this dynamic translation comes from the patch by
  Libor Skarvada \.{<libor@@informatics.muni.cz>}
  and Petr Sojka \.{<sojka@@informatics.muni.cz>}. I didn't use any of the
  actual code, though, preferring a more general approach.}
 
-{This sets the |xchr|, |xord|, and |xprn| arrays.  We overwrite the
- |xchr| assignments from module 21, just in case someone wants to do strange
- character translations. See the function definition in \.{texmfmp.c} for
+{This updates the |xchr|, |xord|, and |xprn| arrays from the provided
+ |translate_filename|.  See the function definition in \.{texmfmp.c} for
  more comments.}
-setup_char_set;
+if translate_filename then read_tcx_file;
 @z
 
 % [3.26] name_of_file is no longer an array.  And change the destination
@@ -587,6 +596,9 @@ tini@/
 @!dvi_buf_size:integer; {size of the output buffer; must be a multiple of 8}
 @!parse_first_line_p:c_int_type; {parse the first line for options}
 @!file_line_error_style_p:c_int_type; {format messages as file:line:error}
+@!eight_bit_p:c_int_type; {make all characters printable by default}
+@!halt_on_error_p:c_int_type; {stop at first error}
+@!quoted_filename:boolean; {current filename is quoted}
 {Variables for source specials}
 @!src_specials_p : boolean;{Whether |src_specials| are enabled at all}
 @!insert_src_special_auto : boolean;
@@ -702,38 +714,11 @@ if last > first then
 @!init function get_strings_started:boolean; {initializes the string pool,
 @z
 
-@x [4.48] l.1252 -- Do not create "^^xy" for strings<256 in string pool
-@ @d app_lc_hex(#)==l:=#;
-  if l<10 then append_char(l+"0")@+else append_char(l-10+"a")
-@y
-@ The first 256 strings will consist of a single character only.
-@z
-@x
-  begin if (@<Character |k| cannot be printed@>) then
-    begin append_char("^"); append_char("^");
-    if k<@'100 then append_char(k+@'100)
-    else if k<@'200 then append_char(k-@'100)
-    else begin app_lc_hex(k div 16); app_lc_hex(k mod 16);
-      end;
-    end
-  else append_char(k);
-@y
-  begin append_char(k);
-@z
-
 @x [4.49] l.1272 -- Change documentation (probably needed in more places)
 would like string @'32 to be the single character @'32 instead of the
 @y
 would like string @'32 to be printed as the single character @'32
 instead of the
-@z
-
-@x [4.49] l.1295 -- Do not hardwire printable ASCII.
-@<Character |k| cannot be printed@>=
-  (k<" ")or(k>"~")
-@y
-@<Character |s| cannot be printed@>=
-   not xprn[s]
 @z
 
 % [4.51] Open the pool file using a path, and can't do string
@@ -787,101 +772,7 @@ done: if a<>@$ then
 @!trick_buf:array[0..ssup_error_line] of ASCII_code; {circular buffer for
 @z
 
-@x [5.58] l.1460 -- Rename |print_char| to |print_visible_char|
-@ The |print_char| procedure sends one character to the desired destination,
-using the |xchr| array to map it into an external character compatible with
-|input_ln|. All printing comes through |print_ln| or |print_char|.
-@y
-@ The |print_visible_char| procedure sends one character to the desired
-destination, if necessary using the |xchr| array to map it into an external 
-character compatible with |input_ln|.  It assumes that it is always called
-with a visible ASCII character and that the special handling for the new-line
-character is done in |print_char|.  All printing comes through |print_ln|
-or |print_char|, which ultimately calls |print_visible_char|.
-
-The |print_char| procedure is the only caller of |print_visible_char|.
-Control sequence names, file names and string constructed with
-\.{\\string} might contain |ASCII_code| values that can't
-be printed using |print_visible_char|.  These characters will be printed
-in three- or four-symbol form like `\.{\^\^A}' or `\.{\^\^e4}'.
-Output that goes to the terminal and/or log file is treated differently
-when it comes to determining whether a character is printable.
-
-@d print_lc_hex(#)==l:=#;
-  if l<10 then print_visible_char(l+"0")@+else print_visible_char(l-10+"a")
-@z
-@x
-procedure print_char(@!s:ASCII_code); {prints a single character}
-label exit;
-begin if @<Character |s| is the current new-line character@> then
- if selector<pseudo then
-  begin print_ln; return;
-  end;
-@y
-procedure print_visible_char(@!s:ASCII_code); {prints a single character}
-label exit; {label is not used but nonetheless kept (for other changes?)}
-begin
-@z
-
-@x [5.58] l.1493 -- Insert new |print_char| procedure
-incr(tally);
-exit:end;
-@y
-incr(tally);
-exit:end;
-@#
-{WEB2C: At this point we cheat and use |print| in |print_char| without
- a forward declaration.  While Pascal is unhappy with this, web2c doesn't
- care.}
-@#
-procedure print_char(@!s:ASCII_code); {prints a single character}
-label exit;
-var l:0..255; {small indices or counters}
-@!nl:integer; {new-line character to restore}
-begin
-if (selector>pseudo) and (not special_printing) and (not message_printing)
-then begin
-  print_visible_char(s);
-  return;
-  end;
-if @<Character |s| is the current new-line character@> then
-  if selector<pseudo then
-    begin print_ln; no_convert:=false; return;
-    end
-  else if message_printing then {encTeX}
-    begin print_visible_char(s); no_convert:=false; return;
-    end;
-if (mubyte_log>0) and (not no_convert) and (mubyte_write[s] > 0)
-then begin
-  {The "character" we're printing must be expanded into a string.
-   Temporarily disable the new-line character when printing the string.}
-  no_convert:=false; nl:=new_line_char; new_line_char:=-1;
-  print(mubyte_write[s]);
-  new_line_char:=nl; return;
-  end;
-no_convert:=false;
-{ The web2c locale dependency is here -- it is correct if we assume
-  that pseudoprinting goes to the terminal or log file.
-  We do not have to check |special_printing| here: we never want to
-  do the printable check for specials, and |selector| equals
-  |new_string| whenever |special_printing| is true. }
-if ((selector<no_print) and (@<Character |s| cannot be printed@>))
-    or ((selector>no_print) and (selector<=pseudo) and (not isprint(xchr[s])))
-then begin print_visible_char("^"); print_visible_char("^");
-  if s<64 then print_visible_char(s+64)
-  else if s<128 then print_visible_char(s-64)
-  else begin print_lc_hex(s div 16);  print_lc_hex(s mod 16);
-    end;
-  end
-else print_visible_char(s);
-exit:end;
-@z
-
-@x [5.59] l.1508 -- Simplify |print| for single characters (strings<256)
-@!nl:integer; {new-line character to restore}
-@y
-@z
-@x
+@x [5.59] l.1508FIXME -- enc\TeX\ modifications of |print|.
   else begin if selector>pseudo then
       begin print_char(s); return; {internal strings are not expanded}
       end;
@@ -889,41 +780,23 @@ exit:end;
       if selector<pseudo then
         begin print_ln; return;
         end;
-    nl:=new_line_char; new_line_char:=-1;
-      {temporarily disable new-line character}
-    j:=str_start[s];
-    while j<str_start[s+1] do
-      begin print_char(so(str_pool[j])); incr(j);
+@y
+  else begin if (selector>pseudo) and (not special_printing)
+                 and (not message_printing) then
+      begin print_char(s); return; {internal strings are not expanded}
       end;
-    new_line_char:=nl; return;
-    end;
-@y
-  else begin print_char(s); return;
-    end;
-@z
-
-@x [5.60] l.1534 -- Remove |slow_print|
-@ Control sequence names, file names, and strings constructed with
-\.{\\string} might contain |ASCII_code| values that can't
-be printed using |print_char|. Therefore we use |slow_print| for them:
-
-@<Basic print...@>=
-procedure slow_print(@!s:integer); {prints string |s|}
-var j:pool_pointer; {current character code position}
-begin if (s>=str_ptr) or (s<256) then print(s)
-else begin j:=str_start[s];
-  while j<str_start[s+1] do
-    begin print(so(str_pool[j])); incr(j);
-    end;
-  end;
-end;
-@y
-@ Old versions of \TeX\ needed a procedure called |slow_print| whose function
-is now subsumed by |print| and the new functionality of |print_char| and
-|print_visible_char|.  We retain the old name |slow_print| here as a
-possible aid to future software arch\ae ologists.
-
-@d slow_print == print
+    if (@<Character |s| is the current new-line character@>) then
+      if selector<pseudo then
+        begin print_ln; no_convert := false; return;
+        end
+      else if message_printing then
+        begin print_char(s); no_convert := false; return;
+        end;
+    if (mubyte_log>0) and (not no_convert) and (mubyte_write[s]>0) then
+      s := mubyte_write[s]
+    else if xprn[s] or special_printing then
+      begin print_char(s); no_convert := false; return; end;
+    no_convert := false;
 @z
 
 @x l.1536 --  If the ``src-specials'' feature is active, change the banner.
@@ -965,7 +838,7 @@ end;
 @x [5.71] encTeX - native buffer printing
 if last<>first then for k:=first to last-1 do print(buffer[k]);
 @y
-while first < last do begin print_buffer(first) end;
+k:=first; while k < last do begin print_buffer(k) end;
 @z
 
 @x [6.73] l.1732 - Add unspecified_mode.
@@ -978,14 +851,9 @@ while first < last do begin print_buffer(first) end;
 @x [6.73] l.1734 - file:line:error style error messages.
   print_nl("! "); print(#);
 @y
-  if (file_line_error_style_p and not terminal_input) then
-  begin 
-    print_nl ("");
-    print (full_source_filename_stack[in_open]);
-    print (":"); print_int (line); print (": ");
-    print (#); 
-  end  
-  else begin print_nl("! "); print(#) end;
+  if file_line_error_style_p then print_file_line
+  else print_nl("! ");
+  print(#);
 @z
 
 
@@ -1032,12 +900,14 @@ do_final_end;
 end;
 @z
 
- @x [6.82] l.1866 - file:line:error style messages force scroll_mode.
+@x [6.82] l.1866 - halt on error?
 print_char("."); show_context;
- @y
-if file_line_error_style_p then interaction:=scroll_mode
-else begin print_char("."); show_context end;
- @z
+@y
+print_char("."); show_context;
+if (halt_on_error_p) then begin
+  history:=fatal_error_stop; jump_out;
+end;
+@z
 
 @x [6.84] l.1888 - Implement the switch-to-editor option.
 line ready to be edited. But such an extension requires some system
@@ -1349,14 +1219,19 @@ for k:=active_base to eqtb_top do
 @x [17.236] l.4954
 @d int_pars=55 {total number of integer parameters}
 @y
-@d char_sub_def_min_code=55 {smallest value in the charsubdef list}
-@d char_sub_def_max_code=56 {largest value in the charsubdef list}
-@d tracing_char_sub_def_code=57 {traces changes to a charsubdef def}
-@d mubyte_in_code=58 {if positive then reading mubytes is active}
-@d mubyte_out_code=59 {if positive then printing mubytes is active}
-@d mubyte_log_code=60 {if positive then print mubytes to log and terminal}
-@d spec_out_code=61 {if positive then print specials by mubytes}
-@d int_pars=62 {total number of integer parameters}
+@d tex_int_pars=55 {total number of \TeX's integer parameters}
+@#
+@d web2c_int_base=tex_int_pars {base for web2c's integer parameters}
+@d char_sub_def_min_code=web2c_int_base {smallest value in the charsubdef list}
+@d char_sub_def_max_code=web2c_int_base+1 {largest value in the charsubdef list}
+@d tracing_char_sub_def_code=web2c_int_base+2 {traces changes to a charsubdef def}
+@d mubyte_in_code=web2c_int_base+3 {if positive then reading mubytes is active}
+@d mubyte_out_code=web2c_int_base+4 {if positive then printing mubytes is active}
+@d mubyte_log_code=web2c_int_base+5 {if positive then print mubytes to log and terminal}
+@d spec_out_code=web2c_int_base+6 {if positive then print specials by mubytes}
+@d web2c_int_pars=web2c_int_base+7 {total number of web2c's integer parameters}
+@#
+@d int_pars=web2c_int_pars {total number of integer parameters}
 @z
 
 % MLTeX: \charsubdefmax and \tracingcharsubdef
@@ -1365,6 +1240,7 @@ for k:=active_base to eqtb_top do
 @d error_context_lines==int_par(error_context_lines_code)
 @y
 @d error_context_lines==int_par(error_context_lines_code)
+@#
 @d char_sub_def_min==int_par(char_sub_def_min_code)
 @d char_sub_def_max==int_par(char_sub_def_max_code)
 @d tracing_char_sub_def==int_par(tracing_char_sub_def_code)
@@ -1693,6 +1569,13 @@ end;
 mubyte_keep := mubyte_skeep; mubyte_start := mubyte_sstart
 @z
 
+@x [23.328] l.7043 - keep top of source_filename_stack initialized
+incr(in_open); push_input; index:=in_open;
+@y
+incr(in_open); push_input; index:=in_open;
+source_filename_stack[index]:=0;full_source_filename_stack[index]:=0;
+@z
+
 @x [23.331] l.7071 - init source file name stacks
 begin input_ptr:=0; max_in_stack:=0;
 @y
@@ -1747,7 +1630,7 @@ var k:0..buf_size; {an index into |buffer|}
 var k:0..buf_size; {an index into |buffer|}
 @!t:halfword; {a token}
 @!i,@!j: 0..buf_size; {more indexes for encTeX}
-@!mubyte_incs: integer; {the total |mubyte_skip| in control sequence}
+@!mubyte_incs: boolean; {control sequence is converted by mubyte}
 @!p:pointer;  {for encTeX test if noexpanding}
 @z
 
@@ -1772,10 +1655,11 @@ else  begin start_cs: k:=loc; cur_chr:=buffer[k]; cat:=cat_code(cur_chr);
   incr(k);
 @y
 else  begin start_cs:
-   mubyte_incs := 0; k := loc;
+   mubyte_incs := false; k := loc; mubyte_skeep := mubyte_keep;
    cur_chr := read_buffer (k); cat := cat_code (cur_chr);
+   if (mubyte_in>0) and (not mubyte_incs) and
+     ((mubyte_skip>0) or (cur_chr<>buffer[k])) then mubyte_incs := true;
    incr (k); 
-   mubyte_incs := mubyte_incs + mubyte_skip;
    if mubyte_token > 0 then
    begin
      state := mid_line;
@@ -1785,9 +1669,14 @@ else  begin start_cs:
 @z
 
 @x [24.354] - encTeX: noexpanding the marked control sequence
+  cur_cs:=single_base+buffer[loc]; incr(loc);
+  end;
 found: cur_cmd:=eq_type(cur_cs); cur_chr:=equiv(cur_cs);
 if cur_cmd>=outer_call then check_outer_validity;
 @y
+  mubyte_keep := mubyte_skeep;
+  cur_cs:=single_base + read_buffer(loc); incr(loc);
+  end;
 found: cur_cmd:=eq_type(cur_cs); cur_chr:=equiv(cur_cs);
 if cur_cmd>=outer_call then check_outer_validity;
 if write_noexpanding then
@@ -1814,25 +1703,24 @@ end
 @y
 begin 
   repeat cur_chr := read_buffer (k); cat := cat_code (cur_chr);
+    if mubyte_token>0 then cat := escape;
+    if (mubyte_in>0) and (not mubyte_incs) and (cat=letter) and
+      ((mubyte_skip>0) or (cur_chr<>buffer[k])) then mubyte_incs := true;
     incr (k);
-    mubyte_incs := mubyte_incs + mubyte_skip;
-  until (cat <> letter) or (k > limit) or (mubyte_token > 0);
-  mubyte_incs := mubyte_incs - mubyte_skip;
+  until (cat <> letter) or (k > limit);
   @<If an expanded...@>;  
   if cat <> letter then 
   begin 
     decr (k); k := k - mubyte_skip; 
-    if mubyte_keep > 0 then incr (mubyte_keep);
-    if mubyte_skip = -1 then mubyte_keep := 0;
   end;
   if k > loc + 1 then { multiletter control sequence has been scanned }
   begin
-    if mubyte_incs > 0 then { multibyte in csname occurrs }
+    if mubyte_incs then { multibyte in csname occurrs }
     begin
-      i := loc; j := first;
-      if j - loc + k - mubyte_incs > max_buf_stack then
+      i := loc; j := first; mubyte_keep := mubyte_skeep;
+      if j - loc + k > max_buf_stack then
       begin
-        max_buf_stack := j - loc + k - mubyte_incs;
+        max_buf_stack := j - loc + k;
         if max_buf_stack >= buf_size then
         begin
           max_buf_stack := buf_size;
@@ -1844,7 +1732,10 @@ begin
         buffer [j] := read_buffer (i);
         incr (i); incr (j);
       end;
-      cur_cs := id_lookup (first, j-first);
+      if j = first+1 then
+        cur_cs := single_base + buffer [first]
+      else
+        cur_cs := id_lookup (first, j-first);
     end else cur_cs := id_lookup (loc, k-loc) ;
     loc := k;
     goto found;
@@ -1923,10 +1814,21 @@ otherwise the file area is null.  If the remaining file name contains
 In C, the default paths are specified separately.
 @z
 
+@x [29.515] l.9995 - filenames: quoted
+begin area_delimiter:=0; ext_delimiter:=0;
+@y
+begin area_delimiter:=0; ext_delimiter:=0; quoted_filename:=false;
+@z
+
 @x [29.516] l.9992 - filenames: more_name
 begin if c=" " then more_name:=false
 @y
-begin if stop_at_space and (c=" ") then more_name:=false
+begin if (c=" ") and stop_at_space and (not quoted_filename) then
+  more_name:=false
+else  if c="""" then begin
+  quoted_filename:=not quoted_filename;
+  more_name:=true;
+  end
 @z
 
 @x [29.516] l.9994 - filenames: more_name
@@ -1957,7 +1859,67 @@ these strings.
 
 @p procedure end_name;
 var temp_str: str_number; {result of file name cache lookups}
-@!j: pool_pointer; {running index}
+@!j,@!s,@!t: pool_pointer; {running indices}
+@!must_quote:boolean; {whether we need to quote a string}
+@z
+
+@x [29.517] l.10022 - end_name: spaces in filenames
+@:TeX capacity exceeded number of strings}{\quad number of strings@>
+@y
+@:TeX capacity exceeded number of strings}{\quad number of strings@>
+str_room(6); {Room for quotes, if needed.}
+{add quotes if needed}
+if area_delimiter<>0 then begin
+  {maybe quote |cur_area|}
+  must_quote:=false;
+  s:=str_start[str_ptr];
+  t:=str_start[str_ptr]+area_delimiter;
+  j:=s;
+  while (not must_quote) and (j<>t) do begin
+    must_quote:=str_pool[j]=" "; incr(j);
+    end;
+  if must_quote then begin
+    for j:=pool_ptr-1 downto t do str_pool[j+2]:=str_pool[j];
+    str_pool[t+1]:="""";
+    for j:=t-1 downto s do str_pool[j+1]:=str_pool[j];
+    str_pool[s]:="""";
+    if ext_delimiter<>0 then ext_delimiter:=ext_delimiter+2;
+    area_delimiter:=area_delimiter+2;
+    pool_ptr:=pool_ptr+2;
+    end;
+  end;
+{maybe quote |cur_name|}
+s:=str_start[str_ptr]+area_delimiter;
+if ext_delimiter=0 then t:=pool_ptr else t:=str_start[str_ptr]+ext_delimiter-1;
+must_quote:=false;
+j:=s;
+while (not must_quote) and (j<>t) do begin
+  must_quote:=str_pool[j]=" "; incr(j);
+  end;
+if must_quote then begin
+  for j:=pool_ptr-1 downto t do str_pool[j+2]:=str_pool[j];
+  str_pool[t+1]:="""";
+  for j:=t-1 downto s do str_pool[j+1]:=str_pool[j];
+  str_pool[s]:="""";
+  if ext_delimiter<>0 then ext_delimiter:=ext_delimiter+2;
+  pool_ptr:=pool_ptr+2;
+  end;
+if ext_delimiter<>0 then begin
+  {maybe quote |cur_ext|}
+  s:=str_start[str_ptr]+ext_delimiter-1;
+  t:=pool_ptr;
+  must_quote:=false;
+  j:=s;
+  while (not must_quote) and (j<>t) do begin
+    must_quote:=str_pool[j]=" "; incr(j);
+    end;
+  if must_quote then begin
+    str_pool[t+1]:="""";
+    for j:=t-1 downto s do str_pool[j+1]:=str_pool[j];
+    str_pool[s]:="""";
+    pool_ptr:=pool_ptr+2;
+    end;
+  end;
 @z
 
 @x [29.517] l.10011 - end_name: string recycling
@@ -2000,6 +1962,63 @@ else  begin cur_name:=str_ptr;
     pool_ptr:=pool_ptr-ext_delimiter+area_delimiter+1;  {update |pool_ptr|}
     end;
   cur_ext:=slow_make_string;  {remake extension string}
+@z
+
+@x [29.518] l.10042 - print_file_name: quote if spaces in names.
+begin slow_print(a); slow_print(n); slow_print(e);
+@y
+var must_quote: boolean; {whether to quote the filename}
+@!j:pool_pointer; {index into |str_pool|}
+begin
+must_quote:=false;
+if a<>0 then begin
+  j:=str_start[a];
+  while (not must_quote) and (j<>str_start[a+1]) do begin
+    must_quote:=str_pool[j]=" "; incr(j);
+  end;
+end;
+if n<>0 then begin
+  j:=str_start[n];
+  while (not must_quote) and (j<>str_start[n+1]) do begin
+    must_quote:=str_pool[j]=" "; incr(j);
+  end;
+end;
+if e<>0 then begin
+  j:=str_start[e];
+  while (not must_quote) and (j<>str_start[e+1]) do begin
+    must_quote:=str_pool[j]=" "; incr(j);
+  end;
+end;
+{FIXME: Alternative is to assume that any filename that has to be quoted has
+ at least one quoted component...if we pick this, a number of insertions
+ of |print_file_name| should go away.
+|must_quote|:=((|a|<>0)and(|str_pool|[|str_start|[|a|]]=""""))or
+              ((|n|<>0)and(|str_pool|[|str_start|[|n|]]=""""))or
+              ((|e|<>0)and(|str_pool|[|str_start|[|e|]]=""""));}
+if must_quote then print_char("""");
+if a<>0 then
+  for j:=str_start[a] to str_start[a+1]-1 do
+    if so(str_pool[j])<>"""" then
+      print(so(str_pool[j]));
+if n<>0 then
+  for j:=str_start[n] to str_start[n+1]-1 do
+    if so(str_pool[j])<>"""" then
+      print(so(str_pool[j]));
+if e<>0 then
+  for j:=str_start[e] to str_start[e+1]-1 do
+    if so(str_pool[j])<>"""" then
+      print(so(str_pool[j]));
+if must_quote then print_char("""");
+@z
+
+@x [29.519] l.10051 - have append_to_name skip quotes.
+@d append_to_name(#)==begin c:=#; incr(k);
+  if k<=file_name_size then name_of_file[k]:=xchr[c];
+  end
+@y
+@d append_to_name(#)==begin c:=#; if not (c="""") then begin incr(k);
+  if k<=file_name_size then name_of_file[k]:=xchr[c];
+  end end
 @z
 
 % [29.519] In pack_file_name, leave room for the extra null we append at
@@ -2098,10 +2117,56 @@ name_of_file[name_length+1]:=0;
 @.I can't find the format...@>
 @z
 
-@x [29.530] l.10239 - prompt_file_name: No default extension is TeX input file.
+@x [29.525] l.10163 - make_name_string
+  make_name_string:=make_string;
+  end;
+@y
+  make_name_string:=make_string;
+  end;
+  {At this point we also set |cur_name|, |cur_ext|, and |cur_area| to
+   match the contents of |name_of_file|.}
+  k:=1;
+  name_in_progress:=true;
+  begin_name;
+  stop_at_space:=false;
+  while (k<=name_length)and(more_name(name_of_file[k])) do
+    incr(k);
+  stop_at_space:=true;
+  end_name;
+  name_in_progress:=false;
+@z
+
+@x [29.526] l.10194 - stop scanning file name if we're at end-of-line.
+  if not more_name(cur_chr) then goto done;
+@y
+  {If |cur_chr| is a space and we're not scanning a token list, check
+   whether we're at the end of the buffer. Otherwise we end up adding
+   spurious spaces to file names in some cases.}
+  if (cur_chr=" ") and (state<>token_list) and (loc>limit) then goto done;
+  if not more_name(cur_chr) then goto done;
+@z
+
+@x [29.530] l.10245 - prompt_file_name: prevent empty filenames.
+var k:0..buf_size; {index into |buffer|}
+@y
+var k:0..buf_size; {index into |buffer|}
+@!saved_cur_name:str_number; {to catch empty terminal input}
+@z
+
+@x [29.530] l.10252 - prompt_file_name: No default extension is TeX input file.
 if e=".tex" then show_context;
 @y
 if (e=".tex") or (e="") then show_context;
+@z
+
+@x [29.530] l.10258 - prompt_file_name: prevent empty filenames.
+clear_terminal; prompt_input(": "); @<Scan file name in the buffer@>;
+if cur_ext="" then cur_ext:=e;
+@y
+saved_cur_name:=cur_name;
+clear_terminal; prompt_input(": "); @<Scan file name in the buffer@>;
+if cur_ext="" then cur_ext:=e;
+if length(cur_name)=0 then cur_name:=saved_cur_name;
 @z
 
 @x [29.532] l.10263 - avoid conflict, `logname' in <unistd.h> on some systems.
@@ -2219,19 +2284,7 @@ loop@+begin
   {Kpathsea tries all the various ways to get the file.}
   if open_in_name_ok(stringcast(name_of_file+1))
      and a_open_in(cur_file, kpse_tex_format) then
-    {At this point |name_of_file| contains the actual name found.
-     We extract the |cur_area|, |cur_name|, and |cur_ext| from it.}
-    begin k:=1;
-    name_in_progress:=true;
-    begin_name;
-    stop_at_space:=false;
-    while (k<=name_length)and(more_name(name_of_file[k])) do
-      incr(k);
-    stop_at_space:=true;
-    end_name;
-    name_in_progress:=false;
     goto done;
-    end;
 @z
 
 @x [29.537] l.10348 - start_input: don't force ".tex" extension.
@@ -2706,6 +2759,12 @@ endif ('IPC')
 ifndef ('IPC')
   k:=4+((dvi_buf_size-dvi_ptr) mod 4); {the number of 223's}
 endifn ('IPC')
+@z
+
+@x [32.642] l.12773 - use print_file_name
+  print_nl("Output written on "); slow_print(output_file_name);
+@y
+  print_nl("Output written on "); print_file_name(0, output_file_name, 0);
 @z
 
 @x [32.642] l.12750 - i18n fix
@@ -3687,17 +3746,7 @@ else kpse_make_tex_discard_errors := 0;
   tex_input_type:=0; {Tell |open_input| we are \.{\\openin}.}
   if open_in_name_ok(stringcast(name_of_file+1))
      and a_open_in(read_file[n], kpse_tex_format) then
-    begin k:=1;
-    name_in_progress:=true;
-    begin_name;
-    stop_at_space:=false;
-    while (k<=name_length)and(more_name(name_of_file[k])) do
-      incr(k);
-    stop_at_space:=true;
-    end_name;
-    name_in_progress:=false;
     read_open[n]:=just_open;
-    end;
 @z
 
 @x [49.1279] - encTeX: implement \noconvert
@@ -3711,19 +3760,21 @@ message_printing := false; active_noconvert := false;
 selector:=old_setting;
 @z
 
-% WEB2C: there's no distinction between print and slow_print.
- @x [49.1279] - encTeX: another concept of message printing because \noconvert
+% encTeX: |slow_print| is too eager to expand printed strings.  To
+% selectively suppress or enable expansion (needed to \noconvert)
+% |print| will look at |message_printing|.  So we bypass |slow_print|
+% and go directly to |print| instead.
+@x [49.1279] - encTeX: to handle \noconvert in messages go directly to |print|
 slow_print(s); update_terminal;
- @y
+@y
 print(s); update_terminal;
- @z
+@z
 
-% WEB2C there's no distinction between print and slow_print.
- @x [49.1279] - encTeX: another concept of message printing because \noconvert
+@x [49.1279] - encTeX: to handle \noconvert in messages go directly to |print|
 begin print_err(""); slow_print(s);
- @y
+@y
 begin print_err(""); print(s);
- @z
+@z
 
 @x [50.1301] l.23679 - INI = VIR, so runtime test.
 format_ident:=" (INITEX)";
@@ -3745,20 +3796,8 @@ if ini_version then format_ident:=" (INITEX)";
 @<Dump constants for consistency check@>;
 @y
 @<Dump constants for consistency check@>;
-dump_int(@"4D4C5458);  {ML\TeX's magic constant: "MLTX"}
-if mltex_p then dump_int(1)
-else dump_int(0);
-dump_int(@"45435458);  {enc\TeX's magic constant: "ECTX"}
-if not enctex_p then dump_int(0)
-else begin
-  dump_int(1);
-  dump_things(xord[0], 256);
-  dump_things(xchr[0], 256);
-  dump_things(xprn[0], 256);
-  dump_things(mubyte_read[0], 256);
-  dump_things(mubyte_write[0], 256);
-  dump_things(mubyte_cswrite[0], 128);
-end;
+@<Dump ML\TeX-specific data@>;
+@<Dump enc\TeX-specific data@>;
 @z
 
 % Eliminate now-unused variable `w' in `load_fmt_file'.
@@ -3779,32 +3818,8 @@ end;
 begin @<Undump constants for consistency check@>;
 @y
 begin @<Undump constants for consistency check@>;
-undump_int(x);   {check magic constant of ML\TeX}
-if x<>@"4D4C5458 then goto bad_fmt;
-undump_int(x);   {undump |mltex_p| flag into |mltex_enabled_p|}
-if x=1 then mltex_enabled_p:=true
-else if x<>0 then goto bad_fmt;
-undump_int(x);   {check magic constant of enc\TeX}
-if x<>@"45435458 then goto bad_fmt;
-undump_int(x);   {undump |enctex_p| flag into |enctex_enabled_p|}
-if x=0 then enctex_enabled_p:=false
-else if x<>1 then goto bad_fmt
-else begin
-  enctex_enabled_p:=true;
-  if translate_filename then begin
-    for k:=0 to 255 do undump_things(dummy_xord, 1);
-    for k:=0 to 255 do undump_things(dummy_xchr, 1);
-    for k:=0 to 255 do undump_things(dummy_xprn, 1);
-    end
-  else begin
-    undump_things(xord[0], 256);
-    undump_things(xchr[0], 256);
-    undump_things(xprn[0], 256);
-    end;
-  undump_things(mubyte_read[0], 256);
-  undump_things(mubyte_write[0], 256);
-  undump_things(mubyte_cswrite[0], 128);
-end;
+@<Undump ML\TeX-specific data@>;
+@<Undump enc\TeX-specific data@>;
 @z
 
 @x [50.1305] l.23751 - Do dumping and undumping of fmt files in C.
@@ -3848,6 +3863,7 @@ x:=x+4-(x mod 4);
 dump_int(x);dump_things(format_engine[0], x);
 libc_free(format_engine);@/
 dump_int(@$);@/
+@<Dump |xord|, |xchr|, and |xprn|@>;
 dump_int(max_halfword);@/
 dump_int(hash_high);
 @z
@@ -3890,6 +3906,7 @@ if x<>@$ then begin {check that strings are the same}
   wterm_ln('---! ', stringcast(name_of_file+1), ' doesn''t match ', pool_name);
   goto bad_fmt;
 end;
+@<Undump |xord|, |xchr|, and |xprn|@>;
 undump_int(x);
 if x<>max_halfword then goto bad_fmt; {check |max_halfword|}
 undump_int(hash_high);
@@ -3930,7 +3947,7 @@ head:=contrib_head; tail:=contrib_head;
 mem_min := mem_bot - extra_mem_bot;
 mem_max := mem_top + extra_mem_top;
 
-yzmem:=xmalloc_array (memory_word, mem_max - mem_min);
+yzmem:=xmalloc_array (memory_word, mem_max - mem_min + 1);
 zmem := yzmem - mem_min;   {this pointer arithmetic fails with some compilers}
 mem := zmem;
 @z
@@ -4476,7 +4493,8 @@ begin @!{|start_here|}
 @+Tini
   if extra_mem_bot>sup_main_memory then extra_mem_bot:=sup_main_memory;
   if extra_mem_top>sup_main_memory then extra_mem_top:=sup_main_memory;
-  mem_top := mem_bot + main_memory;
+  {|mem_top| is an index, |main_memory| a size}
+  mem_top := mem_bot + main_memory -1;
   mem_min := mem_bot;
   mem_max := mem_top;
 
@@ -4515,7 +4533,7 @@ begin @!{|start_here|}
   hyph_list :=xmalloc_array (halfword, hyph_size);
   hyph_link :=xmalloc_array (hyph_pointer, hyph_size);
 @+Init
-  yzmem:=xmalloc_array (memory_word, mem_top - mem_bot);
+  yzmem:=xmalloc_array (memory_word, mem_top - mem_bot + 1);
   zmem := yzmem - mem_bot;   {Some compilers require |mem_bot=0|}
   eqtb_top := eqtb_size+hash_extra;
   if hash_extra=0 then hash_top:=undefined_control_sequence else
@@ -4560,7 +4578,7 @@ end {|main_body|};
     end;
   end;
 @y
-    slow_print(log_name); print_char(".");
+    print_file_name(0, log_name, 0); print_char(".");
     end;
   end;
 print_ln;
@@ -4980,6 +4998,60 @@ end;
 @!debug_format_file: boolean;
 
 
+@ A helper for printing file:line:error style messages.  Look for a
+filename in |full_source_filename_stack|, and if we fail to find
+one fall back on the non-file:line:error style.
+
+@<Basic print...@>=
+procedure print_file_line;
+var level: 0..max_in_open;
+begin
+  level:=in_open;
+  while (level>0) and (full_source_filename_stack[level]=0) do
+    decr(level);
+  if level=0 then
+    print_nl("! ")
+  else begin
+    print_nl (""); print (full_source_filename_stack[level]); print (":");
+    if level=in_open then print_int (line)
+    else print_int (line_stack[index+1-(in_open-level)]);
+    print (": ");
+  end;
+end;
+
+
+@ Dumping the |xord|, |xchr|, and |xprn| arrays.  We dump these always
+in the format, so a TCX file loaded during format creation can set a
+default for users of the format.
+
+@<Dump |xord|, |xchr|, and |xprn|@>=
+dump_things(xord[0], 256);
+dump_things(xchr[0], 256);
+dump_things(xprn[0], 256);
+
+@ Undumping the |xord|, |xchr|, and |xprn| arrays.  This code is more
+complicated, because we want to ensure that a TCX file specified on
+the command line will override whatever is in the format.  Since the
+tcx file has already been loaded, that implies throwing away the data
+in the format.  Also, if no |translate_filename| is given, but
+|eight_bit_p| is set we have to make all characters printable.
+
+@<Undump |xord|, |xchr|, and |xprn|@>=
+if translate_filename then begin
+  for k:=0 to 255 do undump_things(dummy_xord, 1);
+  for k:=0 to 255 do undump_things(dummy_xchr, 1);
+  for k:=0 to 255 do undump_things(dummy_xprn, 1);
+  end
+else begin
+  undump_things(xord[0], 256);
+  undump_things(xchr[0], 256);
+  undump_things(xprn[0], 256);
+  if eight_bit_p then
+    for k:=0 to 255 do
+      xprn[k]:=1;
+end;
+
+
 @* \[54/web2c-string] The string recycling routines.  \TeX{} uses 2
 upto 4 {\it new\/} strings when scanning a filename in an \.{\\input},
 \.{\\openin}, or \.{\\openout} operation.  These strings are normally
@@ -5279,33 +5351,28 @@ probably be changed in one of the next ML\TeX{} versions.
   cur_h:=cur_h+base_width;
   dvi_h:=cur_h {update of |dvi_h| is unnecessary, will be set in module 620}
 
+@ Dumping ML\TeX-related material.  This is just the flag in the
+format that tells us whether ML\TeX{} is enabled.
 
-@* \[54/ML\TeX] System-dependent changes for ML\TeX.
+@<Dump ML\TeX-specific data@>=
+dump_int(@"4D4C5458);  {ML\TeX's magic constant: "MLTX"}
+if mltex_p then dump_int(1)
+else dump_int(0);
 
-The boolean variable |mltex_p| is set by web2c according to the given
-command line option (or an entry in the configuration file) before any
-\TeX{} function is called.
+@ Undump ML\TeX-related material, which is just a flag in the format
+that tells us whether ML\TeX{} is enabled.
 
-@<Global...@> =
-@!mltex_p: boolean;
-
-@ The boolean variable |mltex_enabled_p| is used to enable ML\TeX's
-character substitution.  It is initialised to |false|.  When loading
-a \.{FMT} it is set to the value of the boolean |mltex_p| saved in
-the \.{FMT} file.  Additionally it is set to the value of |mltex_p|
-in Ini\TeX.
-
-@<Glob...@>=
-@!mltex_enabled_p:boolean;  {enable character substitution}
-
-
-@ @<Set init...@>=
-mltex_enabled_p:=false;
+@<Undump ML\TeX-specific data@>=
+undump_int(x);   {check magic constant of ML\TeX}
+if x<>@"4D4C5458 then goto bad_fmt;
+undump_int(x);   {undump |mltex_p| flag into |mltex_enabled_p|}
+if x=1 then mltex_enabled_p:=true
+else if x<>0 then goto bad_fmt;
 
 
 @* \[54/enc\TeX] System-dependent changes for enc\TeX.
 
-@d encTeX_banner == ' encTeX v. Feb. 2003'
+@d encTeX_banner == ' encTeX v. Jun. 2004'
 
 @ The boolean variable |enctex_p| is set by web2c according to the given
 command line option (or an entry in the configuration file) before any
@@ -5571,6 +5638,35 @@ begin
   incr (i);
 end;
 
+@ Additional material to dump for enc\TeX.  This includes whether
+enc\TeX is enabled, and if it is we also have to dump the \.{\\mubyte}
+arrays.
+
+@<Dump enc\TeX-specific data@>=
+dump_int(@"45435458);  {enc\TeX's magic constant: "ECTX"}
+if not enctex_p then dump_int(0)
+else begin
+  dump_int(1);
+  dump_things(mubyte_read[0], 256);
+  dump_things(mubyte_write[0], 256);
+  dump_things(mubyte_cswrite[0], 128);
+end;
+
+@ Undumping the additional material we dumped for enc\TeX.  This includes
+conditionally undumping the \.{\\mubyte} arrays.
+
+@<Undump enc\TeX-specific data@>=
+undump_int(x);   {check magic constant of enc\TeX}
+if x<>@"45435458 then goto bad_fmt;
+undump_int(x);   {undump |enctex_p| flag into |enctex_enabled_p|}
+if x=0 then enctex_enabled_p:=false
+else if x<>1 then goto bad_fmt
+else begin
+  enctex_enabled_p:=true;
+  undump_things(mubyte_read[0], 256);
+  undump_things(mubyte_write[0], 256);
+  undump_things(mubyte_cswrite[0], 128);
+end;
 
 
 @* \[54] System-dependent changes.

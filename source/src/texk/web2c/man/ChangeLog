@@ -1,3 +1,137 @@
+2004-09-07  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* pdfetex.man: .efmt -> .fmt Found by Hartmut Henkel
+	<hartmut_henkel@gmx.de>.
+
+	* pdfxtex.man: .efmt -> .fmt Found by Hartmut Henkel
+	<hartmut_henkel@gmx.de>.
+
+	* etex.man: .efmt -> .fmt Found by Hartmut Henkel
+	<hartmut_henkel@gmx.de>.
+
+2004-08-27  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex.man: Fixed a typo.
+
+	* mf.man: Fixed a typo.
+
+	* mpost.man: Fixed a typo.
+
+	* omega.man: Fixed a typo.
+
+	* pdfetex.man: Fixed a typo.
+
+	* pdftex.man: Fixed a typo.
+
+	* pdfxtex.man: Fixed a typo.
+
+	* tex.man: Fixed a typo.
+
+2004-08-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* pdfxtex.man: Document -output-directory.
+
+	* pdftex.man: Document -output-directory.
+
+	* pdfetex.man: Document -output-directory.
+
+	* tex.man: Document -output-directory.
+
+	* mpost.man: Document -output-directory.
+
+	* mf.man: Document -output-directory.
+
+	* omega.man: Document -output-directory.
+
+	* etex.man: Document -output-directory.
+
+2004-08-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* patgen.man: Major rewrite.
+
+	* weave.man: Fixed a typo.
+
+2004-08-21  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex.man: Update author.
+
+	* etex.man, pdfetex.man: Change -efmt to -fmt.
+
+	* etex.man, tex.man: Remove references to PDF mode.
+
+2004-07-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mpost.man: Misspelt \*(MP macro.  From Peter Breitenlohner
+	<peb@mppmu.mpg.de>.
+
+2004-07-04  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* pdfxtex.man: Change -efmt to -fmt.
+
+2004-06-22  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* pdfetex.man: Correct title to refer to pdfetex.
+
+	* pdfxtex.man: The pdfxtex manual page is based on the pdfetex
+	manual page.
+
+2004-05-08  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* omega.man: Document -halt-on-error.
+
+	* pdftex.man: Document -halt-on-error.
+
+	* pdfetex.man: Document -halt-on-error.
+
+	* etex.man: Document -halt-on-error.
+
+	* tex.man: Document -halt-on-error.
+
+	* mf.man: Document -halt-on-error.
+
+	* mpost.man: Document -halt-on-error.
+
+2004-05-04  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mf.man: Remove mention of mfw, document mf-nowin instead.
+
+2004-03-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.man: Document -no-shell-escape, -no-parse-first-line,
+	-no-file-line-error.
+
+	* etex.man: Document -no-shell-escape, -no-parse-first-line,
+	-no-file-line-error.
+
+	* pdftex.man: Document -no-shell-escape, -no-parse-first-line,
+	-no-file-line-error.
+
+	* pdfetex.man: Document -no-shell-escape, -no-parse-first-line,
+	-no-file-line-error.
+
+	* mf.man: Document -no-parse-first-line, -no-file-line-error.
+
+	* mpost.man: Document -no-parse-first-line, -no-file-line-error.
+
+2004-03-25  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.man: Update for new/previously undocumented options.
+
+	* etex.man: Update for new/previously undocumented options.
+
+	* pdftex.man: Update for new/previously undocumented options.
+
+	* pdfetex.man: Update for new/previously undocumented options.
+
+2004-02-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in [manfiles]: Add pdfxtex.1.
+
+2003-12-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* latex.man: Misspelt \*(TX macro, found by Eric S. Raymond
+	<esr@thyrsus.com>.
+
 2002-12-14  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* tex.man: Clarify notes of first-line parsing.

@@ -17,7 +17,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.ch2#10 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.ch2#17 $
 %
 @x limbo
 \def\pdfTeX{pdf\TeX}
@@ -26,104 +26,53 @@
 \def\pdfeTeX{pdf\eTeX}
 @z
 
-@x [2]
-@d banner=='This is pdfTeX, Version 3.141592','-',pdftex_version_string 
-   {printed when \pdfTeX\ starts}
+@x [1.2] l.188
+@d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
 @y
-@d banner=='This is pdfeTeX, Version 3.141592','-',pdftex_version_string,'-',eTeX_version_string
-   {printed when \pdfTeX\ starts}
+@d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
+   {printed when \pdfeTeX\ starts}
+@#
+@d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
 @z
 
-@x [2]
-@d eTeX_version_string=='3.141592-2.1' {current \eTeX\ version}
+@x [1.2] l.188
+@d banner==pdfTeX_banner
 @y
-@d eTeX_version_string=='2.1' {current \eTeX\ version}
+@d banner==pdfeTeX_banner
 @z
 
-@x [230]
-@d pdftex_first_loc       = local_base+10 {first number defined in this section}
+@x [17.230] l.4727 - first pdfTeX, then e-TeX additional token list parameters
+@d toks_base=pdf_toks {table of 256 token list registers}
+@#
+@d etex_toks_base=tex_toks {base for \eTeX's token list parameters}
 @y
-@d pdftex_first_loc       = token_base+10 {first number defined in this section}
+@d etex_toks_base=pdf_toks {base for \eTeX's token list parameters}
 @z
 
-% @x [230]
-% @d toks_base=local_base+13 {table of 256 token list registers}
-% @y
-% @d toks_base=token_base+13 {table of 256 token list registers}
-% @z
-
-@x [307]
-@d pdftex_first_text       = 16 {first number defined in this section}
+@x [17.236] l.4960 - first pdfTeX, then e-TeX additional integer parameters
+@d int_pars=pdf_int_pars {total number of integer parameters}
+@#
+@d etex_int_base=tex_int_pars {base for \eTeX's integer parameters}
 @y
-@d pdftex_first_text       = 17 {first number defined in this section}
+@d etex_int_base=pdf_int_pars {base for \eTeX's integer parameters}
 @z
 
-@x [307]
-@d write_text=15 {|token_type| code for \.{\\write}}
-@y
-@d write_text=16 {|token_type| code for \.{\\write}}
-@z
-
-@x [410]
-@d pdftex_first_expand_code = 6 {first number defined in this section}
-@y 
-@d pdftex_first_expand_code = 7 {first number defined in this section}
-@z
-% N.B.: eTeX_revision_code = 6 has been already defined by eTeX
-
-@x [416]
-|glue_val|, |input_line_no_code|, |badness_code|, or one of the other codes for
-\pdfTeX{} extensions.
-@y
-|glue_val|, |input_line_no_code|, |badness_code|, or one of the other codes for
-\pdfTeX\ or \eTeX\ extensions.
-@z
-
-@x [416]
-@d pdftex_first_rint_code     = glue_val + 3 {first number defined in this section}
-@y
-@d last_node_type_code=glue_val+1 {code for \.{\\lastnodetype}}
-@d pdftex_first_rint_code     = glue_val + 4 {first number defined in this section}
-@z
-
-@x [416]
-@d input_line_no_code=glue_val+1 {code for \.{\\inputlineno}}
-@d badness_code=glue_val+2 {code for \.{\\badness}}
-@y
-@d input_line_no_code=glue_val+2 {code for \.{\\inputlineno}}
-@d badness_code=glue_val+3 {code for \.{\\badness}}
-@d eTeX_int=pdftex_last_rint_code+1 {first of \eTeX\ codes for integers}
-@d eTeX_dim=eTeX_int+8 {first of \eTeX\ codes for dimensions}
-@d eTeX_glue=eTeX_dim+9 {first of \eTeX\ codes for glue}
-@d eTeX_mu=eTeX_glue+1 {first of \eTeX\ codes for muglue}
-@d eTeX_expr=eTeX_mu+1 {first of \eTeX\ codes for expressions}
-@z
-
-@x [424]
-if cur_chr>glue_val then
-  begin case cur_chr of
-@y
-if m>last_node_type_code then
- if m>=eTeX_glue then @<Process an expression and |return|@>@;
- else if m>=eTeX_dim then
+@x [26.424] l.8507
+ else begin case m of
   begin case m of
-  @/@<Cases for fetching a dimension value@>@/
-  end; {there are no other cases}
-  cur_val_level:=dimen_val;
-  end
+@y
  else begin case m of
 @z
 
-@x
-  endcases;
-@y
-  @/@<Cases for fetching an integer value@>@/
+@x [26.424] l.8507
   end; {there are no other cases}
+@y
 @z
 
-@x [32f]
-@!g_order: glue_ord; {applicable order of infinity for glue}
+@x [27.468] l.9207 - first e-TeX, then pdfTeX additional command codes
+@d pdftex_first_expand_code = 5 {base for \pdfTeX's command codes}
 @y
+@d pdftex_first_expand_code = etex_convert_codes {base for \pdfTeX's command codes}
 @z
 
 @x [32f]
@@ -134,36 +83,18 @@ if m>last_node_type_code then
 @z
 
 @x [32f]
-begin this_box:=temp_ptr; g_order:=glue_order(this_box);
-@y
-begin this_box:=temp_ptr;
-@z
-
-@x [32f]
 base_line:=cur_v; left_edge:=cur_h;
 @y
 base_line:=cur_v;
 prev_p:=this_box+list_offset;
-if eTeX_ex then
-  begin @<Initialize the LR stack@>;
-  if subtype(this_box)=dlist then
-    if cur_dir=right_to_left then
-      begin cur_dir:=left_to_right; cur_h:=cur_h-width(this_box);
-      end
-    else subtype(this_box):=min_quarterword;
-  if (cur_dir=right_to_left)and(subtype(this_box)<>reversed) then
-    @<Reverse the complete hlist and set the subtype to |reversed|@>;
-  end;
+@<Initialize |hlist_out| for mixed...@>;
 left_edge:=cur_h;
 @z
 
 @x [32f]
 decr(cur_s);
 @y
-if eTeX_ex then
-  begin @<Check for LR anomalies at the end of |hlist_out|@>;
-  if subtype(this_box)=dlist then cur_dir:=right_to_left;
-  end;
+@<Finish |hlist_out| for mixed...@>;
 decr(cur_s);
 @z
 
@@ -178,11 +109,7 @@ decr(cur_s);
 kern_node,math_node:cur_h:=cur_h+width(p);
 @y
 kern_node:cur_h:=cur_h+width(p);
-math_node:begin if eTeX_ex then
-    @<Adjust \(t)the LR stack for the |hlist_out| routine; if necessary
-      reverse an hlist segment and |goto reswitch|@>;
-  cur_h:=cur_h+width(p);
-  end;
+math_node: @<Handle a math node in |hlist_out|@>;
 @z
 
 @x [32f]
@@ -212,17 +139,10 @@ next_p:prev_p:=p; p:=link(p);
 @z
 
 @x [32f]
-  begin if g_sign=stretching then
-    begin if stretch_order(g)=g_order then
-      rule_wd:=rule_wd+round(float(glue_set(this_box))*stretch(g));
-@^real multiplication@>
-    end
-  else  begin if shrink_order(g)=g_order then
-      rule_wd:=rule_wd-round(float(glue_set(this_box))*shrink(g));
-    end;
-  end;
+rule_wd:=rule_wd+cur_g;
 @y
-  add_glue(rule_wd);
+rule_wd:=rule_wd+cur_g;
+if eTeX_ex then @<Handle a glue node for mixed...@>;
 @z
 
 @x [32f]
@@ -248,17 +168,6 @@ if cur_dir=right_to_left then cur_h:=cur_h+leader_wd;
 @z
 
 @x [32f]
-@!g_order: glue_ord; {applicable order of infinity for glue}
-@y
-@z
-
-@x [32f]
-begin this_box:=temp_ptr; g_order:=glue_order(this_box);
-@y
-begin this_box:=temp_ptr;
-@z
-
-@x [32f]
   cur_h:=left_edge+shift_amount(p); {shift the box right}
 @y
   if cur_dir=right_to_left then cur_h:=left_edge-shift_amount(p)
@@ -277,20 +186,6 @@ if (rule_ht>0)and(rule_wd>0) then {we don't output empty rules}
 @z
 
 @x [32f]
-  begin if g_sign=stretching then
-    begin if stretch_order(g)=g_order then
-      rule_ht:=rule_ht+round(float(glue_set(this_box))*stretch(g));
-@^real multiplication@>
-    end
-  else  begin if shrink_order(g)=g_order then
-      rule_ht:=rule_ht-round(float(glue_set(this_box))*shrink(g));
-    end;
-  end;
-@y
-  add_glue(rule_ht);
-@z
-
-@x [32f]
 begin cur_h:=left_edge+shift_amount(leader_box);@/
 @y
 begin if cur_dir=right_to_left then
@@ -305,37 +200,12 @@ begin if cur_dir=right_to_left then
 if eTeX_ex then @<Check for LR anomalies at the end of |ship_out|@>;
 @z
 
-@x [33]
-exit:
-if (m = cal_expand_ratio) and (font_expand_ratio <> 0) then begin
-    font_expand_ratio := fix_int(font_expand_ratio, -1000, 1000);
-    q := list_ptr(r);
-    free_node(r, box_node_size);
-    r := hpack(q, w, subst_ex_font);
-end;
-hpack:=r;
+@x [33.649] l.12912
+exit: {|hpack|}
 @y
-exit: if TeXXeT_en then @<Check for LR anomalies at the end of |hpack|@>;
-if (m = cal_expand_ratio) and (font_expand_ratio <> 0) then begin
-    font_expand_ratio := fix_int(font_expand_ratio, -1000, 1000);
-    q := list_ptr(r);
-    free_node(r, box_node_size);
-    r := hpack(q, w, subst_ex_font);
-end;
-hpack:=r;
 @z
 
-@x [651] 
+@x [33.651] l.12936
   math_node: x:=x+width(p);
 @y
-  math_node: begin x:=x+width(p);
-    if TeXXeT_en then @<Adjust \(t)the LR stack for the |hpack| routine@>;
-    end;
-@z
-
-@x [1147] 
-kern_node,math_node: d:=width(p);
-@y
-kern_node: d:=width(p);
-@t\4@>@<Cases of `Let |d| be the natural width' that need special treatment@>@;
 @z

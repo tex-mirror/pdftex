@@ -57,50 +57,6 @@ versions, except that this permission notice may be stated in a
 translation
 
 
-File: web2c.info,  Node: Basic BibTeX style files,  Prev: bibtex invocation,  Up: BibTeX
-
-Basic BibTeX style files
-========================
-
-  Here are descriptions of the four standard and four semi-standard
-basic BibTeX styles.  `CTAN:/biblio/bibtex' contains these and many
-more (for CTAN info, *note unixtex.ftp: (kpathsea)unixtex.ftp.).
-
-`plain'
-     Sorts entries alphabetically, with numeric labels.  Generally
-     formatted according to van Leunen's `A Handbook for Scholars'.
-     The other style files listed here are based on `plain'.
-
-`abbrv'
-     First names, month names, and journal names are abbreviated.
-
-`acm'
-     Names are printed in small caps.
-
-`alpha'
-     Alphanumeric labels, e.g., `Knu66'.
-
-`apalike'
-     No labels at all; instead, the year appears in parentheses after
-     the author.  Should be used in conjunction with `apalike.tex'
-     (plain TeX) or `apalike.sty' (LaTeX), which also changes the
-     citations in the text to be `(AUTHOR, YEAR)'.
-
-`ieeetr'
-     Numeric labels, entries in citation order, IEEE abbreviations,
-     article titles in quotes.
-
-`siam'
-     Numeric labels, alphabetic order, `Math. Reviews' abbreviations,
-     names in small caps.
-
-`unsrt'
-     Lists entries in citation order, i.e., unsorted.
-
-`btxbst.doc'
-     The template file and documentation for the standard styles.
-
-
 File: web2c.info,  Node: WEB,  Next: DVI utilities,  Prev: BibTeX,  Up: Top
 
 WEB: Literate programming

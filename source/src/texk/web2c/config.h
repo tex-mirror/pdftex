@@ -19,17 +19,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #ifndef WEB2C_CONFIG_H
 #define WEB2C_CONFIG_H
 
-#if defined(WIN32)
-#ifdef TEX_DLL
+#if defined (TEX_DLL) && (defined (WIN32) || defined (__CYGWIN__))
 #ifdef MAKE_TEX_DLL
-#define TEXDLL __declspec( dllexport)
-#else
-#define TEXDLL __declspec( dllimport)
+#define TEXDLL __declspec (dllexport)
+#else /* ! MAKE_TEX_DLL */
+#define TEXDLL __declspec (dllimport)
 #endif
-#else
-#define TEXDLL
-#endif
-#else /* ! WIN32 */
+#else /* ! (TEX_DLL && (WIN32 || __CYGWIN__)) */
 #define TEXDLL
 #endif
 
@@ -116,6 +112,6 @@ extern void uexit P1H(int status);
 
 /* usage.c */
 extern void usage P1H(const_string progname);
-extern void usagehelp P1H(const_string *message);
+extern void usagehelp P2H(const_string *message, const_string bug_email);
 
 #endif /* not CONFIG_H */

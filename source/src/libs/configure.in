@@ -36,12 +36,19 @@ test "x$needs_libxpdf" != xno \
   && subconfigures="$subconfigures xpdf"
 test "x$needs_freetype" != xno \
   && subconfigures="$subconfigures freetype"
+test "x$needs_gd" != xno \
+  && subconfigures="$subconfigures gd"
 
 outfiles=
 test "x$needs_pnglib" != xno && test "$using_system_pnglib"  != yes \
   && outfiles="$outfiles libpng/Makefile"
 test "x$needs_zlib" != xno && test "$using_system_zlib"  != yes \
   && outfiles="$outfiles zlib/Makefile"
+
+# create md5 directory  when building outside the srcdir:
+if test -d $srcdir/md5; then
+  test -d md5 || mkdir md5
+fi
 
 AC_CONFIG_SUBDIRS($subconfigures)
 AC_OUTPUT($outfiles)

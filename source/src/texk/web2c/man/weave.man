@@ -67,7 +67,7 @@ change file).
 .\"=====================================================================
 .SH FILES
 .TP \w'@@'u+2n
-.I $TEXMFMAIN/plain/base/webmac.tex
+.I $TEXMFMAIN/tex/plain/base/webmac.tex
 \*(TX macros used by
 .B weave
 output.

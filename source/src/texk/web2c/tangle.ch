@@ -658,7 +658,7 @@ begin
       usage ('tangle');
 
     end else if argument_is ('help') then begin
-      usage_help (TANGLE_HELP);
+      usage_help (TANGLE_HELP, nil);
 
     end else if argument_is ('version') then begin
       print_version_and_exit (banner, nil, 'D.E. Knuth');

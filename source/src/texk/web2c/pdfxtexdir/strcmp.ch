@@ -1,6 +1,6 @@
 % WEB change file containing the \pdfstrcmp extension for pdfTeX 
 %
-% Copyright (c) 1996-2002 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 2004 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
 % This file is part of pdfTeX.
 %
@@ -18,37 +18,36 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: strcmp.ch,v 1.1 2004/02/26 13:40:36 thanh Exp $
+% $Id: strcmp.ch,v 1.2 2004/07/30 07:12:48 olaf Exp $
 
 @x [416]
-@d pdftex_version_code        = pdftex_first_rint_code + 0 {code for \.{\\pdftexversion}}
+@d pdftex_last_item_codes     = pdftex_first_rint_code + 8 {end of \pdfTeX's command codes}
 @y
-@d pdftex_version_code        = pdftex_first_rint_code + 0 {code for \.{\\pdftexversion}}
-@d pdf_strcmp_result_code     = pdftex_last_rint_code + 1 {result of \.{\\pdfstrcmp}}
+@d pdf_strcmp_result_code     = pdftex_first_rint_code + 8 {result of \.{\\pdfstrcmp}}
+@d pdftex_last_item_codes     = pdftex_first_rint_code + 9 {end of \pdfTeX's command codes}
 @z
-% N.B.: pdftex_last_rint_code + 1 is used for eTeX
 
 @x [416]
-primitive("badness",last_item,badness_code);
-@!@:badness_}{\.{\\badness} primitive@>
+primitive("pdflastypos",last_item,pdf_last_y_pos_code);@/
+@!@:pdf_last_y_pos_}{\.{\\pdflastypos} primitive@>
 @y
-primitive("badness",last_item,badness_code);
-@!@:badness_}{\.{\\badness} primitive@>
+primitive("pdflastypos",last_item,pdf_last_y_pos_code);@/
+@!@:pdf_last_y_pos_}{\.{\\pdflastypos} primitive@>
 primitive("pdfstrcmpresult",last_item,pdf_strcmp_result_code);@/
 @!@:pdf_strcmp_result_}{\.{\\pdfstrcmpresult} primitive@>
 @z
 
 @x [417]
-  othercases print_esc("badness")
+  pdf_last_y_pos_code:  print_esc("pdflastypos");
 @y
+  pdf_last_y_pos_code:  print_esc("pdflastypos");
   pdf_strcmp_result_code: print_esc("pdfstrcmpresult");
-  othercases print_esc("badness")
 @z
 
 @x [424]
-  pdftex_version_code:  cur_val := pdftex_version;
+  pdf_last_y_pos_code:  cur_val := pdf_last_y_pos;
 @y
-  pdftex_version_code:  cur_val := pdftex_version;
+  pdf_last_y_pos_code:  cur_val := pdf_last_y_pos;
   pdf_strcmp_result_code:  cur_val := pdf_strcmp_result;
 @z
 

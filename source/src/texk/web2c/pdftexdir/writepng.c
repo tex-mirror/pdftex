@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,11 +17,14 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writepng.c#3 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writepng.c#4 $
 */
 
 #include "ptexlib.h"
 #include "image.h"
+
+static const char perforce_id[] = 
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writepng.c#4 $";
 
 void read_png_info(integer img)
 {
@@ -67,9 +70,9 @@ void read_png_info(integer img)
 
 void write_png(integer img)
 {
-    int i, j;
+    int i, j, k, l;
     integer palette_objnum = 0;
-    png_bytep row, *rows;
+    png_bytep row, r, *rows;
     pdf_puts("/Type /XObject\n/Subtype /Image\n");
     pdf_printf("/Width %i\n/Height %i\n/BitsPerComponent %i\n",
                (int)png_info(img)->width,
@@ -100,9 +103,15 @@ void write_png(integer img)
         row = xtalloc(png_info(img)->rowbytes, png_byte);
         for (i = 0; i < (int)png_info(img)->height; i++) {
             png_read_row(png_ptr(img), row, NULL);
-            pdfroom(png_info(img)->rowbytes);
-            for (j = 0; j < (int)png_info(img)->rowbytes; j++)
-                pdfbuf[pdfptr++] = row[j];
+	    r = row;
+	    k = png_info(img)->rowbytes;
+	    while(k > 0) {
+		l = (k > pdfbufsize)? pdfbufsize : k;
+		pdfroom(l);
+		for (j = 0; j < l; j++)
+		    pdfbuf[pdfptr++] = *r++;
+		k -= l;
+	    }
         }
         xfree(row);
     }
@@ -115,9 +124,14 @@ void write_png(integer img)
         png_read_image(png_ptr(img), rows);
         for (i = 0; i < (int)png_info(img)->height; i++) {
             row = rows[i];
-            pdfroom(png_info(img)->rowbytes);
-            for (j = 0; j < (int)png_info(img)->rowbytes; j++)
-                pdfbuf[pdfptr++] = *row++;
+	    k = png_info(img)->rowbytes;
+	    while(k > 0) {
+		l = (k > pdfbufsize)? pdfbufsize : k;
+		pdfroom(l);
+		for (j = 0; j < l; j++)
+		    pdfbuf[pdfptr++] = *row++;
+		k -= l;
+	    }
             xfree(rows[i]);
         }
         xfree(rows);

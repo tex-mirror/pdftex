@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writejpg.c#5 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writejpg.c#7 $
 */
 
 #include "ptexlib.h"
@@ -145,7 +145,7 @@ void read_jpg_info(integer img)
         case M_SOF15:
             pdftex_fail("unsupported type of compression");
         case M_SOF2:
-	     if (getintpar(cfgpdfminorversioncode) <= 2)
+         if (getintpar(cfgpdfminorversioncode) <= 2)
                  pdftex_fail("cannot use progressive DCT with PDF-1.2");
         case M_SOF0:
         case M_SOF1:

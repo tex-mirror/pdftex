@@ -1,3 +1,645 @@
+2004-09-07  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* doc/web2c.texi: Changes made by Karl Berry.
+
+2004-08-30  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* dvitomp.ch: A more complete implementation of the color stack.
+	Slight modification of code provided by Eddie Kohler
+	<kohler@cs.ucla.edu>.
+
+2004-08-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* doc/web2c.texi: Document -output-directory.
+
+	* doc/install.texi: Correct cross-references for building formats.
+
+	* cpascal.h (output_directory): Added global variable.
+
+	* triptrap/texmf.cnf: Correct settings for main_memory.
+
+	* texmfmp-help.h: Add -output-directory to the help texts.
+
+	* dvitomp.ch: Allow for a variable number of spaces between the
+	'color push' special name and its argument.  From Eddie Kohler
+	<kohler@cs.ucla.edu>.
+
+2004-08-27  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* configure.in: Create etexdir in build tree if we're compiling
+	e-TeX.
+
+2004-08-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mp.ch, mf.ch, tex.ch: |main_memory| is a size, while |mem_top|
+	is an index, so we need to subtract 1 when deriving |mem_top| from
+	|main_memory|.  In a similar vein, we need to add 1 when
+	allocating the |mem| array.  This may seem like nitpicking, but
+	matters for the trip and trap tests.
+
+2004-08-26  Peter Breitenlohner <peb@mppmu.mpg.de>
+
+	* Makefile.in (patgen-check): Provide non-trivial test data.
+
+	* tests/dict, tests/patgen.in, tests/patterns, tests/translate:
+	Input data for patgen-check.
+
+	* tests/patout, tests/pattmp.4: New files.
+	Output from patgen-check.
+
+2004-08-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* patgen.ch: Typo fixed by Peter Breitenlohner <peb@mppmu.mpg.de>.
+
+	* patgen.web: Typo fixed by Peter Breitenlohner
+	<peb@mppmu.mpg.de>.  (New version 2.3, August 2004).
+
+	* Makefile.in (etex-dist,pdftex-dist): Account for etex.version
+	and pdftex.version as generated files.
+
+2004-08-24  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch [23.328]: Ensure that |source_filename_stack|[|in_open|]
+	and |full_source_filename_stack|[|in_open|] are initialized.
+
+	* tex.ch: Revise the file:line:error code to produce the correct
+	filename in the presence of \scantokens (an e-TeX extension).  If
+	we're not reading from a file at all, fall back on the TeX-style
+	messages.  This change introduces |print_file_line| to keep the
+	amount of code in the |print_err| macro under control.
+
+2004-08-23  Karl Berry <karl@tug.org>.
+
+	* doc/web2c.texi: An extensive update.
+
+2004-08-06  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* config.h: Clean the define of TEXDLL up.  From Jan Nieuwenhuizen
+	<janneke@gnu.org>.
+
+2004-08-05  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch [29.530] prompt_file_name: don't allow the use of the
+	empty string for a file name.  After Taco Hoekwater
+	<taco@elvenkind.com>.
+
+	* mf.ch [38.786] prompt_file_name: don't allow the use of the
+	empty string for a file name.
+
+	* mp.ch [35.763] prompt_file_name: don't allow the use of the
+	empty string for a file name.
+
+2004-08-01  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in (post-dist-$(distname)): Ensure that
+	texk/web2c/tests/xampl.bib is actually in the distributed tarball.
+	(bibtex-check): BIBINPUTS should only need $(srcdir)/tests.
+
+2004-07-30  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Undo changes from --option to -option.  This
+	generated too many differences with the TeX-live sources at this
+	time.
+
+2004-07-23  Peter Breitenlohner <peb@mppmu.mpg.de>
+
+	* tex.ch: Reorganize handling of banner string in order to
+	reduce interference between eTeX, pdfTeX, and web2c change
+	files.
+
+2004-07-23  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Use singe dash for -ini, -progname etc.  Use
+	explicit -ini and -progname when running the trip test, because
+	the argv[0] name becomes lt-tex when using shared libraries, and
+	we have settings in triptrap/texmf.cnf that are sensitive to this.
+
+	* Makefile.in (bibtex-check): Add BIBINPUTS or check can fail.
+
+2004-07-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: Reorganize handling of integer parameters in order to
+	reduce interference between eTeX, pdfTeX, and web2c change files.
+	From Peter Breitenlohner <peb@mppmu.mpg.de>.
+
+	* fmtutil.in: Update from Thomas.
+
+2004-07-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mf.ch [42.912]: Remove this simplification of the web code,
+	which is no longer a valid assumption now that we're back to the
+	old print system.
+
+	* mp.ch: A smaller set of changes than for mf.ch, as in version
+	0.64 the |print|, |print_char|, |print_visible_char| system
+	previously implemented in the mp.ch change file was merged into
+	mp.web.  Remove a reference to |slow_print| that was overlooked
+	earlier.
+
+	* mf.ch: Extensive changes to the print routines, to mirror what
+	was done for tex.ch (q.v.).
+
+	* tex.ch: Extensive changes to fix a problem with the encTeX
+	merge.  Original TeX used |slow_print|, |print|, and |print_char|
+	for printing.  This had been changed to |print|, |print_char|, and
+	|print_visible_char|, where the new |print_char| did the expansion
+	of unprintable characters to "escaped sequences" on the fly.
+	encTeX, it turns out, is too tightly interwoven with the old way
+	of doing things, leading to some strange breakage.  So we've
+	largely reverted the code.  In particular, we now store the
+	"escaped sequences" for non-ASCII characters again as strings, and
+	later decide on-the-fly whether to use those or just pass through.
+	This simplifies the change file, and narrows the distance to the
+	encTeX code.
+
+	* texmfmp.h (setupcharset): Removed.
+	(readtcxfile): Added.  Unlike setupcharset, this function doesn't
+	initialize the xchr/xord/xprn arrays, it just updates them from a
+	tcx file.  The name of the must be in the global
+	translate_filename.
+
+	* config.h: Add second argument to call of usagehelp.  This is the
+	email address for bug reports.  If NULL, the default address for
+	web2c is used.
+
+	* bibtex.ch: Add second argument to call of usagehelp.
+
+	* dvicopy.ch: Add second argument to call of usagehelp.
+
+	* dvitomp.ch: Add second argument to call of usagehelp.
+
+	* dvitype.ch: Add second argument to call of usagehelp.
+
+	* gftodvi.ch: Add second argument to call of usagehelp.
+
+	* gftopk.ch: Add second argument to call of usagehelp.
+
+	* gftype.ch: Add second argument to call of usagehelp.
+
+	* mft.ch: Add second argument to call of usagehelp.
+
+	* patgen.ch: Add second argument to call of usagehelp.
+
+	* pktogf.ch: Add second argument to call of usagehelp.
+
+	* pktype.ch: Add second argument to call of usagehelp.
+
+	* pltotf.ch: Add second argument to call of usagehelp.
+
+	* pooltype.ch: Add second argument to call of usagehelp.
+
+	* tangle.ch: Add second argument to call of usagehelp.
+
+	* tftopl.ch: Add second argument to call of usagehelp.
+
+	* vptovf.ch: Add second argument to call of usagehelp.
+
+	* vftovp.ch: Add second argument to call of usagehelp.
+
+	* weave.ch: Add second argument to call of usagehelp.
+
+	* cwebdir/comm-w2c.ch: Add second argument to call of usagehelp.
+
+2004-07-12  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp-help.h: Correct help strings of pdf*tex family.  From
+	Akira Kakuto <kakuto@fsci.fuk.kindai.ac.jp>.
+
+2004-07-04  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Move the creation of the format-related links to
+	format-related install rules; this seems to be a better place for
+	them, as the links are pointless without the corresponding
+	formats.  Make the install-*-pool rules depend on the pool file in
+	question.  Remove TEXMF=$(texmf) from the dumpenv; the
+	TEXMFCNF=../kpathsea should get us a texmf.cnf with suitable
+	absolute paths.
+
+	* tex.ch: Correct date in encTeX_banner.
+
+2004-07-03  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* configure.in: No m4 quoting needed in the KPSE_CROSS_BUILD_VAR
+	calls.  The default of $BUILDLDFLAGS must be $BUILDXLDFLAGS.
+
+	* Makefile.in (web2c/fixwrites,web2c/spitup,web2c/web2c): These
+	also depend on web2c/kps.c.
+	[TANGLEBOOT,CTANGLEBOOT,TANGLE,CTANGLE,OTANGLE,TIE]: Add these
+	variabled so the build can use programs other than what is built.
+	Used when cross-compiling.
+
+	* configure.in: Add KPSE_CROSS_BUILD_VAR and KPSE_CROSS_PATH_PROG
+	invocations to set up cross-compiling.  To cross-compile, you need
+	to have tangle, ctangle, otangle, and tie available on the build
+	machine.
+
+	* weave.ch: Set |max_names| to 10220, so we can still (barely)
+	handle pdfetex.  Clearly a larger reworking is on the horizon.
+
+	* tex.ch: Change |mubyte_incs| into a boolean.
+
+2004-07-02  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: Update to encTeX from Petr Olsak.  These fix three bugs.
+	These bugs are seen only in encTeX mode when \mubytein=1 and in
+	very rare cases.  Petr's explanation follows:
+	
+	1) If the control sequence is converted by \mubyte table but it is
+	not shrunk then the non-converted alternative of control sequence
+	is really used. It can be possible only if one-byte to one-byte
+	conversion is used and declared by \mubyte primitive. More common
+	is to use \mubyte for multi-byte to one-byte conversion. In such
+	situation, there is no problem because control sequence is
+	schrunk. Thanks to Wlodzimierz Bzyl for bugreport.
+	
+	   \def\aXb{xx}
+	   \mubyte X Y\endmubyte
+	   \mubytein=1
+	   \aYb   % writes "undefined control sequence \aXb" because
+	          % error message is converted but real control sequence
+	          % is not converted and \aYb is undefined.
+	
+	2) If multi-byte to one-byte conversion is done during scanning of
+	control sequence name with the result: one-letter control
+	sequence, then this control sequence is not connected with
+	"native" one-letter control sequence but the new "multi-letter
+	control sequence" is allocated with only one letter in real.
+	
+	   \def\X{xx} % one-letter control sequence is defined
+	   \mubyte X YZ\endmubyte
+	   \mubytein=1
+	   \YZ   % writes "undefined control sequence \X" because \YZ is
+	         % converted to \X but allocated as multi-letter control
+	         % sequence, but one-letter control sequence is defined
+	
+	3) If \catcode`\^^@=11 or 7 and if control sequence is terminated
+	by generated control sequence (from \mubyte conversion) then the
+	result of reading is unpredictable.
+	
+	   \def\XXX{xx}
+	   \mubyte \XXX YZ\endmubyte
+	   \mubytein=1 \relaxYZ % it is OK: \relax followed by \XXX
+	   \par\catcode`\^^@=11
+	   \relaxYZ   % bad reading: \relaxYZ control sequence not defined
+
+2004-06-30  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* doc/web2c.texi: Updates to make conversion to HTML easier, from
+	Karl Berry.
+
+2004-06-29  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* doc/install.texi: Remove reference to --enable-auto-core.  That
+	part of the code should be considered terminally broken.
+
+2004-06-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: If the end-of-line character was disabled, we'd end up
+	dropping the last characters of filenames.  Fixed by checking for
+	end-of-line only if we've just seen a space, which could be the
+	end-of-line space.  Reported by Werner Lemberg <wl@gnu.org>.
+
+2004-06-13  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mp.ch: Moving the re-parsing of |name_of_file| back to
+	|start_input|.  The string administration gets confused if this is
+	done in |make_file_name|.
+
+	* tex.ch: Typo in comment.  Remove some redundant material out of
+	the change file.  Replace ' ' with " " in a number of places --
+	this is the difference between the external coding and the
+	internal ASCII-based coding of characters.  Since the external
+	coding is ASCII on all platforms we currently compile on, this is
+	a place where mistakes in the web2c sources can linger.
+
+	* mf.ch: More changes to support spaces in filenames.  In
+	particular, keep quotes around |cur_name|, |cur_ext|, and
+	|cur_area| iff these contain spaces.  This incurs complications
+	because we re-parse |name_of_file| into these components after
+	opening a file.  The file-printing routine is changed to ensure
+	that we print quotes if needed, but do not print any quotes
+	contained in the parameters themselves.
+
+	* mp.ch: More changes to support spaces in filenames.  In
+	particular, keep quotes around |cur_name|, |cur_ext|, and
+	|cur_area| iff these contain spaces.  This incurs complications
+	because we re-parse |name_of_file| into these components after
+	opening a file.  The file-printing routine is changed to ensure
+	that we print quotes if needed, but do not print any quotes
+	contained in the parameters themselves.
+
+2004-06-07  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mp.ch: Larger |max_in_open|, |param_size|, |max_write_files|.
+
+	* tex.ch: More changes to support spaces in filenames.  In
+	particular, keep quotes around |cur_name|, |cur_ext|, and
+	|cur_area| iff these contain spaces.  This incurs complications
+	because we re-parse |name_of_file| into these components after
+	opening a file.  The file-printing routine is changed to ensure
+	that we print quotes if needed, but do not print any quotes
+	contained in the parameters themselves.
+
+2004-06-04  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mp.ch: A slight change to ensure double quotes do not appear in
+	error messages when a filename has to be quoted.
+
+	* mf.ch: A slight change to ensure double quotes do not appear in
+	error messages when a filename has to be quoted.
+
+	* tex.ch: When dealing with a filename with unbalanced quotes,
+	still stop scanning when the buffer ends.  Also a slight
+	modification to prevent double quotes from appearing in error
+	messages.
+
+2004-06-01  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: Delete some MLTeX code that was duplicated accidentally.
+
+2004-05-31  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mf.ch, mp.ch: xprn must be ASCII_code -- we story only 0 or 1
+	there, and 'boolean' is a full 4-byte entity.  Worse, dummy_xprn
+	was already an ASCII_code, so in the presence of a TCX file we
+	didn't correctly undump the base/mem.
+
+2004-05-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* cpascal.h: Remove -oem code.
+
+2004-05-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mp.ch: In mpost, we need to use str_stop to find the end of a
+	string.  Reported by Wlodzimierz Bzyl <matwb@univ.gda.pl>.
+
+2004-05-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch [5.58]: Remove code implementing the locale-dependent
+	printing.  The most generous evaluation is that this was an
+	experiment that failed.  The desired effect of having printable
+	eight-bit characters is handled through different mechanisms.
+
+	* Makefile.in: fmtutil-related changes from Thomas.  May not be
+	completely correct yet.
+
+	* fmtutil.in: New version from TeX-live.
+
+	* texmfmp-help.h: Correct helptexts of pdf*tex for format
+	extensions.
+
+2004-05-12  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* weave.ch: Increase max_refs and max_names for pdf*TeX.
+	Requested by Hartmut Henkel <hartmut_henkel@gmx.de>.
+
+2004-05-10  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in (ctie.c): Name of the change file changed from
+	ctie.ch to ctie-k.ch.
+
+	* web2c/ctiedir: update to latest source from ctan.
+
+2004-05-09  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Add rules to compile, install, and distribute ctie.
+
+	* Add ctie to distribution, it lives in web2c/ctiedir.
+
+	* Makefile.in (post-dist-$(distname)): Remove cweb.c when creating
+	a distribution.  Must be done explicitly because cweb is not a
+	program itself.
+	(ctangleboot.c, cwebboot.c): Make these rules more robust in the
+	presence of timestamp problems.  You could get a empty files and a
+	failed build otherwise.
+
+2004-05-08  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in (install-mf-links, install-mpost-links,
+	install-tex-links): Do not create initex, virtex, inimf, virmf,
+	inimpost, virmpost links on installation.  These are all way more
+	trouble than they're worth.
+
+	* mp.ch: Use TEXMF_POOL_NAME and TEXMF_ENGINE_NAME, and replace
+	hard-coded mf.pool with pool_name in messages.
+
+	* mf.ch: Use TEXMF_POOL_NAME and TEXMF_ENGINE_NAME, and replace
+	hard-coded mf.pool with pool_name in messages.
+
+	* tex.ch: Change TEX_POOL_NAME and TEX_ENGINE_NAME into
+	TEXMF_POOL_NAME and TEXMF_ENGINE_NAME.
+
+	* texmfmp.h: Change TEXPOOLNAME and TEXENGINENAME into
+	TEXMFPOOLNAME and TEXMFENGINENAME.
+
+	* doc/web2c.texi: Document -halt-on-error.
+
+	* texmfmp-help.h: Document -halt-on-error.
+
+	* Makefile.in: Correct dependencies on $(basedir), $(memdir),
+	instead of $(fmtdir).  This matters now that they differ.
+
+	* Makefile.in: Include md5 dir in libs-dist target.
+
+	* Makefile.in: Remove $(all_formats); it has become obsolete.
+	Simplify clean pattern now that only one format extension is left.
+	* Makefile.in: We use .fmt as the extension for all formats.  This
+	means that latex.fmt gets built by e-TeX (as requested by the
+	LaTeX2e group).  So remove that target from the rules for TeX.
+
+	* texmfmp-help.h: Change the various -*fmt options to actually
+	spell -fmt.
+
+	* tex.ch: Implement halt-on-error, and quoted filenames.
+
+	* mf.ch: Implement halt-on-error, and quoted filenames.
+
+	* mp.ch: Implement halt-on-error, and quoted filenames.
+
+2004-05-07  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Remove eomega-related code.  Add aleph-dist target.
+
+	* configure.in: Remove e-Omega code.  Enable pdflib for all
+	members of the pdfTeX family.
+
+	* texmfmp-help.h: Add -8bit to help text.
+
+	* doc/web2c.texi: Document interaction between -8bit and TCX.
+
+	* doc/web2c.texi: Document -8bit option.
+
+	* mp.ch: Add a magic number to the dump, add engine name to dump,
+	dump xord, xchr, xprn, so a TCX file during INI is persistent.
+
+	* mf.ch: Add a magic number to the dump, add engine name to dump,
+	dump xord, xchr, xprn, so a TCX file during INI is persistent.
+
+	* tex.ch: Always dump the xord, xchr, and xprn arrays, so loading
+	a TCX file in INI mode will change these defaults for all users of
+	the format.  Implement an 8bit option that switches all characters
+	to printable by default.  Reorganize the code a bit.
+
+2004-04-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch [5.71]: An error in the encTeX merge (not encTeX itself)
+	made TeX ignore commands given at the error "?" prompt.  Reported
+	by Akira Kakuto <kakuto@fsci.fuk.kindai.ac.jp>.
+
+2004-04-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: Modify error messages involving tex.pool, so they use
+	pool_name instead of the hard-coded name.  Implement checking for
+	the name of the engine, which is now stored in the format file.
+
+	* texmfmp.h: Add proper definitons of TEXENGINENAME for each
+	engine.
+
+2004-04-08  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* bibtex.ch [10]: Add 'hack0' to initialize jmp9998. This had to
+	be moved up because otherwise we could end up doing the longjmp
+	before the setjmp.  Reported by Sven Luther
+	<luther@dpt-info.u-strasbg.fr>.
+
+2004-03-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: Change type of parse_first_line_p,
+	file_line_error_style_p, and shell_escape_p from boolean to
+	c_int_type.  They're used as booleans in the Pascal code, but
+	tri-state in the C code.
+
+	* texmfmp-help.h: Document -no-shell-escape, -no-parse-first-line,
+	-no-file-line-error.
+
+	* doc/web2c.texi: Document -no-shell-escape, -no-file-line-error,
+	-no-parse-first-line.
+
+2004-03-25  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp-help.h: Bring help text up-to-date.
+
+	* tex.ch: Simplify some of the encTeX-related code.
+
+	* configure.in: Add test for Aleph.
+
+	* Makefile.in: Reorganization to mode pdftexlib-related code to
+	its own makefile fragment.  Also rewrite the rules for the engines
+	so it becomes easier to omit specific engines from the default
+	compilation.
+
+2004-03-24  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* cpascal.h: Add definition of floor() for dvitomp.  After Hartmut
+	Henkel <hartmut_henkel@gmx.de>.
+
+	* dvitomp.ch [49,50]: For the code to work, Hobby notes that we
+	need |round|(|x|-0.5) to be equal to $\lfloor x\rfloor$.  For
+	Pascal's |round| function this is emphatically not true.  After
+	Hartmut Henkel <hartmut_henkel@gmx.de>.
+
+	* dvitomp.ch: Support for color specials, like those generated by
+	the colordvi package.  From Eddie Kohler <kohler@cs.ucla.edu>.
+
+2004-03-23  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: Clarify use of special_printing in comment.
+
+2004-03-22  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* dvitomp.ch [57]: Off-by-one error in virtual font handling.
+	From Hartmut Henkel <hartmut_henkel@gmx.de>.
+
+	* tex.ch: Correct comment so the file weaves properly.
+
+2004-03-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: encTeX merge.  Code from Petr Olsak, with modifications
+	to match the rest of web2c better.
+
+2004-03-18  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in [testenv]: somehow the LC_ALL=C got dropped.
+
+2004-03-17  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: Double sup_font_mem_size to 2000000.
+
+	* triptrap/texmf.cnf: Add mem_bot.tex and mem_bot.initex, set
+	main_memory.{ini,}tex to 3000.
+
+	* tex.ch: Make mem_bot configurable (0 and 1 only allowed values).
+	Used for the trip test.
+
+2004-03-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Modifications for Aleph.
+
+	* texmfmp.h: Mods for Aleph.
+
+	* texmfmem.h: Add Aleph.
+
+	* texmfmp-help.h [Aleph]: ALEPHHELP.
+
+2004-02-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tangle.ch: Treat pool files as binary files, not text files
+	(matters on some platforms).
+
+	* pooltype.ch: Treat pool files as binary files, not text files
+	(matters on some platforms).
+
+	* mp.ch [43.1195]: Use kpse_fontmap_format to find psfonts.map.
+
+	* tex.ch: Rename is_printable to xprn.
+
+	* mp.ch: Rename is_printable to xprn.
+
+	* mf.ch: Rename is_printable to xprn.
+
+	* withenable.ac: Add --without-pdfxtex.
+
+	* texmfmp.h (undumpint): Treat WIN32 as if REGFIX is set.
+
+	* texmfmp.h: Add define for kpsefontmapformat.
+
+	* texmfmp.h: Add support for pdfxTeX.
+
+	* fmtutil.in: Sync with TeXlive.
+
+	* configure.in: Add support for pdfxTeX.
+
+	* configure.in: If LEX is (autodetected) flex, add -l option.  We
+	need this for omegafonts.
+
+	* help.h [MFT]: Allow several -style options.
+
+	* mft.ch: Implement multiple style files (multiple -s options) for
+	mft.
+
+	* patgen.ch: Increase trie_size, triec_size.  Do not remove the
+	close_in, close_out operations.
+
+	* tex.ch [6.82]: Do not force scroll_mode for file:line:error
+	style messages.
+
+	* cwebdir/comm-w2c.ch: Correct documentation of CWEBINPUTS.
+	Initialise kpathsea_debug.
+
+2004-01-11  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: Initialize source_filename_stack[0],
+	full_source_filename_stack[0] -- these can be read under some
+	circumstances.  Found by Krank Küster <frank@kuesterei.ch>.
+
+	* tex.ch: Correct printing of |src_specials| when weaving.
+
+2003-10-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* configure.in: Work around flex 2.5.x issue (affecting pl.l in
+	the Omega code) by adding -l flag if we're using flex.  From
+	Thomas.
+
 2003-02-19  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* doc/web2c.texi: Version 7.5.2.

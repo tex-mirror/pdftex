@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#9 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#12 $
 */
 
 #include "ptexlib.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#9 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#12 $";
 
 typedef signed char     TTF_CHAR;
 typedef unsigned char   TTF_BYTE;
@@ -164,7 +164,7 @@ static TTF_USHORT new_ntabs;
 static glyph_entry *glyph_tab;
 static short *glyph_index;
 static int ncmaptabs;
-static cmap_entry *cmap_tab = 0;
+static cmap_entry *cmap_tab = NULL;
 static name_record *name_tab;
 static int name_record_num;
 static char *name_buf;
@@ -281,7 +281,7 @@ static tabdir_entry *ttf_name_lookup(const char *s, boolean required)
         if (required)
             pdftex_fail("can't find table `%s'", s);
         else
-            tab = 0;
+            tab = NULL;
     }
     return tab;
 }
@@ -301,7 +301,7 @@ static void ttf_seek_off(TTF_LONG offset)
 static void ttf_copy_encoding(void)
 {
     int i;
-    char **glyph_names = enc_array[fm_cur->encoding].glyph_names;
+    char **glyph_names = (fm_cur->encoding)->glyph_names;
     ttfenc_entry *e = ttfenc_tab;
     pdfmarkchar(tex_font, 'a'); /* workaround for a bug of AcroReader 4.0 */
     for (i = 0; i <= MAX_CHAR_CODE; i++, e++) {
@@ -357,9 +357,6 @@ static void ttf_read_mapx(void)
     glyph_index = xtalloc(glyphs_count, short);
     glyph_index[0] = 0; /* index of ".notdef" glyph */
     glyph_index[1] = 1; /* index of ".null" glyph */
-    for (i = 0; i < MAX_KEY_CODE; i++)
-        if (i != FONTNAME_CODE)
-            font_keys[i].valid = true;
 }
 
 static void ttf_read_head(void)
@@ -371,6 +368,10 @@ static void ttf_read_head(void)
     font_keys[FONTBBOX2_CODE].value.num = ttf_funit(get_fword());
     font_keys[FONTBBOX3_CODE].value.num = ttf_funit(get_fword());
     font_keys[FONTBBOX4_CODE].value.num = ttf_funit(get_fword());
+    font_keys[FONTBBOX1_CODE].valid = true;
+    font_keys[FONTBBOX2_CODE].valid = true;
+    font_keys[FONTBBOX3_CODE].valid = true;
+    font_keys[FONTBBOX4_CODE].valid = true;
     ttf_skip(2*TTF_USHORT_SIZE + TTF_SHORT_SIZE);
     loca_format = get_short();
 }
@@ -380,22 +381,22 @@ static void ttf_read_hhea(void)
     ttf_seek_tab("hhea", TTF_FIXED_SIZE);
     font_keys[ASCENT_CODE].value.num = ttf_funit(get_fword());
     font_keys[DESCENT_CODE].value.num = ttf_funit(get_fword());
+    font_keys[ASCENT_CODE].valid = true;
+    font_keys[DESCENT_CODE].valid = true;
     ttf_skip(TTF_FWORD_SIZE + TTF_UFWORD_SIZE + 3*TTF_FWORD_SIZE + 8*TTF_SHORT_SIZE);
     nhmtxs = get_ushort();
 }
 
 static void ttf_read_pclt(void)
 {
-    if (ttf_name_lookup("PCLT", false) != 0) {
-        ttf_seek_tab("PCLT", TTF_FIXED_SIZE + TTF_ULONG_SIZE + TTF_USHORT_SIZE);
-        font_keys[XHEIGHT_CODE].value.num = ttf_funit(get_ushort());
-        ttf_skip(2*TTF_USHORT_SIZE);
-        font_keys[CAPHEIGHT_CODE].value.num = ttf_funit(get_ushort());
-    }
-    else {
-        font_keys[XHEIGHT_CODE].valid = false;
-        font_keys[CAPHEIGHT_CODE].valid = false;
-    }
+    if (ttf_name_lookup("PCLT", false) == NULL)
+        return;
+    ttf_seek_tab("PCLT", TTF_FIXED_SIZE + TTF_ULONG_SIZE + TTF_USHORT_SIZE);
+    font_keys[XHEIGHT_CODE].value.num = ttf_funit(get_ushort());
+    ttf_skip(2*TTF_USHORT_SIZE);
+    font_keys[CAPHEIGHT_CODE].value.num = ttf_funit(get_ushort());
+    font_keys[XHEIGHT_CODE].valid = true;
+    font_keys[CAPHEIGHT_CODE].valid = true;
 }
 
 static void ttf_read_hmtx(void)
@@ -420,11 +421,24 @@ static void ttf_read_post(void)
 {
     int k, nnames;
     long length;
+    long int_part, frac_part;
+    int sign = 1;
+    TTF_FIXED italic_angle;
     char *p;
     glyph_entry *glyph;
     tabdir_entry *tab = ttf_seek_tab("post", 0);
     post_format = get_fixed();
-    font_keys[ITALIC_ANGLE_CODE].value.num = get_fixed() >> 16;
+    italic_angle = get_fixed();
+    int_part = italic_angle >> 16;
+    if (int_part > 0x7FFF) { /* a negative number */
+        int_part = 0x10000 - int_part;
+        sign = -1;
+    }
+    frac_part = italic_angle % 0x10000;
+    font_keys[ITALIC_ANGLE_CODE].value.num = sign*(int_part + frac_part*1.0/0x10000);
+    font_keys[ITALIC_ANGLE_CODE].valid = true;
+    if (glyph_tab == NULL)
+        return; /* being called from writeotf() */
     ttf_skip(2*TTF_FWORD_SIZE + 5*TTF_ULONG_SIZE);
     switch (post_format) {
     case 0x10000:
@@ -499,13 +513,13 @@ static void ttf_read_tabdir()
 static void ttf_read_font(void)
 {
     ttf_read_tabdir();
-    if (ttf_name_lookup("PCLT", false) == 0)
+    if (ttf_name_lookup("PCLT", false) == NULL)
         new_ntabs--;
-    if (ttf_name_lookup("fpgm", false) == 0)
+    if (ttf_name_lookup("fpgm", false) == NULL)
         new_ntabs--;
-    if (ttf_name_lookup("cvt ", false) == 0)
+    if (ttf_name_lookup("cvt ", false) == NULL)
         new_ntabs--;
-    if (ttf_name_lookup("prep", false) == 0)
+    if (ttf_name_lookup("prep", false) == NULL)
         new_ntabs--;
     ttf_read_mapx();
     ttf_read_head();
@@ -609,7 +623,7 @@ static void ttf_seg_map_delta(void)
 
 static void ttf_select_cmap(void)
 {
-    if (cmap_tab == 0)
+    if (cmap_tab == NULL)
         cmap_tab = xtalloc(2, cmap_entry);
     cmap_tab[0].platform_id  = 1; /* Macintosh */
     cmap_tab[0].encoding_id  = 0; /* Symbol; ignore code page */
@@ -698,7 +712,7 @@ static void ttf_write_dirtab(void)
     if (is_subsetted(fm_cur)) {
         for (i = 0; i < DEFAULT_NTABS; i++) {
             tab = ttf_name_lookup(newtabnames[i], false);
-            if (tab == 0)
+            if (tab == NULL)
                 continue;
             for (k = 0; k < 4; k++)
                put_char(tab->tag[k]);
@@ -936,7 +950,7 @@ static void ttf_write_OS2(void)
 static boolean unsafe_name(char *s)
 {
     const char **p;
-    for (p = ambiguous_names; *p != 0; p++)
+    for (p = ambiguous_names; *p != NULL; p++)
         if (strcmp(s, *p) == 0)
             return true;
     return false;
@@ -994,13 +1008,13 @@ static void ttf_init_font(int n)
 static void ttf_subset_font(void)
 {
     ttf_init_font(new_ntabs);
-    if (ttf_name_lookup("PCLT", false) != 0)
+    if (ttf_name_lookup("PCLT", false) != NULL)
         ttf_copytab("PCLT");
-    if (ttf_name_lookup("fpgm", false) != 0)
+    if (ttf_name_lookup("fpgm", false) != NULL)
         ttf_copytab("fpgm");
-    if (ttf_name_lookup("cvt ", false) != 0)
+    if (ttf_name_lookup("cvt ", false) != NULL)
         ttf_copytab("cvt ");
-    if (ttf_name_lookup("prep", false) != 0)
+    if (ttf_name_lookup("prep", false) != NULL)
         ttf_copytab("prep");
     ttf_reindex_glyphs();
     ttf_write_glyf();
@@ -1034,7 +1048,7 @@ void writettf()
     set_cur_file_name(fm_cur->ff_name);
     if (is_subsetted(fm_cur) && !(is_reencoded(fm_cur))) {
         pdftex_warn("encoding vector required for TrueType font subsetting");
-        cur_file_name = 0;
+        cur_file_name = NULL;
         return;
     }
     if (!ttf_open()) {
@@ -1050,12 +1064,12 @@ void writettf()
     fontfile_found = true;
     new_glyphs_count = 2;
     new_ntabs = DEFAULT_NTABS;
-    dir_tab = 0;
-    glyph_tab = 0;
-    glyph_index = 0;
-    glyph_name_buf = 0;
-    name_tab = 0;
-    name_buf = 0;
+    dir_tab = NULL;
+    glyph_tab = NULL;
+    glyph_index = NULL;
+    glyph_name_buf = NULL;
+    name_tab = NULL;
+    name_buf = NULL;
     ttf_read_font();
     if (is_included(fm_cur)) {
         pdfsaveoffset = pdfoffset();
@@ -1081,7 +1095,7 @@ void writettf()
         tex_printf(">");
     else
         tex_printf(">>");
-    cur_file_name = 0;
+    cur_file_name = NULL;
 }
 
 void writeotf()
@@ -1095,15 +1109,26 @@ void writeotf()
     cur_file_name = (char*)nameoffile + 1;
     tex_printf("<<%s", cur_file_name);
     fontfile_found = true;
-    dir_tab = 0;
+    dir_tab = NULL;
+    glyph_tab = NULL;
     ttf_read_tabdir();
+    /* read font parameters */
+    if (ttf_name_lookup("head", false) != NULL)
+        ttf_read_head();
+    if (ttf_name_lookup("hhea", false) != NULL)
+        ttf_read_hhea();
+    if (ttf_name_lookup("PCLT", false) != NULL)
+        ttf_read_pclt();
+    if (ttf_name_lookup("post", false) != NULL)
+        ttf_read_post();
+    /* copy font file */
     tab = ttf_seek_tab("CFF ", 0);
     for (i = tab->length; i > 0; i--)
         copy_char();
     xfree(dir_tab);
     ttf_close();
     tex_printf(">>");
-    cur_file_name = 0;
+    cur_file_name = NULL;
 }
 
 /*

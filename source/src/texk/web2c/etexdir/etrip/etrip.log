@@ -1,9 +1,9 @@
-This is e-TeX, Version 3.14159-2.1 (preloaded format=etrip 1999.1.31)  31 JAN 1999 15:29
+This is e-TeX, Version 3.141592-2.2 (preloaded format=etrip 2004.9.6)  6 SEP 2004 23:13
 entering extended mode
 **&etrip etrip
 (etrip.tex e-IniTeX: e-Trip format loaded.
-This is the e-Trip test [1999/01/32] for e-TeX v3.14159-2.1.
-(You are using e-TeX version/revision 2.1)
+This is the e-Trip test [2004-09-06] for e-TeX v3.141592-2.2.
+(You are using e-TeX version/revision 2.2)
 Missing character: There is no b in font nullfont!
 
 Missing character: There is no c in font nullfont!
@@ -668,7 +668,7 @@ Completed box being shipped out [1]
 .\write1{\unexpanded \expandafter {\1}}
 .\closeout1
 
-Memory usage before: 50&181; after: 36&175; still untouched: 681
+Memory usage before: 50&182; after: 36&176; still untouched: 680
 (etrip.out) ( 
 Warning: end of semi simple group (level 3) entered at line 431 of a dif
 ferent file
@@ -2694,9 +2694,9 @@ since the result is out of range.
 
 Expr fraction rounding 3 OK
 [1]
-Memory usage before: 51&319; after: 44&319; still untouched: 681
+Memory usage before: 51&320; after: 44&320; still untouched: 680
 [1]
-Memory usage before: 51&319; after: 44&319; still untouched: 681
+Memory usage before: 51&320; after: 44&320; still untouched: 680
 Checking \mutoglue and \gluetomu:
 ! You can't use `\mutoglue' in vertical mode.
 l.903   \mutoglue
@@ -2899,6 +2899,12 @@ A register number must be between 0 and 32767.
 I changed this one to zero.
 
 \toks32767=.
+> \9=\dimen256.
+l.979 ...8 \let\8=\relax \show\9
+                                
+
+{restoring \9=undefined}
+{restoring \8=undefined}
 {restoring \skip22=0.0pt}
 {restoring \dimen21=0.0pt}
 {restoring \muskip2200=0.0mu}
@@ -3060,8 +3066,10 @@ testing toks registers ...
 {into \toks30=}
 {changing \toks30=}
 {into \toks30=a b c}
-{reassigning \toks3000=}
-{reassigning \toks3000=}
+{changing \toks3000=}
+{into \toks3000=a b c}
+{changing \toks3000=a b c}
+{into \toks3000=}
 {changing \toks3000=}
 {into \toks3000=a b c}
 {restoring \toks30=}

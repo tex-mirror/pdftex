@@ -141,61 +141,6 @@ semicolon P1H(void)
   }
 }
 
-
-/* Since a syntax error can never be recovered from, we exit here with
-   bad status.  */
-
-int
-yyerror P1C(string, s)
-{
-  /* This is so the convert script can delete the output file on error.  */
-  puts ("@error@");
-  fflush (stdout);
-  fputs (s, stderr);
-  fprintf (stderr, ": Last token = %d (%c), ", last_tok, last_tok);
-  fprintf (stderr, "error buffer = `%s',\n\t", yytext);
-  fprintf (stderr, "last id = `%s' (", last_id);
-  ii = search_table (last_id);
-  if (ii == -1)
-    fputs ("not in symbol table", stderr);
-  else
-    switch (sym_table[ii].typ)
-      {
-      case undef_id_tok:
-	fputs ("undefined", stderr);
-	break;
-      case var_id_tok:
-	fputs ("variable", stderr);
-	break;
-      case const_id_tok:
-	fputs ("constant", stderr);
-	break;
-      case type_id_tok:
-	fputs ("type", stderr);
-	break;
-      case proc_id_tok:
-	fputs ("parameterless procedure", stderr);
-	break;
-      case proc_param_tok:
-	fputs ("procedure with parameters", stderr);
-	break;
-      case fun_id_tok:
-	fputs ("parameterless function", stderr);
-	break;
-      case fun_param_tok:
-	fputs ("function with parameters", stderr);
-	break;
-      default:
-	fputs ("unknown!", stderr);
-	break;
-      }
-  fputs (").\n", stderr);
-  uexit (1);
-
-  /* Avoid silly warnings.  */
-  return 0;
-}
-
 int
 hash P1C(const_string, id)
 {
@@ -282,8 +227,6 @@ int
 main P2C(int, argc, string *, argv)
 {
   int error, i;
-
-  kpse_set_progname (argv[0]); /* In case we use FATAL.  */
 
   for (i = 1; i < argc; i++)
     if (argv[i][0] == '-')

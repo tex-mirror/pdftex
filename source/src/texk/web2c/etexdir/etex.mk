@@ -5,7 +5,12 @@
 Makefile: etexdir/etex.mk
 
 # We build etex.
-etex =@ETEX@ etex
+etex = @ETEX@ etex
+
+# Extract etex version
+etexdir/etex.version: etexdir/etex.ch
+	grep '^@d eTeX_version_string==' $(srcdir)/etexdir/etex.ch \
+	  | sed "s/^.*'-//;s/'.*$$//" >etexdir/etex.version
 
 # The C sources.
 etex_c = etexini.c etex0.c etex1.c etex2.c
@@ -20,40 +25,35 @@ $(etex_c) etexcoerce.h etexd.h: etex.p $(web2c_texmf)
 	$(web2c) etex
 etexextra.c: lib/texmfmp.c
 	sed s/TEX-OR-MF-OR-MP/etex/ $(srcdir)/lib/texmfmp.c >$@
+etexdir/etexextra.h: etexdir/etexextra.in etexdir/etex.version
+	test -d etexdir || mkdir etexdir
+	sed s/ETEX-VERSION/`cat etexdir/etex.version`/ \
+	  $(srcdir)/etexdir/etexextra.in >$@
 
 # Tangling
 etex.p etex.pool: tangle etex.web etex.ch
-	./tangle etex.web etex.ch
+	$(TANGLE) etex.web etex.ch
 
 # Generation of the web and ch file.
-etex.web: tie tex.web \
-          etexdir/etex.ch0 \
-          etexdir/etex.ch \
-          etexdir/etex.fix \
-          etexdir/etex.ch1 \
-          etexdir/etex.mk
-	./tie -m etex.web $(srcdir)/tex.web \
-		$(srcdir)/etexdir/etex.ch0 \
-		$(srcdir)/etexdir/etex.ch \
-		$(srcdir)/etexdir/etex.fix \
-		$(srcdir)/etexdir/etex.ch1
-etex.ch: tie etex.web \
-         etexdir/tex.ch0 \
-         tex.ch \
-         etexdir/tex.ch1 \
-         etexdir/tex.ech \
-         etexdir/tex.ch2 \
-         etexdir/etex.mk
-	./tie -c etex.ch etex.web \
-		$(srcdir)/etexdir/tex.ch0 \
-		$(srcdir)/tex.ch \
-		$(srcdir)/etexdir/tex.ch1 \
-		$(srcdir)/etexdir/tex.ech \
-		$(srcdir)/etexdir/tex.ch2
+#   Sources for etex.web:
+etex_web_srcs = $(srcdir)/tex.web \
+  $(srcdir)/etexdir/etex.ch \
+  $(srcdir)/etexdir/etex.fix
+#   Sources for etex.ch:
+etex_ch_srcs = etex.web \
+  $(srcdir)/etexdir/tex.ch0 \
+  $(srcdir)/tex.ch \
+  $(srcdir)/etexdir/tex.ch1 \
+  $(srcdir)/etexdir/tex.ech
+#   Rules:
+etex.web: tie etexdir/etex.mk $(etex_web_srcs)
+	$(TIE) -m etex.web $(etex_web_srcs)
+etex.ch: $(etex_ch_srcs)
+	$(TIE) -c etex.ch $(etex_ch_srcs)
 
 # Tests...
-check: etex-check
-etex-check: etrip etex.efmt
+check: @ETEX@ etex-check
+etex-check: etrip etex.fmt
 # Test truncation (but don't bother showing the warning msg).
 	./etex --progname=etex --output-comment="`cat $(srcdir)/PROJECTS`" \
 	  $(srcdir)/tests/hello 2>/dev/null \
@@ -81,8 +81,9 @@ clean:: etex-clean
 etex-clean: etrip-clean
 	$(LIBTOOL) --mode=clean $(RM) etex
 	rm -f $(etex_o) $(etex_c) etexextra.c etexcoerce.h etexd.h
+	rm -f etexdir/etexextra.h etexdir/etex.version
 	rm -f etex.p etex.pool etex.web etex.ch
-	rm -f etex.efmt etex.log
+	rm -f etex.fmt etex.log
 	rm -f hello.dvi hello.log xfoo.out openout.log one.two.log uno.log
 	rm -f just.log batch.log write18.log mltextst.log texput.log
 	rm -f missfont.log
@@ -92,7 +93,7 @@ etex-clean: etrip-clean
 etestdir = $(srcdir)/etexdir/etrip
 etestenv = TEXMFCNF=$(etestdir)
 
-triptrap: etrip
+triptrap: @ETEX@ etrip
 etrip: pltotf tftopl etex dvitype etrip-clean
 	@echo ">>> See $(etestdir)/etrip.diffs for example of acceptable diffs." >&2
 	@echo "*** TRIP test for e-TeX in compatibility mode ***."
@@ -100,20 +101,20 @@ etrip: pltotf tftopl etex dvitype etrip-clean
 	./tftopl ./trip.tfm trip.pl
 	-diff $(testdir)/trip.pl trip.pl
 	$(LN) $(testdir)/trip.tex . # get same filename in log
-	-$(SHELL) -c '$(etestenv) ./etex --progname=einitex <$(testdir)/trip1.in >ctripin.fot'
+	-$(SHELL) -c '$(etestenv) ./etex --progname=einitex --ini <$(testdir)/trip1.in >ctripin.fot'
 	mv trip.log ctripin.log
 	-diff $(testdir)/tripin.log ctripin.log
-	-$(SHELL) -c '$(etestenv) ./etex <$(testdir)/trip2.in >ctrip.fot'
+	-$(SHELL) -c '$(etestenv) ./etex --progname=etex <$(testdir)/trip2.in >ctrip.fot'
 	mv trip.log ctrip.log
 	-diff $(testdir)/trip.fot ctrip.fot
 	-$(DIFF) $(DIFFFLAGS) $(testdir)/trip.log ctrip.log
 	$(SHELL) -c '$(etestenv) ./dvitype $(dvitype_args) trip.dvi >ctrip.typ'
 	-$(DIFF) $(DIFFFLAGS) $(testdir)/trip.typ ctrip.typ
 	@echo "*** TRIP test for e-TeX in extended mode ***."
-	-$(SHELL) -c '$(etestenv) ./etex --progname=einitex <$(etestdir)/etrip1.in >xtripin.fot'
+	-$(SHELL) -c '$(etestenv) ./etex --progname=einitex --ini <$(etestdir)/etrip1.in >xtripin.fot'
 	mv trip.log xtripin.log
 	-diff ctripin.log xtripin.log
-	-$(SHELL) -c '$(etestenv) ./etex <$(etestdir)/trip2.in >xtrip.fot'
+	-$(SHELL) -c '$(etestenv) ./etex --progname=etex <$(etestdir)/trip2.in >xtrip.fot'
 	mv trip.log xtrip.log
 	-diff ctrip.fot xtrip.fot
 	-$(DIFF) $(DIFFFLAGS) ctrip.log xtrip.log
@@ -124,10 +125,10 @@ etrip: pltotf tftopl etex dvitype etrip-clean
 	./tftopl ./etrip.tfm etrip.pl
 	-diff $(etestdir)/etrip.pl etrip.pl
 	$(LN) $(etestdir)/etrip.tex . # get same filename in log
-	-$(SHELL) -c '$(etestenv) ./etex --progname=einitex <$(etestdir)/etrip2.in >etripin.fot'
+	-$(SHELL) -c '$(etestenv) ./etex --progname=einitex --ini <$(etestdir)/etrip2.in >etripin.fot'
 	mv etrip.log etripin.log
 	-diff $(etestdir)/etripin.log etripin.log
-	-$(SHELL) -c '$(etestenv) ./etex <$(etestdir)/etrip3.in >etrip.fot'
+	-$(SHELL) -c '$(etestenv) ./etex --progname=etex <$(etestdir)/etrip3.in >etrip.fot'
 	-diff $(etestdir)/etrip.fot etrip.fot
 	-$(DIFF) $(DIFFFLAGS) $(etestdir)/etrip.log etrip.log
 	diff $(etestdir)/etrip.out etrip.out
@@ -136,11 +137,11 @@ etrip: pltotf tftopl etex dvitype etrip-clean
 
 # Cleaning up for the etrip.
 etrip-clean:
-	rm -f trip.tfm trip.pl trip.tex trip.efmt ctripin.fot ctripin.log
+	rm -f trip.tfm trip.pl trip.tex trip.fmt ctripin.fot ctripin.log
 	rm -f ctrip.fot ctrip.log trip.dvi ctrip.typ
 	rm -f xtripin.fot xtripin.log
 	rm -f xtrip.fot xtrip.log xtrip.typ
-	rm -f etrip.tfm etrip.pl etrip.tex etrip.efmt etripin.fot etripin.log
+	rm -f etrip.tfm etrip.pl etrip.tex etrip.fmt etripin.fot etripin.log
 	rm -f etrip.fot etrip.log etrip.dvi etrip.out etrip.typ
 	rm -f tripos.tex 8terminal.tex
 	rm -rf tfm
@@ -152,55 +153,60 @@ etrip-clean:
 
 
 # Dumps
-all_efmts = @FMU@ etex.efmt $(efmts)
+all_efmts = etex.fmt $(efmts)
 
-dumps: efmts
+dumps: @ETEX@ efmts
 efmts: $(all_efmts)
 
-etex.efmt: etex
+efmtdir = $(web2cdir)/etex
+$(efmtdir)::
+	$(SHELL) $(top_srcdir)/../mkinstalldirs $(efmtdir)
+
+etex.fmt: etex
 	$(dumpenv) $(MAKE) progname=etex files="etex.src plain.tex cmr10.tfm" prereq-check
 	$(dumpenv) ./etex --progname=etex --jobname=etex --ini \*\\input etex.src \\dump </dev/null
 
-elatex.efmt: etex
+elatex.fmt: etex
 	$(dumpenv) $(MAKE) progname=elatex files="latex.ltx" prereq-check
 	$(dumpenv) ./etex --progname=elatex --jobname=elatex --ini \*\\input latex.ltx </dev/null
 
-latex.efmt: etex
+latex.fmt: etex
 	$(dumpenv) $(MAKE) progname=latex files="latex.ltx" prereq-check
 	$(dumpenv) ./etex --progname=latex --jobname=latex --ini \*\\input latex.ltx </dev/null
 
-tex.efmt: etex
-	$(dumpenv) $(MAKE) progname=tex files="plain.tex cmr10.tfm" prereq-check
-	$(dumpenv) ./etex --progname=tex --jobname=tex --ini \\input plain \\dump </dev/null
+#ctex.fmt: etex
+#	$(dumpenv) $(MAKE) progname=ctex files="plain.tex cmr10.tfm" prereq-check
+#	$(dumpenv) ./etex --progname=ctex --jobname=ctex --ini \\input plain \\dump </dev/null
 
-olatex.efmt: etex
-	$(dumpenv) $(MAKE) progname=olatex files="latex.ltx" prereq-check
-	$(dumpenv) ./etex --progname=olatex --progname=olatex --ini \\input latex.ltx </dev/null
+#olatex.fmt: etex
+#	$(dumpenv) $(MAKE) progname=olatex files="latex.ltx" prereq-check
+#	$(dumpenv) ./etex --progname=olatex --progname=olatex --ini \\input latex.ltx </dev/null
 
 # Install
 install-etex: install-etex-exec install-etex-data
-install-etex-exec: install-etex-links
-install-etex-data:: install-etex-dumps
+install-etex-exec: install-etex-programs install-etex-links
+install-etex-data: install-etex-pool @FMU@ install-etex-dumps
 install-etex-dumps: install-etex-fmts
 
-install-programs: install-etex-programs
-install-etex-programs: $(etex) $(bindir)
+install-programs: @ETEX@ install-etex-programs
+install-etex-programs: etex $(bindir)
+	for p in etex; do $(INSTALL_LIBTOOL_PROG) $$p $(bindir); done
 
-install-links: install-etex-links
+install-links: @ETEX@ install-etex-links
 install-etex-links: install-etex-programs
-	@FMU@cd $(bindir) && (rm -f einitex evirtex; \
-	@FMU@  $(LN) etex einitex; $(LN) etex evirtex)
+	#cd $(bindir) && (rm -f einitex evirtex; \
+	#  $(LN) etex einitex; $(LN) etex evirtex)
+
+install-fmts: @ETEX@ install-etex-fmts
+install-etex-fmts: efmts $(efmtdir)
+	efmts="$(all_efmts)"; \
+	  for f in $$efmts; do $(INSTALL_DATA) $$f $(efmtdir)/$$f; done
 	efmts="$(efmts)"; \
-	  for f in $$efmts; do base=`basename $$f .efmt`; \
+	  for f in $$efmts; do base=`basename $$f .fmt`; \
 	    (cd $(bindir) && (rm -f $$base; $(LN) etex $$base)); done
 
-install-fmts: install-etex-fmts
-install-etex-fmts: efmts
-	$(SHELL) $(top_srcdir)/../mkinstalldirs $(fmtdir)
-	efmts="$(all_efmts)"; \
-	  for f in $$efmts; do $(INSTALL_DATA) $$f $(fmtdir)/$$f; done
-
-install-data install-etex-data:: $(texpooldir)
-@ETEX@	$(INSTALL_DATA) etex.pool $(texpooldir)/etex.pool
+install-data:: @ETEX@ install-etex-data
+install-etex-pool: etex.pool $(texpooldir)
+	$(INSTALL_DATA) etex.pool $(texpooldir)/etex.pool
 
 # end of etex.mk

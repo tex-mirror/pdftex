@@ -14,8 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#### Start of system configuration section. ####
-
 srcdir = @srcdir@
 VPATH  = $(srcdir)
 
@@ -33,38 +31,32 @@ LIBPNGDIR=libs/libpng
 LIBT1DIR=libs/t1lib
 LIBTYPE1DIR=$(LIBT1DIR)/../type1
 LIBXPDFDIR=libs/xpdf
+GDDIR=libs/gd
 FREETYPEDIR=libs/freetype
-
-#### End of system configuration section. ####
-
-ALLPROGS = access afm2tfm bg5conv bibtex bibtex8 cef5conv cefconv cefsconv \
-  cfftot1 ctangle cweave detex devnag disdvi dmp dt2dv dv2dt dvi2tty \
-  dvibook dviconcat dvicopy dvidvi dvilj dvilj2p dvilj4 dvilj4l dvipdfm \
-  dvips dviselect dvitodvi dvitomp dvitype ebb eomega epsffit etex extconv \
-  gftodvi gftopk gftype gsftopk hbf2gf info infokey install-info kpsestat \
-  kpsewhich lacheck mag makeindex makeinfo mf mf-nowin mft mmafm mmpfb \
-  mpost mpto musixflx newer odvicopy odvips odvitype omega omfonts otangle \
-  otfinfo otftotfm otp2ocp outocp patgen pdfetex pdftex pfb2pfa pk2bm \
-  pktogf pktype pltotf pooltype ps2pk psbook psnup psresize psselect \
-  pstops readlink sjisconv t1ascii t1asm t1binary t1disasm t1dotlessj \
-  t1lint t1mac t1testpage t1unmac t4ht tangle tcdialog tex tex4ht texindex \
-  tftopl tie ttf2afm ttf2pk ttf2tfm vftovp vptovf weave xdvi-motif.bin
 
 # Subdirectories that have makefiles
 ESUBDIRS = @ESUBDIRS@ texk
 LIBSDIRS = @LIBSDIRS@
 
+# Subdirectories for which we want to run make (un)install; these are
+# different for xdvik standalone distribution where we don't want to
+# install kpathsea and friends by default.
+INSTDIRS = @INSTDIRS@
+
 default: all
 install: all 
-	for dir in $(ESUBDIRS); do \
+	for dir in $(INSTDIRS); do \
 	   echo making $@ in $$dir; \
 	     (cd $$dir && PATH=$(scriptdir):$(bindir):$(PATH) \
                 $(MAKE) $@) || exit 1; \
 	done
 @FMU@
-@FMU@texmf-setup:
+@FMU@install-extra:
+	# temporary fix for missing links
+	test -x texk/web2c/omegafonts/omfonts && \
+	  cd texk/web2c/omegafonts; $(MAKE) install-links
+
 	$(srcdir)/selfautofix "$(bindir)" "$(texmf)/web2c"
-	cd $(bindir); for i in $(ALLPROGS); do test -f $$i && echo strip $$i && strip $$i || true; done
 	if test -f $(scriptdir)/mktexlsr; then \
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
 	    $(scriptdir)/mktexlsr; \
@@ -77,14 +69,23 @@ install: all
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
 	    $(scriptdir)/texlinks; \
 	else :; fi
+	if test -f $(scriptdir)/updmap; then \
+	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
+	    $(scriptdir)/updmap; \
+	else :; fi
 
 install-exec:
-	for dir in $(ESUBDIRS); do \
+	for dir in $(INSTDIRS); do \
 	   echo making $@ in $$dir; \
 	   (cd $$dir && PATH=$(scriptdir):$(bindir):$(PATH) \
               $(MAKE) $@) || exit 1; \
 	done
-	cd $(bindir); for i in $(ALLPROGS); do test -f $$i && echo strip $$i && strip $$i || true; done
+@FMU@
+@FMU@install-exec-extra:
+	# temporary fix for missing links
+	test -x texk/web2c/omegafonts/omfonts && \
+	  cd texk/web2c/omegafonts; $(MAKE) install-links
+
 	if test -f $(scriptdir)/texlinks; then \
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
 	    $(scriptdir)/texlinks; \
@@ -96,7 +97,7 @@ check:
 	cd texk; TEXMF=$(texmf) TEXMFCNF=$(texmf)/web2c $(MAKE) $@
 
 uninstall:
-	for dir in $(ESUBDIRS); do \
+	for dir in $(INSTDIRS); do \
 	  echo making $@ in $$dir; \
 	  (cd $$dir && $(MAKE) $@) || exit 1; \
 	done
@@ -106,10 +107,11 @@ Makefile: Makefile.in config.status
 
 all: @LIBSDEP@
 all clean mostlyclean:
-	for dir in $(ESUBDIRS); do \
-	  echo making $@ in $$dir; \
-	  (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) $@; else true; fi) || exit 1; \
-	done
+	esubdirs="$(ESUBDIRS)"; \
+	  for dir in $$esubdirs; do \
+	    echo making $@ in $$dir; \
+	    (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) $@; else true; fi) || exit 1; \
+	  done
 
 libsclean:
 	libsdirs="$(LIBSDIRS)"; \
@@ -126,10 +128,11 @@ libsdistclean:
 	  done
 
 distclean: clean
-	for dir in $(ESUBDIRS); do \
-	  echo making $@ in $$dir; \
-	  (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) $@; else true; fi) || exit 1; \
-	done
+	cleandirs="$(ESUBDIRS)"; \
+	  for dir in $$cleandirs; do \
+	    echo making $@ in $$dir; \
+	    (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) $@; else true; fi) || exit 1; \
+	  done
 	rm -f Makefile *.status *.cache *.log dialogconfig.h TAGS
 	rm -f libs/klibtool.config libs/config.log libs/config.status libs/config.cache
 	rm -f utils/texinfo/info/funs.h utils/texinfo/info/doc.c utils/texinfo/info/key.c
@@ -143,9 +146,11 @@ clean mostlyclean: libsclean
 distclean: libsdistclean
 realclean: distclean
 world: all install
-pdftex:
-	cd texk/web2c; $(MAKE) pdftex
+pdftex pdfetex pdfxtex:
+	cd texk/web2c; $(MAKE) $@
 	test -f texk/web2c/pdftex && ls -l texk/web2c/pdftex
+	test -f texk/web2c/pdfetex && ls -l texk/web2c/pdfetex
+	test -f texk/web2c/pdfxtex && ls -l texk/web2c/pdfxtex
 
 $(NCURSESDIR)/lib/libncurses.a:
 	cd $(NCURSESDIR); $(MAKE)
@@ -161,6 +166,10 @@ $(LIBXPDFDIR)/xpdf/libxpdf.a:
 	cd $(LIBXPDFDIR)/xpdf; $(MAKE) libxpdf.a
 $(LIBXPDFDIR)/goo/libGoo.a:
 	cd $(LIBXPDFDIR)/goo; $(MAKE) libGoo.a
+$(LIBXPDFDIR)/fofi/libfofi.a:
+	cd $(LIBXPDFDIR)/fofi; $(MAKE) libfofi.a
+$(GDDIR)/libgd.a:
+	cd $(GDDIR); $(MAKE) libgd.a
 $(FREETYPEDIR)/lib/.libs/libttf.a:
 	cd $(FREETYPEDIR); $(MAKE)
 

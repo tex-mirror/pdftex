@@ -1,5 +1,5 @@
 %
-% Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+% Copyright (c) 2004 Han The Thanh, <thanh@pdftex.org>
 %
 % This file is part of pdfTeX.
 %
@@ -19,38 +19,3 @@
 %
 % $Id: tex.ch2,v 1.1 2004/02/26 13:40:37 thanh Exp $
 %
-@x [4.51] - Change `pdftex.pool' to `pdfxtex.pool' in error messages
-else  bad_pool('! I can''t read pdftex.pool; bad path?')
-@y
-else  bad_pool('! I can''t read pdfxtex.pool; bad path?')
-@z
-
-@x [4.51] - Change `pdftex.pool' to `pdfxtex.pool' in error messages
-begin if eof(pool_file) then bad_pool('! pdftex.pool has no check sum.');
-@y
-begin if eof(pool_file) then bad_pool('! pdfxtex.pool has no check sum.');
-@z
-
-@x [4.51] - Change `pdftex.pool' to `pdfxtex.pool' in error messages
-    bad_pool('! pdftex.pool line doesn''t begin with two digits.');
-@y
-    bad_pool('! pdfxtex.pool line doesn''t begin with two digits.');
-@z
-
-@x [4.51] - Change `pdftex.pool' to `pdfxtex.pool' in error messages
-  bad_pool('! pdftex.pool check sum doesn''t have nine digits.');
-@y
-  bad_pool('! pdfxtex.pool check sum doesn''t have nine digits.');
-@z
-
-@x [4.51] - Change `pdftex.pool' to `pdfxtex.pool' in error messages
-  bad_pool('! pdftex.pool doesn''t match; tangle me again (or fix the path).');
-@y
-  bad_pool('! pdfxtex.pool doesn''t match; tangle me again (or fix the path).');
-@z
-
-@x
-@d format_extension=".efmt" {the extension, as a \.{WEB} constant}
-@y
-@d format_extension=".xfmt" {the extension, as a \.{WEB} constant}
-@z

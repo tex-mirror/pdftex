@@ -1,9 +1,31 @@
-% WEB change file containing code for pdfTeX feature extending TeX;
-% to be applied to tex.web (Version 3.14159) in order to define the
+% WEB change file containing code for pdfTeX features extending TeX;
+% to be applied to tex.web (Version 3.141592) in order to define the
 % pdfTeX program.
 %
-% (WEB2C!) indicates parts that may need adjusting in tex.pch
-% (ETEX!) indicates parts that may need adjusting in pdfetex.ch[12]
+% Note: This file, pdftex.ch, defines pdftex.web in terms of changes to be
+% applied to tex.web; in terms of a program such as TIE (or equivalent),
+%
+%	tex.web			)
+%	   +			)   =>   tie -m ...   =>   etex.web
+%	pdftexdir/pdftex.ch	)
+%
+% In addition, this file is used to define pdfetex.web, a combination
+% of e-TeX and pdfTeX as follows:
+%
+%	tex.web			)
+%	   +			)
+%	etexdir/etex.ch		)
+%	   +			)
+%	pdfetexdir/pdfetex.ch1	)   =>   tie -m ...   =>   pdfetex.web
+%	   +			)
+%	pdftexdir/pdftex.ch	)
+%	   +			)
+%	pdfetexdir/pdfetex.ch2	)
+%
+% where the two (small) files pdfetexdir/pdfetex.ch[12] take care of
+% interferences between e-Tex changes (etexdir/etex.ch) and pdfTeX changes
+% (pdftexdir/pdftex.ch). Consequently, changes in these files have to be
+% coordinated.
 %
 % Copyright (c) 1996-2004 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
@@ -23,7 +45,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#138 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#150 $
 %
 % The TeX program is copyright (C) 1982 by D. E. Knuth.
 % TeX is a trademark of the American Mathematical Society.
@@ -42,41 +64,43 @@
 \def\PDF{PDF}
 @z
 
-@x [2] - This change is made for TeX 3.14159
+@x [2] - This change is made for TeX 3.141592
 @d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
 @y
-@d banner=='This is pdfTeX, Version 3.141592','-',pdftex_version_string
-   {printed when \pdfTeX\ starts}
 @d pdftex_version==120 { \.{\\pdftexversion} }
 @d pdftex_revision=="a" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='1.20a-rc2' {current pdf\TeX\ version}
+@d pdftex_version_string=='-1.20a' {current \pdfTeX\ version}
+@#
+@d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
+   {printed when \pdfTeX\ starts}
+@#
+@d TeX_banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
+@#
+@d banner==pdfTeX_banner
 @z
 
 % Some procedures that need to be declared forward
 @x [173]
 @* \[12] Displaying boxes.
 @y
-@<Declare procedures that need to be declared forward for pdftex@>
+@<Declare procedures that need to be declared forward for pdftex@>@;
+
 @* \[12] Displaying boxes.
 @z
 
-% Define pdftex tokens parameters (ETEX!)
-@x [230]
-@d err_help_loc=local_base+9 {points to token list for \.{\\errhelp}}
-@y
-@d pdftex_first_loc       = local_base+10 {first number defined in this section}
-@d pdftex_last_loc        = pdftex_first_loc + 2 {last number defined in this section}
-@d err_help_loc=local_base+9 {points to token list for \.{\\errhelp}}
-@d pdf_pages_attr_loc     = pdftex_first_loc + 0 {points to token list for \.{\\pdfpagesattr}}
-@d pdf_page_attr_loc      = pdftex_first_loc + 1 {points to token list for \.{\\pdfpageattr}}
-@d pdf_page_resources_loc = pdftex_first_loc + 2 {points to token list for \.{\\pdfpageresources}}
-@z
-% N.B.: don't forget to check for pdftex_last_loc above
-
+% Define pdftex token list parameters
 @x [230]
 @d toks_base=local_base+10 {table of 256 token list registers}
 @y
-@d toks_base = pdftex_last_loc + 1 {table of 256 token list registers}
+@d tex_toks=local_base+10 {end of \TeX's token list parameters}
+@#
+@d pdftex_first_loc       = tex_toks {base for \pdfTeX's token list parameters}
+@d pdf_pages_attr_loc     = pdftex_first_loc + 0 {points to token list for \.{\\pdfpagesattr}}
+@d pdf_page_attr_loc      = pdftex_first_loc + 1 {points to token list for \.{\\pdfpageattr}}
+@d pdf_page_resources_loc = pdftex_first_loc + 2 {points to token list for \.{\\pdfpageresources}}
+@d pdf_toks=pdftex_first_loc+3 {end of \pdfTeX's token list parameters}
+@#
+@d toks_base=pdf_toks {table of 256 token list registers}
 @z
 
 @x [230]
@@ -111,13 +135,13 @@ primitive("pdfpageresources",assign_toks,pdf_page_resources_loc);
   othercases print_esc("errhelp")
 @z
 
-% Define pdftex integer parameters -- (WEB2C!)
+% Define pdftex integer parameters
 @x [236]
-@d error_context_lines_code=54 {maximum intermediate line pairs shown}
+@d int_pars=55 {total number of integer parameters}
 @y
-@d pdftex_first_integer_code = 55 {first number defined in this section}
-@d pdftex_last_integer_code  = pdftex_first_integer_code + 9 {last number defined in this section}
-@d error_context_lines_code=54 {maximum intermediate line pairs shown}
+@d tex_int_pars=55 {total number of \TeX's integer parameters}
+@#
+@d pdftex_first_integer_code = tex_int_pars {base for \pdfTeX's integer parameters}
 @d pdf_output_code           = pdftex_first_integer_code + 0 {switch on PDF output if positive}
 @d pdf_compress_level_code   = pdftex_first_integer_code + 1 {compress level of streams}
 @d pdf_decimal_digits_code   = pdftex_first_integer_code + 2 {digits after the decimal point of numbers}
@@ -128,13 +152,16 @@ primitive("pdfpageresources",assign_toks,pdf_page_resources_loc);
 @d pdf_option_pdf_minor_version_code = pdftex_first_integer_code + 7 {fractional part of the pdf version produced}
 @d pdf_option_always_use_pdfpagebox_code = pdftex_first_integer_code + 8 {if the pdf inclusion should always use a specific pdf page box}
 @d pdf_option_pdf_inclusion_errorlevel_code = pdftex_first_integer_code + 9 {if the pdf inclusion should treat pdfs newer than |pdf_option_pdf_minor_version| as an error}
+@d pdf_int_pars=pdftex_first_integer_code + 10 {total number of \pdfTeX's integer parameters}
+@#
+@d int_pars=pdf_int_pars {total number of integer parameters}
 @z
-% N.B.: don't forget to check for pdftex_last_integer_code above
-
+ 
 @x [236]
 @d error_context_lines==int_par(error_context_lines_code)
 @y
 @d error_context_lines==int_par(error_context_lines_code)
+@#
 @d pdf_output           == int_par(pdf_output_code)
 @d pdf_compress_level   == int_par(pdf_compress_level_code)
 @d pdf_decimal_digits   == int_par(pdf_decimal_digits_code)
@@ -151,6 +178,7 @@ primitive("pdfpageresources",assign_toks,pdf_page_resources_loc);
 error_context_lines_code:print_esc("errorcontextlines");
 @y
 error_context_lines_code:print_esc("errorcontextlines");
+@#
 pdf_output_code:           print_esc("pdfoutput");
 pdf_compress_level_code:   print_esc("pdfcompresslevel");
 pdf_decimal_digits_code:   print_esc("pdfdecimaldigits");
@@ -262,57 +290,20 @@ primitive("pdfthreadmargin",assign_dimen,dimen_base+pdf_thread_margin_code);@/
 @!@:pdf_thread_margin_}{\.{\\pdfthreadmargin} primitive@>
 @z
 
-% Define pdftex tokens parameters
-@x [307]
-@d write_text=15 {|token_type| code for \.{\\write}}
-@y
-@d pdftex_first_text       = 16 {first number defined in this section}
-@d pdftex_last_text        = pdftex_first_text + 2 {last number defined in this section}
-@d write_text=15 {|token_type| code for \.{\\write}}
-@d pdf_pages_attr_text     = pdftex_first_text + 0 {|token_type| code for \.{\\pdfpagesattr}}
-@d pdf_page_attr_text      = pdftex_first_text + 1 {|token_type| code for \.{\\pdfpageattr}}
-@d pdf_page_resources_text = pdftex_first_text + 2 {|token_type| code for \.{\\pdfpageresources}}
-@z
-
-@x [314]
-write_text: print_nl("<write> ");
-othercases print_nl("?") {this should never happen}
-@y
-write_text: print_nl("<write> ");
-pdf_pages_attr_text:  print_nl("<pdfpagesattr> ");
-pdf_page_attr_text:  print_nl("<pdfpageattr> ");
-pdf_page_resources_text: print_nl("<pdfpageresources> ");
-othercases print_nl("?") {this should never happen}
-@z
-
-% Define some read-only pdfTeX primitives (ETEX!)
-@x [410]
-@d tok_val=5 {token lists}
-@y
-@d pdftex_first_expand_code = 6 {first number defined in this section}
-@d pdftex_last_expand_code  = pdftex_first_expand_code + 4 {last number defined in this section}
-@d tok_val=5 {token lists}
-@d pdftex_revision_code     = pdftex_first_expand_code + 0 {command code for \.{\\pdftexrevision}}
-@d pdftex_banner_code       = pdftex_first_expand_code + 1 {command code for \.{\\pdftexbanner}}
-@d pdf_font_name_code       = pdftex_first_expand_code + 2 {command code for \.{\\pdffontname}}
-@d pdf_font_objnum_code     = pdftex_first_expand_code + 3 {command code for \.{\\pdffontobjnum}}
-@d pdf_font_size_code       = pdftex_first_expand_code + 4 {command code for \.{\\pdffontsize}}
-@z
-% N.B.: don't forget to check for pdftex_last_expand_code above and pdfetex.ch2
-
+% Define some read-only pdfTeX primitives
 @x [416]
 |glue_val|, |input_line_no_code|, or |badness_code|.
+@y
+|glue_val|, |input_line_no_code|, or |badness_code|.
+\pdfTeX\ adds the codes for its extensions: |pdftex_version_code|, \dots\ .
+@z
 
-@d input_line_no_code=glue_val+1 {code for \.{\\inputlineno}}
+@x [416]
 @d badness_code=glue_val+2 {code for \.{\\badness}}
 @y
-|glue_val|, |input_line_no_code|, |badness_code|, or one of the other codes for
-\pdfTeX{} extensions.
-
-@d pdftex_first_rint_code     = glue_val + 3 {first number defined in this section}
-@d pdftex_last_rint_code      = pdftex_first_rint_code + 7 {last number defined in this section}
-@d input_line_no_code=glue_val+1 {code for \.{\\inputlineno}}
-@d badness_code=glue_val+2 {code for \.{\\badness}}
+@d badness_code=input_line_no_code+1 {code for \.{\\badness}}
+@#
+@d pdftex_first_rint_code     = badness_code + 1 {base for \pdfTeX's command codes}
 @d pdftex_version_code        = pdftex_first_rint_code + 0 {code for \.{\\pdftexversion}}
 @d pdf_last_obj_code          = pdftex_first_rint_code + 1 {code for \.{\\pdflastobj}}
 @d pdf_last_xform_code        = pdftex_first_rint_code + 2 {code for \.{\\pdflastxform}}
@@ -321,8 +312,8 @@ othercases print_nl("?") {this should never happen}
 @d pdf_last_annot_code        = pdftex_first_rint_code + 5 {code for \.{\\pdflastannot}}
 @d pdf_last_x_pos_code        = pdftex_first_rint_code + 6 {code for \.{\\pdflastxpos}}
 @d pdf_last_y_pos_code        = pdftex_first_rint_code + 7 {code for \.{\\pdflastypos}}
+@d pdftex_last_item_codes     = pdftex_first_rint_code + 8 {end of \pdfTeX's command codes}
 @z
-% N.B.: don't forget to check for pdftex_last_loc above and pdfetex.ch2
 
 @x [416]
 primitive("badness",last_item,badness_code);
@@ -346,16 +337,6 @@ primitive("pdflastxpos",last_item,pdf_last_x_pos_code);@/
 @!@:pdf_last_x_pos_}{\.{\\pdflastxpos} primitive@>
 primitive("pdflastypos",last_item,pdf_last_y_pos_code);@/
 @!@:pdf_last_y_pos_}{\.{\\pdflastypos} primitive@>
-primitive("pdftexrevision",convert,pdftex_revision_code);@/
-@!@:pdftex_revision_}{\.{\\pdftexrevision} primitive@>
-primitive("pdftexbanner",convert,pdftex_banner_code);@/
-@!@:pdftex_banner_}{\.{\\pdftexbanner} primitive@>
-primitive("pdffontname",convert,pdf_font_name_code);@/
-@!@:pdf_font_name_}{\.{\\pdffontname} primitive@>
-primitive("pdffontobjnum",convert,pdf_font_objnum_code);@/
-@!@:pdf_font_objnum_}{\.{\\pdffontobjnum} primitive@>
-primitive("pdffontsize",convert,pdf_font_size_code);@/
-@!@:pdf_font_size_}{\.{\\pdffontsize} primitive@>
 @z
 
 @x [417]
@@ -372,13 +353,17 @@ primitive("pdffontsize",convert,pdf_font_size_code);@/
   othercases print_esc("badness")
 @z
 
-@x [424]
+@x [26.424] l.8506
 if cur_chr>glue_val then
+@y
+if m>=input_line_no_code then
+@z
+
+@x [26.424] l.8507
   begin if cur_chr=input_line_no_code then cur_val:=line
   else cur_val:=last_badness; {|cur_chr=badness_code|}
 @y
-if cur_chr>glue_val then
-  begin case cur_chr of
+  begin case m of
   input_line_no_code: cur_val:=line;
   badness_code: cur_val:=last_badness;
   pdftex_version_code:  cur_val := pdftex_version;
@@ -389,22 +374,68 @@ if cur_chr>glue_val then
   pdf_last_annot_code:  cur_val := pdf_last_annot;
   pdf_last_x_pos_code:  cur_val := pdf_last_x_pos;
   pdf_last_y_pos_code:  cur_val := pdf_last_y_pos;
-  endcases;
+  end; {there are no other cases}
+@z
+
+% Define some char token producing pdfTeX primitives
+@x [27.468] l.9202
+@d number_code=0 {command code for \.{\\number}}
+@y
+\pdfTeX\ adds \.{\\eTeXrevision}}, \.{\\pdftexrevision}, \.{\\pdftexbanner},
+\.{\\pdffontname}, \.{\\pdffontobjnum}, \.{\\pdffontsize}, and \.{\\pdfpageref}
+such that |job_name_code| remains last.
+
+@d number_code=0 {command code for \.{\\number}}
+@z
+
+@x [27.468] l.9207
+@d job_name_code=5 {command code for \.{\\jobname}}
+@y
+@d pdftex_first_expand_code = 5 {base for \pdfTeX's command codes}
+@d pdftex_revision_code     = pdftex_first_expand_code + 0 {command code for \.{\\pdftexrevision}}
+@d pdftex_banner_code       = pdftex_first_expand_code + 1 {command code for \.{\\pdftexbanner}}
+@d pdf_font_name_code       = pdftex_first_expand_code + 2 {command code for \.{\\pdffontname}}
+@d pdf_font_objnum_code     = pdftex_first_expand_code + 3 {command code for \.{\\pdffontobjnum}}
+@d pdf_font_size_code       = pdftex_first_expand_code + 4 {command code for \.{\\pdffontsize}}
+@d pdf_page_ref_code        = pdftex_first_expand_code + 5 {command code for \.{\\pdfpageref}}
+@d pdftex_convert_codes     = pdftex_first_expand_code + 6 {end of \pdfTeX's command codes}
+@d job_name_code=pdftex_convert_codes {command code for \.{\\jobname}}
+@z
+
+@x [27.468] l.9220
+primitive("jobname",convert,job_name_code);@/
+@y
+@#
+primitive("pdftexrevision",convert,pdftex_revision_code);@/
+@!@:pdftex_revision_}{\.{\\pdftexrevision} primitive@>
+primitive("pdftexbanner",convert,pdftex_banner_code);@/
+@!@:pdftex_banner_}{\.{\\pdftexbanner} primitive@>
+primitive("pdffontname",convert,pdf_font_name_code);@/
+@!@:pdf_font_name_}{\.{\\pdffontname} primitive@>
+primitive("pdffontobjnum",convert,pdf_font_objnum_code);@/
+@!@:pdf_font_objnum_}{\.{\\pdffontobjnum} primitive@>
+primitive("pdffontsize",convert,pdf_font_size_code);@/
+@!@:pdf_font_size_}{\.{\\pdffontsize} primitive@>
+primitive("pdfpageref",convert,pdf_page_ref_code);@/
+@!@:pdf_page_ref_}{\.{\\pdfpageref} primitive@>
+@#
+primitive("jobname",convert,job_name_code);@/
 @z
 
 @x [469]
   othercases print_esc("jobname")
 @y
-  pdftex_revision_code:  print_esc("pdftexrevision");
-  pdftex_banner_code:  print_esc("pdftexbanner");
-  pdf_font_name_code:     print_esc("pdffontname");
-  pdf_font_objnum_code:   print_esc("pdffontobjnum");
-  pdf_font_size_code:     print_esc("pdffontsize");
+  pdftex_revision_code: print_esc("pdftexrevision");
+  pdftex_banner_code:   print_esc("pdftexbanner");
+  pdf_font_name_code:   print_esc("pdffontname");
+  pdf_font_objnum_code: print_esc("pdffontobjnum");
+  pdf_font_size_code:   print_esc("pdffontsize");
+  pdf_page_ref_code:    print_esc("pdfpageref");
   othercases print_esc("jobname")
 @z
 
 @x [471]
-end {there are no other cases}
+job_name_code: if job_name=0 then open_log_file;
 @y
 pdftex_revision_code: do_nothing;
 pdftex_banner_code: do_nothing;
@@ -418,16 +449,19 @@ pdf_font_name_code, pdf_font_objnum_code, pdf_font_size_code: begin
             pdf_init_font(cur_val);
     end;
 end;
-end {there are no other cases}
+pdf_page_ref_code: begin
+    scan_int;
+    if cur_val <= 0 then
+        pdf_error("pageref", "invalid page number");
+end;
+job_name_code: if job_name=0 then open_log_file;
 @z
 
 @x [472]
-end {there are no other cases}
+job_name_code: print(job_name);
 @y
 pdftex_revision_code: print(pdftex_revision);
-pdftex_banner_code: begin
-    print(pdftex_banner);
-end;
+pdftex_banner_code: print(pdftex_banner);
 pdf_font_name_code, pdf_font_objnum_code: begin
     set_ff(cur_val);
     if c = pdf_font_name_code then
@@ -436,7 +470,8 @@ pdf_font_name_code, pdf_font_objnum_code: begin
         print_int(pdf_font_num[ff]);
 end;
 pdf_font_size_code: print_scaled(font_size[cur_val]);
-end {there are no other cases}
+pdf_page_ref_code: print_int(get_obj(obj_type_page, cur_val, false));
+job_name_code: print(job_name);
 @z
 
 % Shipping out to PDF
@@ -479,19 +514,21 @@ cfg_pdf_minor_version_code = pdf_option_pdf_minor_version_code;
 cfg_always_use_pdf_pagebox_code = 71; {must be the same as the definition in epdf.h}
 cfg_pdf_option_pdf_inclusion_errorlevel_code = pdf_option_pdf_inclusion_errorlevel_code;
 
+@ Initialize pdftex's parameters to some useful default value.   
+Helpful in case one forgets to set them during initex run.
+
+@<Initialize table entries...@>=
+pdf_h_origin := (one_hundred_inch + 50) div 100;
+pdf_v_origin := (one_hundred_inch + 50) div 100;
+pdf_compress_level := 9;
+pdf_decimal_digits := 4;
+pdf_image_resolution := 72;
+pdf_option_pdf_minor_version := 4;
+
 @ The subroutines define the corresponding macros so we can use them
 in C.
 
 @d flushable(#) == (# = str_ptr - 1)
-
-@d flush_fontname_k(#) == 
-if (# <> font_name[k]) and (flushable(#) or flushable(font_name[k])) then begin
-    if flushable(#) then
-        # := font_name[k]
-    else
-        font_name[k] := #;
-    flush_string;
-end
 
 @d is_valid_char(#)==((font_bc[f] <= #) and (# <= font_ec[f]) and 
                       char_exists(char_info(f)(#)))
@@ -565,30 +602,62 @@ begin
     get_slant := slant(f);
 end;
 
-function new_null_font: internal_font_number;
+function new_dummy_font: internal_font_number;
 begin
-    new_null_font := read_font_info(null_cs, "dummy", "", -1000);
+    new_dummy_font := read_font_info(null_cs, "dummy", "", -1000);
 end;
 
-procedure flush_str(s: str_number); {flush a string if possible}
-begin
-    if flushable(s) then
-        flush_string;
-end;
+@ Helper for debugging purporses
 
-function get_tfm_num(s: str_number): internal_font_number;
-label found;
-var k: internal_font_number;
-begin
-    for k := font_base + 1 to font_ptr do
-        if str_eq_str(font_name[k], s) then begin
-            flush_fontname_k(s);
-            if pdf_font_expand_ratio[k] = 0 then
-                goto found;
+@p procedure short_display_n(@!p, m:integer); {prints highlights of list |p|}
+var n:integer; {for replacement counts}
+    i: integer;
+begin 
+i := 0; 
+font_in_short_display:=null_font;
+if p = null then
+    return;
+while p>mem_min do
+  begin if is_char_node(p) then
+    begin if p<=mem_end then
+      begin if font(p)<>font_in_short_display then
+        begin if (font(p)<font_base)or(font(p)>font_max) then
+          print_char("*")
+@.*\relax@>
+        else @<Print the font identifier for |font(p)|@>;
+        print_char(" "); font_in_short_display:=font(p);
         end;
-    k := read_font_info(null_cs, s, "", -1000);
-found:
-    get_tfm_num := k;
+      print_ASCII(qo(character(p)));
+      end;
+    end
+  else begin
+      if (type(p) = glue_node) or 
+         (type(p) = disc_node) or 
+         (type(p) = penalty_node) or
+         ((type(p) = kern_node) and (subtype(p) = explicit)) then 
+         incr(i);
+      if i >= m then
+         return;
+      if (type(p) = disc_node) then begin 
+          print("|");
+          short_display(pre_break(p));
+          print("|");
+          short_display(post_break(p));
+          print("|");
+          n:=replace_count(p);
+          while n>0 do
+              begin if link(p)<>null then p:=link(p);
+          decr(n);
+          end;
+        end
+        else
+            @<Print a short indication of the contents of node |p|@>;
+  end;
+  p:=link(p);
+  if p = null then
+      return;
+  end;
+  update_terminal;
 end;
 
 @ Sometimes it is neccesary to allocate memory for PDF output that cannot
@@ -605,7 +674,7 @@ be deallocated then, so we use |pdf_mem| for this purpose.
 
 @ @<Set init...@>=
 pdf_mem_ptr := 1; {the first word is not used so we can use zero as a value for testing
-whether a pointer to |pdfmem| is valid}
+whether a pointer to |pdf_mem| is valid}
 
 @ We use |pdf_get_mem| to allocate memory in |pdf_mem|
 
@@ -613,7 +682,7 @@ whether a pointer to |pdfmem| is valid}
 |pdf_mem|}
 begin
     if pdf_mem_ptr + s > pdf_mem_size then
-        overflow("PDF memory size", pdf_mem_size);
+        overflow("PDF memory size (pdf_mem_size)", pdf_mem_size);
     pdf_get_mem := pdf_mem_ptr;
     pdf_mem_ptr := pdf_mem_ptr + s;
 end;
@@ -663,7 +732,6 @@ begin
 end
 
 @<Glob...@>=
-@!fixed_output: integer; {fixed output format}
 @!pdf_file: byte_file; {the PDF output file}
 @!pdf_buf: array[0..pdf_buf_size] of eight_bits; {the PDF buffer}
 @!pdf_ptr: integer; {pointer to the first unused byte in the PDF buffer}
@@ -672,6 +740,8 @@ end
 @!zip_write_state: integer; {which state of compression we are in}
 @!fixed_pdf_minor_version: integer; {fixed minor part of the pdf version}
 @!pdf_minor_version_has_been_written: boolean; {flag if the pdf version has been written}
+@!fixed_pdfoutput: integer; {fixed output format}
+@!fixed_pdfoutput_set: boolean; {|fixed_pdfoutput| has been set?}
 
 @ @<Set init...@>=
 pdf_buf[0] := "%";
@@ -687,6 +757,7 @@ pdf_ptr := 9;
 pdf_gone := 0;
 zip_write_state := no_zip;
 pdf_minor_version_has_been_written := false;
+fixed_pdfoutput_set := false;
 
 @ @p 
 function fix_int(val, min, max: integer): integer;
@@ -794,6 +865,7 @@ begin
         pdf_stream_length := pdf_offset - pdf_save_offset;
     pdf_flush;
     write_stream_length(pdf_stream_length, pdf_stream_length_offset);
+    pdf_print_nl;
     pdf_print_ln("endstream");
     pdf_end_obj;
 end;
@@ -927,7 +999,7 @@ begin
     j:=str_start[s];
     if is_special then begin
         if not (str_in_str(s, "PDF:", 0) or str_in_str(s, "pdf:", 0)) then begin
-            if warn and not (str_in_str(s, "SRC:", 0) or str_in_str(s, "src:", 0)) then
+            if warn and not (str_in_str(s, "SRC:", 0) or str_in_str(s, "src:", 0) or (length(s) = 0)) then
                 print_nl("Non-PDF special ignored!");
             return;
         end;
@@ -982,6 +1054,19 @@ decimal form to PDF buffer}
 begin n:=abs(n) mod 100; pdf_out("0"+(n div 10));
 pdf_out("0"+(n mod 10));
 end;
+
+function tokens_to_string(p: pointer): str_number; {return a string from tokens
+list}
+begin
+    if selector = new_string then
+        pdf_error("tokens", "tokens_to_string() called while selector = new_string");
+    old_setting:=selector; selector:=new_string;
+    show_token_list(link(p),null,pool_size-pool_ptr);
+    selector:=old_setting;
+    last_tokens_string := make_string;
+    tokens_to_string := last_tokens_string;
+end;
+
 
 @ To print |scaled| value to PDF output we need some subroutines to ensure
 accurary.
@@ -1073,7 +1158,7 @@ things are more complicated, as we have to deal with scaling bitmaps as well.
 procedure adv_char_width(f: internal_font_number; w: scaled); {update |pdf_h|
 by character width |w| from font |f|} 
 begin
-    if hasfmentry(pdf_font_map[f]) then begin
+    if hasfmentry(f) then begin
         call_func(divide_scaled(w, pdf_font_size[f], 3));
         pdf_h := pdf_h + scaled_out;
     end
@@ -1112,7 +1197,8 @@ end;
 
 procedure pdf_print_mag_bp(s: scaled); {take |mag| into account}
 begin
-    if (mag <> 1000) and (mag <> 0) then
+    prepare_mag;
+    if mag <> 1000 then
         s := round_xn_over_d(s, mag, 1000);
     pdf_print_bp(s);
 end;
@@ -1223,8 +1309,8 @@ found:
     pdf_begin_text;
     pdf_print("/F");
     pdf_print_int(k);
-    pdf_print_resname_prefix;
     pdf_print_font_tag(f);
+    pdf_print_resname_prefix;
     pdf_out(" ");
     pdf_print_bp(font_size[f]);
     pdf_print(" Tf");
@@ -1830,7 +1916,7 @@ The first time when a character of a font is written out, pdfTeX looks for
 the corresponding virtual font. If the corresponding virtual font exists, then
 the font type is set to |virtual_font_type|; otherwise it will be set to
 |real_font_type|. |subst_font_type| indicates fonts that have been substituted
-during adjusting spacing. Such fonts are linked via the |pdf_font_link| array.
+during adjusting spacing. Such fonts are linked via the |pdf_font_elink| array.
 
 @d new_font_type = 0 {new font (has not been used yet)}
 @d virtual_font_type = 1 {virtual font}
@@ -1887,14 +1973,10 @@ var f, k: internal_font_number;
 begin
     f := tmp_f;
     if not font_used[f] then begin
-        if pdf_font_map[f] = 0 then
-            pdf_font_map[f] := fmlookup(f);
-        if hasfmentry(pdf_font_map[f]) then begin
+        if hasfmentry(f) then begin
+        {this font is scaleable, so different sizes can share a single font object}
             k := tfm_of_fm(pdf_font_map[f]);
-            if (k <> f) and 
-               str_eq_str(font_name[k], font_name[f]) and
-               (font_dsize[k] = font_dsize[f]) and
-               (pdf_font_expand_ratio[k] = pdf_font_expand_ratio[f]) then begin
+            if (k <> f) and str_eq_str(font_name[k], font_name[f]) then begin
                 pdf_use_font(f, -k);
                 return;
             end;
@@ -1974,8 +2056,7 @@ processing with an error message}
   tmp_b2:=tmp_b1; scaled3
 
 @<Glob...@>=
-@!vf_packet_base: ^integer; {base addresses of character
-packets from virtual fonts}
+@!vf_packet_base: ^integer; {base addresses of character packets from virtual fonts}
 @!vf_default_font: ^internal_font_number; {default font in a \.{VF} file}
 @!vf_local_font_num: ^internal_font_number; {number of local fonts in a \.{VF} file}
 @!vf_packet_length: integer; {length of the current packet}
@@ -2031,8 +2112,8 @@ begin
     print(".vf ignored.");
 end;
 
-function vf_def_font(f: internal_font_number): internal_font_number; {process a local font in \.{VF} file}
-label found;
+function vf_def_font(f: internal_font_number): internal_font_number; 
+{process a local font in \.{VF} file}
 var k: internal_font_number;
     s: str_number;
     ds, fs: scaled;
@@ -2056,15 +2137,9 @@ begin
         append_char(vf_byte);
     end;
     s := make_string;
-    for k := font_base + 1 to font_ptr do
-        if str_eq_str(font_name[k], s) then begin
-            flush_fontname_k(s);
-            if (font_dsize[k] = ds) and (font_size[k] = fs) and
-               (pdf_font_expand_ratio[k] = pdf_font_expand_ratio[f])  then
-                goto found;
-        end;
-    k := read_font_info(null_cs, s, "", fs);
-found:
+    k := tfm_lookup(s, fs);
+    if k = null_font then
+        k := read_font_info(null_cs, s, "", fs);
     if k <> null_font then begin
         if ((cs.b0 <> 0) or (cs.b1 <> 0) or (cs.b2 <> 0) or (cs.b3 <> 0)) and
            ((font_check[k].b0 <> 0) or (font_check[k].b1 <> 0) or
@@ -2080,8 +2155,7 @@ found:
     vf_def_font := k;
 end;
 
-procedure do_vf; {process \.{VF} file with font
-internal number |f|}
+procedure do_vf; {process \.{VF} file with font internal number |f|}
 label vf_error;
 var cmd, k, n: integer;
     cc, cmd_length: integer;
@@ -2090,10 +2164,13 @@ var cmd, k, n: integer;
     stack_level: vf_stack_index;
     save_vf_nf: internal_font_number;
     f: internal_font_number;
+
 begin
     f := tmp_f;
-    stack_level := 0;
     pdf_font_type[f] := real_font_type;
+    if auto_expand_vf(f) then
+        return; {auto-expanded virtual font}
+    stack_level := 0;
     @<Open |vf_file|, return if not found@>;
     @<Process the preamble@>;@/
     @<Process the font definitions@>;@/
@@ -2368,7 +2445,7 @@ var save_packet_ptr, save_packet_length: pool_pointer;
 begin
     incr(vf_cur_s);
     if vf_cur_s > vf_max_recursion then
-        overflow("max level recursion", vf_max_recursion);
+        overflow("max level recursion of virtual fonts", vf_max_recursion);
     push_packet_state;
     start_packet(f, c);
     vf_z := font_size[f];
@@ -2553,18 +2630,6 @@ begin
     flush_str(s);
 end;
 
-function tokens_to_string(p: pointer): str_number; {return a string from tokens
-list}
-begin
-    if selector = new_string then
-    pdf_error("tokens", "tokens_to_string() called while selector = new_string");
-    old_setting:=selector; selector:=new_string;
-    show_token_list(link(p),null,pool_size-pool_ptr);
-    selector:=old_setting;
-    last_tokens_string := make_string;
-    tokens_to_string := last_tokens_string;
-end;
-
 procedure pdf_print_toks(p: pointer); {print tokens list |p|}
 var s: str_number;
 begin
@@ -2608,7 +2673,11 @@ var base_line: scaled; {the baseline coordinate for this box}
 @!outer_doing_leaders:boolean; {were we doing leaders?}
 @!edge:scaled; {left edge of sub-box, or right edge of leader space}
 @!running_link: pointer; {pointer to `running' link if exists}
-begin this_box:=temp_ptr; g_order:=glue_order(this_box);
+@!glue_temp:real; {glue value before rounding}
+@!cur_glue:real; {glue seen so far}
+@!cur_g:scaled; {rounded equivalent of |cur_glue| times the glue ratio}
+begin cur_g:=0; cur_glue:=float_constant(0);
+this_box:=temp_ptr; g_order:=glue_order(this_box);
 g_sign:=glue_sign(this_box); p:=list_ptr(this_box);
 incr(cur_s);
 base_line:=cur_v; left_edge:=cur_h;
@@ -2653,7 +2722,6 @@ rule_node: begin rule_ht:=height(p); rule_dp:=depth(p); rule_wd:=width(p);
   end;
 whatsit_node: @<Output the whatsit node |p| in |pdf_hlist_out|@>;
 glue_node: @<(\pdfTeX) Move right or output leaders@>;
-margin_kern_node:cur_h:=cur_h+width(p);
 kern_node,math_node:cur_h:=cur_h+width(p);
 ligature_node: @<Make node |p| look like a |char_node| and |goto reswitch|@>;
 othercases do_nothing
@@ -2684,17 +2752,23 @@ if (rule_ht>0)and(rule_wd>0) then {we don't output empty rules}
   end
 
 @ @<(\pdfTeX) Move right or output leaders@>=
-begin g:=glue_ptr(p); rule_wd:=width(g);
+begin g:=glue_ptr(p); rule_wd:=width(g)-cur_g;
 if g_sign<>normal then
   begin if g_sign=stretching then
     begin if stretch_order(g)=g_order then
-      rule_wd:=rule_wd+round(float(glue_set(this_box))*stretch(g));
+      begin cur_glue:=cur_glue+stretch(g);
+      vet_glue(float(glue_set(this_box))*cur_glue);
 @^real multiplication@>
+      cur_g:=round(glue_temp);
+      end;
     end
-  else  begin if shrink_order(g)=g_order then
-      rule_wd:=rule_wd-round(float(glue_set(this_box))*shrink(g));
-    end;
+  else if shrink_order(g)=g_order then
+      begin cur_glue:=cur_glue-shrink(g);
+      vet_glue(float(glue_set(this_box))*cur_glue);
+      cur_g:=round(glue_temp);
+      end;
   end;
+rule_wd:=rule_wd+cur_g;
 if subtype(p)>=a_leaders then
   @<(\pdfTeX) Output leaders in an hlist, |goto fin_rule| if a rule
     or to |next_p| if done@>;
@@ -2711,7 +2785,7 @@ leader_wd:=width(leader_box);
 if (leader_wd>0)and(rule_wd>0) then
   begin rule_wd:=rule_wd+10; {compensate for floating-point rounding}
   edge:=cur_h+rule_wd; lx:=0;
-  @<(\pdfTeX) Let |cur_h| be the position of the first box, and set |leader_wd+lx|
+  @<Let |cur_h| be the position of the first box, and set |leader_wd+lx|
     to the spacing between corresponding parts of boxes@>;
   while cur_h+leader_wd<=edge do
     @<(\pdfTeX) Output a leader box at |cur_h|,
@@ -2719,20 +2793,6 @@ if (leader_wd>0)and(rule_wd>0) then
   cur_h:=edge-10; goto next_p;
   end;
 end
-
-@ @<(\pdfTeX) Let |cur_h| be the position of the first box, ...@>=
-if subtype(p)=a_leaders then
-  begin save_h:=cur_h;
-  cur_h:=left_edge+leader_wd*((cur_h-left_edge)div leader_wd);
-  if cur_h<save_h then cur_h:=cur_h+leader_wd;
-  end
-else  begin lq:=rule_wd div leader_wd; {the number of box copies}
-  lr:=rule_wd mod leader_wd; {the remaining space}
-  if subtype(p)=c_leaders then cur_h:=cur_h+(lr div 2)
-  else  begin lx:=(2*lr+lq+1) div (2*lq+2); {round|(lr/(lq+1))|}
-    cur_h:=cur_h+((lr-(lq-1)*lx) div 2);
-    end;
-  end
 
 @ @<(\pdfTeX) Output a leader box at |cur_h|, ...@>=
 begin cur_v:=base_line+shift_amount(leader_box);@/
@@ -2759,7 +2819,11 @@ var left_edge: scaled; {the left coordinate for this box}
 @!lx:scaled; {extra space between leader boxes}
 @!outer_doing_leaders:boolean; {were we doing leaders?}
 @!edge:scaled; {bottom boundary of leader space}
-begin this_box:=temp_ptr; g_order:=glue_order(this_box);
+@!glue_temp:real; {glue value before rounding}
+@!cur_glue:real; {glue seen so far}
+@!cur_g:scaled; {rounded equivalent of |cur_glue| times the glue ratio}
+begin cur_g:=0; cur_glue:=float_constant(0);
+this_box:=temp_ptr; g_order:=glue_order(this_box);
 g_sign:=glue_sign(this_box); p:=list_ptr(this_box);
 incr(cur_s);
 left_edge:=cur_h; cur_v:=cur_v-height(this_box); top_edge:=cur_v;
@@ -2816,17 +2880,23 @@ if (rule_ht>0)and(rule_wd>0) then {we don't output empty rules}
 goto next_p
 
 @ @<(\pdfTeX) Move down or output leaders@>=
-begin g:=glue_ptr(p); rule_ht:=width(g);
+begin g:=glue_ptr(p); rule_ht:=width(g)-cur_g;
 if g_sign<>normal then
   begin if g_sign=stretching then
     begin if stretch_order(g)=g_order then
-      rule_ht:=rule_ht+round(float(glue_set(this_box))*stretch(g));
+      begin cur_glue:=cur_glue+stretch(g);
+      vet_glue(float(glue_set(this_box))*cur_glue);
 @^real multiplication@>
+      cur_g:=round(glue_temp);
+      end;
     end
-  else  begin if shrink_order(g)=g_order then
-      rule_ht:=rule_ht-round(float(glue_set(this_box))*shrink(g));
-    end;
+  else if shrink_order(g)=g_order then
+      begin cur_glue:=cur_glue-shrink(g);
+      vet_glue(float(glue_set(this_box))*cur_glue);
+      cur_g:=round(glue_temp);
+      end;
   end;
+rule_ht:=rule_ht+cur_g;
 if subtype(p)>=a_leaders then
   @<(\pdfTeX) Output leaders in a vlist, |goto fin_rule| if a rule
     or to |next_p| if done@>;
@@ -2843,7 +2913,7 @@ leader_ht:=height(leader_box)+depth(leader_box);
 if (leader_ht>0)and(rule_ht>0) then
   begin rule_ht:=rule_ht+10; {compensate for floating-point rounding}
   edge:=cur_v+rule_ht; lx:=0;
-  @<(\pdfTeX) Let |cur_v| be the position of the first box, and set |leader_ht+lx|
+  @<Let |cur_v| be the position of the first box, and set |leader_ht+lx|
     to the spacing between corresponding parts of boxes@>;
   while cur_v+leader_ht<=edge do
     @<(\pdfTeX) Output a leader box at |cur_v|,
@@ -2851,20 +2921,6 @@ if (leader_ht>0)and(rule_ht>0) then
   cur_v:=edge-10; goto next_p;
   end;
 end
-
-@ @<(\pdfTeX) Let |cur_v| be the position of the first box, ...@>=
-if subtype(p)=a_leaders then
-  begin save_v:=cur_v;
-  cur_v:=top_edge+leader_ht*((cur_v-top_edge)div leader_ht);
-  if cur_v<save_v then cur_v:=cur_v+leader_ht;
-  end
-else  begin lq:=rule_ht div leader_ht; {the number of box copies}
-  lr:=rule_ht mod leader_ht; {the remaining space}
-  if subtype(p)=c_leaders then cur_v:=cur_v+(lr div 2)
-  else  begin lx:=(2*lr+lq+1) div (2*lq+2); {round|(lr/(lq+1))|}
-    cur_v:=cur_v+((lr-(lq-1)*lx) div 2);
-    end;
-  end
 
 @ @<(\pdfTeX) Output a leader box at |cur_v|, ...@>=
 begin cur_h:=left_edge+shift_amount(leader_box);@/
@@ -2876,6 +2932,21 @@ doing_leaders:=outer_doing_leaders;
 cur_h:=left_edge;
 cur_v:=save_v-height(leader_box)+leader_ht+lx;
 end
+
+@ |fix_pdfoutput| freezes |pdfoutput| when something has been written to
+the output.
+
+@p procedure fix_pdfoutput;
+begin
+    if not fixed_pdfoutput_set then begin
+        fixed_pdfoutput := pdf_output;
+        fixed_pdfoutput_set := true;
+    end
+    else if fixed_pdfoutput <> pdf_output then
+        pdf_error("setup", 
+            "\pdfoutput can only be changed before anything is written to the output");
+end;
+
 
 @ |pdf_ship_out| is used instead of |ship_out| to shipout a box to PDF
 output. If |shipping_page| is not set then the output will be a Form object,
@@ -2923,28 +2994,11 @@ if tracing_output>0 then
 if (tracing_output<=0) and shipping_page then print_char("]");
 dead_cycles:=0;
 update_terminal; {progress report}
-@<(\pdfTeX) Flush the box from memory, showing statistics if requested@>;
+@<Flush the box from memory, showing statistics if requested@>;
 end;
 
-@ @<(\pdfTeX) Flush the box from memory, showing statistics if requested@>=
-@!stat if tracing_stats>1 then
-  begin print_nl("Memory usage before: ");
-@.Memory usage...@>
-  print_int(var_used); print_char("&");
-  print_int(dyn_used); print_char(";");
-  end;
-tats@/
-flush_node_list(p);
-@!stat if tracing_stats>1 then
-  begin print(" after: ");
-  print_int(var_used); print_char("&");
-  print_int(dyn_used); print("; still untouched: ");
-  print_int(hi_mem_min-lo_mem_max-1); print_ln;
-  end;
-tats
-
 @ @<(\pdfTeX) Ship box |p| out@>=
-@<(\pdfTeX) Update the values of |max_h| and |max_v|; but if the page is too large,
+@<Update the values of |max_h| and |max_v|; but if the page is too large,
   |goto done|@>;
 @<Initialize variables as |pdf_ship_out| begins@>;
 if type(p)=vlist_node then pdf_vlist_out@+else pdf_hlist_out;
@@ -2955,6 +3009,7 @@ cur_s:=-1;
 done:
 
 @ @<Initialize variables as |pdf_ship_out| begins@>=
+fix_pdfoutput;
 temp_ptr:=p;
 prepare_mag;
 pdf_last_resources := pdf_new_objnum;
@@ -3039,33 +3094,13 @@ if shipping_page then begin
 end
 
 @ @<Adjust tranformation matrix for the magnification ratio@>=
-if (mag <> 1000) and (mag <> 0) then begin
+prepare_mag;
+if mag <> 1000 then begin
     pdf_print_real(mag, 3);
     pdf_print(" 0 0 ");
     pdf_print_real(mag, 3);
     pdf_print_ln(" 0 0 cm");
 end
-
-@ @<(\pdfTeX) Update the values of |max_h| and |max_v|; but if the page is too large...@>=
-if (height(p)>max_dimen)or@|(depth(p)>max_dimen)or@|
-   (height(p)+depth(p)+v_offset>max_dimen)or@|
-   (width(p)+h_offset>max_dimen) then
-  begin print_err("Huge page cannot be shipped out");
-@.Huge page...@>
-  help2("The page just created is more than 18 feet tall or")@/
-   ("more than 18 feet wide, so I suspect something went wrong.");
-  error;
-  if tracing_output<=0 then
-    begin begin_diagnostic;
-    print_nl("The following box has been deleted:");
-@.The following...deleted@>
-    show_box(p);
-    end_diagnostic(true);
-    end;
-  goto done;
-  end;
-if height(p)+depth(p)+v_offset>max_v then max_v:=height(p)+depth(p)+v_offset;
-if width(p)+h_offset>max_h then max_h:=width(p)+h_offset
 
 @ @<Finish shipping@>=
 @<Finish stream of page/form contents@>;
@@ -3590,13 +3625,7 @@ will call |dvi_ship_out|, which is the \TeX\ original |ship_out|.
 
 @p procedure ship_out(p:pointer); {output the box |p|}
 begin
-    if total_pages = 0 then
-        fixed_output := pdf_output
-    else begin 
-        if fixed_output <> pdf_output then
-            pdf_error("setup", 
-               "\pdfoutput cannot be changed after shipping out the first page");
-        end;
+    fix_pdfoutput;
     if pdf_output > 0 then
         pdf_ship_out(p, true)
     else
@@ -3613,6 +3642,9 @@ min_bp_val :=
 fixed_pk_resolution := fix_int(pdf_pk_resolution, 72, 2400);
 pk_scale_factor := 
     divide_scaled(72, fixed_pk_resolution, 5 + fixed_decimal_digits);
+kpse_init_prog ('PDFTEX', fixed_pk_resolution, nil, nil);
+if not kpse_var_value('MKTEXPK') then
+    kpse_set_program_enabled (kpse_pk_format, 1, kpse_src_cmdline);
 set_job_id(year, month, day, time, pdftex_version, pdftex_revision); 
 if (pdf_unique_resname > 0) and (pdf_resname_prefix = 0) then
     pdf_resname_prefix := get_resname_prefix
@@ -3769,7 +3801,7 @@ head_tab[obj_type_pages] := l
 
 @ @<Output fonts definition@>=
 for k := font_base + 1 to font_ptr do
-    if font_used[k] and hasfmentry(pdf_font_map[k]) then begin
+    if font_used[k] and hasfmentry(k) then begin
         if pdf_font_num[k] < 0 then
             i := -pdf_font_num[k]
         else 
@@ -4032,7 +4064,7 @@ begin
         @<Print the CreationDate key@>;
     end;
     pdf_str_entry_ln("PTEX.Fullbanner", pdftex_banner);
-    pdf_end_dict
+    pdf_end_dict;
 end;
 
 @ @<Print the Producer key@>=
@@ -4092,6 +4124,27 @@ pdf_print_ln("%%EOF")
 @* \[33] Packaging.
 @z
 
+@x [33.649] l.12912
+exit: hpack:=r;
+@y
+exit: {|hpack|}
+hpack:=r;
+@z
+
+@x [33.651] l.12936
+  kern_node,math_node: x:=x+width(p);
+@y
+  kern_node: x:=x+width(p);
+  math_node: x:=x+width(p);
+@z
+
+@x [39.889] l.17408
+adjust_tail:=adjust_head; just_box:=hpack(q,cur_width,exactly);
+@y
+adjust_tail:=adjust_head;
+just_box:=hpack(q,cur_width,exactly);
+@z
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Declare the necessary variables for finishing PDF file
 % Close PDF output if necessary
@@ -4111,7 +4164,7 @@ var a, b, c, i, j, k, l: integer; {all-purpose index}
 begin @<Finish the extensions@>;
 @!stat if tracing_stats>0 then @<Output statistics about this job@>;@;@+tats@/
 wake_up_terminal;
-if fixed_output > 0 then begin
+if fixed_pdfoutput > 0 then begin
     if history = fatal_error_stop then
         print_err(" ==> Fatal error occurred, the output PDF file is not finished!")
     else begin
@@ -4169,9 +4222,6 @@ if (pdf_output > 0) then
     wterm_ln('output format initialized to PDF')
 else
     wterm_ln('output format initialized to DVI');
-kpse_init_prog ('PDFTEX', pdf_pk_resolution, nil, nil);
-if not kpse_var_value('MKTEXPK') then
-    kpse_set_program_enabled (kpse_pk_format, 1, kpse_src_cmdline);
 pdf_init_map_file('pdftex.map');
 @z
 
@@ -4684,8 +4734,8 @@ begin
     named := 0;
     if scan_keyword("named") then begin
         scan_pdf_ext_toks;
-       named := tokens_to_string(def_ref);
-       delete_token_ref(def_ref);
+        named := tokens_to_string(def_ref);
+        delete_token_ref(def_ref);
     end
     else if scan_keyword("page") then begin
         scan_int;
@@ -4742,13 +4792,19 @@ end
   to declare it together with subroutines needed in |pdf_hlist_out| and
   |pdf_vlist_out|.
 
-@<Declare procedures needed in |pdf_hlist_out|, |pdf_vlist_out|@>=
-function find_obj(t, i: integer; byname: small_number): integer;
+@<Declare procedures that need to be declared forward for pdftex@>=
+function find_obj(t, i: integer; byname: boolean): integer;
 begin
     find_obj := avl_find_obj(t, i, byname);
 end;
 
-function get_obj(t, i: integer; byname: small_number): integer; 
+procedure flush_str(s: str_number); {flush a string if possible}
+begin
+    if flushable(s) then
+        flush_string;
+end;
+
+function get_obj(t, i: integer; byname: boolean): integer; 
 var r: integer;
     s: str_number;
 begin
@@ -5304,8 +5360,8 @@ begin
     pdf_indirect_ln("N", a);
     pdf_indirect_ln("P", head_tab[obj_type_page]);
     pdf_print("/R [0 0 ");
-    pdf_print_mag_bp(pdf_page_width); pdf_out(" ");
-    pdf_print_mag_bp(pdf_page_height);
+    pdf_print_bp(pdf_page_width); pdf_out(" ");
+    pdf_print_bp(pdf_page_height);
     pdf_print_ln("]");
     pdf_end_dict;
     pdf_begin_dict(thread);
@@ -5355,7 +5411,7 @@ begin
     until a = b;
 end;
 
-@ @<Display <rule spec> for whatsit node created by pdf\TeX@>=
+@ @<Display <rule spec> for whatsit node created by \pdfTeX@>=
 print("("); 
 print_rule_dimen(pdf_height(p)); 
 print_char("+");
@@ -5406,12 +5462,12 @@ pdf_refximage_node: begin
 end;
 pdf_annot_node: begin
     print_esc("pdfannot");
-    @<Display <rule spec> for whatsit node created by pdf\TeX@>;
+    @<Display <rule spec> for whatsit node created by \pdfTeX@>;
     print_mark(pdf_annot_data(p));
 end;
 pdf_start_link_node: begin
     print_esc("pdflink");
-    @<Display <rule spec> for whatsit node created by pdf\TeX@>;
+    @<Display <rule spec> for whatsit node created by \pdfTeX@>;
     if pdf_link_attr(p) <> null then begin
         print(" attr");
         print_mark(pdf_link_attr(p));
@@ -5482,7 +5538,7 @@ pdf_dest_node: begin
     pdf_dest_fitv: print("fitv");
     pdf_dest_fitr: begin 
         print("fitr");
-        @<Display <rule spec> for whatsit node created by pdf\TeX@>;
+        @<Display <rule spec> for whatsit node created by \pdfTeX@>;
     end;
     pdf_dest_fit: print("fit");
     othercases print("unknown!");
@@ -5912,6 +5968,8 @@ end;
 
 procedure do_annot(p, parent_box: pointer; x, y: scaled);
 begin
+    if not is_shipping_page then
+        pdf_error("ext4", "annotations cannot be inside an XForm");
     if doing_leaders then
         return;
     set_rect_dimens(p, parent_box, x, y, 
@@ -5946,6 +6004,8 @@ end;
 
 procedure do_link(p, parent_box: pointer; x, y: scaled);
 begin
+    if not is_shipping_page then
+        pdf_error("ext4", "link annotations cannot be inside an XForm");
     if type(parent_box) <> hlist_node then
         pdf_error("ext4", "link annotations can be inside hbox only");
     save_link_level(p);
@@ -6019,6 +6079,8 @@ end;
 procedure append_bead(p: pointer);
 var a, b, c, t: integer;
 begin
+    if not is_shipping_page then
+        pdf_error("ext4", "threads cannot be inside an XForm");
     t := get_obj(obj_type_thread, pdf_thread_id(p), pdf_thread_named_id(p));
     b := pdf_new_objnum;
     obj_bead_ptr(b) := pdf_get_mem(pdfmem_bead_size);
@@ -6129,6 +6191,8 @@ end;
 procedure do_dest(p, parent_box: pointer; x, y: scaled);
 var k: integer;
 begin
+    if not is_shipping_page then
+        pdf_error("ext4", "destinations cannot be inside an XForm");
     if doing_leaders then
         return;
     k := get_obj(obj_type_dest, pdf_dest_id(p), pdf_dest_named_id(p));
@@ -6188,20 +6252,20 @@ begin
         pdf_append_list(pdf_ximage_objnum(p))(pdf_ximage_list);
     if not is_pdf_image(image) then begin
         pdf_print_real(ext_xn_over_d(pdf_width(p), 
-                       10000, one_bp), 4); {1000000,6 leads to overflows with large images}
+                       ten_pow[6], one_hundred_bp), 4);
         pdf_print(" 0 0 ");
         pdf_print_real(ext_xn_over_d(pdf_height(p) + pdf_depth(p), 
-                       10000, one_bp), 4); {1000000,6 leads to overflows with large images}
+                       ten_pow[6], one_hundred_bp), 4);
         pdf_out(" ");
         pdf_print_bp(pdf_x(cur_h)); pdf_out(" ");
         pdf_print_bp(pdf_y(cur_v));
     end
     else begin
         pdf_print_real(ext_xn_over_d(pdf_width(p),
-                       1000000, image_width(image)), 6);
+                       ten_pow[6], image_width(image)), 6);
         pdf_print(" 0 0 ");
         pdf_print_real(ext_xn_over_d(pdf_height(p) + pdf_depth(p),
-                       1000000, image_height(image)), 6);
+                       ten_pow[6], image_height(image)), 6);
         pdf_out(" ");
         pdf_print_bp(pdf_x(cur_h) -
                      ext_xn_over_d(pdf_width(p), epdf_orig_x(image), 
@@ -6325,4 +6389,3 @@ begin
   cur_h:=edge+pdf_width(p); cur_v:=base_line;
   end
 @z
-

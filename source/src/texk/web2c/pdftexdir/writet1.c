@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#15 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#18 $
 */
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#15 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#18 $";
 
 #ifdef pdfTeX /* writet1 used with pdfTeX */
 #include "ptexlib.h"           
@@ -30,7 +30,7 @@ static const char perforce_id[] =
     open_input(&t1_file, kpse_type1_format, FOPEN_RBIN_MODE)
 #define enc_open()      \
     open_input(&enc_file, kpse_enc_format, FOPEN_RBIN_MODE)
-#define external_enc()      enc_array[fm_cur->encoding].glyph_names
+#define external_enc()      (fm_cur->encoding)->glyph_names
 #define full_file_name()    (char*)nameoffile + 1
 #define get_length1()       t1_length1 = t1_offset() - t1_save_offset
 #define get_length2()       t1_length2 = t1_offset() - t1_save_offset
@@ -58,7 +58,7 @@ static integer t1_fontname_offset;
 #undef  fm_slant
 #define fm_slant(f)         0
 #undef  is_reencoded
-#define is_reencoded(f)     (cur_enc_name != 0)
+#define is_reencoded(f)     (cur_enc_name != NULL)
 #undef  is_subsetted
 #define is_subsetted(f)     true
 #undef  is_included
@@ -253,7 +253,7 @@ static const char *cs_token_pairs_list[][2] = {
   {" -|", "|"},
   {" RD", "noaccess put"},
   {" -|", "noaccess put"},
-  {0, 0}
+  {NULL, NULL}
 };
 static const char **cs_token_pair;
 
@@ -349,7 +349,7 @@ void load_enc(char *enc_name, char **glyph_names)
     set_cur_file_name(enc_name);
     if (!enc_open()) {
         pdftex_warn("cannot open encoding file for reading");
-        cur_file_name = 0;
+        cur_file_name = NULL;
         return;
     }
     t1_log("{");
@@ -388,7 +388,7 @@ void load_enc(char *enc_name, char **glyph_names)
 done:
     enc_close();
     t1_log("}");
-    cur_file_name = 0;
+    cur_file_name = NULL;
 }
 
 static void t1_check_pfa(void)
@@ -489,7 +489,7 @@ static float t1_scan_num(char *p, char **r)
         remove_eol(p, t1_line_array);
         pdftex_fail("a number expected: `%s'", t1_line_array);
     }
-    if (r != 0) {
+    if (r != NULL) {
         for (; isdigit(*p) || *p == '.' || 
                *p == 'e' || *p == 'E' || *p == '+' || *p == '-'; p++);
         *r = p;
@@ -616,7 +616,7 @@ static void t1_close_font_file(const char *close_name_suffix)
 {
     t1_log(close_name_suffix);
     t1_close();
-    cur_file_name = 0;
+    cur_file_name = NULL;
 }
 
 static void t1_check_block_len(boolean decrypt)
@@ -731,7 +731,7 @@ static void t1_modify_fm(void)
     b[4] = a[4];
     b[5] = a[5];
     for (i = 0; i < 6; i++) {
-        sprintf(r, "%G ", b[i]);
+        sprintf(r, "%g ", b[i]);
         r = strend(r);
     }
     if (c == '[') {
@@ -761,7 +761,7 @@ static void t1_modify_italic(void)
     strncpy(t1_buf_array, t1_line_array, (unsigned)(p - t1_line_array + 1));
     a = t1_scan_num(p + 1, &r);
     a -= atan(fm_slant(fm_cur)*1E-3)*(180/M_PI);
-    sprintf(t1_buf_array + (p - t1_line_array + 1), "%.2g", a);
+    sprintf(t1_buf_array + (p - t1_line_array + 1), "%g", a);
     strcpy(strend(t1_buf_array), r);
     strcpy(t1_line_array, t1_buf_array);
     t1_line_ptr = eol(t1_line_array);
@@ -992,7 +992,7 @@ static void t1_check_end(void)
 #ifdef pdfTeX
 static boolean t1_open_fontfile(const char *open_name_prefix)
 {
-    char *ex_ffname = 0;
+    char *ex_ffname = NULL;
     ff_entry *ff;
     ff = check_ff_exist(fm_cur);
     if (ff->ff_path != NULL)
@@ -1001,13 +1001,6 @@ static boolean t1_open_fontfile(const char *open_name_prefix)
         set_cur_file_name(fm_cur->ff_name);
         pdftex_warn("cannot open Type 1 font file for reading");
         return false;
-    }
-    if (ff->ismm == 0 && fm_cur->expansion != 0 && is_included(fm_cur)) {
-        /* use ExtendFont to simulate MM instance */
-        if (fm_extend(fm_cur) == 0)
-            fm_extend(fm_cur) = 1000;
-        fm_extend(fm_cur) =
-            roundxnoverd(fm_extend(fm_cur), 1000 + fm_cur->expansion, 1000);
     }
     t1_init_params(open_name_prefix);
     fontfile_found = true;
@@ -1085,10 +1078,10 @@ static boolean t1_open_fontfile(char *open_name_prefix)
 static const char **check_cs_token_pair()
 {
     const char **p = (const char**) cs_token_pairs_list;
-    for (; p[0] != 0; ++p) 
+    for (; p[0] != NULL; ++p) 
         if (t1_buf_prefix(p[0]) && t1_buf_suffix(p[1]))
             return p;
-    return 0;
+    return NULL;
 }
 
 static void cs_store(boolean is_subr)
@@ -1118,7 +1111,7 @@ static void cs_store(boolean is_subr)
     for (p = cs_start + t1_cslen, t1_buf_ptr = t1_buf_array + t1_cslen + 4; 
          *p != 10; *t1_buf_ptr++ = *p++);
     *t1_buf_ptr++ = 10;
-    if (is_subr && cs_token_pair == 0)
+    if (is_subr && cs_token_pair == NULL)
         cs_token_pair = check_cs_token_pair();
     ptr->len = t1_buf_ptr - t1_buf_array;
     ptr->cslen = t1_cslen;
@@ -1225,7 +1218,7 @@ static void cs_warn(const char *cs_name, int subr, const char *fmt,...)
     va_start(args, fmt);
     vsprintf(buf, fmt, args);
     va_end(args);
-    if (cs_name == 0)
+    if (cs_name == NULL)
         pdftex_warn("Subr (%i): %s", (int)subr, buf);
     else
         pdftex_warn("CharString (/%s): %s", cs_name, buf);
@@ -1241,14 +1234,14 @@ static void cs_mark(const char *cs_name, int subr)
                                              OtherSubrs[3] */
     cs_entry *ptr;
     cc_entry *cc;
-    if (cs_name == 0) {
+    if (cs_name == NULL) {
         check_subr(subr);
         ptr = subr_tab + subr;
         if (!ptr->valid)
             return;
     }
     else {
-        if (cs_notdef != 0 && 
+        if (cs_notdef != NULL && 
             (cs_name == notdef || strcmp(cs_name, notdef) == 0))
             ptr = cs_notdef;
         else {
@@ -1265,7 +1258,7 @@ static void cs_mark(const char *cs_name, int subr)
     }
     /* only marked CharString entries and invalid entries can be skipped;
        valid marked subrs must be parsed to keep the stack in sync */
-    if (!ptr->valid || (ptr->used && cs_name != 0))
+    if (!ptr->valid || (ptr->used && cs_name != NULL))
         return; 
     ptr->used = true;
     cr = 4330; 
@@ -1420,19 +1413,19 @@ static void t1_flush_cs(boolean);
 
 static void cs_init(void)
 {
-    cs_ptr = cs_tab = 0;
-    cs_dict_start =  cs_dict_end = 0;
+    cs_ptr = cs_tab = NULL;
+    cs_dict_start =  cs_dict_end = NULL;
     cs_count = cs_size = cs_size_pos = 0;
-    cs_token_pair = 0;
-    subr_tab = 0;
-    subr_array_start = subr_array_end = 0;
+    cs_token_pair = NULL;
+    subr_tab = NULL;
+    subr_array_start = subr_array_end = NULL;
     subr_max = subr_size = subr_size_pos = 0;
 }
 
 static void init_cs_entry(cs_entry *cs)
 {
-    cs->data = 0;
-    cs->name = 0;
+    cs->data = NULL;
+    cs->name = NULL;
     cs->len = 0;
     cs->cslen = 0;
     cs->used = false;
@@ -1517,7 +1510,7 @@ found:
 static void t1_flush_cs(boolean is_subr)
 {
     char *p;
-    byte *r, *return_cs = 0;
+    byte *r, *return_cs = NULL;
     cs_entry *tab, *end_tab, *ptr;
     char *start_line, *line_end;
     int count, size_pos;
@@ -1610,11 +1603,11 @@ static void t1_mark_glyphs(void)
     char *g, *s, *r;
     cs_entry *ptr;
     if (t1_synthetic || embed_all_glyphs(tex_font)) { /* mark everything */
-        if (cs_tab != 0)
+        if (cs_tab != NULL)
             for (ptr = cs_tab; ptr < cs_ptr; ptr++)
                 if (ptr->valid)
                     ptr->used = true;
-        if (subr_tab != 0) {
+        if (subr_tab != NULL) {
             for (ptr = subr_tab; ptr - subr_tab < subr_size; ptr++)
                 if (ptr->valid)
                     ptr->used = true;
@@ -1630,7 +1623,7 @@ static void t1_mark_glyphs(void)
             else
                 mark_cs(t1_glyph_names[i]);
         }
-    if (charset == 0)
+    if (charset == NULL)
         goto set_subr_max;
     g = s = charset + 1; /* skip the first '/' */
     r = strend(g);
@@ -1642,7 +1635,7 @@ static void t1_mark_glyphs(void)
         g = s + 1;
     }
 set_subr_max:
-    if (subr_tab != 0)
+    if (subr_tab != NULL)
         for (subr_max = -1, ptr = subr_tab; ptr - subr_tab < subr_size; ptr++)
             if (ptr->used && ptr - subr_tab > subr_max)
                 subr_max = ptr - subr_tab;
@@ -1659,7 +1652,7 @@ static void t1_subset_charstrings(void)
     cs_ptr = cs_tab = xtalloc(cs_size, cs_entry);
     for (ptr = cs_tab; ptr - cs_tab < cs_size; ptr++)
         init_cs_entry(ptr);
-    cs_notdef = 0;
+    cs_notdef = NULL;
     cs_dict_start = xstrdup(t1_line_array);
     t1_getline();
     while (t1_cslen) {
@@ -1668,8 +1661,8 @@ static void t1_subset_charstrings(void)
     }
     cs_dict_end = xstrdup(t1_line_array);
     t1_mark_glyphs();
-    if (subr_tab != 0) {
-        if (cs_token_pair == 0)
+    if (subr_tab != NULL) {
+        if (cs_token_pair == NULL)
             pdftex_fail("This Type 1 font uses mismatched subroutine begin/end token pairs.");
         t1_subr_flush();
     }
@@ -1756,7 +1749,7 @@ boolean t1_subset(char *fontfile, char *encfile, unsigned char *g)
     cur_enc_name = encfile;
     for (i = 0; i <= MAX_CHAR_CODE; i++)
         ext_glyph_names[i] = (char*) notdef;
-    if (cur_enc_name != 0)
+    if (cur_enc_name != NULL)
         load_enc(cur_enc_name, ext_glyph_names);
     grid = g;
     cur_file_name = fontfile;

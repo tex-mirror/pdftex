@@ -1500,9 +1500,11 @@ changequote([, ])dnl
 dnl We reimplement AC_MSG_CHECKING (mostly) to avoid the ... in the middle.
 echo $ac_n "checking for prefix by $ac_c" 1>&AC_FD_MSG
 AC_PATH_PROG(AC_VAR_NAME, $1)
+dnl SU: additionally, remove trailing /bin from path since the current teTeX paths look like
+dnl '/usr/local/teTeX/bin/i686-pc-linux-gnu/tex'
 changequote(<<, >>)dnl
   if test -n "$ac_cv_path_<<>>AC_VAR_NAME"; then
-    prefix=`echo $ac_cv_path_<<>>AC_VAR_NAME|sed 's%/[^/][^/]*//*[^/][^/]*$%%'`
+    prefix=`echo $ac_cv_path_<<>>AC_VAR_NAME|sed 's%/[^/][^/]*//*[^/][^/]*$%%'|sed 's%/bin$%%'`
 changequote([, ])dnl
   fi
 fi

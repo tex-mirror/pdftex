@@ -113,9 +113,6 @@ pdftex-clean:
 # 	$(dumpenv) $(make) progname=pdflatex files="latex.ltx" prereq-check
 # 	$(dumpenv) .\$(objdir)\pdftex --progname=pdflatex --jobname=pdflatex --ini "\pdfoutput=1 \input latex.ltx" <nul
 # 
-# pdftexinfo.fmt: $(pdftex)
-# 	$(dumpenv) $(make) progname=pdftexinfo files="pdftexinfo.ini" prereq-check
-# 	$(dumpenv) .\$(objdir)\pdftex --progname=pdftexinfo --ini pdftexinfo.ini <nul
 # 
 # Installation.
 install-pdftex: install-pdftex-exec install-pdftex-data

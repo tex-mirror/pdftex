@@ -16,7 +16,7 @@ dnl to build part of the distribution may not have any given program.
 dnl Even main.c isn't guaranteed, but then nothing is, really ...
 AC_INIT(web2c/main.c)
 
-WEB2CVERSION=7.5.2
+WEB2CVERSION=7.5.3
 AC_SUBST(WEB2CVERSION)
 AC_DEFINE_UNQUOTED(WEB2CVERSION," (Web2C $WEB2CVERSION)")
 
@@ -30,20 +30,19 @@ AC_PROG_MAKE_SET
 
 AC_PROG_YACC
 AC_PROG_LEX
-
 # Work around a problem with Flex Version 2.5.31 which needs -l flag.
 # Since all versions of flex support -l, don't check for the
-# specific version. We also need to catch LEX=/some/where/flex, so:
+# specific version. We also want to catch LEX=/some/where/flex, so:
 case $LEX in
   *flex) LEX="$LEX -l" ;;
 esac
-
 AC_PROG_RANLIB
 AC_CHECK_HEADERS(sys/time.h sys/timeb.h)
 AC_CHECK_FUNCS(strerror gettimeofday ftime mkstemp mktemp)
 
 AC_TYPE_SIGNAL
 
+# AC_DECL_YYTEXT is just used to set LEX_OUTPUT_ROOT.
 AC_DECL_YYTEXT
 pb_AC_ASM_UNDERSCORE
 
@@ -128,7 +127,7 @@ if test -d $srcdir/alephdir && test -d $srcdir/omegadir; then
   test "${with_aleph+set}" = set || with_aleph=yes
 else
   if test "x$with_aleph" = xyes; then
-    AC_MSG_WARN(The e-Omega sources are not available.)
+    AC_MSG_WARN(The Aleph sources are not available.)
   fi
   with_aleph=no
 fi
@@ -138,7 +137,6 @@ else
   ALEPH='#! '
 fi
 AC_SUBST(ALEPH)
-test "x$with_aleph" = xyes && { test -d alephdir || mkdir alephdir; }
 
 # For pdfTeX.
 if test -d $srcdir/pdftexdir; then
@@ -175,9 +173,10 @@ else
 fi
 
 # Check whether C++ compiler works.  Prevent exit if it doesn't.
-if test "x$with_pdftex" = xyes ||
+if test "x$with_pdftex"  = xyes ||
    test "x$with_pdfetex" = xyes ||
-   test "x$with_pdfxtex" = xyes; then
+   test "x$with_pdfxtex" = xyes
+then
   # First test whether the compiler works in a subshell, and if so,
   # do it again in the main shell so we see the result.
 (
@@ -209,9 +208,10 @@ CXXLDEXTRA=
 CXXHACKLINK='$(kpathsea_cxx_link)'
 CXXHACKLDLIBS='$(LOADLIBES)'
 if test "x$with_cxx_runtime_hack" = xyes &&
-   { test "x$with_pdftex" = xyes ||
+   { test "x$with_pdftex"  = xyes ||
      test "x$with_pdfetex" = xyes ||
-     test "x$with_pdfxtex" = xyes; }; then
+     test "x$with_pdfxtex" = xyes; }
+then
   AC_MSG_CHECKING(for statically linking C++ runtime library)
 
   cpp_link_hack=false
@@ -281,22 +281,13 @@ else
 fi
 AC_SUBST(PXTEX)
 
-if test "x$with_pdftex" = xyes ||
-   test "x$with_pdfetex" = xyes ||
-   test "x$with_pdfxtex" = xyes; then
-  PANYTEX=
-  with_some_pdftex=yes
-else
-  PANYTEX='#! '
-  with_some_pdftex=no
-fi
-AC_SUBST(PANYTEX)
-
 # For e-TeX, three choices: no, yes, and tex.  In the latter case, we
 # have to comment out the normal TeX build (TEX), as well as enable the
 # e-TeX build (ETEX) and the replacement of TeX with e-TeX in compatibilty
 # mode(CTEX).
 if test -d $srcdir/etexdir; then
+  # Create build dir, if necessary.
+  test -d etexdir || mkdir etexdir
   test "${with_etex+set}" = set || with_etex=yes
 else
   if test "x$with_etex" = xyes; then
@@ -353,8 +344,11 @@ else
 fi
 AC_SUBST(FMU)
 
-# Don't bother with pdflib unless pdfTeX is requested.
-if test "$with_some_pdftex" = yes; then
+# Don't bother with pdflib unless pdf*TeX is requested.
+if test "$with_pdftex" = yes || \
+   test "$with_pdfetex" = yes || \
+   test "$with_pdfxtex" = yes
+then
   libpdfmakefile=pdftexdir/Makefile
 fi
 
@@ -374,10 +368,32 @@ test -d tests || mkdir tests
 # Is libm present.  FIXME: do we need it at all?
 AC_CHECK_LIB(m, main)
 
+# For cross-compilation.  Put at the end so there is a fair chance
+# these are still visible when the configure script has finished.
+
+# The variables we need to build binaries that will run on the build
+# machine: BUILDCC, BUILDCFLAGS, BUILDCCLD.
+KPSE_CROSS_BUILD_VAR(CC, cc)
+KPSE_CROSS_BUILD_VAR(CFLAGS, $(BUILDXCFLAGS))
+KPSE_CROSS_BUILD_VAR(CPPFLAGS, $(BUILDXCPPFLAGS))
+KPSE_CROSS_BUILD_VAR(LDFLAGS, $(BUILDXLDFLAGS))
+KPSE_CROSS_BUILD_VAR(CCLD, $(BUILDCC))
+
+# And supporting programs we need to have available on the build
+# machine.
+KPSE_CROSS_PATH_PROG(TANGLEBOOT, tangle, ./tangleboot)
+KPSE_CROSS_PATH_PROG(TANGLE, tangle, ./tangle)
+KPSE_CROSS_PATH_PROG(CTANGLEBOOT, ctangle, ./ctangleboot)
+KPSE_CROSS_PATH_PROG(CTANGLE, ctangle, ./ctangle)
+KPSE_CROSS_PATH_PROG(TIE, tie, ./tie)
+if test "x$with_omega" = xyes || test "x$with_aleph" = yes; then
+KPSE_CROSS_PATH_PROG(OTANGLE, otangle, ./otangle)
+fi
+
 dnl Generate `Makefile's, `config.status', and our header file.
-AC_OUTPUT(Makefile doc/Makefile lib/Makefile man/Makefile mpware/Makefile
-          web2c/Makefile window/Makefile $libpdfmakefile $libpdfemakefile
-          $libpdfxmakefile $omegafontsmakefile $otpsmakefile
-          fmtutil.cnf:fmtutil.in)
+AC_OUTPUT(Makefile doc/Makefile lib/Makefile man/Makefile mpware/Makefile 
+          web2c/Makefile window/Makefile
+          $libpdfmakefile $libpdfemakefile $libpdfxmakefile
+          $omegafontsmakefile $otpsmakefile fmtutil.cnf:fmtutil.in)
 dnl Update stamp-auto, since we just remade `c-auto.h'.
 date >stamp-auto

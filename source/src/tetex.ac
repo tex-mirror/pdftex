@@ -13,9 +13,6 @@ export enable_fmtutil
 : ${with_mktexfmt_default=yes}
 export with_mktexfmt_default
 
-: ${with_cxx_runtime_hack=yes}
-export with_cxx_runtime_hack
-
 : ${enable_multiplatform=yes}
 if test "x$enable_multiplatform" = xyes \
   && test "x$bindir" = 'x${exec_prefix}/bin'
@@ -31,12 +28,12 @@ if test "x$prefix" = xNONE; then
   ac_configure_args="$ac_configure_args --prefix=$ac_default_prefix"
 fi
 
-enable_ipc=yes
+enable_ipc=yes; export enable_ipc
 case "$target" in
   *nextstep3*|*NEXTSTEP*)
      with_xdvik=no; with_oxdvik=no
      with_nextwin=yes; with_ps=dps
-     export with_xdvik with_oxdvik enable_ipc with_nextwin with_ps;;
+     export with_xdvik with_oxdvik with_nextwin with_ps;;
 esac
 
 test "$no_x" = yes || {

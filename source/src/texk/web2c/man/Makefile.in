@@ -52,8 +52,8 @@ manfiles=		\
 	omega.1		\
 	patgen.1	\
 	pdfetex.1	\
-	pdfxtex.1	\
 	pdftex.1	\
+	pdfxtex.1	\
 	pktogf.1	\
 	pktype.1	\
 	pltotf.1	\
@@ -64,11 +64,6 @@ manfiles=		\
 	vftovp.1	\
 	vptovf.1	\
 	weave.1
-
-pdftex.man : pdftexman.m4
-	m4 -P -DOLD $(srcdir)/pdftexman.m4 > pdftex.man	
-pdfetex.man : pdftexman.m4
-	m4 -P $(srcdir)/pdftexman.m4 > pdfetex.man
 
 default all: manfiles
 

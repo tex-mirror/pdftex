@@ -1,6 +1,6 @@
 /* inputint.c: read integers from text files.  These routines are only
    used for debugging and such, so perfect error checking isn't
-   necessary.  */
+   necessary.  Public domain. */
 
 #include "config.h"
 

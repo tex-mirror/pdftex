@@ -161,7 +161,7 @@ maketex P2C(kpse_file_format_type, format, string*, args)
     ret = system(cmd) == 0 ? getenv ("LAST_FONT_CREATED"): NULL;
     free (cmd);
   }
-#elif defined (MSDOS)
+#elif defined (MSDOS) && !defined(DJGPP)
 #error Implement new MSDOS mktex call interface here
 #elif defined (WIN32)
   /* We would vastly prefer to link directly with mktex.c here.

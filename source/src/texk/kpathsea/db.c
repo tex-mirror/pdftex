@@ -550,7 +550,7 @@ kpse_db_search_list P3C(const_string*, names,  const_string, path_elt,
                         boolean, all)
 {
   string *db_dirs, *orig_dirs, *r;
-  const_string last_slash;
+  const_string last_slash, name, path;
   boolean done;
   str_list_type *ret;
   unsigned e;
@@ -577,13 +577,34 @@ kpse_db_search_list P3C(const_string*, names,  const_string, path_elt,
   done = false;
   /* Handle each name. */
   for (n = 0; !done && names[n]; n++) {
-      /* Absolute names have already been caught in our caller. */
-      if (kpse_absolute_p(names[n], true))
+      name = names[n];
+
+      /* Absolute names should have been caught in our caller. */
+      if (kpse_absolute_p(name, true))
           continue;
 
+      /* When tex-glyph.c calls us looking for, e.g., dpi600/cmr10.pk, we
+         won't find it unless we change NAME to just `cmr10.pk' and append
+         `/dpi600' to PATH_ELT.  We are justified in using a literal `/'
+         here, since that's what tex-glyph.c unconditionally uses in
+         DPI_BITMAP_SPEC.  But don't do anything if the / begins NAME; that
+         should never happen.  */
+      last_slash = strrchr (name, '/');
+      if (last_slash && last_slash != name) {
+          unsigned len = last_slash - name + 1;
+          string dir_part = (string)xmalloc (len);
+          strncpy (dir_part, name, len - 1);
+          dir_part[len - 1] = 0;
+          path = concat3 (path_elt, "/", dir_part);
+          name = last_slash + 1;
+          free(dir_part);
+      } else {
+          path = path_elt;
+      }
+      
       /* If we have aliases for this name, use them.  */
       if (alias_db.buckets)
-          aliases = hash_lookup (alias_db, names[n]);
+          aliases = hash_lookup (alias_db, name);
       else
           aliases = NULL;
 
@@ -600,7 +621,7 @@ kpse_db_search_list P3C(const_string*, names,  const_string, path_elt,
           for (i = len; i > 0; i--) {
               aliases[i] = aliases[i - 1];
           }
-          aliases[0] = (string) names[n];
+          aliases[0] = (string) name;
       }
 
       for (r = aliases; !done && *r; r++) {
@@ -617,11 +638,11 @@ kpse_db_search_list P3C(const_string*, names,  const_string, path_elt,
              and the path looks like .../cx, we don't want the ricoh file.  */
           while (!done && db_dirs && *db_dirs) {
               string db_file = concat (*db_dirs, ctry);
-              boolean matched = match (db_file, path_elt);
+              boolean matched = match (db_file, path);
               
 #ifdef KPSE_DEBUG
               if (KPSE_DEBUG_P (KPSE_DEBUG_SEARCH))
-                DEBUGF3 ("db:match(%s,%s) = %d\n", db_file, path_elt, matched);
+                DEBUGF3 ("db:match(%s,%s) = %d\n", db_file, path, matched);
 #endif
 
               /* We got a hit in the database.  Now see if the file actually
@@ -671,6 +692,8 @@ kpse_db_search_list P3C(const_string*, names,  const_string, path_elt,
       }
       
       free (aliases);
+      if (path != path_elt)
+          free((string)path);
   }
   return ret;
   

@@ -433,8 +433,8 @@ with the option @samp{--disable-mktexpk}.
 
 Considerable effort has gone into trying to ensure that the
 @code{configure} scripts can be run by most Bourne shell variants.
-Should @code{sh} run into trouble, your best bet is to use Bash, the GNU
-shell (@pxref{Top,,,features,Bash Features}).
+If @code{sh} runs into trouble, your best bet is to use Bash, the GNU
+Bourne-again shell (@pxref{Top,,,bash,Bash Reference Manual}).
 
 Bourne shell variants for which problems have been reported in the past
 are:
@@ -962,7 +962,7 @@ The @samp{appendonlydir} option is enabled by default.
 @cindex directories, making append-only
 @flindex mktexdir
 Tell @code{mktexdir} to create directories append-only, i.e., set
-their sticky bit (@pxref{Mode Structure,,, fileutils, GNU File
+their sticky bit (@pxref{Mode Structure,,, coreutils, GNU Core
 Utilities}).  This feature is silently ignored on non-Unix platforms
 (e.g. Windows/NT and MS-DOS) which don't support similar functionality.
 This feature is enabled by default.

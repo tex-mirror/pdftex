@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#17 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#19 $
 */
 
 #include "ptexlib.h"
@@ -29,13 +29,13 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#17 $
 #include <time.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#17 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#19 $";
 
-char *cur_file_name = 0;
+char *cur_file_name = NULL;
 strnumber last_tex_string;
 static char print_buf[PRINTF_BUF_SIZE];
-static char *jobname_cstr = 0;
-static char *job_id_string = 0;
+static char *jobname_cstr = NULL;
+static char *job_id_string = NULL;
 extern string versionstring; /* from web2c/lib/version.c */         
 extern KPSEDLL string kpathsea_version_string; /* from kpathsea/version.c */
 
@@ -99,18 +99,18 @@ void make_subset_tag(fm_entry *fm_cur, integer fn_offset)
     alloc_array(char, l, SMALL_ARRAY_SIZE);
     strcpy(char_array, job_id_string);
     char_ptr = strend(char_array);
-    if (fm_cur->tfm_name != 0) {
+    if (fm_cur->tfm_name != NULL) {
         fnstr_append(" TFM name: ");
         fnstr_append(fm_cur->tfm_name);
     }
     fnstr_append(" PS name: ");
     if (font_keys[FONTNAME_CODE].valid)
         fnstr_append(font_keys[FONTNAME_CODE].value.string);
-    else if (fm_cur->ps_name != 0)
+    else if (fm_cur->ps_name != NULL)
         fnstr_append(fm_cur->ps_name);
     fnstr_append(" Encoding: ");
-    if (fm_cur->encoding >= 0 && enc_array[fm_cur->encoding].name != 0)
-        fnstr_append(enc_array[fm_cur->encoding].name);
+    if (fm_cur->encoding != NULL && (fm_cur->encoding)->name != NULL)
+        fnstr_append((fm_cur->encoding)->name);
     else
         fnstr_append("built-in");
     fnstr_append(" CharSet: ");
@@ -119,7 +119,7 @@ void make_subset_tag(fm_entry *fm_cur, integer fn_offset)
             fnstr_append(" /");
             fnstr_append(t1_glyph_names[i]);
         }
-    if (fm_cur->charset != 0) {
+    if (fm_cur->charset != NULL) {
         fnstr_append(" Extra CharSet: ");
         fnstr_append(fm_cur->charset);
     }
@@ -158,7 +158,7 @@ void pdf_printf(const char *fmt,...)
 strnumber maketexstring(const char *s)
 {
     int l;
-    if (s == 0 || *s == 0)
+    if (s == NULL || *s == 0)
         return getnullstr();
     l = strlen(s);
     check_buf(poolptr + l, poolsize);
@@ -245,7 +245,7 @@ char *makecstring(integer s)
 boolean str_eq_cstr(strnumber n, char *s)
 {
     int l;
-    if (s == 0 || n == 0)
+    if (s == NULL || n == 0)
         return false;
     l = strstart[n];
     while (*s && l < strstart[n + 1] && *s == strpool[l])
@@ -258,7 +258,7 @@ void setjobid(int year, int month, int day, int time, int pdftexversion, int pdf
 {
     char *name_string, *format_string, *s;
 
-    if (job_id_string != 0)
+    if (job_id_string != NULL)
         return;
 
     name_string = xstrdup(makecstring(jobname));
@@ -350,7 +350,7 @@ int xputc(int c, FILE *stream)
 void writestreamlength(integer length, integer offset)
 {
     integer save_offset;
-    if (jobname_cstr == 0)
+    if (jobname_cstr == NULL)
         jobname_cstr = xstrdup(makecstring(jobname));
     save_offset = xftell(pdffile, jobname_cstr);
     xfseek(pdffile, offset, SEEK_SET, jobname_cstr);

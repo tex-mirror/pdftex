@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#9 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#13 $
 */
 
 /*
@@ -36,7 +36,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#9 $
 #include <pdftexdir/ptexmac.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#9 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#13 $";
 
 typedef unsigned char   TTF_BYTE;
 typedef signed char     TTF_CHAR;
@@ -59,7 +59,7 @@ typedef struct {
 
 typedef struct {
     TTF_ULONG wx;
-    char *name;
+    const char *name;
     TTF_USHORT index;
     TTF_LONG bbox[4];
     TTF_LONG offset;
@@ -157,17 +157,17 @@ typedef struct {
 #define enc_eof()       feof(encfile)
 
 #define ttf_skip(n)         getnum(n)
-#define print_str(S)    if (S != 0) fprintf(outfile, #S " %s\n", S)
+#define print_str(S)    if (S != NULL) fprintf(outfile, #S " %s\n", S)
 #define print_dimen(N)  if (N != 0) fprintf(outfile, #N " %i\n", (int)get_ttf_funit(N))
 
 #define get_ttf_funit(n) \
     (n < 0 ? -((-n/upem)*1000 + ((-n%upem)*1000)/upem) :\
     ((n/upem)*1000 + ((n%upem)*1000)/upem))
 
-char *FontName = 0;
-char *FullName = 0;
-char *FamilyName = 0;
-char *Notice = 0;
+char *FontName = NULL;
+char *FullName = NULL;
+char *FamilyName = NULL;
+char *Notice = NULL;
 TTF_LONG ItalicAngle = 0;
 TTF_LONG IsFixedPitch = 0;
 TTF_LONG FontBBox1 = 0;
@@ -181,9 +181,9 @@ TTF_LONG XHeight = 0;
 TTF_LONG Ascender = 0;
 TTF_LONG Descender = 0;
 
-char *cur_file_name = 0;
-char *b_name = 0;
-FILE *fontfile, *encfile, *outfile = 0;
+char *cur_file_name = NULL;
+char *b_name = NULL;
+FILE *fontfile, *encfile, *outfile = NULL;
 char enc_line[ENC_BUF_SIZE];
 int print_all = 0;      /* print all glyphs? */
 int print_index = 0;    /* print glyph names by index? */
@@ -199,7 +199,7 @@ int loca_format;
 int nglyphs;
 int nkernpairs = 0;
 int names_count = 0;
-char *ps_glyphs_buf = 0;
+char *ps_glyphs_buf = NULL;
 dirtab_entry *dir_tab;
 mtx_entry *mtx_tab;
 kern_entry *kern_tab;
@@ -239,7 +239,7 @@ void warn(char *fmt,...)
 void *xmalloc(unsigned long size)
 {
     void *p = (void *)malloc(size);
-    if (p == 0)
+    if (p == NULL)
         ttf_fail("malloc() failed (%lu bytes)", (unsigned long)size);
     return p;
 }
@@ -247,14 +247,14 @@ void *xmalloc(unsigned long size)
 FILE *xfopen(char *name, char *mode)
 {
     FILE *f = fopen(name, mode);
-    if (f == 0)
+    if (f == NULL)
         ttf_fail("fopen() failed");
     return f;
 }
 
 void xfclose(FILE *f)
 {
-  if (fclose (f) != 0)
+  if (fclose (f) != NULL)
         ttf_fail("fclose() failed");
 }
 
@@ -302,14 +302,14 @@ dirtab_entry *name_lookup(char *s)
         if (strncmp(p->tag, s, 4) == 0)
             break;
     if (p - dir_tab == ntabs)
-        p = 0;
+        p = NULL;
     return p;
 }
 
 void seek_tab(char *name, TTF_LONG offset)
 {
     dirtab_entry *p = name_lookup(name);
-    if (p == 0)
+    if (p == NULL)
         ttf_fail("can't find table `%s'", name);
     if (fseek(fontfile, p->offset + offset, SEEK_SET) < 0)
         ttf_fail("fseek() failed while reading `%s' table", name);
@@ -324,10 +324,10 @@ void seek_off(char *name, TTF_LONG offset)
 void store_kern_value(TTF_USHORT i, TTF_USHORT j, TTF_FWORD v)
 {
     kern_entry *pk;
-    for (pk = kern_tab + i; pk->next != 0; pk = pk->next);
+    for (pk = kern_tab + i; pk->next != NULL; pk = pk->next);
     pk->next = ttf_alloc(1, kern_entry);
     pk = pk->next;
-    pk->next = 0;
+    pk->next = NULL;
     pk->adjacent = j;
     pk->value = v;
 }
@@ -335,7 +335,7 @@ void store_kern_value(TTF_USHORT i, TTF_USHORT j, TTF_FWORD v)
 TTF_FWORD get_kern_value(TTF_USHORT i, TTF_USHORT j)
 {
     kern_entry *pk;
-    for (pk = kern_tab + i; pk->next != 0; pk = pk->next)
+    for (pk = kern_tab + i; pk->next != NULL; pk = pk->next)
         if (pk->adjacent == j)
             return pk->value;
     return 0;
@@ -352,8 +352,8 @@ void free_tabs()
         if (enc_names[i] != notdef)
             free(enc_names[i]);
     for (p = kern_tab; p - kern_tab < nglyphs; p++)
-        if (p->next != 0) {
-            for (q = p->next; q != 0; q = r) {
+        if (p->next != NULL) {
+            for (q = p->next; q != NULL; q = r) {
                 r = q->next;
                 xfree(q);
             }
@@ -383,7 +383,7 @@ void read_encoding(char *encname)
     char buf[ENC_BUF_SIZE], *q, *r;
     int i;
     cur_file_name = encname;
-    if ((encfile = kpse_open_file(encname, kpse_enc_format)) == 0)
+    if ((encfile = kpse_open_file(encname, kpse_enc_format)) == NULL)
         ttf_fail("can't open encoding file for reading");
     enc_getline();
     if (*enc_line != '/' || (r = strchr(enc_line, '[')) == 0)
@@ -451,9 +451,9 @@ void read_font()
     loca_format = get_short();
     seek_tab("maxp", TTF_FIXED_SIZE);
     nglyphs = get_ushort();
-    mtx_tab = ttf_alloc(nglyphs, mtx_entry);
-    for (pm = mtx_tab; pm - mtx_tab < nglyphs; pm++) {
-        pm->name = 0; /* notdef */
+    mtx_tab = ttf_alloc(nglyphs + 1, mtx_entry);
+    for (pm = mtx_tab; pm - mtx_tab < nglyphs + 1; pm++) {
+        pm->name = NULL; /* notdef */
         pm->found = 0;
     }
     seek_tab("hhea", TTF_FIXED_SIZE);
@@ -485,7 +485,7 @@ void read_font()
         l = get_ushort(); /* some fonts have this value different from nglyphs */
         for (pm = mtx_tab; pm - mtx_tab < l; pm++)
             pm->index = get_ushort();
-        if ((pd = name_lookup("post")) == 0)
+        if ((pd = name_lookup("post")) == NULL)
             ttf_fail("can't find table `post'");
         n = pd->length - (xftell(fontfile, cur_file_name) - pd->offset);
         ps_glyphs_buf = ttf_alloc(n + 1, char);
@@ -507,7 +507,7 @@ void read_font()
                     pm->name = p;
                 }
                 else {
-                    pm->name = 0; /* index out of valid range, fix name to notdef */
+                    pm->name = NULL; /* index out of valid range, fix name to notdef */
                 }
             }
         }
@@ -524,7 +524,7 @@ void read_font()
     seek_tab("loca", 0);
     for (pm = mtx_tab; pm - mtx_tab < nglyphs; pm++)
         pm->offset = (loca_format == 1 ? get_ulong() : get_ushort() << 1);
-    if ((pd = name_lookup("glyf")) == 0)
+    if ((pd = name_lookup("glyf")) == NULL)
         ttf_fail("can't find table `glyf'");
     for (n = pd->offset, pm = mtx_tab; pm - mtx_tab < nglyphs; pm++)
         if (pm->offset != (pm + 1)->offset) {
@@ -566,22 +566,22 @@ void read_font()
             case 4:  FullName = p; break;
             case 6:  FontName = p; break;
             }
-            if (Notice != 0 && FamilyName != 0 && FullName != 0 && FontName != 0)
+            if (Notice != NULL && FamilyName != NULL && FullName != NULL && FontName != NULL)
                 break;
         }
         i += 6*TTF_USHORT_SIZE;
     }
-    if ((pd = name_lookup("PCLT")) != 0) {
+    if ((pd = name_lookup("PCLT")) != NULL) {
         seek_off("PCLT", pd->offset + TTF_FIXED_SIZE + TTF_ULONG_SIZE + TTF_USHORT_SIZE);
         XHeight = get_ushort();
         ttf_skip(2*TTF_USHORT_SIZE);
         CapHeight = get_ushort();
     }
-    if ((pd = name_lookup("kern")) == 0)
+    if ((pd = name_lookup("kern")) == NULL)
         return;
     kern_tab = ttf_alloc(nglyphs, kern_entry);
     for (pk = kern_tab; pk - kern_tab < nglyphs; pk++) {
-        pk->next = 0;
+        pk->next = NULL;
         pk->value = 0;
     }
     seek_off("kern", pd->offset + TTF_USHORT_SIZE);
@@ -609,22 +609,22 @@ void read_font()
     }
 }
 
-int null_glyph(char *s)
+int null_glyph(const char *s)
 {
-    if (s != 0 &&
+    if (s != NULL &&
         (strcmp(s, ".null") == 0 ||
          strcmp(s, ".notdef") == 0))
         return 1;
     return 0;
 }
 
-#define fix_glyph_name(s)   ((s) != 0 ? (s) : null_name)
+#define fix_glyph_name(s)   ((s) != NULL ? (s) : null_name)
 #define dont_print(s)       (!print_all && !print_index && null_glyph(s))
 #define glyph_found(i)       (print_all || mtx_tab[i].found)
 
 void print_glyph_name(FILE *f, int i)
 {
-    char *s = mtx_tab[i].name;
+    const char *s = mtx_tab[i].name;
     switch (print_index) {
     case 0:
         fprintf(f, fix_glyph_name(s));
@@ -712,7 +712,7 @@ void print_afm(char *date, char *fontname)
             }
             else 
                 for (pm = mtx_tab; pm - mtx_tab < nglyphs; pm++)
-                    if (pm->name != 0 && strcmp(*pe, pm->name) == 0)
+                    if (pm->name != NULL && strcmp(*pe, pm->name) == 0)
                             break;
             if (pm - mtx_tab < nglyphs) {
                 mtx_index[pe - enc_names] = pm - mtx_tab;
@@ -765,7 +765,7 @@ end_metrics:
     for (pk = kern_tab; pk - kern_tab < nglyphs; pk++)
         if (!dont_print(mtx_tab[pk - kern_tab].name) &&
             glyph_found(pk - kern_tab))
-            for (qk = pk; qk != 0; qk = qk->next)
+            for (qk = pk; qk != NULL; qk = qk->next)
                 if (qk->value != 0 &&
                     !dont_print(mtx_tab[qk->adjacent].name) &&
                     glyph_found(qk->adjacent))
@@ -776,7 +776,7 @@ end_metrics:
     for (pk = kern_tab; pk - kern_tab < nglyphs; pk++)
         if (!dont_print(mtx_tab[pk - kern_tab].name) &&
             glyph_found(pk - kern_tab))
-            for (qk = pk; qk != 0; qk = qk->next)
+            for (qk = pk; qk != NULL; qk = qk->next)
                 if (qk->value != 0 && 
                     !dont_print(mtx_tab[qk->adjacent].name) &&
                     glyph_found(qk->adjacent)) {
@@ -811,7 +811,8 @@ void print_encoding(char *fontname)
     long cmap_offset;
     FILE *file;
     TTF_USHORT *glyphId, format, segCount;
-    char *enc_name, *end_enc_name, *n;
+    char *enc_name, *end_enc_name;
+    const char *n;
     seek_tab("cmap", TTF_USHORT_SIZE); /* skip the table vesrion number (0) */
     netabs = get_ushort();
     cmap_offset = xftell(fontfile, cur_file_name) - 2*TTF_USHORT_SIZE;
@@ -833,7 +834,7 @@ void print_encoding(char *fontname)
         }
         sprintf(end_enc_name, ".e%i%i", 
                 (int)e->platform_id, (int)e->encoding_id);
-        if ((file = xfopen(enc_name, FOPEN_W_MODE)) == 0)
+        if ((file = xfopen(enc_name, FOPEN_W_MODE)) == NULL)
             ttf_fail("cannot open file for writing (%s)\n", enc_name);
         fprintf(file, "%% Encoding table from font file %s\n", fontname);
         fprintf(file, "%% Platform ID %i", (int)e->platform_id);
@@ -865,7 +866,7 @@ void print_encoding(char *fontname)
         case 0:
             get_ushort(); /* skip length */
             get_ushort(); /* skip version number */
-            for (i = 0; i < 256; i++) {
+            for (i = 0; i <= MAX_CHAR_CODE; i++) {
                 k = get_byte();
                 n = mtx_tab[k].name;
                 fputs("/", file);
@@ -961,7 +962,7 @@ void print_encoding(char *fontname)
 
 void usage()
 {
-    cur_file_name = 0;
+    cur_file_name = NULL;
     fprintf(stderr,
         "Usage: ttf2afm [-a] [-c name] [-i] [-h|-d] [-e enc] [-o output] fontfile\n"
         "    -a:        print all glyphs\n"
@@ -1006,11 +1007,11 @@ int main(int argc, char **argv)
             print_index = 2;
             break;
         case 'o':
-            if (outfile != 0)
+            if (outfile != NULL)
                 usage();
             cur_file_name = optarg;
             outfile = xfopen(cur_file_name, FOPEN_W_MODE);
-            if (outfile == 0)
+            if (outfile == NULL)
                 ttf_fail("cannot open file for writing");
             break;
         default:
@@ -1021,10 +1022,10 @@ int main(int argc, char **argv)
     sprintf(date, "%s\n", ctime(&t));
     *(char *)strchr(date, '\n') = 0;
     cur_file_name = argv[optind];
-    if ((fontfile = kpse_open_file(cur_file_name, kpse_truetype_format)) == 0)
+    if ((fontfile = kpse_open_file(cur_file_name, kpse_truetype_format)) == NULL)
         ttf_fail("can't open font file for reading");
     read_font();
-    if (outfile == 0)
+    if (outfile == NULL)
         outfile = stdout;
     print_afm(date, cur_file_name);
     if (print_cmap)

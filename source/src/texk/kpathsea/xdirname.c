@@ -37,7 +37,7 @@ xdirname P1C(const_string, name)
   
   if (NAME_BEGINS_WITH_DEVICE(name)) {
       limit = 2;
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN__)
   } else if (IS_UNC_NAME(name)) {
       for (limit = 2; name[limit] && !IS_DIR_SEP(name[limit]); limit++)
           ;

@@ -1,5 +1,5 @@
 {
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: pdfxtex.defines,v 1.1 2004/02/26 13:40:36 thanh Exp $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfxtexdir/pdfxtex.defines#1 $
 }
 
 { pdftex.defines: additions for pdfTeX }
@@ -32,18 +32,14 @@ $Id: pdfxtex.defines,v 1.1 2004/02/26 13:40:36 thanh Exp $
 @define procedure pdfmarkchar();
 @define procedure writepdf();
 
-{ functions from config.c }
-@define function cfgpar();
-@define function iscfgtruedimen();
-@define procedure readconfigfile;
-@define procedure pdfmapfile();
-@define procedure pdfmapline();
-
 { functions from mapfile.c }
 @define function hasfmentry();
 @define function fmlookup();
 @define function tfmoffm();
 @define procedure checkextfm();
+@define procedure pdfmapfile();
+@define procedure pdfmapline();
+@define procedure pdfinitmapfile();
 
 { functions from utils.c }
 @define function getresnameprefix;

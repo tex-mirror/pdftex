@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/vfpacket.c#5 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/vfpacket.c#7 $
 */
 
 #include "ptexlib.h"
@@ -50,7 +50,7 @@ integer newvfpacket(internalfontnumber f)
     vf_ptr->len = xtalloc(n, int);
     vf_ptr->data = xtalloc(n, char *);
     for (i = 0; i < n; i++) {
-        vf_ptr->data[i] = 0;
+        vf_ptr->data[i] = NULL;
         vf_ptr->len[i] = 0;
     }
     vf_ptr->font = f;
@@ -102,7 +102,7 @@ void vf_free(void)
     vf_entry *v;
     int n;
     char **p;
-    if (vf_array != 0) {
+    if (vf_array != NULL) {
         for (v = vf_array; v < vf_ptr; v++) {
             xfree(v->len);
             n = fontec[v->font] - fontec[v->font] + 1;

@@ -1,8 +1,8 @@
 pdfTeX
 ======
 
-INSTALL for pdfTeX 1.20a-rc2
-============================
+INSTALL for pdfTeX 1.20a
+========================
 
 This distribution is a stripped-down version of the TeXlive distribution.
 All source code is in the directory src; the script Build will generate and
@@ -10,12 +10,12 @@ populate a directory build.
 
 The code of pdfTeX is in src/texk/web2c/pdftexdir 
 
-Try the script Build in this directory. If it succeeds, you should end up
-with the files pdftex, pdfetex, pdftex.pool and pdfetex.pool in
-build/texk/web2c
+Try the script Build in this directory. If it succeeds, you should end up with
+the files pdftex, pdfetex, pdfxtex, pdftex.pool, pdfetex.pool and pdfxtex.pool
+in build/texk/web2c
 
-Replace the so-named files in your TeX installation with these and
-regenerate all pdf*-formats of your TeX installation.
+Replace the so-named files in your TeX installation with these and regenerate
+all pdf*-formats of your TeX installation.
 
 The directory texmf contains new ini-files and the file
 tex/generic/config/pdftexconfig.tex which should go in texmf-local and are
