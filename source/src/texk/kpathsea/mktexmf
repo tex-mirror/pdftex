@@ -113,7 +113,7 @@ END
 input fikparm;
 END
     ;;
-  g[lorst][ijmtwx][cinou]*)
+  g[lmorst][ijmtwx][cilnoru]*)
     # A small superset of the names of the cbgreek fonts.
     cat > "mf$$.tmp" <<END
 gensize:=$realsize;

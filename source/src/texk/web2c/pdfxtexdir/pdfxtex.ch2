@@ -33,3 +33,9 @@
 @y
 @d banner==pdfxTeX_banner
 @z
+
+@x
+pdf_print("/Producer (pdfeTeX-");
+@y
+pdf_print("/Producer (pdfxTeX-");
+@z

@@ -45,7 +45,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#150 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#152 $
 %
 % The TeX program is copyright (C) 1982 by D. E. Knuth.
 % TeX is a trademark of the American Mathematical Society.
@@ -68,8 +68,8 @@
 @d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
 @y
 @d pdftex_version==120 { \.{\\pdftexversion} }
-@d pdftex_revision=="a" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.20a' {current \pdfTeX\ version}
+@d pdftex_revision=="b" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='-1.20b-rc0' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -1716,7 +1716,7 @@ begin
     avl_put_obj(obj_ptr, t);
     if t = obj_type_page then begin
         p := head_tab[t];
-        {find the right poition to insert newly created object}@/
+        {find the right position to insert newly created object}@/
         if (p = 0) or (obj_info(p) < i) then begin
             obj_link(obj_ptr) := p;
             head_tab[t] := obj_ptr;
@@ -1947,11 +1947,11 @@ procedure do_vf; forward;
 
 @ To set PDF font we need to find out fonts with the same name, because \TeX\
 can load the same font several times for various sizes. For such fonts we
-define only one font resources. The array |pdf_font_num| holds the object
+define only one font resource. The array |pdf_font_num| holds the object
 number of font resource. A negative value of an entry of |pdf_font_num|
 indicates that the corresponding font shares the font resource with the font
-which internal number is the absolute value of the entry. For partial
-downloading we also need to hold flags indicating which charaters in particular
+whose internal number is the absolute value of the entry. For partial
+downloading we also need to hold flags indicating which characters in particular
 font are used in array |pdf_char_used|.
 
 @d pdf_print_resname_prefix == 
@@ -2682,14 +2682,14 @@ g_sign:=glue_sign(this_box); p:=list_ptr(this_box);
 incr(cur_s);
 base_line:=cur_v; left_edge:=cur_h;
 running_link := null;
-@<Create link annottation for the current hbox if needed@>;
+@<Create link annotation for the current hbox if needed@>;
 while p<>null do
     @<Output node |p| for |pdf_hlist_out| and move to the next node,
     maintaining the condition |cur_v=base_line|@>;
 decr(cur_s);
 end;
 
-@ @<Create link annottation for the current hbox if needed@>=
+@ @<Create link annotation for the current hbox if needed@>=
 if running_link = null then begin
     if is_running(pdf_link_wd) and (pdf_link_level = cur_s) then begin
         append_link(this_box, left_edge, base_line);
@@ -3090,10 +3090,10 @@ pdf_indirect_ln("Resources", pdf_last_resources)
 @ @<Start stream of page/form contents@>=
 pdf_begin_stream;
 if shipping_page then begin
-    @<Adjust tranformation matrix for the magnification ratio@>;
+    @<Adjust transformation matrix for the magnification ratio@>;
 end
 
-@ @<Adjust tranformation matrix for the magnification ratio@>=
+@ @<Adjust transformation matrix for the magnification ratio@>=
 prepare_mag;
 if mag <> 1000 then begin
     pdf_print_real(mag, 3);
@@ -3527,7 +3527,7 @@ if pdf_bead_list <> null then begin
     while k <> null do begin
         pdf_new_obj(obj_type_others, 0);
         pdf_out("[");
-        i := obj_bead_data(info(k)); {pointer to a whasit or whatsit-like node}
+        i := obj_bead_data(info(k)); {pointer to a whatsit or whatsit-like node}
         pdf_print_rect_spec(i);
         if info(i) = max_halfword then {not a whatsit node, so must be destroyed here}
             flush_whatsit_node(i, pdf_start_thread_node);
@@ -3700,8 +3700,8 @@ begin
         sort_dest_names(i, r);
 end;
 
-@  Now the finish of PDF output file. At this moment all Page object
-are already written completly to PDF output file.
+@  Now the finish of PDF output file. At this moment all Page objects
+are already written completely to PDF output file.
 
 @<Finish the PDF file@>=
 if total_pages=0 then print_nl("No pages of output.")
@@ -3824,7 +3824,7 @@ Pages tree. We will repeat this until search only one Pages object. This one
 will be the Root object.
 
 @<Output pages tree@>=
-a := obj_ptr + 1; {all Pages object whose childrend are not Page objects
+a := obj_ptr + 1; {all Pages objects whose children are not Page objects
 should have index greater than |a|}
 l := head_tab[obj_type_pages]; {|l| is the index of current Pages object which is
 being output}
@@ -4178,7 +4178,7 @@ end;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Output statistics about the pdftex specific sizes.
+% Output statistics about the pdftex specific sizes only in PDF mode.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 @x [1334]
   wlog_ln(' ',max_in_stack:1,'i,',max_nest_stack:1,'n,',@|
@@ -4201,9 +4201,12 @@ end;
     param_size:1,'p,',
     buf_size:1,'b,',
     save_size:1,'s');
-  wlog_ln(' ',obj_ptr:1,' PDF objects out of ',obj_tab_size:1);
-  wlog_ln(' ',pdf_dest_names_ptr:1,' named destinations out of ',dest_names_size:1);
-  wlog_ln(' ',pdf_mem_ptr:1,' words of extra memory for PDF output out of ',pdf_mem_size:1);
+  if (pdf_output > 0) then begin
+    wlog_ln('PDF statistics:');
+    wlog_ln(' ',obj_ptr:1,' PDF objects out of ',obj_tab_size:1);
+    wlog_ln(' ',pdf_dest_names_ptr:1,' named destinations out of ',dest_names_size:1);
+    wlog_ln(' ',pdf_mem_ptr:1,' words of extra memory for PDF output out of ',pdf_mem_size:1);
+  end;
   end
 @z
 
@@ -4218,10 +4221,6 @@ end;
   while (loc<limit)and(buffer[loc]=" ") do incr(loc);
   end;
 if (pdf_output_option <> 0) then pdf_output := pdf_output_value;
-if (pdf_output > 0) then
-    wterm_ln('output format initialized to PDF')
-else
-    wterm_ln('output format initialized to DVI');
 pdf_init_map_file('pdftex.map');
 @z
 
@@ -4590,7 +4589,7 @@ begin
     y := image_height(obj_ximage_data(n));
     xr := image_x_res(obj_ximage_data(n));
     yr := image_y_res(obj_ximage_data(n));
-    if (xr > 65536) or (yr > 65536) then begin
+    if (xr > 65535) or (yr > 65535) then begin
         xr := 0;
         yr := 0;
         pdf_warning("ext1", "too large image resolution ignored", true);
@@ -4602,7 +4601,7 @@ begin
         h := y;
     end
     else begin
-        default_res := fix_int(pdf_image_resolution, 0, 2400);
+        default_res := fix_int(pdf_image_resolution, 0, 65535);
         if (default_res > 0) and ((xr = 0) or (yr = 0)) then begin
             xr := default_res;
             yr := default_res;
@@ -6356,7 +6355,7 @@ pdf_start_link_node:
     do_link(p, this_box, left_edge, base_line);
 pdf_end_link_node: begin
     end_link;
-    @<Create link annottation for the current hbox if needed@>;
+    @<Create link annotation for the current hbox if needed@>;
 end;
 pdf_dest_node:
     do_dest(p, this_box, left_edge, base_line);

@@ -25,13 +25,25 @@ pdfetex, pdfeinitex, pdfevirtex \- PDF output from e-TeX
 .SH SYNOPSIS
 .B pdfetex
 .RI [ options ]
-.RI [ commands ]
+.RI [\fB& format ]
+.RI [ file [ .tex ]\ |\ [\fB\e commands ]]
 .\"=====================================================================
 .SH DESCRIPTION
-This manual page is not meant to be exhaustive.  The complete
-documentation for this version of \*(TX can be found in the info file
-or manual
-.IR "Web2C: A TeX implementation" .
+Run the pdfe\*(TX typesetter on
+.IR file ,
+usually creating
+.IR file.pdf .
+Instead of a filename, a set of pdfe\*(TX commands can be given, the first
+of which must start with a backslash.
+With a 
+.BI & format
+argument pdfe\*(TX uses a different set of precompiled commands,
+contained in
+.IR format.fmt ;
+it is usually better to use the
+.B -fmt
+.I format
+option instead.
 .PP
 pdfe\*(TX is a version of e-\*(TX that can create
 .I PDF
@@ -82,15 +94,6 @@ implementation.
 .SH OPTIONS
 This version of pdfe\*(TX understands the following command line options.
 .TP
-.BI -fmt \ format
-.rb
-Use
-.I format
-as the name of the format to be used, instead of the name by which
-pdfe\*(TX was called or a
-.I %&
-line.
-.TP
 .B -enc
 .rb
 Enable the enc\*(TX extensions.  This option is only effective in
@@ -116,6 +119,15 @@ style.
 This is the old name of the
 .B -file-line-error
 option.
+.TP
+.BI -fmt \ format
+.rb
+Use
+.I format
+as the name of the format to be used, instead of the name by which
+pdfe\*(TX was called or a
+.I %&
+line.
 .TP
 .B -halt-on-error
 .rb
@@ -397,6 +409,12 @@ Metric files for pdfe\*(TX's fonts.
 Predigested pdfe\*(TX format (.\|fmt) files.
 .br
 .\"=====================================================================
+.SH NOTES
+This manual page is not meant to be exhaustive.  The complete
+documentation for this version of pdfe\*(TX can be found in the info
+manual
+.IR "Web2C: A TeX implementation" .
+.\"=====================================================================
 .SH BUGS
 This version of pdfe\*(TX implements a number of optional extensions.
 In fact, many of these extensions conflict to a greater or lesser
@@ -430,11 +448,15 @@ ftp at the
 .P
 The following pdfe\*(TX related mailing list is available:
 .BR pdftex@tug.org .
-This is a majordomo list;
+This is a mailman list;
 to subscribe send a message containing
-.I subscribe pdftex
+.I subscribe
 to
-.BR majordomo@tug.org .
+.BR pdftex-request@tug.org .
+More about the list can be found at the
+.B "http://tug.org/mailman/listinfo/pdftex"
+.I mailing list
+website.
 .\"=====================================================================
 .SH "SEE ALSO"
 .BR tex (1),

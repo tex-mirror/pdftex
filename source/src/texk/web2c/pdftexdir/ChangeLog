@@ -1,3 +1,8 @@
+2004-10-29  Jan Nieuwenhuizen  <janneke@gnu.org>
+
+        * pdftex.mk (pdftex):  Build fix: pdftexextra.c depends on
+        pdftexextra.h.
+
 2004-09-07  The pdfTeX team:
 
 	* README: pdftex version 1.20a.

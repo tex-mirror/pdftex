@@ -1,3 +1,11 @@
+2004-09-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* printversion.c (printversionandexit): Hartmut Henkel
+	<hartmut_henkel@gmx.de> noticed that the engines start running
+	like this: "This is TeX, Version 3.141592 (Web2C 7.5.3)" but the
+	-version output looks like this "TeX (Web2C 7.5.3) 3.141592".
+	He supplied a small patch to rectify this.
+
 2004-08-28  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* openclose.c (open_input,open_output): Implement output_directory

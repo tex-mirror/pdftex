@@ -1,10 +1,10 @@
 pdfTeX
 ======
 
-README for version 3.14159-1.20a of $Date: 2004/09/06 $
+README for version 3.14159-1.20b of $Date: 2004/09/06 $
 =======================================================
 
-This directory contains the version 1.20a of pdfTeX, an extended version of
+This directory contains the version 1.20b of pdfTeX, an extended version of
 TeX that can create PDF directly from TeX source files and enhance the
 result of TeX typesetting with the help of PDF. When PDF output is not
 selected, pdfTeX produces normal DVI output, otherwise it produces PDF

@@ -1,4 +1,4 @@
-% This is etex.ch in text format, as of September 6, 2004.
+% This is etex.ch in text format, as of October 12, 2004.
 % WEB change file containing code for various features extending TeX;
 % to be applied to tex.web (Version 3.141592) in order to define the
 % e-TeX program.
@@ -99,7 +99,7 @@
 %             fixed a ligature-\beginR bug in January 1998;
 %             was released in March 1998.
 % Version 2.1 fixed a \marks bug (when min_halfword<>0) (January 1999).
-% Version 2.2 development was started in Feb 2003; released in Sep 2004.
+% Version 2.2 development was started in Feb 2003; released in Oct 2004.
 %             fixed a bug in sparse array handling (0=>null), Jun 2002;
 %             fixed a bug in \lastnodetype (cur_val=>cur_val_level)
 %                 reported by Hartmut Henkel <hartmut_henkel@@gmx.de>,
@@ -113,7 +113,9 @@
 %                 integer parameters, and similar in order to reduce the
 %                 interference between eTeX, pdfTeX, and web2c change files.
 %             adapted to tex.web 3.141592, revised glue rounding for mixed
-%                 direction typesetting.
+%                 direction typesetting;
+%             fixed a bug in the revised glue rounding code, detected by
+%                 Tigran Aivazian <tigran@@aivazian.fsnet.co.uk>, Oct 2004.
 
 % Although considerable effort has been expended to make the e-TeX program
 % correct and reliable, no warranty is implied; the author disclaims any
@@ -1328,7 +1330,7 @@ exit:end;
 @x [27] m.468 l.9202 - e-TeX basic
 @d number_code=0 {command code for \.{\\number}}
 @y
-\eTeX\ adds \.{\\eTeXrevision}} such that |job_name_code| remains last.
+\eTeX\ adds \.{\\eTeXrevision} such that |job_name_code| remains last.
 
 @d number_code=0 {command code for \.{\\number}}
 @z
@@ -3998,7 +4000,7 @@ var l:pointer; {the new list}
 @!g_sign: normal..shrinking; {selects type of glue}
 @!glue_temp:real; {glue value before rounding}
 @!m,@!n:halfword; {count of unmatched math nodes}
-begin g_sign:=glue_sign(this_box);
+begin g_order:=glue_order(this_box); g_sign:=glue_sign(this_box);
 l:=t; p:=temp_ptr; m:=min_halfword; n:=min_halfword;
 loop@+  begin while p<>null do
     @<Move node |p| to the new list and go to the next node;

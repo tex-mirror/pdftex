@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/epdf.h#14 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/epdf.h#15 $
 */
 
 extern "C" {
@@ -96,16 +96,6 @@ extern char *convertStringToPDFString(char *in);
 
 /* config.c */
 extern integer cfgpar(integer);
-
-/* avl.c */
-typedef int avl_comparison_func (const void *avl_a, const void *avl_b, void *avl_param);
-typedef void avl_item_func (void *avl_item, void *avl_param);
-extern struct avl_table *avl_create (avl_comparison_func *, void *, struct libavl_allocator *);
-extern void avl_destroy (struct avl_table *, avl_item_func *);
-extern void **avl_probe (struct avl_table *, void *);
-extern void *avl_insert (struct avl_table *, void *);
-extern void *avl_delete (struct avl_table *, const void *);
-extern void *avl_find (const struct avl_table *, const void *);
 
 /* avlstuff.c */
 extern void avl_put_obj (integer, integer);

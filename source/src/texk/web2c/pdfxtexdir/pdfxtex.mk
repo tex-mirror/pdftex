@@ -92,7 +92,6 @@ pdfxlatex.fmt: pdfxtex
 #	$(dumpenv) $(MAKE) progname=pdflatex files="latex.ltx" prereq-check
 #	$(dumpenv) ./pdfxtex --progname=pdflatex --jobname=pdflatex --ini \*\\pdfoutput=1\\input latex.ltx </dev/null
 
-
 # Installation.
 install-pdfxtex: install-pdfxtex-exec install-pdfxtex-data
 install-pdfxtex-exec: install-pdfxtex-links

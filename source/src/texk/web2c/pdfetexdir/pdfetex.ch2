@@ -17,7 +17,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.ch2#17 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.ch2#18 $
 %
 @x limbo
 \def\pdfTeX{pdf\TeX}
@@ -198,6 +198,12 @@ begin if cur_dir=right_to_left then
 @y
 @<(\pdfTeX) Ship box |p| out@>;
 if eTeX_ex then @<Check for LR anomalies at the end of |ship_out|@>;
+@z
+
+@x
+pdf_print("/Producer (pdfTeX-");
+@y
+pdf_print("/Producer (pdfeTeX-");
 @z
 
 @x [33.649] l.12912

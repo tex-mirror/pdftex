@@ -69,7 +69,10 @@ install: all
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
 	    $(scriptdir)/texlinks; \
 	else :; fi
-	if test -f $(scriptdir)/updmap; then \
+	if test -f $(scriptdir)/updmap \
+	  && TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
+	       kpsewhich --format='web2c files' updmap.cfg >/dev/null; \
+	then \
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
 	    $(scriptdir)/updmap; \
 	else :; fi

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#18 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#20 $
 */
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#18 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#20 $";
 
 #ifdef pdfTeX /* writet1 used with pdfTeX */
 #include "ptexlib.h"           
@@ -51,8 +51,8 @@ static integer t1_save_offset;
 static integer t1_fontname_offset;
 
 #else /* writet1 used with dvips */
-#include "ptexmac.h"
 #include "dvips.h"
+#include "ptexmac.h"
 #undef  fm_extend
 #define fm_extend(f)        0
 #undef  fm_slant
@@ -285,7 +285,7 @@ static void pdftex_fail(char *fmt,...)
     fputs(": ", stderr);
     vsprintf(print_buf, fmt, args);
     fputs(print_buf, stderr);
-    fputs("\n ==> Fatal error occurred, the output PDF file is not finished!\n", stderr);
+    fputs("\n ==> Fatal error occurred, the output PS file is not finished!\n", stderr);
     va_end(args);
     exit(-1);
 }

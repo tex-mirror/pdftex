@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#11 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#12 $
 */
 
 #include "ptexlib.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#11 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#12 $";
 
 key_entry font_keys[FONT_KEYS_NUM] = {
     {"Ascent",       "Ascender",     {0}, false},
@@ -295,18 +295,24 @@ void dopdffont(integer font_objnum, internalfontnumber f)
         writet3(font_objnum, tex_font);
         return;
     }
-    get_char_widths();
-    if ((is_reencoded(fm_cur))) {
-        read_enc(fm_cur->encoding);
-        if (!is_truetype(fm_cur)) {
-            write_enc(NULL, fm_cur->encoding, 0);
-            encoding_objnum = (fm_cur->encoding)->objnum;
+
+    get_char_widths(); /* update char widths; also check whether this font is
+                          used in embedded PDF only; if so then set
+                          write_fontfile_only to true */
+
+    if (!write_fontfile_only) { /* encoding vector needed */
+        if ((is_reencoded(fm_cur))) {
+            read_enc(fm_cur->encoding);
+            if (!is_truetype(fm_cur)) {
+                write_enc(NULL, fm_cur->encoding, 0);
+                encoding_objnum = (fm_cur->encoding)->objnum;
+            }
+            else
+                write_ttf_glyph_names = true;
         }
-        else
-            write_ttf_glyph_names = true;
-    }
-    else if (is_fontfile(fm_cur) && !is_truetype(fm_cur)) {
-        encoding_objnum = pdfnewobjnum();
+        else if (is_fontfile(fm_cur) && !is_truetype(fm_cur)) {
+            encoding_objnum = pdfnewobjnum();
+        }
     }
     if (is_included(fm_cur))
         write_fontfile();
@@ -324,12 +330,14 @@ void dopdffont(integer font_objnum, internalfontnumber f)
         write_char_widths();
     }
     if (cur_glyph_names == t1_builtin_glyph_names) {
-        for (i = 0; i <= MAX_CHAR_CODE; i++)
-            if (!pdfcharmarked(tex_font, i) && cur_glyph_names[i] != notdef) {
-                xfree(cur_glyph_names[i]);
-                cur_glyph_names[i] = (char*) notdef;
-            }
-        write_enc(cur_glyph_names, NULL, encoding_objnum);
+        if (!write_fontfile_only) {
+            for (i = 0; i <= MAX_CHAR_CODE; i++)
+                if (!pdfcharmarked(tex_font, i) && cur_glyph_names[i] != notdef) {
+                    xfree(cur_glyph_names[i]);
+                    cur_glyph_names[i] = (char*) notdef;
+                }
+            write_enc(cur_glyph_names, NULL, encoding_objnum);
+        }
         for (i = 0; i <= MAX_CHAR_CODE; i++)
             if (cur_glyph_names[i] != notdef)
                 xfree(cur_glyph_names[i]);

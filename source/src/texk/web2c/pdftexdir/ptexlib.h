@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#22 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#23 $
 */
 
 #ifndef PDFTEXLIB
@@ -64,7 +64,7 @@ typedef struct {
     char *ff_name;              /* font file name */
     char *subset_tag;           /* pseudoUniqueTag for subsetted font */
     enc_entry *encoding;        /* pointer to corresponding encoding */
-    internalfontnumber tfm_num; /* number of first TFM using this entry */
+    internalfontnumber tfm_num; /* number of the TFM refering this entry */
     unsigned short type;        /* font type (T1/TTF/...) */
     short slant;                /* SlantFont */
     short extend;               /* ExtendFont */
@@ -102,7 +102,6 @@ extern boolean write_ttf_glyph_names;
 extern char **t1_glyph_names, *t1_builtin_glyph_names[];
 extern char *cur_file_name;
 extern const char notdef[];
-extern enc_entry *enc_ptr, *enc_array;
 extern fm_entry *fm_cur;
 extern integer t1_length1, t1_length2, t1_length3;
 extern integer ttf_length;

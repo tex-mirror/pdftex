@@ -18,7 +18,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/hz.ch#10 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/hz.ch#11 $
 
 @x [155] - margin kerning
 @d acc_kern=2 {|subtype| of kern nodes from accents}
@@ -148,7 +148,8 @@ glue_node: @<Move right or output leaders@>;
 margin_kern_node,
 @z
 
-@x [32e] - font expansion
+
+@x [???] - font expansion
 @!tmp_f: internal_font_number; {for use with |pdf_init_font|}
 
 @y
@@ -254,10 +255,16 @@ end;
 procedure set_expand_param(k, f: internal_font_number; e: integer);
 var i, j: integer;
 begin
+    if pdf_font_rp_base[f] = 0 then
+        pdf_font_rp_base[f] := init_font_base(0);
+    if pdf_font_lp_base[f] = 0 then
+        pdf_font_lp_base[f] := init_font_base(0);
+    if pdf_font_ef_base[f] = 0 then
+        pdf_font_ef_base[f] := init_font_base(1000);
     pdf_font_expand_ratio[k] := e;
     pdf_font_step[k] := pdf_font_step[f];
     pdf_font_auto_expand[k] := pdf_font_auto_expand[f];
-    pdf_font_blink[k] := f;
+    pdf_font_blink[k] := f; {???}
     pdf_font_lp_base[k] := pdf_font_lp_base[f];
     pdf_font_rp_base[k] := pdf_font_rp_base[f];
     pdf_font_ef_base[k] := pdf_font_ef_base[f];
@@ -391,8 +398,8 @@ begin
 end;
 
 function expand_font(f: internal_font_number; e: integer): internal_font_number;
-{looks up for font |f| expanded by |e| thousandths; if not found then
-creates it}
+{looks up for font |f| expanded by |e| thousandths, |e| is an arbitrary value
+between max stretch and max shrink of |f|; if not found then creates it}
 var max_expand: integer;
 begin
     expand_font := f;
@@ -409,11 +416,13 @@ end;
 procedure read_expand_font; {read font expansion spec and load expanded font}
 var font_shrink, font_stretch, font_step: integer;
     f: internal_font_number;
+    auto_expand: boolean;
 begin
+    {read font expansion parameters}
     scan_font_ident;
     f := cur_val;
     if f = null_font then
-        pdf_error("font", "invalid font identifier");
+        pdf_error("font expansion", "invalid font identifier");
     scan_optional_equals;
     scan_int;
     font_stretch := fix_int(cur_val, 0, 1000);
@@ -422,22 +431,44 @@ begin
     scan_int;
     font_step := fix_int(cur_val, 0, 1000);
     if font_step = 0 then
-        pdf_error("expand", "invalid step of font expansion");
+        pdf_error("font expansion", "invalid step");
     font_stretch := font_stretch - font_stretch mod font_step;
     if font_stretch < 0 then
         font_stretch := 0;
     font_shrink := font_shrink - font_shrink mod font_step;
     if font_shrink < 0 then
         font_shrink := 0;
-    pdf_font_step[f] := font_step;
-    if scan_keyword("autoexpand") then
-        pdf_font_auto_expand[f] := true;
     if (font_stretch = 0) and (font_shrink = 0) then
-        pdf_error("expand", "invalid limit of font expansion");
-    if font_stretch > 0 then
-        pdf_font_stretch[f] := get_expand_font(f, font_stretch);
-    if font_shrink > 0 then
-        pdf_font_shrink[f] := get_expand_font(f, -font_shrink);
+        pdf_error("font expansion", "invalid limit");
+    auto_expand := false;
+    if scan_keyword("autoexpand") then
+        auto_expand := true;
+
+    {check if the font can be expanded}
+    if (pdf_font_expand_ratio[f] <> 0) then
+        pdf_error("font expansion", "this font has been expanded by another font so it cannot be used now");
+    if (pdf_font_step[f] <> 0) then
+    {this font has been expanded, ensure the expansion parameters are identical}
+    begin
+        if (pdf_font_step[f] <> font_step) or
+           ((pdf_font_stretch[f] = null_font) and (font_stretch <> 0)) or
+           ((pdf_font_stretch[f] <> null_font) and 
+            (pdf_font_expand_ratio[pdf_font_stretch[f]] <> font_stretch)) or
+           ((pdf_font_shrink[f] = null_font) and (font_shrink <> 0)) or
+           ((pdf_font_shrink[f] <> null_font) and 
+            (pdf_font_expand_ratio[pdf_font_shrink[f]] <> -font_shrink)) or
+           (pdf_font_auto_expand[f] <> auto_expand) 
+        then 
+            pdf_error("font expansion", "font has been expanded with different parameters");
+    end 
+    else begin
+        pdf_font_step[f] := font_step;
+        pdf_font_auto_expand[f] := auto_expand;
+        if font_stretch > 0 then
+            pdf_font_stretch[f] := get_expand_font(f, font_stretch);
+        if font_shrink > 0 then
+            pdf_font_shrink[f] := get_expand_font(f, -font_shrink);
+    end;
 end;
 @z
 
@@ -454,17 +485,17 @@ margin_kern_node,
 @p function hpack(@!p:pointer;@!w:scaled;@!m:small_number):pointer;
 @y 
 @ @<Glob...@>=
-@!pdf_font_blink: ^internal_font_number; {link to base font}
-@!pdf_font_elink: ^internal_font_number; {link to expanded fonts}
+@!pdf_font_blink: ^internal_font_number; {link to base font (used for expanded fonts only)}
+@!pdf_font_elink: ^internal_font_number; {link to expanded fonts (used for base fonts only)}
 @!pdf_font_stretch: ^integer; {limit of stretching}
 @!pdf_font_shrink: ^integer; {limit of shrinking}
-@!pdf_font_step: ^integer;  {amount of one step}
-@!pdf_font_expand_ratio: ^integer; {current expansion ratio}
-@!pdf_font_auto_expand: ^boolean;
-@!pdf_font_lp_base: ^integer;
-@!pdf_font_rp_base: ^integer;
-@!pdf_font_ef_base: ^integer;
-@!font_expand_ratio: integer;
+@!pdf_font_step: ^integer;  {amount of one step of expansion}
+@!pdf_font_expand_ratio: ^integer; {expansion ratio of a particular font}
+@!pdf_font_auto_expand: ^boolean; {this font is auto-expanded?}
+@!pdf_font_lp_base: ^integer; {base of left-protruding factor}
+@!pdf_font_rp_base: ^integer; {base of right-protruding factor}
+@!pdf_font_ef_base: ^integer; {base of font expansion factor}
+@!font_expand_ratio: integer; {current expansion ratio}
 @!last_leftmost_char: pointer;
 @!last_rightmost_char: pointer;
 
@@ -962,15 +993,34 @@ end;
 @<Declare subprocedures for |line_break|@>=
 procedure try_break(@!pi:integer;@!break_type:small_number);
 @y
-@d discardable(#) == not(
-    is_char_node(#) or 
-    non_discardable(#) or
-    ((type(#) = kern_node) and (subtype(#) <> explicit)) or
-    (type(#) = margin_kern_node)
+@d cp_skipable(#) == {skipable nodes at the margins during character protrusion}
+(
+    not is_char_node(#) and 
+    (
+        (type(#) = ins_node)
+        or (type(#) = mark_node)
+        or (type(#) = adjust_node)
+        or (type(#) = penalty_node)
+        or ((type(#) = whatsit_node) and 
+            (subtype(#) <> pdf_refximage_node) and
+            (subtype(#) <> pdf_refxform_node)) {reference to an image or XObject form}
+        or ((type(#) = disc_node) and 
+            (pre_break(#) = null) and
+            (post_break(#) = null) and 
+            (replace_count(#) = 0)) {an empty |disc_node|}
+        or ((type(#) = math_node) and (width(#) = 0))
+        or ((type(#) = kern_node) and 
+            ((width(#) = 0) or (subtype(#) = normal)))
+        or ((type(#) = hlist_node) and (width(#) = 0) and (height(#) = 0) and 
+            (depth(#) = 0) and (list_ptr(#) = null))
+    )
 )
+
 
 @<Declare subprocedures for |line_break|@>=
 function prev_rightmost(s, e: pointer): pointer;
+{finds the node preceding the rightmost node |e|; |s| is some node 
+before |e|}
 var p: pointer;
 begin
     prev_rightmost := null;
@@ -986,7 +1036,9 @@ begin
 end;
 
 function total_pw(q, p: pointer): scaled;
-label reswitch;
+{returns the total width of character protrusion of a line;
+|cur_break(break_node(q))| and |p| is the leftmost resp. rightmost node in the
+horizontal list representing the actual line}
 var l, r, s: pointer;
     n: integer;
 begin
@@ -994,36 +1046,26 @@ begin
         l := first_p
     else
         l := cur_break(break_node(q));
-    r := prev_rightmost(prev_p, p); { get |link(r)=p| }
-    if r <> null then begin
-        if (type(r) = disc_node) and 
-           (type(p) = disc_node) and 
-           (pre_break(p) = null) then  
-        { I cannot remember when this case happens but I encountered it once }
-        begin { find the predecessor of |r| }
-            if r = prev_p then 
-            { |link(prev_p)=p| and |prev_p| is also a |disc_node| }
-            begin
-                { start from the leftmost node }
-                r  := prev_rightmost(l, p);
-            end
-            else
-                r := prev_rightmost(prev_p, p);
-        end
-        else if (p <> null) and 
-                (type(p) = disc_node) and 
-                (pre_break(p) <> null) then 
-        { a |disc_node| with non-empty |pre_break|, protrude the last char }
-        begin
-            r := pre_break(p);
-            while link(r) <> null do
-                r := link(r);
-        end;
+    r := prev_rightmost(prev_p, p); {get |link(r)=p|}
+    {let's look at the right margin first}
+    {|
+    short_display_n(r, 2);
+    print("&");
+    short_display_n(p, 2);
+    print_ln;
+    |}
+    if (p <> null) and (type(p) = disc_node) and (pre_break(p) <> null) then  
+    {a |disc_node| with non-empty |pre_break|, protrude the last char of |pre_break|}
+    begin
+        r := pre_break(p);
+        while link(r) <> null do
+            r := link(r);
+    end else begin
+        while (r <> null) and cp_skipable(r) do
+            r := prev_rightmost(l, r);
     end;
-reswitch:
-    while (l <> null) and discardable(l) do
-        l := link(l);
-    if (l <> null) and (type(l) = disc_node) then begin
+
+    {now the left margin}
     {|
         short_display_n(l, 2);
         print_ln;
@@ -1032,9 +1074,12 @@ reswitch:
         show_node_list(l);
         print_ln;
     |}
-        if post_break(l) <> null then
-            l := post_break(l)
-        else begin
+    if (l <> null) and (type(l) = disc_node) then begin
+        if post_break(l) <> null then begin
+            l := post_break(l); {protrude the first char}
+            goto done;
+        end else {discard |replace_count(l)| nodes}
+        begin
             n := replace_count(l);
             l := link(l);
             while n > 0 do begin 
@@ -1043,8 +1088,12 @@ reswitch:
                 decr(n);
             end;
         end;
-        goto reswitch;
     end;
+    while (l <> null) and not is_char_node(l) and not non_discardable(l) do
+        l := link(l);
+    while (l <> null) and cp_skipable(l) do
+        l := link(l);
+done:
     total_pw := left_pw(l) + right_pw(r);
 end;
 
@@ -1454,38 +1503,74 @@ var q,@!r,@!s:pointer; {temporary registers for list manipulation}
 var q,@!r,@!s:pointer; {temporary registers for list manipulation}
     p, k: pointer; 
     w: scaled;
+    glue_break: boolean; {was a break at glue?}
+@z
+
+@x [881] - margin kerning
+q:=cur_break(cur_p); disc_break:=false; post_disc_break:=false;
+@y
+q:=cur_break(cur_p); disc_break:=false; post_disc_break:=false;
+glue_break := false;
+@z
+
+@x [881] - margin kerning
+    subtype(q):=right_skip_code+1; add_glue_ref(right_skip);
+    goto done;
+@y
+    subtype(q):=right_skip_code+1; add_glue_ref(right_skip);
+    glue_break := true;
+    goto done;
 @z
 
 @x [881] - margin kerning
 @<Put the \(r)\.{\\rightskip} glue after node |q|@>;
 done:
 @y
-@<Put the \(r)\.{\\rightskip} glue after node |q|@>;
 done:
+
+{at this point |q| is the rightmost breakpoint; the only exception is the case
+of a discretionary break with non-empty |pre_break|, then |q| has been changed
+to the last node of the |pre_break| list}
+
 if pdf_protrude_chars > 0 then begin
-    p := prev_rightmost(temp_head, q);
-    while (p <> null) and discardable(p) do begin
-        p := prev_rightmost(temp_head, p);
+    if disc_break and (is_char_node(q) or (type(q) <> disc_node))
+    {|q| has been reset to the last node of |pre_break|}
+    then
+        p := q
+    else begin
+        p := prev_rightmost(temp_head, q); {get |link(p) = q|}
+        while (p <> null) and cp_skipable(p) do
+            p := prev_rightmost(temp_head, p);
     end;
+    {|
+    short_display_n(p, 1);
+    print_ln;
+    |}
     w := right_pw(p);
-    if p <> null then begin
-        while link(p) <> q do
-            p := link(p);
-        if w <> 0 then begin
-            k := new_margin_kern(-w, last_rightmost_char, right_side);
-            link(p) := k;
-            link(k) := q;
-        end;
+    if w <> 0 then {we have found a marginal kern, append it after |p|}
+    begin
+        k := new_margin_kern(-w, last_rightmost_char, right_side);
+        link(k) := link(p);
+        link(p) := k;
+        if (p = q) then
+            q := link(q);
     end;
+end;
+
+{if |q| was not a breakpoint at glue and has been reset to |rightskip| then
+ we append |rightskip| after |q| now}
+if not glue_break then begin
+    @<Put the \(r)\.{\\rightskip} glue after node |q|@>;
 end;
 @z
 
 @x [887] - margin kerning
 if left_skip<>zero_glue then
 @y
+{at this point |q| is the leftmost node; all discardable nodes have been discarded}
 if pdf_protrude_chars > 0 then begin
     p := q;
-    while (p <> null) and discardable(p) do
+    while (p <> null) and cp_skipable(p) do
         p := link(p);
     w := left_pw(p);
     if w <> 0 then begin
