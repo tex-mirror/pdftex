@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#21 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#23 $
 */
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#21 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#23 $";
 
 #ifdef pdfTeX /* writet1 used with pdfTeX */
 #include "ptexlib.h"           
@@ -46,9 +46,13 @@ static const char perforce_id[] =
 #define t1_char(c)          c
 #define embed_all_glyphs(tex_font)  fm_cur->all_glyphs
 #define extra_charset()     fm_cur->charset
+#define update_subset_tag() \
+    strncpy(fb_array + t1_fontname_offset, fm_cur->subset_tag, 6)
+
 integer t1_length1, t1_length2, t1_length3;
 static integer t1_save_offset;
 static integer t1_fontname_offset;
+extern char *fb_array;
 
 #else /* writet1 used with dvips */
 #include "dvips.h"
@@ -99,6 +103,8 @@ extern Boolean shiftlowchars;
 #endif /* SHIFTLOWCHARS */
 #define extra_charset()     dvips_extra_charset
 #define make_subset_tag(a, b)
+#define update_subset_tag()
+
 static char *dvips_extra_charset ;
 extern FILE *bitfile ;
 extern FILE *search();
@@ -765,7 +771,7 @@ static void t1_modify_italic(void)
     strcpy(strend(t1_buf_array), r);
     strcpy(t1_line_array, t1_buf_array);
     t1_line_ptr = eol(t1_line_array);
-    font_keys[ITALIC_ANGLE_CODE].value.num = round(a);
+    font_keys[ITALIC_ANGLE_CODE].value = round(a);
     font_keys[ITALIC_ANGLE_CODE].valid = true;
 }
 
@@ -775,14 +781,20 @@ static void t1_scan_keys(void)
     char *p, *q, *r;
     key_entry *key;
     if (fm_extend(fm_cur) != 0 || fm_slant(fm_cur) != 0) {
-        if (strncmp(t1_line_array + 1, "FontMatrix", strlen("FontMatrix")) == 0) {
+        if (t1_prefix("/FontMatrix")) {
             t1_modify_fm();
             return;
         }
-        if (strncmp(t1_line_array + 1, "ItalicAngle", strlen("ItalicAngle")) == 0) {
+        if (t1_prefix("/ItalicAngle")) {
             t1_modify_italic();
             return;
         }
+    }
+    if (t1_prefix("/FontType")) {
+        p = t1_line_array + strlen("FontType") + 1;
+        if ((i = t1_scan_num(p, 0)) != 1)
+            pdftex_fail("Type%d fonts unsupported by pdfTeX", i);
+        return;
     }
     for (key = font_keys; key - font_keys  < MAX_KEY_CODE; key++)
         if (strncmp(t1_line_array + 1, key->t1name, strlen(key->t1name)) == 0)
@@ -807,11 +819,14 @@ static void t1_scan_keys(void)
         if (fm_extend(fm_cur) != 0) {
             sprintf(q, "-Extend_%i", (int)fm_extend(fm_cur));
         }
-        key->value.string = xstrdup(t1_buf_array);
+        strncpy(fontname_buf, t1_buf_array, FONTNAME_BUF_SIZE);
+        /* at this moment we cannot call make_subset_tag() yet, as the encoding 
+         * is not read; thus we mark the offset of the subset tag and write it
+         * later */
         if (is_included(fm_cur) && is_subsetted(fm_cur)) {
             t1_fontname_offset = fb_offset() + (r - t1_line_array);
             strcpy(t1_buf_array, p);
-            sprintf(r, "******+%s%s", key->value.string, t1_buf_array);
+            sprintf(r, "ABCDEF+%s%s", fontname_buf, t1_buf_array);
             t1_line_ptr = eol(r);
         }
         return;
@@ -821,12 +836,12 @@ static void t1_scan_keys(void)
         p++;
     if (k == FONTBBOX1_CODE) {
         for (i = 0; i < 4; i++) {
-            key[i].value.num = t1_scan_num(p, &r);
+            key[i].value = t1_scan_num(p, &r);
             p = r;
         }
         return;
     }
-    key->value.num = t1_scan_num(p, 0);
+    key->value = t1_scan_num(p, 0);
 }
 
 #endif /* pdfTeX */
@@ -1380,8 +1395,10 @@ static void t1_subset_ascii_part(void)
         t1_glyph_names = t1_builtin_glyph_names;
         update_builtin_enc(tex_font, t1_glyph_names); 
     }
-    if (is_included(fm_cur) && is_subsetted(fm_cur))
-        make_subset_tag(fm_cur, t1_fontname_offset);
+    if (is_included(fm_cur) && is_subsetted(fm_cur)) {
+        make_subset_tag(fm_cur, t1_glyph_names);
+        update_subset_tag();
+    }
     if (pdfmovechars == 0 && t1_encoding == ENC_STANDARD)
         t1_puts("/Encoding StandardEncoding def\n");
     else {
@@ -1402,7 +1419,8 @@ static void t1_subset_ascii_part(void)
     do {
         t1_getline();
         t1_scan_param();
-        t1_putline();
+        if (!t1_prefix("/UniqueID")) /* ignore UniqueID for subsetted fonts */
+            t1_putline();
     } while (t1_in_eexec == 0);
 }
 

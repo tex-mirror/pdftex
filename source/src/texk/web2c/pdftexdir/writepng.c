@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writepng.c#4 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writepng.c#5 $
 */
 
 #include "ptexlib.h"
 #include "image.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writepng.c#4 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writepng.c#5 $";
 
 void read_png_info(integer img)
 {
@@ -79,24 +79,29 @@ void write_png(integer img)
                (int)png_info(img)->height,
                (int)png_info(img)->bit_depth);
     pdf_puts("/ColorSpace ");
-    switch (png_info(img)->color_type) {
-    case PNG_COLOR_TYPE_PALETTE:
-        pdfcreateobj(0, 0);
-        palette_objnum = objptr;
-        pdf_printf("[/Indexed /DeviceRGB %i %i 0 R]\n",
-                   (int)(png_info(img)->num_palette - 1),
-                   (int)palette_objnum);
-        break;
-    case PNG_COLOR_TYPE_GRAY:
-    case PNG_COLOR_TYPE_GRAY_ALPHA:
-        pdf_puts("/DeviceGray\n");
-        break;
-    case PNG_COLOR_TYPE_RGB:
-    case PNG_COLOR_TYPE_RGB_ALPHA:
-        pdf_puts("/DeviceRGB\n");
-        break;
-    default:
-        pdftex_fail("unsupported type of color_type <%i>", png_info(img)->color_type);
+    if (img_colorspace_ref(img) != 0) {
+        pdf_printf("%i 0 R\n", (int)img_colorspace_ref(img));
+    }
+    else {
+        switch (png_info(img)->color_type) {
+            case PNG_COLOR_TYPE_PALETTE:
+                pdfcreateobj(0, 0);
+                palette_objnum = objptr;
+                pdf_printf("[/Indexed /DeviceRGB %i %i 0 R]\n",
+                        (int)(png_info(img)->num_palette - 1),
+                        (int)palette_objnum);
+                break;
+            case PNG_COLOR_TYPE_GRAY:
+            case PNG_COLOR_TYPE_GRAY_ALPHA:
+                pdf_puts("/DeviceGray\n");
+                break;
+            case PNG_COLOR_TYPE_RGB:
+            case PNG_COLOR_TYPE_RGB_ALPHA:
+                pdf_puts("/DeviceRGB\n");
+                break;
+            default:
+                pdftex_fail("unsupported type of color_type <%i>", png_info(img)->color_type);
+        }
     }
     pdfbeginstream();
     if (png_info(img)->interlace_type == PNG_INTERLACE_NONE) {

@@ -91,12 +91,6 @@ JArithmeticDecoder::JArithmeticDecoder() {
   str = NULL;
 }
 
-JArithmeticDecoder::~JArithmeticDecoder() {
-  while (dataLen > 0) {
-    readByte();
-  }
-}
-
 inline Guint JArithmeticDecoder::readByte() {
   if (dataLen == 0) {
     return 0xff;
@@ -105,6 +99,12 @@ inline Guint JArithmeticDecoder::readByte() {
     --dataLen;
   }
   return (Guint)str->getChar() & 0xff;
+}
+
+JArithmeticDecoder::~JArithmeticDecoder() {
+  while (dataLen > 0) {
+    readByte();
+  }
 }
 
 void JArithmeticDecoder::start() {

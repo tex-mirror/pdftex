@@ -1,10 +1,10 @@
 pdfTeX
 ======
 
-README for version 3.14159-1.20b of $Date: 2004/09/06 $
+README for version 3.14159-1.21a of $Date: 2005/02/04 $
 =======================================================
 
-This directory contains the version 1.20b of pdfTeX, an extended version of
+This directory contains the version 1.21a of pdfTeX, an extended version of
 TeX that can create PDF directly from TeX source files and enhance the
 result of TeX typesetting with the help of PDF. When PDF output is not
 selected, pdfTeX produces normal DVI output, otherwise it produces PDF
@@ -40,7 +40,7 @@ http://www.ntg.nl/mailman/listinfo/ntg-pdftex
 LEGAL ISSUES
 ============
 
-pdfTeX is copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
+pdfTeX is copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
 
 pdfTeX is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
@@ -92,5 +92,5 @@ See the file TODO for work to be done.
 
 Please send bug reports, offers of help, etc. to martin@pdftex.org
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/README#22 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/README#26 $
 // vim: tw=75

@@ -120,6 +120,7 @@ if kpsewhich $NAME.mf >/dev/null 2>&1 || mktexmf $NAME >/dev/null 2>&1; then
      400) MODE=nexthi;;
      600) MODE=ljfour;;
      720) MODE=epsczz;;
+    1200) MODE=ultre;;
     1270) MODE=linoone;;
     8000) MODE=dpdfezzz;;
        *) echo "$progname: Can't guess mode for $BDPI dpi devices." >&2

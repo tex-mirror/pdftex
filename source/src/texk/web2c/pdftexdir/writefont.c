@@ -17,32 +17,33 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#12 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#13 $
 */
 
 #include "ptexlib.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#12 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#13 $";
 
 key_entry font_keys[FONT_KEYS_NUM] = {
-    {"Ascent",       "Ascender",     {0}, false},
-    {"CapHeight",    "CapHeight",    {0}, false},
-    {"Descent",      "Descender",    {0}, false},
-    {"FontName",     "FontName",     {0}, false},
-    {"ItalicAngle",  "ItalicAngle",  {0}, false},
-    {"StemV",        "StdVW",        {0}, false},
-    {"XHeight",      "XHeight",      {0}, false},
-    {"FontBBox",     "FontBBox",     {0}, false},
-    {"",             "",             {0}, false},
-    {"",             "",             {0}, false},
-    {"",             "",             {0}, false}
+    {"Ascent",       "Ascender",     0, false},
+    {"CapHeight",    "CapHeight",    0, false},
+    {"Descent",      "Descender",    0, false},
+    {"FontName",     "FontName",     0, false},
+    {"ItalicAngle",  "ItalicAngle",  0, false},
+    {"StemV",        "StdVW",        0, false},
+    {"XHeight",      "XHeight",      0, false},
+    {"FontBBox",     "FontBBox",     0, false},
+    {"",             "",             0, false},
+    {"",             "",             0, false},
+    {"",             "",             0, false}
 };
 
 internalfontnumber tex_font;
 boolean fontfile_found;
 boolean is_otf_font;
 boolean write_ttf_glyph_names;
+char fontname_buf[FONTNAME_BUF_SIZE];
 
 static int first_char, last_char;
 static integer char_widths[MAX_CHAR_CODE + 1];
@@ -55,7 +56,7 @@ static void print_key(integer code, integer v)
 {
     pdf_printf("/%s ", font_keys[code].pdfname);
     if (font_keys[code].valid)
-        pdf_printf("%i", (int)font_keys[code].value.num);
+        pdf_printf("%i", (int)font_keys[code].value);
     else
         pdf_printf("%i", (int)dividescaled(v, pdffontsize[tex_font], 3));
     pdf_puts("\n");
@@ -65,7 +66,7 @@ static void print_italic_angle()
 {
     pdf_printf("/%s ", font_keys[ITALIC_ANGLE_CODE].pdfname);
     if (font_keys[ITALIC_ANGLE_CODE].valid)
-        pdf_printf("%g", font_keys[ITALIC_ANGLE_CODE].value.num);
+        pdf_printf("%g", font_keys[ITALIC_ANGLE_CODE].value);
     else
         pdf_printf("%g", -atan(getslant(tex_font)/65536.0)*(180/M_PI));
     pdf_puts("\n");
@@ -78,12 +79,12 @@ static integer getstemv(void)
 
 static void getbbox(void)
 {
-    font_keys[FONTBBOX1_CODE].value.num = 0;
-    font_keys[FONTBBOX2_CODE].value.num = 
+    font_keys[FONTBBOX1_CODE].value = 0;
+    font_keys[FONTBBOX2_CODE].value = 
         dividescaled(-getchardepth(tex_font, 'y'), pdffontsize[tex_font], 3);
-    font_keys[FONTBBOX3_CODE].value.num =
+    font_keys[FONTBBOX3_CODE].value =
         dividescaled(getquad(tex_font), pdffontsize[tex_font], 3);
-    font_keys[FONTBBOX4_CODE].value.num =
+    font_keys[FONTBBOX4_CODE].value =
         dividescaled(getcharheight(tex_font, 'H'), pdffontsize[tex_font], 3);
 }
 
@@ -168,7 +169,7 @@ static void write_fontname(boolean as_reference)
     if (fm_cur->subset_tag != NULL)
         pdf_printf("%s+", fm_cur->subset_tag);
     if (font_keys[FONTNAME_CODE].valid)
-        pdf_printf("%s", font_keys[FONTNAME_CODE].value.string);
+        pdf_printf("%s", fontname_buf);
     else if (fm_cur->ps_name != NULL)
         pdf_printf("%s", fm_cur->ps_name);
     else
@@ -249,10 +250,10 @@ static void write_fontdescriptor(void)
     }
     pdf_printf("/%s [%i %i %i %i]\n",
                font_keys[FONTBBOX1_CODE].pdfname,
-               (int)font_keys[FONTBBOX1_CODE].value.num,
-               (int)font_keys[FONTBBOX2_CODE].value.num,
-               (int)font_keys[FONTBBOX3_CODE].value.num,
-               (int)font_keys[FONTBBOX4_CODE].value.num);
+               (int)font_keys[FONTBBOX1_CODE].value,
+               (int)font_keys[FONTBBOX2_CODE].value,
+               (int)font_keys[FONTBBOX3_CODE].value,
+               (int)font_keys[FONTBBOX4_CODE].value);
     if (!fontfile_found && fm_cur->flags == 4)
         pdf_puts("/Flags 34\n"); /* assumes a roman sans serif font */
     else

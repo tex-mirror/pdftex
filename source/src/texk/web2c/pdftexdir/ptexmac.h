@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#13 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#14 $
 */
 
 #ifndef PDFTEXMAC
@@ -71,6 +71,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#13 $
 #define MAX_PSTRING_LEN     1024
 #define SMALL_BUF_SIZE      256
 #define SMALL_ARRAY_SIZE    256
+#define FONTNAME_BUF_SIZE   128 /* a PDF name can be maximum 127 chars long */
 
 #define check_buf(size, buf_size)                          \
     if ((size) > (buf_size))                               \
@@ -193,8 +194,5 @@ size_t          T##_limit
 #define set_cur_file_name(s)      \
     cur_file_name = s;      \
     packfilename(maketexstring(cur_file_name), getnullstr(), getnullstr())
-
-#define INDEXED_GLYPH_PREFIX    "index"
-
 
 #endif  /* PDFTEXMAC */

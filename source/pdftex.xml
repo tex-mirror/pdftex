@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE entry SYSTEM "../catalogue.dtd">
 <entry id="pdftex"
-       datestamp="2004/11/22" 
+       datestamp="2005/02/04" 
        modifier="martin@pdftex.org">
   <about>
     <name>pdftex</name>
@@ -12,7 +12,7 @@
     <home>http://www.pdftex.org</home>
     <license type="gpl"/>
     <version>
-      <number>1.20b</number>
+      <number>1.21a</number>
     </version>
     <xref refid="hyperref"/>
     <xref refid="thumbpdf"/>

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#27 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#28 $
 */
 
 #include <math.h>
@@ -27,7 +27,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#27 $
 #include "avlstuff.h"
 
 static const char perforce_id[] =
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#27 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#28 $";
 
 #define FM_BUF_SIZE     1024
 
@@ -315,7 +315,7 @@ exit:
 
 static void fm_scan_line(mapitem * mitem)
 {
-    int a, b, c, j;
+    int a, b, c, j, u = 0, v = 0;
     float d;
     char fm_line[FM_BUF_SIZE], buf[FM_BUF_SIZE];
     char **pn;
@@ -366,6 +366,7 @@ static void fm_scan_line(mapitem * mitem)
             goto done;
         case '"':                /* opening quote */
             r++;
+            u = v = 0;
             do {
                 skip(r, ' ');
                 if (sscanf(r, "%f %n", &d, &j) > 0) {
@@ -403,41 +404,36 @@ static void fm_scan_line(mapitem * mitem)
             }
             break;
         default: /* encoding or font file specification */
+            a = b = 0;
+            if (*r == '<') {
+                a = *r++;
+                if (*r == '<' || *r == '[')
+                    b = *r++;
+            }
             read_field(r, q, buf);
-            s = buf;
-            if (q > (buf + 4) && strcasecmp(q - 4, ".enc") == 0) {
                 /* encoding, formats: '8r.enc' or '<8r.enc' or '<[8r.enc' */
-                if (*s == '<') {
-                    s++;
-                    if (*s == '[')
-                        s++;
-                }
-                fm_ptr->encoding = add_enc(s);
-            } else {
+            if (strlen(buf) > 4 && strcasecmp(strend(buf) - 4, ".enc") == 0) {
+                fm_ptr->encoding = add_enc(buf);
+                u = 0;                      /* u, v used if intervening blank: "<< foo" */
+                v = 0;
+            } else if (strlen(buf) > 0) {
                 /* fontfile, formats:
-                * subsetting:      '<cmr10.pfa' 
-                * no subsetting:   '<<cmr10.pfa' 
-                * no embedding:    'cmr10.pfa' 
-                * no embedding:    '!cmr10.pfa' (deprecated)
-                */
-                b = 0;
-                if ((a = *s) == '<') {
-                    s++;
-                    if ((b = *s) == '<')
-                        s++;
-                } else if (a == '!')
-                    s++;
-                if (*s == 0) {
-                    pdftex_warn("invalid entry for `%s': invalid font file name",
-                                fm_ptr->tfm_name);
-                    goto bad_line;
-                }
-                if (a == '<') {
+                 * subsetting:    '<cmr10.pfa' 
+                 * no subsetting: '<<cmr10.pfa' 
+                 * no embedding:  'cmr10.pfa' 
+                 */
+                if (a == '<' || u == '<') {
                     set_included(fm_ptr);
-                    if (b != '<')
+                    if ((a == '<' && b == 0) || (a == 0 && v == 0))
                         set_subsetted(fm_ptr);
+                    /* otherwise b == '<' (or '[') => no subsetting */
                 }
-                fm_ptr->ff_name = xstrdup(s);
+                set_field(ff_name);
+                u = 0;
+                v = 0;
+            } else {
+                u = a;
+                v = b;
             }
         }
     }

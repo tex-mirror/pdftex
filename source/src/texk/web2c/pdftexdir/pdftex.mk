@@ -6,16 +6,11 @@
 # number or how they are configured requires changes to the main distribution
 # anyway.
 
-# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.mk#33 $
+# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.mk#34 $
 
 Makefile: pdftexdir/pdftex.mk
 
-# pdftex_bin = pdfxtex
-# pdftex_exe = pdfxtex.exe
-# pdftex_pool = pdfxtex.pool
 pdftex_bin = pdftex pdfetex pdfxtex ttf2afm pdftosrc
-pdftex_exe = pdftex.exe pdfetex.exe pdfxtex.exe ttf2afm.exe pdftosrc.exe
-pdftex_pool = pdftex.pool pdfetex.pool pdfxtex.pool
 linux_build_dir = $(HOME)/pdftex/build/linux/texk/web2c
 
 # We build pdftex
@@ -169,13 +164,7 @@ pdftosrc-clean:
 # 
 # pdftex binaries archive
 pdftexbin:
-	rm -f pdftex*.tar.bz2 $(pdftex_bin)
 	$(MAKE) $(pdftex_bin)
-	if test "x$(CC)" = "xdos-gcc"; then \
-	    $(MAKE) pdftexbin-djgpp; \
-	else \
-	    $(MAKE) pdftexbin-native; \
-	fi
 
 pdftex-cross:
 	$(MAKE) web2c-cross
@@ -198,14 +187,5 @@ web2c-cross: $(web2c_programs)
 	cp -f $(linux_build_dir)/tie .  && touch tie
 	$(MAKE) tangle && rm -f tangle && \
 	cp -f $(linux_build_dir)/tangle .  && touch tangle
-
-pdftexbin-native:
-	strip $(pdftex_bin)
-	tar cfj pdftex-native-`datestr`.tar.bz2 $(pdftex_bin) $(pdftex_pool)
-
-pdftexbin-djgpp:
-	dos-strip $(pdftex_bin)
-	dos-stubify $(pdftex_bin)
-	tar cfj pdftex-djgpp-`datestr`.tar.bz2 $(pdftex_exe) $(pdftex_pool)
 
 # end of pdftex.mk

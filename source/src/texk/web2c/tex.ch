@@ -1131,6 +1131,55 @@ else  begin if (font(p)>font_max) then print_char("*")
   {or \.{\\charsubdef}}
 @z
 
+% i18n fix: messages printed by print_mode in [16.211] and [46.1049]
+% can not be translated. For example, messages printed by |print_mode|
+% from [16.211] use different word order and [46.1049] use different
+% word order and words are declined.
+@x [16.211] l.4256 
+begin if m>0 then
+  case m div (max_command+1) of
+  0:print("vertical");
+  1:print("horizontal");
+  2:print("display math");
+  end
+else if m=0 then print("no")
+else  case (-m) div (max_command+1) of
+  0:print("internal vertical");
+  1:print("restricted horizontal");
+  2:print("math");
+  end;
+print(" mode");
+end;
+@y
+begin if m>0 then
+  case m div (max_command+1) of
+  0:print("vertical mode");
+  1:print("horizontal mode");
+  2:print("display math mode");
+  end
+else if m=0 then print("no mode")
+else  case (-m) div (max_command+1) of
+  0:print("internal vertical mode");
+  1:print("restricted horizontal mode");
+  2:print("math mode");
+  end;
+end;
+
+procedure print_in_mode(@!m:integer); {prints the mode represented by |m|}
+begin if m>0 then
+  case m div (max_command+1) of
+  0:print("' in vertical mode");
+  1:print("' in horizontal mode");
+  2:print("' in display math mode");
+  end
+else if m=0 then print("' in no mode")
+else  case (-m) div (max_command+1) of
+  0:print("' in internal vertical mode");
+  1:print("' in restricted horizontal mode");
+  2:print("' in math mode");
+  end;
+end;
+@z
 
 @x [16.213] l.4321 - texarray
 @!nest:array[0..nest_size] of list_state_record;
@@ -1778,6 +1827,16 @@ if m=xord_code_base then scanned_result(xord[cur_val])(int_val)
 else if m=xchr_code_base then scanned_result(xchr[cur_val])(int_val)
 else if m=xprn_code_base then scanned_result(xprn[cur_val])(int_val)
 else if m=math_code_base then scanned_result(ho(math_code(cur_val)))(int_val)
+@z
+
+@x [28.501] l.9747 - \eof18
+if_eof_code: begin scan_four_bit_int; b:=(read_open[cur_val]=closed);
+  end;
+@y
+if_eof_code: begin scan_four_bit_int_or_18;
+  if cur_val=18 then b:=not shell_enabled_p
+  else b:=(read_open[cur_val]=closed);
+  end;
 @z
 
 @x [29.513] l.9951 - Area and extension rules for filenames.
@@ -3369,6 +3428,12 @@ if(qo(effective_char(false,main_f,qi(cur_chr)))>font_ec[main_f])or
 main_i:=char_info(main_f)(cur_l);
 @y
 main_i:=effective_char_info(main_f,cur_l);
+@z
+
+@x [46.1049] l.20407 - i18n fix, see change to [16.211]
+print("' in "); print_mode(mode);
+@y
+print_in_mode(mode);
 @z
 
 % disabled in original tex-src-special.ch
@@ -5019,6 +5084,21 @@ begin
   end;
 end;
 
+@ To be able to determine whether \.{\\write18} is enabled from within
+\TeX\ we also implement \.{\\eof18}.  We sort of cheat by having an
+additional route |scan_four_bit_int_or_18| which is the same as
+|scan_four_bit_int| except it also accepts the value 18.
+
+@<Declare procedures that scan restricted classes of integers@>=
+procedure scan_four_bit_int_or_18;
+begin scan_int;
+if (cur_val<0)or((cur_val>15)and(cur_val<>18)) then
+  begin print_err("Bad number");
+@.Bad number@>
+  help2("Since I expected to read a number between 0 and 15,")@/
+    ("I changed this one to zero."); int_error(cur_val); cur_val:=0;
+  end;
+end;
 
 @ Dumping the |xord|, |xchr|, and |xprn| arrays.  We dump these always
 in the format, so a TCX file loaded during format creation can set a

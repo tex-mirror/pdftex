@@ -18,7 +18,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/hz.ch#11 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/hz.ch#12 $
 
 @x [155] - margin kerning
 @d acc_kern=2 {|subtype| of kern nodes from accents}
@@ -32,6 +32,8 @@
 @d lp_code_base == 2
 @d rp_code_base == 3
 @d ef_code_base == 4
+@d max_hlist_stack = 512 {maximum fill level for |hlist_stack|}
+{maybe good if larger than |2 * max_quarterword|, so that box nesting level would overflow first}
 @z
 
 @x [183] - margin kerning
@@ -438,6 +440,8 @@ begin
     font_shrink := font_shrink - font_shrink mod font_step;
     if font_shrink < 0 then
         font_shrink := 0;
+    if font_shrink = 1000 then
+        font_shrink := font_shrink - font_step; {don't allow zero-width font}
     if (font_stretch = 0) and (font_shrink = 0) then
         pdf_error("font expansion", "invalid limit");
     auto_expand := false;
@@ -498,6 +502,8 @@ margin_kern_node,
 @!font_expand_ratio: integer; {current expansion ratio}
 @!last_leftmost_char: pointer;
 @!last_rightmost_char: pointer;
+@!hlist_stack:array[0..max_hlist_stack] of pointer; {stack for |find_protchar_left()| and |find_protchar_right()|}
+@!hlist_stack_level:0..max_hlist_stack; {fill level for |hlist_stack|}
 
 @ @d cal_margin_kern_var(#) ==
 begin
@@ -1035,6 +1041,85 @@ begin
     prev_rightmost := p;
 end;
 
+procedure push_node(p: pointer);
+begin
+    if hlist_stack_level > max_hlist_stack then
+        pdf_error("push_node", "stack overflow");
+    hlist_stack[hlist_stack_level] := p;
+    hlist_stack_level := hlist_stack_level + 1;
+end;
+
+function pop_node: pointer;
+begin
+    hlist_stack_level := hlist_stack_level - 1;
+    if hlist_stack_level < 0 then {would point to some bug}
+        pdf_error("pop_node", "stack underflow (internal error)");
+    pop_node := hlist_stack[hlist_stack_level];
+end;
+
+function find_protchar_left(l: pointer; d: boolean): pointer;
+{searches left to right from list head |l|, returns 1st non-skipable item}
+var t: pointer;
+    run: boolean;
+begin
+    if (link(l) <> null) and (type(l) = hlist_node) and (width(l) = 0)
+        and (height(l) = 0) and (depth(l) = 0) and (list_ptr(l) = null) then
+        l := link(l) {for paragraph start with \.{\\parindent = 0pt}}
+    else if d then
+            while (link(l) <> null) and (not (is_char_node(l) or non_discardable(l))) do
+                l := link(l); {std.\ discardables at line break, \TeX book, p 95}
+    hlist_stack_level := 0;
+    run := true;
+    repeat
+        t := l;
+        while run and (type(l) = hlist_node) and (list_ptr(l) <> null) do begin
+            push_node(l);
+            l := list_ptr(l);
+        end;
+        while run and cp_skipable(l) do begin
+            while (link(l) = null) and (hlist_stack_level > 0) do begin
+                l := pop_node; {don't visit this node again}
+            end;
+            if link(l) <> null then
+                l := link(l)
+            else if hlist_stack_level = 0 then run := false
+        end;
+    until t = l;
+    find_protchar_left := l;
+end;
+
+function find_protchar_right(l, r: pointer): pointer;
+{searches right to left from list tail |r| to head |l|, returns 1st non-skipable item}
+var t: pointer;
+    run: boolean;
+begin
+    find_protchar_right := null;
+    if r = null then return;
+    hlist_stack_level := 0;
+    run := true;
+    repeat
+        t := r;
+        while run and (type(r) = hlist_node) and (list_ptr(r) <> null) do begin
+            push_node(l);
+            push_node(r);
+            l := list_ptr(r);
+            r := l;
+            while link(r) <> null do
+                r := link(r);
+        end;
+        while run and cp_skipable(r) do begin
+            while (r = l) and (hlist_stack_level > 0) do begin
+                r := pop_node; {don't visit this node again}
+                l := pop_node;
+            end;
+            if (r <> l) and (r <> null) then
+                r := prev_rightmost(l, r)
+            else if (r = l) and (hlist_stack_level = 0) then run := false
+        end;
+    until t = r;
+    find_protchar_right := r;
+end;
+
 function total_pw(q, p: pointer): scaled;
 {returns the total width of character protrusion of a line;
 |cur_break(break_node(q))| and |p| is the leftmost resp. rightmost node in the
@@ -1060,11 +1145,7 @@ begin
         r := pre_break(p);
         while link(r) <> null do
             r := link(r);
-    end else begin
-        while (r <> null) and cp_skipable(r) do
-            r := prev_rightmost(l, r);
-    end;
-
+    end else r := find_protchar_right(l, r);
     {now the left margin}
     {|
         short_display_n(l, 2);
@@ -1089,10 +1170,7 @@ begin
             end;
         end;
     end;
-    while (l <> null) and not is_char_node(l) and not non_discardable(l) do
-        l := link(l);
-    while (l <> null) and cp_skipable(l) do
-        l := link(l);
+    l := find_protchar_left(l, true);
 done:
     total_pw := left_pw(l) + right_pw(r);
 end;
@@ -1504,6 +1582,7 @@ var q,@!r,@!s:pointer; {temporary registers for list manipulation}
     p, k: pointer; 
     w: scaled;
     glue_break: boolean; {was a break at glue?}
+    ptmp: pointer;
 @z
 
 @x [881] - margin kerning
@@ -1535,24 +1614,25 @@ to the last node of the |pre_break| list}
 if pdf_protrude_chars > 0 then begin
     if disc_break and (is_char_node(q) or (type(q) <> disc_node))
     {|q| has been reset to the last node of |pre_break|}
-    then
-        p := q
-    else begin
+    then begin
+        p := q;
+        ptmp := p;
+    end else begin
         p := prev_rightmost(temp_head, q); {get |link(p) = q|}
-        while (p <> null) and cp_skipable(p) do
-            p := prev_rightmost(temp_head, p);
+        ptmp := p;
+        p := find_protchar_right(temp_head, p);
     end;
     {|
     short_display_n(p, 1);
     print_ln;
     |}
     w := right_pw(p);
-    if w <> 0 then {we have found a marginal kern, append it after |p|}
+    if w <> 0 then {we have found a marginal kern, append it after |ptmp|}
     begin
         k := new_margin_kern(-w, last_rightmost_char, right_side);
-        link(k) := link(p);
-        link(p) := k;
-        if (p = q) then
+        link(k) := link(ptmp);
+        link(ptmp) := k;
+        if (ptmp = q) then
             q := link(q);
     end;
 end;
@@ -1570,8 +1650,7 @@ if left_skip<>zero_glue then
 {at this point |q| is the leftmost node; all discardable nodes have been discarded}
 if pdf_protrude_chars > 0 then begin
     p := q;
-    while (p <> null) and cp_skipable(p) do
-        p := link(p);
+    p := find_protchar_left(p, false); {no more discardables}
     w := left_pw(p);
     if w <> 0 then begin
         k := new_margin_kern(-w, last_leftmost_char, left_side);
@@ -1591,29 +1670,29 @@ else
     just_box := hpack(q, cur_width, exactly);
 @z
 
-@x [1100] - margin kerning
-var p:pointer; {the box}
-@y
-var p:pointer; {the box}
-    r: pointer; {to remove marging kern nodes}
-@z
-
-@x [1100] - margin kerning
-while link(tail)<>null do tail:=link(tail);
-@y
-if c = copy_code then begin
-    while link(tail)<>null do tail:=link(tail);
-end
-else while link(tail) <> null do begin
-    r := link(tail);
-    if not is_char_node(r) and (type(r) = margin_kern_node) then begin
-        link(tail) := link(r);
-        free_avail(margin_char(r));
-        free_node(r, margin_kern_node_size);
-    end;
-    tail:=link(tail);
-end;
-@z
+% @x [1110] - margin kerning
+% var p:pointer; {the box}
+% @y
+% var p:pointer; {the box}
+%     r: pointer; {to remove marginal kern nodes}
+% @z
+% 
+% @x [1110] - margin kerning
+% while link(tail)<>null do tail:=link(tail);
+% @y
+% if c = copy_code then begin
+%     while link(tail)<>null do tail:=link(tail);
+% end
+% else while link(tail) <> null do begin
+%     r := link(tail);
+%     if not is_char_node(r) and (type(r) = margin_kern_node) then begin
+%         link(tail) := link(r);
+%         free_avail(margin_char(r));
+%         free_node(r, margin_kern_node_size);
+%     end;
+%     tail:=link(tail);
+% end;
+% @z
 
 @x [1147] - margin kerning
 ligature_node:@<Make node |p| look like a |char_node|...@>;
@@ -1673,10 +1752,10 @@ endcases;
 @z
 
 @x [1344]
-@d pdf_literal_node            == pdftex_first_extension_code + 0
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 23
 @y
-@d pdf_literal_node            == pdftex_first_extension_code + 0
-@d pdf_font_expand_code        = pdftex_last_extension_code + 1
+@d pdf_font_expand_code        == pdftex_first_extension_code + 24
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 24
 @z
 
 @x [1344]

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#23 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#24 $
 */
 
 #ifndef PDFTEXLIB
@@ -39,10 +39,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#23 $
 typedef struct {
     const char *pdfname;
     const char *t1name;
-    union {
-        float num;
-        char *string;
-    } value;
+    float value;
     boolean valid;
 } key_entry;
 
@@ -109,6 +106,7 @@ extern internalfontnumber tex_font;
 extern key_entry font_keys[];
 extern strnumber last_tex_string;
 extern size_t last_ptr_index;
+extern char fontname_buf[];
 
 /* pdftexlib function prototypes */
 
@@ -152,7 +150,7 @@ extern void fb_flush(void);
 extern void fb_putchar(eightbits b);
 extern void fb_seek(integer);
 extern void libpdffinish(void);
-extern void make_subset_tag(fm_entry *, integer);
+extern void make_subset_tag(fm_entry *, char **);
 extern void pdf_printf(const char *,...);
 extern void pdf_puts(const char *);
 extern void pdftex_fail(const char *,...);
@@ -197,7 +195,7 @@ extern integer imagepages(integer);
 extern integer imagewidth(integer);
 extern integer imagexres(integer);
 extern integer imageyres(integer);
-extern integer readimage(strnumber, integer, strnumber, integer, integer, integer);
+extern integer readimage(strnumber, integer, strnumber, integer, integer, integer, integer);
 extern void deleteimage(integer);
 extern void img_free(void) ;
 extern void updateimageprocset(integer);

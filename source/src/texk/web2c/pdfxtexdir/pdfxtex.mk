@@ -17,7 +17,7 @@ pdfxtex: pdftexd.h $(pdfxtex_o) $(pdfxtexextra_o) $(pdftexlibsdep)
 	@CXXHACKLINK@ $(pdfxtex_o) $(pdfxtexextra_o) $(pdftexlibs) $(socketlibs) @CXXHACKLDLIBS@ @CXXLDEXTRA@
 
 # C file dependencies.
-$(pdfxtex_c) pdfxtexcoerce.h pdfxtexd.h: pdfxtex.p $(web2c_texmf)
+$(pdfxtex_c) pdfxtexcoerce.h pdfxtexd.h: pdfxtex.p $(web2c_texmf) pdfxtexdir/pdfxtex.defines
 	$(web2c) pdfxtex
 pdfxtexextra.c: pdfxtexdir/pdfxtexextra.h lib/texmfmp.c
 	sed s/TEX-OR-MF-OR-MP/pdfxtex/ $(srcdir)/lib/texmfmp.c >$@
@@ -41,6 +41,12 @@ pdfxtex_web_srcs = $(srcdir)/tex.web \
   $(srcdir)/pdftexdir/misc.ch \
   $(srcdir)/pdftexdir/vadjust.ch \
   $(srcdir)/pdfxtexdir/strcmp.ch \
+  $(srcdir)/pdfxtexdir/quitvmode.ch \
+  $(srcdir)/pdfxtexdir/tagcode.ch \
+  $(srcdir)/pdfxtexdir/pxdimen.ch \
+  $(srcdir)/pdfxtexdir/escapestr.ch \
+  $(srcdir)/pdfxtexdir/fixlinedimen.ch \
+  $(srcdir)/pdfxtexdir/colorspace.ch \
   $(srcdir)/pdfetexdir/pdfetex.ch2 \
   $(srcdir)/pdfxtexdir/pdfxtex.ch2
 #   Sources for pdfxtex.ch:
