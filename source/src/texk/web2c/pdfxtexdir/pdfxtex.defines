@@ -1,5 +1,5 @@
 {
-Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfxtexdir/pdfxtex.defines#1 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#11 $
 }
 
 { pdftex.defines: additions for pdfTeX }
@@ -34,7 +34,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 { functions from mapfile.c }
 @define function hasfmentry();
-@define function fmlookup();
 @define function tfmoffm();
 @define procedure checkextfm();
 @define procedure pdfmapfile();
@@ -50,6 +49,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 @define procedure writestreamlength();
 @define procedure printID();
 @define procedure printcreationdate;
+@define procedure escapestr();
+@define function  escapedstrlen;
+@define function  getescapedchar();
 
 { functions from vfpacket.c }
 @define function newvfpacket();
@@ -71,6 +73,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 @define function epdforigy();
 @define function imageheight();
 @define function imagepages();
+@define function imagecolordepth();
 @define function imagewidth();
 @define function imagexres();
 @define function imageyres();

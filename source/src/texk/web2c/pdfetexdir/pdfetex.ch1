@@ -17,7 +17,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.ch1#8 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.ch1#9 $
 %
 @x [1.2] l.188
 @d TeX_banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
@@ -46,7 +46,7 @@
 @y
 @d badness_code=glue_val+2 {code for \.{\\badness}}
 @#
-@d eTeX_int=pdftex_last_item_codes {first of \eTeX\ codes for integers}
+@d eTeX_int=pdftex_last_item_codes+1 {first of \eTeX\ codes for integers}
 @z
 
 @x [26.424] l.8506

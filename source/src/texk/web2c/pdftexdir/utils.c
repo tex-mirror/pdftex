@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#20 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#21 $
 */
 
 #include "ptexlib.h"
@@ -28,13 +28,14 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#20 $
 #include <time.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#20 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#21 $";
 
 char *cur_file_name = NULL;
 strnumber last_tex_string;
 static char print_buf[PRINTF_BUF_SIZE];
 static char *jobname_cstr = NULL;
 static char *job_id_string = NULL;
+static char *escaped_string = NULL;
 extern string ptexbanner; /* from web2c/lib/texmfmp.c */
 extern string versionstring; /* from web2c/lib/version.c */         
 extern KPSEDLL string kpathsea_version_string; /* from kpathsea/version.c */
@@ -90,11 +91,10 @@ static void fnstr_append(const char *s)
     char_ptr = strend(char_ptr);
 }
 
-void make_subset_tag(fm_entry *fm_cur, integer fn_offset)
+void make_subset_tag(fm_entry *fm_cur, char **glyph_names)
 {
     char tag[7];
     unsigned long crc;
-    eightbits *fontname_ptr = (eightbits*)fb_array + fn_offset;
     int i, l = strlen(job_id_string) + 1;
     alloc_array(char, l, SMALL_ARRAY_SIZE);
     strcpy(char_array, job_id_string);
@@ -105,7 +105,7 @@ void make_subset_tag(fm_entry *fm_cur, integer fn_offset)
     }
     fnstr_append(" PS name: ");
     if (font_keys[FONTNAME_CODE].valid)
-        fnstr_append(font_keys[FONTNAME_CODE].value.string);
+        fnstr_append(fontname_buf);
     else if (fm_cur->ps_name != NULL)
         fnstr_append(fm_cur->ps_name);
     fnstr_append(" Encoding: ");
@@ -114,10 +114,11 @@ void make_subset_tag(fm_entry *fm_cur, integer fn_offset)
     else
         fnstr_append("built-in");
     fnstr_append(" CharSet: ");
+    assert(glyph_names != NULL);
     for (i = 0; i <= MAX_CHAR_CODE; i++)
-        if (pdfcharmarked(tex_font, i) && t1_glyph_names[i] != notdef) {
+        if (pdfcharmarked(tex_font, i) && glyph_names[i] != notdef) {
             fnstr_append(" /");
-            fnstr_append(t1_glyph_names[i]);
+            fnstr_append(glyph_names[i]);
         }
     if (fm_cur->charset != NULL) {
         fnstr_append(" Extra CharSet: ");
@@ -132,7 +133,7 @@ void make_subset_tag(fm_entry *fm_cur, integer fn_offset)
      * of the CRC must be dropped out.
      */
     for (i = 0; i < 6; i++) {
-        fontname_ptr[i] = tag[i] = 'A' + crc % 26;
+        tag[i] = 'A' + crc % 26;
         crc /= 26;
     }
     tag[6] = 0;
@@ -608,4 +609,22 @@ void printcreationdate()
 
     /* print result */
     pdf_printf("/CreationDate (D:%s)\n", time_str);
+}
+
+void escapestr(strnumber s)
+{
+    escaped_string = convertStringToPDFString(makecstring(s));
+}
+
+integer escapedstrlen()
+{
+    assert(escaped_string != NULL);
+    return strlen(escaped_string);
+}
+
+ASCIIcode getescapedchar(integer index)
+{
+    if (index < 0 || index >= strlen(escaped_string))
+        pdftex_fail("getescapedchar(): index out of range");
+    return escaped_string[index];
 }

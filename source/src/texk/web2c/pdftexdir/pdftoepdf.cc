@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#50 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#51 $
 */
 
 #include <stdlib.h>
@@ -46,7 +46,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#50 $
 #include "epdf.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#50 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#51 $";
 
 /* we avoid reading all necessary kpathsea headers, but we need xstrdup */
 #ifdef __cplusplus
@@ -397,10 +397,10 @@ static void copyFont(char *tag, Object *fontRef)
     Ref ref = fontRef->getRef();
     for (p = inObjList; p; p = p->next) {
         if (p->ref.num == ref.num && p->ref.gen == ref.gen) {
-      copyName(tag);
-      pdf_printf(" %d 0 R ", p->num);
-      return;
-    }
+            copyName(tag);
+            pdf_printf(" %d 0 R ", p->num);
+            return;
+        }
     }
     fontRef->fetch(xref, &fontdict);
     if (!fontdict->isDict())
@@ -413,9 +413,9 @@ static void copyFont(char *tag, Object *fontRef)
     /* only handle Type1 fonts; others will be copied */
     if (strcmp(subtype->getName(), "Type1") != 0 ) {
         copyName(tag);
-    pdf_puts(" ");
-    copyObject(fontRef);
-    return;
+        pdf_puts(" ");
+        copyObject(fontRef);
+        return;
     }
     fontdict->dictLookup("BaseFont", &basefont);
     if (!basefont->isName())
@@ -425,10 +425,10 @@ static void copyFont(char *tag, Object *fontRef)
     if (fontmap != NULL && is_type1(fontmap) &&
         fontdict->dictLookupNF("FontDescriptor", &fontdescRef) && 
         fontdescRef->isRef() && fontdescRef->fetch(xref, &fontdesc) &&
-    fontdesc->isDict()) {
+        fontdesc->isDict()) {
         if (fontdesc->dictLookup("CharSet", &charset) && 
-            charset->isString() && is_subsetable(fontmap))
-        mark_glyphs(fontmap, charset->getString()->getCString());
+                charset->isString() && is_subsetable(fontmap))
+            mark_glyphs(fontmap, charset->getString()->getCString());
         else
             embed_whole_font(fontmap);
         addFontDesc(fontdescRef->getRef(), fontmap);

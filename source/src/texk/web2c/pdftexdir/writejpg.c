@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writejpg.c#7 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writejpg.c#8 $
 */
 
 #include "ptexlib.h"
@@ -201,19 +201,24 @@ void write_jpg(integer img)
                (int)jpg_ptr(img)->bits_per_component,
                (int)jpg_ptr(img)->length);
     pdf_puts("/ColorSpace ");
-    switch (jpg_ptr(img)->color_space) {
-    case JPG_GRAY:
-        pdf_puts("/DeviceGray\n");
-        break;
-    case JPG_RGB:
-        pdf_puts("/DeviceRGB\n");
-        break;
-    case JPG_CMYK:
-        pdf_puts("/DeviceCMYK\n/Decode [1 0 1 0 1 0 1 0]\n");
-        break;
-    default:
-        pdftex_fail("Unsupported color space %i", 
-             (int)jpg_ptr(img)->color_space);
+    if (img_colorspace_ref(img) != 0) {
+        pdf_printf("%i 0 R\n", (int)img_colorspace_ref(img));
+    }
+    else {
+        switch (jpg_ptr(img)->color_space) {
+        case JPG_GRAY:
+            pdf_puts("/DeviceGray\n");
+            break;
+        case JPG_RGB:
+            pdf_puts("/DeviceRGB\n");
+            break;
+        case JPG_CMYK:
+            pdf_puts("/DeviceCMYK\n/Decode [1 0 1 0 1 0 1 0]\n");
+            break;
+        default:
+            pdftex_fail("Unsupported color space %i", 
+                 (int)jpg_ptr(img)->color_space);
+        }
     }
     pdf_puts("/Filter /DCTDecode\n>>\nstream\n");
     for (l = jpg_ptr(img)->length, f = jpg_ptr(img)->file; l > 0; l--)

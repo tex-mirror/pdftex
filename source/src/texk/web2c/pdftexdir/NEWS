@@ -1,4 +1,45 @@
 ------------------------------------------------
+pdfTeX 3.141592-1.21a was released on 2005-02-04
+------------------------------------------------
+- ttf2afm 1.0:
+    - added support for refering to glyphs via unicode in encoding files (ie 'uniXXX')
+    - added some more info to the AFM output
+    - some minor bug fixes
+    - a short documentation available
+
+- pdftex now understand forms 'uniXXXX' in encoding files (only makes sense
+  with TrueType fonts)
+
+- added subset tag for TrueType fonts
+
+- PDF strings are now printed as following:
+    (This is a string) -> (This is a string)
+    This is a string -> (This is a string)
+    <a1b245c1a2...> -> <a1b245c1a2...>
+
+- check for double newline char to get rid of empty lines in PDF output
+
+- Fixed a bug in the scanning of map lines introduced in the the fix of bug
+  #242 in 1.20b.
+  
+- Fixed three problems in xpdf; xpdf is now 3.00pl3
+
+- \ifeof18 is a simple method to test if \write18 is enabled.
+
+- a few extensions in pdfxtex:
+    - \pdflastximagecolordepth returns the last color depth
+    - \pdfximage supports a keyword "colorspace" following an object number
+      representing a ColorSpace object
+    - \pdfstrcmp compares two strings
+    - \pdfescapestring/\pdflastescapedstring provide a mean to escape string
+    - \pdffirstlineheight/\pdflastlinedepth/\pdfeachlineheight/\pdfeachlinedepth
+      allow fixing line dimen
+    - patches from Taco
+        - px dimen unit
+        - tagcode patch
+        - quitvmode patch
+
+------------------------------------------------
 pdfTeX 3.141592-1.20b was released on 2004-12-22
 ------------------------------------------------
 - Fixed some minor bugs, mostly with hz
@@ -299,5 +340,5 @@ pdfTeX 3.14159-1.00a-pretest-20010806 was released on 2001-08-06
 pdfTeX 3.14159-1.00a-pretest-20010804 was released on 2001-08-04
 ----------------------------------------------------------------
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#77 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#80 $
 // vim: tw=79:ts=2:expandtab:autoindent

@@ -21,10 +21,10 @@
 % $Id: strcmp.ch,v 1.2 2004/07/30 07:12:48 olaf Exp $
 
 @x [416]
-@d pdftex_last_item_codes     = pdftex_first_rint_code + 8 {end of \pdfTeX's command codes}
+@d pdftex_last_item_codes     = pdftex_first_rint_code + 7 {end of \pdfTeX's command codes}
 @y
 @d pdf_strcmp_result_code     = pdftex_first_rint_code + 8 {result of \.{\\pdfstrcmp}}
-@d pdftex_last_item_codes     = pdftex_first_rint_code + 9 {end of \pdfTeX's command codes}
+@d pdftex_last_item_codes     = pdftex_first_rint_code + 8 {end of \pdfTeX's command codes}
 @z
 
 @x [416]
@@ -52,17 +52,26 @@ primitive("pdfstrcmpresult",last_item,pdf_strcmp_result_code);@/
 @z
 
 @x [1344]
-@d set_language_code=5 {command modifier for \.{\\setlanguage}}
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 24
 @y
-@d set_language_code=5 {command modifier for \.{\\setlanguage}}
-@d pdf_strcmp_code  = pdftex_last_extension_code + 2
+@d pdf_strcmp_code             == pdftex_first_extension_code + 25
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 25
 @z
-% N.B.: pdftex_last_extension_code + 1 is used for \pdffontexpand in hz.ch
+
+@x [1344]
+primitive("pdfliteral",extension,pdf_literal_node);@/
+@!@:pdf_literal_}{\.{\\pdfliteral} primitive@>
+@y
+primitive("pdfliteral",extension,pdf_literal_node);@/
+@!@:pdf_literal_}{\.{\\pdfliteral} primitive@>
+primitive("pdfstrcmp",extension,pdf_strcmp_code);@/
+@!@:pdf_strcmp_}{\.{\\pdfstrcmp} primitive@>
+@z
 
 @x [1348]
-set_language_code:@<Implement \.{\\setlanguage}@>;
+pdf_literal_node: @<Implement \.{\\pdfliteral}@>;
 @y
-set_language_code:@<Implement \.{\\setlanguage}@>;
+pdf_literal_node: @<Implement \.{\\pdfliteral}@>;
 pdf_strcmp_code: @<Implement \.{\\pdfstrcmp}@>;
 @z
 

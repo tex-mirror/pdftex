@@ -160,12 +160,13 @@ void FoFiType1::parse() {
       for (j = 0; j < 256; ++j) {
 	encoding[j] = NULL;
       }
-      line = getNextLine(line);
-      for (j = 0; j < 300 && line; ++j) {
-	line1 = getNextLine(line);
+      for (j = 0, line = getNextLine(line);
+	   j < 300 && line && (line1 = getNextLine(line));
+	   ++j, line = line1) {
 	if ((n = line1 - line) > 255) {
 	  n = 255;
 	}
+	if (n < 0) n = 0;
 	strncpy(buf, line, n);
 	buf[n] = '\0';
 	for (p = buf; *p == ' ' || *p == '\t'; ++p) ;

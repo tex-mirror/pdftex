@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#14 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#15 $
 */
 
 #include "ptexlib.h"
@@ -26,7 +26,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#14 $
 #include <kpathsea/c-memstr.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#14 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#15 $";
     
 #define bp2int(p)    round(p*(onehundredbp/100.0))
 
@@ -53,6 +53,7 @@ static integer new_image_entry(void)
     image_ptr->y_res = 0;
     image_ptr->width = 0;
     image_ptr->height = 0;
+    image_ptr->colorspace_ref = 0;
     return image_ptr++ - image_array;
 }
 
@@ -119,6 +120,20 @@ integer epdforigy(integer img)
 integer imagepages(integer img)
 {
     return img_pages(img);
+}
+
+integer imagecolordepth(integer img)
+{
+    switch (img_type(img)) {
+    case IMAGE_TYPE_PNG:
+        return png_info(img)->bit_depth;
+    case IMAGE_TYPE_JPG:
+        return jpg_ptr(img)->bits_per_component;
+    case IMAGE_TYPE_PDF:
+        return 0;
+    default:
+        pdftex_fail("unknown type of image");
+    }
 }
 
 /*
@@ -232,12 +247,13 @@ static void checktypebyextension(integer img)
         img_type(img) = IMAGE_TYPE_JPG;
 }
 
-integer readimage(strnumber s, integer page_num, strnumber page_name,
+integer readimage(strnumber s, integer page_num, strnumber page_name, integer colorspace,
                   integer pdfversion, integer pdfoptionalwaysusepdfpagebox,
                   integer pdf_option_pdf_inclusion_errorlevel)
 {
     char *dest = NULL;
     integer img = new_image_entry();
+    img_colorspace_ref(img) = colorspace;
 
     /* need to allocate new string as makecstring's buffer is 
        already used by cur_file_name */

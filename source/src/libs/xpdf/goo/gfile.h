@@ -46,6 +46,10 @@
 #    endif
 #  endif
 #endif
+#if defined(__DJGPP__)
+// #  include <sys/djtypes.h> // this somehow didn't work as expected so I tried the next shot below :)
+typedef unsigned int time_t;
+#endif
 #include "gtypes.h"
 
 class GString;

@@ -1,3 +1,21 @@
+2004-12-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch [16.211,46.1049]: I18N fix for |print_mode|, adding
+	|print_in_mode| function to account for differences in declination
+	etc.  After Wlodzimierz Bzyl <matwb@univ.gda.pl>.
+
+	* mf.ch [28.585]: Sufficiently pathological code can overflow the
+	serial_no counter: add a check for this.  From Thorsten Dahlheimer
+	<tdahlheim@gmx.net>.
+
+	* mp.ch [24.539]: Sufficiently pathological code can overflow the
+	serial_no counter: add a check for this.  From Thorsten Dahlheimer
+	<tdahlheim@gmx.net>.
+
+	* tex.ch: Implement \ifeof18 to test whether \write18 is enabled.
+	A variant of the code submitted by Heiko Oberdiek
+	<oberdiek@uni-freiburg.de>.
+
 2004-12-20  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* withenable.ac: Don't define IPC in c-auto.h if --enable-ipc

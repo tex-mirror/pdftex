@@ -1,5 +1,4 @@
-% WEB change file containing code for pdfTeX features extending TeX;
-% to be applied to tex.web (Version 3.141592) in order to define the
+% WEB change file containing code for pdfTeX features extending TeX; % to be applied to tex.web (Version 3.141592) in order to define the
 % pdfTeX program.
 %
 % Note: This file, pdftex.ch, defines pdftex.web in terms of changes to be
@@ -27,7 +26,7 @@
 % (pdftexdir/pdftex.ch). Consequently, changes in these files have to be
 % coordinated.
 %
-% Copyright (c) 1996-2004 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 1996-2005 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
 % This file is part of pdfTeX.
 %
@@ -45,7 +44,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#160 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#163 $
 %
 % The TeX program is copyright (C) 1982 by D. E. Knuth.
 % TeX is a trademark of the American Mathematical Society.
@@ -67,9 +66,9 @@
 @x [2] - This change is made for TeX 3.141592
 @d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
 @y
-@d pdftex_version==120 { \.{\\pdftexversion} }
-@d pdftex_revision=="b" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.20b' {current \pdfTeX\ version}
+@d pdftex_version==121 { \.{\\pdftexversion} }
+@d pdftex_revision=="a" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='-1.21a' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -223,9 +222,8 @@ primitive("pdfoptionpdfinclusionerrorlevel",assign_int,int_base+pdf_option_pdf_i
 @x [247]
 @d emergency_stretch_code=20 {reduces badnesses on final pass of line-breaking}
 @y
-@d pdftex_first_dimen_code = 21 {first number defined in this section}
-@d pdftex_last_dimen_code  = pdftex_first_dimen_code + 6 {last number defined in this section}
 @d emergency_stretch_code=20 {reduces badnesses on final pass of line-breaking}
+@d pdftex_first_dimen_code = 21 {first number defined in this section}
 @d pdf_h_origin_code       = pdftex_first_dimen_code + 0 {horigin of the PDF output}
 @d pdf_v_origin_code       = pdftex_first_dimen_code + 1 {vorigin of the PDF output}
 @d pdf_page_width_code     = pdftex_first_dimen_code + 2 {page width of the PDF output}
@@ -233,8 +231,8 @@ primitive("pdfoptionpdfinclusionerrorlevel",assign_int,int_base+pdf_option_pdf_i
 @d pdf_link_margin_code    = pdftex_first_dimen_code + 4 {link margin in the PDF output}
 @d pdf_dest_margin_code    = pdftex_first_dimen_code + 5 {dest margin in the PDF output}
 @d pdf_thread_margin_code  = pdftex_first_dimen_code + 6 {thread margin in the PDF output}
+@d pdftex_last_dimen_code  = pdftex_first_dimen_code + 6 {last number defined in this section}
 @z
-% N.B.: don't forget to check for pdftex_last_dimen_code above
 
 @x
 @d dimen_pars=21 {total number of dimension parameters}
@@ -312,7 +310,7 @@ primitive("pdfthreadmargin",assign_dimen,dimen_base+pdf_thread_margin_code);@/
 @d pdf_last_annot_code        = pdftex_first_rint_code + 5 {code for \.{\\pdflastannot}}
 @d pdf_last_x_pos_code        = pdftex_first_rint_code + 6 {code for \.{\\pdflastxpos}}
 @d pdf_last_y_pos_code        = pdftex_first_rint_code + 7 {code for \.{\\pdflastypos}}
-@d pdftex_last_item_codes     = pdftex_first_rint_code + 8 {end of \pdfTeX's command codes}
+@d pdftex_last_item_codes     = pdftex_first_rint_code + 7 {end of \pdfTeX's command codes}
 @z
 
 @x [416]
@@ -717,9 +715,9 @@ end
 @d pdf_room(#) == {make sure that there are at least |n| bytes free in PDF
 buffer}
 begin
-    if pdf_buf_size - # < 0 then
+    if pdf_buf_size < # then
         overflow("PDF output buffer", pdf_buf_size);
-    if # + pdf_ptr > pdf_buf_size then
+    if pdf_ptr + # > pdf_buf_size then
         pdf_flush;
 end
 
@@ -877,6 +875,7 @@ suffix |_ln| append a new-line character to the PDF output.
 @d pdf_new_line_char == 10 {new-line character for UNIX platforms}
 
 @d pdf_print_nl == {output a new-line character to PDF buffer}
+if (pdf_ptr > 0) and (pdf_buf[pdf_ptr - 1] <> pdf_new_line_char) then
     pdf_out(pdf_new_line_char)
 
 @d pdf_print_ln(#) == {print out a string to PDF buffer followed by
@@ -1815,13 +1814,15 @@ begin
     end;
 end;
 
-@ ProcSet's handling.
-
 @ @<Glob...@>=
 @!pdf_image_procset: integer; {collection of image types used in current page/form}
 @!pdf_text_procset: boolean; {mask of used ProcSet's in the current page/form}
 
 @ Subroutines to print out various PDF objects
+
+@d is_hex_char(#) == (((# >= '0') and (# <= '9')) or
+                      ((# >= 'A') and (# <= 'F')) or
+                      ((# >= 'a') and (# <= 'f')))
 
 @p procedure pdf_print_fw_int(n, w: integer); {print out an integer with 
 fixed width; used for outputting cross-reference table}
@@ -1870,10 +1871,38 @@ end;
 
 procedure pdf_print_str(s: str_number); {print out |s| as string in PDF
 output}
+label done;
+var i, j, k: pool_pointer;
+    is_hex_string: boolean;
 begin
-    pdf_out("(");
-    pdf_print(s);
-    pdf_out(")");
+    i := str_start[s];
+    j := i + length(s) - 1;
+    if (i > j) then
+        return; {null string}
+    if (str_pool[i] = '(') and (str_pool[j] = ')') then begin
+        pdf_print(s);
+        return;
+    end;
+    is_hex_string := false;
+    if (str_pool[i] <> '<') or (str_pool[j] <> '>') or odd(length(s)) then 
+        goto done;
+    incr(i);
+    decr(j);
+    while i < j do begin
+        if is_hex_char(str_pool[i]) and is_hex_char(str_pool[i + 1]) then
+            i := i + 2
+        else
+            goto done;
+    end;
+    is_hex_string := true;
+done:
+    if is_hex_string then
+        pdf_print(s)
+    else begin
+        pdf_out("(");
+        pdf_print(s);
+        pdf_out(")");
+    end;
 end;
 
 procedure pdf_print_str_ln(s: str_number); {print out |s| as string in PDF
@@ -1939,6 +1968,7 @@ end
 @<Declare procedures that need to be declared forward...@>=
 procedure pdf_create_font_obj; forward;
 procedure do_vf; forward;
+procedure scan_pdf_ext_toks; forward;
 
 @ @<Glob...@>=
 @!pdf_font_type: ^eight_bits; {the type of font}
@@ -4231,9 +4261,8 @@ pdf_init_map_file('pdftex.map');
 @x [1344]
 @d set_language_code=5 {command modifier for \.{\\setlanguage}}
 @y
-@d pdftex_first_extension_code = 6
-@d pdftex_last_extension_code  = pdftex_first_extension_code + 23
 @d set_language_code=5 {command modifier for \.{\\setlanguage}}
+@d pdftex_first_extension_code = 6
 @d pdf_literal_node            == pdftex_first_extension_code + 0
 @d pdf_obj_code                == pdftex_first_extension_code + 1
 @d pdf_refobj_node             == pdftex_first_extension_code + 2
@@ -4258,8 +4287,8 @@ pdf_init_map_file('pdftex.map');
 @d pdf_map_file_code           == pdftex_first_extension_code + 21
 @d pdf_map_line_code           == pdftex_first_extension_code + 22
 @d pdf_trailer_code            == pdftex_first_extension_code + 23
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 23
 @z
-% N.B.: don't forget to check for pdftex_last_extension_code above
 
 @x [1344]
 primitive("setlanguage",extension,set_language_code);@/
@@ -4419,7 +4448,6 @@ end
 @ We have to check whether \.{\\pdfoutput} is set for using \pdfTeX{}
   extensions.
 
-@d scan_pdf_ext_toks == call_func(scan_toks(false, true)); {like \.{\\special}}
 
 @<Declare procedures needed in |do_ext...@>=
 procedure check_pdfoutput(s: str_number);
@@ -4430,6 +4458,11 @@ begin
         print(" used while \pdfoutput is not set"); 
         succumb;
     end;
+end;
+
+procedure scan_pdf_ext_toks;
+begin
+    call_func(scan_toks(false, true)); {like \.{\\special}}
 end;
 
 @ @<Implement \.{\\pdfliteral}@>=
@@ -4714,7 +4747,7 @@ var p: pointer;
     k: integer;
     named: str_number;
     s: str_number;
-    page: integer;
+    page, colorspace: integer;
 begin
     incr(pdf_ximage_count);
     pdf_create_obj(obj_type_ximage, pdf_ximage_count);
@@ -4742,6 +4775,12 @@ begin
     end
     else
         page := 1;
+    if scan_keyword("colorspace") then begin
+        scan_int;
+        colorspace := cur_val;
+    end
+    else
+        colorspace := 0;
     scan_pdf_box_spec; {scans pdf-box-spec to |pdf_last_pdf_box_spec|}
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
@@ -4753,7 +4792,7 @@ begin
         print (")");
         print_ln;
     end;
-    obj_ximage_data(k) := read_image(s, page, named, 
+    obj_ximage_data(k) := read_image(s, page, named, colorspace,
                                      pdf_option_pdf_minor_version, 
                                      pdf_option_always_use_pdfpagebox,
                                      pdf_option_pdf_inclusion_errorlevel);
@@ -4849,12 +4888,12 @@ begin
     else
         pdf_error("ext1", "action type missing");
     if pdf_action_type(p) = pdf_action_user then begin
-        call_func(scan_toks(false, true));
+        scan_pdf_ext_toks;
         pdf_action_user_tokens(p) := def_ref;
         return;
     end;
     if scan_keyword("file") then begin
-        call_func(scan_toks(false, true));
+        scan_pdf_ext_toks;
         pdf_action_file(p) := def_ref;
     end;
     if scan_keyword("page") then begin
@@ -4866,11 +4905,11 @@ begin
             pdf_error("ext1", "page number must be positive");
         pdf_action_id(p) := cur_val;
         pdf_action_named_id(p) := 0;
-        call_func(scan_toks(false, true));
+        scan_pdf_ext_toks;
         pdf_action_page_tokens(p) := def_ref;
     end
     else if scan_keyword("name") then begin
-        call_func(scan_toks(false, true));
+        scan_pdf_ext_toks;
         pdf_action_named_id(p) := 1;
         pdf_action_id(p) := def_ref;
     end
@@ -4912,7 +4951,7 @@ begin
     pdf_depth(tail) := depth(alt_rule);
     if (w = pdf_start_link_node) then begin
         if scan_keyword("attr") then begin
-            call_func(scan_toks(false, true));
+            scan_pdf_ext_toks;
             pdf_link_attr(tail) := def_ref;
         end
         else
@@ -4920,7 +4959,7 @@ begin
     end;
     if (w = pdf_thread_node) or (w = pdf_start_thread_node) then begin
         if scan_keyword("attr") then begin
-            call_func(scan_toks(false, true));
+            scan_pdf_ext_toks;
             pdf_thread_attr(tail) := def_ref;
         end
         else
@@ -4947,7 +4986,7 @@ begin
             k := pdf_new_objnum;
         new_annot_whatsit(pdf_annot_node, pdf_annot_node_size);
         pdf_annot_objnum(tail) := k;
-        call_func(scan_toks(false, true));
+        scan_pdf_ext_toks;
         pdf_annot_data(tail) := def_ref;
         pdf_last_annot := k;
     end
@@ -4999,7 +5038,7 @@ begin
     end
     else
         i := 0;
-    call_func(scan_toks(false, true));
+    scan_pdf_ext_toks;
     q := def_ref;
     pdf_new_obj(obj_type_others, 0);
     j := obj_ptr;
@@ -5098,7 +5137,7 @@ begin
         pdf_dest_named_id(tail) := 0;
     end
     else if scan_keyword("name") then begin
-        call_func(scan_toks(false, true));
+        scan_pdf_ext_toks;
         pdf_dest_id(tail) := def_ref;
         pdf_dest_named_id(tail) := 1;
     end
@@ -5166,7 +5205,7 @@ begin
         pdf_thread_named_id(tail) := 0;
     end
     else if scan_keyword("name") then begin
-        call_func(scan_toks(false, true));
+        scan_pdf_ext_toks;
         pdf_thread_id(tail) := def_ref;
         pdf_thread_named_id(tail) := 1;
     end
@@ -5227,14 +5266,14 @@ end;
 @ @<Implement \.{\\pdfinfo}@>=
 begin
     check_pdfoutput("\pdfinfo");
-    call_func(scan_toks(false, true));
+    scan_pdf_ext_toks;
     pdf_info_toks := concat_tokens(pdf_info_toks, def_ref);
 end
 
 @ @<Implement \.{\\pdfcatalog}@>=
 begin
     check_pdfoutput("\pdfcatalog");
-    call_func(scan_toks(false, true));
+    scan_pdf_ext_toks;
     pdf_catalog_toks := concat_tokens(pdf_catalog_toks, def_ref);
     if scan_keyword("openaction") then
         if pdf_catalog_openaction <> 0 then
@@ -5252,14 +5291,14 @@ end
 @ @<Implement \.{\\pdfnames}@>=
 begin
     check_pdfoutput("\pdfnames");
-    call_func(scan_toks(false, true));
+    scan_pdf_ext_toks;
     pdf_names_toks := concat_tokens(pdf_names_toks, def_ref);
 end
 
 @ @<Implement \.{\\pdftrailer}@>=
 begin
     check_pdfoutput("\pdftrailer");
-    call_func(scan_toks(false, true));
+    scan_pdf_ext_toks;
     pdf_trailer_toks := concat_tokens(pdf_trailer_toks, def_ref);
 end
 
@@ -5279,7 +5318,7 @@ begin
     pdf_check_vf(f);
     if not font_used[f] then
         pdf_init_font(f);
-    call_func(scan_toks(false, true));
+    scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
     k := str_start[s];
@@ -5304,14 +5343,14 @@ begin
     k := cur_val;
     if k = null_font then
         pdf_error("font", "invalid font identifier");
-    call_func(scan_toks(false, true));
+    scan_pdf_ext_toks;
     pdf_font_attr[k] := tokens_to_string(def_ref);
 end
 
 @ @<Implement \.{\\pdfmapfile}@>= 
 begin
     check_pdfoutput("\pdfmapfile");
-    call_func(scan_toks(false, true));
+    scan_pdf_ext_toks;
     pdfmapfile(def_ref);
     delete_token_ref(def_ref);
 end
@@ -5319,7 +5358,7 @@ end
 @ @<Implement \.{\\pdfmapline}@>=
 begin
     check_pdfoutput("\pdfmapline");
-    call_func(scan_toks(false, true));
+    scan_pdf_ext_toks;
     pdfmapline(def_ref);
     delete_token_ref(def_ref);
 end
