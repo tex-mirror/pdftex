@@ -59,8 +59,8 @@ extern void printversionandexit P3H(const_string, const_string, const_string);
 #define FCOUNT	100	/* maximum number of fonts */
 #define SHIFTS	100	/* maximum number of characters with special shifts */
 #define line_length 79	/* maximum output line length (must be at least 60) */
-#define Hprime	307	/* much bigger than max(chars/font,fonts/job) */
-#define MAXCHARS 256	/* character codes fall in the range 0..MAXCHARS-1 */
+#define Hprime	2459	/* much bigger than max(chars/font,fonts/job) */
+#define MAXCHARS 2048	/* character codes fall in the range 0..MAXCHARS-1 */
 #define LLENGTH 1024	/* one more than maximum line length for troff output */
 
 #define is_specchar(c)	(c<=2)	/* does charcode c identify a special char? */

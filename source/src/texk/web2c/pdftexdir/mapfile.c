@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#23 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#27 $
 */
 
 #include <math.h>
@@ -27,7 +27,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#23 $
 #include "avlstuff.h"
 
 static const char perforce_id[] =
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#23 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#27 $";
 
 #define FM_BUF_SIZE     1024
 
@@ -115,8 +115,7 @@ static fm_entry *new_fm_entry(void)
 
 static void delete_fm_entry(fm_entry * fm)
 {
-    if (fm->tfm_name != nontfm)
-        xfree(fm->tfm_name);
+    xfree(fm->tfm_name);
     xfree(fm->ps_name);
     xfree(fm->ff_name);
     xfree(fm->subset_tag);
@@ -167,8 +166,8 @@ boolean hasfmentry(internalfontnumber f)
 {
     if (pdffontmap[f] == NULL)
         pdffontmap[f] = fmlookup(f);
-    return pdffontmap[f] != NULL && 
-           pdffontmap[f] != (fmentryptr) dummy_fm_entry();
+    assert(pdffontmap[f] != NULL);
+    return pdffontmap[f] != (fmentryptr) dummy_fm_entry();
 }
 
 /**********************************************************************/
@@ -248,7 +247,7 @@ static int avl_do_entry(fm_entry * fp, int mode)
 
     /* handle tfm_name link */
 
-    if (fp->tfm_name != nontfm) {
+    if (strcmp(fp->tfm_name, nontfm) != 0) {
         p = (fm_entry *) avl_find(tfm_tree, fp);
         if (p != NULL) {
             if (mode == FM_DUPIGNORE) {
@@ -345,10 +344,7 @@ static void fm_scan_line(mapitem * mitem)
     r = fm_line;
     read_field(r, q, buf);
     fm_ptr = new_fm_entry();
-    if (strcmp(buf, nontfm) == 0)
-        fm_ptr->tfm_name = (char*)nontfm;  /* don't allocate mem for nontfm */
-    else
-        set_field(tfm_name);
+    set_field(tfm_name);
     if (*r == 10)
         goto done;
     p = r;
@@ -406,28 +402,42 @@ static void fm_scan_line(mapitem * mitem)
                 goto bad_line;
             }
             break;
-        default: /* font file or encoding specification */
-            a = b = 0;
-            if (*r == '<')
-                a = *r++;
-            if (*r == '<' || *r == '[')
-                b = *r++;
+        default: /* encoding or font file specification */
             read_field(r, q, buf);
-            /* encoding can take form '<[8r.enc' or '8r.enc' */
-            if (strlen(buf) > 4 && strcasecmp(strend(buf) - 4, ".enc") == 0)
-                fm_ptr->encoding = add_enc(buf);
-            else { 
-            /* subsetting:      '<cmr10.pfa' 
-             * nosubsetting:    '<<cmr10.pfa' 
-             * no embedding:    'cmr10.pfa' 
-             */
+            s = buf;
+            if (q > (buf + 4) && strcasecmp(q - 4, ".enc") == 0) {
+                /* encoding, formats: '8r.enc' or '<8r.enc' or '<[8r.enc' */
+                if (*s == '<') {
+                    s++;
+                    if (*s == '[')
+                        s++;
+                }
+                fm_ptr->encoding = add_enc(s);
+            } else {
+                /* fontfile, formats:
+                * subsetting:      '<cmr10.pfa' 
+                * no subsetting:   '<<cmr10.pfa' 
+                * no embedding:    'cmr10.pfa' 
+                * no embedding:    '!cmr10.pfa' (deprecated)
+                */
+                b = 0;
+                if ((a = *s) == '<') {
+                    s++;
+                    if ((b = *s) == '<')
+                        s++;
+                } else if (a == '!')
+                    s++;
+                if (*s == 0) {
+                    pdftex_warn("invalid entry for `%s': invalid font file name",
+                                fm_ptr->tfm_name);
+                    goto bad_line;
+                }
                 if (a == '<') {
                     set_included(fm_ptr);
-                    if (b == 0)
+                    if (b != '<')
                         set_subsetted(fm_ptr);
-                    /* otherwise b == '<' => nosubsetting */
-                } 
-                set_field(ff_name);
+                }
+                fm_ptr->ff_name = xstrdup(s);
             }
         }
     }
@@ -568,6 +578,8 @@ static fm_entry *mk_ex_fm(internalfontnumber f, fm_entry * basefm, int ex)
     if (fm->extend == 1000)
         fm->extend = 0;
     fm->tfm_name = xstrdup(makecstring(fontname[f]));
+    if (basefm->ps_name != NULL)
+        fm->ps_name = xstrdup(basefm->ps_name);
     fm->ff_name = xstrdup(basefm->ff_name);
     fm->ff_objnum = pdfnewobjnum();
     fm->tfm_num = f;
@@ -674,6 +686,18 @@ static boolean used_tfm(fm_entry *p)
 {
     internalfontnumber f;
     strnumber s;
+    ff_entry *ff;
+
+    /* check if the font file is not a TrueType font */
+    /* font replacement makes sense only for included Type1 files */
+    if (is_truetype(p) || !is_included(p))
+        return false;
+
+    /* check if the font file is available */
+    ff = check_ff_exist(p); 
+    if (ff->ff_path == NULL)
+        return false;
+
     /* check whether this font has been used */
     if (fontused[p->tfm_num])
         return true;
@@ -681,8 +705,7 @@ static boolean used_tfm(fm_entry *p)
 
     /* check whether we didn't find a loaded font yet,
      * and this font has been loaded */
-    if (loaded_tfm_found == NULL &&
-        strcmp(p->tfm_name, nontfm) != 0) {
+    if (loaded_tfm_found == NULL && strcmp(p->tfm_name, nontfm) != 0) {
         s = maketexstring(p->tfm_name);
         if ((f = tfmlookup(s, 0)) != getnullfont()) {
             loaded_tfm_found = p; 
@@ -730,7 +753,7 @@ static boolean used_tfm(fm_entry *p)
  * - the tfm has been loaded (but not used yet)
  * - the tfm can be loaded (but not loaded yet)
  * - the tfm is present in map files, but cannot be loaded. In this case a
- *   dummy tfm can be loaded instead, and warning should be written
+ *   dummy tfm can be loaded instead, and a warning should be written out
  */
 static fm_entry *lookup_ps_name(fm_entry *fm)
 {
@@ -785,7 +808,7 @@ static fm_entry *lookup_ps_name(fm_entry *fm)
         p2->type = p->type;
         p2->slant = p->slant;
         p2->extend = p->extend;
-        p2->tfm_name = (char*) nontfm;
+        p2->tfm_name = xstrdup(nontfm);
         p2->ps_name = xstrdup(p->ps_name);
         if (p->ff_name != NULL)
             p2->ff_name = xstrdup(p->ff_name);
@@ -883,7 +906,6 @@ fm_entry *lookup_fontmap(char *bname)
             pdfinitfont(i);
         return fm;
     }
-/**********************************************************************/
 /*
    The following code snipplet handles fonts with "Slant" and "Extend"
    name extensions in embedded PDF files, which don't yet have an
@@ -903,9 +925,11 @@ fm_entry *lookup_fontmap(char *bname)
 */
 
     tmpx.ps_name = s;
+    tmpx.tfm_name = NULL;
     tmpx.slant = 0;
     tmpx.extend = 0;
-    fm = (fm_entry *) avl_find(ps_tree, &tmpx);
+/*     fm = (fm_entry *) avl_find(ps_tree, &tmpx); */
+    fm = lookup_ps_name(&tmpx);
     if (fm != NULL) {
         if (is_truetype(fm) || !is_included(fm))
             return dummy_fm_entry();
@@ -918,7 +942,7 @@ fm_entry *lookup_fontmap(char *bname)
         fmx->type = fm->type;
         fmx->slant = tmp.slant;
         fmx->extend = tmp.extend;
-        fmx->tfm_name = (char*) nontfm;
+        fmx->tfm_name = xstrdup(nontfm);
         fmx->ps_name = xstrdup(s);
         fmx->ff_name = xstrdup(fm->ff_name);
         ai = avl_do_entry(fmx, FM_DUPIGNORE);
@@ -927,7 +951,6 @@ fm_entry *lookup_fontmap(char *bname)
         assert(fm != NULL);
         return fm;
     }
-/**********************************************************************/
     return dummy_fm_entry();
 }
 

@@ -84,14 +84,6 @@ TEXMF = {$HOMETEXMF,!!$TEXMFLOCAL,!!$TEXMFMAIN,!!$TEXMFDIST}
 % The system trees.  These are the trees that are shared by all the users.
 SYSTEXMF = $TEXMFLOCAL;$TEXMFMAIN;$TEXMFDIST
 
-% $progname: kpathsea 3.5.3 or later overwrites this at runtime.
-% To avoid empty expansions from binaries linked against an earlier
-% version of the library, we set $progname to something non-empty:
-progname = unsetprogname
-
-% similarly for $engine.
-engine = unsetengine
-
 % Where generated fonts may be written.  This tree is used when the sources
 % were found in a system tree and either that tree wasn't writable, or the
 % varfonts feature was enabled in MT_FEATURES in mktex.cnf.
@@ -146,7 +138,6 @@ TEXINPUTS.eplain  = .;$TEXMF/tex/{eplain,plain,generic,}//
 TEXINPUTS.ftex = .;$TEXMF/tex/{formate,plain,generic,}//
 TEXINPUTS.jadetex = .;$TEXMF/tex/{jadetex,plain,generic,}//
 TEXINPUTS.mex = .;$TEXMF/tex/{mex,plain,generic,}//
-TEXINPUTS.utf8mex = .;$TEXMF/tex/{mex,plain,generic,}//
 TEXINPUTS.texinfo = .;$TEXMF/tex/{texinfo,plain,generic,}//
 
 % LaTeX 2e specific macros are stored in latex/, macros that can only be
@@ -163,63 +154,54 @@ TEXINPUTS.latex209 = .;$TEXMF/tex/{latex209,generic,latex,}//
 TEXINPUTS.fontinst = .;$TEXMF/{tex,fonts/afm}//
 
 % MLTeX.
-TEXINPUTS.frlatex = .;$TEXMF/{mltex,tex}/{french,latex,generic,}//
-TEXINPUTS.frtex   = .;$TEXMF/{mltex,tex}/{french,plain,generic,}//
-TEXINPUTS.mllatex = .;$TEXMF/{mltex,tex}/{latex,generic,}//
-TEXINPUTS.mltex = .;$TEXMF/{mltex,tex}/{plain,generic,}//
+TEXINPUTS.frlatex = .;$TEXMF/tex/{french,latex,generic,}//
+TEXINPUTS.frtex   = .;$TEXMF/tex/{french,plain,generic,}//
+TEXINPUTS.mllatex = .;$TEXMF/tex/{latex,generic,}//
+TEXINPUTS.mltex = .;$TEXMF/tex/{plain,generic,}//
 
 % e-TeX.  This form of the input paths is borrowed from teTeX.  A certain
 % variant of TDS is assumed here, unaffected by the build variables.
-TEXINPUTS.elatex   = .;$TEXMF/{etex,tex}/{latex,generic,}//
-TEXINPUTS.etex     = .;$TEXMF/{etex,tex}/{plain,generic,}//
+TEXINPUTS.elatex   = .;$TEXMF/tex/{latex,generic,}//
+TEXINPUTS.etex     = .;$TEXMF/tex/{plain,generic,}//
 
 % pdfTeX.  This form of the input paths is borrowed from teTeX.  A certain
 % variant of TDS is assumed here, unaffected by the build variables.
-TEXINPUTS.pdfcslatex = .;$TEXMF/{pdftex,tex}/{cslatex,csplain,latex,generic,}//
-TEXINPUTS.pdfcsplain = .;$TEXMF/{pdftex,tex}/{csplain,plain,generic,}//
-TEXINPUTS.pdfjadetex = .;$TEXMF/{pdftex,tex}/{jadetex,plain,generic,}//
-TEXINPUTS.pdflatex = .;$TEXMF/{pdftex,tex}/{latex,generic,}//
-TEXINPUTS.pdfmex   = .;$TEXMF/{pdftex,tex}/{mex,plain,generic,}//
-TEXINPUTS.pdftex   = .;$TEXMF/{pdftex,tex}/{plain,generic,}//
-TEXINPUTS.pdfamstex = .;$TEXMF/{pdftex,tex}/{amstex,plain,generic,}//
-% The pdftexinfo entry is obsolete.
-TEXINPUTS.pdftexinfo = .;$TEXMF/{pdftex,tex}/{texinfo,plain,generic,}//
+TEXINPUTS.pdfcslatex = .;$TEXMF/tex/{cslatex,csplain,latex,generic,}//
+TEXINPUTS.pdfcsplain = .;$TEXMF/tex/{csplain,plain,generic,}//
+TEXINPUTS.pdfjadetex = .;$TEXMF/tex/{jadetex,plain,generic,}//
+TEXINPUTS.pdflatex = .;$TEXMF/tex/{latex,generic,}//
+TEXINPUTS.pdfmex   = .;$TEXMF/tex/{mex,plain,generic,}//
+TEXINPUTS.utf8mex   = .;$TEXMF/tex/{mex,plain,generic,}//
+TEXINPUTS.pdftex   = .;$TEXMF/tex/{plain,generic,}//
+TEXINPUTS.pdftexinfo = .;$TEXMF/tex/{texinfo,plain,generic,}//
+TEXINPUTS.pdfamstex = .;$TEXMF/tex/{amstex,plain,generic,}//
 
 % pdfeTeX.
-TEXINPUTS.pdfelatex = .;$TEXMF/{pdfetex,pdftex,etex,tex}/{latex,generic,}//
-TEXINPUTS.pdfetex   = .;$TEXMF/{pdfetex,pdftex,etex,tex}/{plain,generic,}//
+TEXINPUTS.pdfelatex = .;$TEXMF/tex/{latex,generic,}//
+TEXINPUTS.pdfetex   = .;$TEXMF/tex/{plain,generic,}//
 
-% pdfxTeX.
-TEXINPUTS.pdfxlatex = .;$TEXMF/{pdfxtex,pdftex,etex,tex}/{latex,generic,}//
-TEXINPUTS.pdfxtex   = .;$TEXMF/{pdfxtex,pdftex,etex,tex}/{plain,generic,}//
-
-% XeTeX
-TEXINPUTS.xelatex = .;$TEXMF/{xetex,tex}/{latex,generic,}//
-TEXINPUTS.xetex   = .;$TEXMF/{xetex,tex}/{plain,generic,}//
-OTFFONTS = .;$TEXMF/fonts/otf/{xetex,}//
-
-% Omega / e-Omega (unused) / Aleph
-TEXINPUTS.lambda = .;$TEXMF/{omega,tex}/{lambda,latex,generic,}//
-TEXINPUTS.omega = .;$TEXMF/{omega,tex}/{plain,generic,}//
-TEXINPUTS.elambda = .;$TEXMF/{eomega,omega,etex,tex}/{lambda,latex,generic,}//
-TEXINPUTS.eomega = .;$TEXMF/{eomega,omega,etex,tex}/{plain,generic,}//
-% alambda is obsolete -> use lamed
-TEXINPUTS.alambda = .;$TEXMF/{aleph,eomega,omega,etex,tex}/{lambda,latex,generic,}//
-TEXINPUTS.lamed = .;$TEXMF/{aleph,eomega,omega,etex,tex}/{lambda,latex,generic,}//
-TEXINPUTS.aleph = .;$TEXMF/{aleph,eomega,omega,etex,tex}/{plain,generic,}//
+% Omega / Aleph
+TEXINPUTS.lamed = .;$TEXMF/tex/{lamed,lambda,latex,generic,}//
+TEXINPUTS.lambda = .;$TEXMF/tex/{lambda,latex,generic,}//
+TEXINPUTS.omega = .;$TEXMF/tex/{plain,generic,}//
+TEXINPUTS.aleph = .;$TEXMF/tex/{plain,generic,}//
 
 % Context macros by Hans Hagen:
-TEXINPUTS.context = .;$TEXMF/{pdftex,etex,tex}/{context,plain,generic,}//
+TEXINPUTS.context = .;$TEXMF/tex/{context,plain,generic,}//
 
 % odd formats  needing their own paths
 TEXINPUTS.lamstex  = .;$TEXMF/tex/{lamstex,plain,generic,}//
 TEXINPUTS.lollipop = .;$TEXMF/tex/{lollipop,plain,generic,}//
 TEXINPUTS.mex-pl = .;$TEXMF/tex/{mex,plain,generic,}//
 TEXINPUTS.platex-pl  = .;$TEXMF/tex/{platex,latex,generic,}//
-TEXINPUTS.pdfplatex = .;$TEXMF/{pdftex,tex}/{platex,latex,generic,}//
-TEXINPUTS.pdfmex-pl = .;$TEXMF/{pdftex,tex}/{mex,plain,generic,}//
-TEXINPUTS.pdfemex   = .;$TEXMF/{pdfetex,pdftex,etex,tex}/{mex,plain,generic,}//
-TEXINPUTS.pdfemex-pl = .;$TEXMF/{pdfetex,pdftex,etex,tex}/{mex,plain,generic,}//
+TEXINPUTS.pdfplatex = .;$TEXMF/tex/{platex,latex,generic,}//
+TEXINPUTS.pdfmex-pl = .;$TEXMF/tex/{mex,plain,generic,}//
+TEXINPUTS.pdfemex   = .;$TEXMF/tex/{mex,plain,generic,}//
+TEXINPUTS.pdfemex-pl = .;$TEXMF/tex/{mex,plain,generic,}//
+
+% XeTeX
+TEXINPUTS.xelatex = .;$TEXMF/tex/{latex,generic,}//
+TEXINPUTS.xetex   = .;$TEXMF/tex/{plain,generic,}//
 
 % Earlier entries override later ones, so put this last.
 TEXINPUTS = .;$TEXMF/tex/{$progname,generic,}//
@@ -232,12 +214,12 @@ MPINPUTS = .;$TEXMF/metapost//
 % and string pools (.pool) for ini{tex,mf,mp}.  It is silly that we have six
 % paths and directories here (they all resolve to a single place by default),
 % but historically ...
-TEXFORMATS = .;$TEXMF/web2c/{$engine,}//
-MFBASES = .;$TEXMF/web2c/{$engine,}//
-MPMEMS = .;$TEXMF/web2c/{$engine,}//
-TEXPOOL = .;$TEXMF/web2c/{$engine,}//
-MFPOOL = .;$TEXMF/web2c/{$engine,}//
-MPPOOL = .;$TEXMF/web2c/{$engine,}//
+TEXFORMATS = .;$TEXMF/web2c
+MFBASES = .;$TEXMF/web2c
+MPMEMS = .;$TEXMF/web2c
+TEXPOOL = .;$TEXMF/web2c
+MFPOOL = .;$TEXMF/web2c
+MPPOOL = .;$TEXMF/web2c
 
 % Device-independent font metric files.
 VFFONTS = .;$TEXMF/fonts/vf//
@@ -269,8 +251,8 @@ PSHEADERS.XDvi  = .:$TEXMF/%q{dvips,fonts/type1}//
 TEXPICTS.XDvi   = .:$TEXMF/%q{dvips,tex}//
 
 % BibTeX bibliographies and style files.
-BIBINPUTS = .;$TEXMF/bibtex/{bib,}//
-BSTINPUTS = .;$TEXMF/bibtex/{bst,}//
+BIBINPUTS = .;$TEXMF/bibtex/bib//
+BSTINPUTS = .;$TEXMF/bibtex/bst//
 
 % MFT style files.
 MFTINPUTS = .;$TEXMF/mft//
@@ -370,6 +352,10 @@ TEXMFSCRIPTS = $TEXMF/scripts//
 % 
 TEXMFCNF = {$SELFAUTOLOC,$SELFAUTODIR,$SELFAUTOPARENT}{,{/share,}/texmf{-local,}/web2c};$TETEXDIR;$TEXMF/web2c;@web2c@
 
+# $progname: kpathsea v. 3.5.3 or later overwrites this at runtime. To
+# avoid empty expansions from binaries linked against an earlier
+# version of the library, we set $progname to something non-empty:
+progname = unset
 
 
 %  Part 2: Non-path options.

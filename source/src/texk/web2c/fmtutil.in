@@ -34,7 +34,7 @@
 # initex (or another "ini"-engine) on.
 
 # metafont and metapost:
-mf		mf		-		-translate-file=cp227.tcx mf.ini
+mf		mf-nowin	-		-translate-file=cp227.tcx mf.ini
 mpost		mpost		-		-translate-file=cp227.tcx mpost.mp
 metafun		mpost		-		-translate-file=cp227.tcx metafun.mp
 
@@ -53,7 +53,8 @@ pdftex		pdfetex		-	-translate-file=cp227.tcx *pdftex.ini
 pdflatex	pdfetex		language.dat	-translate-file=cp227.tcx *pdflatex.ini
 pdfetex		pdfetex		language.def	-translate-file=cp227.tcx *pdfetex.ini
 @OMEGA@omega		omega		-	omega.ini
-@ALEPH@lambda		aleph		language.dat	lambda.ini
+@OMEGA@lambda		omega		language.dat	lambda.ini
+@ALEPH@lamed		aleph		language.dat	*lambda.ini
 
 # The amstex format:
 

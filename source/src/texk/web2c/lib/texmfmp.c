@@ -150,6 +150,10 @@ static string get_input_file_name P1H(void);
 static int eightbitp;
 #endif /* Omega || eOmega || Aleph */
 
+#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+char *ptexbanner;
+#endif
+
 #ifdef MP
 /* name of TeX program to pass to makempx */
 static string mpost_tex_program = "";
@@ -169,6 +173,10 @@ maininit P2C(int, ac, string *, av)
 
   /* Must be initialized before options are parsed.  */
   interactionoption = 4;
+
+#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+  ptexbanner = BANNER;
+#endif
 
   /* If the user says --help or --version, we need to notice early.  And
      since we want the --ini option, have to do it before getting into
@@ -229,6 +237,10 @@ maininit P2C(int, ac, string *, av)
     } else if (FILESTRCASEEQ (kpse_program_name, VIR_PROGRAM)) {
       virversion = true;
 #ifdef TeX
+    } else if (FILESTRCASEEQ (kpse_program_name, "initex")) {
+      iniversion = true;
+    } else if (FILESTRCASEEQ (kpse_program_name, "virtex")) {
+      virversion = true;
 #if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
     } else if (FILESTRCASEEQ (kpse_program_name, "mltex")) {
       mltexp = true;

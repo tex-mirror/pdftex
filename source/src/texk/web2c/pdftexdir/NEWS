@@ -1,4 +1,22 @@
 ------------------------------------------------
+pdfTeX 3.141592-1.20b was released on 2004-12-22
+------------------------------------------------
+- Fixed some minor bugs, mostly with hz
+
+- The info line "output format initialized to PDF/DVI" isn't shown anymore, as
+  this info wasn't reliable (bug 112).
+
+- Now the PDF-related statistics (PDF objects...) in the .log file is only
+  shown in PDF output mode. It start with a line "PDF statistics:".
+
+- \pdfimageresolution is not limited to 2400 [dpi] anymore, can now be between
+  0 and 65535 [dpi].
+
+- pdfTeX uses xpdf 3.00pl2
+
+- pdfTeX uses libpng 1.2.8, which fixes some png-related bugs.
+
+------------------------------------------------
 pdfTeX 3.141592-1.20a was released on 2004-09-06
 ------------------------------------------------
 
@@ -281,5 +299,5 @@ pdfTeX 3.14159-1.00a-pretest-20010806 was released on 2001-08-06
 pdfTeX 3.14159-1.00a-pretest-20010804 was released on 2001-08-04
 ----------------------------------------------------------------
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#68 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#77 $
 // vim: tw=79:ts=2:expandtab:autoindent

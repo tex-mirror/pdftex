@@ -1,3 +1,22 @@
+2004-12-19  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etex.mk (etexextra.c): Depends on etexdir/etexextra.h.
+
+	* etex.mk (etex-check): Add TEXMFCNF=../kpathsea to the mltex
+	test, so the right files are found when the installation is not
+	yet done.  From Peter Breitenlohner <peb@mppmu.mpg.de>.
+
+2004-10-12  Peter Breitenlohner <peb@mppmu.mpg.de>
+
+	* etex.ch: Fixed a bug in the revised glue rounding code
+	(detected by Tigran Aivazian <tigran@aivazian.fsnet.co.uk>).
+	Version 2.2, dated October 12, 2004.
+			
+2004-09-15  Peter Breitenlohner <peb@mppmu.mpg.de>
+
+	* etex.ch: Fixed a typo in TeX text, found by Giuseppe
+	Bilotta <bilotta78@hotpop.com>.
+
 2004-09-06  Peter Breitenlohner <peb@mppmu.mpg.de>
 
 	* etex.ch: Incorporated register recycling bug fix from Bernd
@@ -11,8 +30,8 @@
 
 2004-08-26  Peter Breitenlohner <peb@mppmu.mpg.de>
 
-	* etex.mk: etex.mk (etrip): Use etex with "--progname=einitex
-	--ini" or "--progname=etex".
+	* etex.mk (etrip): Use etex with "--progname=einitex --ini" or
+	"--progname=etex".
 
 2004-08-26  Olaf Weber  <olaf@infovore.xs4all.nl>
 

@@ -17,16 +17,14 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeenc.c#9 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeenc.c#10 $
 */
 
 #include "ptexlib.h"
+#include "avlstuff.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeenc.c#9 $";
-
-/* define enc_ptr, enc_array & enc_limit */
-define_array(enc);   
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeenc.c#10 $";
 
 void read_enc(enc_entry *e)
 {
@@ -80,30 +78,73 @@ void write_enc(char **glyph_names, enc_entry *e, integer eobjnum)
     pdfenddict();
 }
 
-enc_entry *add_enc(char *s) /* built-in encodings have s == NULL */
+/**********************************************************************/
+/* All encoding entries go into linked list. The named ones (s != NULL)
+are also registered into AVL tree for quicker search. */
+
+typedef struct encstruct_ {
+    enc_entry entry;
+    struct encstruct_ *next;
+} encstruct;
+
+static encstruct *epstart = NULL;	/* start of linked list */
+
+/* handle named encodings through AVL tree */
+
+struct avl_table *enc_tree = NULL;
+
+/* AVL sort enc_entry into enc_tree by name */
+
+static int comp_enc_entry(const void *pa, const void *pb, void *p)
 {
+    return strcmp(((const enc_entry *) pa)->name,
+		  ((const enc_entry *) pb)->name);
+}
+
+enc_entry *add_enc(char *s)
+{				/* built-in encodings have s == NULL */
     int i;
-    enc_entry *e;
-    if (enc_array != NULL && s != NULL) {
-        for (e = enc_array; e < enc_ptr; ++e)
-            if (e->name != NULL) /* don't check for built-in encodings */
-                if  (strcmp(s, e->name) == 0)
-                    return e;
+    enc_entry *enc_ptr, etmp;
+    static encstruct *ep;	/* pointer into linked list of encodings */
+    void **aa;
+
+    if (enc_tree == NULL) {
+	enc_tree = avl_create(comp_enc_entry, NULL, &avl_xallocator);
+	assert(enc_tree != NULL);
     }
-    alloc_array(enc, 1, SMALL_ARRAY_SIZE);
-    if (s != NULL)
-        enc_ptr->name = xstrdup(s);
-    else
-        enc_ptr->name = NULL;
+    if (s != NULL) {
+	etmp.name = s;
+	enc_ptr = (enc_entry *) avl_find(enc_tree, &etmp);
+	if (enc_ptr != NULL)	/* encoding already registered */
+	    return enc_ptr;
+    }
+    if (epstart == NULL) {
+	epstart = xtalloc(1, encstruct);
+	ep = epstart;
+    } else {
+	ep->next = xtalloc(1, encstruct);
+	ep = ep->next;
+    }
+    ep->next = NULL;
+    enc_ptr = &(ep->entry);
+    if (s != NULL) {
+	enc_ptr->name = xstrdup(s);
+	aa = avl_probe(enc_tree, enc_ptr);
+	assert(aa != NULL);
+    } else
+	enc_ptr->name = NULL;
     enc_ptr->loaded = false;
     enc_ptr->updated = false;
     enc_ptr->firstfont = getnullfont();
     enc_ptr->objnum = 0;
     enc_ptr->glyph_names = xtalloc(MAX_CHAR_CODE + 1, char *);
     for (i = 0; i <= MAX_CHAR_CODE; i++)
-        enc_ptr->glyph_names[i] = (char*) notdef;
-    return enc_ptr++;
+	enc_ptr->glyph_names[i] = (char *) notdef;
+
+    return enc_ptr;
 }
+
+/**********************************************************************/
 
 /* get encoding for map entry fm. When encoding vector is not given, try to
  * get it from T1 font file, in this case t1_read_enc sets the font being
@@ -180,18 +221,28 @@ void setcharmap(internalfontnumber f)
     }
 }
 
+/**********************************************************************/
+/* cleaning up... */
+
 void enc_free()
 {
-    enc_entry *e;
     int k;
-    for (e = enc_array; e < enc_ptr; e++) {
-        xfree(e->name);
-        if (e->loaded) { /* encoding has been loaded */
-            for (k = 0; k <= MAX_CHAR_CODE; k++)
-                if (e->glyph_names[k] != notdef)
-                    xfree(e->glyph_names[k]);
-        }
-        xfree(e->glyph_names);
+    encstruct *p, *pn;
+    enc_entry *e;
+
+    for (p = epstart; p != NULL; p = pn) {
+	e = &(p->entry);
+	pn = p->next;
+	xfree(e->name);
+	if (e->loaded)		/* encoding has been loaded */
+	    for (k = 0; k <= MAX_CHAR_CODE; k++)
+		if (e->glyph_names[k] != notdef)
+		    xfree(e->glyph_names[k]);
+	xfree(e->glyph_names);
+	xfree(p);
     }
-    xfree(enc_array);
+    if (enc_tree != NULL)
+	avl_destroy(enc_tree, NULL);
 }
+
+/**********************************************************************/

@@ -1,5 +1,5 @@
 # Makefile for web2c --kb@mail.tug.org. Public domain.
-# $Id: //depot/Build/source.development/TeX/texk/web2c/Makefile.in#60 $
+# $Id: //depot/Build/source.development/TeX/texk/web2c/Makefile.in#61 $
 version = @WEB2CVERSION@
 
 # This makefile uses static rules with many targets (to be compatible to
@@ -16,7 +16,7 @@ efmts = latex.fmt
 pdffmts = pdfolatex.fmt
 pdfefmts = pdflatex.fmt
 pdfxfmts = pdfxlatex.fmt
-afmts = alambda.fmt
+afmts = lamed.fmt
 ofmts = lambda.fmt
 eofmts = elambda.fmt
 bases = # I do not recommend building cmmf.base.
@@ -105,7 +105,7 @@ dumpenv = TEXMFCNF=../kpathsea
 #.SUFFIXES: .p .c .ch .p
 #.p.c: # really depends on $(web2c_programs), and generates .h.
 #	$(web2c) $*
-#.ch.p: # really depends on ./tangle; for mf/mp/tex, also generates .pool
+#.ch.p: # really depends on tangle; for mf/mp/tex, also generates .pool
 #	./tangle $(srcdir)/$*.web $<
 
 # These definitions have to come before the rules that expand them.
@@ -137,7 +137,7 @@ check: bibtex-check
 bibtex-check: bibtex
 	test -f tests/exampl.aux || \
 	  cp $(srcdir)/tests/exampl.aux tests/exampl.aux
-	TEXMFCNF=../kpathsea/texmf.cnf \
+	TEXMFCNF=../kpathsea \
 	  BSTINPUTS=$(srcdir)/tests \
 	  BIBINPUTS=$(srcdir)/tests \
 	  ./bibtex tests/exampl
@@ -177,7 +177,8 @@ dvicopy.p: tangle dvicopy.web dvicopy.ch
 	$(tangle) dvicopy dvicopy
 check: dvicopy-check
 dvicopy-check: dvicopy
-	./dvicopy $(srcdir)/tests/story tests/xstory.dvi
+	TEXMFCNF=../kpathsea \
+	  ./dvicopy $(srcdir)/tests/story tests/xstory.dvi
 # Redirect stderr so the terminal output will end up in the log file.
 	(TFMFONTS=$(srcdir)/tests VFFONTS=$(srcdir)/tests ./dvicopy \
 	  <$(srcdir)/tests/pplr.dvi \
@@ -196,7 +197,8 @@ dvitomp.p: tangle dvitomp.web dvitomp.ch
 	$(tangle) dvitomp dvitomp
 check: dvitomp-check
 dvitomp-check: dvitomp
-	./dvitomp $(srcdir)/tests/story.dvi tests/xstory.mpx
+	TEXMFCNF=../kpathsea \
+	  ./dvitomp $(srcdir)/tests/story.dvi tests/xstory.mpx
 	TFMFONTS=$(srcdir)/tests VFFONTS=$(srcdir)/tests: \
 	  ./dvitomp $(srcdir)/tests/ptmr 
 	mv ptmr.mpx tests/xptmr.mpx
@@ -433,7 +435,7 @@ weave-clean:
 	rm -f weave.o weave.c weave.h weave.p
 	rm -f pooltype.tex
 
-
+# 
 # Defines that are common to the texmf programs.
 
 triptrap: trip trap mptrap
@@ -441,7 +443,7 @@ testdir = $(srcdir)/triptrap
 testenv = TEXMFCNF=$(testdir)
 dvitype_args = -output-level=2 -dpi=72.27 -page-start='*.*.*.*.*.*.*.*.*.*'
 
-
+# 
 # Metafont
 mf_c = mfini.c mf0.c mf1.c mf2.c
 mf_o = mfini.o mf0.o mf1.o mf2.o mfextra.o
@@ -498,7 +500,7 @@ trap-clean:
 	rm -f mftrapin.fot mftrapin.log
 	rm -f mftrap.fot mftrap.log mftrap.tfm
 	rm -f mftrap.pl trap.72270gf trap.typ
-
+# 
 # MetaPost
 mp_c = mpini.c mp0.c mp1.c mp2.c
 mp_o = mpini.o mp0.o mp1.o mp2.o mpextra.o
@@ -513,7 +515,8 @@ mp.p mp.pool: tangle mp.web mp.ch
 check: mpost-check
 mpost-check: mptrap mpost.mem $(mpware)
 	./mpost --progname=mpost '&./mpost \tracingstats:=1; end.'
-	MAKEMPX_BINDIR=`pwd`:`pwd`/mpware MPXCOMMAND=mpware/makempx \
+	TEXMFCNF=../kpathsea \
+	  MAKEMPX_BINDIR=`pwd`:`pwd`/mpware MPXCOMMAND=mpware/makempx \
 	  ./mpost --progname=mpost $(srcdir)/tests/mptest
 	./mpost --progname=mpost $(srcdir)/tests/one.two
 	./mpost --progname=mpost $(srcdir)/tests/uno.dos
@@ -567,7 +570,7 @@ mptrap-clean:
 	rm -f trap.105 trap.106 trap.107 trap.108 trap.109 trap.148
 	rm -f trap.149 trap.150 trap.151 trap.197 trap.200
 	rm -f mptrap.pl
-
+# 
 # TeX
 tex_c = texini.c tex0.c tex1.c tex2.c
 tex_o = texini.o tex0.o tex1.o tex2.o texextra.o
@@ -594,7 +597,8 @@ tex-check: trip tex.fmt
 	./tex --progname=tex $(srcdir)/tests/just.texi && ls -l just.log
 	-./tex --progname=tex $(srcdir)/tests/batch.tex
 	./tex --progname=tex --shell $(srcdir)/tests/write18 | grep echo
-	./tex --mltex --progname=initex --ini $(srcdir)/tests/mltextst
+	TEXMFCNF=../kpathsea \
+	  ./tex --mltex --progname=initex --ini $(srcdir)/tests/mltextst
 	-./tex </dev/null
 	-PATH=`pwd`:$(kpathsea_dir):$(kpathsea_srcdir):$$PATH \
 	  WEB2C=$(kpathsea_srcdir) TMPDIR=.. \
@@ -632,10 +636,10 @@ trip-clean:
 	rm -f trip.tfm trip.pl trip.tex trip.fmt tripin.fot tripin.log
 	rm -f trip.fot trip.log trip.dvi trip.typ tripos.tex 8terminal.tex
 	rm -rf tfm
-
+# 
 # Helper makefile fragment for pdf*tex.
 ac_include pdftexdir/pdftexlib.mk
-
+# 
 # Makefile fragments:
 ac_include etexdir/etex.mk
 ac_include omegadir/omega.mk
@@ -643,7 +647,7 @@ ac_include alephdir/aleph.mk
 ac_include pdftexdir/pdftex.mk
 ac_include pdfetexdir/pdfetex.mk
 ac_include pdfxtexdir/pdfxtex.mk
-
+# 
 # Common
 programs = bibtex ctangle ctie cweave dvicopy dvitomp dvitype gftodvi gftopk \
  gftype mft $(odvicopy) $(odvitype) $(otangle) patgen pktogf pktype pltotf \
@@ -673,8 +677,9 @@ tangle.c tangle.h: tangle.p
 	$(web2c) tangle
 # tangle.p is a special case, since it is needed to compile itself.  We
 # convert and compile the (distributed) tangleboot.p to make a tangle
-# which we use to make the other programs.
-tangle.p: $(TANGLEBOOT) tangle.web tangle.ch
+# which we use to make the other programs.  We depend on tangleboot, even
+# though we might not use it.
+tangle.p: tangleboot tangle.web tangle.ch
 	WEBINPUTS=$(srcdir) $(TANGLEBOOT) tangle tangle
 tangle.web:
 	@echo "You seem to be missing tangle.web, perhaps because you" >&2
@@ -723,9 +728,9 @@ ctangle: ctangle.o cweb.o
 	$(kpathsea_link) ctangle.o cweb.o $(LOADLIBES)
 	$(MAKE) $(common_makeargs) ctangleboot.c cwebboot.c
 # ctangle.c is a special case, since it is needed to compile itself.
-ctangle.c: $(CTANGLEBOOT) cwebdir/ctangle.w cwebdir/ctang-w2c.ch
+ctangle.c: ctangleboot cwebdir/ctangle.w cwebdir/ctang-w2c.ch
 	CWEBINPUTS=$(srcdir)/cwebdir $(CTANGLEBOOT) ctangle ctang-w2c
-cweb.c: $(CTANGLEBOOT) cwebdir/common.w cwebdir/comm-w2c.ch
+cweb.c: ctangleboot cwebdir/common.w cwebdir/comm-w2c.ch
 	CWEBINPUTS=$(srcdir)/cwebdir $(CTANGLEBOOT) common comm-w2c cweb.c
 clean:: ctangle-clean
 clean:: cweb-clean
@@ -981,7 +986,6 @@ install-data:: $(web2cdir)
 	cd man && $(MAKE) $(install_makeargs) install-data
 	$(INSTALL_DATA) $(srcdir)/tiedir/tie.1 $(man1dir)/tie.$(manext)
 	$(INSTALL_DATA) $(srcdir)/ctiedir/ctie.1 $(man1dir)/ctie.$(manext)
-	$(INSTALL_DATA) $(srcdir)/cwebdir/cweb.1 $(man1dir)/cweb.$(manext)
 	$(INSTALL_DATA) fmtutil.cnf $(web2cdir)/fmtutil.cnf
 
 # The distribution comes with up-to-date .info* files,
@@ -1187,6 +1191,8 @@ manpages:
 ac_include ../make/dist.mk
 
 ac_include ../make/config.mk
+
+@MAINT@$(srcdir)/configure: $(srcdir)/withenable.ac
 
 # 
 

@@ -1,6 +1,6 @@
 m4_divert(-1)m4_dnl
 =======================================================================
-$Id: //depot/Build/source.development/TeX/texk/web2c/man/pdftexman.m4#1 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/man/pdftexman.m4#2 $
 
 Common man page for pdftex and pdfetex, to be preprocessed by GNU m4:
 

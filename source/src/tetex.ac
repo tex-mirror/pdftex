@@ -17,8 +17,8 @@ export with_mktexfmt_default
 if test "x$enable_multiplatform" = xyes \
   && test "x$bindir" = 'x${exec_prefix}/bin'
 then
-  enable_multiplatform=yes; export enable_multiplatform
   bindir="$bindir/$host";
+  ac_configure_args="$ac_configure_args --bindir=$bindir"
 fi
 test "${enable_nls+set}" = set || { enable_nls=no; export enable_nls; }
 

@@ -24,11 +24,6 @@ mf, mf-nowin, inimf, virmf \- Metafont, a language for font and logo design
 .RI [ commands ]
 .\"=====================================================================
 .SH DESCRIPTION
-This manual page is not meant to be exhaustive.  The complete
-documentation for this version of \*(TX can be found in the info file
-or manual
-.IR "Web2C: A TeX implementation" .
-.PP
 \*(MF reads the program in the specified files
 and outputs font rasters (in
 .I gf
@@ -597,6 +592,17 @@ The file of
 .IR mode_def s
 for your site's various printers
 .\"=====================================================================
+.SH NOTES
+This manual page is not meant to be exhaustive.  The complete
+documentation for this version of \*(MF can be found in the info manual
+.IR "Web2C: A TeX implementation" .
+.\"=====================================================================
+.SH BUGS
+On January 4, 1986 the ``final'' bug in \*(MF was discovered
+and removed. If an error still lurks in the code, Donald E. Knuth promises to
+pay a finder's fee which doubles every year to the first person who finds
+it.  Happy hunting.
+.\"=====================================================================
 .SH "SUGGESTED READING"
 Donald E. Knuth,
 .I "The \*(MF\^book"
@@ -633,12 +639,6 @@ you see everywhere, especially those of your own design.''
 .BR mft (1),
 .BR pltotf (1),
 .BR tftopl (1).
-.\"=====================================================================
-.SH BUGS
-On January 4, 1986 the ``final'' bug in \*(MF was discovered
-and removed. If an error still lurks in the code, Donald E. Knuth promises to
-pay a finder's fee which doubles every year to the first person who finds
-it.  Happy hunting.
 .\"=====================================================================
 .SH AUTHORS
 \*(MF was designed by Donald E. Knuth, who implemented it

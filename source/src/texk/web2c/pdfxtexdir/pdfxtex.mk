@@ -19,7 +19,7 @@ pdfxtex: pdftexd.h $(pdfxtex_o) $(pdfxtexextra_o) $(pdftexlibsdep)
 # C file dependencies.
 $(pdfxtex_c) pdfxtexcoerce.h pdfxtexd.h: pdfxtex.p $(web2c_texmf)
 	$(web2c) pdfxtex
-pdfxtexextra.c: lib/texmfmp.c
+pdfxtexextra.c: pdfxtexdir/pdfxtexextra.h lib/texmfmp.c
 	sed s/TEX-OR-MF-OR-MP/pdfxtex/ $(srcdir)/lib/texmfmp.c >$@
 pdfxtexdir/pdfxtexextra.h: pdfxtexdir/pdfxtexextra.in pdftexdir/pdftex.version etexdir/etex.version
 	sed -e s/PDFTEX-VERSION/`cat pdftexdir/pdftex.version`/ \
@@ -92,7 +92,7 @@ pdfxlatex.fmt: pdfxtex
 #	$(dumpenv) $(MAKE) progname=pdflatex files="latex.ltx" prereq-check
 #	$(dumpenv) ./pdfxtex --progname=pdflatex --jobname=pdflatex --ini \*\\pdfoutput=1\\input latex.ltx </dev/null
 
-
+# 
 # Installation.
 install-pdfxtex: install-pdfxtex-exec install-pdfxtex-data
 install-pdfxtex-exec: install-pdfxtex-links

@@ -23,13 +23,25 @@ tex, virtex, initex \- text formatting and typesetting
 .SH SYNOPSIS
 .B tex
 .RI [ options ]
-.RI [ commands ]
+.RI [\fB& format ]
+.RI [ file [ .tex ]\ |\ [\fB\e commands ]]
 .\"=====================================================================
 .SH DESCRIPTION
-This manual page is not meant to be exhaustive.  The complete
-documentation for this version of \*(TX can be found in the info file
-or manual
-.IR "Web2C: A TeX implementation" .
+Run the \*(TX typesetter on
+.IR file ,
+usually creating
+.IR file.dvi .
+Instead of a filename, a set of \*(TX commands can be given, the first
+of which must start with a backslash.
+With a 
+.BI & format
+argument \*(TX uses a different set of precompiled commands,
+contained in
+.IR format.fmt ;
+it is usually better to use the
+.B -fmt
+.I format
+option instead.
 .PP
 \*(TX
 formats the interspersed text and commands contained in the named
@@ -79,9 +91,7 @@ Other formats that are often available include
 and
 .IR amstex .
 .PP
-The
-.I commands
-given on the command line to the
+The non-option command line arguments to the
 \*(TX
 program are passed to it as the first input line.  (But it is often
 easier to type extended arguments as the first input line, since UNIX
@@ -461,6 +471,11 @@ Predigested \*(TX format (.\|fmt) files.
 .I $TEXMFMAIN/tex/plain/base/plain.tex
 The basic macro package described in the \*(OXbook.
 .br
+.\"=====================================================================
+.SH NOTES
+This manual page is not meant to be exhaustive.  The complete
+documentation for this version of \*(TX can be found in the info manual
+.IR "Web2C: A TeX implementation" .
 .\"=====================================================================
 .SH BUGS
 This version of \*(TX implements a number of optional extensions.

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#49 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#50 $
 */
 
 #include <stdlib.h>
@@ -44,10 +44,9 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#49 $
 #include "Error.h"
 
 #include "epdf.h"
-#include "avl.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#49 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#50 $";
 
 /* we avoid reading all necessary kpathsea headers, but we need xstrdup */
 #ifdef __cplusplus

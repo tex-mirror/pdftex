@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#19 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#20 $
 */
 
 #include "ptexlib.h"
@@ -25,17 +25,17 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#19 $
 #include "md5.h"
 #include <kpathsea/c-vararg.h>
 #include <kpathsea/c-proto.h>
-#include "pdftexextra.h" /* define BANNER */
 #include <time.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#19 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#20 $";
 
 char *cur_file_name = NULL;
 strnumber last_tex_string;
 static char print_buf[PRINTF_BUF_SIZE];
 static char *jobname_cstr = NULL;
 static char *job_id_string = NULL;
+extern string ptexbanner; /* from web2c/lib/texmfmp.c */
 extern string versionstring; /* from web2c/lib/version.c */         
 extern KPSEDLL string kpathsea_version_string; /* from kpathsea/version.c */
 
@@ -266,12 +266,13 @@ void setjobid(int year, int month, int day, int time, int pdftexversion, int pdf
     s = xtalloc(SMALL_BUF_SIZE + 
                 strlen(name_string) + 
                 strlen(format_string) + 
-                strlen(BANNER) + 
+                strlen(ptexbanner) + 
                 strlen(versionstring) + 
                 strlen(kpathsea_version_string), char);
-    sprintf(s, "%.4d/%.2d/%.2d %.2d:%.2d %s %s %s %s %s",
+    /* The Web2c version string starts with a space.  */
+    sprintf(s, "%.4d/%.2d/%.2d %.2d:%.2d %s %s %s%s %s",
             year, month, day, time/60, time%60, 
-            name_string, format_string, BANNER, 
+            name_string, format_string, ptexbanner, 
             versionstring, kpathsea_version_string);
     job_id_string = xstrdup(s);
     xfree(s);
@@ -288,10 +289,11 @@ void makepdftexbanner(void)
         return;
 
     s = xtalloc(SMALL_BUF_SIZE + 
-                strlen(BANNER) + 
+                strlen(ptexbanner) + 
                 strlen(versionstring) + 
                 strlen(kpathsea_version_string), char);
-    sprintf(s, "%s %s %s", BANNER, versionstring, kpathsea_version_string);
+    /* The Web2c version string starts with a space.  */
+    sprintf(s, "%s%s %s", ptexbanner, versionstring, kpathsea_version_string);
     pdftexbanner = maketexstring(s);
     xfree(s);
     pdftexbanner_init = true;
