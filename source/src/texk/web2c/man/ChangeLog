@@ -1,3 +1,44 @@
+2004-12-19  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in [manfiles]: Add cweb.1.
+
+	* cweb.man: Remove absolute path from FILES section.  Remove
+	references to files that we don't install.  Add reference to Web2C
+	to footer.
+
+	* cweb.man: Manual page for cweb programs, copied from cwebdir so
+	it can be modified.
+
+2004-10-03  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.man: Clarify option handling a bit and reorganize some text.
+
+	* pdfxtex.man: Clarify option handling a bit and reorganize some
+	text.
+
+	* pdfetex.man: Clarify option handling a bit and reorganize some
+	text.
+
+	* pdftex.man: Clarify option handling a bit and reorganize some
+	text.
+
+	* etex.man: Clarify option handling a bit and reorganize some
+	text.
+
+	* omega.man: Clarify option handling a bit and reorganize some
+	text.
+
+	* mf.man: Clarify option handling a bit and reorganize some text.
+
+	* mpost.man: Clarify option handling a bit and reorganize some
+	text.
+
+	* pdfxtex.man: Correct mailing list info.
+
+	* pdfetex.man: Correct mailing list info.
+
+	* pdftex.man: Correct mailing list info.
+
 2004-09-07  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* pdfetex.man: .efmt -> .fmt Found by Hartmut Henkel

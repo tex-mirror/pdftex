@@ -47,6 +47,7 @@ changequote([,])dnl
 
 AC_ARG_ENABLE(ipc,
 [  --enable-ipc            enable TeX's --ipc option, i.e., pipe to a program],
+if test "x$enableval" = xyes; then
   AC_DEFINE(IPC)
   # -lsocket is needed on Solaris, at least.  Maybe -lnsl on SCO, too?
   # See ac_path_xtra.
@@ -54,6 +55,7 @@ AC_ARG_ENABLE(ipc,
   if test x$ac_cv_func_connect = xno; then
     AC_CHECK_LIB(socket, connect, socketlibs="-lsocket $socketlibs")
   fi
+fi
 )
 AC_SUBST(socketlibs)
 
@@ -128,9 +130,7 @@ if test "x$withval" = xyes; then
 fi
 )
 
-dnl The second is apparently superfluous.
-sinclude(../kpathsea/xt.ac)dnl for web2c/configure
-dnl sinclude(kpathsea/xt.ac)dnl for top-level configure
+sinclude(../kpathsea/xt.ac)
 
 AC_ARG_WITH(x11win,
   [  --with-x11win           same as --with-x],
@@ -138,3 +138,21 @@ AC_ARG_WITH(x11win,
 AC_ARG_WITH(x11,
   [  --with-x11              same as --with-x],
   with_x="$withval")
+
+dnl This defines --with-x implicitly (which is why we use that package
+dnl name below), so put it here, so it comes first in the --help output.
+dnl This reads best.
+
+dnl Remember to add AC_PATH_XTRA when actually using X.
+
+AC_ARG_WITH(mf-x-toolkit,
+[  --with-mf-x-toolkit    Use X toolkit for mf.],
+[         case "${withval}" in
+            y | ye | yes )      val=yes ;;
+            n | no )            val=no  ;;
+            * )
+AC_MSG_WARN([unknown --with-mf-x-toolkit argument \`$withval'; using yes.])
+              val=yes;;
+          esac
+          with_mf_x_toolkit=$val
+])

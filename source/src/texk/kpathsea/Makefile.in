@@ -33,7 +33,7 @@ liblobjs = @LTLIBOBJS@
 library = kpathsea
 
 # We want to compile almost everything with libtool ...
-KPATHSEA_CC = $(LIBTOOL) --mode=compile "$(CC)"
+KPATHSEA_CC = $(LIBTOOL) --mode=compile $(CC)
 .SUFFIXES: .lo
 .c.lo:
 	$(KPATHSEA_CC) $(ALL_CFLAGS) -DMAKE_KPSE_DLL -c $<

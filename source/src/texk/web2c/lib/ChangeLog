@@ -1,3 +1,12 @@
+2004-12-20  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c [pdfTeX,pdfeTeX,pdfxTeX]: New variable ptexbanner.
+
+2004-12-19  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c [TeX] (maininit): For all TeX variants, recognize
+	"initex" and "virtex" program names, just in case.
+
 2004-09-16  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* printversion.c (printversionandexit): Hartmut Henkel

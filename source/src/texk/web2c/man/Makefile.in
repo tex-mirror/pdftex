@@ -33,6 +33,7 @@ localmodes = modes
 manfiles=		\
 	amstex.1	\
 	bibtex.1	\
+	cweb.1		\
 	dmp.1		\
 	dvicopy.1	\
 	dvitomp.1	\

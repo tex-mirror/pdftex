@@ -1,0 +1,13 @@
+% etex.ch1 - used by Web2C to adapt e-TeX 2.1 for TeX 3.141592.
+
+@x
+@d banner=='This is TeX, Version 3.14159' {printed when \TeX\ starts}
+@y
+@d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
+@z
+
+@x
+@d eTeX_version_string=='3.14159-2.1' {current \eTeX\ version}
+@y
+@d eTeX_version_string=='3.141592-2.1' {current \eTeX\ version}
+@z

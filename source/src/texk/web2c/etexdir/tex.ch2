@@ -1,0 +1,15 @@
+% Change file to assist in creating the web2c-specific change file.
+% This one comes last.
+% Public domain.
+
+@x
+  xmalloc_array (line_stack, max_in_open);
+  xmalloc_array (eof_seen, max_in_open);
+  xmalloc_array (grp_stack, max_in_open);
+  xmalloc_array (if_stack, max_in_open);
+@y
+  line_stack:=xmalloc_array (integer, max_in_open);
+  eof_seen:=xmalloc_array (boolean, max_in_open);
+  grp_stack:=xmalloc_array (save_pointer, max_in_open);
+  if_stack:=xmalloc_array (pointer, max_in_open);
+@z

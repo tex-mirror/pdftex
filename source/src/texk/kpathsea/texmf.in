@@ -84,6 +84,14 @@ TEXMF = {$HOMETEXMF,!!$TEXMFLOCAL,!!$TEXMFMAIN,!!$TEXMFDIST}
 % The system trees.  These are the trees that are shared by all the users.
 SYSTEXMF = $TEXMFLOCAL;$TEXMFMAIN;$TEXMFDIST
 
+% $progname: kpathsea 3.5.3 or later overwrites this at runtime.
+% To avoid empty expansions from binaries linked against an earlier
+% version of the library, we set $progname to something non-empty:
+progname = unsetprogname
+
+% similarly for $engine.
+engine = unsetengine
+
 % Where generated fonts may be written.  This tree is used when the sources
 % were found in a system tree and either that tree wasn't writable, or the
 % varfonts feature was enabled in MT_FEATURES in mktex.cnf.

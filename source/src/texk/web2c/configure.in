@@ -31,10 +31,11 @@ AC_PROG_MAKE_SET
 AC_PROG_YACC
 AC_PROG_LEX
 # Work around a problem with Flex Version 2.5.31 which needs -l flag.
-# Since all versions of flex support -l, don't check for the
-# specific version. We also want to catch LEX=/some/where/flex, so:
+# Since all recent versions of flex support -l, don't check for the
+# specific version, but check that at least "--version" is supported.
+# We also want to catch LEX=/some/where/flex, so:
 case $LEX in
-  *flex) LEX="$LEX -l" ;;
+  *flex) $LEX --version >/dev/null 2>&1 && LEX="$LEX -l" ;;
 esac
 AC_PROG_RANLIB
 AC_CHECK_HEADERS(sys/time.h sys/timeb.h)

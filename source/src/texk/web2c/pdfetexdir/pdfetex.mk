@@ -90,6 +90,7 @@ pdflatex.fmt: pdfetex
 	$(dumpenv) $(MAKE) progname=pdflatex files="latex.ltx" prereq-check
 	$(dumpenv) ./pdfetex --progname=pdflatex --jobname=pdflatex --ini \*\\pdfoutput=1\\input latex.ltx </dev/null
 
+# 
 # Installation.
 install-pdfetex: install-pdfetex-exec install-pdfetex-data
 install-pdfetex-exec: install-pdfetex-links

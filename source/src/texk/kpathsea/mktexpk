@@ -7,7 +7,7 @@
 # te@dbs.uni-hannover.de, kb@mail.tug.org, and infovore@xs4all.nl.
 # Public domain.
 
-version='$Id: mktexpk,v 1.31 2004/04/01 20:50:01 olaf Exp $'
+version='$Id: mktexpk,v 1.32 2004/12/19 12:47:02 olaf Exp $'
 progname=`echo $0 | sed 's%.*/%%'`
 usage="Usage: $progname [OPTIONS] NAME [REDIRECT],
   Create a PK font.
@@ -116,8 +116,10 @@ if kpsewhich $NAME.mf >/dev/null 2>&1 || mktexmf $NAME >/dev/null 2>&1; then
      100) MODE=nextscrn;;
      180) MODE=toshiba;;
      300) MODE=cx;;
+     360) MODE=epstylus;;
      400) MODE=nexthi;;
      600) MODE=ljfour;;
+     720) MODE=epsczz;;
     1270) MODE=linoone;;
     8000) MODE=dpdfezzz;;
        *) echo "$progname: Can't guess mode for $BDPI dpi devices." >&2

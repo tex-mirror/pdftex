@@ -6,7 +6,7 @@
 # number or how they are configured requires changes to the main distribution
 # anyway.
 
-# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.mk#31 $
+# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.mk#33 $
 
 Makefile: pdftexdir/pdftex.mk
 
@@ -103,6 +103,7 @@ pdfolatex.fmt: pdftex
 #	$(dumpenv) $(MAKE) progname=pdflatex files="latex.ltx" prereq-check
 #	$(dumpenv) ./pdftex --progname=pdflatex --jobname=pdflatex --ini \\pdfoutput=1 \\input latex.ltx </dev/null
 
+# 
 # Installation.
 install-pdftex: install-pdftex-exec install-pdftex-data
 install-pdftex-exec: install-pdftex-links
@@ -132,6 +133,8 @@ install-data:: @PTEX@ install-pdftex-data
 install-pdftex-pool: pdftex.pool $(texpooldir)
 	$(INSTALL_DATA) pdftex.pool $(texpooldir)/pdftex.pool
 
+
+# 
 # ttf2afm
 ttf2afm = ttf2afm
 
@@ -150,7 +153,7 @@ ttf2afm-clean:
 	$(LIBTOOL) --mode=clean $(RM) ttf2afm
 	rm -f ttf2afm.o macnames.o
 	rm -f ttf2afm.c macnames.c
-
+# 
 # pdftosrc
 pdftosrc = pdftosrc
 
@@ -163,7 +166,7 @@ pdftosrc-check: pdftosrc
 clean:: pdftosrc-clean
 pdftosrc-clean:
 	$(LIBTOOL) --mode=clean $(RM) pdftosrc
-
+# 
 # pdftex binaries archive
 pdftexbin:
 	rm -f pdftex*.tar.bz2 $(pdftex_bin)

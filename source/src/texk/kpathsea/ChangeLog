@@ -1,3 +1,42 @@
+2004-12-20  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.in: For XeTeX: TEXINPUTS.xetex, TEXINPUTS.xelatex,
+	OTFFONTS.
+
+2004-12-19  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* xt.ac: Mark --with-x-toolkit as obsolete.
+
+	* Makefile.in [KPATHSEA_CC]: Don't quote $(CC), as it prevents
+	libtool from functioning properly if $(CC) contains options in
+	addition to the compiler name.  From Harald Koenig
+	<koenig@science-computing.de>.
+
+	* mktexpk: Add guesses for dpi 360 and 720.  From Frank Küster
+	<frank@kuesterei.ch> (Debian maintainer).
+
+	* mktexlsr: Write all regular progress messages to stderr, instead
+	of some to stdout.
+
+	* mktexdir: Handle directories with spaces in the names.
+
+	* mktexupd: If we've called mktexlsr, there is no need to do
+	anything else, so exit immediately.  From Thomas.
+
+2004-11-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.in: Add default entries for $progname and $engine, so we
+	don't expand these to empty if the file is used by pre 3.5.3
+	implementations.
+
+	* mktexmf: Extend the pattern for the cbgreek fonts.  From Hartmut
+	Henkel <hartmut_henkel@gmx.de>.
+
+2004-10-05  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.in: Add TEXINPUTS.lamed (Aleph's version of lambda) and
+	TEXINPUTS.uft8mex (utf8 variation of mex).
+
 2004-08-24  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* mktex.opt: Correct syntax error.  Reported by Staszek

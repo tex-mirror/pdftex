@@ -12,11 +12,20 @@ typesetting with the help of PDF.
   Main change of pdfTeX 1.20b:
 ===========================================================================
 
-- Fixed some small bugs.
+- Fixed some minor bugs, mostly with hz
 
-- pdfTeX uses xpdf 3.00pl1
+- The info line "output format initialized to PDF/DVI" isn't shown anymore,
+  as this info wasn't reliable (bug 112).
 
-- pdfTeX uses libpng 1.2.8beta4, which should fix various png-related bugs.
+- Now the PDF-related statistics (PDF objects...) in the .log file is only
+  shown in PDF output mode. It start with a line "PDF statistics:".
+
+- \pdfimageresolution is not limited to 2400 [dpi] anymore, can now be
+  between 0 and 65535 [dpi].
+
+- pdfTeX uses xpdf 3.00pl2
+
+- pdfTeX uses libpng 1.2.8, which fixes some png-related bugs.
 
 For complete release notes see http://www.pdftex.org/NEWS
 
@@ -31,8 +40,8 @@ terms of the GNU General Public License as published by the Free Software
 Foundation; either version 2 of the License, or (at your option) any later
 version.
 
-For a complete README (with a full discussion of the license)
-please look at http://www.pdftex.org/README
+For a complete README (with a full discussion of the license) please look
+at http://www.pdftex.org/README
 
 ===========================================================================
   The files / installation
@@ -43,8 +52,7 @@ distribution.
 
 If you want to compile it yourself or want precompiled binaries, have a
 look at http://www.pdftex.org -- there you can find links to the pdfTeX
-sources on CTAN and precompiled binaries for most operating systems. And
-some useful documentation. 
+sources on CTAN. And some useful documentation. 
 
 ===========================================================================
   Mailing lists / web pages:
@@ -65,4 +73,4 @@ some useful documentation.
 
 Have fun!
 
-Martin Schröder (ms@pdftex.org) for the pdfTeX team, November 2004
+Martin Schröder (ms@pdftex.org) for the pdfTeX team, December 2004

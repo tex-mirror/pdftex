@@ -237,6 +237,10 @@ maininit P2C(int, ac, string *, av)
     } else if (FILESTRCASEEQ (kpse_program_name, VIR_PROGRAM)) {
       virversion = true;
 #ifdef TeX
+    } else if (FILESTRCASEEQ (kpse_program_name, "initex")) {
+      iniversion = true;
+    } else if (FILESTRCASEEQ (kpse_program_name, "virtex")) {
+      virversion = true;
 #if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
     } else if (FILESTRCASEEQ (kpse_program_name, "mltex")) {
       mltexp = true;
@@ -387,16 +391,9 @@ topenin P1H(void)
 #endif
 }
 
-/* disable IPC if DJGPP is being used; somehow 'configure --disable-ipc' didn't
- * work for me -- thanh */
-#if defined(__DJGPP__) && defined(IPC)
-#undef IPC
-#endif
-
 /* IPC for TeX.  By Tom Rokicki for the NeXT; it makes TeX ship out the
    DVI file in a pipe to TeXView so that the output can be displayed
    incrementally.  Shamim Mohamed adapted it for Web2c.  */
-
 #if defined (TeX) && defined (IPC)
 
 #include <sys/socket.h>
