@@ -45,7 +45,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#157 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#158 $
 %
 % The TeX program is copyright (C) 1982 by D. E. Knuth.
 % TeX is a trademark of the American Mathematical Society.
@@ -69,7 +69,7 @@
 @y
 @d pdftex_version==120 { \.{\\pdftexversion} }
 @d pdftex_revision=="b" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.20b-rc4' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.20b-rc5' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}

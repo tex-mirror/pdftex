@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#26 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#27 $
 */
 
 #include <math.h>
@@ -27,7 +27,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#26 $
 #include "avlstuff.h"
 
 static const char perforce_id[] =
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#26 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#27 $";
 
 #define FM_BUF_SIZE     1024
 
@@ -402,28 +402,42 @@ static void fm_scan_line(mapitem * mitem)
                 goto bad_line;
             }
             break;
-        default: /* font file or encoding specification */
-            a = b = 0;
-            if (*r == '<')
-                a = *r++;
-            if (*r == '<' || *r == '[')
-                b = *r++;
+        default: /* encoding or font file specification */
             read_field(r, q, buf);
-            /* encoding can take form '<[8r.enc' or '8r.enc' */
-            if (strlen(buf) > 4 && strcasecmp(strend(buf) - 4, ".enc") == 0)
-                fm_ptr->encoding = add_enc(buf);
-            else { 
-            /* subsetting:      '<cmr10.pfa' 
-             * nosubsetting:    '<<cmr10.pfa' 
-             * no embedding:    'cmr10.pfa' 
-             */
+            s = buf;
+            if (q > (buf + 4) && strcasecmp(q - 4, ".enc") == 0) {
+                /* encoding, formats: '8r.enc' or '<8r.enc' or '<[8r.enc' */
+                if (*s == '<') {
+                    s++;
+                    if (*s == '[')
+                        s++;
+                }
+                fm_ptr->encoding = add_enc(s);
+            } else {
+                /* fontfile, formats:
+                * subsetting:      '<cmr10.pfa' 
+                * no subsetting:   '<<cmr10.pfa' 
+                * no embedding:    'cmr10.pfa' 
+                * no embedding:    '!cmr10.pfa' (deprecated)
+                */
+                b = 0;
+                if ((a = *s) == '<') {
+                    s++;
+                    if ((b = *s) == '<')
+                        s++;
+                } else if (a == '!')
+                    s++;
+                if (*s == 0) {
+                    pdftex_warn("invalid entry for `%s': invalid font file name",
+                                fm_ptr->tfm_name);
+                    goto bad_line;
+                }
                 if (a == '<') {
                     set_included(fm_ptr);
-                    if (b == 0)
+                    if (b != '<')
                         set_subsetted(fm_ptr);
-                    /* otherwise b == '<' => nosubsetting */
-                } 
-                set_field(ff_name);
+                }
+                fm_ptr->ff_name = xstrdup(s);
             }
         }
     }
@@ -675,7 +689,8 @@ static boolean used_tfm(fm_entry *p)
     ff_entry *ff;
 
     /* check if the font file is not a TrueType font */
-    if (is_truetype(p))
+    /* font replacement makes sense only for included Type1 files */
+    if (is_truetype(p) || !is_included(p))
         return false;
 
     /* check if the font file is available */
@@ -891,7 +906,6 @@ fm_entry *lookup_fontmap(char *bname)
             pdfinitfont(i);
         return fm;
     }
-/**********************************************************************/
 /*
    The following code snipplet handles fonts with "Slant" and "Extend"
    name extensions in embedded PDF files, which don't yet have an
@@ -937,7 +951,6 @@ fm_entry *lookup_fontmap(char *bname)
         assert(fm != NULL);
         return fm;
     }
-/**********************************************************************/
     return dummy_fm_entry();
 }
 
