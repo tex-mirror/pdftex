@@ -1,7 +1,5 @@
 /* cpascal.h: implement various bits of standard and other Pascal that
    we use in the change files.  Public domain.
-
-   $Id: //depot/Build/source.development/TeX/texk/web2c/cpascal.h#9 $
    
    This is the top-level include file for all the web2c-generated C
    programs except TeX and Metafont themselves, which use texmf.h.  It's
@@ -49,6 +47,7 @@
 #define odd(x)		((x) & 1)
 #define round(x)	zround ((double) (x))
 #define trunc(x)	((integer) (x))
+#define floor(x)	((integer)floor((double)(x)))
 #define input stdin
 #define output stdout
 #define maxint INTEGER_MAX
@@ -209,20 +208,20 @@ typedef unsigned char *pointertobyte;
 #define kpsemfformat	kpse_mf_format
 #define kpsemftformat	kpse_mft_format
 #define kpsempformat	kpse_mp_format
-#define kpseocpformat  kpse_ocp_format
-#define kpseofmformat  kpse_ofm_format
-#define kpseoplformat  kpse_opl_format
-#define kpseotpformat  kpse_otp_format
-#define kpseovpformat  kpse_ovp_format
-#define kpseovfformat  kpse_ovf_format
+#define kpseocpformat	kpse_ocp_format
+#define kpseofmformat	kpse_ofm_format
+#define kpseoplformat	kpse_opl_format
+#define kpseotpformat	kpse_otp_format
+#define kpseovpformat	kpse_ovp_format
+#define kpseovfformat	kpse_ovf_format
 #define kpseopenfile	kpse_open_file
 #define kpsepkformat	kpse_pk_format
 #define kpsetfmformat	kpse_tfm_format
 #define kpsevfformat	kpse_vf_format
 #define kpsewebformat	kpse_web_format
 #define kpsevarvalue	kpse_var_value
-#define kpsesetprogramenabled kpse_set_program_enabled
-#define kpsesrccmdline  kpse_src_cmdline
+#define kpsesetprogramenabled	kpse_set_program_enabled
+#define kpsesrccmdline	kpse_src_cmdline
 #define makesuffix	make_suffix
 #define recorderchangefilename	recorder_change_filename
 #define recorderenabled	recorder_enabled

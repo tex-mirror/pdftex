@@ -6,14 +6,14 @@
 #
 # Suitable for calling from cron, as in:
 # 0 * * * * cd /your/texmf/root && /usr/local/bin/mktexlsr
-# unless the scripts live in a different directory than the 'access',
+# unless the scripts live in a different directory than the 'kpseaccess',
 # 'kpsestat', 'readlink', and 'kpsewhich' binaries.
 # 
 # Originally written as `texhash' by Thomas Esser
 # <te@dbs.uni-hannover.de>, Okt., 1994.
 # Public domain.
 
-version='$Id: mktexlsr,v 1.32 2002/10/22 18:34:07 olaf Exp $'
+version='$Id: mktexlsr,v 1.37 2004/03/23 19:38:15 olaf Exp $'
 progname=`echo $0 | sed 's%.*/%%'`
 usage="Usage: $progname [DIRS ...]
 
@@ -69,13 +69,22 @@ for TEXMFLS_R in "$@"; do
   /* | [A-z]:/*) ;;
   *)  TEXMFLS_R="`pwd`/$TEXMFLS_R"
   esac
+  # Allow for ls-R and ls-r to exist.  But create ls-R if we're working
+  # from scratch.
+  if test -f "$TEXMFLS_R/ls-R"; then
+    db_file="$TEXMFLS_R/ls-R"
+  elif test -f "$TEXMFLS_R/ls-r"; then
+    db_file="$TEXMFLS_R/ls-r"
+  else
+    db_file="$TEXMFLS_R/ls-R"
+  fi
   # Follow a possible symlink to get the right filesystem. 
   # The '|| true' construct prevents an sh -e aborting.
-  db_file=`readlink "$TEXMFLS_R/ls-R" 2>/dev/null` || true
-  case "$db_file" in
-  "") db_file="$TEXMFLS_R/ls-R" ;;
-  /* | [A-z]:/*) ;;
-  *)  db_file="$TEXMFLS_R/$db_file"
+  db_readlink=`readlink "$TEXMFLS_R/ls-R" 2>/dev/null` || true
+  case "$db_readlink" in
+  "") ;;
+  /* | [A-z]:/*) db_file="$db_readlink" ;;
+  *)  db_file="$TEXMFLS_R/$db_readlink"
   esac
   db_dir=`echo "$db_file" | sed 's%/[^/][^/]*$%%'` # can't rely on dirname
 
@@ -86,14 +95,15 @@ for TEXMFLS_R in "$@"; do
     cp /dev/null "$db_file"
     # Use same permissions as parent directory, minus x,s, or t bits.
     chmod `kpsestat -xst "$db_dir"` "$db_file"
-  elif test "x`sed '1s/$//;1q' \"$db_file\"`" != "x$ls_R_magic" \
+  elif test -s "$db_file" \
+       && test "x`sed '1s/$//;1q' \"$db_file\"`" != "x$ls_R_magic" \
        && test "x`sed '1s/$//;1q' \"$db_file\"`" != "x$old_ls_R_magic"; then
     echo "$progname: $db_file lacks magic string. Skipping..." >&2
     continue
   fi
 
   # Skip if we cannot write the file:
-  access -w "$db_file" || { echo "$progname: $db_file: no write permission. Skipping..." >&2; continue; }
+  kpseaccess -w "$db_file" || { echo "$progname: $db_file: no write permission. Skipping..." >&2; continue; }
 
   db_dir_tmp="$db_dir/lsR$$.tmp"
   (umask 077 && mkdir "$db_dir_tmp" ) \
@@ -111,7 +121,8 @@ for TEXMFLS_R in "$@"; do
   # names results in nothing but grief.
   echo "./:" >>"$db_file_tmp"
   (cd "$TEXMFLS_R" && \ls -LRa 2>/dev/null) |
-    sed 's%^[^.].*:$%./&%; /^\.$/d; /^\.\.$/d; /^lsR[0-9]*\.tmp$/d' >>"$db_file_tmp"
+    sed '/^$/{n;s%^\./%%;s%^%./%;}; /^\.$/d; /^\.\.$/d; /^.*\/\?lsR[0-9]*\.tmp:\?$/d' \
+    >>"$db_file_tmp"
 
   # To be really safe, a loop.
   until PERMS=`kpsestat = "$db_file"`; do sleep 1; done

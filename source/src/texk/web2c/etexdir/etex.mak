@@ -3,7 +3,7 @@
 # Makefile  : eTeX, web2c win32.mak makefile fragment to build e-TeX
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <04/01/07 09:35:11 popineau>
+# Time-stamp: <04/03/20 16:41:06 popineau>
 #
 ################################################################################
 
@@ -168,30 +168,30 @@ etrip-clean:
 #	$(make) etrip | tail +1 >etexdir\etrip\etrip.diffs
 
 # Dumps
-all_efmts = etex.efmt $(efmts)
-
-dumps: efmts
-efmts: $(all_efmts)
-
-etex.efmt: $(etex)
-	$(dumpenv) $(make) progname=etex files="etex.src plain.tex cmr10.tfm" prereq-check
-	$(dumpenv) .\$(objdir)\etex --progname=etex --jobname=etex --ini "*\input etex.src \dump" < nul
-
-elatex.efmt: $(etex)
-	$(dumpenv) $(make) progname=elatex files="latex.ltx" prereq-check
-	$(dumpenv) .\$(objdir)\etex --progname=elatex --jobname=elatex --ini "*\input latex.ltx" < nul
-
-latex.efmt: $(etex)
-	$(dumpenv) $(make) progname=latex files="latex.ltx" prereq-check
-	$(dumpenv) .\$(objdir)\etex --progname=latex --jobname=latex --ini "*\input latex.ltx" < nul
-
-tex.efmt: $(etex)
-	$(dumpenv) $(make) progname=tex files="plain.tex cmr10.tfm" prereq-check
-	$(dumpenv) .\$(objdir)\etex --progname=tex --jobname=tex --ini "\input plain \dump" < nul
-
-olatex.efmt: $(etex)
-	$(dumpenv) $(make) progname=olatex files="latex.ltx" prereq-check
-	$(dumpenv) .\$(objdir)\etex --progname=olatex --progname=olatex --ini "\input latex.ltx" < nul
+# all_efmts = etex.efmt $(efmts)
+# 
+# dumps: efmts
+# efmts: $(all_efmts)
+# 
+# etex.efmt: $(etex)
+# 	$(dumpenv) $(make) progname=etex files="etex.src plain.tex cmr10.tfm" prereq-check
+# 	$(dumpenv) .\$(objdir)\etex --progname=etex --jobname=etex --ini "*\input etex.src \dump" < nul
+# 
+# elatex.efmt: $(etex)
+# 	$(dumpenv) $(make) progname=elatex files="latex.ltx" prereq-check
+# 	$(dumpenv) .\$(objdir)\etex --progname=elatex --jobname=elatex --ini "*\input latex.ltx" < nul
+# 
+# latex.efmt: $(etex)
+# 	$(dumpenv) $(make) progname=latex files="latex.ltx" prereq-check
+# 	$(dumpenv) .\$(objdir)\etex --progname=latex --jobname=latex --ini "*\input latex.ltx" < nul
+# 
+# tex.efmt: $(etex)
+# 	$(dumpenv) $(make) progname=tex files="plain.tex cmr10.tfm" prereq-check
+# 	$(dumpenv) .\$(objdir)\etex --progname=tex --jobname=tex --ini "\input plain \dump" < nul
+# 
+# olatex.efmt: $(etex)
+# 	$(dumpenv) $(make) progname=olatex files="latex.ltx" prereq-check
+# 	$(dumpenv) .\$(objdir)\etex --progname=olatex --progname=olatex --ini "\input latex.ltx" < nul
 
 # Install
 install-etex: install-etex-exec install-etex-data
@@ -205,15 +205,15 @@ install-etex-programs: $(etex) $(bindir)
 	  for %%p in ($(etex)) do $(copy) %%p $(bindir) \
 	) $(redir_stdout)
 
-install-links: install-etex-links
+# install-links: install-etex-links
 install-etex-links: install-etex-programs
-	-@echo $(verbose) & ( \
-	  pushd $(bindir) & \
-	    $(del) .\einitex.exe .\evirtex.exe & \
-	    $(lnexe) .\etex.exe $(bindir)\einitex.exe & \
-	    $(lnexe) .\etex.exe $(bindir)\evirtex.exe & \
-	  popd \
-	) $(redir_stdout)
+#	-@echo $(verbose) & ( \
+#	  pushd $(bindir) & \
+#	    $(del) .\einitex.exe .\evirtex.exe & \
+#	    $(lnexe) .\etex.exe $(bindir)\einitex.exe & \
+#	    $(lnexe) .\etex.exe $(bindir)\evirtex.exe & \
+#	  popd \
+#	) $(redir_stdout)
 	-@echo $(verbose) & ( \
 	  if NOT "$(efmts)"=="" \
 	    for %%i in ($(efmts)) do \
@@ -223,7 +223,7 @@ install-etex-links: install-etex-programs
 	      popd \
 	) $(redir_stdout)
 
-install-fmts: install-etex-fmts
+# install-fmts: install-etex-fmts
 install-etex-fmts: efmts $(fmtdir)
 	-@echo $(verbose) & ( \
 	  for %%f in ($(all_efmts)) \
@@ -237,6 +237,6 @@ install-etex-data: $(texpooldir)
 # End of etex.mk.
 # 
 # Local variables:
-# page-delimiter: "^# \f"
+# page-delimiter: ""
 # mode: Makefile
 # End:

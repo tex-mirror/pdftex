@@ -26,10 +26,13 @@ if NOT %2==mp goto omega
 	goto exit
 :omega
 if NOT %2==omega goto eomega
-goto omega_or_eomega
+goto omega_or_eomega_or_aleph
 :eomega
-if NOT %2==eomega goto pdf
-:omega_or_eomega
+if NOT %2==eomega goto aleph
+goto omega_or_eomega_or_aleph
+:aleph
+if NOT %2==aleph goto pdf
+:omega_or_eomega_or_aleph
 	cat %srcdir%\web2c\common.defines %srcdir%\web2c\texmf.defines %srcdir%\%2dir\%2.defines %2.p | %srcdir%\web2c\%objdir%\web2c -htexmfmp.h -t -c%2coerce | %srcdir%\web2c\%objdir%\fixwrites -t %2 | perl %perldir%\splitup.pl --name=%2 --dfile > %2.c
 	copy .\%2coerce.h+%srcdir%\web2c\coerce.h .\x%2coerce.h
 	copy .\x%2coerce.h .\%2coerce.h

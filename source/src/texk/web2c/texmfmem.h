@@ -63,7 +63,7 @@
 */
 
 /* Omega is sufficiently different to separate the definition. */
-#if !defined(Omega) && !defined(eOmega)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
 
 typedef union
 {

@@ -1,9 +1,11 @@
-.TH TEX 1 "10 November 2001" "Web2C @VERSION@"
+.TH TEX 1 "25 March 2004" "Web2C @VERSION@"
 .\"=====================================================================
 .if n .ds MF Metafont
 .if t .ds MF M\s-2ETAFONT\s0
 .if t .ds TX \fRT\\h'-0.1667m'\\v'0.20v'E\\v'-0.20v'\\h'-0.125m'X\fP
 .if n .ds TX TeX
+.if n .ds MF Metafont
+.if t .ds MF M\s-2ETAFONT\s0
 .ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
 .el .ds OX TeX\" for nroff
 .\" the same but obliqued
@@ -45,16 +47,16 @@ and there are several specific formatting systems, such as
 which require the support of several macro files.
 .PP
 This version of \*(TX looks at its command line to see what name it
-was called under.  Both
+was called under.  If they exist, then both
 .B initex
 and
 .B virtex
-are symlinks to the
+are symbolic links to the
 .B tex
 executable.  When called as
 .BR initex
 (or when the
-.B --ini
+.B -ini
 option is given) it can be used to precompile macros into a
 .I .fmt
 file.  When called as
@@ -122,18 +124,18 @@ to see if it begins with the magic sequence
 .IR %& .
 If the first line begins with
 .BI %& format
-.BI --translate-file \ tcxname
+.BI -translate-file \ tcxname
 then \*(TX will use the named format and transation table
 .I tcxname
 to process the source file.  Either the format name or the
-.B --translate-file
+.B -translate-file
 specification may be omitted, but not both.  This overrides the
 format selection based on the name by which the program is invoked.
 The
-.B --parse-first-line
+.B -parse-first-line
 option or the
 .B parse_first_line
-configuration variable control whether this behaviour is enabled.
+configuration variable controls whether this behaviour is enabled.
 .PP
 The
 .I e
@@ -163,25 +165,21 @@ EOF character (usually control-D).
 .SH OPTIONS
 This version of \*(TX understands the following command line options.
 .TP
-.BI --default-translate-file \ tcxname
+.B -enc
 .rb
-Use the default
-.I tcxname
-translation table. The
-.BI --translate-file
-can overwrite this setting.
+Enable the enc\*(TX extensions.  This option is only effective in
+combination with
+.BR -ini .
+For documentation of the enc\*(TX extensions see
+.BR http://www.olsak.net/enctex.html .
 .TP
-.B --enc
-.rb
-Enable enc\*(TX extension by Petr Olsak, see the file encdoc-e.pdf.
-.TP
-.B --file-line-error-style
+.B -file-line-error-style
 .rb
 Print error messages in the form
 .I file:line:error
 which is similar to the way many compilers format them.
 .TP
-.BI --fmt \ format
+.BI -fmt \ format
 .rb
 Use
 .I format
@@ -190,21 +188,22 @@ as the name of the format to be used, instead of the name by which
 .I %&
 line.
 .TP
-.B --help
+.B -help
 .rb
 Print help message and exit.
 .TP
-.B --ini
+.B -ini
 .rb
-Be
-.BR initex ,
-for dumping formats; this is implicitly true if the program is called
-as
-.BR initex .
+Start in
+.I INI
+mode, which is used to dump formats.  The
+.I INI
+mode can be used for typesetting, but no format is preloaded, and
+basic initializations like setting catcodes may be required.
 .TP
-.BI --interaction \ mode
+.BI -interaction \ mode
 .rb
-Sets the interaction mode.  The mode can be one of
+Sets the interaction mode.  The mode can be either
 .IR batchmode ,
 .IR nonstopmode ,
 .IR scrollmode ,
@@ -213,98 +212,142 @@ and
 The meaning of these modes is the same as that of the corresponding
 \ecommands.
 .TP
-.B --ipc
+.B -ipc
 .rb
 Send DVI output to a socket as well as the usual output file.  Whether
 this option is available is the choice of the installer.
 .TP
-.B --ipc-start
+.B -ipc-start
 .rb
 As
-.BR --ipc ,
+.BR -ipc ,
 and starts the server at the other end as well.  Whether this option
 is available is the choice of the installer.
 .TP
-.BI --jobname \ name
+.BI -jobname \ name
 .rb
 Use
 .I name
 for the job name, instead of deriving it from the name of the input file.
 .TP
-.BI --kpathsea-debug \ bitmask
+.BI -kpathsea-debug \ bitmask
 .rb
 Sets path searching debugging flags according to the bitmask.  See the
 .I Kpathsea
 manual for details.
 .TP
-.BI --maketex \ fmt
+.BI -mktex \ fmt
 .rb
 Enable
 .RI mktex fmt ,
 where
 .I fmt
-must be one of
+must be either
 .I tex
 or
 .IR tfm .
 .TP
-.B --mltex
+.B -mltex
 .rb
-Enable ML\*(TX extensions.
+Enable ML\*(TX extensions.  Only effective in combination with
+.BR -ini .
 .TP
-.BI --no-maketex \ fmt
+.BI -no-mktex \ fmt
 .rb
 Disable
 .RI mktex fmt ,
 where
 .I fmt
-must be one of
+must be either
 .I tex
 or
 .IR tfm .
 .TP
-.BI --output-comment \ string
+.BI -output-comment \ string
 .rb
 Use
 .I string
-for the DVI file comment instead of the date.
+for the
+.I DVI
+file comment instead of the date.
 .TP
-.B --parse-first-line
+.B -parse-first-line
 .rb
 If the first line of the main input file begins with
 .I %&
 parse it to look for a dump name or a
-.B --translate-file
+.B -translate-file
 option.
 .TP
-.BI --progname \ name
+.BI -progname \ name
 .rb
 Pretend to be program
 .IR name .
 This affects both the format used and the search paths.
 .TP
-.B --recorder
+.B -recorder
 .rb
 Enable the filename recorder.  This leaves a trace of the files opened
 for input and output in a file with extension
 .IR .fls .
 .TP
-.B --shell-escape
+.B -shell-escape
 .rb
 Enable the
 .BI \ewrite18{ command }
 construct.  The
 .I command
-can be any Bourne shell command.  This construct is normally
+can be any shell command.  This construct is normally
 disallowed for security reasons.
 .TP
-.BI --translate-file \ tcxname
+.B -src-specials
+.rb
+In
+.I DVI
+mode, insert source specials into the
+.I DVI
+file.
+This option is ignored in
+.I PDF
+mode.
+.TP
+.BI -src-specials \ where
+.rb
+In
+.I DVI
+mode, insert source specials in certain placed of the
+.I DVI
+file.
+.I where
+is a comma-separated value list:
+.IR cr ,
+.IR display ,
+.IR hbox ,
+.IR math ,
+.IR par ,
+.IR parent ,
+or
+.IR vbox .
+This option is ignored in
+.I PDF
+mode.
+.TP
+.BI -translate-file \ tcxname
 .rb
 Use the
 .I tcxname
-translation table.
+translation table to set the mapping of input characters and
+re-mapping of output characters.
 .TP
-.B --version
+.BI -default-translate-file \ tcxname
+.rb
+Like
+.B -translate-file
+except that a
+.I %&
+line can overrule this setting.
+.TP
+.B -version
 .rb
 Print version information and exit.
 .\"=====================================================================
@@ -349,10 +392,23 @@ component will be replaced with the paths defined in the
 file.  For example, set TEXINPUTS to ".:/home/usr/tex:" to prepend the
 current direcory and ``/home/user/tex'' to the standard search path.
 .TP
+TEXFORMATS
+Search path for format files.
+.TP
+TEXPOOL
+search path for
+.B tex
+internal strings.
+.TP
 TEXEDIT
 Command template for switching to editor.  The default, usually
 .BR vi ,
 is set when \*(TX is compiled.
+.TP
+TFMFONTS
+Search path for font metric
+.RI ( .tfm )
+files.
 .\"=====================================================================
 .SH FILES
 The location of the files mentioned below varies from system to
@@ -366,7 +422,7 @@ as other configuration parameters like
 .BR parse_first_line .
 .TP
 .I tex.pool
-Encoded text of \*(TX's messages.
+Text file containing \*(TX's internal strings.
 .TP
 .I texfonts.map
 Filename mapping definitions.
@@ -431,3 +487,5 @@ The version now offered with the Unix \*(TX distribution is that
 generated by the \*(WB to C system
 .RB ( web2c ),
 originally written by Tomas Rokicki and Tim Morgan.
+.PP
+The enc\*(TX extensions were written by Petr Olsak.

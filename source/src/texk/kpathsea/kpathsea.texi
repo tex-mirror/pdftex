@@ -1131,6 +1131,16 @@ type42 fonts
 web2c files
 other text files
 other binary files
+misc fonts
+web: .web
+cweb: .w .web
+enc: .enc
+cmap: .cmap
+sfd: .sfd
+opentype fonts
+pdftex config
+lig files: .lig
+texmfscripts
 @end example
 
 This option and @samp{--path} are mutually exclusive.
@@ -1327,6 +1337,13 @@ style files, web2c, Web2c})
 @code{BSTINPUTS};
 suffix @samp{.bst}.
 
+@item cmap
+@flindex .cmap
+@vindex CMAPFONTS
+(character map files)
+@code{CMAPFONTS};
+suffix @samp{.cmap}.
+
 @item cnf
 @flindex .cnf
 @vindex TEXMFCNF
@@ -1334,12 +1351,28 @@ suffix @samp{.bst}.
 @code{TEXMFCNF};
 suffix @samp{.cnf}.
 
+@item cweb
+@flindex .w
+@flindex .web
+@vindex CWEBINPUTS
+(CWEB input files)
+@code{CWEBINPUTS};
+suffixes @samp{.w}, @samp{.web};
+additional suffix @samp{.ch}.
+
 @item dvips config
 @vindex TEXCONFIG
 @flindex config.ps@r{, search path for}
 (Dvips @samp{config.*} files, such as @file{config.ps}, @pxref{Config
 files,,, dvips, Dvips})
 @code{TEXCONFIG}.
+
+@item enc files
+@flindex .enc
+@vindex ENCFONTS
+(encoding vectors)
+@code{ENCFONTS};
+suffix @samp{.enc}.
 
 @item fmt
 @flindex .fmt
@@ -1374,6 +1407,13 @@ additional suffixes: @samp{.eps}, @samp{.epsi}.
 (makeindex style files)
 @code{TEXINDEXSTYLE}, @code{INDEXSTYLE};
 suffix @samp{.ist}.
+
+@item lig files
+@flindex .lig
+@vindex LIGFONTS
+(ligature definition files)
+@code{LIGFONTS};
+suffix @samp{.lig}.
 
 @item ls-R
 @flindex ls-R
@@ -1423,6 +1463,11 @@ suffix @samp{.pool}.
 @code{MFTINPUTS};
 suffix @samp{.mft}.
 
+@item misc fonts
+@vindex MISCFONTS
+(font-related files that don't fit the other categories)
+@code{MISCFONTS}
+
 @item mp
 @flindex .mp
 @vindex MPINPUTS
@@ -1453,6 +1498,11 @@ dynamic creation program: @code{MakeOmegaOCP}.
 suffixes @samp{.ofm}, @samp{.tfm};
 dynamic creation program: @code{MakeOmegaOFM}.
 
+@item opentype fonts
+@vindex OPENTYPEFONTS
+(OpenType fonts)
+@code{OPENTYPEFONTS}.
+
 @item opl
 @flindex .opl
 (Omega property lists)
@@ -1480,6 +1530,11 @@ suffix @samp{.ovf}.
 @code{OVPFONTS}, @code{TEXFONTS};
 suffix @samp{.ovp}.
 
+@item pdftex config
+@vindex PDFTEXCONFIG
+(PDF@TeX{}-specific configuration files)
+@code{PDFTEXCONFIG}.
+
 @item pk
 @flindex .pk
 @vindex PKFONTS
@@ -1499,6 +1554,13 @@ dynamic creation program: @code{mktexpk}.
 (downloadable PostScript, @pxref{Header files,,, dvips, Dvips})
 @code{TEXPSHEADERS}, @code{PSHEADERS};
 additional suffix @samp{.pro}.
+
+@item subfont definition files
+@flindex .sfd
+@vindex SFDFONTS
+(subfont definition files)
+@code{SFDFONTS}
+suffix @samp{.sfd}.
 
 @item tex
 @flindex .tex
@@ -1520,6 +1582,11 @@ dynamic creation program: @code{mktextex}.
 @vindex TEXSOURCES
 (Source files for the @TeX{} system)
 @code{TEXSOURCES}.
+
+@item texmfscripts
+@vindex TEXMFSCRIPTS
+(Architecture-independent executables distributed in the texmf tree)
+@code{TEXMFSCRIPTS}.
 
 @item texpool
 @flindex .pool
@@ -1571,6 +1638,19 @@ suffixes @samp{.pfa}, @samp{.pfb}.
 (virtual fonts, @pxref{Virtual fonts,,, dvips, Dvips})
 @code{VFFONTS}, @code{TEXFONTS};
 suffix @samp{.vf}.
+
+@item web
+@flindex .web
+@vindex WEBINPUTS
+(WEB input files)
+@code{WEBINPUTS};
+suffix @samp{.web};
+additional suffix @samp{.ch}.
+
+@item web2c files
+@vindex WEB2C
+(files specific to the web2c implementation)
+@code{WEB2C}.
 @end table
 
 There are two special cases, because the paths and environment variables

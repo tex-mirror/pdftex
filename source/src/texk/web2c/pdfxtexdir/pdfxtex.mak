@@ -3,7 +3,7 @@
 # Makefile  : pdfxTeX, web2c win32.mak makefile fragment to build pdfx-TeX
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <04/01/07 11:23:46 popineau>
+# Time-stamp: <04/03/15 12:23:26 popineau>
 #
 ################################################################################
 
@@ -123,13 +123,13 @@ install-pdfxtex-programs: $(pdfxtex) $(bindir)
 
 install-links: install-pdfxtex-links
 install-pdfxtex-links: install-pdfxtex-programs
-	-@echo $(verbose) & ( \
-	  pushd $(bindir) & \
-	    $(del) .\pdfxinitex.exe .\pdfxvirtex.exe & \
-	    $(lnexe) .\pdfxtex.exe $(bindir)\pdfxinitex.exe & \
-	    $(lnexe) .\pdfxtex.exe $(bindir)\pdfxvirtex.exe & \
-	  popd \
-	) $(redir_stdout)
+#	-@echo $(verbose) & ( \
+#	  pushd $(bindir) & \
+#	    $(del) .\pdfxinitex.exe .\pdfxvirtex.exe & \
+#	    $(lnexe) .\pdfxtex.exe $(bindir)\pdfxinitex.exe & \
+#	    $(lnexe) .\pdfxtex.exe $(bindir)\pdfxvirtex.exe & \
+#	  popd \
+#	) $(redir_stdout)
 	-@echo $(verbose) & ( \
 	  if not "$(pdfxfmts)"=="" \
 	    for %%i in ($(pdfxfmts)) do \

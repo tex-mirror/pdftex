@@ -38,7 +38,7 @@ KPATHSEA_CC = $(LIBTOOL) --mode=compile "$(CC)"
 .c.lo:
 	$(KPATHSEA_CC) $(ALL_CFLAGS) -c $<
 
-default all: kpsewhich kpsestat access readlink $(library).info manfiles
+default all: kpsewhich kpsestat kpseaccess readlink $(library).info manfiles
 
 kpsewhich: $(kpathsea) kpsewhich.o
 	$(kpathsea_link) kpsewhich.o $(LOADLIBES)
@@ -46,7 +46,7 @@ kpsewhich: $(kpathsea) kpsewhich.o
 kpsestat: kpsestat.o
 	$(link_command) kpsestat.o
 
-access: access.o
+kpseaccess: access.o
 	$(link_command) access.o
 
 readlink: readlink.o
@@ -177,7 +177,7 @@ install-exec: kpsewhich
 	$(INSTALL_LIBTOOL_LIBS) lib$(library).la $(libdir)
 	$(INSTALL_LIBTOOL_PROG) kpsewhich $(bindir)
 	$(INSTALL_PROGRAM) kpsestat $(bindir)
-	$(INSTALL_PROGRAM) access $(bindir)
+	$(INSTALL_PROGRAM) kpseaccess $(bindir)
 	$(INSTALL_PROGRAM) readlink $(bindir)
 uninstall-exec:
 	rm -f $(bindir)/kpsewhich
@@ -259,7 +259,7 @@ distclean::
 	rm -f paths.h texmf.cnf texmf.sed stamp-paths
 
 # The manual pages
-manfiles = access.1 kpsestat.1 kpsewhich.1 readlink.1 \
+manfiles = kpseaccess.1 kpsestat.1 kpsewhich.1 readlink.1 \
            mktexlsr.1 mktexmf.1 mktextfm.1 mktexpk.1
 
 ac_include ../make/man.mk

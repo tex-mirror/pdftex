@@ -23,7 +23,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#135 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#138 $
 %
 % The TeX program is copyright (C) 1982 by D. E. Knuth.
 % TeX is a trademark of the American Mathematical Society.
@@ -49,7 +49,7 @@
    {printed when \pdfTeX\ starts}
 @d pdftex_version==120 { \.{\\pdftexversion} }
 @d pdftex_revision=="a" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='1.20a-rc1' {current pdf\TeX\ version}
+@d pdftex_version_string=='1.20a-rc2' {current pdf\TeX\ version}
 @z
 
 % Some procedures that need to be declared forward
@@ -3607,12 +3607,6 @@ end;
 ensure_pdf_open;
 check_and_set_pdfoptionpdfminorversion;
 prepare_mag;
-if (mag <> 1000) and (mag <> 0) then begin
-  dimen_par(pdf_h_origin_code) := round_xn_over_d(dimen_par(pdf_h_origin_code), 1000, mag);
-  dimen_par(pdf_v_origin_code) := round_xn_over_d(dimen_par(pdf_v_origin_code), 1000, mag);
-  dimen_par(pdf_page_height_code) := round_xn_over_d(dimen_par(pdf_page_height_code), 1000, mag);
-  dimen_par(pdf_page_width_code) := round_xn_over_d(dimen_par(pdf_page_width_code), 1000, mag)
-end;
 fixed_decimal_digits := fix_int(pdf_decimal_digits, 0, 4);
 min_bp_val := 
     divide_scaled(one_hundred_bp, ten_pow[fixed_decimal_digits + 2], 0);

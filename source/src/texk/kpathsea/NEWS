@@ -1,4 +1,16 @@
 This file records noteworthy changes.
+3.5.3
+* New formats: kpse_enc_format, kpse_cmap_format, kpse_sfd_format,
+  kpse_opentype_fomat, kpse_pdftex_config_format, kpse_lig_format,
+  kpse_texmfscript_format.
+* Add .afmt to the suffixes for kpse_fmt_format.  Aleph uses this.
+* Rename access to kpseaccess.
+* Stop search early if we're given absolute or explicit relative names.
+* Add 'angle(0,0)' to the metafont errors mktexpk will ignore.
+* The withenable.ac script (used in configure) will fall back on using
+  kpsewhich to look for texmf trees.
+* If ls-R is not found check for ls-r as well.
+
 3.5.2 (19 February 2003)
 * Critical bugfix to db.c.
 

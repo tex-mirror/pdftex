@@ -719,7 +719,7 @@ fi
 
 
 
-KPSEVERSION=3.5.2
+KPSEVERSION=3.5.3
 
 cat >> confdefs.h <<EOF
 #define KPSEVERSION "kpathsea version $KPSEVERSION"
@@ -6579,9 +6579,13 @@ if test "x$datadir" != 'x${prefix}/share'; then
   else
     echo "$ac_t""not found" 1>&6
     echo "configure: warning: No texmf tree found at $texmfmain.
-  If you do not have the files, you can retrieve a minimal set from
-  ftp://ftp.tug.org/tex/texklib.tar.gz, which is mirrored on CTAN hosts
-  in systems/web2c.  Winging it." 1>&2
+  *****************************************************************
+  * Error: The main texmf tree was not found.                     *
+  * If you do not have the files, you should be able to them from *
+  * the same place you got these sources from, or from one of the *
+  * CTAN hosts.                                                   *
+  *****************************************************************
+  Winging it." 1>&2
   fi
 else
   # Second case, datadir is default...
@@ -6596,18 +6600,26 @@ else
       break
     fi
   done
+  if test -z "$texmfmain" && test "x$prefix" = "xNONE"; then
+     # Still no texmfmain found, no prefix set, perhaps kpsewhich is
+     # installed and can help us out.
+     texmfmain=`kpsewhich --expand-path='$TEXMFMAIN'` 2>/dev/null
+  fi
   texmfmain=`echo "$texmfmain" | sed 's,//*,/,g'`
   if test -n "$texmfmain"; then
     echo "$ac_t"""$texmfmain"" 1>&6
   else
     eval texmfmain="$datadir/texmf"
     echo "$ac_t""not found" 1>&6
-    echo "configure: warning: The main texmf tree was not found.
-  Specify the location of its parent directory with the --datadir option.
-  If you do not have the files, you can retrieve a minimal set from
-  ftp://ftp.tug.org/tex/texklib.tar.gz, which is mirrored on CTAN hosts
-  in systems/web2c.  Winging it by using the default location
-  $texmfmain." 1>&2
+    echo "configure: warning: The main texmf tree was not found at $texmfmain.
+  *****************************************************************
+  * Error: The main texmf tree was not found.                     *
+  * Use the --datadir option to specify its parent directory.     *
+  * If you do not have the files, you should be able to them from *
+  * the same place you got these sources from, or from one of the *
+  * CTAN hosts.                                                   *
+  *****************************************************************
+  Winging it by pretending $texmfmain is correct." 1>&2
   fi
 fi
 
@@ -6659,7 +6671,7 @@ fi
 
 # Is libm present.  FIXME: do we need it at all?
 echo $ac_n "checking for main in -lm""... $ac_c" 1>&6
-echo "configure:6663: checking for main in -lm" >&5
+echo "configure:6675: checking for main in -lm" >&5
 ac_lib_var=`echo m'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -6667,14 +6679,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lm  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 6671 "configure"
+#line 6683 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:6678: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:6690: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else

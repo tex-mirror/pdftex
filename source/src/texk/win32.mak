@@ -3,7 +3,7 @@
 # Makefile  : Top-Level Makefile for programs using kpathsea 
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/05/17 15:10:45 popineau>
+# Time-stamp: <04/03/09 22:05:17 popineau>
 #
 ################################################################################
 root_srcdir=..
@@ -18,6 +18,7 @@ INCLUDE=$(INCLUDE);$(root_srcdir)\texk
 subdirs= kpathsea	\
 	 contrib	\
 	 web2c		\
+	 afm2pl		\
 	 bibtex8	\
 	 chktex		\
 	 cjkutils	\

@@ -1,4 +1,12 @@
 ----------------------------------------------------
+pdfTeX 3.141592-1.20a-rc2 was released on 2004-04-19
+----------------------------------------------------
+
+Major changes since 1.20a-rc1
+-----------------------------
+- Now includes support for encTeX.
+
+----------------------------------------------------
 pdfTeX 3.141592-1.20a-rc1 was released on 2004-03-19
 ----------------------------------------------------
 
@@ -13,24 +21,42 @@ Major changes since 1.11b
   http://tug.org/pipermail/tex-live/2004-January/004791.html
 
 - New options for \pdfmapfile:
-  - \pdfmapfile {foo.map} Clears all map entries and loads foo.map, whose
-    entries become the only map entries.
-  - \pdfmapfile {+foo.map} loads foo.map and adds all it's entries to the
-    current map entries. Duplicates are ignored. This is the old behaviour.
-  - \pdfmapfile {-foo.map} loads foo.map and removes all it's entries from the
-    current map entries, if they are found.
-  - \pdfmapfile {=foo.map} loads foo.map and adds all it's entries to the
-    current map entries. Duplicates are replaced.
-  - \pdfmapfile {} clears all map entries.
 
-- New command \pdfmapline {line}. It's like \pdfmapfile, but here you can set
-  lines like in the map files directly. The modifiers (+-=) have the same
-  effect as with \pdfmapfile.
+  General functionality: Map items (map files, new: also single map lines; see
+  \pdfmapline) are put in list of pending map items. During next shipout,
+  pending map items are sequentially scanned for their map entries, and an
+  internal map entry database is updated, using the modes below. Then the list
+  of pending map items is cleared. Map entries of fonts already in use are left
+  untouched. New: All \pdfmapfile and \pdfmapline commands can also be given
+  after shipout of the first page.
+
+  - \pdfmapfile {foo.map} clears the list of pending map items and starts a new
+    list with the only pending file foo.map. When the map entry lines of
+    foo.map are scanned, duplicate map entries are ignored and a warning is
+    issued. This is the old behaviour.
+
+  - \pdfmapfile {+foo.map} puts foo.map in the list of pending map items. When
+    the map entry lines of foo.map are scanned, duplicate map entries are
+    ignored and a warning is issued.
+
+  - \pdfmapfile {=foo.map} puts foo.map in the list of pending map items. When
+    foo.map is scanned, matching map entries in database are replaced by new
+    entries from foo.map.
+
+  - \pdfmapfile {-foo.map} puts foo.map in the list of pending map items. When
+    foo.map is scanned, matching map entries are deleted from database.
+
+  - \pdfmapfile {} clears the list of pending map items. It does not affect map
+    entries already registered into the database. This is the old behaviour.
+
+- New command \pdfmapline {line}. It's like \pdfmapfile but here you can
+  set single map lines like in the map files directly. The modifiers (+-=)
+  have the same effect as with \pdfmapfile.
 
 - New command \pdftexbanner which returns a string with the full banner of the
   current binary (e.g. "This is pdfTeX, Version 3.141592-1.20a-rc1 (Web2C
-  7.5.2) kpathsea version 3.5.2"
-  
+  7.5.2) kpathsea version 3.5.2")
+
 - The PTEX.FullBanner key is now inserted in the document info dict instead of
   the catalog. Newer versions of Acrobat display it.
   
@@ -233,5 +259,5 @@ pdfTeX 3.14159-1.00a-pretest-20010806 was released on 2001-08-06
 pdfTeX 3.14159-1.00a-pretest-20010804 was released on 2001-08-04
 ----------------------------------------------------------------
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#51 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#54 $
 // vim: tw=79:ts=2:expandtab:autoindent

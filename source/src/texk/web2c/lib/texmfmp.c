@@ -50,6 +50,8 @@
 #include <omegadir/omegaextra.h>
 #elif defined (eOmega)
 #include <eomegadir/eomegaextra.h>
+#elif defined (Aleph)
+#include <alephdir/alephextra.h>
 #else
 #define BANNER "This is TeX, Version 3.141592"
 #define COPYRIGHT_HOLDER "D.E. Knuth"
@@ -177,10 +179,24 @@ maininit P2C(int, ac, string *, av)
      any path searching.  */
   kpse_set_program_name (argv[0], user_progname);
 
+  /* Second chance to activate file:line:error style messages, this
+     time from texmf.cnf. */
+  if (filelineerrorstylep < 0) {
+    filelineerrorstylep = 0;
+  } else if (!filelineerrorstylep) {
+    string file_line_error_style = kpse_var_value ("file_line_error_style");
+    filelineerrorstylep = (file_line_error_style
+                           && (*file_line_error_style == 't'
+                               || *file_line_error_style == 'y'
+                               || *file_line_error_style == '1'));
+  }
+
   /* If no dump default yet, and we're not doing anything special on
      this run, we may want to look at the first line of the main input
      file for a %&<dumpname> specifier.  */
-  if (!parsefirstlinep) {
+  if (parsefirstlinep < 0) {
+    parsefirstlinep = 0;
+  } else if (!parsefirstlinep) {
     string parse_first_line = kpse_var_value ("parse_first_line");
     parsefirstlinep = (parse_first_line
                        && (*parse_first_line == 't'
@@ -205,16 +221,10 @@ maininit P2C(int, ac, string *, av)
     } else if (FILESTRCASEEQ (kpse_program_name, VIR_PROGRAM)) {
       virversion = true;
 #ifdef TeX
-#if !defined(Omega) && ! defined(eOmega)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
     } else if (FILESTRCASEEQ (kpse_program_name, "mltex")) {
       mltexp = true;
-#endif /* !Omega && !eOmega */
-#ifdef eTeX  /* For e-TeX compatibility mode... */
-    } else if (FILESTRCASEEQ (kpse_program_name, "initex")) {
-      iniversion = true;
-    } else if (FILESTRCASEEQ (kpse_program_name, "virtex")) {
-      virversion = true;
-#endif /* eTeX */
+#endif /* !Omega && !eOmega && !Aleph */
 #endif /* TeX */
     }
 
@@ -224,7 +234,21 @@ maininit P2C(int, ac, string *, av)
       dump_name = (virversion ? "plain" : kpse_program_name);
     }
   }
-
+  
+#ifdef TeX
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
+  /* Sanity check: -mltex and -enc only work in combination with -ini. */
+  if (!iniversion) {
+    if (mltexp) {
+      fprintf(stderr, "-mltex only works with -ini\n");
+    }
+    if (enctexp) {
+      fprintf(stderr, "-enc only works with -ini\n");
+    }
+  }
+#endif
+#endif
+  
   /* If we've set up the fmt/base default in any of the various ways
      above, also set its length.  */
   if (dump_name) {
@@ -250,22 +274,24 @@ maininit P2C(int, ac, string *, av)
                             kpse_src_compile);
 #endif /* MP */
 #ifdef TeX
-#if defined(Omega) || defined (eOmega)
+#if defined(Omega) || defined (eOmega) || defined (Aleph)
   kpse_set_program_enabled (kpse_ocp_format, MAKE_OMEGA_OCP_BY_DEFAULT,
                             kpse_src_compile);
   kpse_set_program_enabled (kpse_ofm_format, MAKE_OMEGA_OFM_BY_DEFAULT,
                             kpse_src_compile);
   kpse_set_program_enabled (kpse_tfm_format, false, kpse_src_compile);
-#else /* !Omega && !eOmega */
+#else /* !Omega && !eOmega && !Aleph */
   kpse_set_program_enabled (kpse_tfm_format, MAKE_TEX_TFM_BY_DEFAULT,
                             kpse_src_compile);
-#endif /* !Omega && !eOmega */
+#endif /* !Omega && !eOmega  && !Aleph */
   kpse_set_program_enabled (kpse_tex_format, MAKE_TEX_TEX_BY_DEFAULT,
                             kpse_src_compile);
   kpse_set_program_enabled (kpse_fmt_format, MAKE_TEX_FMT_BY_DEFAULT,
                             kpse_src_compile);
 
-  if (!shellenabledp) {
+  if (shellenabledp < 0) {
+    shellenabledp = 0;
+  } else if (!shellenabledp) {
     string shell_escape = kpse_var_value ("shell_escape");
     shellenabledp = (shell_escape
                      && (*shell_escape == 't'
@@ -339,7 +365,7 @@ topenin P1H(void)
 
   /* One more time, this time converting to TeX's internal character
      representation.  */
-#if !defined(Omega) && !defined(eOmega)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
   for (i = first; i < last; i++)
     buffer[i] = xord[buffer[i]];
 #endif
@@ -505,14 +531,14 @@ ipcpage P1C(int, is_eof)
     string cwd = xgetcwd ();
     
     ipc_open_out ();
-#if !defined(Omega) && !defined(eOmega)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
     len = strstart[outputfilename + 1] - strstart[outputfilename];
 #else
     len = strstartar[outputfilename + 1 - 65536L] -
             strstartar[outputfilename - 65536L];
 #endif
     name = (string)xmalloc (len + 1);
-#if !defined(Omega) && !defined(eOmega)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
     strncpy (name, &strpool[strstart[outputfilename]], len);
 #else
     for (i=0; i<len; i++)
@@ -538,14 +564,17 @@ ipcpage P1C(int, is_eof)
 
 #if defined (TeX) || defined (MF) || defined (MP)
   /* TCX and Omega get along like sparks and gunpowder. */
-#if !defined(Omega) && !defined(eOmega)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
 
 /* Return the next number following START, setting POST to the following
    character, as in strtol.  Issue a warning and return -1 if no number
    can be parsed.  */
 
 static int
-tcx_get_num P3C(unsigned, line_count,  string, start,  string *, post)
+tcx_get_num P4C(int, upb,
+                unsigned, line_count,
+                string, start,
+                string *, post)
 {
   int num = strtol (start, post, 0);
   assert (post && *post);
@@ -558,9 +587,9 @@ tcx_get_num P3C(unsigned, line_count,  string, start,  string *, post)
       fprintf (stderr, "%s:%d: Expected numeric constant, not `%s'.\n",
                translate_filename, line_count, start);
     num = -1;
-  } else if (num < 0 || num > 255) {
-    fprintf (stderr, "%s:%d: Destination charcode %d <0 or >255.\n",
-             translate_filename, line_count, num);
+  } else if (num < 0 || num > upb) {
+    fprintf (stderr, "%s:%d: Destination charcode %d <0 or >%d.\n",
+             translate_filename, line_count, num, upb);
     num = -1;
   }  
 
@@ -596,24 +625,35 @@ read_char_translation_file P1H(void)
 
       line_count++;
 
-      first = tcx_get_num (line_count, line, &start2);
+      first = tcx_get_num (255, line_count, line, &start2);
       if (first >= 0) {
-        string extra;
+        string start3;
         int second;
+        int printable;
         
-        /* I suppose we could check for nonempty junk following the second
-           charcode, but let's not bother.  */
-        second = tcx_get_num (line_count, start2, &extra);
+        second = tcx_get_num (255, line_count, start2, &start3);
         if (second >= 0) {
+            /* I suppose we could check for nonempty junk following the
+               "printable" code, but let's not bother.  */
+          string extra;
+            
           /* If they mention a second code, make that the internal number.  */
           xord[first] = second;
           xchr[second] = first;
+
+          printable = tcx_get_num (1, line_count, start3, &extra);
+          if (printable == -1)
+            printable = 0;
+          /* Don't allow the 7bit ASCII set to become unprintable. */
+          if (32 <= second && second <= 126)
+            printable = 1;
         } else {
           second = first; /* else make internal the same as external */
+          /* If they mention a charcode, call it printable.  */
+          printable = 1;
         }
 
-        /* If they mention a charcode, call it printable.  */
-        xprn[second] = 1;
+        xprn[second] = printable;
       }
       free (line);
     }
@@ -623,7 +663,7 @@ read_char_translation_file P1H(void)
   }
 }
 
-/* Set up the xchr, xord, and is_printable arrays for TeX, allowing a
+/* Set up the xchr, xord, and xprn arrays for TeX, allowing a
    translation table specified at runtime via an external file.  By
    default, no characters are translated (all 256 simply map to
    themselves) and only printable ASCII is_printable.  We must
@@ -667,14 +707,12 @@ setupcharset P1H(void)
   else {
     /* Use the locale to adjust the xprn array. */
     for (c = 0; c <= 255; c++) {
-      if (!xprn[c] && isprint(c)) {
-        xprn[c] = 1;
-      }
+      xprn[c] = !xprn[c] && isprint(c);
     }
   }
 #endif
 }  
-#endif /* !Omega && !eOmega */
+#endif /* !Omega && !eOmega && !Aleph */
 #endif /* TeX || MF || MP [character translation] */
 
 /* Reading the options.  */
@@ -686,51 +724,54 @@ setupcharset P1H(void)
 
 /* SunOS cc can't initialize automatic structs, so make this static.  */
 static struct option long_options[]
-  = { { DUMP_OPTION,              1, 0, 0 },
-      { "help",                   0, 0, 0 },
-      { "ini",                    0, &iniversion, 1 },
-      { "interaction",            1, 0, 0 },
-      { "kpathsea-debug",         1, 0, 0 },
-      { "progname",               1, 0, 0 },
-      { "version",                0, 0, 0 },
-      { "recorder",               0, &recorder_enabled, 1 },
+  = { { DUMP_OPTION,                 1, 0, 0 },
+      { "help",                      0, 0, 0 },
+      { "ini",                       0, &iniversion, 1 },
+      { "interaction",               1, 0, 0 },
+      { "kpathsea-debug",            1, 0, 0 },
+      { "progname",                  1, 0, 0 },
+      { "version",                   0, 0, 0 },
+      { "recorder",                  0, &recorder_enabled, 1 },
 #ifdef TeX
 #ifdef IPC
-      { "ipc",                    0, &ipcon, 1 },
-      { "ipc-start",              0, &ipcon, 2 },
+      { "ipc",                       0, &ipcon, 1 },
+      { "ipc-start",                 0, &ipcon, 2 },
 #endif /* IPC */
-#if !defined(Omega) && !defined(eOmega)
-      { "mltex",                  0, &mltexp, 1 },
-      { "enc",                    0, &encoption, 1 },
-#endif /* !Omega && !eOmega */
-      { "output-comment",         1, 0, 0 },
-      { "shell-escape",           0, &shellenabledp, 1 },
-      { "debug-format",           0, &debugformatfile, 1 },
-      { "src-specials",           2, 0, 0 },
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
+      { "mltex",                     0, &mltexp, 1 },
+      { "enc",                       0, &enctexp, 1 },
+#endif /* !Omega && !eOmega && !Aleph */
+      { "output-comment",            1, 0, 0 },
+      { "shell-escape",              0, &shellenabledp, 1 },
+      { "no-shell-escape",           0, &shellenabledp, -1 },
+      { "debug-format",              0, &debugformatfile, 1 },
+      { "src-specials",              2, 0, 0 },
 #endif /* TeX */
 #if defined (TeX) || defined (MF) || defined (MP)
-      { "file-line-error-style",  0, &filelineerrorstylep, 1 },
-      { "jobname",                1, 0, 0 },
-#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
-      { "output-format",          1, 0, 0 },
-#endif
-      { "parse-first-line",       0, &parsefirstlinep, 1 },
-#if !defined(Omega) && !defined(eOmega)
-      { "translate-file",         1, 0, 0 },
-      { "default-translate-file", 1, 0, 0 },
+      { "file-line-error-style",     0, &filelineerrorstylep, 1 },
+      { "no-file-line-error-style",  0, &filelineerrorstylep, -1 },
+      /* Shorter option names for the above. */
+      { "file-line-error",           0, &filelineerrorstylep, 1 },
+      { "no-file-line-error",        0, &filelineerrorstylep, -1 },
+      { "jobname",                   1, 0, 0 },
+      { "parse-first-line",          0, &parsefirstlinep, 1 },
+      { "no-parse-first-line",       0, &parsefirstlinep, -1 },
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
+      { "translate-file",            1, 0, 0 },
+      { "default-translate-file",    1, 0, 0 },
 #if defined(WIN32) && defined(OEM)
-      { "oem",                    0, 0, 0 },
+      { "oem",                       0, 0, 0 },
 #endif
-#endif /* !Omega && !eOmega */
+#endif /* !Omega && !eOmega && !Aleph */
 #endif /* TeX || MF || MP */
 #if defined (TeX) || defined (MF)
-      { "mktex",                  1, 0, 0 },
-      { "no-mktex",               1, 0, 0 },
+      { "mktex",                     1, 0, 0 },
+      { "no-mktex",                  1, 0, 0 },
 #endif /* TeX or MF */
 #ifdef MP
-      { "T",                      0, &troffmode, 1 },
-      { "troff",                  0, &troffmode, 1 },
-      { "tex",                    1, 0, 0 },
+      { "T",                         0, &troffmode, 1 },
+      { "troff",                     0, &troffmode, 1 },
+      { "tex",                       1, 0, 0 },
 #endif /* MP */
       { 0, 0, 0, 0 } };
 
@@ -810,18 +851,16 @@ parse_options P2C(int, argc,  string *, argv)
     } else if (ARGUMENT_IS ("output-format")) {
        pdfoutputoption = 1;
        if (strcmp(optarg, "dvi") == 0) {
-           pdfoutputvalue = 0;
-       }
-       else if (strcmp(optarg, "pdf") == 0) {
-           pdfoutputvalue = 2;
-       }
-       else {
-           WARNING1 ("Ignoring unknown value `%s' for --output-format", optarg);
-           pdfoutputoption = 0;
+         pdfoutputvalue = 0;
+       } else if (strcmp(optarg, "pdf") == 0) {
+         pdfoutputvalue = 2;
+       } else {
+         WARNING1 ("Ignoring unknown value `%s' for --output-format", optarg);
+         pdfoutputoption = 0;
        }
 #endif /* pdfTeX || pdfeTeX || pdfxTeX */
 #if defined (TeX) || defined (MF) || defined (MP)
-#if !defined(Omega) && !defined(eOmega)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
     } else if (ARGUMENT_IS ("translate-file")) {
       translate_filename = optarg;
     } else if (ARGUMENT_IS ("default-translate-file")) {
@@ -832,7 +871,7 @@ parse_options P2C(int, argc,  string *, argv)
       locale_name = ".OCP";
       bOem = true;
 #endif
-#endif /* !Omega && !eOmega */
+#endif /* !Omega && !eOmega && !Aleph */
 #endif /* TeX || MF || MP */
 
 #if defined (TeX) || defined (MF)
@@ -1240,7 +1279,7 @@ input_line P1C(FILE *, f)
     --last;
 
   /* Don't bother using xord if we don't need to.  */
-#if !defined(Omega) && !defined(eOmega)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
   for (i = first; i <= last; i++)
      buffer[i] = xord[buffer[i]];
 #endif
@@ -1555,13 +1594,13 @@ gettexstring P1C(strnumber, s)
 {
   poolpointer i, len;
   string name;
-#if !defined(Omega) && !defined(eOmega)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
   len = strstart[s + 1] - strstart[s];
 #else
   len = strstartar[s + 1 - 65536L] - strstartar[s - 65536L];
 #endif
   name = (string)xmalloc (len + 1);
-#if !defined(Omega) && !defined(eOmega)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
   strncpy (name, (string)&strpool[strstart[s]], len);
 #else
   /* Don't use strncpy.  The strpool is not made up of chars. */

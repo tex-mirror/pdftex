@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#18 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#20 $
 */
 
 #ifndef PDFTEXLIB
@@ -133,10 +133,6 @@ extern void fm_read_info(void);
 extern ff_entry * check_ff_exist(fm_entry *);
 extern void pdfmapfile(integer);
 extern void pdfmapline(integer);
-
-/* papersiz.c */
-extern integer myatodim(char **);
-extern integer myatol(char **);
 
 /* pkin.c */
 extern int readchar(boolean, chardesc *);

@@ -45,7 +45,7 @@ or
 or some such.
 .PP
 .B elatex
-is the e-\(*TX extended mode version of \*(LX format.
+is the e-\*(TX extended mode version of \*(LX format.
 .PP
 .B lambda
 is the Omega version of the \*(LX format.

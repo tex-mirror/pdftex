@@ -16,39 +16,9 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/tex.pch#16 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/tex.pch#18 $
 % Change file containing web2c-specific or system-dependent changes to
 % pdftex
-
-@x [4.51] - Change `tex.pool' to `pdftex.pool' in error messages
-else  bad_pool('! I can''t read tex.pool; bad path?')
-@y
-else  bad_pool('! I can''t read pdftex.pool; bad path?')
-@z
-
-@x [4.51] - Change `tex.pool' to `pdftex.pool' in error messages
-begin if eof(pool_file) then bad_pool('! tex.pool has no check sum.');
-@y
-begin if eof(pool_file) then bad_pool('! pdftex.pool has no check sum.');
-@z
-
-@x [4.51] - Change `tex.pool' to `pdftex.pool' in error messages
-    bad_pool('! tex.pool line doesn''t begin with two digits.');
-@y
-    bad_pool('! pdftex.pool line doesn''t begin with two digits.');
-@z
-
-@x [4.51] - Change `tex.pool' to `pdftex.pool' in error messages
-  bad_pool('! tex.pool check sum doesn''t have nine digits.');
-@y
-  bad_pool('! pdftex.pool check sum doesn''t have nine digits.');
-@z
-
-@x [4.51] - Change `tex.pool' to `pdftex.pool' in error messages
-  bad_pool('! tex.pool doesn''t match; tangle me again (or fix the path).');
-@y
-  bad_pool('! pdftex.pool doesn''t match; tangle me again (or fix the path).');
-@z
 
 @x [17.236] - (WEB2C!) 
 @d char_sub_def_min_code=55 {smallest value in the charsubdef list}

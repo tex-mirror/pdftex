@@ -418,6 +418,9 @@ openin_any =			a
 % the %&format construct.
 parse_first_line =			t
 
+% Allow file:line error style
+file_line_error_style =			f
+
 % Disable search on multiple suffixes filenames. In many case, when `foo.bar'
 % is looked for, you do not want to look for `foo.bar.tex' before. This flag
 % disables searching for standard suffixes if the file name has already an

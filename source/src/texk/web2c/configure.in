@@ -123,21 +123,22 @@ else
 fi
 AC_SUBST(OMEGA)
 
-# For e-Omega
-if test -d $srcdir/eomegadir && test -d $srcdir/omegadir; then
-  test "${with_eomega+set}" = set || with_eomega=yes
+# For Aleph
+if test -d $srcdir/alephdir && test -d $srcdir/omegadir; then
+  test "${with_aleph+set}" = set || with_aleph=yes
 else
-  if test "x$with_eomega" = xyes; then
+  if test "x$with_aleph" = xyes; then
     AC_MSG_WARN(The e-Omega sources are not available.)
   fi
-  with_eomega=no
+  with_aleph=no
 fi
-if test "x$with_eomega" = xyes; then
-  EOMEGA=
+if test "x$with_aleph" = xyes; then
+  ALEPH=
 else
-  EOMEGA='#! '
+  ALEPH='#! '
 fi
-AC_SUBST(EOMEGA)
+AC_SUBST(ALEPH)
+test "x$with_aleph" = xyes && { test -d alephdir || mkdir alephdir; }
 
 # For pdfTeX.
 if test -d $srcdir/pdftexdir; then

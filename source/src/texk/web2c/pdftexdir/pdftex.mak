@@ -3,7 +3,7 @@
 # Makefile  : pdftex, web2c win32.mak fragment to build pdfTeX
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <04/03/04 09:48:05 popineau>
+# Time-stamp: <04/03/20 16:40:35 popineau>
 #
 ################################################################################
 
@@ -97,25 +97,25 @@ pdftex-clean:
 	)
 
 # Dumps.
-all_pdffmts = pdftex.fmt $(pdffmts)
+# all_pdffmts = pdftex.fmt $(pdffmts)
 
-dumps: pdffmts
-pdffmts: $(all_pdffmts)
-pdftex.fmt: $(pdftex)
-	$(dumpenv) $(make) progname=pdftex files="plain.tex cmr10.tfm" prereq-check
-	$(dumpenv) .\$(objdir)\pdftex --progname=pdftex --jobname=pdftex --ini "\pdfoutput=1 \input plain \dump" <nul
-
-pdfolatex.fmt: $(pdftex)
-	$(dumpenv) $(make) progname=pdfolatex files="latex.ltx" prereq-check
-	$(dumpenv) .\$(objdir)\pdftex --progname=pdfolatex --jobname=pdfolatex --ini "\pdfoutput=1 \input latex.ltx" <nul
-
-pdflatex.fmt: $(pdftex)
-	$(dumpenv) $(make) progname=pdflatex files="latex.ltx" prereq-check
-	$(dumpenv) .\$(objdir)\pdftex --progname=pdflatex --jobname=pdflatex --ini "\pdfoutput=1 \input latex.ltx" <nul
-
-pdftexinfo.fmt: $(pdftex)
-	$(dumpenv) $(make) progname=pdftexinfo files="pdftexinfo.ini" prereq-check
-	$(dumpenv) .\$(objdir)\pdftex --progname=pdftexinfo --ini pdftexinfo.ini <nul
+# dumps: pdffmts
+# pdffmts: $(all_pdffmts)
+# pdftex.fmt: $(pdftex)
+# 	$(dumpenv) $(make) progname=pdftex files="plain.tex cmr10.tfm" prereq-check
+# 	$(dumpenv) .\$(objdir)\pdftex --progname=pdftex --jobname=pdftex --ini "\pdfoutput=1 \input plain \dump" <nul
+# 
+# pdfolatex.fmt: $(pdftex)
+# 	$(dumpenv) $(make) progname=pdfolatex files="latex.ltx" prereq-check
+# 	$(dumpenv) .\$(objdir)\pdftex --progname=pdfolatex --jobname=pdfolatex --ini "\pdfoutput=1 \input latex.ltx" <nul
+# 
+# pdflatex.fmt: $(pdftex)
+# 	$(dumpenv) $(make) progname=pdflatex files="latex.ltx" prereq-check
+# 	$(dumpenv) .\$(objdir)\pdftex --progname=pdflatex --jobname=pdflatex --ini "\pdfoutput=1 \input latex.ltx" <nul
+# 
+# pdftexinfo.fmt: $(pdftex)
+# 	$(dumpenv) $(make) progname=pdftexinfo files="pdftexinfo.ini" prereq-check
+# 	$(dumpenv) .\$(objdir)\pdftex --progname=pdftexinfo --ini pdftexinfo.ini <nul
 # 
 # Installation.
 install-pdftex: install-pdftex-exec install-pdftex-data
@@ -130,15 +130,15 @@ install-pdftex-programs: $(pdftex) $(bindir)
 	  for %%p in ($(pdftex)) do $(copy) %%p $(bindir) \
 	) $(redir_stdout)
 
-install-links: install-pdftex-links
+# install-links: install-pdftex-links
 install-pdftex-links: install-pdftex-programs
-	-@echo $(verbose) & ( \
-	  pushd $(bindir) & \
-	    $(del) .\pdfinitex.exe .\pdfvirtex.exe & \
-	    $(lnexe) .\pdftex.exe $(bindir)\pdfinitex.exe & \
-	    $(lnexe) .\pdftex.exe $(bindir)\pdfvirtex.exe & \
-	 popd \
-	) $(redir_stdout)
+# 	-@echo $(verbose) & ( \
+# 	  pushd $(bindir) & \
+# 	    $(del) .\pdfinitex.exe .\pdfvirtex.exe & \
+# 	    $(lnexe) .\pdftex.exe $(bindir)\pdfinitex.exe & \
+# 	    $(lnexe) .\pdftex.exe $(bindir)\pdfvirtex.exe & \
+# 	 popd \
+# 	) $(redir_stdout)
 	-@echo $(verbose) & ( \
 	  if not "$(pdffmts)"=="" \
 	    for %%i in ($(pdffmts)) do \
@@ -148,7 +148,7 @@ install-pdftex-links: install-pdftex-programs
 	      popd \
 	) $(redir_stdout)
 
-install-fmts: install-pdftex-fmts
+# install-fmts: install-pdftex-fmts
 install-pdftex-fmts: pdffmts $(fmtdir)
 	-@echo $(verbose) & ( \
 	  for %%f in ($(all_pdffmts)) \

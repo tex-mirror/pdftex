@@ -17,12 +17,12 @@ This
 @iftex
 chapter
 @end iftex
-is @url{ftp://ftp.tug.org/tex/unixtex.ftp}, last updated 16 January 2003.
-Also available as @url{http://www.tug.org/unixtex.ftp}.  The IP address
-is currently @code{[130.225.2.178]}, and the canonical host name is
-currently @samp{tug.org}.  It is also in Kpathsea source distributions
-as @file{etc/unixtex.ftp} (although the network version is usually
-newer).  Mail @email{tex-k@@mail.tug.org} with comments or questions.
+is @uref{ftp://ftp.tug.org/tex/unixtex.ftp}, last updated 26 December
+2003.  Also available as @uref{http://www.tug.org/unixtex.ftp}.  The
+IP address is currently @code{[130.225.2.178]}.  It is also in
+Kpathsea source distributions as @file{etc/unixtex.ftp} (although the
+network version is usually newer).  Mail @email{tex-k@@mail.tug.org}
+with comments or questions.
 
 Following are general instructions for Unix or other sites who wish to
 acquire the Web2c distribution, (plain) @TeX{}, La@TeX{} (2e),
@@ -30,19 +30,22 @@ Bib@TeX{}, Metafont, MetaPost, DVI processors for the X window system,
 PostScript, the PCL language in the HP LaserJet, and related programs.
 They are oriented towards building from the original sources, though
 some information on alternative packages is included in the last
-section.  See also @url{http://www.tug.org/web2c}, the Web2c and
+section.  See also @uref{http://www.tug.org/web2c/}, the Web2c and
 Kpathsea home page.
 
-Please note that the Web2c distribution is a bare-bones distribution in
-source form, and building a complete installation from it is a
+Please note that the Web2c distribution is a bare-bones distribution
+in source form, and building a complete installation from it is a
 non-trivial matter.  For most uses, it is a better idea to install a
-distribution with pre-packaged binaries for your platform.  An example
-of such a distribution is te@TeX{}, which is based on the Web2c sources.
+distribution with pre-packaged binaries for your platform.  The
+principal example of such a distribution is @TeX{} Live
+(@uref{http://www.tug.org/texlive/}), which is based on the
+Web2c sources.
 
-Please consider joining the @TeX{} Users Group (TUG) to help support the
-maintenance and development of the programs you retrieve.  Email
-@email{office@@tug.org} or see @url{http://www.tug.org} for information and
-a membership form.
+Please consider joining the @TeX{} Users Group (TUG) or another user
+group of your choice to help support the maintenance and development
+of the programs you retrieve.  See @uref{http://www.tug.org/join.html}
+for information and the membership registration form, and
+@uref{http://www.tug.org/usergroups.html} for a listing of all user groups.
 
 For actual installation instructions after obtaining the necessary
 sources, see @ref{Installation}.  A copy is in the distribution file
@@ -54,7 +57,6 @@ sources, see @ref{Installation}.  A copy is in the distribution file
 * Other TeX packages::
 @end menu
 
-@c Note that
 @c * Tape distribution::
 @c used to be in this menu.
 
@@ -68,12 +70,12 @@ sources, see @ref{Installation}.  A copy is in the distribution file
 @cindex CTAN, defined
 @cindex backbone of CTAN
 In many places we refer to @var{CTAN:}.  This is @emph{both} a host name
-and a directory name.  Here are some primary locations:
+and a directory name.  Here are the primary locations:
 
 @example
-@url{ftp://ctan.tug.org/tex-archive}    @r{(California, USA)}
-@url{ftp://ftp.dante.de/tex-archive}    @r{(Germany)}
-@url{ftp://ftp.tex.ac.uk/tex-archive}   @r{(England)}
+@uref{ftp://ctan.tug.org/tex-archive/}    @r{(Vermont, USA)}
+@uref{ftp://ftp.dante.de/tex-archive/}    @r{(Germany)}
+@uref{ftp://ftp.tex.ac.uk/tex-archive/}   @r{(England)}
 @end example
 
 @noindent
@@ -81,16 +83,13 @@ and a directory name.  Here are some primary locations:
 @flindex CTAN.sites
 @cindex mirrors, FTP
 CTAN has many mirrors worldwide; see the top-level file
-@file{README.mirrors} from one of the sites above, or finger
-@email{ctan@@ftp.tug.org}, or see @url{http://www.tug.org/CTAN.sites}.
-A list current as of the time of distribution is in the top-level file
-@file{./MIRROR}.
+@file{README.mirrors} from one of the sites above or see
+@uref{http://www.tug.org/CTAN.sites}.
 
 @cindex World Wide Web CTAN access
-@cindex Gopher CTAN access
 @cindex email CTAN access
 @cindex NFS CTAN access
-You can also access CTAN via the World Wide Web, Gopher, electronic
+You can also access CTAN via the World Wide Web, electronic
 mail, or NFS.  The same @file{README.mirrors} file explains how.
 
 @cindex binary mode, for file transfers
@@ -99,21 +98,9 @@ depending on your needs (don't forget to set binary mode for file
 transfers):
 
 @table @asis
-@item @file{@var{CTAN:}/systems/web2c/texmflib.tar.gz}
-A basic collection of fonts (TFM files only) and macro packages
-(including Texinfo and La@TeX{} 2e).  It unpacks into @file{texmf/}; if
-you change the structure of this hierarchy, you will also have to change
-the default search paths (@pxref{Changing search paths}).  It is
-required unless you already have these files, in which case you should
-change the default paths as necessary to find them.
-
-Please note that this collection is bare-bones, providing just the means
-for bootstrapping @TeX{}.  It's contents may also be outdated, especially
-where La@TeX{} 2e is concerned.
-
 @item @file{@var{CTAN:}/systems/web2c/web.tar.gz}
 @cindex Knuth, Donald E., original author
-The original WEB source files, written mostly by Don Knuth.  Required
+The original WEB source files, written primarily by Don Knuth.  Required
 unless you already have this @file{web} version.  (The WEB sources
 change irregularly with respect to Web2c itself.)  Unpacks into
 @file{web2c-@var{version}}.
@@ -154,42 +141,13 @@ Unpacks into @file{web2c-@var{version}}.
 Additions to the texmf tree needed to build pdf@TeX{}.  Optional.
 Unpacks into @file{texmf/}.
 
-@item @file{@var{CTAN:}/systems/web2c/pdftexdoc.tar.gz}
-Unpacks into @file{texmf/}.  Documentation for pdf@TeX{} as an addition
-to the texmf tree.  Optional.  Unpacks into @file{texmf/}.
-
-@c @item @file{@var{CTAN:}/systems/web2c/texk.tar.gz}
-@c The web and web2c sources, plus the additions for web2c, plus the dvi
-@c drivers mentioned below, plus extra dvi drivers and tools not packaged
-@c separately.  Recommended if you want to build a complete system, but may
-@c contain an older version of the separate packages.  Unpacks into
-@c @file{texk-@var{version}}.
-
-@c @item @file{@var{CTAN:}/systems/web2c/texklib.tar.gz}
-@c The basic texmf tree, plus the additions for e-@TeX{}, Omega, and
-@c pdf@TeX{}.  The match for texk.tar.gz, and therefore may also be older
-@c than the separate packages.  Unpacks into @file{texmf/}.
-
-@c @item @file{@var{CTAN:}/systems/web2c/psfonts.tar.gz}
-@c Metrics, outlines, and bitmaps (for previewing) for the 35 de facto
-@c standard fonts donated by URW and the additional high-quality freely
-@c available PostScript fonts donated by Adobe, Bitstream, and URW,
-@c including geometrically-created variants such as oblique and small
-@c caps.  Unpacks into @file{texmf}.  Necessary for PostScript printing or
-@c previewing support.
-
-@item @file{@var{CTAN:}/dviware/dvipsk/dvipsk.tar.gz}
-DVI-to-PostScript translator.  Unpacks into @file{dvipsk-@var{version}}.
-Optional.
-
 @item @file{@var{CTAN:}/dviware/xdvik/xdvik.tar.gz}
 X window system DVI previewer.  Unpacks into @file{xdvik-@var{version}}.
 Optional.
-
-@item @file{@var{CTAN:}/dviware/dviljk/dviljk.tar.gz}
-DVI-to-PCL (HP LaserJet) translator.  Unpacks into
-@file{dviljk-@var{version}}.  Optional.
 @end table
+
+Additional drivers, macro files, and other support are needed to build
+a working system.  These are available in te@TeX{}.
 
 All that said, the originating host for the software above is
 @file{ftp.tug.org}.  You can retrieve these distributions (but not much
@@ -203,27 +161,14 @@ else) from the @file{tex/} directory on that host.
 @cindex obtaining Web2c on CD-ROM
 @cindex distributions, on CD-ROM
 
-Numerous organizations distribute various @TeX{} CD-ROM's:
+Numerous organizations distribute various @TeX{} CD-ROM's (and DVD's):
 
 @itemize @bullet
 @item
 @cindex @TeX{} Live CD-ROM
-@cindex TUG
-@cindex UKTUG
-@cindex GUTenberg
-TUG, UK TUG, and GUTenberg (French-speaking @TeX{} user group)
-collaborated to produce the @cite{@TeX{} Live} CD-ROM, based on
-te@TeX{}, which in turn is based on Web2c; email
-@email{tex-live@@mail.tug.org} or see
-@url{http://www.tug.org/tex-live.html}.
-
-@item
-@cindex Dante @TeX{} CD-ROM
-@cindex German @TeX{} CD info
-Dante (the German-speaking @TeX{} user group) has produced a CD-ROM.
-See @url{http://www.dante.de/dante/DANTE-CTAN-CD-ROM.html}, and
-@url{http://www.dante.de/tex-informationen/CD-ROMs.html} for
-information about @TeX{} CD's in general.  Both are in German.
+Virtually all the @TeX{} user groups collaborate to produce the
+@cite{@TeX{} Live} distribution once a year; see
+@uref{http://www.tug.org/texlive/} for more information.
 
 @item
 @cindex Free Software Foundation
@@ -266,10 +211,10 @@ minimal @TeX{} source distribution described in the previous section
 Most Linux distributions include some @TeX{} package based on
 Web2c; see the Linux documentation file @samp{Distribution-HOWTO} for a
 comparison of Linux distributions, available (for example) via
-@url{http://www.linux.org}.
+@uref{http://www.linux.org}.
 @end itemize
 
-If you know of additional @TeX{} CD-ROM distributions to add to this
+If you know of additional @TeX{} distributions to add to this
 list, please inform @email{tex-k@@mail.tug.org}.
 
 @ignore
@@ -324,10 +269,10 @@ contribute improvements!)
 
 @cindex te@TeX{}
 @cindex precompiled Unix binaries
-The Unix distribution alluded to above is the te@TeX{} distribution.
-This includes both complete sources and precompiled binaries for many
-popular Unix variants, including Linux. It is based on Web2c, and
-contains many other @TeX{}-related programs as well.
+The principal user-oriented Unix distribution based on Web2c is the
+te@TeX{} distribution.  It includes complete sources, and runs on
+all modern Unix variants, including Linux. It contains many
+@TeX{}-related programs besides those in the core Web2c.
 
 @flindex labrea.stanford.edu
 @cindex Knuth, Donald E., archive of programs by

@@ -2,7 +2,7 @@
 % By Tim Morgan, UC Irvine ICS Department, and many others.
 %
 % Be very careful when making changes to this file, as it is used to
-% generate TeX, e-TeX, pdf[ex]TeX, and most changes require similar
+% generate TeX, e-TeX, and pdf[ex]TeX, and most changes require similar
 % changes to be made to the Omega sources.
 %
 % (05/28/86) ETM Started with TeX 2.0
@@ -224,6 +224,7 @@ versions of the program.
 @!max_trie_op=ssup_trie_opcode; {largest possible trie opcode for any language}
 @!pool_name=TEX_POOL_NAME; {this is configurable, for the sake of ML-\TeX}
   {string of length |file_name_size|; tells where the string pool appears}
+@!engine_name=TEX_ENGINE_NAME; {the name of this engine}
 @#
 @!inf_mem_bot = 0;
 @!sup_mem_bot = 1;
@@ -343,27 +344,18 @@ mubyte_stoken: pointer; { saved first token in mubyte primitive }
 mubyte_sout: integer; { saved value of |mubyte_out| }
 mubyte_slog: integer; { saved value of |mubyte_log| }
 spec_sout: integer; { saved value of |spec_out| }
-loc_reprint: halfword; { for |reprint_buffer| procedure }
 no_convert: boolean; { conversion supressed by noconvert primitive }
 active_noconvert: boolean; { true if noconvert primitive is active }
 write_noexpanding: boolean; { true only if we need not write expansion }
 cs_converting: boolean; { true only if we need csname converting }
 special_printing: boolean; { true only if we need converting in special }
 message_printing: boolean; { true if message or errmessage prints to string }
-enc_option: boolean; { -enc option is used }
-enc_from_fmt: boolean; { encTeX initialized from format }
-fmt_is_read: boolean; { format file was read }
 @z
 
-% setup_char_set will do all the work.
-@x [2.23] l.723 - Translate characters if desired, otherwise allow them all, encTeX: printable chars.
+@x [2.23] l.723 - Translate characters if desired, otherwise allow them all.
 for i:=0 to @'37 do xchr[i]:=' ';
 for i:=@'177 to @'377 do xchr[i]:=' ';
 @y
-for i:=0 to @'37 do xchr[i]:=i;
-for i:=@'177 to @'377 do xchr[i]:=i;
-for i:=0 to 255 do xprn[i]:=0;
-for i:=32 to 126 do xprn[i]:=1;
 for i:=0 to 255 do mubyte_read[i]:=null;
 for i:=0 to 255 do mubyte_write[i]:=0;
 for i:=0 to 128 do mubyte_cswrite[i]:=null;
@@ -371,10 +363,23 @@ mubyte_keep := 0; mubyte_start := false;
 write_noexpanding := false; cs_converting := false;
 special_printing := false; message_printing := false;
 no_convert := false; active_noconvert := false;
-fmt_is_read := false;  enc_from_fmt := false;
 @z
 
-% we need not setup_char_set in encTeX, the change of [2.24] is removed
+@x [2.24] l.733 - Don't reinitialize xord.
+for i:=@'200 to @'377 do xord[xchr[i]]:=i;
+for i:=0 to @'176 do xord[xchr[i]]:=i;
+@y
+{The idea for this dynamic translation comes from the patch by
+ Libor Skarvada \.{<libor@@informatics.muni.cz>}
+ and Petr Sojka \.{<sojka@@informatics.muni.cz>}. I didn't use any of the
+ actual code, though, preferring a more general approach.}
+
+{This sets the |xchr|, |xord|, and |xprn| arrays.  We overwrite the
+ |xchr| assignments from module 21, just in case someone wants to do strange
+ character translations. See the function definition in \.{texmfmp.c} for
+ more comments.}
+setup_char_set;
+@z
 
 % [3.26] name_of_file is no longer an array.  And change the destination
 % type to text_char, which fixes:
@@ -580,8 +585,8 @@ tini@/
 @!save_size:integer; {space for saving values outside of current group; must be
   at most |max_halfword|}
 @!dvi_buf_size:integer; {size of the output buffer; must be a multiple of 8}
-@!parse_first_line_p:boolean; {parse the first line for options}
-@!file_line_error_style_p:boolean; {format error messages as file:line:error}
+@!parse_first_line_p:c_int_type; {parse the first line for options}
+@!file_line_error_style_p:c_int_type; {format messages as file:line:error}
 {Variables for source specials}
 @!src_specials_p : boolean;{Whether |src_specials| are enabled at all}
 @!insert_src_special_auto : boolean;
@@ -697,13 +702,39 @@ if last > first then
 @!init function get_strings_started:boolean; {initializes the string pool,
 @z
 
-%@x [4.49] l.1295 -- Do not hardwire printable ASCII.
-%@<Character |k| cannot be printed@>=
-%  (k<" ")or(k>"~")
-%@y
-%@<Character |k| cannot be printed@>=
-%   not is_printable[k]
-%@z
+@x [4.48] l.1252 -- Do not create "^^xy" for strings<256 in string pool
+@ @d app_lc_hex(#)==l:=#;
+  if l<10 then append_char(l+"0")@+else append_char(l-10+"a")
+@y
+@ The first 256 strings will consist of a single character only.
+@z
+@x
+  begin if (@<Character |k| cannot be printed@>) then
+    begin append_char("^"); append_char("^");
+    if k<@'100 then append_char(k+@'100)
+    else if k<@'200 then append_char(k-@'100)
+    else begin app_lc_hex(k div 16); app_lc_hex(k mod 16);
+      end;
+    end
+  else append_char(k);
+@y
+  begin append_char(k);
+@z
+
+@x [4.49] l.1272 -- Change documentation (probably needed in more places)
+would like string @'32 to be the single character @'32 instead of the
+@y
+would like string @'32 to be printed as the single character @'32
+instead of the
+@z
+
+@x [4.49] l.1295 -- Do not hardwire printable ASCII.
+@<Character |k| cannot be printed@>=
+  (k<" ")or(k>"~")
+@y
+@<Character |s| cannot be printed@>=
+   not xprn[s]
+@z
 
 % [4.51] Open the pool file using a path, and can't do string
 % assignments directly.  (`strcpy' and `strlen' work here because
@@ -722,32 +753,32 @@ if a_open_in (pool_file, kpse_texpool_format) then
 @x [4.51] l.1322 - Make `TEX.POOL' lowercase, and change how it's read.
 else  bad_pool('! I can''t read TEX.POOL.')
 @y
-else  bad_pool('! I can''t read tex.pool; bad path?')
+else  bad_pool('! I can''t read ', pool_name, '; bad path?')
 @z
 @x [4.52] l.1326 - Make `TEX.POOL' lowercase, and change how it's read.
 begin if eof(pool_file) then bad_pool('! TEX.POOL has no check sum.');
 @.TEX.POOL has no check sum@>
 read(pool_file,m,n); {read two digits of string length}
 @y
-begin if eof(pool_file) then bad_pool('! tex.pool has no check sum.');
+begin if eof(pool_file) then bad_pool('! ', pool_name, ' has no check sum.');
 @.TEX.POOL has no check sum@>
 read(pool_file,m); read(pool_file,n); {read two digits of string length}
 @z
 @x [4.52] l.1332 - Make `TEX.POOL' lowercase, and change how it's read.
     bad_pool('! TEX.POOL line doesn''t begin with two digits.');
 @y
-    bad_pool('! tex.pool line doesn''t begin with two digits.');
+    bad_pool('! ', pool_name, ' line doesn''t begin with two digits.');
 @z
 @x [4.53] l.1354 - Make `TEX.POOL' lowercase, and change how it's read.
   bad_pool('! TEX.POOL check sum doesn''t have nine digits.');
 @y
-  bad_pool('! tex.pool check sum doesn''t have nine digits.');
+  bad_pool('! ', pool_name, ' check sum doesn''t have nine digits.');
 @z
 @x [4.53] l.1360 - Make `TEX.POOL' lowercase, and change how it's read.
 done: if a<>@$ then bad_pool('! TEX.POOL doesn''t match; TANGLE me again.');
 @y
 done: if a<>@$ then
-  bad_pool('! tex.pool doesn''t match; tangle me again (or fix the path).');
+  bad_pool('! ', pool_name, ' doesn''t match; tangle me again (or fix the path).');
 @z
 
 @x [5.54] l.1422 - error_line
@@ -756,17 +787,101 @@ done: if a<>@$ then
 @!trick_buf:array[0..ssup_error_line] of ASCII_code; {circular buffer for
 @z
 
-@x [5.57] - encTeX: reprint_buffer: forward declaration
-@<Basic print...@>=
-procedure print_ln; {prints an end-of-line}
+@x [5.58] l.1460 -- Rename |print_char| to |print_visible_char|
+@ The |print_char| procedure sends one character to the desired destination,
+using the |xchr| array to map it into an external character compatible with
+|input_ln|. All printing comes through |print_ln| or |print_char|.
 @y
-@<Basic print...@>=
-procedure@?reprint_buffer; forward;@t\2@>@/
-@#
-procedure print_ln; {prints an end-of-line}
+@ The |print_visible_char| procedure sends one character to the desired
+destination, if necessary using the |xchr| array to map it into an external 
+character compatible with |input_ln|.  It assumes that it is always called
+with a visible ASCII character and that the special handling for the new-line
+character is done in |print_char|.  All printing comes through |print_ln|
+or |print_char|, which ultimately calls |print_visible_char|.
+
+The |print_char| procedure is the only caller of |print_visible_char|.
+Control sequence names, file names and string constructed with
+\.{\\string} might contain |ASCII_code| values that can't
+be printed using |print_visible_char|.  These characters will be printed
+in three- or four-symbol form like `\.{\^\^A}' or `\.{\^\^e4}'.
+Output that goes to the terminal and/or log file is treated differently
+when it comes to determining whether a character is printable.
+
+@d print_lc_hex(#)==l:=#;
+  if l<10 then print_visible_char(l+"0")@+else print_visible_char(l-10+"a")
+@z
+@x
+procedure print_char(@!s:ASCII_code); {prints a single character}
+label exit;
+begin if @<Character |s| is the current new-line character@> then
+ if selector<pseudo then
+  begin print_ln; return;
+  end;
+@y
+procedure print_visible_char(@!s:ASCII_code); {prints a single character}
+label exit; {label is not used but nonetheless kept (for other changes?)}
+begin
 @z
 
-@x encTeX: more complicated print procedure
+@x [5.58] l.1493 -- Insert new |print_char| procedure
+incr(tally);
+exit:end;
+@y
+incr(tally);
+exit:end;
+@#
+{WEB2C: At this point we cheat and use |print| in |print_char| without
+ a forward declaration.  While Pascal is unhappy with this, web2c doesn't
+ care.}
+@#
+procedure print_char(@!s:ASCII_code); {prints a single character}
+label exit;
+var l:0..255; {small indices or counters}
+@!nl:integer; {new-line character to restore}
+begin
+if (selector>pseudo) and (not special_printing) and (not message_printing)
+then begin
+  print_visible_char(s);
+  return;
+  end;
+if @<Character |s| is the current new-line character@> then
+  if selector<pseudo then
+    begin print_ln; no_convert:=false; return;
+    end
+  else if message_printing then {encTeX}
+    begin print_visible_char(s); no_convert:=false; return;
+    end;
+if (mubyte_log>0) and (not no_convert) and (mubyte_write[s] > 0)
+then begin
+  {The "character" we're printing must be expanded into a string.
+   Temporarily disable the new-line character when printing the string.}
+  no_convert:=false; nl:=new_line_char; new_line_char:=-1;
+  print(mubyte_write[s]);
+  new_line_char:=nl; return;
+  end;
+no_convert:=false;
+{ The web2c locale dependency is here -- it is correct if we assume
+  that pseudoprinting goes to the terminal or log file.
+  We do not have to check |special_printing| here: we never want to
+  do the printable check for specials, and |selector| equals
+  |new_string| whenever |special_printing| is true. }
+if ((selector<no_print) and (@<Character |s| cannot be printed@>))
+    or ((selector>no_print) and (selector<=pseudo) and (not isprint(xchr[s])))
+then begin print_visible_char("^"); print_visible_char("^");
+  if s<64 then print_visible_char(s+64)
+  else if s<128 then print_visible_char(s-64)
+  else begin print_lc_hex(s div 16);  print_lc_hex(s mod 16);
+    end;
+  end
+else print_visible_char(s);
+exit:end;
+@z
+
+@x [5.59] l.1508 -- Simplify |print| for single characters (strings<256)
+@!nl:integer; {new-line character to restore}
+@y
+@z
+@x
   else begin if selector>pseudo then
       begin print_char(s); return; {internal strings are not expanded}
       end;
@@ -774,22 +889,41 @@ procedure print_ln; {prints an end-of-line}
       if selector<pseudo then
         begin print_ln; return;
         end;
-@y
-  else begin if (selector>pseudo) and (not special_printing) 
-                 and (not message_printing) then
-      begin print_char(s); return; {internal strings are not expanded}
+    nl:=new_line_char; new_line_char:=-1;
+      {temporarily disable new-line character}
+    j:=str_start[s];
+    while j<str_start[s+1] do
+      begin print_char(so(str_pool[j])); incr(j);
       end;
-    if (@<Character |s| is the current new-line character@>) then
-      if selector<pseudo then
-        begin print_ln; no_convert := false; return;
-        end else if message_printing then
-        begin print_char(s); no_convert := false; return; 
-        end;
-    if (mubyte_log>0) and (not no_convert) and (mubyte_write[s]>0) then 
-      s := mubyte_write [s]
-    else if (xprn[s]>0) or special_printing then 
-      begin print_char(s); no_convert := false; return; end;
-    no_convert := false;    
+    new_line_char:=nl; return;
+    end;
+@y
+  else begin print_char(s); return;
+    end;
+@z
+
+@x [5.60] l.1534 -- Remove |slow_print|
+@ Control sequence names, file names, and strings constructed with
+\.{\\string} might contain |ASCII_code| values that can't
+be printed using |print_char|. Therefore we use |slow_print| for them:
+
+@<Basic print...@>=
+procedure slow_print(@!s:integer); {prints string |s|}
+var j:pool_pointer; {current character code position}
+begin if (s>=str_ptr) or (s<256) then print(s)
+else begin j:=str_start[s];
+  while j<str_start[s+1] do
+    begin print(so(str_pool[j])); incr(j);
+    end;
+  end;
+end;
+@y
+@ Old versions of \TeX\ needed a procedure called |slow_print| whose function
+is now subsumed by |print| and the new functionality of |print_char| and
+|print_visible_char|.  We retain the old name |slow_print| here as a
+possible aid to future software arch\ae ologists.
+
+@d slow_print == print
 @z
 
 @x l.1536 --  If the ``src-specials'' feature is active, change the banner.
@@ -809,9 +943,6 @@ else  begin slow_print(format_ident); print_ln;
 wterm(version_string);
 if format_ident>0 then slow_print(format_ident);
 print_ln;
-if enc_option then begin
-  wterm (encTeX_banner); wterm_ln (', the reencoding enabled.');
-end;
 if shell_enabled_p then begin
   wterm_ln(' \write18 enabled.')
 end;
@@ -824,13 +955,17 @@ end;
 if parse_first_line_p then begin
   wterm_ln(' %&-line parsing enabled.')
 end;
+if translate_filename then begin
+  wterm(' (');
+  fputs(translate_filename, stdout);
+  wterm_ln(')');
+end;
 @z
 
 @x [5.71] encTeX - native buffer printing
 if last<>first then for k:=first to last-1 do print(buffer[k]);
 @y
-loc_reprint := first;
-while loc_reprint < last do reprint_buffer;
+while first < last do begin print_buffer(first) end;
 @z
 
 @x [6.73] l.1732 - Add unspecified_mode.
@@ -897,12 +1032,12 @@ do_final_end;
 end;
 @z
 
-@x [6.82] l.1866 - file:line:error style messages force scroll_mode.
+ @x [6.82] l.1866 - file:line:error style messages force scroll_mode.
 print_char("."); show_context;
-@y
+ @y
 if file_line_error_style_p then interaction:=scroll_mode
 else begin print_char("."); show_context end;
-@z
+ @z
 
 @x [6.84] l.1888 - Implement the switch-to-editor option.
 line ready to be edited. But such an extension requires some system
@@ -1209,7 +1344,9 @@ for k:=active_base to eqtb_top do
   {Note: |char_sub_code(c)| is the true substitution info plus |min_halfword|}
 @z
 
-@x [17.236] l.4954 - MLTeX: \charsubdefmax and \tracingcharsubdef
+% MLTeX: \charsubdefmax and \tracingcharsubdef
+% encTeX: \mubytein \mubyteout \mubytelog and \specialout
+@x [17.236] l.4954
 @d int_pars=55 {total number of integer parameters}
 @y
 @d char_sub_def_min_code=55 {smallest value in the charsubdef list}
@@ -1222,7 +1359,9 @@ for k:=active_base to eqtb_top do
 @d int_pars=62 {total number of integer parameters}
 @z
 
-@x [17.236] l.5016 - MLTeX: \charsubdefmax and \tracingcharsubdef
+% MLTeX: \charsubdefmax and \tracingcharsubdef
+% encTeX: \mubytein \mubyteout \mubytelog and \specialout
+@x [17.236] l.5016
 @d error_context_lines==int_par(error_context_lines_code)
 @y
 @d error_context_lines==int_par(error_context_lines_code)
@@ -1235,7 +1374,9 @@ for k:=active_base to eqtb_top do
 @d spec_out==int_par(spec_out_code)
 @z
 
-@x [17.237] l.5080 - MLTeX: \charsubdefmax and \tracingcharsubdef
+% MLTeX: \charsubdefmax and \tracingcharsubdef
+% encTeX: \mubytein \mubyteout \mubytelog and \specialout
+@x [17.237] l.5080
 error_context_lines_code:print_esc("errorcontextlines");
 @y
 error_context_lines_code:print_esc("errorcontextlines");
@@ -1248,7 +1389,9 @@ mubyte_log_code:print_esc("mubytelog");
 spec_out_code:print_esc("specialout");
 @z
 
-@x [17.238] l.5200 - MLTeX: \charsubdefmax and \tracingcharsubdef
+% MLTeX: \charsubdefmax and \tracingcharsubdef
+% encTeX: \mubytein \mubyteout \mubytelog and \specialout
+@x [17.238] l.5200
 @!@:error_context_lines_}{\.{\\errorcontextlines} primitive@>
 @y
 @!@:error_context_lines_}{\.{\\errorcontextlines} primitive@>
@@ -1262,8 +1405,8 @@ if mltex_p then
   primitive("tracingcharsubdef",assign_int,int_base+tracing_char_sub_def_code);@/
 @!@:tracing_char_sub_def_}{\.{\\tracingcharsubdef} primitive@>
   end;
-if enc_option then
-begin
+if enctex_p then
+  begin enctex_enabled_p:=true;
   primitive("mubytein",assign_int,int_base+mubyte_in_code);@/
 @!@:mubyte_in_}{\.{\\mubytein} primitive@>
   primitive("mubyteout",assign_int,int_base+mubyte_out_code);@/
@@ -1382,45 +1525,40 @@ begin if text(p)>0 then
 procedure print_cs(@!p:integer); {prints a purported control sequence}
 begin if p<hash_base then {single character}
 @y
-The backward converting from control sequence to byte sequence for
-encTeX (see encdoc.tex) is implemented here. Of course, the simplest
-way is to implement the new array of string pointers with |hash_size| 
-length, but we assume that only a few control sequences will need to 
-be converted. So, only 128 items array |mubyte_cswrite| is used. The items 
-points to the token lists. First token includes a csname number and 
-the second points the string to be outputted. The third token includes the
-number of another csname and fourth token its pointer to the string
-etc. We need to do the sequential searching in one of the 128 token
-lists.
-
-See the \$332 and \$1221 for more code of encTeX.
-
-@d encTeX_banner == 'encTeX v. Feb. 2003, the reencoding enabled.'
+The conversion from control sequence to byte sequence for enc\TeX is
+implemented here. Of course, the simplest way is to implement an array
+of string pointers with |hash_size| length, but we assume that only a
+few control sequences will need to be converted. So |mubyte_cswrite|,
+an array with only 128 items, is used. The items point to the token
+lists. First token includes a csname number and the second points the
+string to be output. The third token includes the number of another
+csname and fourth token its pointer to the string etc. We need to do
+the sequential searching in one of the 128 token lists.
 
 @<Basic printing...@>=
 procedure print_cs(@!p:integer); {prints a purported control sequence}
 var q: pointer;
     s: str_number;
 begin
-  if active_noconvert and (not no_convert) and 
+  if active_noconvert and (not no_convert) and
      (eq_type(p) = let) and (equiv(p) = normal+11) then { noconvert }
   begin
      no_convert := true;
      return;
   end;
-  s := 0;  
+  s := 0;
   if cs_converting and (not no_convert) then
   begin
     q := mubyte_cswrite [p mod 128] ;
-    while q <> null do 
+    while q <> null do
     if info (q) = p then
     begin
       s := info (link(q)); q := null;
-    end else  q := link (link (q));    
+    end else  q := link (link (q));
   end;
   no_convert := false;
   if s > 0 then print (s)
-  else if p<hash_base then {single character}                    
+  else if p<hash_base then {single character}
 @z
 
 @x [18.262] l.5583 - hash_extra
@@ -1436,7 +1574,7 @@ else if (text(p)<0)or(text(p)>=str_ptr) then print_esc("NONEXISTENT.")
 else if (text(p)>=str_ptr) then print_esc("NONEXISTENT.")
 @z
 
-@x [18.262] - encTeX: return code for print_cs
+@x [18.262] - encTeX: exit label for print_cs
   print_char(" ");
   end;
 end;
@@ -1452,8 +1590,11 @@ primitive("endcsname",end_cs_name,0);@/
 @y
 primitive("endcsname",end_cs_name,0);@/
 @!@:end_cs_name_}{\.{\\endcsname} primitive@>
-primitive("endmubyte",end_cs_name,10);@/
+if enctex_p then
+begin
+  primitive("endmubyte",end_cs_name,10);@/
 @!@:end_mubyte_}{\.{\\endmubyte} primitive@>
+end;
 @z
 
 @x [18.266] - encTeX: \endmubyte primitive
@@ -1542,12 +1683,12 @@ if j>0 then for i:=start to j-1 do
   print(buffer[i]);
   end
 @y
-loc_reprint := start; mubyte_skeep := mubyte_keep;
+i := start; mubyte_skeep := mubyte_keep;
 mubyte_sstart := mubyte_start; mubyte_start := false;
-if j>0 then while loc_reprint < j do
+if j>0 then while i < j do
 begin
-  if loc_reprint=loc then set_trick_count;
-  reprint_buffer;
+  if i=loc then set_trick_count;
+  print_buffer(i);
 end;
 mubyte_keep := mubyte_skeep; mubyte_start := mubyte_sstart
 @z
@@ -1559,267 +1700,18 @@ begin input_ptr:=0; max_in_stack:=0;
 source_filename_stack[0]:=0;full_source_filename_stack[0]:=0;
 @z
 
-@x [24.332] encTeX: the main new code
+@x [24.332] encTeX: insert the added functions
 appear on that line. (There might not be any tokens at all, if the
 |end_line_char| has |ignore| as its catcode.)
 @y
 appear on that line. (There might not be any tokens at all, if the
 |end_line_char| has |ignore| as its catcode.)
 
-Six auxiliary functions/procedures for enc\TeX{} 
-(by Petr Olsak, see encdoc.tex)
-follows. These functions implement the \.{\\mubyte} code to convert
-the multibytes in |buffer| to one byte or to one control
-sequence. These functions manipulates with a mubyte tree: each node of
-this tree is token list with n+1 tokens (first token consist the byte
-from byte sequence itself and the other tokens points to the
-branches). If you travel from root of the tree to the leaf then you
-find exactly one byte sequence which we have to convert to one byte or
-control sequence. There are two variants of the leaf: the ``definitive 
-end'' or the ``middle leaf'' if a longer byte sequence exists and the mubyte
-tree continues under this leaf. First variant is implemented as one
-memory word where the link part includes the token to
-which we have to convert and type part includes the number 60 (normal
-conversion) or 1..52 (insert the control sequence). 
-The second variant of ``middle leaf'' is implemented as two memory words:
-first one has a type advanced by 64 and link points to the second
-word where info part includes the token to which we have to convert
-and link points to the next token list with the branches of 
-the subtree.
+Some additional routines used by the enc\TeX extension have to be
+declared at this point.
 
-The inversion: one byte to multi byte (for
-log printing and \.{\\write} printing) is implemented via pool. Each
-multibyte sequence is stored in pool as a string and
-|mubyte_write|[{\it printed char\/}] points to this string.
-
-@d new_mubyte_node == 
-  link (p) := get_avail; p := link (p); info (p) := get_avail; p := info (p)
-@d subinfo (#) == subtype (#)
-
-@p function read_buffer(var i: pointer):ASCII_code; 
-                        { reads buffer[i] and convert multibyte }
-var p: pointer;
-    last_found: integer;
-    last_type: integer;
-begin
-  mubyte_skip := 0; mubyte_token := 0; 
-  read_buffer := buffer[i];
-  if mubyte_in = 0 then
-  begin
-    if mubyte_keep > 0 then mubyte_keep := 0;
-    return ;
-  end;
-  last_found := -2;
-  if (i = start) and (not mubyte_start) then
-  begin
-    mubyte_keep := 0;
-    if (end_line_char >= 0) and (end_line_char < 256) then
-      if mubyte_read [end_line_char] <> null then
-      begin
-        mubyte_start := true; mubyte_skip := -1;
-        p := mubyte_read [end_line_char];
-        goto continue;
-      end;
-  end;
-restart:
-  mubyte_start := false;
-  if (mubyte_read [buffer[i]] = null) or (mubyte_keep > 0) then 
-  begin
-    if mubyte_keep > 0 then decr (mubyte_keep);
-    return ;
-  end;
-  p := mubyte_read [buffer[i]];
-continue:
-  if type (p) >= 64 then
-  begin
-    last_type := type (p) - 64;
-    p := link (p); 
-    mubyte_token := info (p); last_found := mubyte_skip;
-  end else if type (p) > 0 then 
-  begin
-    last_type := type (p);
-    mubyte_token := link (p);
-    goto found;
-  end;
-  incr (mubyte_skip);
-  if i + mubyte_skip > limit then
-  begin
-    mubyte_skip := 0;
-    if mubyte_start then goto restart;
-    return;
-  end;
-  repeat
-    p := link (p);
-    if subinfo (info(p)) = buffer [i+mubyte_skip] then
-    begin
-      p := info (p); goto continue;
-    end;
-  until link (p) = null;
-  mubyte_skip := 0;
-  if mubyte_start then goto restart;
-  if last_found = -2 then return;  { no found }
-  mubyte_skip := last_found;
-found:
-  if mubyte_token < 256 then  { multibyte to one byte }
-  begin
-    read_buffer := mubyte_token;  mubyte_token := 0; 
-    i := i + mubyte_skip;
-    if mubyte_start and (i >= start) then mubyte_start := false;
-    return;
-  end else begin     { multibyte to control sequence }
-    read_buffer := 0;
-    if last_type = 60 then { normal conversion }
-      i := i + mubyte_skip
-    else begin            { insert control sequence }
-      decr (i); mubyte_keep := last_type;
-      if i < start then mubyte_start := true;
-      if last_type = 52 then mubyte_keep := 10000;
-      if last_type = 51 then mubyte_keep := mubyte_skip + 1;
-      mubyte_skip := -1;  
-    end;
-    if mubyte_start and (i >= start) then mubyte_start := false;
-    return;
-  end;
-exit: end;
-@#
-procedure mubyte_update; { saves new string to mubyte tree }
-var j: pool_pointer;
-    p: pointer;
-    q: pointer;
-    in_mutree: integer;
-begin
-  j := str_start [str_ptr];
-  if mubyte_read [so(str_pool[j])] = null then
-  begin
-    in_mutree := 0;    
-    p := get_avail;
-    mubyte_read [so(str_pool[j])] := p;
-    subinfo (p) := so(str_pool[j]); type (p) := 0;
-  end else begin
-    in_mutree := 1;
-    p := mubyte_read [so(str_pool[j])];
-  end;
-  incr (j);
-  while j < pool_ptr do 
-  begin
-    if in_mutree = 0 then 
-    begin
-      new_mubyte_node; subinfo (p) := so(str_pool[j]); type (p) := 0;
-    end else { |in_mutree| = 1 }
-      if (type (p) > 0) and (type (p) < 64) then 
-      begin
-        type (p) := type (p) + 64;
-        q := link (p); link (p) := get_avail; p := link (p); 
-        info (p) := q; 
-        new_mubyte_node; subinfo (p) := so(str_pool[j]); type (p) := 0;
-        in_mutree := 0;
-      end else begin
-        if type (p) >= 64 then p := link (p);
-        repeat
-          p := link (p);
-          if subinfo (info(p)) = so(str_pool[j]) then
-          begin
-            p := info (p); 
-            goto continue;
-          end;
-        until link (p) = null;
-        new_mubyte_node; subinfo (p) := so(str_pool[j]); type (p) := 0;
-        in_mutree := 0;
-      end;
-continue: 
-    incr (j);
-  end;
-  if in_mutree = 1 then
-  begin
-    if type (p) = 0 then
-    begin
-       type (p) := mubyte_prefix + 64;
-       q := link (p);  link (p) := get_avail; p := link (p);
-       link (p) := q; info (p) := mubyte_stoken;
-       return; 
-    end;
-    if type (p) >= 64 then
-    begin
-      type (p) := mubyte_prefix + 64;
-      p := link (p); info (p) := mubyte_stoken;
-      return;
-    end;
-  end;
-  type (p) := mubyte_prefix;
-  link (p) := mubyte_stoken;
-exit: end;
-@#
-procedure dispose_munode (p: pointer); { frees a mu subtree recursivelly }
-var q: pointer;
-begin
-  if (type (p) > 0) and (type (p) < 64) then free_avail (p)
-  else begin
-    if type (p) >= 64 then
-    begin
-      q := link (p); free_avail (p); p := q;
-    end;
-    q := link (p); free_avail (p); p := q;
-    while p <> null do
-    begin
-      dispose_munode (info (p));
-      q := link (p);
-      free_avail (p);
-      p := q;
-    end;
-  end;     
-end;
-@#
-procedure dispose_mutableout (cs: pointer); { frees record from out table }
-var p, q, r: pointer;
-begin
-  p := mubyte_cswrite [cs mod 128];
-  r := null;
-  while p <> null do
-    if info (p) = cs then
-    begin
-      if r <> null then link (r) := link (link (p))
-      else mubyte_cswrite[cs mod 128] := link (link (p));
-      q := link (link(p)); 
-      free_avail (link(p)); free_avail (p);
-      p := q;  
-    end else begin
-      r := link (p); p := link (r);
-    end;
-end;
-@#
-function my_make_string: str_number; 
-                        { as |make_string| but avoids dublets }
-var s, v: str_number;
-begin
-  v := make_string;
-  my_make_string := v;
-  s := 1; { we spend a time to save the pool size }
-  while s < str_ptr - 1 do
-  begin
-    if str_eq_str (s, v) then
-    begin
-      my_make_string := s;
-      flush_string; {we need not the string in pool twice}
-      s := str_ptr; {leave the loop}
-    end;
-    incr (s);
-  end;
-end;
-@#
-procedure reprint_buffer; { prints one char from |buffer|[|loc_reprint|] }
-var c: ASCII_code;
-begin
-  if mubyte_in = 0 then print (buffer[loc_reprint]) { normal TeX }
-  else if mubyte_log > 0 then print_char (buffer[loc_reprint])
-       else begin
-         c := read_buffer (loc_reprint);
-         if mubyte_token > 0 then print_cs (mubyte_token-cs_token_flag)
-         else print (c);
-       end;
-  incr (loc_reprint);
-end;
+@p @t\4@>@<Declare additional routines for enc\TeX@>@/
 @z
-
 
 @x [24.338] l.7164 - i18n fix
 print(" while scanning ");
@@ -1859,11 +1751,14 @@ var k:0..buf_size; {an index into |buffer|}
 @!p:pointer;  {for encTeX test if noexpanding}
 @z
 
-@x [24.343] - encTeX: the buffer accessing via read_buffer
+@x [24.343] - encTeX: access the buffer via read_buffer
   begin cur_chr:=buffer[loc]; incr(loc);
 @y
   begin
-    cur_chr := read_buffer (loc); incr (loc); 
+    { Use |k| instead of |loc| for type correctness. }
+    k := loc;
+    cur_chr := read_buffer (k);
+    loc := k; incr (loc); 
     if (mubyte_token > 0) then
     begin
       state := mid_line;
@@ -1872,7 +1767,7 @@ var k:0..buf_size; {an index into |buffer|}
     end;
 @z
 
-@x [24.354] - encTeX: the buffer accessing via read_buffer
+@x [24.354] - encTeX: access the buffer via read_buffer
 else  begin start_cs: k:=loc; cur_chr:=buffer[k]; cat:=cat_code(cur_chr);
   incr(k);
 @y
@@ -1906,7 +1801,7 @@ begin
 end;
 @z
 
-@x [24.356] - encTeX: the buffer accessing via read_buffer
+@x [24.356] - encTeX: access the buffer via read_buffer
 begin repeat cur_chr:=buffer[k]; cat:=cat_code(cur_chr); incr(k);
 until (cat<>letter)or(k>limit);
 @<If an expanded...@>;
@@ -1975,8 +1870,8 @@ end
 @x [24.363] encTeX - native buffer printing
   if start<limit then for k:=start to limit-1 do print(buffer[k]);
 @y
-  loc_reprint := start;
-  while loc_reprint < limit do reprint_buffer;
+  k := start;
+  while k < limit do begin print_buffer(k) end;
 @z
 
 @x [25.372] - encTeX: we need to distinguish \endcsname and \endmubyte
@@ -1985,7 +1880,7 @@ if cur_cmd<>end_cs_name then @<Complain about missing \.{\\endcsname}@>;
 if (cur_cmd<>end_cs_name) or (cur_chr<>0) then @<Complain about missing \.{\\endcsname}@>;
 @z
 
-@x [26.414] l.8358 - encTeX: accessing the xord/xchr
+@x [26.414] l.8358 - encTeX: accessing xord/xchr/xprn
 if m=math_code_base then scanned_result(ho(math_code(cur_val)))(int_val)
 @y
 if m=xord_code_base then scanned_result(xord[cur_val])(int_val)
@@ -2230,6 +2125,22 @@ pack_job_name(".fls");
 recorder_change_filename(stringcast(name_of_file+1));
 @z
 
+@x [29.534] l.10293 - MLTeX: add MLTeX banner after loading fmt file
+@<Print the banner line, including the date and time@>;
+@y
+@<Print the banner line, including the date and time@>;
+if mltex_enabled_p then
+  begin wlog_cr; wlog('MLTeX v2.2 enabled');
+  end;
+if enctex_enabled_p then
+  begin wlog_cr; wlog(encTeX_banner); wlog(', reencoding enabled');
+    if translate_filename then
+      begin wlog_cr;
+        wlog(' (\xordcode, \xchrcode, \xprncode overridden by TCX)');
+    end;
+  end;
+@z
+
 @x
 begin wlog(banner);
 @y
@@ -2259,74 +2170,28 @@ months := ' JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC';
 @x [29/536] l.10331
 end
 @y
-selector := term_and_log;
-if fmt_is_read and enc_option and (not enc_from_fmt) then
-begin
-  wlog_cr; file_offset := 0;
-  print ("encTeX is disabled in format file, use -enc in initex.");
-  wterm_cr; term_offset := 0;
-  enc_option := false;
-end;
-if enc_from_fmt then
-begin
-  if (not enc_option) then
-  begin
-    wterm (encTeX_banner);
-    wterm (' initialized from format, the reencoding enabled.');
-    wterm_cr;
-  end;
-  wlog_cr;
-  wlog (encTeX_banner);
-  wlog (' initialized from format, the reencoding enabled.');
-  enc_option := true;
-end else
-if enc_option then
-begin
-  wlog_cr;
-  wlog (encTeX_banner);
-  wlog ('initialized, the reencoding enabled.');
-end;
-if enc_option and translate_filename then
-begin
-  wlog_cr; file_offset := 0;
-  print (" TCX may overwrite the encTeX values \xordcode, \xchrcode, \xprncode:");
-  setup_charset;
-  print_nl (" (");
-  fputs (translate_filename, stdout);
-  fputs (translate_filename, log_file);
-  print (")");
-  wterm_cr; term_offset := 0;
-end;
-if not enc_option then
-begin
-  setup_charset; { may be xprn vector is set by locale info }
-  if translate_filename then
-  begin
-    wlog_cr; file_offset := 0;
-    print (" (");
-    fputs (translate_filename, stdout);
-    fputs (translate_filename, log_file);
-    print (")");
-    wterm_cr; term_offset := 0;
-  end;
-end;
-selector := log_only;
 if shell_enabled_p then begin
   wlog_cr;
   wlog('\write18 enabled.')
-end;
+  end;
 if src_specials_p then begin
   wlog_cr;
   wlog(' Source specials enabled.')
-end;
+  end;
 if file_line_error_style_p then begin
   wlog_cr;
   wlog(' file:line:error style messages enabled.')
-end;
+  end;
 if parse_first_line_p then begin
   wlog_cr;
   wlog(' %&-line parsing enabled.');
-end;
+  end;
+if translate_filename then begin
+  wlog_cr;
+  wlog(' (');
+  fputs(translate_filename, log_file);
+  wlog(')');
+  end;
 end
 @z
 
@@ -3524,7 +3389,7 @@ if every_display<>null then begin_token_list(every_display,every_display_text);
   if every_vbox<>null then begin_token_list(every_vbox,every_vbox_text);
 @z
 
-@x [49.1211] - encTeX: for \mubyte primitive
+@x [49.1211] - encTeX: extra variables for \mubyte primitive
 @!p,@!q:pointer; {for temporary short-term use}
 @y
 @!p,@!q,@!r:pointer; {for temporary short-term use}
@@ -3537,16 +3402,19 @@ if (cur_cs=0)or(cur_cs>eqtb_top)or
   ((cur_cs>frozen_control_sequence)and(cur_cs<=eqtb_size)) then
 @z
 
-@x [49.1219] - encTeX: \mubyte primitive
+@x [49.1219] - encTeX: \mubyte and \noconvert primitives
 primitive("futurelet",let,normal+1);@/
 @!@:future_let_}{\.{\\futurelet} primitive@>
 @y
 primitive("futurelet",let,normal+1);@/
 @!@:future_let_}{\.{\\futurelet} primitive@>
-primitive("mubyte",let,normal+10);@/
+if enctex_p then
+begin
+  primitive("mubyte",let,normal+10);@/
 @!@:mubyte_}{\.{\\mubyte} primitive@>
-primitive("noconvert",let,normal+11);@/
+  primitive("noconvert",let,normal+11);@/
 @!@:noconvert_}{\.{\\noconvert} primitive@>
+end;
 @z
 
 @x [49.1220] - encTeX: \mubyte primitive
@@ -3644,14 +3512,14 @@ let:  if cur_chr = normal+11 then do_nothing  { noconvert primitive }
                   p := link (p); 
                   if mubyte_relax then begin
                     info (p) := 0; pool_ptr := str_start [str_ptr];
-                  end else info (p) := my_make_string; 
+                  end else info (p) := slow_make_string; 
                   link (p) := r;
                 end;
               end else begin                       { single character  }
                 if str_start [str_ptr] = pool_ptr then
                   mubyte_write [mubyte_stoken] := 0
                 else 
-                  mubyte_write [mubyte_stoken] := my_make_string;
+                  mubyte_write [mubyte_stoken] := slow_make_string;
               end;
             end else pool_ptr := str_start [str_ptr];
           end;
@@ -3712,7 +3580,9 @@ else begin n:=cur_chr; get_r_token; p:=cur_cs; define(p,relax,256);
 primitive("catcode",def_code,cat_code_base);
 @!@:cat_code_}{\.{\\catcode} primitive@>
 @y
-if enc_option then
+primitive("catcode",def_code,cat_code_base);
+@!@:cat_code_}{\.{\\catcode} primitive@>
+if enctex_p then
 begin
   primitive("xordcode",def_code,xord_code_base);
 @!@:xord_code_}{\.{\\xordcode} primitive@>
@@ -3721,11 +3591,9 @@ begin
   primitive("xprncode",def_code,xprn_code_base);
 @!@:xprn_code_}{\.{\\xprncode} primitive@>
 end;
-primitive("catcode",def_code,cat_code_base);
-@!@:cat_code_}{\.{\\catcode} primitive@>
 @z
 
-@x [49.1231] l.22956 - encTeX: \xordcode, \xchrcode primitives
+@x [49.1231] l.22956 - encTeX: \xordcode, \xchrcode, \xprncode primitives
 def_code: if chr_code=cat_code_base then print_esc("catcode")
 @y
 def_code: if chr_code=xord_code_base then print_esc("xordcode")
@@ -3734,7 +3602,7 @@ def_code: if chr_code=xord_code_base then print_esc("xordcode")
   else if chr_code=cat_code_base then print_esc("catcode")
 @z
 
-@x [49.1232] l.22969 - encTeX: setting a new value to xchr/xord
+@x [49.1232] l.22969 - encTeX: setting a new value to xchr/xord/xprn
   p:=cur_chr; scan_char_num; p:=p+cur_val; scan_optional_equals;
   scan_int;
 @y
@@ -3747,7 +3615,7 @@ def_code: if chr_code=xord_code_base then print_esc("xordcode")
   scan_int;
 @z
 
-@x [49.1232] l.22980 - encTeX: setting a new value to xchr/xord
+@x [49.1232] l.22980 - encTeX: setting a new value to xchr/xord/xprn
   if p<math_code_base then define(p,data,cur_val)
 @y
   if p<256 then xord[p]:=cur_val
@@ -3832,7 +3700,7 @@ else kpse_make_tex_discard_errors := 0;
     end;
 @z
 
-@x [49.1279] - encTeX: another concept of message printing because \noconvert
+@x [49.1279] - encTeX: implement \noconvert
 old_setting:=selector; selector:=new_string;
 token_show(def_ref); selector:=old_setting;
 @y
@@ -3843,17 +3711,19 @@ message_printing := false; active_noconvert := false;
 selector:=old_setting;
 @z
 
-@x [49.1279] - encTeX: another concept of message printing because \noconvert
+% WEB2C: there's no distinction between print and slow_print.
+ @x [49.1279] - encTeX: another concept of message printing because \noconvert
 slow_print(s); update_terminal;
-@y
+ @y
 print(s); update_terminal;
-@z
+ @z
 
-@x [49.1279] - encTeX: another concept of message printing because \noconvert
+% WEB2C there's no distinction between print and slow_print.
+ @x [49.1279] - encTeX: another concept of message printing because \noconvert
 begin print_err(""); slow_print(s);
-@y
+ @y
 begin print_err(""); print(s);
-@z
+ @z
 
 @x [50.1301] l.23679 - INI = VIR, so runtime test.
 format_ident:=" (INITEX)";
@@ -3861,26 +3731,51 @@ format_ident:=" (INITEX)";
 if ini_version then format_ident:=" (INITEX)";
 @z
 
-@x [50.1302] l.23690 - Eliminate now-unused variable `w' in `store_fmt_file'.
+% Eliminate now-unused variable `w' in `store_fmt_file'.
+% Add format_engine.
+@x [50.1302] l.23690
 @!w: four_quarters; {four ASCII codes}
 @y
+@!format_engine: ^text_char;
 @z
 
-@x [50.1302] l.23694 - MLTeX: dump |mltex_p| to fmt file
+% MLTeX: dump |mltex_p| to fmt file
+% encTeX: dump encTeX-specific data to fmt file.
+@x [50.1302] l.23694
 @<Dump constants for consistency check@>;
 @y
 @<Dump constants for consistency check@>;
 dump_int(@"4D4C5458);  {ML\TeX's magic constant: "MLTX"}
 if mltex_p then dump_int(1)
 else dump_int(0);
+dump_int(@"45435458);  {enc\TeX's magic constant: "ECTX"}
+if not enctex_p then dump_int(0)
+else begin
+  dump_int(1);
+  dump_things(xord[0], 256);
+  dump_things(xchr[0], 256);
+  dump_things(xprn[0], 256);
+  dump_things(mubyte_read[0], 256);
+  dump_things(mubyte_write[0], 256);
+  dump_things(mubyte_cswrite[0], 128);
+end;
 @z
 
-@x [50.1303] l.23722 - Ditto, for `load_fmt_file'.
+% Eliminate now-unused variable `w' in `load_fmt_file'.
+% Add dummies for undumping encTeX into the void.
+% Add format_engine.
+@x [50.1303] l.23722
 @!w: four_quarters; {four ASCII codes}
 @y
+@!format_engine: ^text_char;
+@!dummy_xord: ASCII_code;
+@!dummy_xchr: text_char;
+@!dummy_xprn: ASCII_code;
 @z
 
-@x [50.1303] l.23694 - MLTeX: undump |mltex_enabled_p| from fmt file
+% MLTeX: undump |mltex_enabled_p| from fmt file
+% encTeX: undump encTeX-specific data from fmt file.
+@x [50.1303] l.23694
 begin @<Undump constants for consistency check@>;
 @y
 begin @<Undump constants for consistency check@>;
@@ -3889,6 +3784,27 @@ if x<>@"4D4C5458 then goto bad_fmt;
 undump_int(x);   {undump |mltex_p| flag into |mltex_enabled_p|}
 if x=1 then mltex_enabled_p:=true
 else if x<>0 then goto bad_fmt;
+undump_int(x);   {check magic constant of enc\TeX}
+if x<>@"45435458 then goto bad_fmt;
+undump_int(x);   {undump |enctex_p| flag into |enctex_enabled_p|}
+if x=0 then enctex_enabled_p:=false
+else if x<>1 then goto bad_fmt
+else begin
+  enctex_enabled_p:=true;
+  if translate_filename then begin
+    for k:=0 to 255 do undump_things(dummy_xord, 1);
+    for k:=0 to 255 do undump_things(dummy_xchr, 1);
+    for k:=0 to 255 do undump_things(dummy_xprn, 1);
+    end
+  else begin
+    undump_things(xord[0], 256);
+    undump_things(xchr[0], 256);
+    undump_things(xprn[0], 256);
+    end;
+  undump_things(mubyte_read[0], 256);
+  undump_things(mubyte_write[0], 256);
+  undump_things(mubyte_cswrite[0], 128);
+end;
 @z
 
 @x [50.1305] l.23751 - Do dumping and undumping of fmt files in C.
@@ -3922,27 +3838,25 @@ else if x<>0 then goto bad_fmt;
 @x [50,1307] l.23779 - texarray
 dump_int(@$);@/
 @y
+dump_int(@"57325458);  {Web2C \TeX's magic constant: "W2TX"}
+{Align engine to 4 bytes with one or more trailing NUL}
+x:=strlen(engine_name);
+format_engine:=xmalloc_array(text_char,x+4);
+strcpy(format_engine, engine_name);
+for k:=x to x+3 do format_engine[k]:=0;
+x:=x+4-(x mod 4);
+dump_int(x);dump_things(format_engine[0], x);
+libc_free(format_engine);@/
 dump_int(@$);@/
 dump_int(max_halfword);@/
 dump_int(hash_high);
 @z
 
 %%%%%%%% dynamic hyph_size
-@x 23784 m.1307, encTeX: xord/xchr/xprn dumping
+@x 23784 m.1307
 dump_int(hyph_size)
 @y  23784
-dump_int(hyph_size);
-dump_int(enc_option);
-if enc_option then
-begin
-  dump_things(xord[0], 256);
-  dump_things(xchr[0], 256);
-  dump_things(xprn[0], 256);
-  dump_things(mubyte_read[0], 256);
-  dump_things(mubyte_write[0], 256);
-  dump_things(mubyte_cswrite[0], 128);
-  print (" encTeX data dumped");
-end
+dump_int(hyph_prime)
 @z
 
 @x [50.1308] l.23793 - texarray
@@ -3954,8 +3868,28 @@ libc_free(font_info); libc_free(str_pool); libc_free(str_start);
 libc_free(yhash); libc_free(zeqtb); libc_free(yzmem);
 @+Tini
 undump_int(x);
+format_debug('format magic number')(x);
+if x<>@"57325458 then goto bad_fmt; {not a format file}
+undump_int(x);
+format_debug('engine name size')(x);
+if (x<0) or (x>256) then goto bad_fmt; {corrupted format file}
+format_engine:=xmalloc_array(text_char, x);
+undump_things(format_engine[0], x);
+format_engine[x-1]:=0; {force string termination, just in case}
+if strcmp(engine_name, format_engine) then
+  begin wake_up_terminal;
+  wterm_ln('---! ', stringcast(name_of_file+1), ' was written by ', format_engine);
+  libc_free(format_engine);
+  goto bad_fmt;
+end;
+libc_free(format_engine);
+undump_int(x);
 format_debug('string pool checksum')(x);
-if x<>@$ then goto bad_fmt; {check that strings are the same}
+if x<>@$ then begin {check that strings are the same}
+  wake_up_terminal;
+  wterm_ln('---! ', stringcast(name_of_file+1), ' doesn''t match ', pool_name);
+  goto bad_fmt;
+end;
 undump_int(x);
 if x<>max_halfword then goto bad_fmt; {check |max_halfword|}
 undump_int(hash_high);
@@ -4002,21 +3936,10 @@ mem := zmem;
 @z
 
 %%%%%%%% dynamic hyph_size
-@x 23804 m.1308, encTeX: xord/xchr/xprn udumping
+@x 23804 m.1308
 if x<>hyph_size then goto bad_fmt
 @y  23804
-if x<>hyph_size then goto bad_fmt;
-fmt_is_read := true;
-undump_int (enc_from_fmt);
-if enc_from_fmt then
-begin
-  undump_things(xord[0], 256);
-  undump_things(xchr[0], 256);
-  undump_things(xprn[0], 256);
-  undump_things(mubyte_read[0], 256);
-  undump_things(mubyte_write[0], 256);
-  undump_things(mubyte_cswrite[0], 128);
-end
+if x<>hyph_prime then goto bad_fmt
 @z
 
 % [1309] Make dumping/undumping more efficient by doing whole arrays at
@@ -4686,6 +4609,12 @@ fix_date_and_time;@/
 if mltex_enabled_p then
   begin wterm_ln('MLTeX v2.2 enabled');
   end;
+if enctex_enabled_p then
+  begin wterm(encTeX_banner); wterm_ln(', reencoding enabled.');
+    if translate_filename then begin
+      wterm_ln(' (\xordcode, \xchrcode, \xprncode overridden by TCX)');
+    end;
+  end;
 fix_date_and_time;@/
 
 @!init
@@ -4772,7 +4701,7 @@ if trie_not_ready then begin {initex without format loaded}
   end;
 @z
 
-@x [53.1341] - encTeX: \write stores mubyte value
+@x [53.1341] - encTeX: keep track of mubyte value for \write
 @d write_stream(#) == info(#+1) {stream number (0 to 17)}
 @y
 @d write_stream(#) == type(#+1) {stream number (0 to 17)}
@@ -4811,13 +4740,13 @@ else if mubyte_out + mubyte_zero >= 2*mubyte_zero then
 begin new_whatsit(special_node,write_node_size); write_stream(tail):=null;
 p:=scan_toks(false,true); write_tokens(tail):=def_ref;
 @y
-begin new_whatsit(special_node,write_node_size); 
+begin new_whatsit(special_node,write_node_size);
 if spec_out + mubyte_zero < 0 then write_stream(tail) := 0
-else if spec_out + mubyte_zero >= 2*mubyte_zero then 
+else if spec_out + mubyte_zero >= 2*mubyte_zero then
        write_stream(tail) := 2*mubyte_zero - 1
      else write_stream(tail) := spec_out + mubyte_zero;
 if mubyte_out + mubyte_zero < 0 then write_mubyte(tail) := 0
-else if mubyte_out + mubyte_zero >= 2*mubyte_zero then 
+else if mubyte_out + mubyte_zero >= 2*mubyte_zero then
        write_mubyte(tail) := 2*mubyte_zero - 1
      else write_mubyte(tail) := mubyte_out + mubyte_zero;
 if (spec_out = 2) or (spec_out = 3) then
@@ -4844,7 +4773,7 @@ special_node:begin print_esc("special");
 if write_stream(p) <> mubyte_zero then
 begin
   print_char ("<"); print_int (write_stream(p)-mubyte_zero);
-  if (write_stream(p)-mubyte_zero = 2) or 
+  if (write_stream(p)-mubyte_zero = 2) or
      (write_stream(p)-mubyte_zero = 3) then
   begin
     print_char (":"); print_int (write_mubyte(p)-mubyte_zero);
@@ -4860,12 +4789,12 @@ old_setting:=selector; selector:=new_string;
 spec_sout := spec_out;  spec_out := write_stream(p) - mubyte_zero;
 mubyte_sout := mubyte_out;  mubyte_out := write_mubyte(p) - mubyte_zero;
 active_noconvert := true;
-mubyte_slog := mubyte_log;  
+mubyte_slog := mubyte_log;
 mubyte_log := 0;
 if (mubyte_out > 0) or (mubyte_out = -1) then mubyte_log := 1;
 if (spec_out = 2) or (spec_out = 3) then
 begin
-  if (mubyte_out > 0) or (mubyte_out = -1) then 
+  if (mubyte_out > 0) or (mubyte_out = -1) then
   begin
     special_printing := true; mubyte_log := 1;
   end;
@@ -4877,7 +4806,7 @@ end;
 for k:=str_start[str_ptr] to pool_ptr-1 do dvi_out(so(str_pool[k]));
 @y
 if (spec_out = 1) or (spec_out = 3) then
-  for k:=str_start[str_ptr] to pool_ptr-1 do 
+  for k:=str_start[str_ptr] to pool_ptr-1 do
     str_pool[k] := si(xchr[so(str_pool[k])]);
 for k:=str_start[str_ptr] to pool_ptr-1 do dvi_out(so(str_pool[k]));
 spec_out := spec_sout; mubyte_out := mubyte_sout; mubyte_log := mubyte_slog;
@@ -4885,12 +4814,12 @@ special_printing := false; cs_converting := false;
 active_noconvert := false;
 @z
 
-@x [53.1370] l.24770 - \write 18 + encTeX 
+@x [53.1370] l.24770 - \write18{foo} / encTeX
 begin @<Expand macros in the token list
 @y
 @!d:integer; {number of characters in incomplete current string}
 @!clobbered:boolean; {system string is ok?}
-begin 
+begin
 mubyte_sout := mubyte_out;  mubyte_out := write_mubyte(p) - mubyte_zero;
 if (mubyte_out > 2) or (mubyte_out = -1) or (mubyte_out = -2) then
   write_noexpanding := true;
@@ -4906,7 +4835,7 @@ if shell_enabled_p and (j=18) then
 else if write_open[j] then selector:=j
 @z
 
-@x [53.1370] - encTeX: converting in \write parameter
+@x [53.1370] - encTeX: conversion in parameter of \write
 token_show(def_ref); print_ln;
 @y
 active_noconvert := true;
@@ -5019,7 +4948,7 @@ strings.
 @<Global...@> =
 @!save_str_ptr: str_number;
 @!save_pool_ptr: pool_pointer;
-@!shell_enabled_p: boolean;
+@!shell_enabled_p: c_int_type;
 @!output_comment: ^char;
 @!k,l: 0..255; {used by `Make the first 256 strings', etc.}
 
@@ -5349,6 +5278,299 @@ probably be changed in one of the next ML\TeX{} versions.
   dvi_out(base_c);@/
   cur_h:=cur_h+base_width;
   dvi_h:=cur_h {update of |dvi_h| is unnecessary, will be set in module 620}
+
+
+@* \[54/ML\TeX] System-dependent changes for ML\TeX.
+
+The boolean variable |mltex_p| is set by web2c according to the given
+command line option (or an entry in the configuration file) before any
+\TeX{} function is called.
+
+@<Global...@> =
+@!mltex_p: boolean;
+
+@ The boolean variable |mltex_enabled_p| is used to enable ML\TeX's
+character substitution.  It is initialised to |false|.  When loading
+a \.{FMT} it is set to the value of the boolean |mltex_p| saved in
+the \.{FMT} file.  Additionally it is set to the value of |mltex_p|
+in Ini\TeX.
+
+@<Glob...@>=
+@!mltex_enabled_p:boolean;  {enable character substitution}
+
+
+@ @<Set init...@>=
+mltex_enabled_p:=false;
+
+
+@* \[54/enc\TeX] System-dependent changes for enc\TeX.
+
+@d encTeX_banner == ' encTeX v. Feb. 2003'
+
+@ The boolean variable |enctex_p| is set by web2c according to the given
+command line option (or an entry in the configuration file) before any
+\TeX{} function is called.
+
+@<Global...@> =
+@!enctex_p: boolean;
+
+
+@ The boolean variable |enctex_enabled_p| is used to enable enc\TeX's
+primitives.  It is initialised to |false|.  When loading a \.{FMT} it
+is set to the value of the boolean |enctex_p| saved in the \.{FMT} file.
+Additionally it is set to the value of |enctex_p| in Ini\TeX.
+
+@<Glob...@>=
+@!enctex_enabled_p:boolean;  {enable encTeX}
+
+
+@ @<Set init...@>=
+enctex_enabled_p:=false;
+
+
+@ Auxiliary functions/procedures for enc\TeX{} (by Petr Olsak) follow.
+These functions implement the \.{\\mubyte} code to convert
+the multibytes in |buffer| to one byte or to one control
+sequence. These functions manipulate a mubyte tree: each node of
+this tree is token list with n+1 tokens (first token consist the byte
+from the byte sequence itself and the other tokens point to the
+branches). If you travel from root of the tree to a leaf then you
+find exactly one byte sequence which we have to convert to one byte or
+control sequence. There are two variants of the leaf: the ``definitive 
+end'' or the ``middle leaf'' if a longer byte sequence exists and the mubyte
+tree continues under this leaf. First variant is implemented as one
+memory word where the link part includes the token to
+which we have to convert and type part includes the number 60 (normal
+conversion) or 1..52 (insert the control sequence). 
+The second variant of ``middle leaf'' is implemented as two memory words:
+first one has a type advanced by 64 and link points to the second
+word where info part includes the token to which we have to convert
+and link points to the next token list with the branches of 
+the subtree.
+
+The inverse: one byte to multi byte (for log printing and \.{\\write}
+printing) is implemented via a pool. Each multibyte sequence is stored
+in a pool as a string and |mubyte_write|[{\it printed char\/}] points
+to this string.
+
+@d new_mubyte_node == 
+  link (p) := get_avail; p := link (p); info (p) := get_avail; p := info (p)
+@d subinfo (#) == subtype (#)
+
+@<Basic printing...@>=
+{ read |buffer|[|i|] and convert multibyte.  |i| should have been
+  of type 0..|buf_size|, but web2c doesn't like that construct in
+  argument lists. }
+function read_buffer(var i:integer):ASCII_code; 
+var p: pointer;
+    last_found: integer;
+    last_type: integer;
+begin
+  mubyte_skip := 0; mubyte_token := 0; 
+  read_buffer := buffer[i];
+  if mubyte_in = 0 then
+  begin
+    if mubyte_keep > 0 then mubyte_keep := 0;
+    return ;
+  end;
+  last_found := -2;
+  if (i = start) and (not mubyte_start) then
+  begin
+    mubyte_keep := 0;
+    if (end_line_char >= 0) and (end_line_char < 256) then
+      if mubyte_read [end_line_char] <> null then
+      begin
+        mubyte_start := true; mubyte_skip := -1;
+        p := mubyte_read [end_line_char];
+        goto continue;
+      end;
+  end;
+restart:
+  mubyte_start := false;
+  if (mubyte_read [buffer[i]] = null) or (mubyte_keep > 0) then 
+  begin
+    if mubyte_keep > 0 then decr (mubyte_keep);
+    return ;
+  end;
+  p := mubyte_read [buffer[i]];
+continue:
+  if type (p) >= 64 then
+  begin
+    last_type := type (p) - 64;
+    p := link (p); 
+    mubyte_token := info (p); last_found := mubyte_skip;
+  end else if type (p) > 0 then 
+  begin
+    last_type := type (p);
+    mubyte_token := link (p);
+    goto found;
+  end;
+  incr (mubyte_skip);
+  if i + mubyte_skip > limit then
+  begin
+    mubyte_skip := 0;
+    if mubyte_start then goto restart;
+    return;
+  end;
+  repeat
+    p := link (p);
+    if subinfo (info(p)) = buffer [i+mubyte_skip] then
+    begin
+      p := info (p); goto continue;
+    end;
+  until link (p) = null;
+  mubyte_skip := 0;
+  if mubyte_start then goto restart;
+  if last_found = -2 then return;  { no found }
+  mubyte_skip := last_found;
+found:
+  if mubyte_token < 256 then  { multibyte to one byte }
+  begin
+    read_buffer := mubyte_token;  mubyte_token := 0; 
+    i := i + mubyte_skip;
+    if mubyte_start and (i >= start) then mubyte_start := false;
+    return;
+  end else begin     { multibyte to control sequence }
+    read_buffer := 0;
+    if last_type = 60 then { normal conversion }
+      i := i + mubyte_skip
+    else begin            { insert control sequence }
+      decr (i); mubyte_keep := last_type;
+      if i < start then mubyte_start := true;
+      if last_type = 52 then mubyte_keep := 10000;
+      if last_type = 51 then mubyte_keep := mubyte_skip + 1;
+      mubyte_skip := -1;  
+    end;
+    if mubyte_start and (i >= start) then mubyte_start := false;
+    return;
+  end;
+exit: end;
+
+@ @<Declare additional routines for enc\TeX@>=
+procedure mubyte_update; { saves new string to mubyte tree }
+var j: pool_pointer;
+    p: pointer;
+    q: pointer;
+    in_mutree: integer;
+begin
+  j := str_start [str_ptr];
+  if mubyte_read [so(str_pool[j])] = null then
+  begin
+    in_mutree := 0;    
+    p := get_avail;
+    mubyte_read [so(str_pool[j])] := p;
+    subinfo (p) := so(str_pool[j]); type (p) := 0;
+  end else begin
+    in_mutree := 1;
+    p := mubyte_read [so(str_pool[j])];
+  end;
+  incr (j);
+  while j < pool_ptr do 
+  begin
+    if in_mutree = 0 then 
+    begin
+      new_mubyte_node; subinfo (p) := so(str_pool[j]); type (p) := 0;
+    end else { |in_mutree| = 1 }
+      if (type (p) > 0) and (type (p) < 64) then 
+      begin
+        type (p) := type (p) + 64;
+        q := link (p); link (p) := get_avail; p := link (p); 
+        info (p) := q; 
+        new_mubyte_node; subinfo (p) := so(str_pool[j]); type (p) := 0;
+        in_mutree := 0;
+      end else begin
+        if type (p) >= 64 then p := link (p);
+        repeat
+          p := link (p);
+          if subinfo (info(p)) = so(str_pool[j]) then
+          begin
+            p := info (p); 
+            goto continue;
+          end;
+        until link (p) = null;
+        new_mubyte_node; subinfo (p) := so(str_pool[j]); type (p) := 0;
+        in_mutree := 0;
+      end;
+continue: 
+    incr (j);
+  end;
+  if in_mutree = 1 then
+  begin
+    if type (p) = 0 then
+    begin
+       type (p) := mubyte_prefix + 64;
+       q := link (p);  link (p) := get_avail; p := link (p);
+       link (p) := q; info (p) := mubyte_stoken;
+       return; 
+    end;
+    if type (p) >= 64 then
+    begin
+      type (p) := mubyte_prefix + 64;
+      p := link (p); info (p) := mubyte_stoken;
+      return;
+    end;
+  end;
+  type (p) := mubyte_prefix;
+  link (p) := mubyte_stoken;
+exit: end;
+@#
+procedure dispose_munode (p: pointer); { frees a mu subtree recursivelly }
+var q: pointer;
+begin
+  if (type (p) > 0) and (type (p) < 64) then free_avail (p)
+  else begin
+    if type (p) >= 64 then
+    begin
+      q := link (p); free_avail (p); p := q;
+    end;
+    q := link (p); free_avail (p); p := q;
+    while p <> null do
+    begin
+      dispose_munode (info (p));
+      q := link (p);
+      free_avail (p);
+      p := q;
+    end;
+  end;     
+end;
+@#
+procedure dispose_mutableout (cs: pointer); { frees record from out table }
+var p, q, r: pointer;
+begin
+  p := mubyte_cswrite [cs mod 128];
+  r := null;
+  while p <> null do
+    if info (p) = cs then
+    begin
+      if r <> null then link (r) := link (link (p))
+      else mubyte_cswrite[cs mod 128] := link (link (p));
+      q := link (link(p)); 
+      free_avail (link(p)); free_avail (p);
+      p := q;  
+    end else begin
+      r := link (p); p := link (r);
+    end;
+end;
+
+@ The |print_buffer| procedure prints one character from |buffer|[|i|].
+It also increases |i| to the next character in the buffer.
+
+@<Basic printing...@>=
+{ print one char from |buffer|[|i|]. |i| should have been of type
+  0..|buf_size|, but web2c doesn't like that construct in argument lists. }
+procedure print_buffer(var i:integer);
+var c: ASCII_code;
+begin
+  if mubyte_in = 0 then print (buffer[i]) { normal TeX }
+  else if mubyte_log > 0 then print_char (buffer[i])
+       else begin
+         c := read_buffer (i);
+         if mubyte_token > 0 then print_cs (mubyte_token-cs_token_flag)
+         else print (c);
+       end;
+  incr (i);
+end;
+
 
 
 @* \[54] System-dependent changes.

@@ -2,6 +2,8 @@
 
    Written in 1996 by K. Berry.  Public domain.  */
 
+/* $Id: //depot/Build/source.development/TeX/texk/web2c/lib/printversion.c#6 $ */
+
 #include "config.h"
 
 /* We're passed in the original WEB banner string, which has the form
@@ -38,12 +40,12 @@ printversionandexit P3C(const_string, banner,
   puts (kpathsea_version_string);
 
   if (copyright_holder) {
-    printf ("Copyright (C) 1997-2003 %s.\n", copyright_holder);
+    printf ("Copyright (C) 1997-2004 %s.\n", copyright_holder);
     if (!author)
       author = copyright_holder;
   }
 
-  puts ("Kpathsea is copyright (C) 1997-2003 Free Software Foundation, Inc.");
+  puts ("Kpathsea is copyright (C) 1997-2004 Free Software Foundation, Inc.");
 
   puts ("There is NO warranty.  Redistribution of this software is");
   fputs ("covered by the terms of ", stdout);

@@ -593,6 +593,7 @@ kpse_set_program_name P2C(const_string, argv0, const_string, progname)
       kpse_program_name = xstrdup (program_invocation_short_name);
     }
   }
+
   xputenv("progname", kpse_program_name);
 }
 

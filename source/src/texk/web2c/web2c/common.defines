@@ -5,8 +5,6 @@
  Some are standard Pascal functions, others are simply used in our
  implementation.
 
- $Id: //depot/Build/source.development/TeX/texk/web2c/web2c/common.defines#8 $
-
  web2c.yacc can parse these @define statements.}
 
 {The fields in the memory_word structure, defined in
@@ -59,10 +57,12 @@
 @define const stdout;
 @define const true;
 
+@define const ALEPHHELP;
 @define const BIBTEXHELP;
 @define const DVICOPYHELP;
 @define const DVITOMPHELP;
 @define const DVITYPEHELP;
+@define const EOMEGAHELP;
 @define const ETEXHELP;
 @define const GFTODVIHELP;
 @define const GFTOPKHELP;
@@ -109,6 +109,7 @@
 @define function fabs ();
 @define function feof ();
 @define function findsuffix ();
+@define function floor ();
 @define function ftell ();
 @define function fopen ();
 @define function getc ();

@@ -65,6 +65,11 @@ manfiles=		\
 	vptovf.1	\
 	weave.1
 
+pdftex.man : pdftexman.m4
+	m4 -P -DOLD $(srcdir)/pdftexman.m4 > pdftex.man	
+pdfetex.man : pdftexman.m4
+	m4 -P $(srcdir)/pdftexman.m4 > pdfetex.man
+
 default all: manfiles
 
 ac_include ../make/man.mk

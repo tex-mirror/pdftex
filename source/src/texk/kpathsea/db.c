@@ -40,6 +40,15 @@ static hash_table_type db; /* The hash table for all the ls-R's.  */
 #ifndef DB_NAME
 #define DB_NAME "ls-R"
 #endif
+#ifndef DB_NAME_LC
+#define DB_NAME_LC "ls-r"
+#endif
+
+static const_string db_names[] = {
+    DB_NAME,
+    DB_NAME_LC,
+    NULL
+};
 
 static hash_table_type alias_db;
 #ifndef ALIAS_NAME
@@ -336,10 +345,16 @@ void
 kpse_init_db P1H(void)
 {
   boolean ok = false;
-  const_string db_path = kpse_init_format (kpse_db_format);
-  string *db_files = kpse_all_path_search (db_path, DB_NAME);
-  string *orig_db_files = db_files;
+  const_string db_path;
+  string *db_files;
+  string *orig_db_files;
 
+  assert(sizeof(DB_NAME) == sizeof(DB_NAME_LC));
+
+  db_path = kpse_init_format (kpse_db_format);
+  db_files = kpse_all_path_search_list (db_path, db_names);
+  orig_db_files = db_files;
+  
   /* Must do this after the path searching (which ends up calling
     kpse_db_search recursively), so db.buckets stays NULL.  */
   db = hash_create (DB_HASH_SIZE);
@@ -562,6 +577,10 @@ kpse_db_search_list P3C(const_string*, names,  const_string, path_elt,
   done = false;
   /* Handle each name. */
   for (n = 0; !done && names[n]; n++) {
+      /* Absolute names have already been caught in our caller. */
+      if (kpse_absolute_p(names[n], true))
+          continue;
+
       /* If we have aliases for this name, use them.  */
       if (alias_db.buckets)
           aliases = hash_lookup (alias_db, names[n]);

@@ -173,7 +173,13 @@ dir_list_search_list P3C(str_llist_type *, dirs,  const_string*, names,
       
       for (i = 0; names[i]; i++) {
           const_string name = names[i];
-          unsigned name_len = strlen(name);
+          unsigned name_len;
+
+          /* Don't bother with absolute & explicit relative. */
+          if (kpse_absolute_p(name, true))
+              continue;
+          
+          name_len = strlen(name);
 
           while (dir_len + name_len + 1 > allocated) {
               allocated += allocated;
@@ -397,6 +403,7 @@ search_list P4C(const_string, path,  const_string*, names,
   const_string* namep;
   string elt;
   boolean done = false;
+  boolean all_absolute = true;
 
 #ifdef __DJGPP__
   /* We will use `stat' heavily, so let's request for
@@ -435,13 +442,24 @@ search_list P4C(const_string, path,  const_string*, names,
   
   /* No need to do any expansion on names.  */
 
+  /* First catch any absolute or explicit relative names. */
   for (namep = names; *namep; namep++) {
-      if (kpse_absolute_p(*namep, true) && kpse_readable_file(*namep)) {
+      if (kpse_absolute_p(*namep, true)) {
+          if (kpse_readable_file(*namep)) {
           str_list_add(&ret_list, xstrdup(*namep));
           /* I know, I know... */
-          goto out;
+          if (!all)
+              goto out;
+          }
+      } else {
+          all_absolute = false;
       }
   }
+  /* Shortcut: if we were only given absolute/explicit relative names,
+     we can skip the rest.  Typically, if one name is absolute, they
+     all are, because our caller derived them from each other. */
+  if (all_absolute)
+      goto out;
 
   /* Look at each path element in turn. */
   for (elt = kpse_path_element (path); !done && elt;
@@ -551,6 +569,13 @@ kpse_all_path_search P2C(const_string, path,  const_string, name)
 {
   string *ret = search (path, name, true, true);
   return ret;
+}
+
+string *
+kpse_all_path_search_list P2C(const_string, path,  const_string*, names)
+{
+    string *ret = search_list (path, names, true, true);
+    return ret;
 }
 
 #ifdef TEST

@@ -28,20 +28,30 @@
 
 /* Some things are the same except for the name.  */
 #ifdef TeX
-#if defined(pdfeTeX)
+#if defined (pdfeTeX)
 #define TEXPOOLNAME "pdfetex.pool"
-#elif defined(pdfxTeX)
+#define TEXENGINENAME "pdfetex"
+#elif defined (pdfxTeX)
 #define TEXPOOLNAME "pdfxtex.pool"
+#define TEXENGINENAME "pdfxtex"
 #elif defined (pdfTeX)
 #define TEXPOOLNAME "pdftex.pool"
+#define TEXENGINENAME "pdftex"
 #elif defined (eTeX)
 #define TEXPOOLNAME "etex.pool"
+#define TEXENGINENAME "etex"
 #elif defined (Omega)
 #define TEXPOOLNAME "omega.pool"
+#define TEXENGINENAME "omega"
 #elif defined (eOmega)
 #define TEXPOOLNAME "eomega.pool"
+#define TEXENGINENAME "eomega"
+#elif defined (Aleph)
+#define TEXPOOLNAME "aleph.pool"
+#define TEXENGINENAME "aleph"
 #else
 #define TEXPOOLNAME "tex.pool"
+#define TEXENGINENAME "tex"
 #endif
 #define DUMP_FILE fmtfile
 #define DUMP_FORMAT kpse_fmt_format
@@ -78,8 +88,8 @@ extern int tfmtemp, texinputtype;
 extern boolean openinnameok P1H(const_string);
 extern boolean openoutnameok P1H(const_string);
 
-/* All but Omega use this. */
-#if !defined(Omega) && !defined(eOmega)
+/* All but the Omega family use this. */
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
 extern void setupcharset P1H(void);
 extern string translate_filename;
 #define translatefilename translate_filename

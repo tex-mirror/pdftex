@@ -1,5 +1,5 @@
 # Makefile for libpdf - te@dbs.uni-hannover.de
-# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/Makefile.in#15 $
+# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/Makefile.in#17 $
 
 ac_include ../make/common.mk
 ac_include ../make/programs.mk
@@ -32,7 +32,7 @@ XCPPFLAGS=-I.. -I$(srcdir)/.. -I../.. -I$(srcdir)/../.. -I$(LIBMD5DIR) -I$(LIBMD
 @LIBPNGCPPFLAGS@ @ZLIBCPPFLAGS@ -DpdfTeX
 
 
-OBJS = epdf.o mapfile.o papersiz.o utils.o vfpacket.o pkin.o \
+OBJS = epdf.o mapfile.o utils.o vfpacket.o pkin.o \
 writefont.o writet1.o writet3.o writezip.o writeenc.o writettf.o \
 writejpg.o writepng.o writeimg.o pdftoepdf.o avl.o avlstuff.o
 

@@ -450,14 +450,15 @@ kpse_init_format P1C(kpse_file_format_type, format)
       break;
     case kpse_db_format:
       INIT_FORMAT ("ls-R", DEFAULT_TEXMFDBS, DB_ENVS);
-      SUFFIXES ("ls-R");
+#define LSR_SUFFIXES "ls-R", "ls-r"
+      SUFFIXES (LSR_SUFFIXES);
       FMT_INFO.path = remove_dbonly (FMT_INFO.path);
       break;
     case kpse_fmt_format:
       init_maketex (format, "mktexfmt", NULL);
       INIT_FORMAT ("fmt", DEFAULT_TEXFORMATS, FMT_ENVS);
       SUFFIXES (".fmt");
-#define FMT_SUFFIXES ".efmt",".efm",".oft",".eoft",".eof",".pfmt",".epfmt"
+#define FMT_SUFFIXES ".efmt",".efm",".oft",".eoft",".eof",".pfmt",".epfmt", ".afmt"
       ALT_SUFFIXES (FMT_SUFFIXES);
       FMT_INFO.binmode = true;
       break;

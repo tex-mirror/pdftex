@@ -2,15 +2,9 @@
 % Public Domain.
 
 @x l.1163
-  if cur_chr=last_node_type_code then
     begin cur_val:=int_val;
-    if (tail=head)or(mode=0) then cur_val:=-1;
-    end
 @y
-  if cur_chr=last_node_type_code then
     begin cur_val_level:=int_val;
-    if (tail=head)or(mode=0) then cur_val:=-1;
-    end
 @z
 
 @x l.5503

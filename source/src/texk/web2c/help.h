@@ -180,6 +180,7 @@ const_string MFTHELP[] = {
     "-change=CHFILE  apply the change file CHFILE as with tangle and weave",
     "-metapost       assume NAME is a METAPOST source file",
     "-style=MFTNAME  use MFTNAME instead of plain.mft (or mplain.mft)",
+    "                 (this option can be given more than once)",
     "-help           display this help and exit",
     "-version        output version information and exit",
     NULL

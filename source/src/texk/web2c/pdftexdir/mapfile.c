@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#17 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#19 $
 */
 
 #include <math.h>
@@ -30,7 +30,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#17 $
 #undef AUTO_MAKE_EXT_FONT
 
 static const char perforce_id[] =
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#17 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#19 $";
 
 #define FM_BUF_SIZE     1024
 
@@ -248,6 +248,8 @@ with the original version.
 static int avl_do_entry(fm_entry * fp, int mode)
 {
     fm_entry *p;
+    void *a;
+    void **aa;
 
     /* handle tfm_name link */
 
@@ -265,14 +267,16 @@ static int avl_do_entry(fm_entry * fp, int mode)
                                 fp->tfm_name);
                     goto exit;        
                 }
-                assert(avl_delete(tfm_tree, p) != NULL);
+                a = avl_delete(tfm_tree, p);
+                assert(a != NULL);
                 unset_tfmlink(p);
                 if (!has_pslink(p))
                     delete_fm_entry(p);
             }
         }
         if (mode != DELETE) {
-            assert(avl_probe(tfm_tree, fp) != NULL);
+            aa = avl_probe(tfm_tree, fp);
+            assert(aa != NULL);
             set_tfmlink(fp);
         }
     }
@@ -295,14 +299,16 @@ static int avl_do_entry(fm_entry * fp, int mode)
                                 p->tfm_name);
                     goto exit;        
                 }
-                assert(avl_delete(ps_tree, p) != NULL);
+                a = avl_delete(ps_tree, p);
+                assert(a != NULL);
                 unset_pslink(p);
                 if (!has_tfmlink(p))
                     delete_fm_entry(p);
             }
         }
         if (mode != DELETE) {
-            assert(avl_probe(ps_tree, fp) != NULL);
+            aa = avl_probe(ps_tree, fp);
+            assert(aa != NULL);
             set_pslink(fp);
         }
     }
@@ -612,6 +618,7 @@ ff_entry *check_ff_exist(fm_entry * fm)
     ff_entry *ff;
     ff_entry tmp;
     char *ex_ffname;
+    void **aa;
 
     assert(fm->ff_name != NULL);
     tmp.ff_name = fm->ff_name;
@@ -638,7 +645,8 @@ ff_entry *check_ff_exist(fm_entry * fm)
                 ff->ff_path =
                     kpse_find_file(fm->ff_name, kpse_type1_format, 0);
         }
-        assert(avl_probe(ff_tree, ff) != NULL);
+        aa = avl_probe(ff_tree, ff);
+        assert(aa != NULL);
     }
     return ff;
 }
@@ -654,7 +662,7 @@ fm_entry *lookup_fontmap(char *bname)
     ff_entry *ff;
     char buf[SMALL_BUF_SIZE];
     char *a, *b, *c, *d, *e, *s;
-    int i, sl, ex;
+    int i, sl, ex, ai;
     if (tfm_tree == NULL || mapitems != NULL)
         fm_read_info();
     if (bname == NULL)
@@ -777,8 +785,10 @@ fm_entry *lookup_fontmap(char *bname)
         fmx->tfm_name = nontfm;
         fmx->ps_name = xstrdup(s);
         fmx->ff_name = xstrdup(fm->ff_name);
-        assert(avl_do_entry(fmx, DUPIGNORE) == 0);
-        assert((fm = lookup_fontmap(bname)) != NULL);        /* new try */
+        ai = avl_do_entry(fmx, DUPIGNORE);
+        assert(ai == 0);
+        fm = lookup_fontmap(bname);        /* new try */
+        assert(fm != NULL);
         return fm;
     }
 /**********************************************************************/
@@ -801,7 +811,7 @@ fmentryptr fmlookup(internalfontnumber f)
     char *tfm, *p;
     fm_entry *fm, *exfm;
     fm_entry tmp;
-    int e;
+    int ai, e;
     if (tfm_tree == NULL || mapitems != NULL)
         fm_read_info();
     tfm = makecstring(fontname[f]);
@@ -829,7 +839,8 @@ fmentryptr fmlookup(internalfontnumber f)
     if (fm != NULL) {
         exfm = mk_ex_fm(f, fm, e);
         init_fm(exfm, f);
-        assert(avl_do_entry(exfm, DUPIGNORE) == 0);
+        ai = avl_do_entry(exfm, DUPIGNORE);
+        assert(ai == 0);
         return (fmentryptr) exfm;
     }
     return (fmentryptr) dummy_fm_entry();

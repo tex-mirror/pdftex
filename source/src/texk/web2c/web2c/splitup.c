@@ -94,6 +94,9 @@ main P2C(int, argc, string *, argv)
   } else if (STREQ (output_name, "tex")) {
     fputs ("#define INITEX\n#define TeX\n", out);
     coerce = "texcoerce.h";
+  } else if (STREQ (output_name, "aleph")) {
+    fputs ("#define INITEX\n#define TeX\n#define Aleph\n", out);
+    coerce = "alephcoerce.h";
   } else if (STREQ (output_name, "eomega")) {
     fputs ("#define INITEX\n#define TeX\n#define eOmega\n", out);
     coerce = "eomegacoerce.h";

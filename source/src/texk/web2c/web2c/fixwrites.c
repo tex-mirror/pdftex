@@ -402,13 +402,25 @@ main P2C(int, argc,  string *, argv)
 		  ++cp;		/* allow \" in string */
 	    }
 
-          /* More kludge -- versionstring is a string, not a number, so
-             we have to use %s.  */
-          else if (strncmp (cp, "versionstring", 13) == 0)
+          /* More kludges -- recognize some things as strings and use %s:
+             - versionstring
+             - poolname
+             - formatengine */
+          else if (strncmp (cp, "versionstring", 13) == 0
+                   || strncmp (cp, "poolname", 8) == 0
+                   || strncmp (cp, "formatengine", 12) == 0)
             {
               *as++ = '%';
               *as++ = 's';
             }
+
+	  /* And yet another kludge, to handle stringcast (<whatever>) */
+          else if (strncmp (cp, "stringcast", 10) == 0)
+	    {
+	      *as++ = '%';
+	      *as++ = 's';
+	      cp = skip_balanced (cp);  /* Skip cast expression */
+	    }
 
           else
 	    {

@@ -1,3 +1,11 @@
+2004-01-27  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etex.fix: The assignment to cur_val instead of cur_val_level
+	would result in \lastnodetype getting confused about what type of
+	value it was supposed to be.  Reported by Hartmut Henkel
+	<hartmut_henkel@gmx.de>, fix found by Fabrice Popineau
+	<Fabrice.Popineau@supelec.fr>.
+
 2003-02-19  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* etex.mk: Installation of formats is no longer done via

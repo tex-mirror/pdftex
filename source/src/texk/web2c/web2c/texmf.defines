@@ -2,6 +2,7 @@
  for use in the TeX, Metafont, and MetaPost change files.  Public domain.}
 
 @define const TEXPOOLNAME;
+@define const TEXENGINENAME;
 
 @define @field b0;
 @define @field b1;
@@ -51,6 +52,8 @@
 @define procedure flushdvi;
 @define procedure ipcpage ();
 @define procedure paintrow ();
+{ Declare |print| here, because Pascal forward is broken. }
+@define procedure print ();
 @define procedure put2bytes ();
 @define procedure put4bytes ();
 @define procedure remembersourceinfo ();
