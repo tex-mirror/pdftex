@@ -5,7 +5,7 @@
 Makefile: $(srcdir)/pdfetexdir/pdfetex.mk
 
 # We build pdfetex
-pdfetex = pdfetex
+pdfetex =@PETEX@ pdfetex
 pdfetexdir = pdfetexdir
 
 # The C sources.
@@ -34,6 +34,8 @@ pdfetex.web: tie tex.web \
              etexdir/etex.ch1 \
              pdfetexdir/pdfetex.ch1 \
              pdftexdir/pdftex.ch \
+             pdftexdir/hz.ch \
+             pdftexdir/misc.ch \
              pdfetexdir/pdfetex.ch2 \
              pdfetexdir/pdfetex.h \
              pdfetexdir/pdfetex.defines \
@@ -45,6 +47,8 @@ pdfetex.web: tie tex.web \
 		$(srcdir)/etexdir/etex.ch1 \
 		$(srcdir)/pdfetexdir/pdfetex.ch1 \
 		$(srcdir)/pdftexdir/pdftex.ch \
+		$(srcdir)/pdftexdir/hz.ch \
+		$(srcdir)/pdftexdir/misc.ch \
 		$(srcdir)/pdfetexdir/pdfetex.ch2
 pdfetex.ch: tie pdfetex.web pdfetexdir/tex.ch0 tex.ch etexdir/tex.ch1 \
             etexdir/tex.ech etexdir/tex.ch2 pdfetexdir/tex.ch1 \
@@ -76,7 +80,7 @@ pdfetex-clean:
 	rm -f pdfetex.efmt pdfetex.log
 
 # Dumps
-all_pdfefmts = pdfetex.efmt $(pdfefmts)
+all_pdfefmts = @FMU@ pdfetex.efmt $(pdfefmts)
 pdfefmts: $(all_pdfefmts)
 
 pdfetex.efmt: pdfetex
@@ -105,8 +109,8 @@ install-pdfetex-programs: $(pdfetex) $(bindir)
 
 install-links: install-pdfetex-links
 install-pdfetex-links: install-pdfetex-programs
-	cd $(bindir) && (rm -f inipdfetex virpdfetex; \
-	  $(LN) pdfetex inipdfetex; $(LN) pdfetex virpdfetex)
+	@FMU@cd $(bindir) && (rm -f inipdfetex virpdfetex; \
+	@FMU@  $(LN) pdfetex inipdfetex; $(LN) pdfetex virpdfetex)
 	pdfefmts="$(pdfefmts)";
 	  for f in $$pdfefmts; do base=`basename $$f .efmt`; \
 	    (cd $(bindir) && (rm -f $$base; $(LN) pdfetex $$base)); done
@@ -118,6 +122,6 @@ install-pdfetex-fmts: pdfefmts $(fmtdir)
 
 # Auxiliary files.
 install-data install-pdfetex-data:: $(texpooldir)
-	$(INSTALL_DATA) pdfetex.pool $(texpooldir)/pdfetex.pool
+@PETEX@	$(INSTALL_DATA) pdfetex.pool $(texpooldir)/pdfetex.pool
 
 # end of pdfetex.mk

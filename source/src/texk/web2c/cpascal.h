@@ -1,5 +1,7 @@
 /* cpascal.h: implement various bits of standard and other Pascal that
    we use in the change files.  Public domain.
+
+   $Id: //depot/Build/source.development/TeX/texk/web2c/cpascal.h#9 $
    
    This is the top-level include file for all the web2c-generated C
    programs except TeX and Metafont themselves, which use texmf.h.  It's
@@ -218,6 +220,9 @@ typedef unsigned char *pointertobyte;
 #define kpsetfmformat	kpse_tfm_format
 #define kpsevfformat	kpse_vf_format
 #define kpsewebformat	kpse_web_format
+#define kpsevarvalue	kpse_var_value
+#define kpsesetprogramenabled kpse_set_program_enabled
+#define kpsesrccmdline  kpse_src_cmdline
 #define makesuffix	make_suffix
 #define recorderchangefilename	recorder_change_filename
 #define recorderenabled	recorder_enabled

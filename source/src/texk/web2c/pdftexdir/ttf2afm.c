@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ttf2afm.c#14 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#9 $
 */
 
 /*
@@ -36,7 +36,7 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ttf2afm.c#14 $
 #include <pdftexdir/ptexmac.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ttf2afm.c#14 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#9 $";
 
 typedef unsigned char   TTF_BYTE;
 typedef signed char     TTF_CHAR;
@@ -113,6 +113,7 @@ typedef struct {
 
 #define NTABS           24
 
+/*
 #define append_char_to_buf(c, p, buf, buf_size) do {       \
     if (c == 9)                                            \
         c = 32;                                            \
@@ -142,6 +143,7 @@ typedef struct {
     if (*r == 32)                                          \
         r++;                                               \
 } while (0)
+*/
 
 #define ttf_alloc(n, t) ((t *) xmalloc ((n) * sizeof (t)))
 #define pdftex_fail     ttf_fail
@@ -381,13 +383,13 @@ void read_encoding(char *encname)
     char buf[ENC_BUF_SIZE], *q, *r;
     int i;
     cur_file_name = encname;
-    if ((encfile = kpse_open_file(encname, kpse_tex_ps_header_format)) == 0)
+    if ((encfile = kpse_open_file(encname, kpse_enc_format)) == 0)
         ttf_fail("can't open encoding file for reading");
     enc_getline();
     if (*enc_line != '/' || (r = strchr(enc_line, '[')) == 0)
         ttf_fail("invalid encoding vector: name or `[' missing:\n%s", enc_line);
     for (i = 0; i <= MAX_CHAR_CODE; i++)
-        enc_names[i] = xstrdup(notdef);
+        enc_names[i] = (char*) notdef;
     if (r[1] == 32)
         r += 2;
     else
@@ -477,7 +479,7 @@ void read_font()
     switch (post_format) {
     case 0x00010000:
         for (pm = mtx_tab; pm - mtx_tab < NMACGLYPHS; pm++)
-            pm->name = xstrdup(mac_glyph_names[pm - mtx_tab]);
+            pm->name = mac_glyph_names[pm - mtx_tab];
         break;
     case 0x00020000:
         l = get_ushort(); /* some fonts have this value different from nglyphs */
@@ -496,7 +498,7 @@ void read_font()
         }
         for (pm = mtx_tab; pm - mtx_tab < l; pm++) {
             if (pm->index < NMACGLYPHS)
-                pm->name = xstrdup(mac_glyph_names[pm->index]);
+                pm->name = mac_glyph_names[pm->index];
             else {
                 k = pm->index - NMACGLYPHS;
                 if (k < m) {

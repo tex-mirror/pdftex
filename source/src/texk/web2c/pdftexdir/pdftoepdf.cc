@@ -1,5 +1,5 @@
 /*
-Copyright 1996,1997,1998,1999,2000,2001,2002,2003 Han The Thanh, <thanh@pdftex.org>
+Copyright 1996-2004 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#19 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#47 $
 */
 
 #include <stdlib.h>
@@ -44,9 +44,10 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#19 $
 #include "Error.h"
 
 #include "epdf.h"
+#include "avl.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#19 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#47 $";
 
 /* we avoid reading all necessary kpathsea headers, but we need xstrdup */
 #ifdef __cplusplus
@@ -132,7 +133,7 @@ struct InObj {
     InObjType type;     // object type
     InObj *next;        // next entry in list of indirect objects
     integer num;        // new object number in output PDF
-    int fontmap;        // index of font map entry
+    fm_entry * fontmap; // pointer to font map entry
     integer encoding;   // Encoding for objFont      
     int written;        // has it been written to output PDF?
 };
@@ -259,7 +260,7 @@ static int addEncoding(GfxFont *gfont)
 #define addOther(ref) \
         addInObj(objOther, ref, 0, 0)
 
-static int addInObj(InObjType type, Ref ref, int f, integer e)
+static int addInObj(InObjType type, Ref ref, fm_entry *f, integer e)
 {
     InObj *p, *q, *n = new InObj;
     if (ref.num == 0)
@@ -391,7 +392,7 @@ static void copyFont(char *tag, Object *fontRef)
 {
     PdfObject fontdict, subtype, basefont, fontdescRef, fontdesc, charset;
     GfxFont *gfont;
-    int fontmap;
+    fm_entry *fontmap;
     // Check whether the font has already been embedded before analysing it.
     InObj *p;
     Ref ref = fontRef->getRef();
@@ -422,7 +423,7 @@ static void copyFont(char *tag, Object *fontRef)
         pdftex_fail("pdf inclusion: invalid font BaseFont entry type <%s>", 
                     basefont->getTypeName());
     fontmap = lookup_fontmap(basefont->getName());
-    if (fontmap >= 0 && is_type1(fontmap) &&
+    if (fontmap != NULL && is_type1(fontmap) &&
         fontdict->dictLookupNF("FontDescriptor", &fontdescRef) && 
         fontdescRef->isRef() && fontdescRef->fetch(xref, &fontdesc) &&
     fontdesc->isDict()) {
@@ -491,7 +492,7 @@ static char *
 convertNumToPDF(double n) 
 {
     static const int precision = 6;
-    static const int fact = (int) 1E6;	/* must be 10^precision */
+    static const int fact = (int) 1E6;        /* must be 10^precision */
     static const double epsilon = 0.5E-6; /* 2epsilon must be 10^-precision */
     static char buf[64];
     // handle very small values: return 0
@@ -686,15 +687,7 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
     float pdf_version_found, pdf_version_wanted;
     // initialize
     if (!isInit) {
-        // We should better not call xpdf's initParams, which would
-        // read $HOME/.xpdfrc to find external font files.  There is
-        // no good reason for pdftex to have a hidden dependence on
-        // .xpdfrc, and we don't want the output PDF to depend on its
-        // contents.  The following four lines replace the call to
-        // initParams().
-
-        // read config file
-        globalParams = new GlobalParams("");
+        globalParams = new GlobalParams();
         globalParams->setErrQuiet(gFalse);
         isInit = gTrue;
     }
@@ -828,8 +821,6 @@ write_epdf(void)
     int i, l;
     int rotate;
     double scale[6] = {0, 0, 0, 0, 0, 0};
-    char mybuf[2048];
-    mybuf[0] = '\0';
     PdfDocument *pdf_doc = (PdfDocument *) epdf_doc;
     (pdf_doc->occurences)--;
 #ifdef DEBUG
@@ -847,8 +838,8 @@ write_epdf(void)
     pdf_puts("/FormType 1\n");
 
     // write additional information
-    convertStringToPDFString (pdf_doc->file_name, mybuf);
-    pdf_printf("/%s.FileName (%s)\n", pdfkeyprefix, mybuf);
+    pdf_printf("/%s.FileName (%s)\n", pdfkeyprefix, 
+               convertStringToPDFString(pdf_doc->file_name));
     pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, epdf_selected_page);
     pdf_doc->doc->getDocInfoNF(&info);
     if (info.isRef()) {

@@ -479,6 +479,9 @@ AC_SUBST([SET_MAKE])dnl
 AC_DEFUN(AC_PROG_RANLIB,
 [AC_CHECK_PROG(RANLIB, ranlib, ranlib, :)])
 
+AC_DEFUN(AC_PROG_AR,
+[AC_CHECK_PROG(AR, ar, ar, :)])
+
 dnl Check for mawk first since it's generally faster.
 AC_DEFUN(AC_PROG_AWK,
 [AC_CHECK_PROGS(AWK, mawk gawk nawk awk, )])

@@ -139,7 +139,7 @@ else
     ps2pk)
       # grep for the font in $PSMAPFILE.  These are base font names, such as
       # rpplr (the original) or pplr0 (an interim step) or pplr8r (current).
-      : ${PSMAPFILE=`kpsewhich --format='dvips config' psfonts.map ps2pk.map`}
+      : ${PSMAPFILE=`kpsewhich --format=map psfonts.map ps2pk.map`}
       pattern="^$NAME"'([ 	]|$)' 
       psline=`egrep "$pattern" $PSMAPFILE | tail -1`
       if test -n "$psline"; then
@@ -213,16 +213,20 @@ fi
 
 echo "$progname: Running $cmd"
 $cmd </dev/null || {
-  # Don't abort if only "Strange path" or "bad pos" errors occurr.
+  # Don't abort if only "Strange path", "bad pos" or "angle(0,0)"
+  # errors occurr.
   grep '^!' $NAME.log | sort >$$.errs 2>/dev/null
   grep '^! Strange path' $$.errs >$$.strange 2>/dev/null
   grep '^! bad pos.' $$.errs >$$.badpos 2>/dev/null
-  cat $$.badpos $$.strange | sort > $$.errs_accept
+  grep '^! angle(0,0) is taken as zero.' $$.errs >$$.angle 2>/dev/null
+  cat $$.badpos $$.strange $$.angle | sort > $$.errs_accept
   if cmp $$.errs $$.errs_accept >/dev/null 2>&1; then
     test -s $$.strange >/dev/null 2>&1 \
       && echo "$progname: warning: \`$cmd' caused strange path errors." >&2
     test -s $$.badpos >/dev/null 2>&1 \
       && echo "$progname: warning: \`$cmd' caused bad pos errors." >&2
+    test -s $$.angle >/dev/null 2>&1 \
+      && echo "$progname: warning: \`$cmd' caused angle(0,0) errors." >&2
   else
     echo "$progname: \`$cmd' failed." >&2
     test -s $NAME.log && mv -f $NAME.log "$KPSE_DOT"

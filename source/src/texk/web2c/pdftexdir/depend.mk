@@ -9,8 +9,6 @@ utils.o: utils.c ptexlib.h ../pdftexd.h ../texmfmp.h ../cpascal.h \
  ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h ptexmac.h \
  ../../../libs/zlib/zlib.h ../../../libs/zlib/zconf.h \
  ../../../libs/md5/md5.h pdftexextra.h
-config.o: config.c ptexlib.h ../pdftexd.h ../texmfmp.h ../cpascal.h \
- ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h ptexmac.h
 vfpacket.o: vfpacket.c ptexlib.h ../pdftexd.h ../texmfmp.h \
  ../cpascal.h ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h \
  ptexmac.h

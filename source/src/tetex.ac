@@ -1,3 +1,9 @@
+: ${with_etex=no}
+export with_etex
+
+: ${with_pdftex=no}
+export with_pdftex
+
 : ${enable_shared=no}
 export enable_shared
 
@@ -38,12 +44,3 @@ test "$no_x" = yes || {
   : ${with_x=yes}
   export with_mf_nowin with_x
 }
-
-# for libwww, does not compile otherwise
-: ${with_expat=no}
-: ${with_wais=no}
-: ${with_socks5=no}
-: ${with_socks4=no}
-: ${with_ssl=no}
-: ${with_regex=no}
-export with_expat with_wais with_socks5 with_socks4 with_ssl with_regex

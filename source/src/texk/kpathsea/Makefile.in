@@ -78,6 +78,7 @@ texmf.sed: Makefile
 # likely to have been mangled as well.
 	echo '/^ *TEXMFMAIN[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 	echo '/^[% ]*TEXMFLOCAL[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFDIST[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 	echo '/^[% ]*VARTEXMF[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 	echo '/^[% ]*TEXMFCNF[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 # And fill in the last clause of TEXMFCNF with an absolute path.

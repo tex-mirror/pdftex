@@ -1,3 +1,54 @@
+----------------------------------------------------
+pdfTeX 3.141592-1.20a-rc1 was released on 2004-03-19
+----------------------------------------------------
+
+Major changes since 1.11b
+-------------------------
+- The file pdftex.cfg is gone completely. All parameters that had previously
+  been set by it can be set through primitives; their values are dumped to the
+  format file.
+  
+- Changed the searchpath for encoding and mapfiles.
+  See http://tug.org/pipermail/tex-live/2004-January/004734.html and
+  http://tug.org/pipermail/tex-live/2004-January/004791.html
+
+- New options for \pdfmapfile:
+  - \pdfmapfile {foo.map} Clears all map entries and loads foo.map, whose
+    entries become the only map entries.
+  - \pdfmapfile {+foo.map} loads foo.map and adds all it's entries to the
+    current map entries. Duplicates are ignored. This is the old behaviour.
+  - \pdfmapfile {-foo.map} loads foo.map and removes all it's entries from the
+    current map entries, if they are found.
+  - \pdfmapfile {=foo.map} loads foo.map and adds all it's entries to the
+    current map entries. Duplicates are replaced.
+  - \pdfmapfile {} clears all map entries.
+
+- New command \pdfmapline {line}. It's like \pdfmapfile, but here you can set
+  lines like in the map files directly. The modifiers (+-=) have the same
+  effect as with \pdfmapfile.
+
+- New command \pdftexbanner which returns a string with the full banner of the
+  current binary (e.g. "This is pdfTeX, Version 3.141592-1.20a-rc1 (Web2C
+  7.5.2) kpathsea version 3.5.2"
+  
+- The PTEX.FullBanner key is now inserted in the document info dict instead of
+  the catalog. Newer versions of Acrobat display it.
+  
+- Extended \pdfannot to use reserveobjnum/useobjnum 
+- Changed \pdffontexpand promitive --> expand factor is now fixed to 1000
+
+- Bugfix: pdftex would read an .xpdfrc when including pdfs.
+  See http://tug.org/pipermail/pdftex/2004-March/004835.html
+
+- Bugfix: The strings in /ID would sometimes be empty.
+  
+- Bugfix: Even when mapfiles or encodings or PostScript font files were
+  missing, pdfTeX still produced a (most often corrupt) pdf. Now it aborts with
+  an error in these cases.
+  
+- pdfTeX now uses the GNU libavl from Ben Pfaff for managing of fontmap
+  entries.
+  
 ------------------------------------------------
 pdfTeX 3.141592-1.11b was released on 2003-10-06
 ------------------------------------------------
@@ -128,7 +179,7 @@ Major changes since 1.0
   versions <= 1.3 . 
     The default for \pdfoptionpdfminorversion is 4 for pdf 1.4
     This must appear before any data is written to the generated pdf file, so
-  you should it put at the very start of your files.
+  you should put it at the very start of your files.
     This can also be set in pdftex.cfg with pdf_minorversion
 
 - It is now possible to specify the pdf page box to use when including pdfs.
@@ -182,5 +233,5 @@ pdfTeX 3.14159-1.00a-pretest-20010806 was released on 2001-08-06
 pdfTeX 3.14159-1.00a-pretest-20010804 was released on 2001-08-04
 ----------------------------------------------------------------
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/NEWS#10 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#51 $
 // vim: tw=79:ts=2:expandtab:autoindent

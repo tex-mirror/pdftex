@@ -135,7 +135,6 @@ maketex P2C(kpse_file_format_type, format, string*, args)
   /* New implementation, use fork/exec pair instead of popen, since
    * the latter is virtually impossible to make safe.
    */
-  int i;
   unsigned len;
   string *s;
   string ret;
@@ -173,11 +172,9 @@ maketex P2C(kpse_file_format_type, format, string*, args)
   {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
-    DWORD dwCode;
 
     HANDLE child_in, child_out, child_err;
-    HANDLE father_in, father_out;
-    HANDLE father_in_dup, father_out_dup;
+    HANDLE father_in, father_out_dup;
     HANDLE current_pid;
     SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE};
     string new_cmd = NULL, app_name = NULL;
@@ -491,6 +488,7 @@ kpse_make_tex P2C(kpse_file_format_type, format,  const_string, base)
     }
     for (i = 0; base[i]; i++) {
       if (!ISALNUM(base[i])
+          && base[i] != '+'
           && base[i] != '-'
           && base[i] != '_'
           && base[i] != '.'

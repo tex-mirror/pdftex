@@ -1,7 +1,7 @@
 %% This is the list of new or extended primitives provided by pdftex.
 %% Used convention for syntax rules is borrowed from `TeXbook naruby' by 
 %% Petr Olsak.
-%% $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftex-syntax.txt#2 $
+%% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex-syntax.txt#12 $
 
 %% integer registers:
 \pdfoutput                                              (integer)
@@ -34,6 +34,7 @@
 
 %% expandable commands:
 \pdftexrevision                                         (expandable)
+\pdftexbanner                                           (expandable)
 \pdffontname <font>                                     (expandable)
 \pdffontobjnum <font> <general text>                    (expandable)
 \pdfincludechars <font> <general text>                  (expandable)

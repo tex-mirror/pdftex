@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ptexmac.h#12 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#9 $
 */
 
 #ifndef PDFTEXMAC
@@ -48,12 +48,12 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ptexmac.h#12 $
 #define pdfroom(n) do {                                 \
     if (pdfbufsize - n < 0)                             \
         pdftex_fail("PDF output buffer overflowed");    \
-    if (pdfptr + n >= pdfbufsize)                       \
+    if (pdfptr + n > pdfbufsize)                        \
         pdfflush();                                     \
 } while (0)
 
 #define pdfout(c)  do {             \
-    if (pdfptr + 1 >= pdfbufsize)   \
+    if (pdfptr > pdfbufsize)        \
         pdfflush();                 \
     pdfbuf[pdfptr++] = c;           \
 } while (0)
@@ -66,13 +66,15 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ptexmac.h#12 $
 #define MAX_CHAR_CODE       255
 #define MOVE_CHARS_OFFSET   160
 
-#define FF_BUF_SIZE         0x1000
 #define PRINTF_BUF_SIZE     1024
 #define MAX_CSTRING_LEN     1024
+#define MAX_PSTRING_LEN     1024
+#define SMALL_BUF_SIZE      256
+#define SMALL_ARRAY_SIZE    256
 
-#define check_buf(size, buf_size)                         \
-    if ((size) >= buf_size - 2)                           \
-        pdftex_fail("buffer overflow", buf_size)
+#define check_buf(size, buf_size)                          \
+    if ((size) > (buf_size))                               \
+        pdftex_fail("buffer overflow", (buf_size))
 
 #define append_char_to_buf(c, p, buf, buf_size) do {       \
     if (c == 9)                                            \
@@ -80,16 +82,15 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ptexmac.h#12 $
     if (c == 13 || c == EOF)                               \
         c = 10;                                            \
     if (c != ' ' || (p > buf && p[-1] != 32)) {            \
-        check_buf(p - buf, buf_size);                      \
+        check_buf(p - buf + 1, (buf_size));                \
         *p++ = c;                                          \
     }                                                      \
 } while (0)
 
 #define append_eol(p, buf, buf_size) do {                  \
-    if (p - buf > 1 && p[-1] != 10) {                      \
-        check_buf(p - buf, buf_size);                      \
+    check_buf(p - buf + 2, (buf_size));                    \
+    if (p - buf > 1 && p[-1] != 10)                        \
         *p++ = 10;                                         \
-    }                                                      \
     if (p - buf > 2 && p[-2] == 32) {                      \
         p[-2] = 10;                                        \
         p--;                                               \
@@ -105,19 +106,30 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ptexmac.h#12 $
 
 #define skip(p, c)   if (*p == c)  p++
 
-#define entry_room(t, n, s) do {                            \
-    if (t##_tab == 0) {                                     \
-        t##_max = (s);                                      \
-        t##_tab = xtalloc(t##_max, t##_entry);              \
-        t##_ptr = t##_tab;                                  \
+#define alloc_array(T, n, s) do {                           \
+    if (T##_array == 0) {                                   \
+        T##_limit = (s);                                    \
+        if ((n) > T##_limit)                                \
+            T##_limit = (n);                                \
+        T##_array = xtalloc(T##_limit, T##_entry);          \
+        T##_ptr = T##_array;                                \
     }                                                       \
-    else if (t##_ptr - t##_tab + n >= t##_max) {            \
-        last_tab_index = t##_ptr - t##_tab;                 \
-        t##_tab = xretalloc(t##_tab, t##_max + (s), t##_entry); \
-        t##_ptr = t##_tab + last_tab_index;                 \
-        t##_max += (s);                                     \
+    else if (T##_ptr - T##_array + (n) > T##_limit) {       \
+        last_ptr_index = T##_ptr - T##_array;               \
+        T##_limit *= 2;                                     \
+        if (T##_ptr - T##_array + (n) > T##_limit)          \
+            T##_limit = T##_ptr - T##_array + (n);          \
+        T##_array = xretalloc(T##_array, T##_limit, T##_entry); \
+        T##_ptr = T##_array + last_ptr_index;               \
     }                                                       \
 } while (0)
+
+#define is_cfg_comment(c) \
+    (c == 10 || c == '*' || c == '#' || c == ';' || c == '%')
+
+#define define_array(T)                     \
+T##_entry      *T##_ptr, *T##_array = 0;    \
+size_t          T##_limit
 
 #define xfree(p)            do { if (p != 0) free(p); p = 0; } while (0)
 #define strend(s)           strchr(s, 0)
@@ -174,6 +186,15 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ptexmac.h#12 $
 #define is_pcgfont(fm)      (fm_fontfile(fm) == 0 && !is_basefont(fm))
 #define need_encoding_obj(fm) (is_reencoded(fm) || is_subsetted(fm))
 
+#define LINK_TFM            0x01
+#define LINK_PS             0x02
+#define set_tfmlink(fm)     ((fm)->links |= LINK_TFM)
+#define set_pslink(fm)      ((fm)->links |= LINK_PS)
+#define unset_tfmlink(fm)   ((fm)->links &= ~LINK_TFM)
+#define unset_pslink(fm)    ((fm)->links &= ~LINK_PS)
+#define has_tfmlink(fm)     ((fm)->links & LINK_TFM)
+#define has_pslink(fm)      ((fm)->links & LINK_PS)
+
 #define unset_fontfile(fm)  xfree((fm)->ff_name)
 
 #define set_cur_file_name(s)      \
@@ -182,6 +203,5 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ptexmac.h#12 $
 
 #define INDEXED_GLYPH_PREFIX    "index"
 
-#define SMALL_BUF_SIZE      256
 
 #endif  /* PDFTEXMAC */

@@ -10,8 +10,8 @@ srcdir = @srcdir@
 VPATH = @srcdir@
 
 kpathsea_include_dir = -I$(srcdir)/../../../texk -I../../../texk
-ALLCFLAGS = $(CFLAGS) @DEFS@ -I.. -I$(srcdir) -I. $(kpathsea_include_dir)
-ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ -I.. -I$(srcdir) -I. $(kpathsea_include_dir)
+ALLCFLAGS = $(CFLAGS) @DEFS@ -I.. -I$(srcdir) -I$(srcdir)/.. -I. $(kpathsea_include_dir)
+ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ -I.. -I$(srcdir) -I$(srcdir)/.. -I. $(kpathsea_include_dir)
 CXXFLAGS = @CXXFLAGS@
 CC = @CC@
 CXX = @CXX@

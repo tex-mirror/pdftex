@@ -91,9 +91,8 @@ find_format P2C(string, name, boolean, is_filename)
   
   if (is_filename && user_format != kpse_last_format) {
     ret = user_format;
-  } else if (FILESTRCASEEQ (name, "psfonts.map") ||
-             FILESTRCASEEQ (name, "pdftex.map")) {
-    ret = kpse_dvips_config_format;
+  } else if (FILESTRCASEEQ (name, "pdftex.cfg")) {
+    ret = kpse_pdftex_config_format;
   } else {
     int f;  /* kpse_file_format_type */
     boolean found = false;

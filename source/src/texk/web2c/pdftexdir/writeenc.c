@@ -17,20 +17,20 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writeenc.c#12 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeenc.c#6 $
 */
 
 #include "ptexlib.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writeenc.c#12 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeenc.c#6 $";
 
-enc_entry *enc_ptr, *enc_tab = 0;
-int enc_max;
+/* define enc_ptr, enc_array & enc_limit */
+define_array(enc);   
 
 void read_enc(integer encoding)
 {
-    enc_entry *e = enc_tab + encoding;
+    enc_entry *e = enc_array + encoding;
     if (e->loaded)
         return;
     load_enc(e->name, e->glyph_names);
@@ -41,7 +41,7 @@ void read_enc(integer encoding)
  * internal encoding (read from the font file); when glyph_names is non null
  * the second argument will be treated as the number of the Encoding object;
  * otherwise the second argument will be treated as index of encoding in
- * enc_tab
+ * enc_array
  */
 
 void write_enc(char **glyph_names, integer n)
@@ -51,7 +51,7 @@ void write_enc(char **glyph_names, integer n)
     enc_entry *e;
     char **g;
     if (glyph_names == 0) {
-        e = enc_tab + n;
+        e = enc_array + n;
         if (e->objnum != 0) /* the encoding has been written already */
             return;
         pdfnewdict(0, 0);
@@ -87,13 +87,13 @@ integer add_enc(char *s) /* built-in encodings have s = 0 */
 {
     int i;
     enc_entry *e;
-    if (enc_tab != 0 && s != 0) {
-        for (e = enc_tab; e < enc_ptr; e++)
+    if (enc_array != 0 && s != 0) {
+        for (e = enc_array; e < enc_ptr; e++)
             if (e->name != 0) /* don't check for built-in encodings */
                 if  (strcmp(s, e->name) == 0)
-                    return e - enc_tab;
+                    return e - enc_array;
     }
-    entry_room(enc, 1, 256);
+    alloc_array(enc, 1, SMALL_ARRAY_SIZE);
     if (s != 0)
         enc_ptr->name = xstrdup(s);
     else
@@ -104,8 +104,8 @@ integer add_enc(char *s) /* built-in encodings have s = 0 */
     enc_ptr->objnum = 0;
     enc_ptr->glyph_names = xtalloc(MAX_CHAR_CODE + 1, char *);
     for (i = 0; i <= MAX_CHAR_CODE; i++)
-        enc_ptr->glyph_names[i] = xstrdup(notdef);
-    return enc_ptr++ - enc_tab;
+        enc_ptr->glyph_names[i] = (char*) notdef;
+    return enc_ptr++ - enc_array;
 }
 
 /* get encoding for map entry fm. When encoding vector is not given, try to
@@ -125,10 +125,10 @@ boolean get_enc(fm_entry *fm)
         return false;
     if (t1_read_enc(fm)) { /* encoding read into t1_builtin_glyph_names */
         fm->encoding = add_enc(0);
-        glyph_names = enc_tab[fm->encoding].glyph_names;
+        glyph_names = enc_array[fm->encoding].glyph_names;
         for (i = 0; i <= MAX_CHAR_CODE; i++)
             glyph_names[i] = t1_builtin_glyph_names[i];
-        enc_tab[fm->encoding].loaded = true;
+        enc_array[fm->encoding].loaded = true;
         return true;
     }
     return false;
@@ -137,7 +137,7 @@ boolean get_enc(fm_entry *fm)
 /* check whether an encoding contains indexed glyph in form "/index123" */
 /* boolean indexed_enc(fm_entry *fm) */
 /* { */
-/*     char **s = enc_tab[fm->encoding].glyph_names; */
+/*     char **s = enc_array[fm->encoding].glyph_names; */
 /*     int i, n; */
 /*     for (i = 0; i <= MAX_CHAR_CODE; i++, s++) */
 /*         if (*s != 0 && *s != notdef &&  */
@@ -152,17 +152,17 @@ void setcharmap(internalfontnumber f)
     enc_entry *e;
     char **glyph_names;
     int i, k;
-    if (pdfmovechars == 0 || fontbc[f] > 32 || pdffontmap[f] < 0)
+    if (pdfmovechars == 0 || fontbc[f] > 32 || !hasfmentry(pdffontmap[f]))
         return;
     if (fontec[f] < 128) {
         for (i = fontbc[f]; i <= 32; i++)
             pdfcharmap[f][i] = i + MOVE_CHARS_OFFSET;
         return;
     }
-    fm = fm_tab + pdffontmap[f];
+    fm = (fm_entry *) pdffontmap[f];
     if (pdfmovechars == 1 || !get_enc(fm))
         return;
-    e = enc_tab + fm->encoding;
+    e = enc_array + fm->encoding;
     if (e->firstfont != getnullfont()) {
         for (i = fontbc[f]; i <= 32; i++)
             pdfcharmap[f][i] = pdfcharmap[e->firstfont][i];
@@ -178,7 +178,7 @@ void setcharmap(internalfontnumber f)
         if (k < 128)
             return;
         glyph_names[k] = glyph_names[i];
-        glyph_names[i] = xstrdup(notdef);
+        glyph_names[i] = (char*) notdef;
         pdfcharmap[f][i] = k;
     }
 }
@@ -187,7 +187,7 @@ void enc_free()
 {
     enc_entry *e;
     int k;
-    for (e = enc_tab; e < enc_ptr; e++) {
+    for (e = enc_array; e < enc_ptr; e++) {
         xfree(e->name);
         if (e->loaded != 0) { /* encoding has been loaded */
             for (k = 0; k <= MAX_CHAR_CODE; k++)
@@ -196,5 +196,5 @@ void enc_free()
         }
         xfree(e->glyph_names);
     }
-    xfree(enc_tab);
+    xfree(enc_array);
 }

@@ -1,0 +1,7 @@
+Information about the teTeX distribution:
+
+The texinfo package does not contain the stand-alone info reader. If
+you need it, get the texinfo package (from ftp://ftp.gnu.org/pub/gnu/
+or a mirror site) and install it separately. You can then use the
+  --without-texinfo
+option to configure when building teTeX.

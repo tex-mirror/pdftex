@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id$
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetexextra.h#115 $
 */
 
 /* pdfetexextra.h: banner etc. for pdfeTeX.
@@ -26,7 +26,7 @@ $Id$
    (generated from ../lib/texmfmp.c).
 */
 
-#define BANNER "This is pdfeTeX, Version 3.141592-1.11b-2.1"
+#define BANNER "This is pdfeTeX, Version 3.141592-1.20a-2.1-rc1"
 #define COPYRIGHT_HOLDER "The NTS Team (eTeX)/Han The Thanh (pdfTeX)"
 #define AUTHOR NULL
 #define PROGRAM_HELP PDFETEXHELP

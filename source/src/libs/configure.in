@@ -14,8 +14,6 @@ AM_MAINTAINER_MODE
 sinclude(../texk/kpathsea/withenable.ac)
 sinclude(t1lib/withenable.ac)
 sinclude(t1lib/t1lib.ac)
-sinclude(libwww/withenable.ac)
-sinclude(libwww/libwww.ac)
 sinclude(ncurses/withenable.ac)
 sinclude(ncurses/ncurses.ac)
 sinclude(libpng/withenable.ac)
@@ -32,8 +30,6 @@ sinclude(freetype/freetype.ac)
 subconfigures=
 test "x$needs_libt1" != xno && test "$using_system_t1lib"  != yes \
   && subconfigures="$subconfigures t1lib type1"
-test "x$needs_libwww" != xno && test "$using_system_wwwlib"  != yes \
-  && subconfigures="$subconfigures libwww"
 test "x$needs_ncurses" != xno && test "$using_system_ncurses"  != yes \
   && subconfigures="$subconfigures ncurses"
 test "x$needs_libxpdf" != xno \

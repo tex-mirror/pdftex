@@ -8,13 +8,16 @@
 
 Makefile: pdftexdir/pdftex.mk
 
-pdftex_bin = pdftex pdfetex ttf2afm pdftosrc
-pdftex_exe = pdftex.exe pdfetex.exe ttf2afm.exe pdftosrc.exe
-pdftex_pool = pdftex.pool pdfetex.pool
+pdftex_bin = pdfxtex
+pdftex_exe = pdfxtex.exe
+# pdftex_bin = pdftex pdfetex pdfxtex ttf2afm pdftosrc
+# pdftex_exe = pdftex.exe pdfetex.exe pdfxtex.exe ttf2afm.exe pdftosrc.exe
+pdftex_pool = pdfxtex.pool
+#pdftex_pool = pdftex.pool pdfetex.pool pdfxtex.pool
 linux_build_dir = $(HOME)/pdftex/build/linux/texk/web2c
 
 # We build pdftex
-pdftex = pdftex
+pdftex =@PTEX@ pdftex
 pdftexdir = pdftexdir
 
 # The C sources.
@@ -36,8 +39,15 @@ pdftex.p pdftex.pool: tangle pdftex.web pdftex.ch
 	./tangle pdftex.web pdftex.ch
 
 # Generation of the web and ch files.
-pdftex.web: tie tex.web pdftexdir/pdftex.ch pdftexdir/pdftex.mk
-	./tie -m pdftex.web $(srcdir)/tex.web $(srcdir)/pdftexdir/pdftex.ch
+pdftex.web: tie tex.web pdftexdir/pdftex.mk \
+            pdftexdir/pdftex.ch \
+            pdftexdir/hz.ch \
+            pdftexdir/misc.ch
+	./tie -m pdftex.web $(srcdir)/tex.web \
+	$(srcdir)/pdftexdir/pdftex.ch \
+	$(srcdir)/pdftexdir/hz.ch  \
+	$(srcdir)/pdftexdir/misc.ch
+
 pdftex.ch: tie pdftex.web pdftexdir/tex.ch0 tex.ch pdftexdir/tex.ch1 \
            pdftexdir/tex.pch pdftexdir/tex.ch2 pdftexdir/pdftex.mk
 	./tie -c pdftex.ch pdftex.web \
@@ -60,7 +70,7 @@ pdftex-clean:
 	rm -f pdftex.fmt pdftex.log
 
 # Dumps.
-all_pdffmts = pdftex.fmt $(pdffmts)
+all_pdffmts = @FMU@ pdftex.fmt $(pdffmts)
 
 dumps: pdffmts
 pdffmts: $(all_pdffmts)
@@ -89,24 +99,25 @@ install-pdftex-dumps: install-pdftex-fmts
 # The actual binary executables and pool files.
 install-programs: install-pdftex-programs
 install-pdftex-programs: $(pdftex) $(bindir)
-	for p in pdftex; do $(INSTALL_LIBTOOL_PROG) $$p $(bindir); done
+	pdftex="$(pdftex)"; \
+	  for p in $$pdftex; do $(INSTALL_LIBTOOL_PROG) $$p $(bindir); done
 
 install-links: install-pdftex-links
 install-pdftex-links: install-pdftex-programs
-	cd $(bindir) && (rm -f inipdftex virpdftex; \
-	  $(LN) pdftex inipdftex; $(LN) pdftex virpdftex)
-	pdffmts="$(pdffmts)";
+	@FMU@cd $(bindir) && (rm -f inipdftex virpdftex; \
+	@FMU@  $(LN) pdftex inipdftex; $(LN) pdftex virpdftex)
+	pdffmts="$(pdffmts)"; \
 	  for f in $$pdffmts; do base=`basename $$f .fmt`; \
 	    (cd $(bindir) && (rm -f $$base; $(LN) pdftex $$base)); done
 
 install-fmts: install-pdftex-fmts
 install-pdftex-fmts: pdffmts $(fmtdir)
-	pdffmts="$(all_pdffmts)";
+	pdffmts="$(all_pdffmts)"; \
 	  for f in $$pdffmts; do $(INSTALL_DATA) $$f $(fmtdir)/$$f; done
 
 # Auxiliary files.
 install-data install-pdftex-data:: $(texpooldir)
-	$(INSTALL_DATA) pdftex.pool $(texpooldir)/pdftex.pool
+@PTEX@	$(INSTALL_DATA) pdftex.pool $(texpooldir)/pdftex.pool
 
 
 
@@ -132,7 +143,7 @@ ttf2afm-clean:
 # pdftosrc
 pdftosrc = pdftosrc
 
-pdftosrc: pdftexdir/pdftosrc.o
+pdftosrc: pdftexdir/pdftosrc.o $(LIBXPDFDEP)
 	@CXXHACKLINK@ pdftexdir/pdftosrc.o $(LDLIBXPDF) -lm @CXXLDEXTRA@
 pdftexdir/pdftosrc.o:$(srcdir)/pdftexdir/pdftosrc.cc
 	cd pdftexdir && $(MAKE) pdftosrc.o
@@ -144,14 +155,10 @@ pdftosrc-clean:
 
 # pdftex binaries archive
 pdftexbin:
-	rm -f pdtex*.zip $(pdftex_bin)
-	XLDFLAGS=-static $(MAKE) $(pdftex_bin)
+	rm -f pdftex*.tar.bz2 $(pdftex_bin)
+	$(MAKE) $(pdftex_bin)
 	if test "x$(CC)" = "xdos-gcc"; then \
 	    $(MAKE) pdftexbin-djgpp; \
-	elif test "x$(CC)" = "xi386-mingw32-gcc"; then \
-	    $(MAKE) pdftexbin-mingw32; \
-	elif test "x$(CC)" = "xgnuwin32gcc"; then \
-	    $(MAKE) pdftexbin-gnuwin32; \
 	else \
 	    $(MAKE) pdftexbin-native; \
 	fi
@@ -167,36 +174,24 @@ web2c-cross: $(web2c_programs)
 	cp -f $(linux_build_dir)/web2c/splitup web2c
 	cp -f $(linux_build_dir)/web2c/web2c web2c
 	touch web2c/fixwrites web2c/splitup web2c/web2c
-	$(MAKE) tie
-	rm -f tie
-	cp -f $(linux_build_dir)/tie .
-	touch tie
-	$(MAKE) tangleboot
-	rm -f tangleboot
-	cp -f $(linux_build_dir)/tangleboot .
-	touch tangleboot
-	$(MAKE) tangle
-	rm -f tangle
-	cp -f $(linux_build_dir)/tangle .
-	touch tangle
+	$(MAKE) tangleboot && rm -f tangleboot && \
+	cp -f $(linux_build_dir)/tangleboot .  && touch tangleboot
+	$(MAKE) ctangleboot && rm -f ctangleboot && \
+	cp -f $(linux_build_dir)/ctangleboot .  && touch ctangleboot
+	$(MAKE) ctangle && rm -f ctangle && \
+	cp -f $(linux_build_dir)/ctangle .  && touch ctangle
+	$(MAKE) tie && rm -f tie && \
+	cp -f $(linux_build_dir)/tie .  && touch tie
+	$(MAKE) tangle && rm -f tangle && \
+	cp -f $(linux_build_dir)/tangle .  && touch tangle
 
 pdftexbin-native:
 	strip $(pdftex_bin)
-	zip pdftex-native-`datestr`.zip $(pdftex_bin) $(pdftex_pool)
+	tar cfj pdftex-native-`datestr`.tar.bz2 $(pdftex_bin) $(pdftex_pool)
 
 pdftexbin-djgpp:
 	dos-strip $(pdftex_bin)
 	dos-stubify $(pdftex_bin)
-	zip pdftex-djgpp-`datestr`.zip $(pdftex_exe) $(pdftex_pool)
-
-pdftexbin-mingw32:
-	i386-mingw32-strip $(pdftex_bin)
-	for f in $(pdftex_bin); do mv $$f $$f.exe; done
-	zip pdftex-mingw32-`datestr`.zip $(pdftex_exe) $(pdftex_pool)
-
-pdftexbin-gnuwin32:
-	gnuwin32strip $(pdftex_bin)
-	for f in $(pdftex_bin); do mv $$f $$f.exe; done
-	zip pdftex-gnuwin32-`datestr`.zip $(pdftex_exe) $(pdftex_pool)
+	tar cfj pdftex-djgpp-`datestr`.tar.bz2 $(pdftex_exe) $(pdftex_pool)
 
 # end of pdftex.mk

@@ -3,7 +3,7 @@
 # Makefile  : pdftex, web2c win32.mak fragment to build pdfTeX
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/08/17 15:32:53 popineau>
+# Time-stamp: <04/03/04 09:48:05 popineau>
 #
 ################################################################################
 
@@ -13,9 +13,9 @@
 
 Makefile: pdftexdir\pdftex.mk
 
-pdftex_bin = $(objdir)\pdftex.exe $(objdir)\pdfetex.exe $(objdir)\ttf2afm.exe $(objdir)\pdftosrc.exe
-# pdftex_exe = pdftex.exe pdfetex.exe ttf2afm.exe pdftosrc.exe
-pdftex_pool = pdftex.pool pdfetex.pool
+pdftex_bin = $(objdir)\pdftex.exe $(objdir)\pdfetex.exe $(objdir)\pdfxtex.exe $(objdir)\ttf2afm.exe $(objdir)\pdftosrc.exe
+# pdftex_exe = pdftex.exe pdfetex.exe pdfxtex.exe ttf2afm.exe pdftosrc.exe
+pdftex_pool = pdftex.pool pdfetex.pool pdfxtex.pool
 # linux_build_dir = $(HOME)\pdftex\build\linux\texk\web2c
 
 # We build pdftex
@@ -23,7 +23,6 @@ pdftex = $(objdir)\pdftex.exe
 !ifdef TEX_DLL
 pdftex = $(pdftex) $(objdir)\$(library_prefix)pdftex.dll
 !endif
-pdftexdir = pdftexdir
 
 # The C sources.
 pdftex_c = pdftex.c
@@ -55,8 +54,17 @@ pdftex.p pdftex.pool: .\$(objdir)\tangle.exe pdftex.web pdftex.ch
 	.\$(objdir)\tangle pdftex.web pdftex.ch
 
 # Generation of the web and ch files.
-pdftex.web: $(objdir)\tie.exe tex.web pdftexdir\pdftex.ch # pdftexdir\pdftex.mak
-	.\$(objdir)\tie -m pdftex.web tex.web pdftexdir\pdftex.ch
+pdftex.web: $(objdir)\tie.exe \
+	tex.web \
+        pdftexdir/pdftex.ch \
+        pdftexdir/hz.ch \
+        pdftexdir/misc.ch \
+	# pdftexdir\pdftex.mak
+	.\$(objdir)\tie -m pdftex.web tex.web \
+	pdftexdir\pdftex.ch \
+	$(srcdir)/pdftexdir/hz.ch  \
+	$(srcdir)/pdftexdir/misc.ch
+
 pdftex.ch: $(objdir)\tie.exe pdftex.web	\
 	   pdftexdir\tex.ch0		\
 	   tex.ch			\
@@ -82,9 +90,11 @@ pdftex-check: pdftex pdftex.fmt
 clean:: pdftex-clean
 pdftex-clean:
 #	$(LIBTOOL) --mode=clean $(RM) pdftex
-	-@$(del) $(pdftex_o) $(pdftex_c) pdftexextra.c pdftexcoerce.h $(redir_stderr)
-	-@$(del) pdftexd.h pdftex.p pdftex.pool pdftex.web pdftex.ch $(redir_stderr)
-	-@$(del) pdftex.fmt pdftex.log $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(pdftex_o) $(pdftex_c) pdftexextra.c pdftexcoerce.h \
+			    pdftexd.h pdftex.p pdftex.pool pdftex.web pdftex.ch \
+                            pdftex.fmt pdftex.log) do $(del) %%i $(redir_stderr) \
+	)
 
 # Dumps.
 all_pdffmts = pdftex.fmt $(pdffmts)
@@ -164,8 +174,10 @@ ttf2afm-check: $(objdir)\ttf2afm.exe
 clean:: ttf2afm-clean
 ttf2afm-clean:
 #	$(LIBTOOL) --mode=clean $(RM) ttf2afm
-	-@$(del) $(objdir)\ttf2afm.obj $(objdir)\macnames.obj $(redir_stderr)
-	-@$(del) ttf2afm.c macnames.c $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\ttf2afm.obj $(objdir)\macnames.obj \
+			    ttf2afm.c macnames.c) do $(del) %%i $(redir_stderr) \
+	)
 # 
 # pdftosrc
 pdftosrc = $(objdir)\pdftosrc.exe

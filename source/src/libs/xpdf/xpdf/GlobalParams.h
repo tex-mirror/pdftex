@@ -3,6 +3,7 @@
 // GlobalParams.h
 //
 // Copyright 2001-2003 Glyph & Cog, LLC
+// Patched by Martin Schröder (martin@pdftex.org)
 //
 //========================================================================
 
@@ -123,6 +124,8 @@ enum EndOfLineKind {
 class GlobalParams {
 public:
 
+  // Initialize the global parameters
+  GlobalParams();
   // Initialize the global parameters by attempting to read a config
   // file.
   GlobalParams(char *cfgFileName);
@@ -198,6 +201,7 @@ public:
 
 private:
 
+  void init();
   void parseFile(GString *fileName, FILE *f);
   void parseNameToUnicode(GList *tokens, GString *fileName, int line);
   void parseCIDToUnicode(GList *tokens, GString *fileName, int line);

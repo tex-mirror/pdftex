@@ -44,6 +44,8 @@
 #include <pdftexdir/pdftexextra.h>
 #elif defined (pdfeTeX)
 #include <pdfetexdir/pdfetexextra.h>
+#elif defined (pdfxTeX)
+#include <pdfxtexdir/pdfxtexextra.h>
 #elif defined (Omega)
 #include <omegadir/omegaextra.h>
 #elif defined (eOmega)
@@ -611,7 +613,7 @@ read_char_translation_file P1H(void)
         }
 
         /* If they mention a charcode, call it printable.  */
-        isprintable[second] = 1;
+        xprn[second] = 1;
       }
       free (line);
     }
@@ -641,7 +643,7 @@ setupcharset P1H(void)
      we handle the string pool. */
   for (c = 0; c <= 255; c++) {
     xchr[c] = xord[c] = c;
-    isprintable[c] = (32 <= c && c <= 126);
+    xprn[c] = (32 <= c && c <= 126);
   }
 
 #if 0
@@ -652,26 +654,21 @@ setupcharset P1H(void)
     translate_filename = kpse_var_value ("CHARTRANSLATE");
   }
 #endif
-  
-  /* Load up cp8bit.tcx to do 1->1 translation if not other
-     mapping is specified. */
-  if (!translate_filename)
-      translate_filename = "cp8bit";
 
   /* The expansion is nonempty if the variable is set.  */
   if (translate_filename) {
     read_char_translation_file ();
   }
 #if 0
-  /* Code to set the isprintable array based on the locale.  The code
+  /* Code to set the xprn array based on the locale.  The code
    * was removed because in this form it affected not just output to
    * the terminal and log file, but also the results of \write.
    */
   else {
-    /* Use the locale to adjust the isprintable array. */
+    /* Use the locale to adjust the xprn array. */
     for (c = 0; c <= 255; c++) {
-      if (!isprintable[c] && isprint(c)) {
-        isprintable[c] = 1;
+      if (!xprn[c] && isprint(c)) {
+        xprn[c] = 1;
       }
     }
   }
@@ -704,6 +701,7 @@ static struct option long_options[]
 #endif /* IPC */
 #if !defined(Omega) && !defined(eOmega)
       { "mltex",                  0, &mltexp, 1 },
+      { "enc",                    0, &encoption, 1 },
 #endif /* !Omega && !eOmega */
       { "output-comment",         1, 0, 0 },
       { "shell-escape",           0, &shellenabledp, 1 },
@@ -713,6 +711,9 @@ static struct option long_options[]
 #if defined (TeX) || defined (MF) || defined (MP)
       { "file-line-error-style",  0, &filelineerrorstylep, 1 },
       { "jobname",                1, 0, 0 },
+#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+      { "output-format",          1, 0, 0 },
+#endif
       { "parse-first-line",       0, &parsefirstlinep, 1 },
 #if !defined(Omega) && !defined(eOmega)
       { "translate-file",         1, 0, 0 },
@@ -805,6 +806,20 @@ parse_options P2C(int, argc,  string *, argv)
           parse_src_specials_option(optarg);
        }
 #endif /* TeX */
+#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+    } else if (ARGUMENT_IS ("output-format")) {
+       pdfoutputoption = 1;
+       if (strcmp(optarg, "dvi") == 0) {
+           pdfoutputvalue = 0;
+       }
+       else if (strcmp(optarg, "pdf") == 0) {
+           pdfoutputvalue = 2;
+       }
+       else {
+           WARNING1 ("Ignoring unknown value `%s' for --output-format", optarg);
+           pdfoutputoption = 0;
+       }
+#endif /* pdfTeX || pdfeTeX || pdfxTeX */
 #if defined (TeX) || defined (MF) || defined (MP)
 #if !defined(Omega) && !defined(eOmega)
     } else if (ARGUMENT_IS ("translate-file")) {
@@ -1487,7 +1502,7 @@ checkpoolpointer (poolpointer poolptr, size_t len)
   }
 }
 
-#if !defined(pdfTeX) && !defined(pdfeTeX)
+#if !defined(pdfTeX) && !defined(pdfeTeX) && !defined(pdfxTeX)
 static int
 maketexstring(const_string s)
 {

@@ -30,6 +30,8 @@
 #ifdef TeX
 #if defined(pdfeTeX)
 #define TEXPOOLNAME "pdfetex.pool"
+#elif defined(pdfxTeX)
+#define TEXPOOLNAME "pdfxtex.pool"
 #elif defined (pdfTeX)
 #define TEXPOOLNAME "pdftex.pool"
 #elif defined (eTeX)
@@ -62,6 +64,7 @@
 
 /* Restore underscores.  */
 #define kpsedvipsconfigformat kpse_dvips_config_format
+#define kpsefontmapformat kpse_fontmap_format
 #define kpsemfpoolformat kpse_mfpool_format
 #define kpsempformat kpse_mp_format
 #define kpsemppoolformat kpse_mppool_format

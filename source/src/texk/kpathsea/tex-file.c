@@ -84,6 +84,13 @@ kpse_format_info_type kpse_format_info[kpse_last_format];
 #define MISCFONTS_ENVS "MISCFONTS"
 #define WEB_ENVS "WEBINPUTS"
 #define CWEB_ENVS "CWEBINPUTS"
+#define ENC_ENVS "ENCFONTS"
+#define CMAP_ENVS "CMAPFONTS"
+#define SFD_ENVS "SFDFONTS"
+#define OPENTYPE_ENVS "OPENTYPEFONTS"
+#define PDFTEXCONFIG_ENVS "PDFTEXCONFIG"
+#define LIG_ENVS "LIGFONTS"
+#define TEXMFSCRIPTS_ENVS "TEXMFSCRIPTS"
 
 /* The compiled-in default list, DEFAULT_FONT_SIZES, is intended to be
    set from the command line (presumably via the Makefile).  */
@@ -541,7 +548,7 @@ kpse_init_format P1C(kpse_file_format_type, format)
       INIT_FORMAT ("PostScript header", DEFAULT_TEXPSHEADERS,
                    TEX_PS_HEADER_ENVS);
 /* Unfortunately, dvipsk uses this format for type1 fonts.  */
-#define TEXPSHEADER_SUFFIXES ".pro", ".enc"
+#define TEXPSHEADER_SUFFIXES ".pro"
       ALT_SUFFIXES (TEXPSHEADER_SUFFIXES);
       FMT_INFO.binmode = true;
       break;
@@ -619,6 +626,32 @@ kpse_init_format P1C(kpse_file_format_type, format)
 #define CWEB_SUFFIXES ".w", ".web"
       SUFFIXES (CWEB_SUFFIXES);
       ALT_SUFFIXES (".ch");
+      break;
+    case kpse_enc_format:
+      INIT_FORMAT ("enc files", DEFAULT_ENCFONTS, ENC_ENVS);
+      SUFFIXES (".enc");
+      break;
+    case kpse_cmap_format:
+      INIT_FORMAT ("cmap files", DEFAULT_CMAPFONTS, CMAP_ENVS);
+      SUFFIXES (".cmap");      
+      break;
+    case kpse_sfd_format:
+      INIT_FORMAT ("subfont definition files", DEFAULT_SFDFONTS, SFD_ENVS);
+      SUFFIXES (".sfd");
+      break;
+    case kpse_opentype_format:
+      INIT_FORMAT ("opentype fonts", DEFAULT_OPENTYPEFONTS, OPENTYPE_ENVS);
+      FMT_INFO.binmode = true;
+      break;
+    case kpse_pdftex_config_format:
+      INIT_FORMAT ("pdftex config", DEFAULT_PDFTEXCONFIG, PDFTEXCONFIG_ENVS);
+      break;
+    case kpse_lig_format:
+      INIT_FORMAT ("lig files", DEFAULT_LIGFONTS, LIG_ENVS);
+      SUFFIXES (".lig");
+      break;
+    case kpse_texmfscripts_format:
+      INIT_FORMAT ("texmfscripts", DEFAULT_TEXMFSCRIPTS, TEXMFSCRIPTS_ENVS);
       break;
     default:
       FATAL1 ("kpse_init_format: Unknown format %d", format);
@@ -864,6 +897,7 @@ kpse_reset_program_name P1C(const_string, progname)
 
   free (kpse_program_name);
   kpse_program_name = xstrdup (progname);
+  xputenv("progname", kpse_program_name);
   
   /* Clear paths -- do we want the db path to be cleared? */
   for (i = 0; i != kpse_last_format; ++i) {

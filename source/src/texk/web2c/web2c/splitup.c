@@ -109,11 +109,14 @@ main P2C(int, argc, string *, argv)
   } else if (STREQ (output_name, "pdfetex")) {
     fputs ("#define INITEX\n#define TeX\n#define pdfeTeX\n", out);
     coerce = "pdfetexcoerce.h";
+  } else if (STREQ (output_name, "pdfxtex")) {
+    fputs ("#define INITEX\n#define TeX\n#define pdfxTeX\n", out);
+    coerce = "pdfxtexcoerce.h";
   } else if (STREQ (output_name, "mp")) {
     fputs ("#define INIMP\n#define MP\n", out);
     coerce = "mpcoerce.h";
   } else
-    FATAL1 ("Can only split mf, mp, tex, etex, omega, eomega, pdftex, or pdfetex, not %s", output_name);
+    FATAL1 ("Can only split mf, mp, tex, etex, omega, eomega or pdf[ex]tex, not %s", output_name);
   
   coerce_len = strlen (coerce);
   

@@ -3,7 +3,7 @@ if test "$needs_libxpdf" = no; then
   LDLIBXPDF=
   LIBXPDFDEP=
 else
-  LIBXPDFCPPFLAGS='-I$(LIBXPDFDIR) -I$(LIBXPDFDIR)/xpdf -I$(LIBXPDFDIR)/goo -I$(LIBXPDFSRCDIR)/xpdf -I$(LIBXPDFSRCDIR)/goo'
+  LIBXPDFCPPFLAGS='-I$(LIBXPDFDIR) -I$(LIBXPDFDIR)/xpdf -I$(LIBXPDFDIR)/goo -I$(LIBXPDFSRCDIR) -I$(LIBXPDFSRCDIR)/xpdf -I$(LIBXPDFSRCDIR)/goo'
   LDLIBXPDF='$(LIBXPDFDIR)/xpdf/libxpdf.a $(LIBXPDFDIR)/goo/libGoo.a'
   LIBXPDFDEP='$(LIBXPDFDIR)/xpdf/libxpdf.a $(LIBXPDFDIR)/goo/libGoo.a'
 fi

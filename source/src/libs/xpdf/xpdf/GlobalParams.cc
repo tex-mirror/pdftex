@@ -3,6 +3,7 @@
 // GlobalParams.cc
 //
 // Copyright 2001-2003 Glyph & Cog, LLC
+// Patched by Martin Schröder (martin@pdftex.org)
 //
 //========================================================================
 
@@ -125,11 +126,9 @@ PSFontParam::~PSFontParam() {
 // parsing
 //------------------------------------------------------------------------
 
-GlobalParams::GlobalParams(char *cfgFileName) {
+void GlobalParams::init() {
   UnicodeMap *map;
   DisplayFontParam *dfp;
-  GString *fileName;
-  FILE *f;
   int i;
 
 #if MULTITHREADED
@@ -239,7 +238,17 @@ GlobalParams::GlobalParams(char *cfgFileName) {
 			       displayFontTab[i].encoding);
     displayFonts->add(dfp->name, dfp);
   }
+}
 
+GlobalParams::GlobalParams() {
+  init();
+}
+
+GlobalParams::GlobalParams(char *cfgFileName) {
+  GString *fileName;
+  FILE *f;
+  
+  init();
   // look for a user config file, then a system-wide config file
   f = NULL;
   fileName = NULL;

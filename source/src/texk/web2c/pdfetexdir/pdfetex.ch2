@@ -17,7 +17,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id$
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.ch2#10 $
 %
 @x limbo
 \def\pdfTeX{pdf\TeX}
@@ -41,77 +41,58 @@
 @z
 
 @x [230]
-@d pdf_pages_attr_loc=local_base+9 {points to token list for \.{\\pdfpagesattr}}
-@d pdf_page_attr_loc=local_base+10 {points to token list for \.{\\pdfpageattr}}
-@d pdf_page_resources_loc=local_base+11 {points to token list for \.{\\pdfpageresources}}
-@d err_help_loc=local_base+12 {points to token list for \.{\\errhelp}}
-@d toks_base=local_base+13 {table of 256 token list registers}
+@d pdftex_first_loc       = local_base+10 {first number defined in this section}
 @y
-@d pdf_pages_attr_loc=token_base+9 {points to token list for \.{\\pdfpagesattr}}
-@d pdf_page_attr_loc=token_base+10 {points to token list for \.{\\pdfpageattr}}
-@d pdf_page_resources_loc=token_base+11 {points to token list for \.{\\pdfpageresources}}
-@d err_help_loc=token_base+12 {points to token list for \.{\\errhelp}}
-@d toks_base=token_base+13 {table of 256 token list registers}
+@d pdftex_first_loc       = token_base+10 {first number defined in this section}
+@z
+
+% @x [230]
+% @d toks_base=local_base+13 {table of 256 token list registers}
+% @y
+% @d toks_base=token_base+13 {table of 256 token list registers}
+% @z
+
+@x [307]
+@d pdftex_first_text       = 16 {first number defined in this section}
+@y
+@d pdftex_first_text       = 17 {first number defined in this section}
 @z
 
 @x [307]
 @d write_text=15 {|token_type| code for \.{\\write}}
-@d pdf_pages_attr_text  = 16 {|token_type| code for \.{\\pdfpagesattr}}
-@d pdf_page_attr_text  = 17 {|token_type| code for \.{\\pdfpageattr}}
-@d pdf_page_resources_text = 18 {|token_type| code for \.{\\pdfpageresources}}
 @y
 @d write_text=16 {|token_type| code for \.{\\write}}
-@d pdf_pages_attr_text  = 17 {|token_type| code for \.{\\pdfpagesattr}}
-@d pdf_page_attr_text  = 18 {|token_type| code for \.{\\pdfpageattr}}
-@d pdf_page_resources_text = 19 {|token_type| code for \.{\\pdfpageresources}}
 @z
 
 @x [410]
-@d pdftex_revision_code   = 6  {command code for \.{\\pdftexrevision}}
-@d pdf_font_name_code     = 7  {command code for \.{\\pdffontname}}
-@d pdf_font_objnum_code   = 8  {command code for \.{\\pdffontobjnum}}
-@d pdf_font_size_code     = 9  {command code for \.{\\pdffontsize}}
-@y eTeX_revision_code = 6 has been already defined by eTeX
-@d pdftex_revision_code   = 7  {command code for \.{\\pdftexrevision}}
-@d pdf_font_name_code     = 8  {command code for \.{\\pdffontname}}
-@d pdf_font_objnum_code   = 9  {command code for \.{\\pdffontobjnum}}
-@d pdf_font_size_code     = 10  {command code for \.{\\pdffontsize}}
+@d pdftex_first_expand_code = 6 {first number defined in this section}
+@y 
+@d pdftex_first_expand_code = 7 {first number defined in this section}
 @z
+% N.B.: eTeX_revision_code = 6 has been already defined by eTeX
 
 @x [416]
 |glue_val|, |input_line_no_code|, |badness_code|, or one of the other codes for
 \pdfTeX{} extensions.
-
-@d input_line_no_code=glue_val+1 {code for \.{\\inputlineno}}
-@d badness_code=glue_val+2 {code for \.{\\badness}}
-@d pdftex_version_code     = glue_val + 3 {code for \.{\\pdftexversion}}
-@d pdf_last_obj_code       = glue_val + 4 {code for \.{\\pdflastobj}}
-@d pdf_last_xform_code     = glue_val + 5 {code for \.{\\pdflastxform}}
-@d pdf_last_ximage_code    = glue_val + 6 {code for \.{\\pdflastximage}}
-@d pdf_last_ximage_pages_code = glue_val + 7 {code for \.{\\pdflastximagepages}}
-@d pdf_last_annot_code     = glue_val + 8 {code for \.{\\pdflastannot}}
-@d pdf_last_x_pos_code     = glue_val + 9 {code for \.{\\pdflastxpos}}
-@d pdf_last_y_pos_code     = glue_val + 10 {code for \.{\\pdflastypos}}
-@d pdf_last_demerits_code  = glue_val + 11 {code for \.{\\pdflastdemerits}}
-@d pdf_last_vbreak_penalty_code = glue_val + 12 {code for \.{\\pdflastvbreakpenalty}}
 @y
 |glue_val|, |input_line_no_code|, |badness_code|, or one of the other codes for
 \pdfTeX\ or \eTeX\ extensions.
+@z
 
+@x [416]
+@d pdftex_first_rint_code     = glue_val + 3 {first number defined in this section}
+@y
 @d last_node_type_code=glue_val+1 {code for \.{\\lastnodetype}}
+@d pdftex_first_rint_code     = glue_val + 4 {first number defined in this section}
+@z
+
+@x [416]
+@d input_line_no_code=glue_val+1 {code for \.{\\inputlineno}}
+@d badness_code=glue_val+2 {code for \.{\\badness}}
+@y
 @d input_line_no_code=glue_val+2 {code for \.{\\inputlineno}}
 @d badness_code=glue_val+3 {code for \.{\\badness}}
-@d pdftex_version_code     = glue_val + 4 {code for \.{\\pdftexversion}}
-@d pdf_last_obj_code       = glue_val + 5 {code for \.{\\pdflastobj}}
-@d pdf_last_xform_code     = glue_val + 6 {code for \.{\\pdflastxform}}
-@d pdf_last_ximage_code    = glue_val + 7 {code for \.{\\pdflastximage}}
-@d pdf_last_ximage_pages_code = glue_val + 8 {code for \.{\\pdflastximagepages}}
-@d pdf_last_annot_code     = glue_val + 9 {code for \.{\\pdflastannot}}
-@d pdf_last_x_pos_code     = glue_val + 10 {code for \.{\\pdflastxpos}}
-@d pdf_last_y_pos_code     = glue_val + 11 {code for \.{\\pdflastypos}}
-@d pdf_last_demerits_code  = glue_val + 12 {code for \.{\\pdflastdemerits}}
-@d pdf_last_vbreak_penalty_code  = glue_val + 13 {code for \.{\\pdflastvbreakpenalty}}
-@d eTeX_int=glue_val+14 {first of \eTeX\ codes for integers}
+@d eTeX_int=pdftex_last_rint_code+1 {first of \eTeX\ codes for integers}
 @d eTeX_dim=eTeX_int+8 {first of \eTeX\ codes for dimensions}
 @d eTeX_glue=eTeX_dim+9 {first of \eTeX\ codes for glue}
 @d eTeX_mu=eTeX_glue+1 {first of \eTeX\ codes for muglue}
@@ -121,19 +102,6 @@
 @x [424]
 if cur_chr>glue_val then
   begin case cur_chr of
-  input_line_no_code: cur_val:=line;
-  badness_code: cur_val:=last_badness;
-  pdftex_version_code:  cur_val := pdftex_version;
-  pdf_last_obj_code:    cur_val := pdf_last_obj;
-  pdf_last_xform_code:  cur_val := pdf_last_xform;
-  pdf_last_ximage_code: cur_val := pdf_last_ximage;
-  pdf_last_ximage_pages_code: cur_val := pdf_last_ximage_pages;
-  pdf_last_annot_code:  cur_val := pdf_last_annot;
-  pdf_last_x_pos_code:  cur_val := pdf_last_x_pos;
-  pdf_last_y_pos_code:  cur_val := pdf_last_y_pos;
-  pdf_last_demerits_code:  cur_val := fewest_demerits;
-  pdf_last_vbreak_penalty_code:  cur_val := last_vbreak_penalty;
-  endcases;
 @y
 if m>last_node_type_code then
  if m>=eTeX_glue then @<Process an expression and |return|@>@;
@@ -144,18 +112,11 @@ if m>last_node_type_code then
   cur_val_level:=dimen_val;
   end
  else begin case m of
-  input_line_no_code: cur_val:=line;
-  badness_code: cur_val:=last_badness;
-  pdftex_version_code:  cur_val := pdftex_version;
-  pdf_last_obj_code:    cur_val := pdf_last_obj;
-  pdf_last_xform_code:  cur_val := pdf_last_xform;
-  pdf_last_ximage_code: cur_val := pdf_last_ximage;
-  pdf_last_ximage_pages_code: cur_val := pdf_last_ximage_pages;
-  pdf_last_annot_code:  cur_val := pdf_last_annot;
-  pdf_last_x_pos_code:  cur_val := pdf_last_x_pos;
-  pdf_last_y_pos_code:  cur_val := pdf_last_y_pos;
-  pdf_last_demerits_code:  cur_val := fewest_demerits;
-  pdf_last_vbreak_penalty_code:  cur_val := last_vbreak_penalty;
+@z
+
+@x
+  endcases;
+@y
   @/@<Cases for fetching an integer value@>@/
   end; {there are no other cases}
 @z

@@ -16,7 +16,9 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/tex.pch#22 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/tex.pch#16 $
+% Change file containing web2c-specific or system-dependent changes to
+% pdftex
 
 @x [4.51] - Change `tex.pool' to `pdftex.pool' in error messages
 else  bad_pool('! I can''t read tex.pool; bad path?')
@@ -52,12 +54,20 @@ begin if eof(pool_file) then bad_pool('! pdftex.pool has no check sum.');
 @d char_sub_def_min_code=55 {smallest value in the charsubdef list}
 @d char_sub_def_max_code=56 {largest value in the charsubdef list}
 @d tracing_char_sub_def_code=57 {traces changes to a charsubdef def}
-@d int_pars=58 {total number of integer parameters}
+@d mubyte_in_code=58 {if positive then reading mubytes is active}
+@d mubyte_out_code=59 {if positive then printing mubytes is active}
+@d mubyte_log_code=60 {if positive then print mubytes to log and terminal}
+@d spec_out_code=61 {if positive then print specials by mubytes}
+@d int_pars=62 {total number of integer parameters}
 @y
-@d char_sub_def_min_code=67 {smallest value in the charsubdef list}
-@d char_sub_def_max_code=68 {largest value in the charsubdef list}
-@d tracing_char_sub_def_code=69 {traces changes to a charsubdef def}
-@d int_pars=73 {total number of integer parameters}
+@d char_sub_def_min_code=71 {smallest value in the charsubdef list}
+@d char_sub_def_max_code=72 {largest value in the charsubdef list}
+@d tracing_char_sub_def_code=73 {traces changes to a charsubdef def}
+@d mubyte_in_code=74 {if positive then reading mubytes is active}
+@d mubyte_out_code=75 {if positive then printing mubytes is active}
+@d mubyte_log_code=76 {if positive then print mubytes to log and terminal}
+@d spec_out_code=77 {if positive then print specials by mubytes}
+@d int_pars=78 {total number of integer parameters}
 @z
 
 @x (MLTeX)
@@ -207,6 +217,49 @@ found: @<Print character substition tracing log@>;
     end
 @z
 
+
+@x [50.1302] l.23694 - Dump |pdf_output| to fmt file
+@<Dump constants for consistency check@>;
+dump_int(@"4D4C5458);  {ML\TeX's magic constant: "MLTX"}
+@y
+@<Dump constants for consistency check@>;
+dump_int(@"504D5458);  {PDFML\TeX's magic constant: "PMTX"}
+dump_int(pdf_output);
+dump_int(pdf_compress_level);
+dump_int(pdf_decimal_digits);
+dump_int(pdf_move_chars);
+dump_int(pdf_image_resolution);
+dump_int(pdf_pk_resolution);
+dump_int(pdf_unique_resname);
+dump_int(pdf_option_pdf_minor_version);
+dump_int(pdf_option_always_use_pdfpagebox);
+dump_int(pdf_option_pdf_inclusion_errorlevel);
+dump_int(pdf_h_origin);
+dump_int(pdf_v_origin);
+dump_int(pdf_page_width);
+dump_int(pdf_page_height);
+@z
+
+@x
+if x<>@"4D4C5458 then goto bad_fmt;
+@y
+if x<>@"504D5458 then goto bad_fmt;
+undump_int(pdf_output);   {undump |pdf_output| mode flag}
+undump_int(pdf_compress_level);
+undump_int(pdf_decimal_digits);
+undump_int(pdf_move_chars);
+undump_int(pdf_image_resolution);
+undump_int(pdf_pk_resolution);
+undump_int(pdf_unique_resname);
+undump_int(pdf_option_pdf_minor_version);
+undump_int(pdf_option_always_use_pdfpagebox);
+undump_int(pdf_option_pdf_inclusion_errorlevel);
+undump_int(pdf_h_origin);
+undump_int(pdf_v_origin);
+undump_int(pdf_page_width);
+undump_int(pdf_page_height);
+@z
+
 @x (WEB2C!)
 param_base:=xmalloc_array(integer, font_max);
 
@@ -218,14 +271,13 @@ pdf_char_used:=xmalloc_array(char_used_array, font_max);
 pdf_char_map:=xmalloc_array(char_map_array, font_max);
 pdf_font_size:=xmalloc_array(scaled, font_max);
 pdf_font_num:=xmalloc_array(integer, font_max);
-pdf_font_map:=xmalloc_array(integer, font_max);
+pdf_font_map:=xmalloc_array(fm_entry_ptr, font_max);
 pdf_font_type:=xmalloc_array(eight_bits, font_max);
 pdf_font_attr:=xmalloc_array(str_number, font_max);
 pdf_font_link:=xmalloc_array(internal_font_number, font_max);
 pdf_font_stretch:=xmalloc_array(integer, font_max);
 pdf_font_shrink:=xmalloc_array(integer, font_max);
 pdf_font_step:=xmalloc_array(integer, font_max);
-pdf_font_expand_factor:=xmalloc_array(integer, font_max);
 pdf_font_expand_ratio:=xmalloc_array(integer, font_max);
 pdf_font_lp_base:=xmalloc_array(integer, font_max);
 pdf_font_rp_base:=xmalloc_array(integer, font_max);
@@ -244,20 +296,20 @@ for font_k := font_base to font_max do begin
     pdf_char_map[font_k, 32] := 32;
     pdf_font_size[font_k] := 0;
     pdf_font_num[font_k] := 0;
-    pdf_font_map[font_k] := -1;
+    pdf_font_map[font_k] := 0;
     pdf_font_type[font_k] := new_font_type;
     pdf_font_attr[font_k] := "";
     pdf_font_link[font_k] := null_font;
     pdf_font_stretch[font_k] := null_font;
     pdf_font_shrink[font_k] := null_font;
     pdf_font_step[font_k] := 0;
-    pdf_font_expand_factor[font_k] := 0;
     pdf_font_expand_ratio[font_k] := 0;
     pdf_font_lp_base[font_k] := -1;
     pdf_font_rp_base[font_k] := -1;
     pdf_font_ef_base[font_k] := -1;
 end;
 
+make_pdftex_banner;
 undump_things(font_check[null_font], font_ptr+1-null_font);
 @z
 
@@ -302,14 +354,13 @@ pdf_char_used:=xmalloc_array(char_used_array,font_max);
 pdf_char_map:=xmalloc_array(char_map_array,font_max);
 pdf_font_size:=xmalloc_array(scaled,font_max);
 pdf_font_num:=xmalloc_array(integer,font_max);
-pdf_font_map:=xmalloc_array(integer,font_max);
+pdf_font_map:=xmalloc_array(fm_entry_ptr,font_max);
 pdf_font_type:=xmalloc_array(eight_bits,font_max);
 pdf_font_attr:=xmalloc_array(str_number,font_max);
 pdf_font_link:=xmalloc_array(internal_font_number,font_max);
 pdf_font_stretch:=xmalloc_array(integer,font_max);
 pdf_font_shrink:=xmalloc_array(integer,font_max);
 pdf_font_step:=xmalloc_array(integer,font_max);
-pdf_font_expand_factor:=xmalloc_array(integer,font_max);
 pdf_font_expand_ratio:=xmalloc_array(integer,font_max);
 pdf_font_lp_base:=xmalloc_array(integer,font_max);
 pdf_font_rp_base:=xmalloc_array(integer,font_max);
@@ -328,14 +379,13 @@ for font_k := font_base to font_max do begin
     pdf_char_map[font_k, 32] := 32;
     pdf_font_size[font_k] := 0;
     pdf_font_num[font_k] := 0;
-    pdf_font_map[font_k] := -1;
+    pdf_font_map[font_k] := 0;
     pdf_font_type[font_k] := new_font_type;
     pdf_font_attr[font_k] := "";
     pdf_font_link[font_k] := null_font;
     pdf_font_stretch[font_k] := null_font;
     pdf_font_shrink[font_k] := null_font;
     pdf_font_step[font_k] := 0;
-    pdf_font_expand_factor[font_k] := 0;
     pdf_font_expand_ratio[font_k] := 0;
     pdf_font_lp_base[font_k] := -1;
     pdf_font_rp_base[font_k] := -1;
@@ -343,4 +393,5 @@ for font_k := font_base to font_max do begin
 end;
 
 font_ptr:=null_font; fmem_ptr:=7;
+make_pdftex_banner;
 @z

@@ -5,7 +5,7 @@
 Makefile: etexdir/etex.mk
 
 # We build etex.
-etex = etex
+etex =@ETEX@ etex
 
 # The C sources.
 etex_c = etexini.c etex0.c etex1.c etex2.c
@@ -152,7 +152,7 @@ etrip-clean:
 
 
 # Dumps
-all_efmts = etex.efmt $(efmts)
+all_efmts = @FMU@ etex.efmt $(efmts)
 
 dumps: efmts
 efmts: $(all_efmts)
@@ -184,12 +184,12 @@ install-etex-data:: install-etex-dumps
 install-etex-dumps: install-etex-fmts
 
 install-programs: install-etex-programs
-install-etex-programs: etex $(bindir)
+install-etex-programs: $(etex) $(bindir)
 
 install-links: install-etex-links
 install-etex-links: install-etex-programs
-	cd $(bindir) && (rm -f einitex evirtex; \
-	  $(LN) etex einitex; $(LN) etex evirtex)
+	@FMU@cd $(bindir) && (rm -f einitex evirtex; \
+	@FMU@  $(LN) etex einitex; $(LN) etex evirtex)
 	efmts="$(efmts)"; \
 	  for f in $$efmts; do base=`basename $$f .efmt`; \
 	    (cd $(bindir) && (rm -f $$base; $(LN) etex $$base)); done
@@ -201,6 +201,6 @@ install-etex-fmts: efmts
 	  for f in $$efmts; do $(INSTALL_DATA) $$f $(fmtdir)/$$f; done
 
 install-data install-etex-data:: $(texpooldir)
-	$(INSTALL_DATA) etex.pool $(texpooldir)/etex.pool
+@ETEX@	$(INSTALL_DATA) etex.pool $(texpooldir)/etex.pool
 
 # end of etex.mk

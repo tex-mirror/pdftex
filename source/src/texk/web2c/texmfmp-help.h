@@ -1,5 +1,7 @@
 /* The help messages for TeX & MF family of programs.
 
+$Id: //depot/Build/source.development/TeX/texk/web2c/texmfmp-help.h#12 $
+
 Copyright (C) 1995, 96 Karl Berry, 2001 O.Weber.
 
 This program is free software; you can redistribute it and/or modify
@@ -54,6 +56,7 @@ const_string ETEXHELP[] = {
     "-kpathsea-debug=NUMBER   set path searching debugging flags according to",
     "                          the bits of NUMBER",
     "[-no]-mktex=FMT          disable/enable mktexFMT generation (FMT=tex/tfm)",
+    "-enc                     enable encTeX extension, see encdoc-e.pdf",
     "-mltex                   enable MLTeX extensions such as \\charsubdef",
     "-output-comment=STRING   use STRING for DVI file comment instead of date",
     "-parse-first-line        parse of the first line of the input file",
@@ -65,6 +68,8 @@ const_string ETEXHELP[] = {
     "                          the DVI file. WHERE is a comma-separated value",
     "                          list: cr display hbox math par parend vbox",
     "-translate-file=TCXNAME  use the TCX file TCXNAME",
+    "-default-translate-file=TCXNAME  use the default TCX file TCXNAME,",
+    "                          the -translate-file can overwrite this value",
     "-help                    display this help and exit",
     "-version                 output version information and exit",
     NULL
@@ -291,8 +296,10 @@ const_string PDFTEXHELP[] = {
     "-kpathsea-debug=NUMBER   set path searching debugging flags according to",
     "                          the bits of NUMBER",
     "[-no]-mktex=FMT          disable/enable mktexFMT generation (FMT=tex/tfm)",
+    "-enc                     enable encTeX extension, see encdoc-e.pdf",
     "-mltex                   enable MLTeX extensions such as \\charsubdef",
     "-output-comment=STRING   use STRING for PDF file comment instead of date",
+    "-output-format=FORMAT    use FORMAT for job output; FORMAT is `dvi' or `pdf'", 
     "-parse-first-line        parse of the first line of the input file",
     "-progname=STRING         set program (and fmt) name to STRING",
     "-recorder                enable filename recorder",
@@ -302,6 +309,8 @@ const_string PDFTEXHELP[] = {
     "                          the DVI file. WHERE is a comma-separated value",
     "                          list: cr display hbox math par parend vbox",
     "-translate-file=TCXNAME  use the TCX file TCXNAME",
+    "-default-translate-file=TCXNAME  use the default TCX file TCXNAME,",
+    "                          the -translate-file can overwrite this value",
     "-help                    display this help and exit",
     "-version                 output version information and exit",
     NULL
@@ -343,8 +352,10 @@ const_string PDFETEXHELP[] = {
     "-kpathsea-debug=NUMBER   set path searching debugging flags according to",
     "                          the bits of NUMBER",
     "[-no]-mktex=FMT          disable/enable mktexFMT generation (FMT=tex/tfm)",
+    "-enc                     enable encTeX extension, see encdoc-e.pdf",
     "-mltex                   enable MLTeX extensions such as \\charsubdef",
-    "-output-comment=STRING   use STRING for PDF file comment instead of date",
+    "-output-comment=STRING   use STRING for DVI file comment instead of date",
+    "-output-format=FORMAT    use FORMAT for job output; FORMAT is `dvi' or `pdf'", 
     "-parse-first-line        parse of the first line of the input file",
     "-progname=STRING         set program (and fmt) name to STRING",
     "-recorder                enable filename recorder",
@@ -354,11 +365,69 @@ const_string PDFETEXHELP[] = {
     "                          the DVI file. WHERE is a comma-separated value",
     "                          list: cr display hbox math par parend vbox",
     "-translate-file=TCXNAME  use the TCX file TCXNAME",
+    "-default-translate-file=TCXNAME  use the default TCX file TCXNAME,",
+    "                          the -translate-file can overwrite this value",
     "-help                    display this help and exit",
     "-version                 output version information and exit",
     NULL
 };
 #endif /* pdfeTeX */
+
+#ifdef pdfxTeX
+const_string PDFETEXHELP[] = {
+    "Usage: pdfxtex [OPTION]... [TEXNAME[.tex]] [COMMANDS]",
+    "   or: pdfxtex [OPTION]... \\FIRST-LINE",
+    "   or: pdfxtex [OPTION]... &FMT ARGS",
+    "  Run pdfxTeX on TEXNAME, usually creating TEXNAME.pdf.",
+    "  Any remaining COMMANDS are processed as pdfxTeX input, after TEXNAME is read.",
+    "  If the first line of TEXNAME is %&FMT, and FMT is an existing .fmt file,",
+    "  use it.  Else use `NAME.efmt', where NAME is the program invocation name,",
+    "  most commonly `pdfxtex'.",
+    "",
+    "  Alternatively, if the first non-option argument begins with a backslash,",
+    "  interpret all non-option arguments as a line of pdfxTeX input.",
+    "",
+    "  Alternatively, if the first non-option argument begins with a &, the",
+    "  next word is taken as the FMT to read, overriding all else.  Any",
+    "  remaining arguments are processed as above.",
+    "",
+    "  If no arguments or options are specified, prompt for input.",
+    "",
+    "-efmt=FMTNAME             use FMTNAME instead of program name or a %& line",
+    "-file-line-error-style   print file:line:error style messages",
+    "-ini                     be pdfxinitex, for dumping formats; this is implicitly",
+    "                          true if the program name is `pdfxinitex'",
+    "-interaction=STRING      set interaction mode (STRING=batchmode/nonstopmode/",
+    "                          scrollmode/errorstopmode)",
+#ifdef IPC
+    "-ipc                     send DVI output to a socket as well as the usual",
+    "                          output file",
+    "-ipc-start               as -ipc, and also start the server at the other end",
+#endif /* IPC */
+    "-jobname=STRING          set the job name to STRING",
+    "-kpathsea-debug=NUMBER   set path searching debugging flags according to",
+    "                          the bits of NUMBER",
+    "[-no]-mktex=FMT          disable/enable mktexFMT generation (FMT=tex/tfm)",
+    "-enc                     enable encTeX extension, see encdoc-e.pdf",
+    "-mltex                   enable MLTeX extensions such as \\charsubdef",
+    "-output-comment=STRING   use STRING for DVI file comment instead of date",
+    "-output-format=FORMAT    use FORMAT for job output; FORMAT is `dvi' or `pdf'", 
+    "-parse-first-line        parse of the first line of the input file",
+    "-progname=STRING         set program (and fmt) name to STRING",
+    "-recorder                enable filename recorder",
+    "-shell-escape            enable \\write18{SHELL COMMAND}",
+    "-src-specials            insert source specials into the DVI file",
+    "-src-specials=WHERE      insert source specials in certain places of",
+    "                          the DVI file. WHERE is a comma-separated value",
+    "                          list: cr display hbox math par parend vbox",
+    "-translate-file=TCXNAME  use the TCX file TCXNAME",
+    "-default-translate-file=TCXNAME  use the default TCX file TCXNAME,",
+    "                          the -translate-file can overwrite this value",
+    "-help                    display this help and exit",
+    "-version                 output version information and exit",
+    NULL
+};
+#endif /* pdfxTeX */
 
 #ifdef TeX
 const_string TEXHELP[] = {
@@ -395,6 +464,7 @@ const_string TEXHELP[] = {
     "-kpathsea-debug=NUMBER   set path searching debugging flags according to",
     "                          the bits of NUMBER",
     "[-no]-mktex=FMT          disable/enable mktexFMT generation (FMT=tex/tfm)",
+    "-enc                     enable encTeX extension, see encdoc-e.pdf",
     "-mltex                   enable MLTeX extensions such as \\charsubdef",
     "-output-comment=STRING   use STRING for DVI file comment instead of date",
     "-parse-first-line        parse of the first line of the input file",
@@ -406,6 +476,8 @@ const_string TEXHELP[] = {
     "                          the DVI file. WHERE is a comma-separated value",
     "                          list: cr display hbox math par parend vbox",
     "-translate-file=TCXNAME  use the TCX file TCXNAME",
+    "-default-translate-file=TCXNAME  use the default TCX file TCXNAME,",
+    "                          the -translate-file can overwrite this value",
     "-help                    display this help and exit",
     "-version                 output version information and exit",
     NULL

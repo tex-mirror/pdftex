@@ -32,20 +32,23 @@ ZLIBDIR=libs/zlib
 LIBPNGDIR=libs/libpng
 LIBT1DIR=libs/t1lib
 LIBTYPE1DIR=$(LIBT1DIR)/../type1
-LIBWWWDIR=libs/libwww
 LIBXPDFDIR=libs/xpdf
 FREETYPEDIR=libs/freetype
 
 #### End of system configuration section. ####
 
-ALLPROGS = access afm2tfm bibtex ctangle cweave dmp dvicopy dvilj \
-  dvilj2p dvilj4 dvilj4l dvipdfm dvips dvitomp dvitype ebb eomega etex \
-  gftodvi gftopk gftype gsftopk info infokey install-info kpsestat \
-  kpsewhich mag makeindex makeinfo mf mf-nowin mft mpost mpto newer \
-  odvicopy odvips odvitype omega omfonts otangle otp2ocp outocp oxdvi.bin \
-  patgen pdfetex pdftex pdftosrc pfb2pfa pk2bm pktogf pktype pltotf \
-  pooltype ps2pk readlink tangle tcdialog tex texindex tftopl tie ttf2afm \
-  vftovp vptovf weave xdvi.bin
+ALLPROGS = access afm2tfm bg5conv bibtex bibtex8 cef5conv cefconv cefsconv \
+  cfftot1 ctangle cweave detex devnag disdvi dmp dt2dv dv2dt dvi2tty \
+  dvibook dviconcat dvicopy dvidvi dvilj dvilj2p dvilj4 dvilj4l dvipdfm \
+  dvips dviselect dvitodvi dvitomp dvitype ebb eomega epsffit etex extconv \
+  gftodvi gftopk gftype gsftopk hbf2gf info infokey install-info kpsestat \
+  kpsewhich lacheck mag makeindex makeinfo mf mf-nowin mft mmafm mmpfb \
+  mpost mpto musixflx newer odvicopy odvips odvitype omega omfonts otangle \
+  otfinfo otftotfm otp2ocp outocp patgen pdfetex pdftex pfb2pfa pk2bm \
+  pktogf pktype pltotf pooltype ps2pk psbook psnup psresize psselect \
+  pstops readlink sjisconv t1ascii t1asm t1binary t1disasm t1dotlessj \
+  t1lint t1mac t1testpage t1unmac t4ht tangle tcdialog tex tex4ht texindex \
+  tftopl tie ttf2afm ttf2pk ttf2tfm vftovp vptovf weave xdvi-motif.bin
 
 # Subdirectories that have makefiles
 ESUBDIRS = @ESUBDIRS@ texk
@@ -154,8 +157,6 @@ $(LIBT1DIR)/libt1.a:
 	cd $(LIBT1DIR); $(MAKE) libt1.a
 $(LIBTYPE1DIR)/libtype1.a:
 	cd $(LIBTYPE1DIR); $(MAKE) libtype1.a
-$(LIBWWWDIR)/libwww.a:
-	cd $(LIBWWWDIR); $(MAKE) libwww.a
 $(LIBXPDFDIR)/xpdf/libxpdf.a:
 	cd $(LIBXPDFDIR)/xpdf; $(MAKE) libxpdf.a
 $(LIBXPDFDIR)/goo/libGoo.a:

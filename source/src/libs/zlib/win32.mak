@@ -7,7 +7,11 @@
 #
 ################################################################################
 root_srcdir=..\..
+!ifdef DEVELOPMENT
+INCLUDE=$(INCLUDE);$(root_srcdir)\texk.development
+!else
 INCLUDE=$(INCLUDE);$(root_srcdir)\texk
+!endif
 
 USE_ZLIB = 1
 MAKE_ZLIB = 1

@@ -3,7 +3,7 @@
 # Makefile  : eTeX, web2c win32.mak makefile fragment to build e-TeX
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/02/19 19:39:24 popineau>
+# Time-stamp: <04/01/07 09:35:11 popineau>
 #
 ################################################################################
 
@@ -93,12 +93,14 @@ etex-check: etrip etex.efmt
 clean:: etex-clean
 etex-clean: etrip-clean
 #	$(LIBTOOL) --mode=clean $(RM) etex
-	-@$(del) $(etex_o) $(etex_c) etexextra.c etexcoerce.h etexd.h $(redir_stderr)
-	-@$(del) etex.p etex.pool etex.web etex.ch $(redir_stderr)
-	-@$(del) etex.efmt etex.log $(redir_stderr)
-	-@$(del) hello.dvi hello.log xfoo.out openout.log one.two.log uno.log $(redir_stderr)
-	-@$(del) just.log batch.log write18.log mltextst.log texput.log $(redir_stderr)
-	-@$(del) missfont.log $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(etex_o) $(etex_c) etexextra.c etexcoerce.h etexd.h \
+			    etex.p etex.pool etex.web etex.ch \
+			    etex.efmt etex.log \
+			    hello.dvi hello.log xfoo.out openout.log one.two.log uno.log \
+			    just.log batch.log write18.log mltextst.log texput.log \
+			    missfont.log) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(deldir) tfm $(redir_stderr)
 
 #etrip
@@ -149,13 +151,15 @@ etrip: $(objdir)\pltotf.exe $(objdir)\tftopl.exe $(objdir)\etex.exe $(objdir)\dv
 
 # Cleaning up for the etrip.
 etrip-clean:
-	-@$(del) trip.tfm trip.pl trip.tex trip.efmt ctripin.fot ctripin.log $(redir_stderr)
-	-@$(del) ctrip.fot ctrip.log trip.dvi ctrip.typ $(redir_stderr)
-	-@$(del) xtripin.fot xtripin.log $(redir_stderr)
-	-@$(del) xtrip.fot xtrip.log xtrip.typ $(redir_stderr)
-	-@$(del) etrip.tfm etrip.pl etrip.tex etrip.efmt etripin.fot etripin.log $(redir_stderr)
-	-@$(del) etrip.fot etrip.log etrip.dvi etrip.out etrip.typ $(redir_stderr)
-	-@$(del) tripos.tex 8terminal.tex $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in (trip.tfm trip.pl trip.tex trip.efmt ctripin.fot ctripin.log \
+			    ctrip.fot ctrip.log trip.dvi ctrip.typ \
+			    xtripin.fot xtripin.log \
+			    xtrip.fot xtrip.log xtrip.typ \
+			    etrip.tfm etrip.pl etrip.tex etrip.efmt etripin.fot etripin.log \
+			    etrip.fot etrip.log etrip.dvi etrip.out etrip.typ \
+			    tripos.tex 8terminal.tex) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(deldir) tfm $(redir_stderr)
 
 # Distfiles ...

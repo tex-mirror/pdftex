@@ -5,7 +5,7 @@
 % (WEB2C!) indicates parts that may need adjusting in tex.pch
 % (ETEX!) indicates parts that may need adjusting in pdfetex.ch[12]
 %
-% Copyright (c) 1996-2003 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 1996-2004 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
 % This file is part of pdfTeX.
 %
@@ -23,7 +23,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftex.ch#18 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#135 $
 %
 % The TeX program is copyright (C) 1982 by D. E. Knuth.
 % TeX is a trademark of the American Mathematical Society.
@@ -47,42 +47,9 @@
 @y
 @d banner=='This is pdfTeX, Version 3.141592','-',pdftex_version_string
    {printed when \pdfTeX\ starts}
-@d pdftex_version==111 { \.{\\pdftexversion} }
-@d pdftex_revision=="b" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='1.11b' {current pdf\TeX\ version}
-
-@z
-
-@x [142] - pre vadjust
-@d adjust_node=5 {|type| of an adjust node}
-@y
-@d adjust_node=5 {|type| of an adjust node}
-@d adjust_pre == subtype  {pre-adjustment?}
-@z
-
-@x [155] - margin kerning
-@d acc_kern=2 {|subtype| of kern nodes from accents}
-@y
-@d acc_kern=2 {|subtype| of kern nodes from accents}
-@d margin_kern_node = 40
-@d margin_kern_node_size = 3
-@d margin_char(#) == info(# + 2)
-@d left_side == 0
-@d right_side == 1
-@z
-
-
-@x [162] - pre vadjust
-@d backup_head==mem_top-13 {head of token list built by |scan_keyword|}
-@d hi_mem_stat_min==mem_top-13 {smallest statically allocated word in
-  the one-word |mem|}
-@d hi_mem_stat_usage=14 {the number of one-word nodes always present}
-@y
-@d backup_head==mem_top-13 {head of token list built by |scan_keyword|}
-@d pre_adjust_head==mem_top-14  {head of pre-adjustment list returned by |hpack|}
-@d hi_mem_stat_min==mem_top-14 {smallest statically allocated word in
-  the one-word |mem|}
-@d hi_mem_stat_usage=15 {the number of one-word nodes always present}
+@d pdftex_version==120 { \.{\\pdftexversion} }
+@d pdftex_revision=="a" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='1.20a-rc1' {current pdf\TeX\ version}
 @z
 
 % Some procedures that need to be declared forward
@@ -93,109 +60,46 @@
 @* \[12] Displaying boxes.
 @z
 
-@x [174] - displaying fonts
-        print_char(" "); font_in_short_display:=font(p);
-@y
-        font_in_short_display:=font(p);
-@z
-
-@x [176] - displaying fonts
-  print_char(" "); print_ASCII(qo(character(p)));
-@y
-  print_ASCII(qo(character(p)));
-@z
-
-@x [183] - margin kerning
-  kern_node: @<Display kern |p|@>;
-@y
-  margin_kern_node: begin
-    print_esc("kern");
-    print_scaled(width(p));
-    if subtype(p) = left_side then
-        print(" (left margin)")
-    else
-        print(" (right margin)");
-  end;
-  kern_node: @<Display kern |p|@>;
-@z
-
-@x [197] - pre vadjust
-begin print_esc("vadjust"); node_list_display(adjust_ptr(p)); {recursive call}
-@y
-begin print_esc("vadjust"); if adjust_pre(p) <> 0 then print(" pre ");
-node_list_display(adjust_ptr(p)); {recursive call}
-@z
-
-@x [202] - margin kerning
-    kern_node,math_node,penalty_node: do_nothing;
-@y
-    margin_kern_node: begin
-        free_avail(margin_char(p));
-        free_node(p, margin_kern_node_size);
-        goto done;
-    end;
-    kern_node,math_node,penalty_node: do_nothing;
-@z
-
-@x [206] - margin kerning
-kern_node,math_node,penalty_node: begin r:=get_node(small_node_size);
-  words:=small_node_size;
-  end;
-@y
-margin_kern_node: begin
-    r := get_node(margin_kern_node_size);
-    fast_get_avail(margin_char(r));
-    font(margin_char(r)) := font(margin_char(p));
-    character(margin_char(r)) := character(margin_char(p));
-    words := small_node_size;
-end;
-kern_node,math_node: begin 
-    r := get_node(small_node_size);
-    words:=small_node_size;
-end;
-penalty_node: begin
-    r := get_node(small_node_size);
-    penalty(r) := penalty(p);
-    if (pdf_max_penalty <> 0) and (penalty(r) > pdf_max_penalty) then
-        penalty(r) := pdf_max_penalty;
-    if (pdf_min_penalty <> 0) and (penalty(r) < pdf_min_penalty) then
-        penalty(r) := pdf_min_penalty;
-end;
-@z
-
 % Define pdftex tokens parameters (ETEX!)
 @x [230]
 @d err_help_loc=local_base+9 {points to token list for \.{\\errhelp}}
+@y
+@d pdftex_first_loc       = local_base+10 {first number defined in this section}
+@d pdftex_last_loc        = pdftex_first_loc + 2 {last number defined in this section}
+@d err_help_loc=local_base+9 {points to token list for \.{\\errhelp}}
+@d pdf_pages_attr_loc     = pdftex_first_loc + 0 {points to token list for \.{\\pdfpagesattr}}
+@d pdf_page_attr_loc      = pdftex_first_loc + 1 {points to token list for \.{\\pdfpageattr}}
+@d pdf_page_resources_loc = pdftex_first_loc + 2 {points to token list for \.{\\pdfpageresources}}
+@z
+% N.B.: don't forget to check for pdftex_last_loc above
+
+@x [230]
 @d toks_base=local_base+10 {table of 256 token list registers}
 @y
-@d pdf_pages_attr_loc=local_base+9 {points to token list for \.{\\pdfpagesattr}}
-@d pdf_page_attr_loc=local_base+10 {points to token list for \.{\\pdfpageattr}}
-@d pdf_page_resources_loc=local_base+11 {points to token list for \.{\\pdfpageresources}}
-@d err_help_loc=local_base+12 {points to token list for \.{\\errhelp}}
-@d toks_base=local_base+13 {table of 256 token list registers}
+@d toks_base = pdftex_last_loc + 1 {table of 256 token list registers}
 @z
 
 @x [230]
 @d err_help==equiv(err_help_loc)
 @y
+@d err_help==equiv(err_help_loc)
 @d pdf_pages_attr==equiv(pdf_pages_attr_loc)
 @d pdf_page_attr==equiv(pdf_page_attr_loc)
 @d pdf_page_resources==equiv(pdf_page_resources_loc)
-@d err_help==equiv(err_help_loc)
 @z
 
 @x [230]
 primitive("errhelp",assign_toks,err_help_loc);
 @!@:err_help_}{\.{\\errhelp} primitive@>
 @y
+primitive("errhelp",assign_toks,err_help_loc);
+@!@:err_help_}{\.{\\errhelp} primitive@>
 primitive("pdfpagesattr",assign_toks,pdf_pages_attr_loc);
 @!@:pdf_pages_attr_}{\.{\\pdfpagesattr} primitive@>
 primitive("pdfpageattr",assign_toks,pdf_page_attr_loc);
 @!@:pdf_page_attr_}{\.{\\pdfpageattr} primitive@>
 primitive("pdfpageresources",assign_toks,pdf_page_resources_loc);
 @!@:pdf_page_resources_}{\.{\\pdfpageresources} primitive@>
-primitive("errhelp",assign_toks,err_help_loc);
-@!@:err_help_}{\.{\\errhelp} primitive@>
 @z
 
 @x [231]
@@ -211,44 +115,33 @@ primitive("errhelp",assign_toks,err_help_loc);
 @x [236]
 @d error_context_lines_code=54 {maximum intermediate line pairs shown}
 @y
+@d pdftex_first_integer_code = 55 {first number defined in this section}
+@d pdftex_last_integer_code  = pdftex_first_integer_code + 9 {last number defined in this section}
 @d error_context_lines_code=54 {maximum intermediate line pairs shown}
-@d pdf_output_code           = 55 {switch on PDF output if positive}
-@d pdf_adjust_spacing_code   = 56 {level of spacing adjusting}
-@d pdf_compress_level_code   = 57 {compress level of streams}
-@d pdf_decimal_digits_code   = 58 {digits after the decimal point of numbers}
-@d pdf_move_chars_code       = 59 {move chars 0..31 to higher area if possible}
-@d pdf_image_resolution_code = 60 {default image resolution}
-@d pdf_pk_resolution_code    = 61 {default resolution of PK font}
-@d pdf_unique_resname_code   = 62 {generate unique names for resouces}
-@d pdf_protrude_chars_code   = 63 {protrude chars at left/right edge of paragraphs}
-@d pdf_avoid_overfull_code   = 64 {try to avoid overfull boxes?}
-@d pdf_max_penalty_code      = 65 {maximal allowed value of penalty for copying}
-@d pdf_min_penalty_code      = 66 {minimal allowed value of penalty for copying}
-@d pdf_option_pdf_minor_version_code = 70 {fractional part of the pdf version produced}
-@d pdf_option_always_use_pdfpagebox_code = 71 {if the pdf inclusion should 
-   always use a specific pdf page box}
-@d pdf_option_pdf_inclusion_errorlevel_code = 72 {if the pdf inclusion should treat 
-   pdfs newer than pdf_option_pdf_minor_version as an error}
-@# {N.B.: don't forget to check for |char_sub_def_min_code|,...,|int_pars| in
-   \.{tex.pch}} 
+@d pdf_output_code           = pdftex_first_integer_code + 0 {switch on PDF output if positive}
+@d pdf_compress_level_code   = pdftex_first_integer_code + 1 {compress level of streams}
+@d pdf_decimal_digits_code   = pdftex_first_integer_code + 2 {digits after the decimal point of numbers}
+@d pdf_move_chars_code       = pdftex_first_integer_code + 3 {move chars 0..31 to higher area if possible}
+@d pdf_image_resolution_code = pdftex_first_integer_code + 4 {default image resolution}
+@d pdf_pk_resolution_code    = pdftex_first_integer_code + 5 {default resolution of PK font}
+@d pdf_unique_resname_code   = pdftex_first_integer_code + 6 {generate unique names for resouces}
+@d pdf_option_pdf_minor_version_code = pdftex_first_integer_code + 7 {fractional part of the pdf version produced}
+@d pdf_option_always_use_pdfpagebox_code = pdftex_first_integer_code + 8 {if the pdf inclusion should always use a specific pdf page box}
+@d pdf_option_pdf_inclusion_errorlevel_code = pdftex_first_integer_code + 9 {if the pdf inclusion should treat pdfs newer than |pdf_option_pdf_minor_version| as an error}
 @z
+% N.B.: don't forget to check for pdftex_last_integer_code above
 
 @x [236]
 @d error_context_lines==int_par(error_context_lines_code)
 @y
 @d error_context_lines==int_par(error_context_lines_code)
 @d pdf_output           == int_par(pdf_output_code)
-@d pdf_adjust_spacing   == int_par(pdf_adjust_spacing_code)
 @d pdf_compress_level   == int_par(pdf_compress_level_code)
 @d pdf_decimal_digits   == int_par(pdf_decimal_digits_code)
 @d pdf_move_chars       == int_par(pdf_move_chars_code)
 @d pdf_image_resolution == int_par(pdf_image_resolution_code)
 @d pdf_pk_resolution    == int_par(pdf_pk_resolution_code)
 @d pdf_unique_resname   == int_par(pdf_unique_resname_code)
-@d pdf_protrude_chars   == int_par(pdf_protrude_chars_code)
-@d pdf_avoid_overfull   == int_par(pdf_avoid_overfull_code)
-@d pdf_max_penalty      == int_par(pdf_max_penalty_code)
-@d pdf_min_penalty      == int_par(pdf_min_penalty_code)
 @d pdf_option_pdf_minor_version == int_par(pdf_option_pdf_minor_version_code)
 @d pdf_option_always_use_pdfpagebox == int_par(pdf_option_always_use_pdfpagebox_code)
 @d pdf_option_pdf_inclusion_errorlevel == int_par(pdf_option_pdf_inclusion_errorlevel_code)
@@ -259,17 +152,12 @@ error_context_lines_code:print_esc("errorcontextlines");
 @y
 error_context_lines_code:print_esc("errorcontextlines");
 pdf_output_code:           print_esc("pdfoutput");
-pdf_adjust_spacing_code:   print_esc("pdfadjustspacing");
 pdf_compress_level_code:   print_esc("pdfcompresslevel");
 pdf_decimal_digits_code:   print_esc("pdfdecimaldigits");
 pdf_move_chars_code:       print_esc("pdfmovechars");
 pdf_image_resolution_code: print_esc("pdfimageresolution");
 pdf_pk_resolution_code:    print_esc("pdfpkresolution");
 pdf_unique_resname_code:   print_esc("pdfuniqueresname");
-pdf_protrude_chars_code:   print_esc("pdfprotrudechars");
-pdf_avoid_overfull_code:   print_esc("pdfavoidoverfull");
-pdf_max_penalty_code:      print_esc("pdfmaxpenalty");
-pdf_min_penalty_code:      print_esc("pdfminpenalty");
 pdf_option_pdf_minor_version_code: print_esc("pdfoptionpdfminorversion");
 pdf_option_always_use_pdfpagebox_code: print_esc("pdfoptionalwaysusepdfpagebox");
 pdf_option_pdf_inclusion_errorlevel_code: print_esc("pdfoptionpdfinclusionerrorlevel");
@@ -283,8 +171,6 @@ primitive("errorcontextlines",assign_int,int_base+error_context_lines_code);@/
 @!@:error_context_lines_}{\.{\\errorcontextlines} primitive@>
 primitive("pdfoutput",assign_int,int_base+pdf_output_code);@/
 @!@:pdf_output_}{\.{\\pdfoutput} primitive@>
-primitive("pdfadjustspacing",assign_int,int_base+pdf_adjust_spacing_code);@/
-@!@:pdf_adjust_spacing_}{\.{\\pdfadjustspacing} primitive@>
 primitive("pdfcompresslevel",assign_int,int_base+pdf_compress_level_code);@/
 @!@:pdf_compress_level_}{\.{\\pdfcompresslevel} primitive@>
 primitive("pdfdecimaldigits",assign_int,int_base+pdf_decimal_digits_code);@/
@@ -297,14 +183,6 @@ primitive("pdfpkresolution",assign_int,int_base+pdf_pk_resolution_code);@/
 @!@:pdf_pk_resolution_}{\.{\\pdfpkresolution} primitive@>
 primitive("pdfuniqueresname",assign_int,int_base+pdf_unique_resname_code);@/
 @!@:pdf_unique_resname_}{\.{\\pdfuniqueresname} primitive@>
-primitive("pdfprotrudechars",assign_int,int_base+pdf_protrude_chars_code);@/
-@!@:pdf_protrude_chars_}{\.{\\pdfprotrudechars} primitive@>
-primitive("pdfavoidoverfull",assign_int,int_base+pdf_avoid_overfull_code);@/
-@!@:pdf_avoid_overfull_}{\.{\\pdfavoidoverfull} primitive@>
-primitive("pdfmaxpenalty",assign_int,int_base+pdf_max_penalty_code);@/
-@!@:pdf_max_penalty_}{\.{\\pdfmaxpenalty} primitive@>
-primitive("pdfminpenalty",assign_int,int_base+pdf_min_penalty_code);@/
-@!@:pdf_min_penalty_}{\.{\\pdfminpenalty} primitive@>
 primitive("pdfoptionpdfminorversion",assign_int,int_base+pdf_option_pdf_minor_version_code);@/
 @!@:pdf_option_pdf_minor_version_}{\.{\\pdfoptionpdfminorversion} primitive@>
 primitive("pdfoptionalwaysusepdfpagebox",assign_int,int_base+pdf_option_always_use_pdfpagebox_code);@/
@@ -316,17 +194,24 @@ primitive("pdfoptionpdfinclusionerrorlevel",assign_int,int_base+pdf_option_pdf_i
 % Define pdftex dimension parameters
 @x [247]
 @d emergency_stretch_code=20 {reduces badnesses on final pass of line-breaking}
+@y
+@d pdftex_first_dimen_code = 21 {first number defined in this section}
+@d pdftex_last_dimen_code  = pdftex_first_dimen_code + 6 {last number defined in this section}
+@d emergency_stretch_code=20 {reduces badnesses on final pass of line-breaking}
+@d pdf_h_origin_code       = pdftex_first_dimen_code + 0 {horigin of the PDF output}
+@d pdf_v_origin_code       = pdftex_first_dimen_code + 1 {vorigin of the PDF output}
+@d pdf_page_width_code     = pdftex_first_dimen_code + 2 {page width of the PDF output}
+@d pdf_page_height_code    = pdftex_first_dimen_code + 3 {page height of the PDF output}
+@d pdf_link_margin_code    = pdftex_first_dimen_code + 4 {link margin in the PDF output}
+@d pdf_dest_margin_code    = pdftex_first_dimen_code + 5 {dest margin in the PDF output}
+@d pdf_thread_margin_code  = pdftex_first_dimen_code + 6 {thread margin in the PDF output}
+@z
+% N.B.: don't forget to check for pdftex_last_dimen_code above
+
+@x
 @d dimen_pars=21 {total number of dimension parameters}
 @y
-@d emergency_stretch_code=20 {reduces badnesses on final pass of line-breaking}
-@d pdf_h_origin_code      = 21 {horigin of the PDF output}
-@d pdf_v_origin_code      = 22 {horigin of the PDF output}
-@d pdf_page_width_code    = 23 {page width of the PDF output}
-@d pdf_page_height_code   = 24 {page height of the PDF output}
-@d pdf_link_margin_code   = 25 {link margin in the PDF output}
-@d pdf_dest_margin_code   = 26 {dest margin in the PDF output}
-@d pdf_thread_margin_code = 27 {thread margin in the PDF output}
-@d dimen_pars             = 28 {total number of dimension parameters}
+@d dimen_pars = pdftex_last_dimen_code + 1 {total number of dimension parameters}
 @z
 
 @x [247]
@@ -377,31 +262,16 @@ primitive("pdfthreadmargin",assign_dimen,dimen_base+pdf_thread_margin_code);@/
 @!@:pdf_thread_margin_}{\.{\\pdfthreadmargin} primitive@>
 @z
 
-@x [267] - displaying fonts
-@<Print the font identifier for |font(p)|@>=
-print_esc(font_id_text(font(p)))
-@y
-@<Print the font identifier for |font(p)|@>=
-begin
-    print("/");
-    print(font_name[font(p)]);
-    if font_size[font(p)] <> font_dsize[font(p)] then begin 
-        print("@@");
-        print_scaled(font_size[font(p)]);
-        print("pt");
-    end;
-    print("/");
-end
-@z
-
 % Define pdftex tokens parameters
 @x [307]
 @d write_text=15 {|token_type| code for \.{\\write}}
 @y
+@d pdftex_first_text       = 16 {first number defined in this section}
+@d pdftex_last_text        = pdftex_first_text + 2 {last number defined in this section}
 @d write_text=15 {|token_type| code for \.{\\write}}
-@d pdf_pages_attr_text  = 16 {|token_type| code for \.{\\pdfpagesattr}}
-@d pdf_page_attr_text  = 17 {|token_type| code for \.{\\pdfpageattr}}
-@d pdf_page_resources_text = 18 {|token_type| code for \.{\\pdfpageresources}}
+@d pdf_pages_attr_text     = pdftex_first_text + 0 {|token_type| code for \.{\\pdfpagesattr}}
+@d pdf_page_attr_text      = pdftex_first_text + 1 {|token_type| code for \.{\\pdfpageattr}}
+@d pdf_page_resources_text = pdftex_first_text + 2 {|token_type| code for \.{\\pdfpageresources}}
 @z
 
 @x [314]
@@ -415,23 +285,20 @@ pdf_page_resources_text: print_nl("<pdfpageresources> ");
 othercases print_nl("?") {this should never happen}
 @z
 
-% Define some read-only pdfTeX primitives
+% Define some read-only pdfTeX primitives (ETEX!)
 @x [410]
 @d tok_val=5 {token lists}
 @y
+@d pdftex_first_expand_code = 6 {first number defined in this section}
+@d pdftex_last_expand_code  = pdftex_first_expand_code + 4 {last number defined in this section}
 @d tok_val=5 {token lists}
-@d pdftex_revision_code   = 6  {command code for \.{\\pdftexrevision}}
-@d pdf_font_name_code     = 7  {command code for \.{\\pdffontname}}
-@d pdf_font_objnum_code   = 8  {command code for \.{\\pdffontobjnum}}
-@d pdf_font_size_code     = 9  {command code for \.{\\pdffontsize}}
+@d pdftex_revision_code     = pdftex_first_expand_code + 0 {command code for \.{\\pdftexrevision}}
+@d pdftex_banner_code       = pdftex_first_expand_code + 1 {command code for \.{\\pdftexbanner}}
+@d pdf_font_name_code       = pdftex_first_expand_code + 2 {command code for \.{\\pdffontname}}
+@d pdf_font_objnum_code     = pdftex_first_expand_code + 3 {command code for \.{\\pdffontobjnum}}
+@d pdf_font_size_code       = pdftex_first_expand_code + 4 {command code for \.{\\pdffontsize}}
 @z
-
-@x [413] - HZ
-var m:halfword; {|chr_code| part of the operand token}
-@y
-var m:halfword; {|chr_code| part of the operand token}
-    n, k: integer; {accumulators}
-@z
+% N.B.: don't forget to check for pdftex_last_expand_code above and pdfetex.ch2
 
 @x [416]
 |glue_val|, |input_line_no_code|, or |badness_code|.
@@ -442,26 +309,26 @@ var m:halfword; {|chr_code| part of the operand token}
 |glue_val|, |input_line_no_code|, |badness_code|, or one of the other codes for
 \pdfTeX{} extensions.
 
+@d pdftex_first_rint_code     = glue_val + 3 {first number defined in this section}
+@d pdftex_last_rint_code      = pdftex_first_rint_code + 7 {last number defined in this section}
 @d input_line_no_code=glue_val+1 {code for \.{\\inputlineno}}
 @d badness_code=glue_val+2 {code for \.{\\badness}}
-@d pdftex_version_code     = glue_val + 3 {code for \.{\\pdftexversion}}
-@d pdf_last_obj_code       = glue_val + 4 {code for \.{\\pdflastobj}}
-@d pdf_last_xform_code     = glue_val + 5 {code for \.{\\pdflastxform}}
-@d pdf_last_ximage_code    = glue_val + 6 {code for \.{\\pdflastximage}}
-@d pdf_last_ximage_pages_code = glue_val + 7 {code for \.{\\pdflastximagepages}}
-@d pdf_last_annot_code     = glue_val + 8 {code for \.{\\pdflastannot}}
-@d pdf_last_x_pos_code     = glue_val + 9 {code for \.{\\pdflastxpos}}
-@d pdf_last_y_pos_code     = glue_val + 10 {code for \.{\\pdflastypos}}
-@d pdf_last_demerits_code  = glue_val + 11 {code for \.{\\pdflastdemerits}}
-@d pdf_last_vbreak_penalty_code = glue_val + 12 {code for \.{\\pdflastvbreakpenalty}}
-@# {N.B.: don't forget to check \.{pdfetex.ch2}} 
+@d pdftex_version_code        = pdftex_first_rint_code + 0 {code for \.{\\pdftexversion}}
+@d pdf_last_obj_code          = pdftex_first_rint_code + 1 {code for \.{\\pdflastobj}}
+@d pdf_last_xform_code        = pdftex_first_rint_code + 2 {code for \.{\\pdflastxform}}
+@d pdf_last_ximage_code       = pdftex_first_rint_code + 3 {code for \.{\\pdflastximage}}
+@d pdf_last_ximage_pages_code = pdftex_first_rint_code + 4 {code for \.{\\pdflastximagepages}}
+@d pdf_last_annot_code        = pdftex_first_rint_code + 5 {code for \.{\\pdflastannot}}
+@d pdf_last_x_pos_code        = pdftex_first_rint_code + 6 {code for \.{\\pdflastxpos}}
+@d pdf_last_y_pos_code        = pdftex_first_rint_code + 7 {code for \.{\\pdflastypos}}
 @z
+% N.B.: don't forget to check for pdftex_last_loc above and pdfetex.ch2
 
 @x [416]
 primitive("badness",last_item,badness_code);
 @!@:badness_}{\.{\\badness} primitive@>
 @y
-primitive("badness",last_item,badness_code);@/
+primitive("badness",last_item,badness_code);
 @!@:badness_}{\.{\\badness} primitive@>
 primitive("pdftexversion",last_item,pdftex_version_code);@/
 @!@:pdftex_version_}{\.{\\pdftexversion} primitive@>
@@ -479,12 +346,10 @@ primitive("pdflastxpos",last_item,pdf_last_x_pos_code);@/
 @!@:pdf_last_x_pos_}{\.{\\pdflastxpos} primitive@>
 primitive("pdflastypos",last_item,pdf_last_y_pos_code);@/
 @!@:pdf_last_y_pos_}{\.{\\pdflastypos} primitive@>
-primitive("pdflastdemerits",last_item,pdf_last_demerits_code);@/
-@!@:pdf_last_demerits_}{\.{\\pdflastdemerits} primitive@>
-primitive("pdflastvbreakpenalty",last_item,pdf_last_vbreak_penalty_code);@/
-@!@:pdf_last_vbreak_penalty_}{\.{\\pdflastvbreakpenalty} primitive@>
 primitive("pdftexrevision",convert,pdftex_revision_code);@/
 @!@:pdftex_revision_}{\.{\\pdftexrevision} primitive@>
+primitive("pdftexbanner",convert,pdftex_banner_code);@/
+@!@:pdftex_banner_}{\.{\\pdftexbanner} primitive@>
 primitive("pdffontname",convert,pdf_font_name_code);@/
 @!@:pdf_font_name_}{\.{\\pdffontname} primitive@>
 primitive("pdffontobjnum",convert,pdf_font_objnum_code);@/
@@ -504,8 +369,6 @@ primitive("pdffontsize",convert,pdf_font_size_code);@/
   pdf_last_annot_code:  print_esc("pdflastannot");
   pdf_last_x_pos_code:  print_esc("pdflastxpos");
   pdf_last_y_pos_code:  print_esc("pdflastypos");
-  pdf_last_demerits_code:  print_esc("pdflastdemerits");
-  pdf_last_vbreak_penalty_code:  print_esc("pdflastvbreakpenalty");
   othercases print_esc("badness")
 @z
 
@@ -526,35 +389,14 @@ if cur_chr>glue_val then
   pdf_last_annot_code:  cur_val := pdf_last_annot;
   pdf_last_x_pos_code:  cur_val := pdf_last_x_pos;
   pdf_last_y_pos_code:  cur_val := pdf_last_y_pos;
-  pdf_last_demerits_code:  cur_val := fewest_demerits;
-  pdf_last_vbreak_penalty_code:  cur_val := last_vbreak_penalty;
   endcases;
-@z
-
-@x [426]
-begin scan_font_ident;
-if m=0 then scanned_result(hyphen_char[cur_val])(int_val)
-else scanned_result(skew_char[cur_val])(int_val);
-@y
-begin scan_font_ident;
-if m=0 then scanned_result(hyphen_char[cur_val])(int_val)
-else if m=1 then scanned_result(skew_char[cur_val])(int_val)
-else begin
-    n := cur_val;
-    scan_char_num;
-    k := cur_val;
-    case m of 
-    lp_code_base: scanned_result(get_lp_code(n, k))(int_val);
-    rp_code_base: scanned_result(get_rp_code(n, k))(int_val);
-    ef_code_base: scanned_result(get_ef_code(n, k))(int_val);
-    end;
-end;
 @z
 
 @x [469]
   othercases print_esc("jobname")
 @y
   pdftex_revision_code:  print_esc("pdftexrevision");
+  pdftex_banner_code:  print_esc("pdftexbanner");
   pdf_font_name_code:     print_esc("pdffontname");
   pdf_font_objnum_code:   print_esc("pdffontobjnum");
   pdf_font_size_code:     print_esc("pdffontsize");
@@ -565,6 +407,7 @@ end;
 end {there are no other cases}
 @y
 pdftex_revision_code: do_nothing;
+pdftex_banner_code: do_nothing;
 pdf_font_name_code, pdf_font_objnum_code, pdf_font_size_code: begin
     scan_font_ident;
     if cur_val = null_font then
@@ -582,6 +425,9 @@ end {there are no other cases}
 end {there are no other cases}
 @y
 pdftex_revision_code: print(pdftex_revision);
+pdftex_banner_code: begin
+    print(pdftex_banner);
+end;
 pdf_font_name_code, pdf_font_objnum_code: begin
     set_ff(cur_val);
     if c = pdf_font_name_code then
@@ -591,13 +437,6 @@ pdf_font_name_code, pdf_font_objnum_code: begin
 end;
 pdf_font_size_code: print_scaled(font_size[cur_val]);
 end {there are no other cases}
-@z
-
-@x [622] - margin kerning
-kern_node,math_node:cur_h:=cur_h+width(p);
-@y
-kern_node,math_node:cur_h:=cur_h+width(p);
-margin_kern_node:cur_h:=cur_h+width(p);
 @z
 
 % Shipping out to PDF
@@ -619,23 +458,14 @@ ready for the |dvi_ship_out| routine that gets them started in the first place.
 
 @* \[32a] \pdfTeX\ basic.
 
-When \pdfTeX{} starts without ``init'', it reads a number of parameters
-from the config file before starting input. The values from the config file
-thus overwrite \TeX{} parameters that have been set in the format. We want
-to use the codes corresponding to \pdfTeX{} parameters
-(e.g.~|cfg_output_code|) in~C as well, so we must define the following
-constants.
-
 @<Constants...@>=
 cfg_output_code = pdf_output_code;
-cfg_adjust_spacing_code = pdf_adjust_spacing_code;
 cfg_compress_level_code = pdf_compress_level_code;
 cfg_decimal_digits_code = pdf_decimal_digits_code;
 cfg_move_chars_code = pdf_move_chars_code;
 cfg_image_resolution_code = pdf_image_resolution_code;
 cfg_pk_resolution_code = pdf_pk_resolution_code;
 cfg_unique_resname_code = pdf_unique_resname_code;
-cfg_protrude_chars_code = pdf_protrude_chars_code;
 cfg_h_origin_code = pdf_h_origin_code;
 cfg_v_origin_code = pdf_v_origin_code;
 cfg_page_height_code = pdf_page_height_code;
@@ -648,63 +478,6 @@ cfg_pdf13_compliant_code = cfg_pdf12_compliant_code + 1;
 cfg_pdf_minor_version_code = pdf_option_pdf_minor_version_code;
 cfg_always_use_pdf_pagebox_code = 71; {must be the same as the definition in epdf.h}
 cfg_pdf_option_pdf_inclusion_errorlevel_code = pdf_option_pdf_inclusion_errorlevel_code;
-
-@ Integer parameters are initialized immediately after the config file is
-read, but dimension parameters are set when opening the PDF output file.
-
-@d do_pdf_int_pars(#) ==
-    #(output_);
-    #(adjust_spacing_);
-    #(compress_level_);
-    #(decimal_digits_);
-    #(move_chars_);
-    #(image_resolution_);
-    #(pk_resolution_);
-    #(unique_resname_);
-    #(protrude_chars_);
-
-@d do_pdf_dimen_pars(#) ==
-    #(h_origin_);
-    #(v_origin_);
-    #(page_height_);
-    #(page_width_);
-    #(link_margin_);
-    #(dest_margin_);
-    #(thread_margin_)
-
-@d get_cfg_int(#) == int_par(cfg_@&#@&code) := cfg_par(cfg_@&#@&code)
-
-@d get_cfg_dimen(#) == dimen_par(cfg_@&#@&code) := cfg_par(cfg_@&#@&code)
-
-@d mag_cfg_dimen(#) ==
-    if (dimen_par(cfg_@&#@&code) = cfg_par(cfg_@&#@&code)) and
-        is_cfg_truedimen(cfg_@&#@&code)
-    then
-        dimen_par(cfg_@&#@&code) := 
-            round_xn_over_d(dimen_par(cfg_@&#@&code), 1000, mag)
-
-@d get_cfg_int_pars == do_pdf_int_pars(get_cfg_int)
-@d get_cfg_dimen_pars == do_pdf_dimen_pars(get_cfg_dimen)
-@d mag_cfg_dimen_pars == do_pdf_dimen_pars(mag_cfg_dimen)
-
-@ Here we read the values from the config file and initialize any integer
-parameters, e.g. |pdf_option_pdf_minor_version|.
-
-@<Read values from config file if necessary@>=
-read_config_file;
-get_cfg_int_pars;
-get_cfg_dimen_pars;
-if pdf_pk_resolution = 0 then
-    pdf_pk_resolution := 600;
-pdf_option_pdf_minor_version := 4;
-if cfg_par(cfg_pdf12_compliant_code) > 0 then
-    pdf_option_pdf_minor_version := 2;
-if cfg_par(cfg_pdf13_compliant_code) > 0 then
-    pdf_option_pdf_minor_version := 3;
-if cfg_par(cfg_pdf_minor_version_code) > -1 then
-    pdf_option_pdf_minor_version := cfg_par(cfg_pdf_minor_version_code);
-pdf_option_always_use_pdfpagebox := cfg_par(cfg_always_use_pdf_pagebox_code);
-pdf_option_pdf_inclusion_errorlevel := cfg_par(cfg_pdf_option_pdf_inclusion_errorlevel_code);
 
 @ The subroutines define the corresponding macros so we can use them
 in C.
@@ -818,148 +591,6 @@ found:
     get_tfm_num := k;
 end;
 
-@ Here we have some utilities for tracing purpose.
-
-@d print_delta_field_end(#) == 
-    print_glue(s, # - 2, 0); end
-
-@d print_delta_field(#) ==
-s := #;
-if s <> 0 then begin 
-    if not_printed_plus_yet then begin
-        print(" plus ");
-        not_printed_plus_yet := false;
-    end;
-print_delta_field_end
-
-@d print_delta_like_node(#) == begin
-    print_scaled(#(1));
-    print_delta_field(#(2))(2);
-    print_delta_field(#(3))(3);
-    print_delta_field(#(4))(4);
-    print_delta_field(#(5))(5);
-    if #(6) <> 0 then begin 
-        print(" minus ");
-        print_glue(#(6), 0, 0);
-    end;
-end
-
-@d delta_field(#) == mem[p + #].sc
-@d active_width_field(#) == active_width[#]
-@d cur_active_width_field(#) == cur_active_width[#]
-@d break_width_field(#) == break_width[#]
-@d prev_active_width_field(#) == prev_active_width[#]
-
-@p
-procedure short_display_n(@!p, m:integer); {prints highlights of list |p|}
-var n:integer; {for replacement counts}
-    i: integer;
-begin 
-i := 0; 
-font_in_short_display:=null_font;
-if p = null then
-    return;
-while p>mem_min do
-  begin if is_char_node(p) then
-    begin if p<=mem_end then
-      begin if font(p)<>font_in_short_display then
-        begin if (font(p)<font_base)or(font(p)>font_max) then
-          print_char("*")
-@.*\relax@>
-        else @<Print the font identifier for |font(p)|@>;
-        print_char(" "); font_in_short_display:=font(p);
-        end;
-      print_ASCII(qo(character(p)));
-      end;
-    end
-  else begin
-      if (type(p) = glue_node) or 
-         (type(p) = disc_node) or 
-         (type(p) = penalty_node) or
-         ((type(p) = kern_node) and (subtype(p) = explicit)) then 
-         incr(i);
-      if i >= m then
-         return;
-      if (type(p) = disc_node) then begin 
-          print("|");
-          short_display(pre_break(p));
-          print("|");
-          short_display(post_break(p));
-          print("|");
-          n:=replace_count(p);
-          while n>0 do
-              begin if link(p)<>null then p:=link(p);
-          decr(n);
-          end;
-        end
-        else
-            @<Print a short indication of the contents of node |p|@>;
-  end;
-  p:=link(p);
-  if p = null then
-      return;
-  end;
-  update_terminal;
-end;
-
-function show_line_breaking: integer;
-label done;
-var not_printed_plus_yet: boolean;
-    p, q: pointer;
-    s: scaled;
-begin
-    print_nl("cur_active_width: "); print_delta_like_node(cur_active_width_field);
-    print_ln;
-    not_printed_plus_yet := true;
-    print_nl("active list: ");
-    p := link(active);
-    while true do begin 
-        if type(p) = 2  {|delta_node| = 2}
-        then begin
-            print("delta: "); print_delta_like_node(delta_field);
-        end
-        else begin
-            print("active: ");
-            if break_node(p) <>  null then
-                short_display_n(cur_break(break_node(p)), 5);
-        end;
-        if link(p) = last_active then
-            goto done;
-        p := link(p);
-        print_ln;
-    end;
-done:
-    print_ln;
-    print_nl("active_width: "); print_delta_like_node(active_width_field);
-    print_nl("break_width: "); print_delta_like_node(break_width_field);
-    print_nl("prev_active_width: "); print_delta_like_node(prev_active_width_field);
-    print_nl("cur_p: "); short_display_n(cur_p, 5);
-    if prev_legal <> null then begin
-        print_nl("prev_legal: "); short_display_n(prev_legal, 5);
-    end;
-    if rejected_cur_p <> null then begin
-        print_nl("rejected_cur_p: "); short_display_n(rejected_cur_p, 5);
-    end;
-    if prev_p <> null then begin
-        print_nl("prev_p: "); short_display_n(prev_p, 5);
-    end;
-    if prev_legal <> null then begin
-        print_nl("prev_legal: "); short_display_n(prev_legal, 5);
-    end;
-    print_ln;
-    show_line_breaking := 0;
-end;
-
-function mi(p: pointer): pointer;
-begin
-    mi := info(p);
-end;
-
-function ml(p: pointer): pointer;
-begin
-    ml := link(p);
-end;
-
 @ Sometimes it is neccesary to allocate memory for PDF output that cannot
 be deallocated then, so we use |pdf_mem| for this purpose.
 
@@ -1019,14 +650,14 @@ buffer}
 begin
     if pdf_buf_size - # < 0 then
         overflow("PDF output buffer", pdf_buf_size);
-    if # + pdf_ptr >= pdf_buf_size then
+    if # + pdf_ptr > pdf_buf_size then
         pdf_flush;
 end
 
 @d pdf_out(#) == {do the same as |pdf_quick_out| and flush the PDF
 buffer if necessary}
 begin
-    if pdf_ptr + 1 >= pdf_buf_size then
+    if pdf_ptr > pdf_buf_size then
         pdf_flush;
     pdf_quick_out(#);
 end
@@ -1442,7 +1073,7 @@ things are more complicated, as we have to deal with scaling bitmaps as well.
 procedure adv_char_width(f: internal_font_number; w: scaled); {update |pdf_h|
 by character width |w| from font |f|} 
 begin
-    if pdf_font_map[f] >= 0 then begin
+    if hasfmentry(pdf_font_map[f]) then begin
         call_func(divide_scaled(w, pdf_font_size[f], 3));
         pdf_h := pdf_h + scaled_out;
     end
@@ -1511,6 +1142,8 @@ have to save it in order to adjust spacing when string drawing is finished}
 @!fixed_pk_resolution: integer; 
 @!fixed_decimal_digits: integer;
 @!pk_scale_factor: integer;
+@!pdf_output_option: integer;
+@!pdf_output_value: integer;
 
 @ Following procedures implement low-level subroutines to convert \TeX{}
 internal structures to PDF page description.
@@ -1848,7 +1481,7 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d pdf_annot_data(#)       == info(# + 5) {raw data of general annotations}
 @d pdf_link_attr(#)        == info(# + 5) {attributes of link annotations}
 @d pdf_link_action(#)      == link(# + 5) {pointer to action structure}
-@d pdf_annot_objnum(# )    == mem[# + 6].int {object number of corresponding object}
+@d pdf_annot_objnum(#)     == mem[# + 6].int {object number of corresponding object}
 
 @# {types of actions}
 @d pdf_action_page         == 0 {Goto action}
@@ -1930,14 +1563,12 @@ whatsit node; |obj_bead_rect| is needed only when the bead rectangle has
 been written out and after that |obj_bead_data| is not needed any more
 so we can use this field for both}
 
-@# {data structure of snap node}
-@d snap_glue_ptr(#)         == info(# + 1)
-
 @<Constants...@>=
 @!inf_obj_tab_size = 32000; {min size of the cross-reference table for PDF output}
 @!sup_obj_tab_size = 8388607; {max size of the cross-reference table for PDF output}
 @!inf_dest_names_size = 10000; {min size of the destination names table for PDF output}
 @!sup_dest_names_size = 131072; {max size of the destination names table for PDF output}
+@!pdf_objtype_max = head_tab_max;
 @!pdf_pdf_box_spec_media  = 0;
 @!pdf_pdf_box_spec_crop   = 1;
 @!pdf_pdf_box_spec_bleed  = 2;
@@ -1996,6 +1627,7 @@ begin
     obj_info(obj_ptr) := i;
     obj_offset(obj_ptr) := 0;
     obj_aux(obj_ptr) := 0;
+    avl_put_obj(obj_ptr, t);
     if t = obj_type_page then begin
         p := head_tab[t];
         {find the right poition to insert newly created object}@/
@@ -2225,179 +1857,7 @@ procedure do_vf; forward;
 @ @<Glob...@>=
 @!pdf_font_type: ^eight_bits; {the type of font}
 @!pdf_font_attr: ^str_number; {pointer to additional attributes}
-@!pdf_font_link: ^internal_font_number; {link to expanded fonts}
-@!pdf_font_stretch: ^integer; {limit of stretching}
-@!pdf_font_shrink: ^integer; {limit of shrinking}
-@!pdf_font_step: ^integer;  {amount of one step}
-@!pdf_font_expand_factor: ^integer;
-@!pdf_font_expand_ratio: ^integer;
-@!pdf_font_lp_base: ^integer;
-@!pdf_font_rp_base: ^integer;
-@!pdf_font_ef_base: ^integer;
 @!tmp_f: internal_font_number; {for use with |pdf_init_font|}
-
-@ Here come some subroutines to deal with expanded fonts for HZ-algorithm.
-
-@d copy_char_settings(#) == 
-if (#[k] < 0) and (#[f] >= 0) then begin
-    i := pdf_get_mem(256);
-    for j := 0 to 255 do
-        pdf_mem[i + j] := pdf_mem[#[f] + j];
-    #[k] := i;
-end
-
-@p
-function init_font_base: integer;
-var i, j: integer;
-begin
-    i := pdf_get_mem(256);
-    for j := 0 to 255 do
-        pdf_mem[i + j] := 0;
-    init_font_base := i;
-end;
-
-procedure set_lp_code(f: internal_font_number; c: eight_bits; i: integer);
-begin
-    if pdf_font_lp_base[f] < 0 then
-        pdf_font_lp_base[f] := init_font_base;
-    pdf_mem[pdf_font_lp_base[f] + c] := fix_int(i, -1000, 1000);
-end;
-
-procedure set_rp_code(f: internal_font_number; c: eight_bits; i: integer);
-begin
-    if pdf_font_rp_base[f] < 0 then
-        pdf_font_rp_base[f] := init_font_base;
-    pdf_mem[pdf_font_rp_base[f] + c] := fix_int(i, -1000, 1000);
-end;
-
-procedure set_ef_code(f: internal_font_number; c: eight_bits; i: integer);
-begin
-    if pdf_font_ef_base[f] < 0 then
-        pdf_font_ef_base[f] := init_font_base;
-    pdf_mem[pdf_font_ef_base[f] + c] := fix_int(i, 0, 1000);
-end;
-
-function read_expand_font(f: internal_font_number; e: scaled): internal_font_number;
-{read font |f| expanded by |e| thousandths into font memory}
-label found;
-var old_setting:0..max_selector; {holds |selector| setting}
-    s: str_number; {font name}
-    k: internal_font_number;
-begin
-    old_setting:=selector; selector:=new_string;
-    print(font_name[f]);
-    if e > 0 then
-        print("+"); {minus sign will be printed by |print_int|}
-    print_int(e);
-    selector:=old_setting;
-    s := make_string;
-    for k := font_base + 1 to font_ptr do
-        if str_eq_str(font_name[k], s) then begin
-            flush_fontname_k(s);
-            if (font_dsize[k] = font_dsize[f]) and
-               (font_size[k] = font_size[f]) and
-               {|
-               (((pdf_font_expand_ratio[k] = 0) and
-                 (pdf_font_expand_factor[k] = 0)) or
-                ((pdf_font_expand_ratio[k] = e) and
-                 (pdf_font_expand_factor[k] = pdf_font_expand_factor[f])))
-               |}
-                ((pdf_font_expand_ratio[k] = e) and
-                 (pdf_font_expand_factor[k] = pdf_font_expand_factor[f]))
-            then
-                goto found;
-        end;
-    k := read_font_info(null_cs, s, "", font_size[f]);
-found:
-    read_expand_font := k;
-end;
-
-procedure set_expand_param(k, f: internal_font_number; e: integer);
-var i, j: integer;
-begin
-    pdf_font_expand_ratio[k] := e;
-    pdf_font_step[k] := pdf_font_step[f];
-    pdf_font_expand_factor[k] := pdf_font_expand_factor[f];
-    copy_char_settings(pdf_font_lp_base);
-    copy_char_settings(pdf_font_rp_base);
-    copy_char_settings(pdf_font_ef_base);
-end;
-
-function get_expand_value(f: internal_font_number; e, max_expand: integer): integer;
-var step: integer;
-    neg: boolean;
-begin
-    if e = 0 then begin
-        get_expand_value := e;
-        return;
-    end;
-    if e < 0 then begin
-        e := -e;
-        max_expand := -max_expand;
-        neg := true;
-    end
-    else begin
-        neg := false;
-    end;
-    step := pdf_font_step[f];
-    if e mod step > 0 then
-        e := step*round_xn_over_d(e, 1, step);
-    if e > max_expand then
-        e :=  max_expand - max_expand mod step;
-    if neg then
-        e := -e;
-    get_expand_value := e;
-end;
-
-function get_expand_factor(f: internal_font_number): integer;
-begin
-    if pdf_font_expand_ratio[f] = 0 then
-        get_expand_factor := 0
-    else
-        get_expand_factor := 
-            get_expand_value(f, 
-                             round_xn_over_d(pdf_font_expand_ratio[f], 
-                                             pdf_font_expand_factor[f], 
-                                             1000), 
-                             pdf_font_expand_ratio[f]);
-end;
-
-function new_ex_font(f: internal_font_number; e: scaled): internal_font_number;
-var k: internal_font_number;
-begin
-    k := pdf_font_link[f];
-    while k <> null_font do begin
-        if pdf_font_expand_ratio[k] = e then begin
-            new_ex_font := k;
-            return;
-        end;
-        k := pdf_font_link[k];
-    end;
-    k := read_expand_font(f, e);
-    set_expand_param(k, f, e);
-    check_ex_tfm(font_name[f], get_expand_factor(k));
-    pdf_font_link[k] := pdf_font_link[f];
-    pdf_font_link[f] := k;
-    new_ex_font := k;
-end;
-
-function expand_font(f: internal_font_number; e: integer): internal_font_number;
-{look up for font |f| expanded by |e| thousandths}
-var max_expand: integer;
-begin
-    expand_font := f;
-    if pdf_font_link[f] = null_font then
-        pdf_error("expand", "uninitialized pdf_font_link");
-    if e = 0 then
-        return;
-    if e < 0 then
-        max_expand := pdf_font_expand_ratio[pdf_font_shrink[f]]
-    else
-        max_expand := pdf_font_expand_ratio[pdf_font_stretch[f]];
-    e := get_expand_value(f, e, max_expand);
-    if e <> 0 then
-        expand_font := new_ex_font(f, e);
-end;
 
 @ To set PDF font we need to find out fonts with the same name, because \TeX\
 can load the same font several times for various sizes. For such fonts we
@@ -2427,14 +1887,14 @@ var f, k: internal_font_number;
 begin
     f := tmp_f;
     if not font_used[f] then begin
-        if pdf_font_map[f] = -1 then
+        if pdf_font_map[f] = 0 then
             pdf_font_map[f] := fmlookup(f);
-        if (pdf_font_map[f] >= 0) then begin
+        if hasfmentry(pdf_font_map[f]) then begin
             k := tfm_of_fm(pdf_font_map[f]);
             if (k <> f) and 
                str_eq_str(font_name[k], font_name[f]) and
                (font_dsize[k] = font_dsize[f]) and
-               (get_expand_factor(k) = get_expand_factor(f)) then begin
+               (pdf_font_expand_ratio[k] = pdf_font_expand_ratio[f]) then begin
                 pdf_use_font(f, -k);
                 return;
             end;
@@ -2450,6 +1910,7 @@ downloading.
 @<Types...@>=
 char_used_array = array[0..31] of eight_bits; 
 char_map_array = array[0..32] of eight_bits; {move chars in range 0..32}
+fm_entry_ptr = ^integer;
 
 @ @<Glob...@>=
 @!pdf_char_used: ^char_used_array; {to mark used chars}
@@ -2457,7 +1918,7 @@ char_map_array = array[0..32] of eight_bits; {move chars in range 0..32}
 @!pdf_font_size: ^scaled; {used size of font in PDF file}
 @!pdf_font_num: ^integer; {mapping between internal font number in \TeX\ and
     font name defined in resources in PDF file}
-@!pdf_font_map: ^integer; {index in table of font mappings}
+@!pdf_font_map: ^fm_entry_ptr; {pointer into AVL tree of font mappings}
 @!pdf_font_list: pointer; {list of used fonts in current page}
 @!pdf_resname_prefix: str_number; {global prefix of resources name}
 @!last_tokens_string: str_number; {the number of the most recently string
@@ -2599,8 +2060,7 @@ begin
         if str_eq_str(font_name[k], s) then begin
             flush_fontname_k(s);
             if (font_dsize[k] = ds) and (font_size[k] = fs) and
-               (pdf_font_expand_ratio[k] = pdf_font_expand_ratio[f]) and
-               (pdf_font_expand_factor[k] = pdf_font_expand_factor[f]) then
+               (pdf_font_expand_ratio[k] = pdf_font_expand_ratio[f])  then
                 goto found;
         end;
     k := read_font_info(null_cs, s, "", fs);
@@ -3096,6 +2556,8 @@ end;
 function tokens_to_string(p: pointer): str_number; {return a string from tokens
 list}
 begin
+    if selector = new_string then
+    pdf_error("tokens", "tokens_to_string() called while selector = new_string");
     old_setting:=selector; selector:=new_string;
     show_token_list(link(p),null,pool_size-pool_ptr);
     selector:=old_setting;
@@ -4146,7 +3608,10 @@ ensure_pdf_open;
 check_and_set_pdfoptionpdfminorversion;
 prepare_mag;
 if (mag <> 1000) and (mag <> 0) then begin
-    mag_cfg_dimen_pars;
+  dimen_par(pdf_h_origin_code) := round_xn_over_d(dimen_par(pdf_h_origin_code), 1000, mag);
+  dimen_par(pdf_v_origin_code) := round_xn_over_d(dimen_par(pdf_v_origin_code), 1000, mag);
+  dimen_par(pdf_page_height_code) := round_xn_over_d(dimen_par(pdf_page_height_code), 1000, mag);
+  dimen_par(pdf_page_width_code) := round_xn_over_d(dimen_par(pdf_page_width_code), 1000, mag)
 end;
 fixed_decimal_digits := fix_int(pdf_decimal_digits, 0, 4);
 min_bp_val := 
@@ -4154,7 +3619,7 @@ min_bp_val :=
 fixed_pk_resolution := fix_int(pdf_pk_resolution, 72, 2400);
 pk_scale_factor := 
     divide_scaled(72, fixed_pk_resolution, 5 + fixed_decimal_digits);
-set_job_id(year, month, day, time, pdftex_version, pdftex_revision);
+set_job_id(year, month, day, time, pdftex_version, pdftex_revision); 
 if (pdf_unique_resname > 0) and (pdf_resname_prefix = 0) then
     pdf_resname_prefix := get_resname_prefix
 
@@ -4310,8 +3775,8 @@ head_tab[obj_type_pages] := l
 
 @ @<Output fonts definition@>=
 for k := font_base + 1 to font_ptr do
-    if (font_used[k]) and (pdf_font_map[k] >= 0) then begin
-        if (pdf_font_num[k] < 0) then
+    if font_used[k] and hasfmentry(pdf_font_map[k]) then begin
+        if pdf_font_num[k] < 0 then
             i := -pdf_font_num[k]
         else 
             i := tfm_of_fm(pdf_font_map[k]);
@@ -4513,7 +3978,6 @@ if pdf_catalog_toks <> null then begin
 end;
 if pdf_catalog_openaction <> 0 then
     pdf_indirect_ln("OpenAction", pdf_catalog_openaction);
-pdf_str_entry_ln("PTEX.Fullbanner", pdftex_banner);
 pdf_end_dict
 
 @ If the same keys in a dictionary are given several times,
@@ -4573,6 +4037,7 @@ begin
     if not creationdate_given then begin
         @<Print the CreationDate key@>;
     end;
+    pdf_str_entry_ln("PTEX.Fullbanner", pdftex_banner);
     pdf_end_dict
 end;
 
@@ -4633,1514 +4098,7 @@ pdf_print_ln("%%EOF")
 @* \[33] Packaging.
 @z
 
-@x [649] - HZ
-@ Here now is |hpack|, which contains few if any surprises.
-
-@p function hpack(@!p:pointer;@!w:scaled;@!m:small_number):pointer;
-@y 
-@ @<Glob...@>=
-@!font_expand_ratio: integer;
-@!last_leftmost_char: pointer;
-@!last_rightmost_char: pointer;
-
-@ @d cal_margin_kern_var(#) ==
-begin
-    character(cp) := character(#);
-    font(cp) := font(#);
-    do_subst_font(cp, 1000);
-    if font(cp) <> font(#) then
-        margin_kern_stretch := margin_kern_stretch + left_pw(#) - left_pw(cp);
-    font(cp) := font(#);
-    do_subst_font(cp, -1000);
-    if font(cp) <> font(#) then
-        margin_kern_shrink := margin_kern_shrink + left_pw(cp) - left_pw(#);
-end
-    
-@<Calculate variations of marginal kerns@>=
-begin
-    lp := last_leftmost_char;
-    rp := last_rightmost_char;
-    fast_get_avail(cp);
-    if lp <> null then
-        cal_margin_kern_var(lp);
-    if rp <> null then
-        cal_margin_kern_var(rp);
-    free_avail(cp);
-end
-
-@ Here now is |hpack|, which is place where we do font substituting when
-font expansion is being used. 
-
-@# {constants used when calling |hpack| to deal with font expansion}
-@d cal_expand_ratio    == 2 {calculate amount for font expansion after breaking
-                             paragraph into lines}
-@d subst_ex_font       == 3 {substitute fonts}
-
-@d substituted = 3 {|subtype| of kern nodes that should be substituted}
-
-@d left_pw(#) == char_pw(#, left_side)
-@d right_pw(#) == char_pw(#, right_side)
-
-@p
-function check_expand_pars(f: internal_font_number): boolean;
-var k: internal_font_number;
-begin
-    check_expand_pars := false;
-    if (pdf_font_step[f] = 0) or ((pdf_font_stretch[f] = null_font) and 
-                                  (pdf_font_shrink[f] = null_font)) then
-        return;
-    if cur_font_step < 0 then
-        cur_font_step := pdf_font_step[f]
-    else if cur_font_step <> pdf_font_step[f] then
-        pdf_error("HZ", "using fonts with different step of expansion in one paragraph is not allowed");
-    k := pdf_font_stretch[f];
-    if k <> null_font then begin
-        if max_stretch_ratio < 0 then
-            max_stretch_ratio := pdf_font_expand_ratio[k]
-        else if max_stretch_ratio <> pdf_font_expand_ratio[k] then
-            pdf_error("HZ", "using fonts with different limit of expansion in one paragraph is not allowed");
-    end;
-    k := pdf_font_shrink[f];
-    if k <> null_font then begin
-        if max_shrink_ratio < 0 then
-            max_shrink_ratio := pdf_font_expand_ratio[k]
-        else if max_shrink_ratio <> pdf_font_expand_ratio[k] then
-            pdf_error("HZ", "using fonts with different limit of expansion in one paragraph is not allowed");
-    end;
-    check_expand_pars := true;
-end;
-
-function char_stretch(f: internal_font_number; c: eight_bits): scaled;
-var k: internal_font_number;
-    dw: scaled;
-    ef: integer;
-begin
-    char_stretch := 0;
-    k := pdf_font_stretch[f];
-    ef := get_ef_code(f, c);
-    if (k <> null_font) and (ef > 0) then begin
-        dw := char_width(k)(char_info(k)(c)) - char_width(f)(char_info(f)(c));
-        if dw > 0 then
-            char_stretch := round_xn_over_d(dw, ef, 1000);
-    end;
-end;
-
-function char_shrink(f: internal_font_number; c: eight_bits): scaled;
-var k: internal_font_number;
-    dw: scaled;
-    ef: integer;
-begin
-    char_shrink := 0;
-    k := pdf_font_shrink[f];
-    ef := get_ef_code(f, c);
-    if (k <> null_font) and (ef > 0) then begin
-        dw := char_width(f)(char_info(f)(c)) - char_width(k)(char_info(k)(c));
-        if dw > 0 then
-            char_shrink := round_xn_over_d(dw, ef, 1000);
-    end;
-end;
-
-function get_kern(f: internal_font_number; lc, rc: eight_bits): scaled;
-label continue;
-var i: four_quarters;
-    j: four_quarters;
-    k: font_index;
-    p: pointer;
-    s: integer;
-begin
-    get_kern := 0;
-    i := char_info(f)(lc);
-    if char_tag(i) <> lig_tag then
-        return;
-    k := lig_kern_start(f)(i);
-    j := font_info[k].qqqq;
-    if skip_byte(j) <= stop_flag then
-        goto continue + 1;
-    k := lig_kern_restart(f)(j);
-continue:
-    j := font_info[k].qqqq;
-continue + 1:
-    if (next_char(j) = rc) and (skip_byte(j) <= stop_flag) and 
-       (op_byte(j) >= kern_flag)
-    then begin
-        get_kern := char_kern(f)(j);
-        return;
-    end;
-    if skip_byte(j) = qi(0) then
-        incr(k)
-    else begin
-        if skip_byte(j) >= stop_flag then
-            return;
-        k := k + qo(skip_byte(j)) + 1;
-    end;
-    goto continue;
-end;
-
-function kern_stretch(p: pointer): scaled;
-var l, r: pointer;
-    d: scaled;
-begin
-    kern_stretch := 0;
-    if (prev_char_p = null) or (link(prev_char_p) <> p) or (link(p) = null)
-    then
-        return;
-    l := prev_char_p;
-    r := link(p);
-    if type(l) = ligature_node then
-        l := lig_char(l);
-    if type(r) = ligature_node then
-        r := lig_char(r);
-    if not (is_char_node(l) and is_char_node(r) and 
-            (font(l) = font(r)) and 
-            (pdf_font_stretch[font(l)] <> null_font))
-    then
-        return;
-    d := get_kern(pdf_font_stretch[font(l)], character(l), character(r));
-    kern_stretch := round_xn_over_d(d - width(p), 
-                                    get_ef_code(font(l), character(l)), 1000);
-end;
-
-function kern_shrink(p: pointer): scaled;
-var l, r: pointer;
-    d: scaled;
-begin
-    kern_shrink := 0;
-    if (prev_char_p = null) or (link(prev_char_p) <> p) or (link(p) = null)
-    then
-        return;
-    l := prev_char_p;
-    r := link(p);
-    if type(l) = ligature_node then
-        l := lig_char(l);
-    if type(r) = ligature_node then
-        r := lig_char(r);
-    if not (is_char_node(l) and is_char_node(r) and 
-            (font(l) = font(r)) and 
-            (pdf_font_shrink[font(l)] <> null_font))
-    then
-        return;
-    d := get_kern(pdf_font_shrink[font(l)], character(l), character(r));
-    kern_shrink := round_xn_over_d(width(p) - d, 
-                                    get_ef_code(font(l), character(l)), 1000);
-end;
-
-procedure do_subst_font(p: pointer; ex_ratio: integer);
-var f, k: internal_font_number;
-    r: pointer;
-    ef: integer;
-begin
-    if not is_char_node(p) and (type(p) = disc_node) then begin
-        r := pre_break(p);
-        while r <> null do begin
-            if is_char_node(r) or (type(r) = ligature_node) then
-                do_subst_font(r, ex_ratio);
-            r := link(r);
-        end;
-        r := post_break(p);
-        while r <> null do begin
-            if is_char_node(r) or (type(r) = ligature_node) then
-                do_subst_font(r, ex_ratio);
-            r := link(r);
-        end;
-        return;
-    end;
-    if is_char_node(p) then
-        r := p
-    else if type(p) = ligature_node then
-        r := lig_char(p)
-    else begin
-        short_display_n(p, 5);
-        pdf_error("HZ", "invalid node type");
-    end;
-    f := font(r);
-    ef := get_ef_code(f, character(r));
-    if ef = 0 then
-        return;
-    if (pdf_font_stretch[f] <> null_font) and (ex_ratio > 0) then
-        k := expand_font(f, divide_scaled(ex_ratio*
-                                pdf_font_expand_ratio[pdf_font_stretch[f]]*ef,
-                                1000000, 0))
-    else if (pdf_font_shrink[f] <> null_font) and (ex_ratio < 0) then
-        k := expand_font(f, -divide_scaled(ex_ratio*
-                                pdf_font_expand_ratio[pdf_font_shrink[f]]*ef,
-                                1000000, 0))
-    else
-        k := f;
-    if k <> f then begin
-        font(r) := k;
-        if not is_char_node(p) then begin
-            r := lig_ptr(p);
-            while r <> null do begin
-                font(r) := k;
-                r := link(r);
-            end;
-        end;
-    end;
-end;
-
-function char_pw(p: pointer; side: small_number): scaled;
-var f: internal_font_number;
-    c: integer;
-begin
-    char_pw := 0;
-    if side = left_side then
-        last_leftmost_char := null
-    else
-        last_rightmost_char := null;
-    if p = null then
-        return;
-    if type(p) = ligature_node then
-        p := lig_char(p)
-    else if not is_char_node(p) then
-        return;
-    f := font(p);
-    if side = left_side then begin
-        c := get_lp_code(f, character(p));
-        last_leftmost_char := p;
-    end
-    else begin
-        c := get_rp_code(f, character(p));
-        last_rightmost_char := p;
-    end;
-    if c = 0 then
-        return;
-    char_pw := 
-        round_xn_over_d(quad(f), c, 1000);
-end;
-
-function new_margin_kern(w: scaled; p: pointer; side: small_number): pointer;
-var k: pointer;
-begin
-    k := get_node(margin_kern_node_size);
-    type(k) := margin_kern_node;
-    subtype(k) := side;
-    width(k) := w;
-    if p = null then
-        pdf_error("protruding", "invalid pointer to marginal char node");
-    fast_get_avail(margin_char(k));
-    character(margin_char(k)) := character(p);
-    font(margin_char(k)) := font(p);
-    new_margin_kern := k;
-end;
-
-function hpack(@!p:pointer;@!w:scaled;@!m:small_number):pointer;
-@z
-
-
-@x [649] - HZ
-begin last_badness:=0; r:=get_node(box_node_size); type(r):=hlist_node;
-subtype(r):=min_quarterword; shift_amount(r):=0;
-q:=r+list_offset; link(q):=p;@/
-@y
-font_stretch: scaled;
-font_shrink: scaled;
-k: scaled;
-begin last_badness:=0; r:=get_node(box_node_size); type(r):=hlist_node;
-subtype(r):=min_quarterword; shift_amount(r):=0;
-q:=r+list_offset; link(q):=p;@/
-if m = cal_expand_ratio then begin
-    prev_char_p := null;
-    font_stretch := 0;
-    font_shrink := 0;
-    font_expand_ratio := 0;
-end;
-@z
-
-@x [649] - pre vadjust
-if adjust_tail<>null then link(adjust_tail):=null;
-@y
-if adjust_tail<>null then link(adjust_tail):=null;
-if pre_adjust_tail<>null then link(pre_adjust_tail):=null;
-@z
-
-@x [649] - HZ
-exit: hpack:=r;
-@y
-exit:
-if (m = cal_expand_ratio) and (font_expand_ratio <> 0) then begin
-    font_expand_ratio := fix_int(font_expand_ratio, -1000, 1000);
-    q := list_ptr(r);
-    free_node(r, box_node_size);
-    r := hpack(q, w, subst_ex_font);
-end;
-hpack:=r;
-@z
-
-@x [651] - HZ
-  kern_node,math_node: x:=x+width(p);
-@y
-  math_node: x:=x+width(p);
-  margin_kern_node: begin
-    if m = cal_expand_ratio then begin
-        f := font(margin_char(p));
-        do_subst_font(margin_char(p), 1000);
-        if f <> font(margin_char(p)) then
-            font_stretch := font_stretch - width(p) - 
-                char_pw(margin_char(p), subtype(p));
-        font(margin_char(p)) := f;
-        do_subst_font(margin_char(p), -1000);
-        if f <> font(margin_char(p)) then
-            font_shrink := font_shrink - width(p) -
-                char_pw(margin_char(p), subtype(p));
-        font(margin_char(p)) := f;
-    end
-    else if m = subst_ex_font then begin
-            do_subst_font(margin_char(p), font_expand_ratio);
-            width(p) := -char_pw(margin_char(p), subtype(p));
-    end;
-    x := x + width(p);
-  end;
-  kern_node: begin
-    if (m = cal_expand_ratio) and (subtype(p) = normal) then begin
-        k := kern_stretch(p);
-        if k <> 0 then begin
-            subtype(p) := substituted;
-            font_stretch := font_stretch + k;
-        end;
-        k := kern_shrink(p);
-        if k <> 0 then begin
-            subtype(p) := substituted;
-            font_shrink := font_shrink + k;
-        end;
-    end
-    else if (m = subst_ex_font) and (subtype(p) = substituted) then begin
-        if type(link(p)) = ligature_node then
-            width(p) := get_kern(font(prev_char_p),
-                                 character(prev_char_p),
-                                 character(lig_char(link(p))))
-        else 
-            width(p) := get_kern(font(prev_char_p),
-                                 character(prev_char_p),
-                                 character(link(p)))
-    end;
-    x := x + width(p);
-  end;
-@z
-
-@x [651] - HZ
-  ligature_node: @<Make node |p| look like a |char_node|
-    and |goto reswitch|@>;
-@y
-  ligature_node: begin
-      if m = subst_ex_font then
-          do_subst_font(p, font_expand_ratio);
-      @<Make node |p| look like a |char_node| and |goto reswitch|@>;
-  end;
-  disc_node:
-      if m = subst_ex_font then
-          do_subst_font(p, font_expand_ratio);
-@z
-
-@x [654] - HZ
-begin f:=font(p); i:=char_info(f)(character(p)); hd:=height_depth(i);
-@y
-begin
-if m >= cal_expand_ratio then begin
-    prev_char_p := p;
-    case m of
-    cal_expand_ratio: begin
-        f := font(p);
-        add_char_stretch(font_stretch)(character(p));
-        add_char_shrink(font_shrink)(character(p));
-    end;
-    subst_ex_font:
-        do_subst_font(p, font_expand_ratio);
-    endcases;
-end;
-f:=font(p); i:=char_info(f)(character(p)); hd:=height_depth(i);
-@z
-
-@x [655] - pre vadjust
-@<Transfer node |p| to the adjustment list@>=
-begin while link(q)<>p do q:=link(q);
-if type(p)=adjust_node then
-  begin link(adjust_tail):=adjust_ptr(p);
-  while link(adjust_tail)<>null do adjust_tail:=link(adjust_tail);
-  p:=link(p); free_node(link(q),small_node_size);
-  end
-@y
-@<Glob...@>=
-@!pre_adjust_tail: pointer;
-
-@ @<Set init...@>=
-pre_adjust_tail := null;
-
-@ Materials in \.{\\vadjust} used with \.{pre} keyword will be appended to
-|pre_adjust_tail| instead of |adjust_tail|.
-
-@d update_adjust_list(#) == begin
-    link(#) := adjust_ptr(p);
-    while link(#) <> null do 
-        # := link(#);
-end
-
-@<Transfer node |p| to the adjustment list@>=
-begin while link(q)<>p do q:=link(q);
-    if type(p) = adjust_node then begin
-        if adjust_pre(p) <> 0 then
-            update_adjust_list(pre_adjust_tail)
-        else
-            update_adjust_list(adjust_tail);
-        p := link(p); free_node(link(q), small_node_size);
-    end
-@z
-
-@x [658] - HZ
-@ @<Determine horizontal glue stretch setting...@>=
-begin @<Determine the stretch order@>;
-@y
-@ If |hpack| is called with |m=cal_expand_ratio| we calculate
-|font_expand_ratio| and return without checking for overfull or underfull box.
-
-@<Determine horizontal glue stretch setting...@>=
-begin @<Determine the stretch order@>;
-if (m = cal_expand_ratio) and (o = normal) and (font_stretch > 0) then begin
-    font_expand_ratio := divide_scaled(x, font_stretch, 3);
-    return;
-end;
-@z
-
-@x [664] - HZ
-@ @<Determine horizontal glue shrink setting...@>=
-begin @<Determine the shrink order@>;
-@y
-@ @<Determine horizontal glue shrink setting...@>=
-begin @<Determine the shrink order@>;
-if (m = cal_expand_ratio) and (o = normal) and (font_shrink > 0) then begin
-    font_expand_ratio := divide_scaled(x, font_shrink, 3);
-    return;
-end;
-@z
-
-@x [770] - pre vadjust
-@d align_stack_node_size=5 {number of |mem| words to save alignment states}
-@y
-@d align_stack_node_size=6 {number of |mem| words to save alignment states}
-@z
-
-@x [770] - pre vadjust
-@!cur_head,@!cur_tail:pointer; {adjustment list pointers}
-@y
-@!cur_head,@!cur_tail:pointer; {adjustment list pointers}
-@!cur_pre_head,@!cur_pre_tail:pointer; {pre-adjustment list pointers}
-@z
-
-@x [771] - pre vadjust
-cur_head:=null; cur_tail:=null;
-@y
-cur_head:=null; cur_tail:=null;
-cur_pre_head:=null; cur_pre_tail:=null;
-@z
-
-@x [772] - pre vadjust
-info(p+4):=cur_head; link(p+4):=cur_tail;
-@y
-info(p+4):=cur_head; link(p+4):=cur_tail;
-info(p+5):=cur_pre_head; link(p+5):=cur_pre_tail;
-@z
-
-@x [771] - pre vadjust
-cur_tail:=link(p+4); cur_head:=info(p+4);
-@y
-cur_tail:=link(p+4); cur_head:=info(p+4);
-cur_pre_tail:=link(p+5); cur_pre_head:=info(p+5);
-@z
-
-@x [786] - pre vadjust
-cur_align:=link(preamble); cur_tail:=cur_head; init_span(cur_align);
-@y
-cur_align:=link(preamble); cur_tail:=cur_head; cur_pre_tail:=cur_pre_head;
-init_span(cur_align);
-@z
-
-@x [791] - pre vadjust
-  begin adjust_tail:=cur_tail; u:=hpack(link(head),natural); w:=width(u);
-  cur_tail:=adjust_tail; adjust_tail:=null;
-  end
-@y
-  begin adjust_tail:=cur_tail; pre_adjust_tail:=cur_pre_tail;
-  u:=hpack(link(head),natural); w:=width(u);
-  cur_tail:=adjust_tail; adjust_tail:=null;
-  cur_pre_tail:=pre_adjust_tail; pre_adjust_tail:=null;
-  end
-@z
-
-@x [799] - pre vadjust
-  pop_nest; append_to_vlist(p);
-  if cur_head<>cur_tail then
-    begin link(tail):=link(cur_head); tail:=cur_tail;
-    end;
-@y
-  pop_nest;
-  if cur_pre_head <> cur_pre_tail then
-      append_list(cur_pre_head)(cur_pre_tail);
-  append_to_vlist(p);
-  if cur_head <> cur_tail then
-      append_list(cur_head)(cur_tail);
-@z
-
-@x [822] - HZ
-@d delta_node_size=7 {number of words in a delta node}
-@y
-@d delta_node_size=9 {number of words in a delta node}
-@z
-
-@x [823] - HZ, protruding chars, avoiding overfull boxes
-@<Glo...@>=
-@!active_width:array[1..6] of scaled;
-  {distance from first active node to~|cur_p|}
-@!cur_active_width:array[1..6] of scaled; {distance from current active node}
-@!background:array[1..6] of scaled; {length of an ``empty'' line}
-@!break_width:array[1..6] of scaled; {length being computed after current break}
-@y
-@d do_seven_eight(#) == if pdf_adjust_spacing > 1 then begin #(7);#(8); end
-@d do_all_eight(#) == do_all_six(#); do_seven_eight(#)
-@d do_one_seven_eight(#) == #(1); do_seven_eight(#)
-
-@d total_font_stretch == cur_active_width[7] 
-@d total_font_shrink == cur_active_width[8] 
-
-@d save_active_width(#) == prev_active_width[#] := active_width[#]
-@d restore_active_width(#) == active_width[#] := prev_active_width[#]
-
-@<Glo...@>=
-@!active_width:array[1..8] of scaled;
-  {distance from first active node to~|cur_p|}
-@!cur_active_width:array[1..8] of scaled; {distance from current active node}
-@!background:array[1..8] of scaled; {length of an ``empty'' line}
-@!break_width:array[1..8] of scaled; {length being computed after current break}
-@#
-@!auto_breaking: boolean; {make |auto_breaking| accessible out of |line_break|}
-@!prev_p: pointer; {make |prev_p| accessible out of |line_break|}
-@!first_p: pointer; {to access the first node of the paragraph}
-@!prev_char_p: pointer; {pointer to the previous char of an implicit kern}
-@!next_char_p: pointer; {pointer to the next char of an implicit kern}
-@# 
-@!try_prev_break: boolean; {force break at the previous legal breakpoint?}
-@!prev_legal: pointer; {the previous legal breakpoint}
-@!prev_prev_legal: pointer; {to save |prev_p| corresponding to |prev_legal|}
-@!prev_auto_breaking: boolean; {to save |auto_breaking| corresponding to |prev_legal|}
-@!prev_active_width: array[1..8] of scaled; {to save |active_width| corresponding to |prev_legal|}
-@!rejected_cur_p: pointer; {the last |cur_p| that has been rejected}
-@!before_rejected_cur_p: boolean; {|cur_p| is still before |rejected_cur_p|?}
-@#
-@!max_stretch_ratio: integer; {maximal stretch ratio of expanded fonts}
-@!max_shrink_ratio: integer; {maximal shrink ratio of expanded fonts}
-@!cur_font_step: integer; {the current step of expanded fonts}
-@z
-
-@x [827] - HZ
-background[6]:=shrink(q)+shrink(r);
-@y
-background[6]:=shrink(q)+shrink(r);
-if pdf_adjust_spacing > 1 then begin
-    background[7] := 0;
-    background[8] := 0;
-    max_stretch_ratio := -1;
-    max_shrink_ratio := -1;
-    cur_font_step := -1;
-    prev_char_p := null;
-end;
-@z
-
-@x [829] - protruding chars
-@<Declare subprocedures for |line_break|@>=
-procedure try_break(@!pi:integer;@!break_type:small_number);
-@y
-@d discardable(#) == not(
-    is_char_node(#) or 
-    non_discardable(#) or
-    ((type(#) = kern_node) and (subtype(#) <> explicit)) or
-    (type(#) = margin_kern_node)
-)
-
-@<Declare subprocedures for |line_break|@>=
-function prev_rightmost(s, e: pointer): pointer;
-var p: pointer;
-begin
-    prev_rightmost := null;
-    p := s;
-    if p = null then
-        return;
-    while link(p) <> e do begin
-        p := link(p);
-        if p = null then
-            return;
-    end;
-    prev_rightmost := p;
-end;
-
-function total_pw(q, p: pointer): scaled;
-label reswitch;
-var l, r, s: pointer;
-    n: integer;
-begin
-    if break_node(q) = null then
-        l := first_p
-    else
-        l := cur_break(break_node(q));
-    r := prev_rightmost(prev_p, p); { get |link(r)=p| }
-    if r <> null then begin
-        if (type(r) = disc_node) and 
-           (type(p) = disc_node) and 
-           (pre_break(p) = null) then  
-        { I cannot remember when this case happens but I encountered it once }
-        begin { find the predecessor of |r| }
-            if r = prev_p then 
-            { |link(prev_p)=p| and |prev_p| is also a |disc_node| }
-            begin
-                { start from the leftmost node }
-                r  := prev_rightmost(l, p);
-            end
-            else
-                r := prev_rightmost(prev_p, p);
-        end
-        else if (p <> null) and 
-                (type(p) = disc_node) and 
-                (pre_break(p) <> null) then 
-        { a |disc_node| with non-empty |pre_break|, protrude the last char }
-        begin
-            r := pre_break(p);
-            while link(r) <> null do
-                r := link(r);
-        end;
-    end;
-reswitch:
-    while (l <> null) and discardable(l) do
-        l := link(l);
-    if (l <> null) and (type(l) = disc_node) then begin
-    {|
-        short_display_n(l, 2);
-        print_ln;
-        breadth_max := 10;
-        depth_threshold := 2;
-        show_node_list(l);
-        print_ln;
-    |}
-        if post_break(l) <> null then
-            l := post_break(l)
-        else begin
-            n := replace_count(l);
-            l := link(l);
-            while n > 0 do begin 
-                if link(l) <> null then 
-                    l := link(l);
-                decr(n);
-            end;
-        end;
-        goto reswitch;
-    end;
-    total_pw := left_pw(l) + right_pw(r);
-end;
-
-procedure try_break(@!pi:integer;@!break_type:small_number);
-@z
-
-@x [829] - avoiding overfull boxes
-@!no_break_yet:boolean; {have we found a feasible break at |cur_p|?}
-@y
-@!no_break_yet:boolean; {have we found a feasible break at |cur_p|?}
-@!can_try_prev_break: boolean; {can we try to break at the previous breakpoint?}
-@!margin_kern_stretch: scaled;
-@!margin_kern_shrink: scaled;
-@!lp, rp, cp: pointer;
-@z
-
-@x [829] - HZ
-do_all_six(copy_to_cur_active);
-@y
-do_all_eight(copy_to_cur_active);
-@z
-
-@x [829] - avoiding overfull boxes
-exit: @!stat @<Update the value of |printed_node| for
-  symbolic displays@>@+tats@;
-end;
-@y
-exit: 
-if can_try_prev_break then 
-    try_prev_break := true
-else begin
-    do_nothing;
-@!stat @<Update the value of |printed_node| for symbolic displays@> @+tats@;
-    do_nothing;
-    if try_prev_break then begin
-        prev_legal := null;
-        try_prev_break := false;
-    end
-    else begin
-        if pi < inf_penalty then begin
-            prev_legal := cur_p;
-            prev_prev_legal := prev_p;
-            prev_auto_breaking := auto_breaking;
-            do_all_eight(save_active_width);
-        end;
-        if before_rejected_cur_p and (cur_p = rejected_cur_p) then
-            before_rejected_cur_p := false;
-    end;
-end;
-end;
-@z
-
-@x [831] - avoiding overfull boxes
-if abs(pi)>=inf_penalty then
-@y
-if try_prev_break and (pi <= inf_penalty) then
-    pi := eject_penalty;
-can_try_prev_break := false;
-if abs(pi)>=inf_penalty then
-@z
-
-@x [832] - HZ
-  begin do_all_six(update_width);
-@y
-  begin do_all_eight(update_width);
-@z
-
-@x [837] - HZ
-begin no_break_yet:=false; do_all_six(set_break_width_to_background);
-@y
-begin no_break_yet:=false; do_all_eight(set_break_width_to_background);
-@z
-
-@x [839] - HZ
-@<Glob...@>=
-@!disc_width:scaled; {the length of discretionary material preceding a break}
-@y
-@d reset_disc_width(#) == disc_width[#] := 0
-
-@d add_disc_width_to_break_width(#) ==  
-    break_width[#] := break_width[#] + disc_width[#]
-
-@d add_disc_width_to_active_width(#) ==  
-    active_width[#] := active_width[#] + disc_width[#]
-
-@d sub_disc_width_from_active_width(#) ==  
-    active_width[#] := active_width[#] - disc_width[#]
-
-@d add_char_stretch_end(#) == char_stretch(f, #)
-@d add_char_stretch(#) == # := # + add_char_stretch_end
-
-@d add_char_shrink_end(#) == char_shrink(f, #)
-@d add_char_shrink(#) == # := # + add_char_shrink_end
-
-@d sub_char_stretch_end(#) == char_stretch(f, #)
-@d sub_char_stretch(#) == # := # - sub_char_stretch_end
-
-@d sub_char_shrink_end(#) == char_shrink(f, #)
-@d sub_char_shrink(#) == # := # - sub_char_shrink_end
-
-@d add_kern_stretch_end(#) == kern_stretch(#)
-@d add_kern_stretch(#) == # := # + add_kern_stretch_end
-
-@d add_kern_shrink_end(#) == kern_shrink(#)
-@d add_kern_shrink(#) == # := # + add_kern_shrink_end
-
-@d sub_kern_stretch_end(#) == kern_stretch(#)
-@d sub_kern_stretch(#) == # := # - sub_kern_stretch_end
-
-@d sub_kern_shrink_end(#) == kern_shrink(#)
-@d sub_kern_shrink(#) == # := # - sub_kern_shrink_end
-
-@<Glob...@>=
-@!disc_width: array[1..8] of scaled; {the length of discretionary material preceding a break}
-@z
-
-@x [840] - HZ
-break_width[1]:=break_width[1]+disc_width;
-@y
-do_one_seven_eight(add_disc_width_to_break_width);
-@z
-
-@x [841] - HZ
-  break_width[1]:=break_width[1]-char_width(f)(char_info(f)(character(v)));
-@y
-  break_width[1]:=break_width[1]-char_width(f)(char_info(f)(character(v)));
-  if (pdf_adjust_spacing > 1) and check_expand_pars(f) then begin
-      prev_char_p := v;
-      sub_char_stretch(break_width[7])(character(v));
-      sub_char_shrink(break_width[8])(character(v));
-  end;
-@z
-
-@x [841] - HZ
-    break_width[1]:=@|break_width[1]-
-      char_width(f)(char_info(f)(character(lig_char(v))));
-@y
-    break_width[1]:=@|break_width[1]-
-      char_width(f)(char_info(f)(character(lig_char(v))));
-    if (pdf_adjust_spacing > 1) and check_expand_pars(f) then begin
-        prev_char_p := v;
-        sub_char_stretch(break_width[7])(character(lig_char(v)));
-        sub_char_shrink(break_width[8])(character(lig_char(v)));
-    end;
-@z
-
-@x [841] - HZ
-  hlist_node,vlist_node,rule_node,kern_node:
-    break_width[1]:=break_width[1]-width(v);
-@y
-  hlist_node,vlist_node,rule_node,kern_node: begin
-    break_width[1]:=break_width[1]-width(v);
-    if (type(v) = kern_node) and
-       (pdf_adjust_spacing > 1) and (subtype(v) = normal)
-    then begin
-        sub_kern_stretch(break_width[7])(v);
-        sub_kern_shrink(break_width[8])(v);
-    end;
-  end;
-@z
-
-@x [842] - HZ
-  break_width[1]:=@|break_width[1]+char_width(f)(char_info(f)(character(s)));
-@y
-  break_width[1]:=@|break_width[1]+char_width(f)(char_info(f)(character(s)));
-  if (pdf_adjust_spacing > 1) and check_expand_pars(f) then begin
-      prev_char_p := s;
-      add_char_stretch(break_width[7])(character(s));
-      add_char_shrink(break_width[8])(character(s));
-  end;
-@z
-
-@x [842] - HZ
-    break_width[1]:=break_width[1]+
-      char_width(f)(char_info(f)(character(lig_char(s))));
-@y
-    break_width[1]:=break_width[1]+
-      char_width(f)(char_info(f)(character(lig_char(s))));
-    if (pdf_adjust_spacing > 1) and check_expand_pars(f) then begin
-        prev_char_p := s;
-        add_char_stretch(break_width[7])(character(lig_char(s)));
-        add_char_shrink(break_width[8])(character(lig_char(s)));
-    end;
-@z
-
-@x [842] - HZ
-  hlist_node,vlist_node,rule_node,kern_node:
-    break_width[1]:=break_width[1]+width(s);
-@y
-  hlist_node,vlist_node,rule_node,kern_node: begin
-    break_width[1]:=break_width[1]+width(s);
-    if (type(s) = kern_node) and
-       (pdf_adjust_spacing > 1) and (subtype(s) = normal)
-    then begin
-        add_kern_stretch(break_width[7])(s);
-        add_kern_shrink(break_width[8])(s);
-    end;
-  end;
-@z
-
-@x [843] - HZ
-  begin do_all_six(convert_to_break_width);
-@y
-  begin do_all_eight(convert_to_break_width);
-@z
-
-@x [843] - HZ
-  begin do_all_six(store_break_width);
-@y
-  begin do_all_eight(store_break_width);
-@z
-
-@x [843] - HZ
-  do_all_six(new_delta_to_break_width);
-@y
-  do_all_eight(new_delta_to_break_width);
-@z
-
-@x [844] - HZ
-  do_all_six(new_delta_from_break_width);
-@y
-  do_all_eight(new_delta_from_break_width);
-@z
-
-@x [851] - HZ, protruding chars
-shortfall:=line_width-cur_active_width[1]; {we're this much too short}
-@y
-shortfall:=line_width-cur_active_width[1]; {we're this much too short}
-
-{|
-if pdf_output > 2 then begin
-print_ln;
-if (r <> null) and (break_node(r) <> null) then
-    short_display_n(cur_break(break_node(r)), 5);
-print_ln;
-short_display_n(cur_p, 5);
-print_ln;
-end;
-|}
-
-if pdf_protrude_chars > 1 then
-    shortfall := shortfall + total_pw(r, cur_p);
-if (pdf_adjust_spacing > 1) and (shortfall <> 0) then begin
-    margin_kern_stretch := 0;
-    margin_kern_shrink := 0;
-    if pdf_protrude_chars > 1 then 
-        @<Calculate variations of marginal kerns@>;
-    if (shortfall > 0) and ((total_font_stretch + margin_kern_stretch) > 0) 
-    then begin
-        if (total_font_stretch + margin_kern_stretch) > shortfall then
-            shortfall := ((total_font_stretch + margin_kern_stretch) div 
-                          (max_stretch_ratio div cur_font_step)) div 2
-        else
-            shortfall := shortfall - (total_font_stretch + margin_kern_stretch);
-    end
-    else if (shortfall < 0) and ((total_font_shrink + margin_kern_shrink) > 0) 
-    then begin
-        if (total_font_shrink + margin_kern_shrink) > -shortfall then
-            shortfall := -((total_font_shrink + margin_kern_shrink) div 
-                           (max_shrink_ratio div cur_font_step)) div 2
-        else
-            shortfall := shortfall + (total_font_shrink + margin_kern_shrink);
-    end;
-end;
-@z
-
-@x [854] - HZ, avoiding overfull boxes
-   (prev_r=active) then
-  artificial_demerits:=true {set demerits zero, this break is forced}
-@y
-   (prev_r=active) then begin
-        if (pdf_avoid_overfull > 0) and (b > inf_bad) and
-           (prev_legal <> null) and (prev_legal <> cur_p) 
-        then begin
-            if try_prev_break then
-                confusion("overfull box recovery");
-            rejected_cur_p := cur_p;
-            can_try_prev_break := true;
-            return;
-        end;
-        artificial_demerits:=true {set demerits zero, this break is forced}
-   end
-@z
-
-@x [860] - HZ
-    begin do_all_six(downdate_width);
-@y
-    begin do_all_eight(downdate_width);
-@z
-
-@x [860] - HZ
-    begin do_all_six(update_width);
-    do_all_six(combine_two_deltas);
-@y
-    begin do_all_eight(update_width);
-    do_all_eight(combine_two_deltas);
-@z
-
-@x [861] - HZ
-  begin do_all_six(update_active);
-  do_all_six(copy_to_cur_active);
-@y
-  begin do_all_eight(update_active);
-  do_all_eight(copy_to_cur_active);
-@z
-
-@x [862] - protruding chars, avoiding overfull boxes
-@!auto_breaking:boolean; {is node |cur_p| outside a formula?}
-@!prev_p:pointer; {helps to determine when glue nodes are breakpoints}
-@y
-@z
-
-@x [863] - avoiding overfull boxes
-  final_pass:=(emergency_stretch<=0);
-@y
-  final_pass:=((emergency_stretch <= 0) and (pdf_avoid_overfull <= 0));
-@z
-
-@x [863] - protruding chars, avoiding overfull boxes
-  while (cur_p<>null)and(link(active)<>last_active) do
-@y
-  prev_char_p := null;
-  prev_legal := null;
-  rejected_cur_p := null;
-  try_prev_break := false;
-  before_rejected_cur_p := false;
-  first_p := cur_p; {to access the first node of paragraph as the first active
-                     node has |break_node=null|}
-  while (cur_p<>null)and(link(active)<>last_active) do
-@z
-
-@x [863] - avoiding overfull boxes
-    threshold:=tolerance; second_pass:=true; final_pass:=(emergency_stretch<=0);
-@y
-    threshold:=tolerance; second_pass:=true;
-    final_pass:=((emergency_stretch <= 0) and (pdf_avoid_overfull <= 0));
-@z
-
-@x [863] - avoiding overfull boxes
-    background[2]:=background[2]+emergency_stretch; final_pass:=true;
-@y
-    if pdf_avoid_overfull <= 0 then
-        background[2]:=background[2]+emergency_stretch;
-    final_pass := true;
-@z
-
-@x [864] - HZ
-do_all_six(store_background);@/
-@y
-do_all_eight(store_background);@/
-@z
-
-@x [866] - avoiding overfull boxes
-  if second_pass and auto_breaking then
-    @<Try to hyphenate the following word@>;
-@y
-  if second_pass and auto_breaking and
-     not (before_rejected_cur_p or (cur_p = rejected_cur_p)) then
-    @<Try to hyphenate the following word@>;
-@z
-
-@x [666] - HZ
-  else act_width:=act_width+width(cur_p);
-@y
-  else begin
-    act_width:=act_width+width(cur_p);
-    if (pdf_adjust_spacing > 1) and (subtype(cur_p) = normal) then begin
-        add_kern_stretch(active_width[7])(cur_p);
-        add_kern_shrink(active_width[8])(cur_p);
-    end;
-  end;
-@z
-
-@x [866] - HZ
-  act_width:=act_width+char_width(f)(char_info(f)(character(lig_char(cur_p))));
-@y
-  act_width:=act_width+char_width(f)(char_info(f)(character(lig_char(cur_p))));
-  if (pdf_adjust_spacing > 1) and check_expand_pars(f) then begin
-      prev_char_p := cur_p;
-      add_char_stretch(active_width[7])(character(lig_char(cur_p)));
-      add_char_shrink(active_width[8])(character(lig_char(cur_p)));
-  end;
-@z
-
-@x [866] - avoiding overfull boxes
-done5:end
-@y
-done5:
-if try_prev_break then begin
-    if pdf_avoid_overfull > 1 then begin
-        print_ln;
-        print_nl("Overfull \hbox detected at breakpoint:");
-        print_ln;
-        short_display_n(prev_p, 10);
-        print_ln;
-        print_nl("Trying to break at the previous legal breakpoint:");
-        print_ln;
-        short_display_n(prev_legal, 10);
-        print_ln;
-    end;
-    cur_p := prev_legal;
-    prev_p := prev_prev_legal;
-    auto_breaking := prev_auto_breaking;
-    do_all_eight(restore_active_width);
-    prev_legal := null;
-    before_rejected_cur_p := true;
-end;
-end
-@z
-
-@x [867] - HZ
-act_width:=act_width+char_width(f)(char_info(f)(character(cur_p)));
-@y
-act_width:=act_width+char_width(f)(char_info(f)(character(cur_p)));
-if (pdf_adjust_spacing > 1) and check_expand_pars(f) then begin
-    prev_char_p := cur_p;
-    add_char_stretch(active_width[7])(character(cur_p));
-    add_char_shrink(active_width[8])(character(cur_p));
-end;
-@z
-
-@x [869] - HZ
-begin s:=pre_break(cur_p); disc_width:=0;
-@y
-begin s:=pre_break(cur_p);
-do_one_seven_eight(reset_disc_width);
-@z
-
-@x [869] - HZ
-  act_width:=act_width+disc_width;
-  try_break(hyphen_penalty,hyphenated);
-  act_width:=act_width-disc_width;
-@y
-  do_one_seven_eight(add_disc_width_to_active_width);
-  try_break(hyphen_penalty,hyphenated);
-  do_one_seven_eight(sub_disc_width_from_active_width);
-@z
-
-@x [870] - HZ
-  disc_width:=disc_width+char_width(f)(char_info(f)(character(s)));
-@y
-  disc_width[1]:=disc_width[1]+char_width(f)(char_info(f)(character(s)));
-  if (pdf_adjust_spacing > 1) and check_expand_pars(f) then begin
-      prev_char_p := s;
-      add_char_stretch(disc_width[7])(character(s));
-      add_char_shrink(disc_width[8])(character(s));
-  end;
-@z
-
-@x [870] - HZ
-    disc_width:=disc_width+
-      char_width(f)(char_info(f)(character(lig_char(s))));
-@y
-    disc_width[1]:=disc_width[1]+
-      char_width(f)(char_info(f)(character(lig_char(s))));
-    if (pdf_adjust_spacing > 1) and check_expand_pars(f) then begin
-        prev_char_p := s;
-        add_char_stretch(disc_width[7])(character(lig_char(s)));
-        add_char_shrink(disc_width[8])(character(lig_char(s)));
-    end;
-@z
-
-@x [870] - HZ
-  hlist_node,vlist_node,rule_node,kern_node:
-    disc_width:=disc_width+width(s);
-@y
-  hlist_node,vlist_node,rule_node,kern_node: begin
-    disc_width[1]:=disc_width[1]+width(s);
-    if (type(s) = kern_node) and
-       (pdf_adjust_spacing > 1) and (subtype(s) = normal)
-    then begin
-        add_kern_stretch(disc_width[7])(s);
-        add_kern_shrink(disc_width[8])(s);
-    end;
-  end;
-@z
-
-@x [871] - HZ
-  act_width:=act_width+char_width(f)(char_info(f)(character(s)));
-@y
-  act_width:=act_width+char_width(f)(char_info(f)(character(s)));
-  if (pdf_adjust_spacing > 1) and check_expand_pars(f) then begin
-      prev_char_p := s;
-      add_char_stretch(active_width[7])(character(s));
-      add_char_shrink(active_width[8])(character(s));
-  end;
-@z
-
-@x [871] - HZ
-    act_width:=act_width+
-      char_width(f)(char_info(f)(character(lig_char(s))));
-@y
-    act_width:=act_width+
-      char_width(f)(char_info(f)(character(lig_char(s))));
-    if (pdf_adjust_spacing > 1) and check_expand_pars(f) then begin
-        prev_char_p := s;
-        add_char_stretch(active_width[7])(character(lig_char(s)));
-        add_char_shrink(active_width[8])(character(lig_char(s)));
-    end;
-@z
-
-@x [671] - HZ
-  hlist_node,vlist_node,rule_node,kern_node:
-    act_width:=act_width+width(s);
-@y
-  hlist_node,vlist_node,rule_node,kern_node: begin
-    act_width:=act_width+width(s);
-    if (type(s) = kern_node) and
-       (pdf_adjust_spacing > 1) and (subtype(s) = normal)
-    then begin
-        add_kern_stretch(active_width[7])(s);
-        add_kern_shrink(active_width[8])(s);
-    end;
-  end;
-@z
-
-@x [873] - avoiding overfull boxes
-begin try_break(eject_penalty,hyphenated);
-@y
-begin try_break(eject_penalty,hyphenated);
-if try_prev_break then
-    goto done5;
-@z
-
-@x [877] - protruding chars
-var q,@!r,@!s:pointer; {temporary registers for list manipulation}
-@y
-var q,@!r,@!s:pointer; {temporary registers for list manipulation}
-    p, k: pointer; 
-    w: scaled;
-@z
-
-@x [881] - protruding chars
-@<Put the \(r)\.{\\rightskip} glue after node |q|@>;
-done:
-@y
-@<Put the \(r)\.{\\rightskip} glue after node |q|@>;
-done:
-if pdf_protrude_chars > 0 then begin
-    p := prev_rightmost(temp_head, q);
-    if (p <> null) and 
-       ((type(p) = disc_node) or (type(p) = penalty_node))
-    then
-        p := prev_rightmost(temp_head, p);
-    w := right_pw(p);
-    if p <> null then begin
-        while link(p) <> q do
-            p := link(p);
-        if w <> 0 then begin
-            k := new_margin_kern(-w, last_rightmost_char, right_side);
-            link(p) := k;
-            link(k) := q;
-        end;
-    end;
-end;
-@z
-
-@x [887] - protruding chars
-if left_skip<>zero_glue then
-@y
-if pdf_protrude_chars > 0 then begin
-    p := q;
-    while (p <> null) and discardable(p) do
-        p := link(p);
-    w := left_pw(p);
-    if w <> 0 then begin
-        k := new_margin_kern(-w, last_leftmost_char, left_side);
-        link(k) := q;
-        q := k;
-    end;
-end;
-if left_skip<>zero_glue then
-@z
-
-@x [888] - pre vadjust,  line snapping
-@ @<Append the new box to the current vertical list...@>=
-append_to_vlist(just_box);
-if adjust_head<>adjust_tail then
-  begin link(tail):=link(adjust_head); tail:=adjust_tail;
-   end;
-adjust_tail:=null
-@y
-@ |append_list| is used to append a list to |tail|.
-
-@d append_list_end(#) == tail := #; end
-@d append_list(#) == begin link(tail) := link(#); append_list_end
-
-@<Append the new box to the current vertical list...@>=
-if pre_adjust_head <> pre_adjust_tail then
-    append_list(pre_adjust_head)(pre_adjust_tail);
-pre_adjust_tail := null;
-prepend_line_snap_nodes;
-append_to_vlist(just_box);
-if adjust_head <> adjust_tail then
-    append_list(adjust_head)(adjust_tail);
-adjust_tail := null
-@z
-
-@x [889] - HZ, pre vadjust
-adjust_tail:=adjust_head; just_box:=hpack(q,cur_width,exactly);
-@y
-adjust_tail := adjust_head;
-pre_adjust_tail := pre_adjust_head;
-if pdf_adjust_spacing > 0 then
-    just_box := hpack(q, cur_width, cal_expand_ratio)
-else
-    just_box := hpack(q, cur_width, exactly);
-@z
-
-@x [970] - avoiding overfull boxes
-done: vert_break:=best_place;
-end;
-@y
-done: vert_break:=best_place;
-if best_place = null then
-    last_vbreak_penalty := eject_penalty
-else if type(best_place) = penalty_node then
-    last_vbreak_penalty := penalty(best_place)
-else
-    last_vbreak_penalty := 0;
-end;
-
-@ @<Glob...@>=
-@!last_vbreak_penalty: integer;
-@z
-
-@x [1076] - pre vadjust
-    begin append_to_vlist(cur_box);
-    if adjust_tail<>null then
-      begin if adjust_head<>adjust_tail then
-        begin link(tail):=link(adjust_head); tail:=adjust_tail;
-        end;
-      adjust_tail:=null;
-      end;
-@y
-    begin 
-        if pre_adjust_tail <> null then begin
-            if pre_adjust_head <> pre_adjust_tail then
-                append_list(pre_adjust_head)(pre_adjust_tail);
-            pre_adjust_tail := null;
-        end;
-        append_to_vlist(cur_box);
-        if adjust_tail <> null then begin
-            if adjust_head <> adjust_tail then
-                append_list(adjust_head)(adjust_tail);
-            adjust_tail := null;
-        end;
-@z
-
-@x [1085] - pre vadjust
-adjusted_hbox_group: begin adjust_tail:=adjust_head; package(0);
-@y
-adjusted_hbox_group: begin adjust_tail:=adjust_head; 
-    pre_adjust_tail:=pre_adjust_head; package(0);
-@z
-
-@x [1099] - pre vadjust
-saved(0):=cur_val; incr(save_ptr);
-new_save_level(insert_group); scan_left_brace; normal_paragraph;
-push_nest; mode:=-vmode; prev_depth:=ignore_depth;
-end;
-@y
-saved(0) := cur_val;
-if (cur_cmd = vadjust) and scan_keyword("pre") then
-    saved(1) := 1
-else
-    saved(1) := 0;
-save_ptr := save_ptr + 2;
-new_save_level(insert_group); scan_left_brace; normal_paragraph;
-push_nest; mode:=-vmode; prev_depth:=ignore_depth;
-end;
-@z
-
-@x [1100] - pre vadjust
-  d:=split_max_depth; f:=floating_penalty; unsave; decr(save_ptr);
-@y
-  d:=split_max_depth; f:=floating_penalty; unsave; save_ptr := save_ptr - 2;
-@z
-
-@x [1100] - pre vadjust
-    subtype(tail):=0; {the |subtype| is not used}
-@y
-    adjust_pre(tail) := saved(1); {the |subtype| is used for |adjust_pre|}
-@z
-
-@x [1100] - margin kerning
-var p:pointer; {the box}
-@y
-var p:pointer; {the box}
-    r: pointer; {to remove marging kern nodes}
-@z
-
-@x [1100] - margin kerning
-while link(tail)<>null do tail:=link(tail);
-@y
-if c = copy_code then begin
-    while link(tail)<>null do tail:=link(tail);
-end
-else while link(tail) <> null do begin
-    r := link(tail);
-    if not is_char_node(r) and (type(r) = margin_kern_node) then begin
-        link(tail) := link(r);
-        free_avail(margin_char(r));
-        free_node(r, margin_kern_node_size);
-    end;
-    tail:=link(tail);
-end;
-@z
-
-@x [1147] - margin kerning
-kern_node,math_node: d:=width(p);
-@y
-kern_node,math_node: d:=width(p);
-margin_kern_node: d:=width(p);
-@z
-
-@x [1198] - pre vadjust
-@!t:pointer; {tail of adjustment list}
-@y
-@!t:pointer; {tail of adjustment list}
-@!pre_t:pointer; {tail of pre-adjustment list}
-@z
-
-@x [1199] - pre vadjust
-adjust_tail:=adjust_head; b:=hpack(p,natural); p:=list_ptr(b);
-t:=adjust_tail; adjust_tail:=null;@/
-@y
-adjust_tail:=adjust_head; pre_adjust_tail:=pre_adjust_head;
-b:=hpack(p,natural); p:=list_ptr(b);
-t:=adjust_tail; adjust_tail:=null;@/
-pre_t:=pre_adjust_tail; pre_adjust_tail:=null;@/
-@z
-
-@x [1205] - pre vadjust
-if t<>adjust_head then {migrating material comes after equation number}
-  begin link(tail):=link(adjust_head); tail:=t;
-  end;
-@y
-if t<>adjust_head then {migrating material comes after equation number}
-  begin link(tail):=link(adjust_head); tail:=t;
-  end;
-if pre_t<>pre_adjust_head then
-  begin link(tail):=link(pre_adjust_head); tail:=pre_t;
-  end;
-@z
-
-@x [1253] - HZ
-assign_font_int: begin n:=cur_chr; scan_font_ident; f:=cur_val;
-  scan_optional_equals; scan_int;
-  if n=0 then hyphen_char[f]:=cur_val@+else skew_char[f]:=cur_val;
-  end;
-@y
-assign_font_int: begin n:=cur_chr; scan_font_ident; f:=cur_val;
-  if n < lp_code_base then begin
-    scan_optional_equals; scan_int;
-    if n=0 then hyphen_char[f]:=cur_val@+else skew_char[f]:=cur_val;
-  end
-  else begin
-    scan_char_num; p := cur_val;
-    scan_optional_equals; scan_int;
-    case n of 
-    lp_code_base: set_lp_code(f, p, cur_val);
-    rp_code_base: set_rp_code(f, p, cur_val);
-    ef_code_base: set_ef_code(f, p, cur_val);
-    end;
-  end;
-end;
-@z
-
-@x [1254] - HZ
-@ @<Put each...@>=
-primitive("hyphenchar",assign_font_int,0);
-@!@:hyphen_char_}{\.{\\hyphenchar} primitive@>
-primitive("skewchar",assign_font_int,1);
-@!@:skew_char_}{\.{\\skewchar} primitive@>
-@y
-@ 
-@d lp_code_base == 2
-@d rp_code_base == 3
-@d ef_code_base == 4
-
-@<Put each...@>=
-primitive("hyphenchar",assign_font_int,0);
-@!@:hyphen_char_}{\.{\\hyphenchar} primitive@>
-primitive("skewchar",assign_font_int,1);
-@!@:skew_char_}{\.{\\skewchar} primitive@>
-primitive("lpcode",assign_font_int,lp_code_base);
-@!@:lp_code_}{\.{\\lpcode} primitive@>
-primitive("rpcode",assign_font_int,rp_code_base);
-@!@:rp_code_}{\.{\\rpcode} primitive@>
-primitive("efcode",assign_font_int,ef_code_base);
-@!@:ef_code_}{\.{\\efcode} primitive@>
-@z
-
-@x [1255] - HZ
-assign_font_int: if chr_code=0 then print_esc("hyphenchar")
-  else print_esc("skewchar");
-@y
-assign_font_int: case chr_code of
-0: print_esc("hyphenchar");
-1: print_esc("skewchar");
-lp_code_base: print_esc("lpcode");
-rp_code_base: print_esc("rpcode");
-ef_code_base: print_esc("efcode");
-endcases;
-@z
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Print new line before termination; switch to editor if
-% necessary.
 % Declare the necessary variables for finishing PDF file
 % Close PDF output if necessary
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -6203,17 +4161,24 @@ end;
 @z
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Read config file before input
+% Override pdf_output value from format file with command line option
+% and initialize other options
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-@x [1337]
-@<Initialize the print |selector|...@>;
-if (loc<limit)and(cat_code(buffer[loc])<>escape) then start_input;
-  {\.{\\input} assumed}
+@x
+  while (loc<limit)and(buffer[loc]=" ") do incr(loc);
+  end;
 @y
-@<Initialize the print |selector|...@>;
-if (loc<limit)and(cat_code(buffer[loc])<>escape) then start_input;
-  {\.{\\input} assumed}
-@<Read values from config file if necessary@>;
+  while (loc<limit)and(buffer[loc]=" ") do incr(loc);
+  end;
+if (pdf_output_option <> 0) then pdf_output := pdf_output_value;
+if (pdf_output > 0) then
+    wterm_ln('output format initialized to PDF')
+else
+    wterm_ln('output format initialized to DVI');
+kpse_init_prog ('PDFTEX', pdf_pk_resolution, nil, nil);
+if not kpse_var_value('MKTEXPK') then
+    kpse_set_program_enabled (kpse_pk_format, 1, kpse_src_cmdline);
+pdf_init_map_file('pdftex.map');
 @z
 
 
@@ -6221,41 +4186,37 @@ if (loc<limit)and(cat_code(buffer[loc])<>escape) then start_input;
 % PDF-speficic extensions that don't fall to any previous category
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 @x [1344]
-@d immediate_code=4 {command modifier for \.{\\immediate}}
 @d set_language_code=5 {command modifier for \.{\\setlanguage}}
 @y
-@d immediate_code=4 {command modifier for \.{\\immediate}}
+@d pdftex_first_extension_code = 6
+@d pdftex_last_extension_code  = pdftex_first_extension_code + 23
 @d set_language_code=5 {command modifier for \.{\\setlanguage}}
-@d pdf_literal_node              == 6
-@d pdf_obj_code                  == 7
-@d pdf_refobj_node               == 8
-@d pdf_xform_code                == 9
-@d pdf_refxform_node             == 10
-@d pdf_ximage_code               == 11
-@d pdf_refximage_node            == 12
-@d pdf_annot_node                == 13
-@d pdf_start_link_node           == 14
-@d pdf_end_link_node             == 15
-@d pdf_outline_code              == 16
-@d pdf_dest_node                 == 17
-@d pdf_thread_node               == 18
-@d pdf_start_thread_node         == 19
-@d pdf_end_thread_node           == 20
-@d pdf_save_pos_node             == 21
-@d pdf_snap_ref_point_node       == 22
-@d pdf_snap_x_node               == 23
-@d pdf_snap_y_node               == 24
-@d pdf_line_snap_x_code          == 25
-@d pdf_line_snap_y_code          == 26
-@d pdf_info_code                 == 27
-@d pdf_catalog_code              == 28
-@d pdf_names_code                == 29
-@d pdf_font_attr_code            == 30
-@d pdf_include_chars_code        == 31
-@d pdf_font_expand_code          == 32
-@d pdf_map_file_code             == 33
-@d pdf_trailer_code              == 34
+@d pdf_literal_node            == pdftex_first_extension_code + 0
+@d pdf_obj_code                == pdftex_first_extension_code + 1
+@d pdf_refobj_node             == pdftex_first_extension_code + 2
+@d pdf_xform_code              == pdftex_first_extension_code + 3
+@d pdf_refxform_node           == pdftex_first_extension_code + 4
+@d pdf_ximage_code             == pdftex_first_extension_code + 5
+@d pdf_refximage_node          == pdftex_first_extension_code + 6
+@d pdf_annot_node              == pdftex_first_extension_code + 7
+@d pdf_start_link_node         == pdftex_first_extension_code + 8
+@d pdf_end_link_node           == pdftex_first_extension_code + 9
+@d pdf_outline_code            == pdftex_first_extension_code + 10
+@d pdf_dest_node               == pdftex_first_extension_code + 11
+@d pdf_thread_node             == pdftex_first_extension_code + 12
+@d pdf_start_thread_node       == pdftex_first_extension_code + 13
+@d pdf_end_thread_node         == pdftex_first_extension_code + 14
+@d pdf_save_pos_node           == pdftex_first_extension_code + 15
+@d pdf_info_code               == pdftex_first_extension_code + 16
+@d pdf_catalog_code            == pdftex_first_extension_code + 17
+@d pdf_names_code              == pdftex_first_extension_code + 18
+@d pdf_font_attr_code          == pdftex_first_extension_code + 19
+@d pdf_include_chars_code      == pdftex_first_extension_code + 20
+@d pdf_map_file_code           == pdftex_first_extension_code + 21
+@d pdf_map_line_code           == pdftex_first_extension_code + 22
+@d pdf_trailer_code            == pdftex_first_extension_code + 23
 @z
+% N.B.: don't forget to check for pdftex_last_extension_code above
 
 @x [1344]
 primitive("setlanguage",extension,set_language_code);@/
@@ -6295,16 +4256,6 @@ primitive("pdfendthread",extension,pdf_end_thread_node);@/
 @!@:pdf_end_thread_}{\.{\\pdfendthread} primitive@>
 primitive("pdfsavepos",extension,pdf_save_pos_node);@/
 @!@:pdf_save_pos_}{\.{\\pdfsavepos} primitive@>
-primitive("pdfsnaprefpoint",extension,pdf_snap_ref_point_node);@/
-@!@:pdf_snap_ref_point_}{\.{\\pdfsnaprefpoint} primitive@>
-primitive("pdfsnapx",extension,pdf_snap_x_node);@/
-@!@:pdf_snap_x_}{\.{\\pdfsnapx} primitive@>
-primitive("pdfsnapy",extension,pdf_snap_y_node);@/
-@!@:pdf_snap_y_}{\.{\\pdfsnapy} primitive@>
-primitive("pdflinesnapx",extension,pdf_line_snap_x_code);@/
-@!@:pdf_line_snap_x_}{\.{\\pdflinesnapx} primitive@>
-primitive("pdflinesnapy",extension,pdf_line_snap_y_code);@/
-@!@:pdf_line_snap_y_}{\.{\\pdflinesnapy} primitive@>
 primitive("pdfinfo",extension,pdf_info_code);@/
 @!@:pdf_info_}{\.{\\pdfinfo} primitive@>
 primitive("pdfcatalog",extension,pdf_catalog_code);@/
@@ -6315,19 +4266,18 @@ primitive("pdfincludechars",extension,pdf_include_chars_code);@/
 @!@:pdf_include_chars_}{\.{\\pdfincludechars} primitive@>
 primitive("pdffontattr",extension,pdf_font_attr_code);@/
 @!@:pdf_font_attr_}{\.{\\pdffontattr} primitive@>
-primitive("pdffontexpand",extension,pdf_font_expand_code);@/
-@!@:pdf_font_expand_}{\.{\\pdffontexpand} primitive@>
 primitive("pdfmapfile",extension,pdf_map_file_code);@/
 @!@:pdf_map_file_}{\.{\\pdfmapfile} primitive@>
+primitive("pdfmapline",extension,pdf_map_line_code);@/
+@!@:pdf_map_line_}{\.{\\pdfmapline} primitive@>
 primitive("pdftrailer",extension,pdf_trailer_code);@/
 @!@:pdf_trailer_}{\.{\\pdftrailer} primitive@>
 @z
 
 @x [1346]
   set_language_code:print_esc("setlanguage");
-  othercases print("[unknown extension!]")
 @y
-  set_language_code: print_esc("setlanguage");
+  set_language_code:print_esc("setlanguage");
   pdf_literal_node: print_esc("pdfliteral");
   pdf_obj_code: print_esc("pdfobj");
   pdf_refobj_node: print_esc("pdfrefobj");
@@ -6344,27 +4294,22 @@ primitive("pdftrailer",extension,pdf_trailer_code);@/
   pdf_start_thread_node: print_esc("pdfstartthread");
   pdf_end_thread_node: print_esc("pdfendthread");
   pdf_save_pos_node: print_esc("pdfsavepos");
-  pdf_snap_ref_point_node: print_esc("pdfsnaprefpoint");
-  pdf_snap_x_node: print_esc("pdfsnapx");
-  pdf_snap_y_node: print_esc("pdfsnapy");
-  pdf_line_snap_x_code: print_esc("pdflinesnapx");
-  pdf_line_snap_y_code: print_esc("pdflinesnapy");
   pdf_info_code: print_esc("pdfinfo");
   pdf_catalog_code: print_esc("pdfcatalog");
   pdf_names_code: print_esc("pdfnames");
   pdf_include_chars_code: print_esc("pdfincludechars");
   pdf_font_attr_code: print_esc("pdffontattr");
-  pdf_font_expand_code: print_esc("pdffontexpand");
   pdf_map_file_code: print_esc("pdfmapfile");
+  pdf_map_line_code: print_esc("pdfmapline");
   pdf_trailer_code: print_esc("pdftrailer");
-  othercases print("[unknown extension!]")
 @z
 
 @x [1348]
+immediate_code:@<Implement \.{\\immediate}@>;
 set_language_code:@<Implement \.{\\setlanguage}@>;
-othercases confusion("ext1")
 @y
-set_language_code: @<Implement \.{\\setlanguage}@>;
+immediate_code:@<Implement \.{\\immediate}@>;
+set_language_code:@<Implement \.{\\setlanguage}@>;
 pdf_literal_node: @<Implement \.{\\pdfliteral}@>;
 pdf_obj_code: @<Implement \.{\\pdfobj}@>;
 pdf_refobj_node: @<Implement \.{\\pdfrefobj}@>;
@@ -6381,18 +4326,13 @@ pdf_thread_node: @<Implement \.{\\pdfthread}@>;
 pdf_start_thread_node: @<Implement \.{\\pdfstartthread}@>;
 pdf_end_thread_node: @<Implement \.{\\pdfendthread}@>;
 pdf_save_pos_node: @<Implement \.{\\pdfsavepos}@>;
-pdf_snap_ref_point_node: @<Implement \.{\\pdfsnaprefpoint}@>;
-pdf_snap_x_node: @<Implement \.{\\pdfsnapx}@>;
-pdf_snap_y_node: @<Implement \.{\\pdfsnapy}@>;
-pdf_line_snap_x_code: @<Implement \.{\\pdflinesnapx}@>;
-pdf_line_snap_y_code: @<Implement \.{\\pdflinesnapy}@>;
 pdf_info_code: @<Implement \.{\\pdfinfo}@>;
 pdf_catalog_code: @<Implement \.{\\pdfcatalog}@>;
 pdf_names_code: @<Implement \.{\\pdfnames}@>;
 pdf_include_chars_code: @<Implement \.{\\pdfincludechars}@>;
 pdf_font_attr_code: @<Implement \.{\\pdffontattr}@>;
-pdf_font_expand_code: @<Implement \.{\\pdffontexpand}@>;
 pdf_map_file_code: @<Implement \.{\\pdfmapfile}@>;
+pdf_map_line_code: @<Implement \.{\\pdfmapline}@>;
 pdf_trailer_code: @<Implement \.{\\pdftrailer}@>;
 @z
 
@@ -6483,8 +4423,8 @@ begin
         if scan_keyword("useobjnum") then begin
             scan_int;
             k := cur_val;
-	    if (k = 0) or (obj_data_ptr(k) <> 0) then 
-	    	pdf_error("ext1", "this object numer appears to have been used");
+            if (k <= 0) or (k > obj_ptr) or (obj_data_ptr(k) <> 0) then 
+                pdf_error("ext1", "invalid object number");
         end
         else begin
             incr(pdf_obj_count);
@@ -6809,30 +4749,9 @@ end
   |pdf_vlist_out|.
 
 @<Declare procedures needed in |pdf_hlist_out|, |pdf_vlist_out|@>=
-function find_obj(t, i: integer; byname: small_number): integer; 
-label found, done;
-var p, r: integer;
+function find_obj(t, i: integer; byname: small_number): integer;
 begin
-    p := head_tab[t];
-    r := 0;
-    if byname > 0 then begin
-        while p <> 0 do begin
-            if (obj_info(p) < 0) and (str_eq_str(-obj_info(p), i)) then begin
-                r := p;
-                goto done;
-            end;
-            p := obj_link(p);
-        end;
-    end
-    else while p <> 0 do begin
-        if  obj_info(p) = i then begin
-            r := p;
-            goto done;
-        end;
-        p := obj_link(p);
-    end;
-done:
-    find_obj := r;
+    find_obj := avl_find_obj(t, i, byname);
 end;
 
 function get_obj(t, i: integer; byname: small_number): integer; 
@@ -6966,12 +4885,23 @@ end;
 @ @<Implement \.{\\pdfannot}@>=
 begin
     check_pdfoutput("\pdfannot");
-    k := pdf_new_objnum;
-    new_annot_whatsit(pdf_annot_node, pdf_annot_node_size);
-    pdf_annot_objnum(tail) := k;
-    call_func(scan_toks(false, true));
-    pdf_annot_data(tail) := def_ref;
-    pdf_last_annot := k;
+    if scan_keyword("reserveobjnum") then
+        pdf_last_annot := pdf_new_objnum
+    else begin
+        if scan_keyword("useobjnum") then begin
+            scan_int;
+            k := cur_val;
+            if (k <= 0) or (k > obj_ptr) or (obj_annot_ptr(k) <> 0) then 
+                pdf_error("ext1", "invalid object number");
+        end
+        else
+            k := pdf_new_objnum;
+        new_annot_whatsit(pdf_annot_node, pdf_annot_node_size);
+        pdf_annot_objnum(tail) := k;
+        call_func(scan_toks(false, true));
+        pdf_annot_data(tail) := def_ref;
+        pdf_last_annot := k;
+    end
 end
 
 @ @<Implement \.{\\pdfstartlink}@>=
@@ -7215,91 +5145,14 @@ begin
     new_whatsit(pdf_end_thread_node, small_node_size);
 end
 
-@ Extensions for getting possions and snapping.
-@d snap_node_size = 2
-
-@<Glob...@>=
+@ @<Glob...@>=
 @!pdf_last_x_pos: integer;
 @!pdf_last_y_pos: integer;
-@!pdf_snap_x_pos: integer;
-@!pdf_snap_y_pos: integer;
-@!pdf_line_snap_x: pointer;
-@!pdf_line_snap_y: pointer;
-
-@ @<Set init...@>=
-pdf_line_snap_x := null;
-pdf_line_snap_y := null;
 
 @ @<Implement \.{\\pdfsavepos}@>=
 begin
     check_pdfoutput("\pdfsavepos");
     new_whatsit(pdf_save_pos_node, small_node_size);
-end
-
-@ @<Implement \.{\\pdfsnaprefpoint}@>=
-begin
-    check_pdfoutput("\pdfsnaprefpoint");
-    new_whatsit(pdf_snap_ref_point_node, small_node_size);
-end
-
-@ @<Declare procedures that need to be declared forward for pdftex@>=
-procedure prepend_line_snap_nodes; forward;
-
-@ @d prepend_snap_node(#) == 
-if (# <> null) and (width(snap_glue_ptr(#)) <> 0) then begin
-    r := copy_node_list(#);
-    link(r) := list_ptr(just_box);
-    list_ptr(just_box) := r;
-end;
-
-@<Declare procedures needed in |do_ext...@>=
-function new_snap_node(s: small_number): pointer;
-var p: pointer;
-begin
-    scan_glue(glue_val);
-    if width(cur_val) < 0 then
-        pdf_error("ext1", "negative snap glue");
-    p := get_node(snap_node_size);
-    type(p) := whatsit_node;
-    subtype(p) := s;
-    link(p) := null;
-    snap_glue_ptr(p) := cur_val;
-    new_snap_node := p;
-end;
-
-procedure prepend_line_snap_nodes;
-var r: pointer;
-begin
-    prepend_snap_node(pdf_line_snap_x);
-    prepend_snap_node(pdf_line_snap_y);
-end;
-
-@ @<Implement \.{\\pdfsnapx}@>=
-begin
-    check_pdfoutput("\pdfsnapx");
-    tail_append(new_snap_node(pdf_snap_x_node));
-end
-
-@ @<Implement \.{\\pdfsnapy}@>=
-begin
-    check_pdfoutput("\pdfsnapy");
-    tail_append(new_snap_node(pdf_snap_y_node));
-end
-
-@ @<Implement \.{\\pdflinesnapx}@>=
-begin
-    check_pdfoutput("\pdflinesnapx");
-    if pdf_line_snap_x <> null then
-        flush_node_list(pdf_line_snap_x);
-    pdf_line_snap_x := new_snap_node(pdf_snap_x_node);
-end
-
-@ @<Implement \.{\\pdflinesnapy}@>=
-begin
-    check_pdfoutput("\pdflinesnapy");
-    if pdf_line_snap_y <> null then
-        flush_node_list(pdf_line_snap_y);
-    pdf_line_snap_y := new_snap_node(pdf_snap_y_node);
 end
 
 @ To implement primitives as \.{\\pdfinfo}, \.{\\pdfcatalog} or
@@ -7361,6 +5214,7 @@ begin
     pdf_trailer_toks := concat_tokens(pdf_trailer_toks, def_ref);
 end
 
+
 @ The following subroutines are about PDF-specific font issues.
 
 @<Declare procedures needed in |do_ext...@>=
@@ -7387,37 +5241,6 @@ begin
     flush_str(s);
 end;
 
-procedure do_expand_font;
-var font_shrink, font_stretch, font_step, expand_factor: integer;
-    f: internal_font_number;
-begin
-    scan_font_ident;
-    f := cur_val;
-    if f = null_font then
-        pdf_error("font", "invalid font identifier");
-    scan_optional_equals;
-    scan_int;
-    font_stretch := fix_int(cur_val, 0, 1000);
-    scan_int;
-    font_shrink := fix_int(cur_val, 0, 1000);
-    scan_int;
-    font_step := fix_int(cur_val, 0, 1000);
-    scan_int;
-    expand_factor := fix_int(cur_val, 0, 1000);
-    if (expand_factor <> 1000) and (pdf_output <= 0) then
-        pdf_error("expand", "only font expansion factor 1000 can used in DVI mode");
-    if font_step = 0 then
-        pdf_error("expand", "invalid step of font expansion");
-    font_stretch := font_stretch - font_stretch mod font_step;
-    font_shrink := font_shrink - font_shrink mod font_step;
-    pdf_font_step[f] := font_step;
-    pdf_font_expand_factor[f] := expand_factor;
-    if font_stretch > 0 then
-        pdf_font_stretch[f] := new_ex_font(f, font_stretch);
-    if font_shrink > 0 then
-        pdf_font_shrink[f] := new_ex_font(f, -font_shrink);
-
-end;
 
 @ @<Implement \.{\\pdfincludechars}@>= 
 begin
@@ -7436,9 +5259,6 @@ begin
     pdf_font_attr[k] := tokens_to_string(def_ref);
 end
 
-@ @<Implement \.{\\pdffontexpand}@>= 
-    do_expand_font
-
 @ @<Implement \.{\\pdfmapfile}@>= 
 begin
     check_pdfoutput("\pdfmapfile");
@@ -7447,7 +5267,15 @@ begin
     delete_token_ref(def_ref);
 end
 
-@ The following function are needed for outputing the article thread.
+@ @<Implement \.{\\pdfmapline}@>=
+begin
+    check_pdfoutput("\pdfmapline");
+    call_func(scan_toks(false, true));
+    pdfmapline(def_ref);
+    delete_token_ref(def_ref);
+end
+
+@ The following function are needed for outputing article thread.
 
 @<Declare procedures needed in |do_ext...@>=
 procedure thread_title(thread: integer);
@@ -7690,17 +5518,6 @@ pdf_start_thread_node: begin
 end;
 pdf_end_thread_node: print_esc("pdfendthread");
 pdf_save_pos_node: print_esc("pdfsavepos");
-pdf_snap_ref_point_node: print_esc("pdfsnaprefpoint");
-pdf_snap_x_node: begin
-    print_esc("pdfsnapx");
-    print_char(" ");
-    print_spec(snap_glue_ptr(p), 0);
-end;
-pdf_snap_y_node: begin
-    print_esc("pdfsnapy");
-    print_char(" ");
-    print_spec(snap_glue_ptr(p), 0);
-end;
 othercases print("whatsit?")
 @z
 
@@ -7759,15 +5576,8 @@ pdf_start_thread_node: begin
 end;
 pdf_end_thread_node:
     r := get_node(small_node_size);
-pdf_save_pos_node,
-pdf_snap_ref_point_node:
+pdf_save_pos_node:
     r := get_node(small_node_size);
-pdf_snap_x_node,
-pdf_snap_y_node: begin
-    add_glue_ref(snap_glue_ptr(p));
-    r := get_node(small_node_size);
-    words := small_node_size;
-end;
 othercases confusion("ext2")
 @z
 
@@ -7811,14 +5621,8 @@ pdf_start_thread_node: begin
 end;
 pdf_end_thread_node:
     free_node(p, small_node_size);
-pdf_save_pos_node,
-pdf_snap_ref_point_node:
+pdf_save_pos_node:
     free_node(p, small_node_size);
-pdf_snap_x_node,
-pdf_snap_y_node: begin
-    delete_glue_ref(snap_glue_ptr(p));
-    free_node(p, small_node_size);
-end;
 othercases confusion("ext3")
 @z
 
@@ -7943,8 +5747,7 @@ for k:=0 to 15 do if write_open[k] then a_close(write_file[k])
 @ @<Finish the extensions@>=
 for k:=0 to 15 do if write_open[k] then a_close(write_file[k])
 
-@ Shiping out PDF mark.
-
+@ Shipping out PDF marks.
 
 @<Types...@>=
 dest_name_entry = record
@@ -8422,84 +6225,6 @@ begin
     pdf_print_ln("Q");
 end;
 
-procedure do_snap(p: pointer);
-var gap_amount, stretch_amount, shrink_amount: scaled;
-    cur_point, last_point, next_point: scaled;
-begin
-    gap_amount := width(snap_glue_ptr(p));
-    if stretch_order(snap_glue_ptr(p)) > normal then
-        stretch_amount := max_dimen
-    else
-        stretch_amount := stretch(snap_glue_ptr(p));
-    if shrink_order(snap_glue_ptr(p)) > normal then
-        shrink_amount := max_dimen
-    else
-        shrink_amount := shrink(snap_glue_ptr(p));
-    if subtype(p) = pdf_snap_x_node then begin
-        cur_point := cur_h;
-        last_point := pdf_snap_x_pos + 
-            gap_amount * ((cur_point - pdf_snap_x_pos) div gap_amount);
-    end
-    else begin
-        cur_point := cur_v;
-        last_point := pdf_snap_y_pos + 
-            gap_amount * ((cur_point - pdf_snap_y_pos) div gap_amount);
-    end;
-    next_point := last_point + gap_amount;
-    {|
-    print_nl("snap glue = "); print_spec(snap_glue_ptr(p), "pt");
-    print_nl("gap amount = "); print_scaled(gap_amount); 
-    print_nl("stretch amount = "); print_scaled(stretch_amount); 
-    print_nl("shrink amount = "); print_scaled(shrink_amount); 
-    print_nl("last point = "); print_scaled(last_point); 
-    print_nl("cur point = "); print_scaled(cur_point); 
-    print_nl("next point = "); print_scaled(next_point); 
-    |}
-    if (cur_point - last_point > shrink_amount) and
-        (next_point - cur_point > stretch_amount) then
-        return;
-    if cur_point - last_point > shrink_amount then
-        cur_point := next_point
-    else if next_point - cur_point > stretch_amount then
-        cur_point := last_point
-    else if cur_point - last_point <= next_point - cur_point then
-        cur_point := last_point
-    else 
-        cur_point := next_point;
-    if subtype(p) = pdf_snap_x_node then
-        cur_h := cur_point
-    else
-        cur_v := cur_point;
-end;
-
-function node_type(p: pointer): integer;
-begin
-    node_type := 0;
-    if p = null then
-        return;
-    if is_char_node(p) then
-        print("char_node")
-    else case type(p) of
-    hlist_node: print("hlist_node");
-    vlist_node: print("vlist_node");
-    rule_node: print("rule_node");
-    ins_node: print("ins_node");
-    mark_node: print("mark_node");
-    adjust_node: print("adjust_node");
-    ligature_node: print("ligature_node");
-    disc_node: print("disc_node");
-    whatsit_node: print("whatsit_node");
-    math_node: print("math_node");
-    glue_node: print("glue_node");
-    kern_node: print("kern_node");
-    penalty_node: print("penalty_node");
-    unset_node: print("unset_node");
-    style_node: print("style_node");
-    choice_node: print("choice_node");
-    endcases;
-    print_ln;
-end;
-
 
 @ @<Output the whatsit node |p| in |pdf_vlist_out|@>=
 case subtype(p) of
@@ -8526,16 +6251,6 @@ pdf_end_thread_node:
     end_thread;
 pdf_save_pos_node:
     @<Save current position to |pdf_last_x_pos|, |pdf_last_y_pos|@>;
-pdf_snap_ref_point_node:
-    @<Save current position to |pdf_snap_x_pos|, |pdf_snap_y_pos|@>;
-pdf_snap_x_node,
-pdf_snap_y_node: begin
-    do_snap(p);
-    if list_ptr(this_box) = p then begin
-        top_edge := cur_v;
-        left_edge := cur_h;
-    end;
-end;
 special_node:
     pdf_special(p);
 othercases out_what(p);
@@ -8551,12 +6266,6 @@ begin
         pdf_last_y_pos := cur_page_height - cur_v
     else
         pdf_last_y_pos := pdf_xform_height + pdf_xform_depth - cur_v;
-end
-
-@ @<Save current position to |pdf_snap_x_pos|, |pdf_snap_y_pos|@>=
-begin
-    pdf_snap_x_pos := cur_h;
-    pdf_snap_y_pos := cur_v;
 end
 
 @ @<Output a Image node in a vlist@>=
@@ -8601,16 +6310,6 @@ pdf_end_thread_node:
     pdf_error("ext4", "\pdfendthread ended up in hlist");
 pdf_save_pos_node:
     @<Save current position to |pdf_last_x_pos|, |pdf_last_y_pos|@>;
-pdf_snap_ref_point_node:
-    @<Save current position to |pdf_snap_x_pos|, |pdf_snap_y_pos|@>;
-pdf_snap_x_node,
-pdf_snap_y_node: begin
-    do_snap(p);
-    if list_ptr(this_box) = p then begin
-        base_line := cur_v;
-        left_edge := cur_h;
-    end;
-end;
 special_node:
     pdf_special(p);
 othercases out_what(p);
@@ -8632,3 +6331,4 @@ begin
   cur_h:=edge+pdf_width(p); cur_v:=base_line;
   end
 @z
+

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftosrc.cc#13 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftosrc.cc#9 $
 */
 
 #include <stdlib.h>
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
     fileName = new GString(argv[1]);
-    globalParams = new GlobalParams("");
+    globalParams = new GlobalParams();
     doc = new PDFDoc(fileName);
     if (!doc->isOk()) {
         fprintf(stderr, "Invalid PDF file\n");

@@ -1,5 +1,5 @@
 # Makefile for web2c --kb@mail.tug.org. Public domain.
-# $Id$
+# $Id: //depot/Build/source.development/TeX/texk/web2c/Makefile.in#45 $
 version = @WEB2CVERSION@
 
 # This makefile uses static rules with many targets (to be compatible to
@@ -11,12 +11,12 @@ version = @WEB2CVERSION@
 # install-fmts/install-bases/install-mems will install. plain.* is
 # created automatically (as a link).  See the Formats node in
 # doc/web2c.texi for details on the fmts.
-fmts = olatex.fmt # amstex.fmt eplain.fmt texinfo.fmt
-efmts = latex.efmt
-pdffmts = pdfolatex.fmt
-pdfefmts = pdflatex.efmt
-ofmts = lambda.oft
-eofmts = elambda.eoft
+fmts = @FMU@ olatex.fmt # amstex.fmt eplain.fmt texinfo.fmt
+efmts = @FMU@ latex.efmt
+pdffmts = @FMU@ pdfolatex.fmt
+pdfefmts = @FMU@ pdflatex.efmt
+ofmts = @FMU@ lambda.oft
+eofmts = @FMU@ elambda.eoft
 bases = # I do not recommend building cmmf.base.
 mems =  # mfplain.mem is probably not generally useful.
 
@@ -72,24 +72,24 @@ install_makeargs = INSTALL='$(INSTALL)' INSTALL_DATA='$(INSTALL_DATA)' \
 
 proglib = lib/lib.a
 windowlib = window/window.a
-@PTEX@ZLIBDIR=../../libs/zlib
-@PTEX@ZLIBSRCDIR=$(srcdir)/$(ZLIBDIR)
-@PTEX@LIBPNGDIR=../../libs/libpng
-@PTEX@LIBPNGSRCDIR=$(srcdir)/$(LIBPNGDIR)
-@PTEX@LIBXPDFDIR=../../libs/xpdf
-@PTEX@LIBXPDFSRCDIR=$(srcdir)/$(LIBXPDFDIR)
-@PTEX@LIBMD5DIR=../../libs/md5
-@PTEX@LIBMD5SRCDIR=$(srcdir)/$(LIBMD5DIR)
-@PTEX@pdflib = pdftexdir/libpdf.a
-@PTEX@LIBPNGDEP = @LIBPNGDEP@
-@PTEX@LDLIBPNG = @LDLIBPNG@
-@PTEX@ZLIBDEP = @ZLIBDEP@
-@PTEX@LDZLIB = @LDZLIB@
-@PTEX@LIBXPDFDEP = @LIBXPDFDEP@
-@PTEX@LDLIBXPDF = @LDLIBXPDF@
-@PTEX@LIBMD5DEP=$(LIBMD5DIR)/md5.o
-@PTEX@pdftexlibs = $(pdflib) $(LDLIBPNG) $(LDZLIB) $(LDLIBXPDF) $(LIBMD5DEP)
-@PTEX@pdftexlibsdep = $(pdflib) $(LIBPNGDEP) $(ZLIBDEP) $(LIBXPDFDEP) $(LIBMD5DEP)
+@PANYTEX@ZLIBDIR=../../libs/zlib
+@PANYTEX@ZLIBSRCDIR=$(srcdir)/$(ZLIBDIR)
+@PANYTEX@LIBPNGDIR=../../libs/libpng
+@PANYTEX@LIBPNGSRCDIR=$(srcdir)/$(LIBPNGDIR)
+@PANYTEX@LIBXPDFDIR=../../libs/xpdf
+@PANYTEX@LIBXPDFSRCDIR=$(srcdir)/$(LIBXPDFDIR)
+@PANYTEX@LIBMD5DIR=../../libs/md5
+@PANYTEX@LIBMD5SRCDIR=$(srcdir)/$(LIBMD5DIR)
+@PANYTEX@pdflib = pdftexdir/libpdf.a
+@PANYTEX@LIBPNGDEP = @LIBPNGDEP@
+@PANYTEX@LDLIBPNG = @LDLIBPNG@
+@PANYTEX@ZLIBDEP = @ZLIBDEP@
+@PANYTEX@LDZLIB = @LDZLIB@
+@PANYTEX@LIBXPDFDEP = @LIBXPDFDEP@
+@PANYTEX@LDLIBXPDF = @LDLIBXPDF@
+@PANYTEX@LIBMD5DEP=$(LIBMD5DIR)/md5.o
+@PANYTEX@pdftexlibs = $(pdflib) $(LDLIBPNG) $(LDZLIB) $(LDLIBXPDF) $(LIBMD5DEP)
+@PANYTEX@pdftexlibsdep = $(pdflib) $(LIBPNGDEP) $(ZLIBDEP) $(LIBXPDFDEP) $(LIBMD5DEP)
 
 # The sh script that does the conversion:
 web2c = srcdir=$(srcdir) $(SHELL) $(srcdir)/web2c/convert
@@ -624,6 +624,10 @@ trip-clean:
 	rm -f trip.tfm trip.pl trip.tex trip.fmt tripin.fot tripin.log
 	rm -f trip.fot trip.log trip.dvi trip.typ tripos.tex 8terminal.tex
 	rm -rf tfm
+
+@PANYTEX@clean:: md5lib-clean
+@PANYTEX@md5lib-clean:
+@PANYTEX@	rm -f $(LIBMD5DEP)
 
 # Makefile fragments:
 ac_include etexdir/etex.mk
@@ -631,12 +635,14 @@ ac_include omegadir/omega.mk
 ac_include eomegadir/eomega.mk
 ac_include pdftexdir/pdftex.mk
 ac_include pdfetexdir/pdfetex.mk
+ac_include pdfxtexdir/pdfxtex.mk
 
 # Common
 programs = bibtex ctangle cweave dvicopy dvitomp dvitype gftodvi gftopk \
- gftype mft $(odvicopy) $(odvitype) $(otangle) patgen pktogf pktype pltotf \
- pooltype tangle tftopl tie $(ttf2afm) vftovp vptovf weave $(tex) $(etex) \
- $(omega) $(eomega) $(pdftex) $(pdfetex) $(mf) $(mfn) mpost
+ gftype mft $(odvicopy) $(odvitype) $(otangle) patgen pktogf pktype \
+ pltotf pooltype tangle tftopl tie $(ttf2afm) $(pdftosrc) vftovp vptovf \
+ weave $(tex) $(etex) $(omega) $(eomega) $(pdftex) $(pdfxtex) $(pdfetex) \
+ $(mf) $(mfn) mpost
 
 programs: $(programs) $(mpware) $(omegafonts_programs) $(otps_programs) \
  $(pdftosrc)
@@ -766,22 +772,22 @@ $(windowlib): mfd.h $(window_sources)
 	cd window && $(MAKE) $(window_makeargs)
 window/trap.o: $(srcdir)/window/trap.c
 	cd window && $(MAKE) $(common_makeargs) trap.o
-@PTEX@pdflib_sources = $(srcdir)/pdftexdir/*.c $(srcdir)/pdftexdir/*.cc \
-@PTEX@	$(srcdir)/pdftexdir/*.h
-@PTEX@pdftexdir/libpdf.a: $(pdflib_sources)
-@PTEX@	cd pdftexdir && $(MAKE) $(common_makeargs) libpdf.a
-@PTEX@$(LIBPNGDIR)/libpng.a: $(LIBPNGSRCDIR)/*.c
-@PTEX@	cd $(LIBPNGDIR) && $(MAKE) $(common_makeargs) libpng.a
-@PTEX@$(ZLIBDIR)/libz.a: $(ZLIBSRCDIR)
-@PTEX@	cd $(ZLIBDIR) && $(MAKE) $(common_makeargs) libz.a
-@PTEX@$(LIBXPDFDIR)/xpdf/libxpdf.a: $(LIBXPDFSRCDIR)/xpdf/*.cc \
-@PTEX@	$(LIBXPDFSRCDIR)/xpdf/*.h
-@PTEX@	cd $(LIBXPDFDIR)/xpdf; $(MAKE) $(common_makeargs) libxpdf.a
-@PTEX@$(LIBXPDFDIR)/goo/libGoo.a: $(LIBXPDFSRCDIR)/goo/*.cc \
-@PTEX@	$(LIBXPDFSRCDIR)/goo/*.c $(LIBXPDFSRCDIR)/goo/*.h
-@PTEX@	cd $(LIBXPDFDIR)/goo; $(MAKE) $(common_makeargs) libGoo.a
-@PTEX@$(LIBMD5DEP): $(LIBMD5DIR) $(LIBMD5SRCDIR)/md5.c $(LIBMD5SRCDIR)/md5.h
-@PTEX@$(LIBMD5DIR)::
+@PANYTEX@pdflib_sources = $(srcdir)/pdftexdir/*.c $(srcdir)/pdftexdir/*.cc \
+@PANYTEX@	$(srcdir)/pdftexdir/*.h
+@PANYTEX@pdftexdir/libpdf.a: $(pdflib_sources)
+@PANYTEX@	cd pdftexdir && $(MAKE) $(common_makeargs) libpdf.a
+@PANYTEX@$(LIBPNGDIR)/libpng.a: $(LIBPNGSRCDIR)/*.c
+@PANYTEX@	cd $(LIBPNGDIR) && $(MAKE) $(common_makeargs) libpng.a
+@PANYTEX@$(ZLIBDIR)/libz.a: $(ZLIBSRCDIR)
+@PANYTEX@	cd $(ZLIBDIR) && $(MAKE) $(common_makeargs) libz.a
+@PANYTEX@$(LIBXPDFDIR)/xpdf/libxpdf.a: $(LIBXPDFSRCDIR)/xpdf/*.cc \
+@PANYTEX@	$(LIBXPDFSRCDIR)/xpdf/*.h
+@PANYTEX@	cd $(LIBXPDFDIR)/xpdf; $(MAKE) $(common_makeargs) libxpdf.a
+@PANYTEX@$(LIBXPDFDIR)/goo/libGoo.a: $(LIBXPDFSRCDIR)/goo/*.cc \
+@PANYTEX@	$(LIBXPDFSRCDIR)/goo/*.c $(LIBXPDFSRCDIR)/goo/*.h
+@PANYTEX@	cd $(LIBXPDFDIR)/goo; $(MAKE) $(common_makeargs) libGoo.a
+@PANYTEX@$(LIBMD5DEP): $(LIBMD5DIR) $(LIBMD5SRCDIR)/md5.c $(LIBMD5SRCDIR)/md5.h
+@PANYTEX@$(LIBMD5DIR)::
 	 $(SHELL) $(top_srcdir)/../mkinstalldirs $(LIBMD5DIR)
 
 # The web2c program consists of several executables.
@@ -797,7 +803,7 @@ ac_include ../make/tkpathsea.mk
 # 
 # Making dumps.
 all_fmts = tex.fmt $(fmts)
-all_formats = $(all_fmts) $(all_efmts) $(all_ofmts) $(all_pdffmts) $(all_pdfefmts)
+all_formats = $(all_fmts) $(all_efmts) $(all_ofmts) $(all_pdffmts) $(all_pdfefmts) $(all_pdfxfmts)
 all_bases = mf.base $(bases)
 all_mems = mpost.mem $(mems)
 
@@ -894,14 +900,14 @@ install-programs: $(programs)
 	for p in $(programs); do $(INSTALL_LIBTOOL_PROG) $$p $(bindir); done
 
 # The links to {mf,mp,tex} for each format and for {ini,vir}{mf,mp,tex},
-# plus the equivalents for e-TeX, Omega, pdfTeX, and pdfeTeX.
+# plus the equivalents for e-TeX, Omega, and pdf[ex]TeX.
 install-links: install-programs
-	cd $(bindir) && (rm -f initex virtex; \
-	  $(LN) tex initex; $(LN) tex virtex)
-	cd $(bindir) && (rm -f inimf virmf; \
-	  $(LN) mf inimf; $(LN) mf virmf)
-	cd $(bindir) && (rm -f inimpost virmpost; \
-	  $(LN) mpost inimpost; $(LN) mpost virmpost)
+	@FMU@cd $(bindir) && (rm -f initex virtex; \
+	@FMU@  $(LN) tex initex; $(LN) tex virtex)
+	@FMU@cd $(bindir) && (rm -f inimf virmf; \
+	@FMU@  $(LN) mf inimf; $(LN) mf virmf)
+	@FMU@cd $(bindir) && (rm -f inimpost virmpost; \
+	@FMU@  $(LN) mpost inimpost; $(LN) mpost virmpost)
 	fmts="$(fmts)"; \
 	  for f in $$fmts; do base=`basename $$f .fmt`; \
 	    (cd $(bindir) && (rm -f $$base; $(LN) tex $$base)); done
@@ -1035,13 +1041,13 @@ manpages:
 @MAINT@# Remove cruft.
 @MAINT@	cd $(distdir); rm -f $(addsuffix .c, $(programs) tangleboot)
 @MAINT@	cd $(distdir); rm -f $(addsuffix .h, $(programs) tangleboot)
-@MAINT@	cd $(distdir); rm -f etex.ch pdftex.ch pdfetex.ch omega.ch eomega.ch
+@MAINT@	cd $(distdir); rm -f etex.ch pdftex.ch pdfetex.ch pdfxtex.ch omega.ch eomega.ch
 @MAINT@	cd $(distdir); bash -c "rm -f tests/x* tests/allbib.{bbl,blg,dvi,log}"
 @MAINT@	cd $(distdir); bash -c "rm -f $(omega_files) eomegamem.h"
 @MAINT@	cd $(distdir); bash -c "rm -f tangleboot.c *{coerce,d}.h"
 @MAINT@	cd $(distdir); bash -c "rm -f omega*.c eomega*.c"
 @MAINT@	cd $(distdir); bash -c "rm -f tex*.c etex*.c"
-@MAINT@	cd $(distdir); bash -c "rm -f pdftex*.c pdfetex*.c"
+@MAINT@	cd $(distdir); bash -c "rm -f pdftex*.c pdfetex*.c pdfxtex*.c"
 @MAINT@	cd $(distdir); bash -c "rm -f mf*.c mp*.c"
 @MAINT@	cd $(distdir); bash -c "rm -f macnames.c *extra.c"
 @MAINT@	touch $(distdir)/doc/*.info*
@@ -1051,7 +1057,7 @@ manpages:
 @MAINT@	mkdir -p $(distdir)
 @MAINT@	for f in *.web; do ln $$f $(distdir); done
 @MAINT@	rm -f $(distdir)/etex.web $(distdir)/omega.web $(distdir)/eomega.web
-@MAINT@	rm -f $(distdir)/pdftex.web $(distdir)/pdfetex.web
+@MAINT@	rm -f $(distdir)/pdftex.web $(distdir)/pdfetex.web $(distdir)/pdfxtex.web
 @MAINT@	cd $(distdir); bash -c "rm -f $(omega_files)"
 @MAINT@	chmod -w $(distdir)/*
 @MAINT@	GZIP=-9 tar czf web-$(version).tar.gz $(top_distdir)
@@ -1085,9 +1091,10 @@ manpages:
 @MAINT@
 @MAINT@pdftex-dist:
 @MAINT@	rm -rf $(top_distdir)
-@MAINT@	mkdir -p $(distdir)/pdftexdir $(distdir)/pdfetexdir
+@MAINT@	mkdir -p $(distdir)/pdftexdir $(distdir)/pdfetexdir $(distdir)/pdfxtexdir
 @MAINT@	cp -rp pdftexdir/* $(distdir)/pdftexdir
 @MAINT@	cp -rp pdfetexdir/* $(distdir)/pdfetexdir
+@MAINT@	cp -rp pdfxtexdir/* $(distdir)/pdfxtexdir
 @MAINT@	rm -rf $(distdir)/pdf*texdir/CVS $(distdir)/pdf*texdir/*/CVS
 @MAINT@	rm -f $(distdir)/pdf*texdir/Makefile
 @MAINT@	rm -f $(distdir)/pdf*texdir/*.[oa]
@@ -1136,7 +1143,7 @@ installcheck:
 
 # 
 # Cleaning.
-all_subdirs = doc lib man mpware web2c window $(omegafonts) $(otps) $(pdftexdir) $(pdfetexdir)
+all_subdirs = doc lib man mpware web2c window $(omegafonts) $(otps) $(pdftexdir) $(pdfetexdir) $(pdfxtexdir)
 
 # Having a multiple-target rule with the subdir loop fails because of
 # the dependencies introduced by clean.mk.  Yet, we want the

@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writettf.c#13 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#9 $
 */
 
 #include "ptexlib.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writettf.c#13 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#9 $";
 
 typedef signed char     TTF_CHAR;
 typedef unsigned char   TTF_BYTE;
@@ -179,9 +179,9 @@ static FILE *ttf_file;
 static ttfenc_entry ttfenc_tab[MAX_CHAR_CODE + 1];
 
 integer ttf_length;
-#define ttf_putchar     ff_putchar
-#define ttf_offset      ff_offset
-#define ttf_seek_outbuf ff_seek
+#define ttf_putchar     fb_putchar
+#define ttf_offset      fb_offset
+#define ttf_seek_outbuf fb_seek
 
 #define INFILE ttf_file
 
@@ -301,14 +301,14 @@ static void ttf_seek_off(TTF_LONG offset)
 static void ttf_copy_encoding(void)
 {
     int i;
-    char **glyph_names = enc_tab[fm_cur->encoding].glyph_names;
+    char **glyph_names = enc_array[fm_cur->encoding].glyph_names;
     ttfenc_entry *e = ttfenc_tab;
     pdfmarkchar(tex_font, 'a'); /* workaround for a bug of AcroReader 4.0 */
     for (i = 0; i <= MAX_CHAR_CODE; i++, e++) {
         if (pdfcharmarked(tex_font, i))
             e->name = glyph_names[i];
         else
-            e->name = xstrdup(notdef);
+            e->name = (char*) notdef;
     }
 }
 
@@ -352,7 +352,7 @@ static void ttf_read_mapx(void)
         glyph->newindex = -1;
         glyph->newoffset = 0;
         glyph->name_index = 0;
-        glyph->name = xstrdup(notdef);
+        glyph->name = (char*) notdef;
     }
     glyph_index = xtalloc(glyphs_count, short);
     glyph_index[0] = 0; /* index of ".notdef" glyph */
@@ -429,7 +429,7 @@ static void ttf_read_post(void)
     switch (post_format) {
     case 0x10000:
         for (glyph = glyph_tab; glyph - glyph_tab < NMACGLYPHS; glyph++) {
-            glyph->name = xstrdup(mac_glyph_names[glyph - glyph_tab]);
+            glyph->name = (char*)mac_glyph_names[glyph - glyph_tab];
             glyph->name_index = glyph - glyph_tab;
         }
         break;
@@ -446,7 +446,7 @@ static void ttf_read_post(void)
         }
         for (glyph = glyph_tab; glyph - glyph_tab < nnames; glyph++) {
             if (glyph->name_index < NMACGLYPHS)
-                glyph->name = xstrdup(mac_glyph_names[glyph->name_index]);
+                glyph->name = (char*)mac_glyph_names[glyph->name_index];
             else {
                 p = glyph_name_buf;
                 k = glyph->name_index - NMACGLYPHS;
@@ -527,7 +527,7 @@ static void ttf_reset_chksm(tabdir_entry *tab)
         pdftex_warn("offset of `%4.4s' is not a multiple of 4", tab->tag);
 }
 
-extern char *ff_buf_tab;
+extern char *fb_array;
 
 static void ttf_set_chksm(tabdir_entry *tab)
 {
@@ -719,7 +719,7 @@ static void ttf_write_dirtab(void)
     /* adjust checkSumAdjustment */
     tmp_ulong = 0;
     checksum = 0;
-    for (p = ff_buf_tab, i = 0; i < save_offset;) {
+    for (p = fb_array, i = 0; i < save_offset;) {
         tmp_ulong = (tmp_ulong << 8) + *p++;
         i++;
         if (i % 4 == 0) {
@@ -1038,9 +1038,7 @@ void writettf()
         return;
     }
     if (!ttf_open()) {
-        pdftex_warn("cannot open TrueType font file for reading");
-        cur_file_name = 0;
-        return;
+        pdftex_fail("cannot open TrueType font file for reading");
     }
     cur_file_name = (char*)nameoffile + 1;
     if (!is_included(fm_cur))
@@ -1092,9 +1090,7 @@ void writeotf()
     long i;
     set_cur_file_name(fm_cur->ff_name);
     if (!open_input(&ttf_file, kpse_type1_format, FOPEN_RBIN_MODE)) {
-        pdftex_warn("cannot open OpenType font file for reading");
-        cur_file_name = 0;
-        return;
+        pdftex_fail("cannot open OpenType font file for reading");
     }
     cur_file_name = (char*)nameoffile + 1;
     tex_printf("<<%s", cur_file_name);

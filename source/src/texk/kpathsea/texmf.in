@@ -1,4 +1,4 @@
-% TeX Live texmf.cnf
+% original texmf.cnf -- edit at your peril
 % What follows is a super-summary of what this .cnf file can
 % contain. Please read the Kpathsea manual for more information.
 % 
@@ -45,9 +45,13 @@
 % find where to look dynamically.  See the manual and the definition
 % below of TEXMFCNF.
 
-% The main tree, which must be mentioned in $TEXMF, below:
-TEXMFMAIN =			@texmf@
-% A place for local additions to a "standard" texmf tree.  
+% The tree containing the runtime files closely related to the specific
+% program version used:
+TEXMFMAIN = @texmf@
+
+% The main distribution tree:
+TEXMFDIST = @texmf@-dist
+
 TEXMFLOCAL =			@texmf@-local
 
 % User texmf trees can be catered for like this...
@@ -67,7 +71,7 @@ VARTEXMF =			@texmf@-var
 %   TEXMFEXTRA=@texmf@-extra
 % If you set this, add $TEXMFEXTRA in the list below
 %
-TEXMF =			{$HOMETEXMF,!!$VARTEXMF,$TEXMFLOCAL,!!$TEXMFMAIN}
+TEXMF =			{$HOMETEXMF,!!$VARTEXMF,$TEXMFLOCAL,!!$TEXMFMAIN,!!$TEXMFDIST}
 
 % The system trees.  These are the trees that are shared by all the users.
 SYSTEXMF =			$TEXMF
@@ -128,61 +132,63 @@ TEXINPUTS.texinfo =			.;$TEXMF/tex/{texinfo,plain,generic,}//
 TEXINPUTS.eplain  =			.;$TEXMF/tex/{eplain,plain,generic,}//
 
 % e-TeX.  
-TEXINPUTS.latex   =			.;$TEXMF/{etex,tex}/{latex,generic,}//
-TEXINPUTS.etex     =			.;$TEXMF/{etex,tex}/{plain,generic,}//
+TEXINPUTS.latex   =			.;$TEXMF/tex/{latex,generic,}//
+TEXINPUTS.etex     =			.;$TEXMF/tex/{plain,generic,}//
 
 % PDFTeX.  This form of the input paths is borrowed from teTeX.  A certain
 % variant of TDS is assumed here, unaffected by the build variables.
-TEXINPUTS.pdftexinfo =			.;$TEXMF/{pdftex,tex}/{texinfo,plain,generic,}//
-TEXINPUTS.pdftex   =			.;$TEXMF/{pdftex,tex}/{plain,generic,}//
-TEXINPUTS.pdflatex =			.;$TEXMF/{pdfetex,pdftex,etex,tex}/{latex,generic,}//
-TEXINPUTS.pdfetex   =			.;$TEXMF/{pdfetex,pdftex,etex,tex}/{plain,generic,}//
+TEXINPUTS.pdftexinfo =			.;$TEXMF/tex/{texinfo,plain,generic,}//
+TEXINPUTS.pdftex   =			.;$TEXMF/tex/{plain,generic,}//
+TEXINPUTS.pdflatex =			.;$TEXMF/tex/{latex,generic,}//
+TEXINPUTS.pdfetex   =			.;$TEXMF/tex/{plain,generic,}//
+TEXINPUTS.pdfxtex   =			.;$TEXMF/tex/{plain,generic,}//
 
 % Omega.
-TEXINPUTS.lambda =			.;$TEXMF/{omega,tex}/{lambda,latex,generic,}//
-TEXINPUTS.omega =			.;$TEXMF/{omega,tex}/{plain,generic,}//
-TEXINPUTS.elambda =			.;$TEXMF/{eomega,omega,tex}/{lambda,latex,generic,}//
-TEXINPUTS.eomega =			.;$TEXMF/{eomega,omega,tex}/{plain,generic,}//
+TEXINPUTS.lambda =			.;$TEXMF/tex/{lambda,latex,generic,}//
+TEXINPUTS.omega =			.;$TEXMF/tex/{plain,generic,}//
+TEXINPUTS.elambda =			.;$TEXMF/tex/{lambda,latex,generic,}//
+TEXINPUTS.eomega =			.;$TEXMF/tex/{plain,generic,}//
 
 % Context macros by Hans Hagen:
-TEXINPUTS.context   =			.;$TEXMF/{pdfetex,pdftex,etex,tex}/{context,plain,generic,}//
+TEXINPUTS.context   =			.;$TEXMF/tex/{context,plain,generic,}//
 
 % cstex, from Petr Olsak
-TEXINPUTS.cslatex =			.;$TEXMF//tex/{cslatex,csplain,latex,generic,}//
+TEXINPUTS.cslatex =			.;$TEXMF/tex/{cslatex,csplain,latex,generic,}//
 TEXINPUTS.csplain =			.;$TEXMF/tex/{csplain,plain,generic,}//
-TEXINPUTS.pdfcslatex =			.;$TEXMF/{pdftex,tex}/{cslatex,csplain,latex,generic,}//
-TEXINPUTS.pdfcsplain =			.;$TEXMF/{pdftex,cstex,tex}/{csplain,plain,generic,}//
+TEXINPUTS.pdfcslatex =			.;$TEXMF/tex/{cslatex,csplain,latex,generic,}//
+TEXINPUTS.pdfcsplain =			.;$TEXMF/tex/{csplain,plain,generic,}//
 
 % Polish 
-TEXINPUTS.platex  =			.;$TEXMF/{tex}/{platex,latex,generic,}//
-TEXINPUTS.pdfplatex =			.;$TEXMF/{pdftex,tex}/{platex,latex,generic,}//
-TEXINPUTS.pdfmex   =			.;$TEXMF/{pdftex,tex}/{mex,plain,generic,}//
-TEXINPUTS.pdfemex   =			.;$TEXMF/{pdfetex,pdftex,tex}/{mex,plain,generic,}//
+TEXINPUTS.platex  =			.;$TEXMF/tex/{platex,latex,generic,}//
+TEXINPUTS.pdfplatex =			.;$TEXMF/tex/{platex,latex,generic,}//
+TEXINPUTS.pdfmex   =			.;$TEXMF/tex/{mex,plain,generic,}//
+TEXINPUTS.pdfemex   =			.;$TEXMF/tex/{mex,plain,generic,}//
+TEXINPUTS.pdfxmex   =			.;$TEXMF/tex/{mex,plain,generic,}//
 TEXINPUTS.mex   =			.;$TEXMF/tex/{mex,plain,generic,}//
 
 % french
-TEXINPUTS.frlatex =			.;$TEXMF/{mltex,tex}/{french,latex,generic,}//
-TEXINPUTS.frtex   =			.;$TEXMF/{mltex,tex}/{french,plain,generic,}//
-TEXINPUTS.frpdflatex =			.;$TEXMF/{mltex,pdftex,tex}/{french,latex,generic,}//
-TEXINPUTS.frpdftex   =			.;$TEXMF/{mltex,pdftex,tex}/{french,plain,generic,}//
+TEXINPUTS.frlatex =			.;$TEXMF/tex/{french,latex,generic,}//
+TEXINPUTS.frtex   =			.;$TEXMF/tex/{french,plain,generic,}//
+TEXINPUTS.frpdflatex =			.;$TEXMF/tex/{french,latex,generic,}//
+TEXINPUTS.frpdftex   =			.;$TEXMF/tex/{french,plain,generic,}//
 
 % MLTeX
-TEXINPUTS.mltex =			.;$TEXMF/{mltex,tex}/{plain,generic,}//
-TEXINPUTS.mllatex =			.;$TEXMF/{mltex,tex}/{latex,generic,}//
+TEXINPUTS.mltex =			.;$TEXMF/tex/{plain,generic,}//
+TEXINPUTS.mllatex =			.;$TEXMF/tex/{latex,generic,}//
 
 % odd formats  needing their own paths
 TEXINPUTS.lollipop =			.;$TEXMF/tex/{lollipop,generic,plain,}//
 TEXINPUTS.lamstex  =			.;$TEXMF/tex/{lamstex,generic,plain,}//
 
 % David Carlisle's xmltex
-TEXINPUTS.xmltex =			.;$TEXMF/{etex,tex}/{xmltex,latex,generic,}//
-TEXINPUTS.pdfxmltex =			.;$TEXMF/{pdfetex,pdftex,etex,tex}/{xmltex,latex,generic,}//
+TEXINPUTS.xmltex =			.;$TEXMF/tex/{xmltex,latex,generic,}//
+TEXINPUTS.pdfxmltex =			.;$TEXMF/tex/{xmltex,latex,generic,}//
 
 % Sebastian Rahtz' jadetex for DSSSL
-TEXINPUTS.pdfjadetex =			.;$TEXMF/{pdftex,tex}/{jadetex,generic,plain,}//
+TEXINPUTS.pdfjadetex =			.;$TEXMF/tex/{jadetex,generic,plain,}//
 TEXINPUTS.jadetex =			.;$TEXMF/tex/{jadetex,generic,plain,}//
 
-% Earlier entries override later ones, so put this last.
+% The default for all other:
 TEXINPUTS =			.;$TEXMF/tex/{generic,}//
 
 % Metafont, MetaPost inputs.
@@ -226,38 +232,60 @@ GLYPHFONTS =			.;$TEXMF/fonts
 
 % For texfonts.map and included map files used by mktexpk.
 % See ftp://ftp.tug.org/tex/fontname.tar.gz.
-TEXFONTMAPS =			.;$TEXMF/fontname
+TEXFONTMAPS =			.;$TEXMF/fonts/map//
+
 
 % BibTeX bibliographies and style files.
 BIBINPUTS =			.;$TEXMF/bibtex/{bib,}//
 BSTINPUTS =			.;$TEXMF/bibtex/{bst,}//
 
+% For bibtex8. Do we really need to repeat the BIBINPUTS setting?
+BIBINPUTS.bibtex8 =		.;$TEXMF/bibtex/{bib,}//
+BSTINPUTS.bibtex8 =		.;$TEXMF/bibtex/{bst,csf,}//
+
 % PostScript headers, prologues (.pro), encodings (.enc) and fonts;
-% this is also where pdftex finds included figures files!
-TEXPSHEADERS = .;$TEXMF/{{dvips,fonts/{map,enc}/{dvips,}},pdftex,tex,fonts/type1}//
-TEXPSHEADERS.gsftopk = .;$TEXMF/{{dvips,fonts/{map,enc}/{dvips,}},pdftex,tex,fonts/{type1,truetype}}//
+TEXPSHEADERS =			.;$TEXMF/{fonts/{enc,type1},dvips}//
+TEXPSHEADERS.gsftopk =		.;$TEXMF/{fonts/{enc,type1,truetype},dvips}//
 
 % PostScript Type 1 outline fonts.
-T1FONTS =			.;$TEXMF/fonts/{type1,pfb}//;$TEXMF/fonts/misc/hbf//
+T1FONTS =			.;$TEXMF/fonts/type1//
 
 % PostScript AFM metric files.
 AFMFONTS =			.;$TEXMF/fonts/afm//
 
 % TrueType outline fonts.
-TTFONTS =			.;$TEXMF/fonts/{truetype,ttf}//
+TTFONTS =			.;$TEXMF/fonts/truetype//
 TTF2TFMINPUTS =			.;$TEXMF/ttf2pk//
 
 % Type 42 outline fonts.
 T42FONTS =			.;$TEXMF/fonts/type42//
 
+% Ligature definition files.
+LIGFONTS =			.;$TEXMF/fonts/lig//
+
 % A place to puth everything that doesn't fit the other font categories.
 MISCFONTS =			.;$TEXMF/fonts/misc//
 
 % Dvips' config.* files (this name should not start with `TEX'!).
-TEXCONFIG =			$TEXMF/{dvips,fonts/{map,enc}/{dvips,}}//
+TEXCONFIG =			$TEXMF/dvips//
 
 % Makeindex style (.ist) files.
-INDEXSTYLE =			.;$TEXMF/makeindex//;$TEXMF/tex//
+INDEXSTYLE =			.;$TEXMF/makeindex//
+
+% Font encoding files (.enc).
+ENCFONTS = .;$TEXMF/fonts/enc//
+
+% CMap files.
+CMAPFONTS = .;$TEXMF/fonts/cmap//
+
+% Subfont definition files.
+SFDFONTS = .;$TEXMF/fonts/sfd//
+
+% Opentype outline fonts.
+OPENTYPEFONTS = .;$TEXMF/fonts/opentype//
+
+% Pdftex config files:
+PDFTEXCONFIG = .;$TEXMF/pdftex/{$progname,}//
 
 % Used by DMP (ditroff-to-mpx), called by makempx -troff.
 TRFONTS =			/usr/lib/font/devpost
@@ -289,17 +317,16 @@ OVPFONTS =			.;{$TEXMF/fonts,$VARTEXFONTS}/ovp//
 OTPINPUTS =			.;$TEXMF/omega/otp//
 OCPINPUTS =			.;$TEXMF/omega/ocp//
 
-%dvipdfm
-DVIPDFMINPUTS =			.;$TEXMF/{dvipdfm,{dvips,fonts/{map,enc}/{dvips,}}}//
-
 %% t4ht utility, sharing files with TeX4ht
 TEX4HTFONTSET=alias,iso8859
 TEX4HTINPUTS =			.;$TEXMF/tex4ht/base//;$TEXMF/tex4ht/ht-fonts/{$TEX4HTFONTSET}//
 T4HTINPUTS=			.;$TEXMF/tex4ht/base//
-%% The mktex* scripts rely on KPSE_DOT. Do not set it in the environment.
 
-XDVIINPUTS=.;$TEXMF/{xdvi,{dvips,fonts/{map,enc}/{dvips,}}}//
-KPSE_DOT =			.
+% Part for scripts that are distributed/installed in the texmf tree.
+TEXMFSCRIPTS =			$TEXMF/scripts//
+
+%% The mktex* scripts rely on KPSE_DOT. Do not set it in the environment.
+% KPSE_DOT =			.
 
 % Perl, Python, Ruby, Java scripts (Win32 only)
 % This is used by the irun.exe program which simulates a symlink
@@ -390,12 +417,6 @@ openin_any =			a
 % Allow TeX, MF, and MP to parse the first line of an input file for
 % the %&format construct.
 parse_first_line =			t
-
-% Allow TeX, eTeX, Omega to include `src:' specials in the dvi file.
-% These specials are used by viewers to jump from the viewer into
-% the editor at the right page/lineno.
-% Possible values : none auto cr display hbox math par parend vbox
-src_specials =			none
 
 % Disable search on multiple suffixes filenames. In many case, when `foo.bar'
 % is looked for, you do not want to look for `foo.bar.tex' before. This flag

@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writefont.c#12 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#8 $
 */
 
 #include "ptexlib.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writefont.c#12 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#8 $";
 
 key_entry font_keys[FONT_KEYS_NUM] = {
     {"Ascent",       "Ascender",     {0}, false},
@@ -93,10 +93,9 @@ static void getbbox(void)
 void update_enc(internalfontnumber f, char **glyph_names)
 {
     int i;
-    fm_entry *fm = fm_tab + pdffontmap[f];
-    if (fontec[f] > 127 || 
-        (fm >= fm_tab &&
-         (is_reencoded(fm) && (enc_tab + fm->encoding)->updated)))
+    fm_entry *fm = (fm_entry *) pdffontmap[f];
+    if (fontec[f] > 127 || (hasfmentry((fmentryptr) fm) &&
+         (is_reencoded(fm) && (enc_array + fm->encoding)->updated)))
         return;
     for (i = fontbc[f]; i <= 32; i++)
         if (pdfcharmap[f][i] != i) {
@@ -105,10 +104,10 @@ void update_enc(internalfontnumber f, char **glyph_names)
             if (glyph_names[i] != notdef)
                 glyph_names[i + MOVE_CHARS_OFFSET] = xstrdup(glyph_names[i]);
             else
-                glyph_names[i + MOVE_CHARS_OFFSET] = xstrdup(notdef);
+                glyph_names[i + MOVE_CHARS_OFFSET] = (char*) notdef;
         }
     if (is_reencoded(fm))
-        (enc_tab + fm->encoding)->updated = true;
+        (enc_array + fm->encoding)->updated = true;
 }
 
 static void get_char_widths(void)
@@ -143,7 +142,7 @@ static void get_char_widths(void)
             char_widths[i] = 0;
     if (is_reencoded(fm_cur) && pdfmovechars > 0) {
         read_enc(fm_cur->encoding);
-        update_enc(f, (enc_tab + fm_cur->encoding)->glyph_names);
+        update_enc(f, (enc_array + fm_cur->encoding)->glyph_names);
     }
 }
 
@@ -234,7 +233,7 @@ static void write_fontfile(void)
         pdf_printf("/Length1 %i\n/Length2 %i\n/Length3 %i\n",
                    (int)t1_length1, (int)t1_length2, (int)t1_length3);
     pdfbeginstream();
-    ff_flush();
+    fb_flush();
     pdfendstream();
 }
 
@@ -271,7 +270,7 @@ static void write_fontdescriptor(void)
 
             for (i = 0; i <= MAX_CHAR_CODE; i++)
                 if (pdfcharmarked(tex_font, i) && cur_glyph_names[i] != notdef)
-					pdf_printf("/%s", cur_glyph_names[i]);
+                    pdf_printf("/%s", cur_glyph_names[i]);
             pdf_puts(")\n");
         }
         if (is_truetype(fm_cur))
@@ -293,11 +292,11 @@ void dopdffont(integer font_objnum, internalfontnumber f)
     write_ttf_glyph_names = false;
     write_fontfile_only = false;
     without_fontdescriptor = false;
-    if (pdffontmap[tex_font] == -1)
+    if (pdffontmap[tex_font] == 0)
         pdftex_fail("pdffontmap not initialized for font %s", 
                     makecstring(fontname[tex_font]));
-    if (pdffontmap[tex_font] >= 0)
-        fm_cur = fm_tab + pdffontmap[tex_font];
+    if (hasfmentry(pdffontmap[tex_font]))
+        fm_cur = (fm_entry *) pdffontmap[tex_font];
     else
         fm_cur = 0;
     if (fm_cur == 0 || (fm_cur->ps_name == 0 && fm_cur->ff_name == 0)) {
@@ -312,7 +311,7 @@ void dopdffont(integer font_objnum, internalfontnumber f)
 /*         if (!is_truetype(fm_cur) || !indexed_enc(fm_cur)) { */
         if (!is_truetype(fm_cur)) {
             write_enc(0, fm_cur->encoding);
-            encoding_objnum = enc_tab[fm_cur->encoding].objnum;
+            encoding_objnum = enc_array[fm_cur->encoding].objnum;
             if (is_truetype(fm_cur))
                 write_ttf_glyph_names = true;
         }
@@ -347,7 +346,7 @@ void dopdffont(integer font_objnum, internalfontnumber f)
         for (i = 0; i <= MAX_CHAR_CODE; i++)
             if (!pdfcharmarked(tex_font, i) && cur_glyph_names[i] != notdef) {
                 xfree(cur_glyph_names[i]);
-                cur_glyph_names[i] = xstrdup(notdef);
+                cur_glyph_names[i] = (char*) notdef;
             }
         write_enc(cur_glyph_names, encoding_objnum);
         for (i = 0; i <= MAX_CHAR_CODE; i++)

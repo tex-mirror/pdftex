@@ -3,11 +3,15 @@
 # Makefile  : Web2C / Web2C converter
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/02/20 09:45:40 popineau>
+# Time-stamp: <04/01/07 11:12:14 popineau>
 #
 ################################################################################
 root_srcdir = ..\..\..
+!ifdef DEVELOPMENT
+INCLUDE=$(INCLUDE);$(root_srcdir)\texk.development
+!else
 INCLUDE=$(INCLUDE);$(root_srcdir)\texk
+!endif
 
 USE_KPATHSEA = 1
 USE_GNUW32 = 1
@@ -83,7 +87,9 @@ $(proglib): $(lib_sources)
 !include <msvc/clean.mak>
 
 clean::
-	-@$(del) y_tab.c y_tab.h y.output yacc.* $(LEX_OUTPUT_ROOT).c
+	-@echo $(verbose) & ( \
+		for %%i in (y_tab.c y_tab.h y.output yacc.* $(LEX_OUTPUT_ROOT).c) do $(del) %%i $(redir_stderr) \
+	)
 
 !include <msvc/rdepend.mak>
 !include "./depend.mak"

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writet3.c#12 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet3.c#6 $
 */
 
 #include "ptexlib.h"
@@ -30,9 +30,12 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writet3.c#12 $
 #define T3_TYPE_PGC   1
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writet3.c#12 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet3.c#6 $";
 
-static char t3_line[T3_BUF_SIZE], *t3_line_ptr;
+/* define t3_line_ptr, t3_line_array & t3_line_limit */
+typedef char t3_line_entry;
+define_array(t3_line);   
+
 FILE *t3_file;
 static boolean t3_image_used;
 
@@ -48,7 +51,7 @@ static boolean is_pk_font;
 #define t3_close()      xfclose(t3_file, cur_file_name)
 #define t3_getchar()    xgetc(t3_file)
 #define t3_eof()        feof(t3_file)
-#define t3_prefix(s)    (!strncmp(t3_line, s, strlen(s)))
+#define t3_prefix(s)    (!strncmp(t3_line_array, s, strlen(s)))
 #define t3_putchar(c)   pdfout(c)
 
 #define t3_check_eof()                                     \
@@ -59,16 +62,18 @@ static void t3_getline(void)
 {
     int c;
 restart:
-    t3_line_ptr = t3_line;
+    t3_line_ptr = t3_line_array;
     c = t3_getchar();
     while (!t3_eof()) {
-        append_char_to_buf(c, t3_line_ptr, t3_line, T3_BUF_SIZE);
+        alloc_array(t3_line, 1, T3_BUF_SIZE);
+        append_char_to_buf(c, t3_line_ptr, t3_line_array, t3_line_limit);
         if (c == 10)
             break;
         c = t3_getchar();
     }
-    append_eol(t3_line_ptr, t3_line, T3_BUF_SIZE);
-    if (t3_line_ptr - t3_line <= 1 || *t3_line == '%') {
+    alloc_array(t3_line, 2, T3_BUF_SIZE);
+    append_eol(t3_line_ptr, t3_line_array, T3_BUF_SIZE);
+    if (t3_line_ptr - t3_line_array < 2 || *t3_line_array == '%') {
         if (!t3_eof())
             goto restart;
     }
@@ -76,7 +81,7 @@ restart:
 
 static void t3_putline(void)
 {
-    char *p = t3_line;
+    char *p = t3_line_array;
     while (p < t3_line_ptr)
         t3_putchar(*p++);
 }
@@ -110,11 +115,11 @@ static void t3_write_glyph(internalfontnumber f)
     char *p;
     t3_getline();
     if (t3_prefix(t3_begin_glyph_str)) {
-        if (sscanf(t3_line + strlen(t3_begin_glyph_str) + 1,
+        if (sscanf(t3_line_array + strlen(t3_begin_glyph_str) + 1,
                    "%i %i %i %i %i %i %i %i =", &glyph_index,
                    &width, &height, &depth, &llx, &lly, &urx, &ury) != 8) {
-            remove_eol(p, t3_line);
-            pdftex_warn("invalid glyph preamble: `%s'", t3_line);
+            remove_eol(p, t3_line_array);
+            pdftex_warn("invalid glyph preamble: `%s'", t3_line_array);
             return;
         }
         if (glyph_index < fontbc[f] || glyph_index > fontec[f])
@@ -190,10 +195,8 @@ static boolean writepk(internalfontnumber f)
     dpi = kpse_magstep_fix(
              round(fixedpkresolution*(((float)pdffontsize[f])/fontdsize[f])),
              fixedpkresolution, NULL);
-    if ((e = getexpandfactor(f)) != 0)
+    if ((e = pdffontexpandratio[f]) != 0)
         cur_file_name = mk_exname(mk_basename(makecstring(fontname[f])), e);
-    else if (pdffontexpandratio[f] != 0) /* strip down the expansion tag */
-        cur_file_name = mk_basename(makecstring(fontname[f]));
     else /* no expansion */
         cur_file_name = makecstring(fontname[f]);
     name = kpse_find_pk(cur_file_name, (unsigned)dpi, &font_ret);
@@ -280,10 +283,8 @@ void writet3(int objnum, internalfontnumber f)
         t3_char_widths[i] = 0;
     }
     packfilename(fontname[f], getnullstr(), maketexstring(".pgc"));
-    if ((e = getexpandfactor(f)) != 0)
+    if ((e = pdffontexpandratio[f]) != 0)
         cur_file_name = mk_exname(mk_basename(makecstring(makenamestring())), e);
-    else if (pdffontexpandratio[f] != 0) /* strip down the expansion tag */
-        cur_file_name = mk_basename(makecstring(makenamestring()));
     else /* no expansion */
         cur_file_name = makecstring(makenamestring());
     is_pk_font = false;
@@ -298,7 +299,7 @@ void writet3(int objnum, internalfontnumber f)
     tex_printf("<%s", nameoffile + 1);
     t3_getline();
     if (!t3_prefix(t3_font_scale_str) ||
-        sscanf(t3_line + strlen(t3_font_scale_str) + 1, "%g", &t3_font_scale) < 1 ||
+        sscanf(t3_line_array + strlen(t3_font_scale_str) + 1, "%g", &t3_font_scale) < 1 ||
         t3_font_scale <= 0 || t3_font_scale > 1000 ) {
         pdftex_warn("missing or invalid font scale");
         t3_close();

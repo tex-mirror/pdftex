@@ -77,6 +77,14 @@ e-\*(TX's handling of its command-line arguments is similar to that of
 .SH OPTIONS
 This version of e-\*(TX understands the following command line options.
 .TP
+.BI --default-translate-file \ tcxname
+.rb
+Use the default
+.I tcxname
+translation table. The
+.BI --translate-file
+can overwrite this setting.
+.TP
 .BI --efmt \ format
 .rb
 Use
@@ -85,6 +93,10 @@ as the name of the format to be used, instead of the name by which
 e-\*(TX was called or a
 .I %&
 line.
+.TP
+.B --enc
+.rb
+Enable enc\*(TX extension by Petr Olsak, see the file encdoc-e.pdf.
 .TP
 .B --file-line-error-style
 .rb

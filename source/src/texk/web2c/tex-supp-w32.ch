@@ -40,7 +40,7 @@ if c="""" then begin
   quoted_filename:=not quoted_filename;
   more_name:=true;
 end;
-if (c=" ") and (not quoted_filename) then more_name:=false
+if (c=" ") and stop_at_space and (not quoted_filename) then more_name:=false
 else  begin
   if (c="*") then c:=" "
   else if (c="?") then c:="~";

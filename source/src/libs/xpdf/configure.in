@@ -46,11 +46,12 @@ AC_PROG_CC_STDC
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_RANLIB
+AC_PROG_AR
+
 
 dnl ##### Default values for Unix.
 EXE=""
 LIBPREFIX="lib"
-AR="ar rc"
 UP_DIR=""
 
 dnl ##### Check for OS/2.
@@ -62,7 +63,6 @@ xpdf_cv_sys_os2=yes, xpdf_cv_sys_os2=no)])
 if test "$xpdf_cv_sys_os2" = yes; then
   EXE=".exe"
   LIBPREFIX=""
-  AR="ar -rc"
 fi
 
 dnl ##### Check for DOS (with DJGPP).
@@ -74,15 +74,29 @@ xpdf_cv_sys_dos=yes, xpdf_cv_sys_dos=no)])
 if test "$xpdf_cv_sys_dos" = yes; then
   EXE=".exe"
   LIBPREFIX="lib"
-  AR="ar -rc"
   UP_DIR="../"
 fi
 
 dnl ##### Do substitutions.
 AC_SUBST(EXE)
 AC_SUBST(LIBPREFIX)
-AC_SUBST(AR)
 AC_SUBST(UP_DIR)
+
+
+dnl Copied from ../../texk/kpathsea/withenable.ac
+dnl These are standard among *NIX systems, but not when cross-compiling
+AC_DEFUN([CF_SUBST],
+[AC_MSG_CHECKING(for $1 (symbol $2))
+AC_CACHE_VAL(cf_cv_subst_$2,[
+test -z "[$]$2" && $2=$3
+cf_cv_subst_$2=[$]$2])
+$2=${cf_cv_subst_$2}
+AC_MSG_RESULT([$]$2)
+AC_SUBST($2)
+])dnl
+CF_SUBST(loader,LD,ld)
+CF_SUBST(archiver,AR,ar)
+CF_SUBST(archiver options,ARFLAGS,rc)
 
 dnl ##### Checks for header files.
 AC_PATH_XTRA

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftex.defines#13 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#9 $
 }
 
 { pdftex.defines: additions for pdfTeX }
@@ -32,20 +32,19 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftex.defines#13 $
 @define procedure pdfmarkchar();
 @define procedure writepdf();
 
-{ functions from config.c }
-@define function cfgpar();
-@define function iscfgtruedimen();
-@define procedure readconfigfile;
-
 { functions from mapfile.c }
+@define function hasfmentry();
 @define function fmlookup();
 @define function tfmoffm();
 @define procedure checkextfm();
 @define procedure pdfmapfile();
+@define procedure pdfmapline();
+@define procedure pdfinitmapfile();
 
 { functions from utils.c }
 @define function getresnameprefix;
 @define procedure setjobid();
+@define procedure makepdftexbanner;
 @define function extxnoverd();
 @define procedure libpdffinish;
 @define procedure writestreamlength();
@@ -86,5 +85,9 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftex.defines#13 $
 
 { functions from writezip.c }
 @define procedure writezip();
+
+{ functions from avlstuff.c }
+@define procedure avlputobj();
+@define function avlfindobj();
 
 { end of pdftex.defines }

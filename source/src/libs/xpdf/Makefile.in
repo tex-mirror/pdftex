@@ -2,7 +2,7 @@ all:
 	(cd xpdf; $(MAKE) libxpdf.a)
 	(cd goo; $(MAKE) libGoo.a)
 
-mostlyclean clean:
+mostlyclean clean depend:
 	(cd xpdf; $(MAKE) $@)
 	(cd goo; $(MAKE) $@)
 

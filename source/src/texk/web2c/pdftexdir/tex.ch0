@@ -17,12 +17,11 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/tex.ch0#10 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/tex.ch0#6 $
 %
 % Change file to assist in creating the web2c-specific change file.
 % This one comes first, resolves inconsistencies between the generated
 % pdftex.web and tex.ch
-% Public domain.
 
 @x [2] - This change is made for TeX 3.141592
 @d banner=='This is pdfTeX, Version 3.141592','-',pdftex_version_string

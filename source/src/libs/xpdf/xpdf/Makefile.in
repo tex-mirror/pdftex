@@ -6,16 +6,17 @@
 #
 # Heavily modified for pdftex by Thomas Esser, 1998, 1999
 #
-# $Id$
+# $Id: //depot/Build/source.development/TeX/libs/xpdf/xpdf/Makefile.in#21 $
 #========================================================================
 
 VPATH = @srcdir@
 srcdir = @srcdir@
 
 goodir = $(srcdir)/../goo
+parentdir = $(srcdir)/..
 
 CXXFLAGS = @CXXFLAGS@
-ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ $(XCFLAGS) -I.. -I$(goodir) -I. -I$(srcdir) -DPDF_PARSER_ONLY -DNO_DECRYPTION
+ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ $(XCFLAGS) -I.. -I$(parentdir) -I$(goodir) -I. -I$(srcdir) -DPDF_PARSER_ONLY
 
 CXX = @CXX@
 

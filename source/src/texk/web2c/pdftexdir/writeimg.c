@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writeimg.c#14 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#12 $
 */
 
 #include "ptexlib.h"
@@ -26,12 +26,12 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writeimg.c#14 $
 #include <kpathsea/c-memstr.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writeimg.c#14 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#12 $";
     
 #define bp2int(p)    round(p*(onehundredbp/100.0))
 
-image_entry *image_ptr, *image_tab = 0;
-integer image_max;
+/* define image_ptr, image_array & image_limit */
+define_array(image);   
 
 float epdf_width;
 float epdf_height;
@@ -45,7 +45,7 @@ void *epdf_doc;
 
 static integer new_image_entry(void)
 {
-    entry_room(image, 1, 256);
+    alloc_array(image, 1, SMALL_BUF_SIZE);
     image_ptr->image_type = IMAGE_TYPE_NONE;
     image_ptr->color_type = 0;
     image_ptr->num_pages = 0;
@@ -53,7 +53,7 @@ static integer new_image_entry(void)
     image_ptr->y_res = 0;
     image_ptr->width = 0;
     image_ptr->height = 0;
-    return image_ptr++ - image_tab;
+    return image_ptr++ - image_array;
 }
 
 integer imagecolor(integer img)
@@ -345,5 +345,5 @@ void deleteimage(integer img)
 
 void img_free() 
 {
-    xfree(image_tab);
+    xfree(image_array);
 }

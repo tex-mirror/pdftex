@@ -3,11 +3,15 @@
 # Makefile  : Web2C / pdftexdir
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/08/13 10:18:05 popineau>
+# Time-stamp: <04/03/08 09:00:31 popineau>
 #
 ################################################################################
 root_srcdir = ..\..\..
+!ifdef DEVELOPMENT
+INCLUDE=$(INCLUDE);$(root_srcdir)\texk.development
+!else
 INCLUDE=$(INCLUDE);$(root_srcdir)\texk
+!endif
 
 
 USE_XPDF = 1
@@ -23,8 +27,9 @@ USE_KPATHSEA = 1
 
 DEFS = -I.. -I$(top_srcdir) $(DEFS) -DMAKE_TEX_DLL -DHAVE_CONFIG_H -DpdfTeX
 
-objects = $(objdir)\epdf.obj $(objdir)\mapfile.obj $(objdir)\papersiz.obj       \
-	$(objdir)\utils.obj $(objdir)\config.obj $(objdir)\vfpacket.obj      \
+objects = $(objdir)\avl.obj $(objdir)\avlstuff.obj $(objdir)\epdf.obj 	     \
+	$(objdir)\mapfile.obj $(objdir)\papersiz.obj       		     \
+	$(objdir)\utils.obj $(objdir)\vfpacket.obj			     \
 	$(objdir)\pkin.obj $(objdir)\writefont.obj $(objdir)\writet1.obj     \
 	$(objdir)\writet3.obj $(objdir)\writezip.obj $(objdir)\writeenc.obj  \
 	$(objdir)\writettf.obj $(objdir)\writejpg.obj $(objdir)\writepng.obj \

@@ -1,4 +1,4 @@
-AC_INIT(texk/web2c/tex.web)
+AC_INIT(texk/make/common.mk)
 
 AC_CONFIG_AUX_DIR(config)
 AC_SET_MAKE
@@ -46,17 +46,17 @@ sinclude(withenable.ac)
 sinclude(utils/dialog/withenable.ac)
 sinclude(texk/withenable.ac)
 sinclude(texk/kpathsea/withenable.ac)
-sinclude(texk/kpathsea/xt.ac)
+dnl xdvik's xt.ac has much more to offer
+dnl sinclude(texk/kpathsea/xt.ac)
 sinclude(texk/web2c/withenable.ac)
 sinclude(texk/xdvik/withenable.ac)
-sinclude(libs/libwww/withenable.ac)
+sinclude(texk/xdvik/xt.ac)
 sinclude(libs/ncurses/withenable.ac)
 sinclude(libs/libpng/withenable.ac)
 sinclude(libs/t1lib/withenable.ac)
 sinclude(libs/zlib/withenable.ac)
 sinclude(libs/freetype/withenable.ac)
 
-LIBWWWDIR=libs/libwww
 NCURSESDIR=libs/ncurses
 LIBT1DIR=libs/t1lib
 LIBTYPE1DIR=libs/type1
@@ -67,12 +67,6 @@ FREETYPEDIR=libs/freetype
 
 test "$no_x" = yes && { with_xdvik=no; with_oxdvik=no; }
 export with_xdvik with_oxdvik
-
-# we need libwww for xdvik and oxdvik
-test ! -d $srcdir/$LIBWWWDIR  && : ${needs_libwww=no}
-test "$with_xdvik"   != no    && : ${needs_libwww=yes}
-test "$with_oxdvik"  != no    && : ${needs_libwww=yes}
-: ${needs_libwww=no}
 
 # we need libt1 for xdvik and oxdvik
 test ! -d $srcdir/$LIBT1DIR   && : ${needs_libt1=no}
@@ -85,23 +79,26 @@ test ! -d $srcdir/$NCURSESDIR && : ${needs_ncurses=no}
 test "$with_dialog"  != no    && : ${needs_ncurses=yes}
 : ${needs_ncurses=no}
 
-# we need pnglib for pdftex and pdfetex
+# we need pnglib for pdf[ex]tex
 test ! -d $srcdir/$LIBPNGDIR  && : ${needs_pnglib=no}
 test "$with_pdftex"  != no    && : ${needs_pnglib=yes}
 test "$with_pdfetex" != no    && : ${needs_pnglib=yes}
+test "$with_pdfxtex" != no    && : ${needs_pnglib=yes}
 : ${needs_pnglib=no}
 
-# we need zlib for texinfo, pdftex and pdfetex
+# we need zlib for texinfo and pdf[ex]tex
 test ! -d $srcdir/$ZLIBDIR    && : ${needs_zlib=no}
 test "$with_pdftex"  != no    && : ${needs_zlib=yes}
 test "$with_pdfetex" != no    && : ${needs_zlib=yes}
+test "$with_pdfxtex" != no    && : ${needs_zlib=yes}
 test "$with_texinfo" != no    && : ${needs_zlib=yes}
 : ${needs_zlib=no}
 
-# we need libxpdf for pdftex and pdfetex
+# we need libxpdf for pdf[ex]tex
 test ! -d $srcdir/$LIBXPDFDIR && : ${needs_libxpdf=no}
 test "$with_pdftex"  != no    && : ${needs_libxpdf=yes}
 test "$with_pdfetex"  != no    && : ${needs_libxpdf=yes}
+test "$with_pdfxtex"  != no    && : ${needs_libxpdf=yes}
 : ${needs_libxpdf=no}
 
 # we need freetype for ttf2pk
@@ -111,23 +108,20 @@ test "$with_ttf2pk" = no        && : ${needs_freetype=no}
 : ${needs_freetype=yes}
 
 export needs_ncurses needs_pnglib needs_zlib
-export needs_libwww needs_libxpdf
+export needs_libxpdf
 export needs_libt1 needs_freetype
 
 dnl We cannot use variables (e.g. $LIBPNGDIR) for sinclude, so...
 sinclude(libs/libpng/libpng.ac)
 sinclude(libs/zlib/zlib.ac)
-sinclude(libs/libwww/libwww.ac)
 sinclude(libs/ncurses/ncurses.ac)
 sinclude(libs/xpdf/libxpdf.ac)
 sinclude(libs/t1lib/t1lib.ac)
 sinclude(libs/freetype/freetype.ac)
 
-LIBSDEP="$LIBWWWDEP $CURSESDEP $ZLIBDEP $LIBPNGDEP $LIBXPDFDEP $LIBT1DEP $FREETYPEDEP"
+LIBSDEP="$CURSESDEP $ZLIBDEP $LIBPNGDEP $LIBXPDFDEP $LIBT1DEP $FREETYPEDEP"
 
 LIBSDIRS=
-test "$needs_libwww" = yes && test "$using_system_wwwlib"  != yes \
-  && LIBSDIRS="$LIBWWWDIR $LIBSDIRS"
 test "$needs_ncurses" = yes && test "$using_system_ncurses" != yes \
   && LIBSDIRS="$NCURSESDIR $LIBSDIRS"
 test "$needs_pnglib" = yes && test "$using_system_pnglib" != yes \
@@ -141,7 +135,7 @@ test "$needs_libt1" = yes \
 test "$needs_freetype" = yes \
   && LIBSDIRS="$FREETYPEDIR $LIBSDIRS"
 
-PKGS='texinfo dialog t1utils mminstance psutils'
+PKGS='texinfo dialog t1utils lcdf-typetools psutils'
 ESUBDIRS=
 for pkg in $PKGS; do
   if test -d $srcdir/utils/$pkg; then
@@ -156,8 +150,8 @@ AC_SUBST(ESUBDIRS)
 AC_SUBST(LIBSDEP)
 AC_SUBST(LIBSDIRS)
 
-# initialize texmf tree with fmtutil only for teTeX
-if test -d $srcdir/utils/TeXLive || test ! -d $srcdir/texk/tetex; then
+# initialize texmf tree with fmtutil only for teTeX and TeX Live
+if test ! -d $srcdir/texk/tetex; then
   FMU=
 else
   FMU='# '

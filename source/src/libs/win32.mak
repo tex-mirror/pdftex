@@ -3,11 +3,15 @@
 # Makefile  : fpTeX libraries
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/07/22 05:10:55 popineau>
+# Time-stamp: <03/10/12 18:50:34 popineau>
 #
 ################################################################################
 root_srcdir = ..
+!ifdef DEVELOPMENT
+INCLUDE=$(INCLUDE);$(root_srcdir)\texk.development
+!else
 INCLUDE=$(INCLUDE);$(root_srcdir)\texk
+!endif
 
 !include <msvc/common.mak>
 
@@ -15,7 +19,7 @@ prereqfiles = \
 	"$(MSDEV)\Visual Studio .NET Enterprise Architect 2003 - English\MSVCP71.dll" \
 	"$(MSDEV)\Visual Studio .NET Enterprise Architect 2003 - English\MSVCR71.dll" \
 	"c:\Windows\System32\MFC71.dll" \
-	c:\Local\ActiveState\Perl\bin\perl58.dll \
+	c:\Local\Perl\bin\perl58.dll \
 #	$(jpegdll) \
 #	$(pngdll) \
 #	$(zlibdll) \

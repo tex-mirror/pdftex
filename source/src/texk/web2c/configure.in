@@ -30,7 +30,14 @@ AC_PROG_MAKE_SET
 
 AC_PROG_YACC
 AC_PROG_LEX
-test "x$LEX" = xflex && LEX='flex -l'
+
+# Work around a problem with Flex Version 2.5.31 which needs -l flag.
+# Since all versions of flex support -l, don't check for the
+# specific version. We also need to catch LEX=/some/where/flex, so:
+case $LEX in
+  *flex) LEX="$LEX -l" ;;
+esac
+
 AC_PROG_RANLIB
 AC_CHECK_HEADERS(sys/time.h sys/timeb.h)
 AC_CHECK_FUNCS(strerror gettimeofday ftime mkstemp mktemp)
@@ -155,8 +162,21 @@ else
   with_pdfetex=no
 fi
 
+# For pdfxTeX
+if test -d $srcdir/pdfxtexdir && test -d $srcdir/pdftexdir \
+    && test -d $srcdir/etexdir; then
+  test "${with_pdfxtex+set}" = set || with_pdfxtex=yes
+else
+  if test "x$with_pdfxtex" = xyes; then
+    AC_MSG_WARN(Not all sources of pdfxTeX are available.)
+  fi
+  with_pdfxtex=no
+fi
+
 # Check whether C++ compiler works.  Prevent exit if it doesn't.
-if test "x$with_pdftex" = xyes || test "x$with_pdfetex" = xyes; then
+if test "x$with_pdftex" = xyes ||
+   test "x$with_pdfetex" = xyes ||
+   test "x$with_pdfxtex" = xyes; then
   # First test whether the compiler works in a subshell, and if so,
   # do it again in the main shell so we see the result.
 (
@@ -168,14 +188,17 @@ if test "x$with_pdftex" = xyes || test "x$with_pdfetex" = xyes; then
     && AC_MSG_WARN(No C++ compiler: pdfTeX will not be compiled.)
   test "x$with_pdfetex" = xyes \
     && AC_MSG_WARN(No C++ compiler: pdfeTeX will not be compiled.)
+  test "x$with_pdfxtex" = xyes \
+    && AC_MSG_WARN(No C++ compiler: pdfxTeX will not be compiled.)
   with_pdftex=no
   with_pdfetex=no
+  with_pdfxtex=no
   true
 }
 fi
 
 # Check if we can link the C++ runlime lib statically. Only check, if we are
-# going to build pdftex or pdfetex. And, only try the magic hack, if C++ is
+# going to build pdf[ex]tex. And, only try the magic hack, if C++ is
 # GNU C++ (i.e. if $ac_cv_prog_gxx=yes). The reason for using a static C++
 # runtime is that binaries are more portable. That's only important if you are
 # planning to distribute binaries, so all the neat stuff is disabled by default:
@@ -185,7 +208,9 @@ CXXLDEXTRA=
 CXXHACKLINK='$(kpathsea_cxx_link)'
 CXXHACKLDLIBS='$(LOADLIBES)'
 if test "x$with_cxx_runtime_hack" = xyes &&
-   { test "x$with_pdftex" = xyes || test "x$with_pdfetex" = xyes; }; then
+   { test "x$with_pdftex" = xyes ||
+     test "x$with_pdfetex" = xyes ||
+     test "x$with_pdfxtex" = xyes; }; then
   AC_MSG_CHECKING(for statically linking C++ runtime library)
 
   cpp_link_hack=false
@@ -247,6 +272,24 @@ else
   PETEX='#! '
 fi
 AC_SUBST(PETEX)
+
+if test "x$with_pdfxtex" = xyes; then
+  PXTEX=
+else
+  PXTEX='#! '
+fi
+AC_SUBST(PXTEX)
+
+if test "x$with_pdftex" = xyes ||
+   test "x$with_pdfetex" = xyes ||
+   test "x$with_pdfxtex" = xyes; then
+  PANYTEX=
+  with_some_pdftex=yes
+else
+  PANYTEX='#! '
+  with_some_pdftex=no
+fi
+AC_SUBST(PANYTEX)
 
 # For e-TeX, three choices: no, yes, and tex.  In the latter case, we
 # have to comment out the normal TeX build (TEX), as well as enable the
@@ -310,13 +353,18 @@ fi
 AC_SUBST(FMU)
 
 # Don't bother with pdflib unless pdfTeX is requested.
-if test "$with_pdftex" = yes; then
+if test "$with_some_pdftex" = yes; then
   libpdfmakefile=pdftexdir/Makefile
 fi
 
 # Don't bother with pdfelib unless pdfeTeX is requested.
 if test "$with_pdfetex" = yes; then
   libpdfemakefile=pdfetexdir/Makefile
+fi
+
+# Don't bother with pdfxlib unless pdfxTeX is requested.
+if test "$with_pdfxtex" = yes; then
+  libpdfxmakefile=pdfxtexdir/Makefile
 fi
 
 dnl Create tests subdirectory.
@@ -326,8 +374,9 @@ test -d tests || mkdir tests
 AC_CHECK_LIB(m, main)
 
 dnl Generate `Makefile's, `config.status', and our header file.
-AC_OUTPUT(Makefile doc/Makefile lib/Makefile man/Makefile mpware/Makefile 
+AC_OUTPUT(Makefile doc/Makefile lib/Makefile man/Makefile mpware/Makefile
           web2c/Makefile window/Makefile $libpdfmakefile $libpdfemakefile
-          $omegafontsmakefile $otpsmakefile fmtutil.cnf:fmtutil.in)
+          $libpdfxmakefile $omegafontsmakefile $otpsmakefile
+          fmtutil.cnf:fmtutil.in)
 dnl Update stamp-auto, since we just remade `c-auto.h'.
 date >stamp-auto

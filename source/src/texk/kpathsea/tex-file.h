@@ -92,6 +92,13 @@ typedef enum
   kpse_miscfonts_format,
   kpse_web_format,
   kpse_cweb_format,
+  kpse_enc_format,
+  kpse_cmap_format,
+  kpse_sfd_format,
+  kpse_opentype_format,
+  kpse_pdftex_config_format,
+  kpse_lig_format,
+  kpse_texmfscripts_format,
   kpse_last_format /* one past last index */
 } kpse_file_format_type;
 
