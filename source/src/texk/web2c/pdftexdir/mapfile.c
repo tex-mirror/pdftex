@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#25 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#26 $
 */
 
 #include <math.h>
@@ -27,7 +27,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#25 $
 #include "avlstuff.h"
 
 static const char perforce_id[] =
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#25 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/mapfile.c#26 $";
 
 #define FM_BUF_SIZE     1024
 
@@ -672,6 +672,17 @@ static boolean used_tfm(fm_entry *p)
 {
     internalfontnumber f;
     strnumber s;
+    ff_entry *ff;
+
+    /* check if the font file is not a TrueType font */
+    if (is_truetype(p))
+        return false;
+
+    /* check if the font file is available */
+    ff = check_ff_exist(p); 
+    if (ff->ff_path == NULL)
+        return false;
+
     /* check whether this font has been used */
     if (fontused[p->tfm_num])
         return true;
@@ -721,9 +732,8 @@ static boolean used_tfm(fm_entry *p)
 /* lookup_ps_name looks for an entry with a given ps name + slant + extend.
  * As there may exist several such entries, we need to select the `right'
  * one. We do so by checking all such entries and return the first one that
- * fulfills the following criteria:
+ * fulfils the following criteria (in descending priority):
  *
- * - the font file is available, and (in descending priority):
  * - the tfm has been used (some char from this font has been typeset)
  * - the tfm has been loaded (but not used yet)
  * - the tfm can be loaded (but not loaded yet)
@@ -733,7 +743,6 @@ static boolean used_tfm(fm_entry *p)
 static fm_entry *lookup_ps_name(fm_entry *fm)
 {
     fm_entry *p, *p2;
-    ff_entry *ff;
     struct avl_traverser t, t2;
     strnumber s;
     int a;
@@ -752,16 +761,14 @@ static fm_entry *lookup_ps_name(fm_entry *fm)
 
     /* search forward */
     do {
-        ff = check_ff_exist(p);
-        if (ff->ff_path != NULL && used_tfm(p))
+        if (used_tfm(p))
             return p;
         p = avl_t_next(&t);
     } while (p != NULL && comp_fm_entry_ps(fm, p, NULL) == 0);
 
     /* search backward */
     while (p2 != NULL && comp_fm_entry_ps(fm, p2, NULL) == 0) {
-        ff = check_ff_exist(p2);
-        if (ff->ff_path != NULL && used_tfm(p2))
+        if (used_tfm(p2))
             return p2;
         p2 = avl_t_prev(&t2);
     }
