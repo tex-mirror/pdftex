@@ -7,7 +7,7 @@
 # te@dbs.uni-hannover.de, kb@mail.tug.org, and infovore@xs4all.nl.
 # Public domain.
 
-version='$Id: mktexmf,v 1.24 2002/10/22 18:34:15 olaf Exp $'
+version='$Id: mktexmf,v 1.25 2003/02/27 21:00:37 olaf Exp $'
 progname=`echo $0 | sed 's%.*/%%'`
 usage="Usage: $progname FONT.
 

@@ -305,34 +305,14 @@ CONST_FACTOR:
 STRING:
 	  string_literal_tok
             { 
-              int i, j; char s[132];
-              j = 1;
-              s[0] = '"';
-              for (i=1; yytext[i-1] != 0; i++) {
-                if (yytext[i] == '\\' || yytext[i] == '"')
-                  s[j++] = '\\';
-                else if (yytext[i] == '\'')
-                  i++;
-                s[j++] = yytext[i];
-              }
-              s[j-1] = '"';
-              s[j] = 0;
+              char s[132];
+              get_string_literal(s);
               my_output (s);
             }
 	| single_char_tok
             { 
               char s[5];
-              s[0]='\'';
-              if (yytext[1] == '\\' || yytext[1] == '\'') {
-                s[1] = '\\';
-                s[2] = yytext[1];
-                s[3] = '\'';
-                s[4] = 0;
-              } else {
-                s[1] = yytext[1];
-                s[2] = '\'';
-                s[3] = 0;
-              }
+              get_single_char(s);
               my_output (s);
             }
 	;
@@ -805,7 +785,7 @@ FUNCTION_HEAD:
             }
           RESULT_TYPE
             { 
-              strcpy(fn_return_type, yytext);
+              get_result_type(fn_return_type);
               do_proc_args();
               gen_function_head();
             }
@@ -826,7 +806,7 @@ FUNCTION_HEAD:
               array_offset[0] = 0;
             }
           RESULT_TYPE
-            { strcpy(fn_return_type, yytext);
+            { get_result_type(fn_return_type);
               do_proc_args();
               gen_function_head();
             }

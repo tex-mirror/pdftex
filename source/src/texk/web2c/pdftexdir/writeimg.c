@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writeimg.c#14 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#14 $
 */
 
 #include "ptexlib.h"
@@ -26,12 +26,12 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writeimg.c#14 $
 #include <kpathsea/c-memstr.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writeimg.c#14 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#14 $";
     
 #define bp2int(p)    round(p*(onehundredbp/100.0))
 
-image_entry *image_ptr, *image_tab = 0;
-integer image_max;
+/* define image_ptr, image_array & image_limit */
+define_array(image);   
 
 float epdf_width;
 float epdf_height;
@@ -45,7 +45,7 @@ void *epdf_doc;
 
 static integer new_image_entry(void)
 {
-    entry_room(image, 1, 256);
+    alloc_array(image, 1, SMALL_BUF_SIZE);
     image_ptr->image_type = IMAGE_TYPE_NONE;
     image_ptr->color_type = 0;
     image_ptr->num_pages = 0;
@@ -53,7 +53,7 @@ static integer new_image_entry(void)
     image_ptr->y_res = 0;
     image_ptr->width = 0;
     image_ptr->height = 0;
-    return image_ptr++ - image_tab;
+    return image_ptr++ - image_array;
 }
 
 integer imagecolor(integer img)
@@ -236,7 +236,7 @@ integer readimage(strnumber s, integer page_num, strnumber page_name,
                   integer pdfversion, integer pdfoptionalwaysusepdfpagebox,
                   integer pdf_option_pdf_inclusion_errorlevel)
 {
-    char *dest = 0;
+    char *dest = NULL;
     integer img = new_image_entry();
 
     /* need to allocate new string as makecstring's buffer is 
@@ -250,15 +250,15 @@ integer readimage(strnumber s, integer page_num, strnumber page_name,
       char *p = cur_file_name;
       char *q = cur_file_name;
       while (p && *p) {
-	*q = (*p == '"' ? *(++p) : *p);
-	p++, q++;
+    *q = (*p == '"' ? *(++p) : *p);
+    p++, q++;
       }
       *q = '\0';
     }
     fprintf(stderr, " %s\n", cur_file_name);
 #endif
     img_name(img) = kpse_find_file(cur_file_name, kpse_tex_format, true);
-    if (img_name(img) == 0)
+    if (img_name(img) == NULL)
         pdftex_fail("cannot find image file");
     /* type checks */
     checktypebyheader(img);
@@ -269,7 +269,7 @@ integer readimage(strnumber s, integer page_num, strnumber page_name,
         pdf_ptr(img) = xtalloc(1, pdf_image_struct);
         pdf_ptr(img)->page_box = pdflastpdfboxspec;
         pdf_ptr(img)->always_use_pdfpagebox = pdfoptionalwaysusepdfpagebox;
-	    page_num = read_pdf_info(img_name(img), dest, page_num, 
+        page_num = read_pdf_info(img_name(img), dest, page_num, 
                                      pdfversion, pdfoptionalwaysusepdfpagebox,
                                      pdf_option_pdf_inclusion_errorlevel);
         img_width(img) = bp2int(epdf_width);
@@ -293,7 +293,7 @@ integer readimage(strnumber s, integer page_num, strnumber page_name,
         pdftex_fail("unknown type of image");
     }
     xfree(dest);
-    cur_file_name = 0;
+    cur_file_name = NULL;
     return img;
 }
 
@@ -319,7 +319,7 @@ void writeimage(integer img)
         pdftex_fail("unknown type of image");
     }
     tex_printf(">");
-    cur_file_name = 0;
+    cur_file_name = NULL;
 }
 
 void deleteimage(integer img)
@@ -345,5 +345,5 @@ void deleteimage(integer img)
 
 void img_free() 
 {
-    xfree(image_tab);
+    xfree(image_array);
 }

@@ -3,7 +3,7 @@
 # Makefile  : pdfeTeX, web2c win32.mak makefile fragment to build pdfe-TeX
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/08/17 15:32:39 popineau>
+# Time-stamp: <04/03/20 17:02:03 popineau>
 #
 ################################################################################
 
@@ -35,6 +35,8 @@ $(objdir)\pdfetex.exe: $(pdfetex_o) $(objdir)\win32main.obj $(objdir)\pdfetex.re
 	$(link) $(**) $(socketlibs) $(conlibs)
 !endif
 
+pdfetex: $(pdfetex)
+
 # C file dependencies.
 $(pdfetex_c) pdfetexcoerce.h pdfetexd.h: pdfetex.p $(web2c_texmf)
 	$(web2c) pdfetex
@@ -50,6 +52,8 @@ pdfetex_files = \
 	 etexdir\etex.ch1 \
          pdfetexdir\pdfetex.ch1 \
          pdftexdir\pdftex.ch \
+         pdftexdir/hz.ch \
+         pdftexdir/misc.ch \
          pdfetexdir\pdfetex.ch2
 
 pdfetex_changefiles = \
@@ -61,7 +65,8 @@ pdfetex_changefiles = \
 	    etexdir\tex.ch2 \
 	    pdfetexdir\tex.ch1 \
 	    pdftexdir\tex.pch \
-	    pdfetexdir\tex.ch2
+	    pdfetexdir\tex.ch2 \
+#	    pdfetexdir\tex.ch3
 
 # Generation of the web and ch files.
 pdfetex.web: $(objdir)\tie.exe tex.web $(pdfetex_files) \
@@ -85,49 +90,51 @@ pdfetex-check: pdfetex pdfetex.efmt
 clean:: pdfetex-clean
 pdfetex-clean:
 #	$(LIBTOOL) --mode=clean $(RM) pdfetex
-	-@$(del) $(pdfetex_o) $(pdfetex_c) pdfetexextra.c pdfetexcoerce.h $(redir_stderr)
-	-@$(del) pdfetexd.h pdfetex.p pdfetex.pool pdfetex.web pdfetex.ch $(redir_stderr)
-	-@$(del) pdfetex.efmt pdfetex.log $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(pdfetex_o) $(pdfetex_c) pdfetexextra.c pdfetexcoerce.h \
+			    pdfetexd.h pdfetex.p pdfetex.pool pdfetex.web pdfetex.ch \
+			    pdfetex.efmt pdfetex.log) do $(del) %%i $(redir_stderr) \
+	)
 
 # Dumps
-all_pdfefmts = pdfetex.efmt $(pdfefmts)
-pdfefmts: $(all_pdfefmts)
+# all_pdfefmts = pdfetex.efmt $(pdfefmts)
+# pdfefmts: $(all_pdfefmts)
 
-pdfetex.efmt: $(pdfetex)
-	$(dumpenv) $(make) progname=pdfetex files="etex.src plain.tex cmr10.tfm" prereq-check
-	$(dumpenv) ./pdfetex --progname=pdfetex --jobname=pdfetex --ini "*\pdfoutput=1\input etex.src \dump" <nul
-
-pdfelatex.efmt: $(pdfetex)
-	$(dumpenv) $(make) progname=pdfelatex files="latex.ltx" prereq-check
-	$(dumpenv) ./pdfetex --progname=pdfelatex --jobname=pdfelatex --ini "*\pdfoutput=1\input latex.ltx" <nul
-
-pdflatex.efmt: $(pdfetex)
-	$(dumpenv) $(make) progname=pdflatex files="latex.ltx" prereq-check
-	$(dumpenv) ./pdfetex --progname=pdflatex --jobname=pdflatex --ini "*\pdfoutput=1\input latex.ltx" <nul
+# pdfetex.efmt: $(pdfetex)
+# 	$(dumpenv) $(make) progname=pdfetex files="etex.src plain.tex cmr10.tfm" prereq-check
+# 	$(dumpenv) ./pdfetex --progname=pdfetex --jobname=pdfetex --ini "*\pdfoutput=1\input etex.src \dump" <nul
+# 
+# pdfelatex.efmt: $(pdfetex)
+# 	$(dumpenv) $(make) progname=pdfelatex files="latex.ltx" prereq-check
+# 	$(dumpenv) ./pdfetex --progname=pdfelatex --jobname=pdfelatex --ini "*\pdfoutput=1\input latex.ltx" <nul
+# 
+# pdflatex.efmt: $(pdfetex)
+# 	$(dumpenv) $(make) progname=pdflatex files="latex.ltx" prereq-check
+# 	$(dumpenv) ./pdfetex --progname=pdflatex --jobname=pdflatex --ini "*\pdfoutput=1\input latex.ltx" <nul
 
 # 
 # Installation.
 install-pdfetex: install-pdfetex-exec install-pdfetex-data
 install-pdfetex-exec: install-pdfetex-links
-@FMU@install-pdfetex-data: install-pdfetex-dumps
+# install-pdfetex-data: install-pdfetex-dumps
 install-pdfetex-dumps: install-pdfetex-fmts
 
 # The actual binary executables and pool files.
-install-prograns: install-pdfetex-programs
+install-programs: install-pdfetex-programs
 install-pdfetex-programs: $(pdfetex) $(bindir)
 	-@echo $(verbose) & ( \
 	  for %%p in ($(pdfetex)) do $(copy) %%p $(bindir) \
 	) $(redir_stdout)
 
-install-links: install-pdfetex-links
+# install-links: install-pdfetex-links
 install-pdfetex-links: install-pdfetex-programs
-	-@echo $(verbose) & ( \
-	  pushd $(bindir) & \
-	    $(del) .\pdfeinitex.exe .\pdfevirtex.exe & \
-	    $(lnexe) .\pdfetex.exe $(bindir)\pdfeinitex.exe & \
-	    $(lnexe) .\pdfetex.exe $(bindir)\pdfevirtex.exe & \
-	  popd \
-	) $(redir_stdout)
+# 	-@echo $(verbose) & ( \
+# 	  pushd $(bindir) & \
+# 	    $(del) .\pdfeinitex.exe .\pdfevirtex.exe & \
+# 	    $(lnexe) .\pdfetex.exe $(bindir)\pdfeinitex.exe & \
+# 	    $(lnexe) .\pdfetex.exe $(bindir)\pdfevirtex.exe & \
+# 	  popd \
+# 	) $(redir_stdout)
 	-@echo $(verbose) & ( \
 	  if not "$(pdfefmts)"=="" \
 	    for %%i in ($(pdfefmts)) do \
@@ -137,7 +144,7 @@ install-pdfetex-links: install-pdfetex-programs
 	      popd \
 	) $(redir_stdout)
 
-install-fmts: install-pdfetex-fmts
+# install-fmts: install-pdfetex-fmts
 install-pdfetex-fmts: pdfefmts $(fmtdir)
 	-@echo $(verbose) & ( \
 	  for %%f in ($(all_pdfefmts)) \

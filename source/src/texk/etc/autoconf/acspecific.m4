@@ -479,6 +479,9 @@ AC_SUBST([SET_MAKE])dnl
 AC_DEFUN(AC_PROG_RANLIB,
 [AC_CHECK_PROG(RANLIB, ranlib, ranlib, :)])
 
+AC_DEFUN(AC_PROG_AR,
+[AC_CHECK_PROG(AR, ar, ar, :)])
+
 dnl Check for mawk first since it's generally faster.
 AC_DEFUN(AC_PROG_AWK,
 [AC_CHECK_PROGS(AWK, mawk gawk nawk awk, )])
@@ -723,7 +726,7 @@ AC_MSG_RESULT($INSTALL)
 test -z "$INSTALL_PROGRAM" && INSTALL_PROGRAM='${INSTALL}'
 AC_SUBST(INSTALL_PROGRAM)dnl
 
-test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL_PROGRAM}'
+test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL}'
 AC_SUBST(INSTALL_SCRIPT)dnl
 
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
@@ -2613,6 +2616,13 @@ dnl FIXME banish uname from this macro!
 	fi
       fi
       LIBS="$ac_xsave_LIBS"
+      ;;
+     OSF1*|IRIX*)
+       # OSF1 refers to Dec-Unix.  -rpath is required in du 4.0 - at least
+       # -rpath is required in irix 5.x and 6.x - at least
+       # (Is -rpath really needed in IRIX?  OJM)
+       X_LIBS="$X_LIBS -Wl,-rpath,$x_libraries"
+       ;;
     esac
   fi
 

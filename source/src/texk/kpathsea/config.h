@@ -32,11 +32,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define __i386_pc_gnu__
 #endif
 
-/* If we have either DOS or OS2, we are DOSISH.  */
-#if defined(__i386_pc_gnu__) || \
-    defined(OS2) || \
-    defined(MSDOS) || defined(__MSDOS__) || defined(DOS) || \
-    defined(WIN32) || defined(__WIN32__) || defined(_WIN32)
+/* If we have either DOS or OS2, we are DOSISH.  Cygwin pretends to be
+ * unix, mostly, so don't include it here.
+ */
+#if defined(OS2)     || \
+    defined(MSDOS)   || defined(__MSDOS__) || defined(DOS)    || \
+    defined(WIN32)   || defined(__WIN32__) || defined(_WIN32) || \
+    defined(DJGPP)   || defined(__DJGPP__) || \
+    defined(MINGW32) || defined(__MINGW32__)
 #define DOSISH
 #endif
 

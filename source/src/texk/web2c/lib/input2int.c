@@ -1,5 +1,5 @@
 /* input2int.c: read two or three integers from text files.  These
-   routines are only used in patgen.  */
+   routines are only used in patgen.  Public domain. */
 
 #include "config.h"
 

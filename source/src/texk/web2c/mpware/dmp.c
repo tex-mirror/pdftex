@@ -138,7 +138,13 @@ int hash P1C(char*,s)
 {
     register int r;
     for(r=0; *s!=0; s++) {
-	r = (r<<1) + *s;
+        /* GROFF - in font metrics file the character name may be 8bit
+           groff_font(5): Groff supports eight bit characters;
+           groff_out(5): Note that single characters can have the
+               eighth  bit  set, as can the names of fonts and special
+               characters.
+        */
+	r = (r<<1) + *(unsigned char*)s;
 	while (r>=Hprime) r-=Hprime;
     }
     return r;
@@ -214,7 +220,7 @@ FILE *fsearch P3C(char*,nam, char*,ext, kpse_file_format_type,format)
    numbers from strings but they give no indication of how much of the string
    is consumed.  These homemade versions don't parse scientific notation.
 */
-char *arg_tail;		/* char after the number just gotten; NULL on failure */
+char *arg_tail;	  /* char after the number just gotten; NULL on failure */
 
 
 int get_int P1C(char *,s)
@@ -233,6 +239,21 @@ bad:arg_tail = NULL;
     return 0;
 }
 
+/* GROFF font description files use octal character codes
+   groff_font(5): The code can be any integer.  If it starts with
+       a 0 it will be interpreted as octal; if it starts with  0x
+       or 0X it will be intepreted as hexadecimal.
+*/
+int get_int_map P1C(char *,s)
+{
+    register int i;
+    if (s==NULL) goto bad;
+    i=strtol(s,&arg_tail,0);
+    if (s==arg_tail) goto bad;
+    return i;
+bad:arg_tail = NULL;
+    return 0;
+}
 
 /* Troff output files contain few if any non-integers, but this program is
    prepared to read floats whenever they seem reasonable; i.e., when the
@@ -271,7 +292,23 @@ float get_float P1C(char *,s)
     return neg ? -x : x;
 }
 
-
+/* GROFF font description files have metrics field
+   of comma-separated integers. Traditional troff
+   have a float in this position. The value is not
+   used anyway - thus just skip the value,
+   eat all non-space chars.
+*/
+float get_float_map P1C(char *,s)
+{
+    if (s!=NULL) {
+        while (isspace(*s))
+            s++;
+        while (!isspace(*s) && *s)
+            s++;
+    }
+    arg_tail = s;
+    return 0;
+}
 
 /**************************************************************
 		Reading Initialization Files
@@ -436,9 +473,9 @@ int scan_desc_line P2C(int,f, char*,lin)
     if (*lin=='"')
 	*hfind(s,charcodes[f]) = lastcode;
     else {
-	(void) get_float(lin);
+	(void) get_float_map(lin);
 	(void) get_int(arg_tail);
-	lastcode = get_int(arg_tail);
+	lastcode = get_int_map(arg_tail);
 	if (arg_tail==NULL) return 0;
 	*hfind(s,charcodes[f]) = lastcode;
 	if (lastcode<0 || lastcode>=MAXCHARS) return 0;
@@ -685,6 +722,22 @@ void set_num_char P2C(int,f,int,c)
     str_h2 = hh + cursize*charwd[f][c];
 }
 
+/* Output a string. */
+void set_string P1C(char*,cname)
+{
+    float hh;  /* corrected version of h, current horisontal position */
+
+    if (!*cname) return;
+    hh = h;
+    set_num_char(curfont,*cname);
+    hh+= cursize*charwd[curfont][*cname];
+    while (*++cname){
+       print_char(*cname);
+       hh += cursize*charwd[curfont][*cname];
+    }
+    h = rint(hh);
+    finish_last_char();
+}
 
 /* The following initialization and clean-up is required.
 */
@@ -962,6 +1015,10 @@ void do_graphic P1C(char*,s)
 {
     float h1, v1, h2, v2;
     finish_last_char();
+    /* GROFF uses Fd to set fill color for solid drawing objects to the
+       default, so just ignore that.
+    */
+    if (s[0] == 'F' && s[1] == 'd') return;
     gx = (float) h;
     gy = YCORR/unit - ((float) v);
     if (!graphics_used) prepare_graphics();
@@ -1056,6 +1113,15 @@ int do_x_cmd P1C(char *,s0)
     case 'H':
 	while (*s!=' ' && *s!='\t') s++;
 	Xheight = get_float(s);
+	/* GROFF troff output is scaled
+	   groff_out(5): The argument to the s command is in scaled
+               points (units of points/n, where n is the argument
+               to the sizescale command  in the DESC file.)  The
+               argument to the x Height command is also in scaled points.
+               sizescale for groff devps is 1000
+        */
+	if(unit != 0.0) Xheight *= unit;
+	else Xheight /= 1000.0;
 	if (Xheight==cursize) Xheight=0.0;
 	break;
     case 'S':
@@ -1104,6 +1170,16 @@ int do_page()
 		break;
 	    case 's':
 		cursize = get_float(c+1);
+		/* GROFF troff output is scaled
+		   groff_out(5): The argument to the s command is in scaled
+                       points (units of points/n, where n is the argument
+                       to the sizescale command  in the DESC file.)  The
+                       argument to the x Height command is also in scaled
+                       points.
+                   sizescale for groff devps is 1000
+		*/
+		if (unit != 0.0) cursize *= unit;
+		else cursize /= 1000.0;
 		goto iarg;
 	    case 'f':
 		change_font(get_int(c+1));
@@ -1152,6 +1228,27 @@ int do_page()
 		goto eoln;
 	    case '#':
 		goto eoln;
+	    case 'F':
+                /* GROFF uses this command to report filename */
+                goto eoln;
+	    case 'm':
+                /* GROFF uses this command to control color */
+		goto eoln;
+	    case 'u':
+                /* GROFF uses this command to output a word with additional
+                   white space between characters, not implemented
+                */
+		quit("Bad command in troff output\n",
+                     "change the DESC file for your GROFF PostScript device, ",
+                     "remove tcommand");
+	    case 't':
+                /* GROFF uses this command to output a word */
+		cc=c; do cc++; while (*cc!=' ' && *cc!='\t' && *cc!='\0');
+		a= *cc; *cc='\0';
+	    	set_string(++c);
+	    	c = cc;
+	    	*c = a;
+	    	continue;
 	    default:
 		quit("Bad command in troff output","","");
 	    }
@@ -1178,10 +1275,10 @@ void dmp_usage P2C(char*,name, int,status)
     extern KPSEDLL char *kpse_bug_address;
     FILE *f = status == 0 ? stdout : stderr;
     fputs ("Usage: dmp [OPTION]... DITROFFFILE [MPXFILE]\n\
-!   Translate DITROFFFILE to the MetaPost MPXFILE or standard output.\n\
-! \n\
-! --help      display this help and exit\n\
-! --version   output version information and exit\n", f);
+  Translate DITROFFFILE to the MetaPost MPXFILE or standard output.\n\
+\n\
+--help      display this help and exit\n\
+--version   output version information and exit\n", f);
     putc ('\n', f);
     fputs (kpse_bug_address, f);
     exit(status);

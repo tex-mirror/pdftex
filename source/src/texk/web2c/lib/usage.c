@@ -22,16 +22,14 @@ usage P1C(const_string, str)
    limitations (sigh).
 */
 void
-usagehelp P1C(const_string*, message)
+usagehelp P2C(const_string*, message, const_string,bug_email)
 {
-    extern KPSEDLL char *kpse_bug_address;
-
+    if (!bug_email)
+        bug_email = "tex-k@mail.tug.org";
     while (*message) {
-        fputs(*message, stdout);
-        putchar('\n');
+        printf("%s\n", *message);
         ++message;
     }
-    putchar('\n');
-    fputs(kpse_bug_address, stdout);
+    printf("\nEmail bug reports to %s.\n", bug_email);
     uexit(0);
 }

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/utils.c#13 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#19 $
 */
 
 #include "ptexlib.h"
@@ -29,86 +29,88 @@ $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/utils.c#13 $
 #include <time.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/utils.c#13 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#19 $";
 
-char *cur_file_name = 0;
+char *cur_file_name = NULL;
 strnumber last_tex_string;
 static char print_buf[PRINTF_BUF_SIZE];
-static char *jobname_cstr = 0;
-char *job_id_string = 0;
-long int last_tab_index; /* for use with entry_room */
+static char *jobname_cstr = NULL;
+static char *job_id_string = NULL;
+extern string versionstring; /* from web2c/lib/version.c */         
+extern KPSEDLL string kpathsea_version_string; /* from kpathsea/version.c */
 
-typedef char    ff_buf_entry;
-ff_buf_entry    *ff_buf_ptr, *ff_buf_tab = 0;
-integer         ff_buf_max;
+size_t last_ptr_index; /* for use with alloc_array */
 
-typedef char    fnstr_entry;
-fnstr_entry     *fnstr_ptr, *fnstr_tab;
-integer         fnstr_max;
+/* define fb_ptr, fb_array & fb_limit */
+typedef char fb_entry;
+define_array(fb);   
 
-integer ff_offset(void)
+/* define char_ptr, char_array & char_limit */
+typedef char char_entry;
+define_array(char);   
+
+integer fb_offset(void)
 {
-    return ff_buf_ptr - ff_buf_tab;
+    return fb_ptr - fb_array;
 }
 
-void ff_seek(integer offset)
+void fb_seek(integer offset)
 {
-     ff_buf_ptr = ff_buf_tab + offset;
+     fb_ptr = fb_array + offset;
 }
 
-void ff_putchar(eightbits b)
+void fb_putchar(eightbits b)
 {
-    entry_room(ff_buf, 1, FF_BUF_SIZE);
-    *ff_buf_ptr++ = b;
+    alloc_array(fb, 1, SMALL_ARRAY_SIZE);
+    *fb_ptr++ = b;
 }
 
-void ff_flush(void)
+void fb_flush(void)
 {
-    ff_buf_entry *p;
+    fb_entry *p;
     integer n;
-    for (p = ff_buf_tab; p < ff_buf_ptr;) {
+    for (p = fb_array; p < fb_ptr;) {
         n = pdfbufsize - pdfptr;
-        if (ff_buf_ptr - p < n)
-            n = ff_buf_ptr - p;
+        if (fb_ptr - p < n)
+            n = fb_ptr - p;
         memcpy(pdfbuf + pdfptr, p, (unsigned)n);
         pdfptr += n;
         if (pdfptr == pdfbufsize)
             pdfflush();
         p += n;
     }
-    ff_buf_ptr = ff_buf_tab;
+    fb_ptr = fb_array;
 }
 
 static void fnstr_append(const char *s)
 {
     int l = strlen(s) + 1;
-    entry_room(fnstr, l, l);
-    strcat(fnstr_ptr, s);
-    fnstr_ptr = strend(fnstr_ptr);
+    alloc_array(char, l, SMALL_ARRAY_SIZE);
+    strcat(char_ptr, s);
+    char_ptr = strend(char_ptr);
 }
 
 void make_subset_tag(fm_entry *fm_cur, integer fn_offset)
 {
     char tag[7];
     unsigned long crc;
-    eightbits *fontname_ptr = (eightbits*)ff_buf_tab + fn_offset;
-    int i, l = strlen(job_id_string);
-    fnstr_tab = 0;
-    entry_room(fnstr, 1, l + 1);
-    strcpy(fnstr_tab, job_id_string);
-    fnstr_ptr = strend(fnstr_tab);
-    if (fm_cur->tfm_name != 0) {
+    eightbits *fontname_ptr = (eightbits*)fb_array + fn_offset;
+    int i, l = strlen(job_id_string) + 1;
+    alloc_array(char, l, SMALL_ARRAY_SIZE);
+    strcpy(char_array, job_id_string);
+    char_ptr = strend(char_array);
+    if (fm_cur->tfm_name != NULL) {
         fnstr_append(" TFM name: ");
         fnstr_append(fm_cur->tfm_name);
     }
     fnstr_append(" PS name: ");
     if (font_keys[FONTNAME_CODE].valid)
         fnstr_append(font_keys[FONTNAME_CODE].value.string);
-    else if (fm_cur->ps_name != 0)
+    else if (fm_cur->ps_name != NULL)
         fnstr_append(fm_cur->ps_name);
     fnstr_append(" Encoding: ");
-    if (fm_cur->encoding >= 0 && enc_tab[fm_cur->encoding].name != 0)
-        fnstr_append(enc_tab[fm_cur->encoding].name);
+    if (fm_cur->encoding != NULL && (fm_cur->encoding)->name != NULL)
+        fnstr_append((fm_cur->encoding)->name);
     else
         fnstr_append("built-in");
     fnstr_append(" CharSet: ");
@@ -117,13 +119,12 @@ void make_subset_tag(fm_entry *fm_cur, integer fn_offset)
             fnstr_append(" /");
             fnstr_append(t1_glyph_names[i]);
         }
-    if (fm_cur->charset != 0) {
+    if (fm_cur->charset != NULL) {
         fnstr_append(" Extra CharSet: ");
         fnstr_append(fm_cur->charset);
     }
     crc = crc32(0L, Z_NULL, 0);
-    crc = crc32(crc, (Bytef*)fnstr_tab, strlen(fnstr_tab));
-    xfree(fnstr_tab);
+    crc = crc32(crc, (Bytef*)char_array, strlen(char_array));
     /* we need to fit a 32-bit number into a string of 6 uppercase chars long;
      * there are 26 uppercase chars ==> each char represents a number in range
      * 0..25. The maximal number that can be represented by the tag is
@@ -157,7 +158,7 @@ void pdf_printf(const char *fmt,...)
 strnumber maketexstring(const char *s)
 {
     int l;
-    if (s == 0 || *s == 0)
+    if (s == NULL || *s == 0)
         return getnullstr();
     l = strlen(s);
     check_buf(poolptr + l, poolsize);
@@ -233,55 +234,77 @@ char *makecstring(integer s)
     static char cstrbuf[MAX_CSTRING_LEN];
     char *p = cstrbuf;
     int i, l = strstart[s + 1] - strstart[s];
-    check_buf(l, MAX_CSTRING_LEN);
+    check_buf(l + 1, MAX_CSTRING_LEN);
     for (i = 0; i < l; i++)
         *p++ = strpool[i + strstart[s]];
     *p = 0;
     return cstrbuf;
 }
 
+/*
 boolean str_eq_cstr(strnumber n, char *s)
 {
     int l;
-    if (s == 0 || n == 0)
+    if (s == NULL || n == 0)
         return false;
     l = strstart[n];
     while (*s && l < strstart[n + 1] && *s == strpool[l])
         l++, s++;
     return !*s && l == strstart[n + 1];
 }
+*/
 
 void setjobid(int year, int month, int day, int time, int pdftexversion, int pdftexrevision)
 {
-    extern string versionstring; /* from web2c/lib/version.c */         
-    extern KPSEDLL string kpathsea_version_string; /* from kpathsea/version.c */
-    char *name_string = xstrdup(makecstring(jobname)),
-         *format_string = xstrdup(makecstring(formatident)),
-         *s = xtalloc(SMALL_BUF_SIZE + 
-                      strlen(name_string) + 
-                      strlen(format_string) + 
-                      strlen(BANNER) + 
-                      strlen(versionstring) + 
-                      strlen(kpathsea_version_string), char);
+    char *name_string, *format_string, *s;
+
+    if (job_id_string != NULL)
+        return;
+
+    name_string = xstrdup(makecstring(jobname));
+    format_string = xstrdup(makecstring(formatident));
+    s = xtalloc(SMALL_BUF_SIZE + 
+                strlen(name_string) + 
+                strlen(format_string) + 
+                strlen(BANNER) + 
+                strlen(versionstring) + 
+                strlen(kpathsea_version_string), char);
     sprintf(s, "%.4d/%.2d/%.2d %.2d:%.2d %s %s %s %s %s",
             year, month, day, time/60, time%60, 
             name_string, format_string, BANNER, 
             versionstring, kpathsea_version_string);
     job_id_string = xstrdup(s);
-
-    pdftexbanner = maketexstring(BANNER);
-    
+    xfree(s);
     xfree(name_string);
     xfree(format_string);
+}
+
+void makepdftexbanner(void)
+{
+    static boolean pdftexbanner_init = false;
+    char *s;
+
+    if (pdftexbanner_init)
+        return;
+
+    s = xtalloc(SMALL_BUF_SIZE + 
+                strlen(BANNER) + 
+                strlen(versionstring) + 
+                strlen(kpathsea_version_string), char);
+    sprintf(s, "%s %s %s", BANNER, versionstring, kpathsea_version_string);
+    pdftexbanner = maketexstring(s);
     xfree(s);
+    pdftexbanner_init = true;
 }
 
 strnumber getresnameprefix(void)
 {
+/*     static char name_str[] = */
+/* "!\"$&'*+,-.0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\" */
+/* "^_`abcdefghijklmnopqrstuvwxyz|~"; */
     static char name_str[] =
-"!\"$&'*+,-.0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\
-^_`abcdefghijklmnopqrstuvwxyz|~";
-    char prefix[6]; /* make a tag of 6 chars long */
+"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    char prefix[7]; /* make a tag of 6 chars long */
     unsigned long crc;
     int i, base = strlen(name_str);
     crc = crc32(0L, Z_NULL, 0);
@@ -290,7 +313,7 @@ strnumber getresnameprefix(void)
         prefix[i] = name_str[crc % base];
         crc /= base;
     }
-    prefix[5] = 0;
+    prefix[6] = 0;
     return maketexstring(prefix);
 }
 
@@ -327,7 +350,7 @@ int xputc(int c, FILE *stream)
 void writestreamlength(integer length, integer offset)
 {
     integer save_offset;
-    if (jobname_cstr == 0)
+    if (jobname_cstr == NULL)
         jobname_cstr = xstrdup(makecstring(jobname));
     save_offset = xftell(pdffile, jobname_cstr);
     xfseek(pdffile, offset, SEEK_SET, jobname_cstr);
@@ -349,9 +372,11 @@ scaled extxnoverd(scaled x, scaled n, scaled d)
 
 void libpdffinish()
 {
-    xfree(ff_buf_tab);
+    xfree(fb_array);
+    xfree(char_array);
     xfree(job_id_string);
     fm_free();
+    t1_free();
     enc_free();
     img_free();
     vf_free();
@@ -362,13 +387,16 @@ void libpdffinish()
  * handled by printf et.al.: \ is escaped to \\, paranthesis are escaped and
  * control characters are hexadecimal encoded.
  */
-void convertStringToPDFString (char *in, char *out)
+char *convertStringToPDFString (char *in)
 {
+    static char pstrbuf[MAX_PSTRING_LEN];
+    char *out = pstrbuf;
     int lin = strlen (in);
     int i, j;
     char buf[4];
     j = 0;
     for (i = 0; i < lin; i++) {
+        check_buf(j + sizeof(buf), MAX_PSTRING_LEN);
         if ((unsigned char)in[i] < ' ') {
             /* convert control characters into hex */
             sprintf (buf, "#%02x", (unsigned int)(unsigned char)in[i]);
@@ -392,15 +420,15 @@ void convertStringToPDFString (char *in, char *out)
             }
         }
     out[j] = '\0';
+    return pstrbuf;
 }
 
 /* Converts any string given in in in an allowed PDF string which is 
  * hexadecimal encoded and enclosed in '<' and '>'.
- * sizeof(out) should be strlen(in)*2+3.
+ * sizeof(out) should be at least lin*2+3.
  */
-void convertStringToHexString (char *in, char *out)
+void convertStringToHexString (char *in, char *out, int lin)
 {
-    int lin = strlen (in);
     int i, j;
     char buf[3];
     out[0] = '<';
@@ -462,7 +490,8 @@ void printID (strnumber filename)
     size = strftime (time_str, sizeof(time_str), "%Y%m%dT%H%M%SZ", gmtime(&t));
     md5_append(&state, (const md5_byte_t *)time_str, size);
     /* get the file name */
-    getcwd(pwd, sizeof(pwd));
+    if (getcwd(pwd, sizeof(pwd)) == NULL)
+        pdftex_fail("getcwd() failed (path too long?)");
     file_name = makecstring(filename);
     md5_append(&state, (const md5_byte_t *)pwd, strlen(pwd));
     md5_append(&state, (const md5_byte_t *)"/", 1);
@@ -470,7 +499,7 @@ void printID (strnumber filename)
     /* finish md5 */
     md5_finish(&state, digest);
     /* write the IDs */
-    convertStringToHexString ((char*)digest, id);
+    convertStringToHexString ((char*)digest, id, 16);
     pdf_printf("/ID [%s %s]\n", id, id);
 }
 

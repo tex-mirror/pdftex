@@ -10,7 +10,7 @@
 /*
  * Use A4 paper size instead of Letter for PostScript output.
  */
-#define A4_PAPER 1
+#undef A4_PAPER
 
 /*
  * Do not allow text selection.
@@ -20,7 +20,7 @@
 /*
  * Include support for OPI comments.
  */
-#define OPI_SUPPORT 1
+#undef OPI_SUPPORT
 
 /*
  * Enable multithreading support.
@@ -48,7 +48,7 @@
 #undef HAVE_SYS_BSDTYPES_H
 #undef HAVE_STRINGS_H
 #undef HAVE_BSTRING_H
-#define HAVE_POPEN 1
+#undef HAVE_POPEN
 #undef HAVE_MKSTEMP
 #undef SELECT_TAKES_INT
 #undef HAVE_FSEEK64
@@ -67,12 +67,12 @@
  * One of these is defined if using FreeType (version 1 or 2).
  */
 #undef HAVE_FREETYPE_H
-#undef HAVE_FREETYPE_FREETYPE_H
+#define HAVE_FREETYPE_FREETYPE_H 1
 
 /*
  * This is defined if using FreeType version 2.
  */
-#undef FREETYPE2
+#define FREETYPE2
 
 /*
  * This is defined if using libpaper.

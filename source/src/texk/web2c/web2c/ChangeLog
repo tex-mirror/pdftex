@@ -1,3 +1,107 @@
+2004-07-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.defines (print): Remove forward declaration.
+	(setupcharset): Remove declaration, function has been removed.
+	(readtcxfile): Add declaration, new function.
+
+2004-07-11  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Remove redundant -o $@ from rules using
+	$(build_link_command).  From Thomas Esser.
+
+2004-07-03  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Include ../make/cross.mk.  Add explicit rules to
+	cross-build the objects we used.  We could define a suffix rule
+	instead, but there aren't that many.
+
+	* kps.c (uppercasify): Fix.
+
+2004-06-29  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Remove use of ../lib/lib.a and of libkpathsea.
+
+	* main.c (main): Remove use of kpse_set_progname.
+	(yyerror): Moved to web2c.l.
+
+	* splitup.c: Remove use of kpse_set_progname.  Clean up
+	comma-expression at end.
+
+	* web2c.h: Add declarations of get_string_literal(),
+	get_single_char(), get_result_type(), remove declaration of yytext
+	and its #ifdefs.
+
+	* web2c.l (get_string_literal): New function, helper for code in
+	web2c.y.
+	(get_single_char): New function, helper for code in web2c.y.
+	(get_result_type): New function, helper for code in web2c.y.
+	(yyerror): Define here, so it can reference yytext.
+
+	* web2c.y: Use get_string_literal(), get_single_char(),
+	get_result_type() to replace references to yytext.  This way, this
+	file doesn't need to know the exact type of yytext.
+
+	* fixwrites.c: Change uexit to exit.
+
+	* kps.c: New file, with helper functions so that we don't have to
+	link with libkpathsea.
+
+2004-05-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* fixwrites.c: Remove code related to -oem option.
+
+2004-05-08  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.defines: Change TEXPOOLNAME, TEXENGINENAME to
+	TEXMFPOOLNAME, TEXMFENGINENAME.
+
+2004-04-17  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* fixwrites.c (main): Take argument of stringcast into account
+	(otherwise the format string is incomplete).
+
+2004-04-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.defines: Add TEXENGINENAME to constants.
+
+	* fixwrites.c (main): Recognize 'poolname', 'formatengine', and
+	'stringcast...' as strings.
+
+2004-04-08  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* cvtbib.sed: Break init of jmp9998 out from init of jmp32.  The
+	former is needed earlier in the program.  Reported by Sven Luther
+	<luther@dpt-info.u-strasbg.fr>.
+
+2004-03-24  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* common.defines: Add declaration of floor for dvitomp.  From
+	Hartmut Henkel <hartmut_henkel@gmx.de>.
+
+2004-03-22  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.defines: "forward" declaration of print.
+
+2004-03-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* convert: Add aleph.
+
+	* splitup.c: Modifications for Aleph.
+
+	* common.defines: Add ALEPHHELP, EOMEGAHELP.
+
+2004-02-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* splitup.c: Add support for pdfxTeX.
+
+	* convert: Add support for pdfxTeX.
+
+	* common.defines: Add PDFXTEXHELP.
+
+	* common.defines: Add kpsefontmapformat.
+
+	* coerce.h: Add support for pdfxTeX.
+
 2003-02-17  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* convert: We no longer have more than 10 basefiles.

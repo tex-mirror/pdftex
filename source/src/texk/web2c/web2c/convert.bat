@@ -26,10 +26,13 @@ if NOT %2==mp goto omega
 	goto exit
 :omega
 if NOT %2==omega goto eomega
-goto omega_or_eomega
+goto omega_or_eomega_or_aleph
 :eomega
-if NOT %2==eomega goto pdf
-:omega_or_eomega
+if NOT %2==eomega goto aleph
+goto omega_or_eomega_or_aleph
+:aleph
+if NOT %2==aleph goto pdf
+:omega_or_eomega_or_aleph
 	cat %srcdir%\web2c\common.defines %srcdir%\web2c\texmf.defines %srcdir%\%2dir\%2.defines %2.p | %srcdir%\web2c\%objdir%\web2c -htexmfmp.h -t -c%2coerce | %srcdir%\web2c\%objdir%\fixwrites -t %2 | perl %perldir%\splitup.pl --name=%2 --dfile > %2.c
 	copy .\%2coerce.h+%srcdir%\web2c\coerce.h .\x%2coerce.h
 	copy .\x%2coerce.h .\%2coerce.h
@@ -39,10 +42,13 @@ rem	copy %srcdir%\%2.c.opt %srcdir%\%2.c && del /f %srcdir%\%2.c.opt
 	goto exit
 :pdf
 if NOT %2==pdftex goto pdfetex
-goto pdftex_or_pdfetex
+goto pdftex_or_pdfetex_or_pdfxtex
 :pdfetex
-if NOT %2==pdfetex goto tex
-:pdftex_or_pdfetex
+if NOT %2==pdfetex goto pdfxtex
+goto pdftex_or_pdfetex_or_pdfxtex
+:pdfxtex
+if NOT %2==pdfxtex goto tex
+:pdftex_or_pdfetex_or_pdfxtex
 	cat %srcdir%\web2c\common.defines %srcdir%\web2c\texmf.defines %srcdir%\%2dir\%2.defines %2.p | %srcdir%\web2c\%objdir%\web2c -htexmfmp.h -t -c%2coerce | %srcdir%\web2c\%objdir%\fixwrites -t %2 | perl %perldir%\splitup.pl --name=%2 --dfile > %2.c
 	copy %srcdir%\%2coerce.h+%srcdir%\web2c\coerce.h %srcdir%\x%2coerce.h
 	copy %srcdir%\x%2coerce.h %srcdir%\%2coerce.h

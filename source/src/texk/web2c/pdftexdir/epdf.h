@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/epdf.h#13 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/epdf.h#14 $
 */
 
 extern "C" {
@@ -63,18 +63,18 @@ extern integer pdfbufmax;
 
 extern char notdef[];
 
-extern int is_subsetable(int);
-extern int is_type1(int);
-extern int lookup_fontmap(char *);
-extern integer get_fontfile(int);
-extern integer get_fontname(int);
+extern int is_subsetable(struct fm_entry *);
+extern int is_type1(struct fm_entry *);
+extern struct fm_entry * lookup_fontmap(char *);
+extern integer get_fontfile(struct fm_entry *);
+extern integer get_fontname(struct fm_entry *);
 extern integer pdfnewobjnum(void);
 extern integer read_pdf_info(char*, char*, integer, integer, integer, integer);
-extern void embed_whole_font(int);
+extern void embed_whole_font(struct fm_entry *);
 extern void epdf_check_mem(void);
 extern void epdf_delete(void);
 extern void epdf_free(void);
-extern void mark_glyphs(int, char *);
+extern void mark_glyphs(struct fm_entry *, char *);
 extern void pdf_printf(const char *fmt,...);
 extern void pdf_puts(const char *);
 extern void pdfbeginstream(void);
@@ -84,7 +84,7 @@ extern void pdfflush(void);
 extern void pdftex_fail(const char *fmt,...);
 extern void pdftex_warn(const char *fmt,...);
 extern void tex_printf(const char *, ...);
-extern void write_enc(char **, integer);
+extern void write_enc(char **, struct enc_entry *, integer);
 extern void write_epdf(void);
 extern void zpdfbegindict(integer);
 extern void zpdfbeginobj(integer);
@@ -92,8 +92,22 @@ extern void zpdfcreateobj(integer, integer);
 extern void zpdfnewdict(integer, integer);
 
 /* utils.c */
-extern void convertStringToPDFString(char *in, char *out);
+extern char *convertStringToPDFString(char *in);
 
 /* config.c */
 extern integer cfgpar(integer);
+
+/* avl.c */
+typedef int avl_comparison_func (const void *avl_a, const void *avl_b, void *avl_param);
+typedef void avl_item_func (void *avl_item, void *avl_param);
+extern struct avl_table *avl_create (avl_comparison_func *, void *, struct libavl_allocator *);
+extern void avl_destroy (struct avl_table *, avl_item_func *);
+extern void **avl_probe (struct avl_table *, void *);
+extern void *avl_insert (struct avl_table *, void *);
+extern void *avl_delete (struct avl_table *, const void *);
+extern void *avl_find (const struct avl_table *, const void *);
+
+/* avlstuff.c */
+extern void avl_put_obj (integer, integer);
+extern integer avl_find_obj (integer, integer, integer);
 }

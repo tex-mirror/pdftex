@@ -81,9 +81,13 @@ procedure initialize;
 @x [8] Increase constants for tex2pdf, etc.
 @!max_bytes=45000; {|1/ww| times the number of bytes in identifiers,
   index entries, and module names; must be less than 65536}
+@!max_names=5000; {number of identifiers, index entries, and module names;
+  must be less than 10240}
 @y
 @!max_bytes=60000; {|1/ww| times the number of bytes in identifiers,
   index entries, and module names; must be less than 65536}
+@!max_names=10220; {number of identifiers, index entries, and module names;
+  must be less than 10240}
 @z
 @x
 @!buf_size=100; {maximum length of input line}
@@ -91,6 +95,7 @@ procedure initialize;
 @!buf_size=3000; {maximum length of input line}
 @z
 @x
+@!max_refs=30000; {number of cross references; must be less than 65536}
 @!max_toks=30000; {number of symbols in \PASCAL\ texts being parsed;
   must be less than 65536}
 @!max_texts=2000; {number of phrases in \PASCAL\ texts being parsed;
@@ -98,6 +103,7 @@ procedure initialize;
 @!max_scraps=1000; {number of tokens in \PASCAL\ texts being parsed}
 @!stack_size=200; {number of simultaneous output levels}
 @y
+@!max_refs=65000; {number of cross references; must be less than 65536}
 @!max_toks=65000; {number of symbols in \PASCAL\ texts being parsed;
   must be less than 65536}
 @!max_texts=10000; {number of phrases in \PASCAL\ texts being parsed;
@@ -350,7 +356,7 @@ begin
       usage ('weave');
 
     end else if argument_is ('help') then begin
-      usage_help (WEAVE_HELP);
+      usage_help (WEAVE_HELP, nil);
 
     end else if argument_is ('version') then begin
       print_version_and_exit (banner, nil, 'D.E. Knuth');

@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writefont.c#12 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#11 $
 */
 
 #include "ptexlib.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writefont.c#12 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#11 $";
 
 key_entry font_keys[FONT_KEYS_NUM] = {
     {"Ascent",       "Ascender",     {0}, false},
@@ -47,7 +47,6 @@ boolean write_ttf_glyph_names;
 static int first_char, last_char;
 static integer char_widths[MAX_CHAR_CODE + 1];
 static boolean write_fontfile_only;
-static boolean without_fontdescriptor;
 static int char_widths_objnum,
            encoding_objnum;
 static char **cur_glyph_names;
@@ -55,19 +54,21 @@ static char **cur_glyph_names;
 static void print_key(integer code, integer v)
 {
     pdf_printf("/%s ", font_keys[code].pdfname);
-    if (!font_keys[code].valid) {
-        pdf_printf("%i",
-                   (code == ITALIC_ANGLE_CODE) ? (int)v :
-                   (int)dividescaled(v, pdffontsize[tex_font], 3));
-    }
-    else 
+    if (font_keys[code].valid)
         pdf_printf("%i", (int)font_keys[code].value.num);
+    else
+        pdf_printf("%i", (int)dividescaled(v, pdffontsize[tex_font], 3));
     pdf_puts("\n");
 }
 
-static integer getitalicangle(void)
+static void print_italic_angle()
 {
-    return -atan(getslant(tex_font)/65536.0)*(180/M_PI);
+    pdf_printf("/%s ", font_keys[ITALIC_ANGLE_CODE].pdfname);
+    if (font_keys[ITALIC_ANGLE_CODE].valid)
+        pdf_printf("%g", font_keys[ITALIC_ANGLE_CODE].value.num);
+    else
+        pdf_printf("%g", -atan(getslant(tex_font)/65536.0)*(180/M_PI));
+    pdf_puts("\n");
 }
 
 static integer getstemv(void)
@@ -93,10 +94,9 @@ static void getbbox(void)
 void update_enc(internalfontnumber f, char **glyph_names)
 {
     int i;
-    fm_entry *fm = fm_tab + pdffontmap[f];
-    if (fontec[f] > 127 || 
-        (fm >= fm_tab &&
-         (is_reencoded(fm) && (enc_tab + fm->encoding)->updated)))
+    fm_entry *fm = (fm_entry *) pdffontmap[f];
+    if (fontec[f] > 127 || (hasfmentry(f) &&
+         (is_reencoded(fm) && (fm->encoding)->updated)))
         return;
     for (i = fontbc[f]; i <= 32; i++)
         if (pdfcharmap[f][i] != i) {
@@ -105,10 +105,10 @@ void update_enc(internalfontnumber f, char **glyph_names)
             if (glyph_names[i] != notdef)
                 glyph_names[i + MOVE_CHARS_OFFSET] = xstrdup(glyph_names[i]);
             else
-                glyph_names[i + MOVE_CHARS_OFFSET] = xstrdup(notdef);
+                glyph_names[i + MOVE_CHARS_OFFSET] = (char*) notdef;
         }
     if (is_reencoded(fm))
-        (enc_tab + fm->encoding)->updated = true;
+        (fm->encoding)->updated = true;
 }
 
 static void get_char_widths(void)
@@ -143,7 +143,7 @@ static void get_char_widths(void)
             char_widths[i] = 0;
     if (is_reencoded(fm_cur) && pdfmovechars > 0) {
         read_enc(fm_cur->encoding);
-        update_enc(f, (enc_tab + fm_cur->encoding)->glyph_names);
+        update_enc(f, (fm_cur->encoding)->glyph_names);
     }
 }
 
@@ -165,16 +165,14 @@ static void write_fontname(boolean as_reference)
         return;
     }
     pdf_puts("/");
-    if (fm_cur->subset_tag != 0)
+    if (fm_cur->subset_tag != NULL)
         pdf_printf("%s+", fm_cur->subset_tag);
     if (font_keys[FONTNAME_CODE].valid)
         pdf_printf("%s", font_keys[FONTNAME_CODE].value.string);
-    else if (fm_cur->ps_name != 0)
+    else if (fm_cur->ps_name != NULL)
         pdf_printf("%s", fm_cur->ps_name);
     else
         pdf_printf("%s", fm_cur->tfm_name);
-    if (pdffontexpandratio[tex_font] != 0 && !is_included(fm_cur))
-        pdf_printf("%+i", (int)pdffontexpandratio[tex_font]);
     pdf_puts("\n");
 }
 
@@ -189,7 +187,7 @@ static void write_fontobj(integer font_objnum)
         pdfprint(pdffontattr[tex_font]);
         pdf_puts("\n");
     }
-    if (is_basefont(fm_cur)) {
+    if (is_basefont(fm_cur) && !is_included(fm_cur)) {
         pdf_printf("/BaseFont /%s\n", fm_cur->ps_name);
         pdfenddict();
         return;
@@ -197,15 +195,11 @@ static void write_fontobj(integer font_objnum)
     char_widths_objnum = pdfnewobjnum();
     pdf_printf("/FirstChar %i\n/LastChar %i\n/Widths %i 0 R\n",
                first_char, last_char, char_widths_objnum);
-    if (is_noparsing(fm_cur))
-        pdf_printf("/BaseFont /%s\n", fm_cur->ps_name);
-    else {
-        pdf_printf("/BaseFont ");
-        write_fontname(true);
-        if (fm_cur->fd_objnum == 0)
-            fm_cur->fd_objnum = pdfnewobjnum();
-        pdf_printf("/FontDescriptor %i 0 R\n", fm_cur->fd_objnum);
-    }
+    pdf_printf("/BaseFont ");
+    write_fontname(true);
+    if (fm_cur->fd_objnum == 0)
+        fm_cur->fd_objnum = pdfnewobjnum();
+    pdf_printf("/FontDescriptor %i 0 R\n", fm_cur->fd_objnum);
     pdfenddict();
 }
 
@@ -234,21 +228,20 @@ static void write_fontfile(void)
         pdf_printf("/Length1 %i\n/Length2 %i\n/Length3 %i\n",
                    (int)t1_length1, (int)t1_length2, (int)t1_length3);
     pdfbeginstream();
-    ff_flush();
+    fb_flush();
     pdfendstream();
 }
 
 static void write_fontdescriptor(void)
 {
     int i;
-
     pdfbegindict(fm_cur->fd_objnum); /* font descriptor */
     print_key(ASCENT_CODE, getcharheight(tex_font, 'h'));
     print_key(CAPHEIGHT_CODE, getcharheight(tex_font, 'H'));
     print_key(DESCENT_CODE, -getchardepth(tex_font, 'y'));
     pdf_printf("/FontName ");
     write_fontname(true);
-    print_key(ITALIC_ANGLE_CODE, getitalicangle());
+    print_italic_angle();
     print_key(STEMV_CODE, getstemv());
     print_key(XHEIGHT_CODE, getxheight(tex_font));
     if (!font_keys[FONTBBOX1_CODE].valid) {
@@ -260,18 +253,17 @@ static void write_fontdescriptor(void)
                (int)font_keys[FONTBBOX2_CODE].value.num,
                (int)font_keys[FONTBBOX3_CODE].value.num,
                (int)font_keys[FONTBBOX4_CODE].value.num);
-    if (!fontfile_found)
-        pdf_puts("/Flags 34\n");
+    if (!fontfile_found && fm_cur->flags == 4)
+        pdf_puts("/Flags 34\n"); /* assumes a roman sans serif font */
     else
         pdf_printf("/Flags %i\n", (int)fm_cur->flags);
     if (is_included(fm_cur) && fontfile_found) {
         if (is_subsetted(fm_cur) && !is_truetype(fm_cur)) {
             cur_glyph_names = t1_glyph_names;
             pdf_puts("/CharSet (");
-
             for (i = 0; i <= MAX_CHAR_CODE; i++)
                 if (pdfcharmarked(tex_font, i) && cur_glyph_names[i] != notdef)
-					pdf_printf("/%s", cur_glyph_names[i]);
+                    pdf_printf("/%s", cur_glyph_names[i]);
             pdf_puts(")\n");
         }
         if (is_truetype(fm_cur))
@@ -288,47 +280,35 @@ void dopdffont(integer font_objnum, internalfontnumber f)
 {
     int i;
     tex_font = f;
-    cur_glyph_names = 0;
+    cur_glyph_names = NULL;
     encoding_objnum = 0;
     write_ttf_glyph_names = false;
     write_fontfile_only = false;
-    without_fontdescriptor = false;
-    if (pdffontmap[tex_font] == -1)
+    if (pdffontmap[tex_font] == NULL)
         pdftex_fail("pdffontmap not initialized for font %s", 
                     makecstring(fontname[tex_font]));
-    if (pdffontmap[tex_font] >= 0)
-        fm_cur = fm_tab + pdffontmap[tex_font];
+    if (hasfmentry(tex_font))
+        fm_cur = (fm_entry *) pdffontmap[tex_font];
     else
-        fm_cur = 0;
-    if (fm_cur == 0 || (fm_cur->ps_name == 0 && fm_cur->ff_name == 0)) {
+        fm_cur = NULL;
+    if (fm_cur == NULL || (fm_cur->ps_name == NULL && fm_cur->ff_name == NULL)) {
         writet3(font_objnum, tex_font);
         return;
     }
-    if (fm_cur->tfm_num != tex_font)
-        without_fontdescriptor = true; /* cannot remember why it is needed :( */
     get_char_widths();
     if ((is_reencoded(fm_cur))) {
         read_enc(fm_cur->encoding);
-/*         if (!is_truetype(fm_cur) || !indexed_enc(fm_cur)) { */
         if (!is_truetype(fm_cur)) {
-            write_enc(0, fm_cur->encoding);
-            encoding_objnum = enc_tab[fm_cur->encoding].objnum;
-            if (is_truetype(fm_cur))
-                write_ttf_glyph_names = true;
+            write_enc(NULL, fm_cur->encoding, 0);
+            encoding_objnum = (fm_cur->encoding)->objnum;
         }
+        else
+            write_ttf_glyph_names = true;
     }
-    else if (!is_basefont(fm_cur) && 
-             !is_truetype(fm_cur) && 
-             !without_fontdescriptor)
+    else if (is_fontfile(fm_cur) && !is_truetype(fm_cur)) {
         encoding_objnum = pdfnewobjnum();
-    if (without_fontdescriptor) {
-        if (fm_cur->fn_objnum == 0)
-            fm_cur->fn_objnum = pdfnewobjnum();
-        write_fontobj(font_objnum);
-        write_char_widths();
-        return;
     }
-    if (!is_basefont(fm_cur))
+    if (is_included(fm_cur))
         write_fontfile();
     if (fm_cur->fn_objnum != 0) {
         pdfbeginobj(fm_cur->fn_objnum);
@@ -337,7 +317,7 @@ void dopdffont(integer font_objnum, internalfontnumber f)
     }
     if (!write_fontfile_only)
         write_fontobj(font_objnum);
-    if (is_basefont(fm_cur) || is_noparsing(fm_cur))
+    if (is_basefont(fm_cur) && !is_included(fm_cur))
         return;
     if (!write_fontfile_only) {
         write_fontdescriptor();
@@ -347,9 +327,9 @@ void dopdffont(integer font_objnum, internalfontnumber f)
         for (i = 0; i <= MAX_CHAR_CODE; i++)
             if (!pdfcharmarked(tex_font, i) && cur_glyph_names[i] != notdef) {
                 xfree(cur_glyph_names[i]);
-                cur_glyph_names[i] = xstrdup(notdef);
+                cur_glyph_names[i] = (char*) notdef;
             }
-        write_enc(cur_glyph_names, encoding_objnum);
+        write_enc(cur_glyph_names, NULL, encoding_objnum);
         for (i = 0; i <= MAX_CHAR_CODE; i++)
             if (cur_glyph_names[i] != notdef)
                 xfree(cur_glyph_names[i]);

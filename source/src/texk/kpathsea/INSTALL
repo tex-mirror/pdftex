@@ -301,9 +301,9 @@ the option `--disable-mktexpk'.  *Note configure options::.
 ..................
 
   Considerable effort has gone into trying to ensure that the
-`configure' scripts can be run by most Bourne shell variants.  Should
-`sh' run into trouble, your best bet is to use Bash, the GNU shell
-(*note Top: (features)Top.).
+`configure' scripts can be run by most Bourne shell variants.  If `sh'
+runs into trouble, your best bet is to use Bash, the GNU Bourne-again
+shell (*note Top: (bash)Top.).
 
   Bourne shell variants for which problems have been reported in the
 past are:
@@ -657,7 +657,7 @@ other cases the working directory is used.
 
 `appendonlydir'
      Tell `mktexdir' to create directories append-only, i.e., set their
-     sticky bit (*note Mode Structure: (fileutils)Mode Structure.).
+     sticky bit (*note Mode Structure: (coreutils)Mode Structure.).
      This feature is silently ignored on non-Unix platforms (e.g.
      Windows/NT and MS-DOS) which don't support similar functionality.
      This feature is enabled by default.

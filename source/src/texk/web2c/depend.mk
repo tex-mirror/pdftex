@@ -1,3 +1,109 @@
+aleph.o: aleph.c alephd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h alephmem.h alephcoerce.h
+aleph0.o: aleph0.c alephd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h alephmem.h alephcoerce.h
+aleph1.o: aleph1.c alephd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h alephmem.h alephcoerce.h
+aleph2.o: aleph2.c alephd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h alephmem.h alephcoerce.h
+aleph3.o: aleph3.c alephd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h alephmem.h alephcoerce.h
+alephbis.o: alephbis.c \
+  alephd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h alephmem.h alephcoerce.h
+alephextra.o: alephextra.c alephd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h alephmem.h alephcoerce.h $(kpathsea_srcdir)/line.h \
+  $(kpathsea_srcdir)/readable.h $(kpathsea_srcdir)/variable.h $(kpathsea_srcdir)/absolute.h \
+  texmfmp-help.h alephdir/alephextra.h 
+alephini.o: alephini.c alephd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h alephmem.h alephcoerce.h
 bibtex.o: bibtex.c \
   cpascal.h \
   config.h $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
@@ -14,7 +120,8 @@ ctangle.o: ctangle.c \
   $(kpathsea_srcdir)/kpathsea.h $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h \
   $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h $(kpathsea_srcdir)/absolute.h \
@@ -36,8 +143,31 @@ ctangleboot.o: ctangleboot.c \
   $(kpathsea_srcdir)/kpathsea.h $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h \
   $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h $(kpathsea_srcdir)/absolute.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/c-dir.h \
+  $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/c-namemx.h \
+  $(kpathsea_srcdir)/c-pathch.h $(kpathsea_srcdir)/c-pathmx.h $(kpathsea_srcdir)/c-stat.h \
+  $(kpathsea_srcdir)/c-vararg.h \
+  $(kpathsea_srcdir)/cnf.h $(kpathsea_srcdir)/concatn.h $(kpathsea_srcdir)/db.h \
+  $(kpathsea_srcdir)/str-list.h $(kpathsea_srcdir)/default.h $(kpathsea_srcdir)/expand.h \
+  $(kpathsea_srcdir)/fn.h $(kpathsea_srcdir)/fontmap.h $(kpathsea_srcdir)/hash.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/line.h $(kpathsea_srcdir)/magstep.h \
+  $(kpathsea_dir)/paths.h $(kpathsea_srcdir)/pathsearch.h $(kpathsea_srcdir)/str-llist.h \
+  $(kpathsea_srcdir)/proginit.h $(kpathsea_srcdir)/readable.h $(kpathsea_srcdir)/tex-file.h \
+  $(kpathsea_srcdir)/tex-glyph.h $(kpathsea_srcdir)/tex-hush.h $(kpathsea_srcdir)/tex-make.h \
+  $(kpathsea_srcdir)/tilde.h $(kpathsea_srcdir)/truncate.h $(kpathsea_srcdir)/variable.h \
+  $(kpathsea_srcdir)/xopendir.h $(kpathsea_srcdir)/xstat.h
+ctie.o: ctie.c \
+  $(kpathsea_srcdir)/kpathsea.h $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h \
+  $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h $(kpathsea_srcdir)/absolute.h \
   $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/c-dir.h \
@@ -58,7 +188,8 @@ cweave.o: cweave.c \
   $(kpathsea_srcdir)/kpathsea.h $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h \
   $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h $(kpathsea_srcdir)/absolute.h \
@@ -82,7 +213,8 @@ cweb.o: cweb.c \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h \
+  $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
@@ -106,7 +238,8 @@ cwebboot.o: cwebboot.c \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h \
+  $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
@@ -127,7 +260,8 @@ cwebboot.o: cwebboot.c \
 dvicopy.o: dvicopy.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -137,7 +271,8 @@ dvicopy.o: dvicopy.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 dvitomp.o: dvitomp.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -147,115 +282,19 @@ dvitomp.o: dvitomp.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 dvitype.o: dvitype.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
   $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
   $(kpathsea_srcdir)/tex-file.h help.h dvitype.h
-eomega.o: eomega.c omegad.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h omegamem.h omegacoerce.h
-eomega0.o: eomega0.c eomegad.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h eomegamem.h eomegacoerce.h
-eomega1.o: eomega1.c eomegad.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h eomegamem.h eomegacoerce.h
-eomega2.o: eomega2.c eomegad.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h eomegamem.h eomegacoerce.h
-eomega3.o: eomega3.c eomegad.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h eomegamem.h eomegacoerce.h
-eomegabis.o: eomegabis.c \
-  omegad.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h $(kpathsea_srcdir)/c-memstr.h \
-  $(kpathsea_srcdir)/c-errno.h $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h omegamem.h omegacoerce.h
-eomegaextra.o: eomegaextra.c eomegad.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h eomegamem.h eomegacoerce.h $(kpathsea_srcdir)/line.h \
-  $(kpathsea_srcdir)/readable.h $(kpathsea_srcdir)/variable.h $(kpathsea_srcdir)/absolute.h \
-  texmfmp-help.h eomegadir/eomegaextra.h 
-eomegaini.o: eomegaini.c eomegad.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h eomegamem.h eomegacoerce.h
 etex0.o: etex0.c etexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -267,7 +306,8 @@ etex0.o: etex0.c etexd.h texmfmp.h cpascal.h config.h \
 etex1.o: etex1.c etexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -279,7 +319,8 @@ etex1.o: etex1.c etexd.h texmfmp.h cpascal.h config.h \
 etex2.o: etex2.c etexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -291,7 +332,8 @@ etex2.o: etex2.c etexd.h texmfmp.h cpascal.h config.h \
 etexextra.o: etexextra.c etexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -305,7 +347,8 @@ etexextra.o: etexextra.c etexd.h texmfmp.h cpascal.h config.h \
 etexini.o: etexini.c etexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -317,7 +360,8 @@ etexini.o: etexini.c etexd.h texmfmp.h cpascal.h config.h \
 gftodvi.o: gftodvi.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -327,7 +371,8 @@ gftodvi.o: gftodvi.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 gftopk.o: gftopk.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -337,7 +382,8 @@ gftopk.o: gftopk.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 gftype.o: gftype.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -348,7 +394,8 @@ macnames.o: macnames.c
 mf0.o: mf0.c mfd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -360,7 +407,8 @@ mf0.o: mf0.c mfd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
 mf1.o: mf1.c mfd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -372,7 +420,8 @@ mf1.o: mf1.c mfd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
 mf2.o: mf2.c mfd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -384,7 +433,8 @@ mf2.o: mf2.c mfd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
 mfextra.o: mfextra.c mfd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -398,7 +448,8 @@ mfextra.o: mfextra.c mfd.h texmfmp.h cpascal.h config.h \
 mfini.o: mfini.c mfd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -410,7 +461,8 @@ mfini.o: mfini.c mfd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h 
 mft.o: mft.c cpascal.h config.h $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h \
   $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -420,7 +472,8 @@ mft.o: mft.c cpascal.h config.h $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-au
 mp0.o: mp0.c mpd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -432,7 +485,8 @@ mp0.o: mp0.c mpd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
 mp1.o: mp1.c mpd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -444,7 +498,8 @@ mp1.o: mp1.c mpd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
 mp2.o: mp2.c mpd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -456,7 +511,8 @@ mp2.o: mp2.c mpd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
 mpextra.o: mpextra.c mpd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -466,12 +522,12 @@ mpextra.o: mpextra.c mpd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
   texmfmem.h mpcoerce.h $(kpathsea_srcdir)/line.h $(kpathsea_srcdir)/readable.h \
   $(kpathsea_srcdir)/variable.h $(kpathsea_srcdir)/absolute.h \
-  texmfmp-help.h $(kpathsea_srcdir)/concatn.h \
-  lib/mfmpi386.asm
+  texmfmp-help.h $(kpathsea_srcdir)/concatn.h lib/mfmpi386.asm
 mpini.o: mpini.c mpd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -483,7 +539,8 @@ mpini.o: mpini.c mpd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h 
 odvicopy.o: odvicopy.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -493,7 +550,8 @@ odvicopy.o: odvicopy.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 odvitype.o: odvitype.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -503,7 +561,8 @@ odvitype.o: odvitype.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 omega.o: omega.c omegad.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -515,7 +574,8 @@ omega.o: omega.c omegad.h texmfmp.h cpascal.h config.h \
 omega0.o: omega0.c omegad.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -527,7 +587,8 @@ omega0.o: omega0.c omegad.h texmfmp.h cpascal.h config.h \
 omega1.o: omega1.c omegad.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -539,7 +600,8 @@ omega1.o: omega1.c omegad.h texmfmp.h cpascal.h config.h \
 omega2.o: omega2.c omegad.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -551,7 +613,8 @@ omega2.o: omega2.c omegad.h texmfmp.h cpascal.h config.h \
 omega3.o: omega3.c omegad.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -564,7 +627,8 @@ omegabis.o: omegabis.c \
   omegad.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h $(kpathsea_srcdir)/c-memstr.h \
-  $(kpathsea_srcdir)/c-errno.h $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-errno.h $(kpathsea_srcdir)/c-minmax.h \
+  $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
@@ -575,7 +639,8 @@ omegabis.o: omegabis.c \
 omegaextra.o: omegaextra.c omegad.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -589,7 +654,8 @@ omegaextra.o: omegaextra.c omegad.h texmfmp.h cpascal.h config.h \
 omegaini.o: omegaini.c omegad.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -601,7 +667,8 @@ omegaini.o: omegaini.c omegad.h texmfmp.h cpascal.h config.h \
 otangle.o: otangle.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -611,7 +678,8 @@ otangle.o: otangle.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 patgen.o: patgen.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -621,7 +689,8 @@ patgen.o: patgen.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 pdfetex0.o: pdfetex0.c pdfetexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -634,7 +703,8 @@ pdfetex0.o: pdfetex0.c pdfetexd.h texmfmp.h cpascal.h config.h \
 pdfetex1.o: pdfetex1.c pdfetexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -647,7 +717,8 @@ pdfetex1.o: pdfetex1.c pdfetexd.h texmfmp.h cpascal.h config.h \
 pdfetex2.o: pdfetex2.c pdfetexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -660,7 +731,8 @@ pdfetex2.o: pdfetex2.c pdfetexd.h texmfmp.h cpascal.h config.h \
 pdfetex3.o: pdfetex3.c pdfetexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -673,7 +745,8 @@ pdfetex3.o: pdfetex3.c pdfetexd.h texmfmp.h cpascal.h config.h \
 pdfetexextra.o: pdfetexextra.c pdfetexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -688,7 +761,8 @@ pdfetexextra.o: pdfetexextra.c pdfetexd.h texmfmp.h cpascal.h config.h \
 pdfetexini.o: pdfetexini.c pdfetexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -701,7 +775,8 @@ pdfetexini.o: pdfetexini.c pdfetexd.h texmfmp.h cpascal.h config.h \
 pdftex0.o: pdftex0.c pdftexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -714,7 +789,8 @@ pdftex0.o: pdftex0.c pdftexd.h texmfmp.h cpascal.h config.h \
 pdftex1.o: pdftex1.c pdftexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -727,7 +803,8 @@ pdftex1.o: pdftex1.c pdftexd.h texmfmp.h cpascal.h config.h \
 pdftex2.o: pdftex2.c pdftexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -740,7 +817,8 @@ pdftex2.o: pdftex2.c pdftexd.h texmfmp.h cpascal.h config.h \
 pdftex3.o: pdftex3.c pdftexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -753,7 +831,8 @@ pdftex3.o: pdftex3.c pdftexd.h texmfmp.h cpascal.h config.h \
 pdftexextra.o: pdftexextra.c pdftexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -768,7 +847,8 @@ pdftexextra.o: pdftexextra.c pdftexd.h texmfmp.h cpascal.h config.h \
 pdftexini.o: pdftexini.c pdftexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -778,10 +858,97 @@ pdftexini.o: pdftexini.c pdftexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
   texmfmem.h pdftexcoerce.h pdftexdir/pdftex.h pdftexdir/ptexlib.h \
   pdftexdir/ptexmac.h
+pdfxtex0.o: pdfxtex0.c pdfxtexd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
+  pdftexdir/ptexmac.h
+pdfxtex1.o: pdfxtex1.c pdfxtexd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
+  pdftexdir/ptexmac.h
+pdfxtex2.o: pdfxtex2.c pdfxtexd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
+  pdftexdir/ptexmac.h
+pdfxtex3.o: pdfxtex3.c pdfxtexd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
+  pdftexdir/ptexmac.h
+pdfxtexextra.o: pdfxtexextra.c pdfxtexd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
+  pdftexdir/ptexmac.h $(kpathsea_srcdir)/line.h $(kpathsea_srcdir)/readable.h \
+  $(kpathsea_srcdir)/variable.h $(kpathsea_srcdir)/absolute.h \
+  texmfmp-help.h pdfxtexdir/pdfxtexextra.h 
+pdfxtexini.o: pdfxtexini.c pdfxtexd.h texmfmp.h cpascal.h config.h \
+  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
+  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
+  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
+  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
+  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
+  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
+  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
+  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
+  pdftexdir/ptexmac.h
 pktogf.o: pktogf.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -791,7 +958,8 @@ pktogf.o: pktogf.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 pktype.o: pktype.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -801,7 +969,8 @@ pktype.o: pktype.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 pltotf.o: pltotf.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -811,7 +980,8 @@ pltotf.o: pltotf.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 pooltype.o: pooltype.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -821,7 +991,8 @@ pooltype.o: pooltype.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 tangle.o: tangle.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -831,7 +1002,8 @@ tangle.o: tangle.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 tangleboot.o: tangleboot.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -841,7 +1013,8 @@ tangleboot.o: tangleboot.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 tex0.o: tex0.c texd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -853,7 +1026,8 @@ tex0.o: tex0.c texd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
 tex1.o: tex1.c texd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -865,7 +1039,8 @@ tex1.o: tex1.c texd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
 tex2.o: tex2.c texd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -877,7 +1052,8 @@ tex2.o: tex2.c texd.h texmfmp.h cpascal.h config.h $(kpathsea_srcdir)/config.h \
 texextra.o: texextra.c texd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -891,7 +1067,8 @@ texextra.o: texextra.c texd.h texmfmp.h cpascal.h config.h \
 texini.o: texini.c texd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -903,7 +1080,8 @@ texini.o: texini.c texd.h texmfmp.h cpascal.h config.h \
 tftopl.o: tftopl.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -913,7 +1091,8 @@ tftopl.o: tftopl.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 tie.o: tie.c cpascal.h config.h $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h \
   $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -923,7 +1102,8 @@ tie.o: tie.c cpascal.h config.h $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-au
 ttf2afm.o: ttf2afm.c $(kpathsea_srcdir)/kpathsea.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h $(kpathsea_srcdir)/absolute.h \
@@ -945,7 +1125,8 @@ ttf2afm.o: ttf2afm.c $(kpathsea_srcdir)/kpathsea.h $(kpathsea_srcdir)/config.h \
 vftovp.o: vftovp.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -955,7 +1136,8 @@ vftovp.o: vftovp.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 vptovf.o: vptovf.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
@@ -965,7 +1147,8 @@ vptovf.o: vptovf.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
 weave.o: weave.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h $(kpathsea_srcdir)/c-errno.h \
+  $(kpathsea_srcdir)/c-memstr.h \
+  $(kpathsea_srcdir)/c-errno.h \
   $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \

@@ -1,5 +1,5 @@
 /* zround.c: round R to the nearest whole number.  This is supposed to
-   implement the predefined Pascal round function.  */
+   implement the predefined Pascal round function.  Public domain. */
 
 #include "config.h"
 

@@ -1,9 +1,11 @@
-.TH ETEX 1 "10 November 2001" "Web2C @VERSION@"
+.TH ETEX 1 "21 August 2004" "Web2C @VERSION@"
 .\"=====================================================================
 .if n .ds MF Metafont
 .if t .ds MF M\s-2ETAFONT\s0
 .if t .ds TX \fRT\\h'-0.1667m'\\v'0.20v'E\\v'-0.20v'\\h'-0.125m'X\fP
 .if n .ds TX TeX
+.if n .ds MF Metafont
+.if t .ds MF M\s-2ETAFONT\s0
 .ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
 .el .ds OX TeX\" for nroff
 .\" the same but obliqued
@@ -67,17 +69,19 @@ commands are e-\*(TX's analogues to the
 .B initex
 and
 .B virtex
-commands.  In this installation, they are symlinks to the
+commands.  In this installation, they are symbolic links to the
 .B etex
-executable.
+executable.  These symbolic links may not exist at all.
 .PP
 e-\*(TX's handling of its command-line arguments is similar to that of
-\*(TX.
+the other \*(TX programs in the
+.I web2c
+implementation.
 .\"=====================================================================
 .SH OPTIONS
 This version of e-\*(TX understands the following command line options.
 .TP
-.BI --efmt \ format
+.BI -fmt \ format
 .rb
 Use
 .I format
@@ -86,27 +90,52 @@ e-\*(TX was called or a
 .I %&
 line.
 .TP
-.B --file-line-error-style
+.B -enc
+.rb
+Enable the enc\*(TX extensions.  This option is only effective in
+combination with
+.BR -ini .
+For documentation of the enc\*(TX extensions see
+.BR http://www.olsak.net/enctex.html .
+.TP
+.B -file-line-error
 .rb
 Print error messages in the form
 .I file:line:error
 which is similar to the way many compilers format them.
 .TP
-.B --help
+.B -no-file-line-error
+.rb
+Disable printing error messages in the
+.I file:line:error
+style.
+.TP
+.B -file-line-error-style
+.rb
+This is the old name of the
+.B -file-line-error
+option.
+.TP
+.B -halt-on-error
+.rb
+Exit with an error code when an error is encountered during processing.
+.TP
+.B -help
 .rb
 Print help message and exit.
 .TP
-.B --ini
+.B -ini
 .rb
-Be
-.BR einitex ,
-for dumping formats; this is implicitly true if the program is called
-as
-.BR einitex .
+Start in
+.I INI
+mode, which is used to dump formats.  The
+.I INI
+mode can be used for typesetting, but no format is preloaded, and
+basic initializations like setting catcodes may be required.
 .TP
-.BI --interaction \ mode
+.BI -interaction \ mode
 .rb
-Sets the interaction mode.  The mode can be one of
+Sets the interaction mode.  The mode can be either
 .IR batchmode ,
 .IR nonstopmode ,
 .IR scrollmode ,
@@ -115,98 +144,151 @@ and
 The meaning of these modes is the same as that of the corresponding
 \ecommands.
 .TP
-.B --ipc
+.B -ipc
 .rb
 Send DVI output to a socket as well as the usual output file.  Whether
 this option is available is the choice of the installer.
 .TP
-.B --ipc-start
+.B -ipc-start
 .rb
 As
-.BR --ipc ,
+.BR -ipc ,
 and starts the server at the other end as well.  Whether this option
 is available is the choice of the installer.
 .TP
-.BI --jobname \ name
+.BI -jobname \ name
 .rb
 Use
 .I name
 for the job name, instead of deriving it from the name of the input file.
 .TP
-.BI --kpathsea-debug \ bitmask
+.BI -kpathsea-debug \ bitmask
 .rb
 Sets path searching debugging flags according to the bitmask.  See the
 .I Kpathsea
 manual for details.
 .TP
-.BI --maketex \ fmt
+.BI -mktex \ fmt
 .rb
 Enable
 .RI mktex fmt ,
 where
 .I fmt
-must be one of
+must be either
 .I tex
 or
 .IR tfm .
 .TP
-.B --mltex
+.B -mltex
 .rb
-Enable ML\*(TX extensions.
+Enable ML\*(TX extensions.  Only effective in combination with
+.BR -ini .
 .TP
-.BI --no-maketex \ fmt
+.BI -no-mktex \ fmt
 .rb
 Disable
 .RI mktex fmt ,
 where
 .I fmt
-must be one of
+must be either
 .I tex
 or
 .IR tfm .
 .TP
-.BI --output-comment \ string
+.BI -output-comment \ string
 .rb
 Use
 .I string
-for the DVI file comment instead of the date.
+for the
+.I DVI
+file comment instead of the date.
 .TP
-.B --parse-first-line
+.BI -output-directory \ directory
+.rb Write output files in
+.I directory
+instead of the current directory.  Look up input files in
+.I directory
+first, the along the normal search path.
+.TP
+.B -parse-first-line
 .rb
 If the first line of the main input file begins with
 .I %&
 parse it to look for a dump name or a
-.B --translate-file
+.B -translate-file
 option.
 .TP
-.BI --progname \ name
+.B -no-parse-first-line
+.rb
+Disable parsing of the first line of the main input file.
+.TP
+.BI -progname \ name
 .rb
 Pretend to be program
 .IR name .
 This affects both the format used and the search paths.
 .TP
-.B --recorder
+.B -recorder
 .rb
 Enable the filename recorder.  This leaves a trace of the files opened
 for input and output in a file with extension
 .IR .fls .
 .TP
-.B --shell-escape
+.B -shell-escape
 .rb
 Enable the
 .BI \ewrite18{ command }
 construct.  The
 .I command
-can be any Bourne shell command.  This construct is normally
+can be any shell command.  This construct is normally
 disallowed for security reasons.
 .TP
-.BI --translate-file \ tcxname
+.B -no-shell-escape
+.rb
+Disable the
+.BI \ewrite18{ command }
+construct, even if it is enabled in the
+.I texmf.cnf
+file.
+.TP
+.B -src-specials
+.rb
+Insert source specials into the
+.I DVI
+file.
+.TP
+.BI -src-specials \ where
+.rb
+Insert source specials in certain placed of the
+.I DVI
+file.
+.I where
+is a comma-separated value list:
+.IR cr ,
+.IR display ,
+.IR hbox ,
+.IR math ,
+.IR par ,
+.IR parent ,
+or
+.IR vbox .
+.TP
+.BI -translate-file \ tcxname
 .rb
 Use the
 .I tcxname
-translation table.
+translation table to set the mapping of input characters and
+re-mapping of output characters.
 .TP
-.B --version
+.BI -default-translate-file \ tcxname
+.rb
+Like
+.B -translate-file
+except that a
+.I %&
+line can overrule this setting.
+.TP
+.B -version
 .rb
 Print version information and exit.
 .\"=====================================================================
@@ -228,7 +310,7 @@ Normally, e-\*(TX puts its output files in the current directory.  If
 any output file cannot be opened there, it tries to open it in the
 directory specified in the environment variable TEXMFOUTPUT.
 There is no default value for that variable.  For example, if you say
-.I tex paper
+.I etex paper
 and the current directory is not writable, if TEXMFOUTPUT has
 the value
 .IR /tmp ,
@@ -251,23 +333,23 @@ component will be replaced with the paths defined in the
 file.  For example, set TEXINPUTS to ".:/home/usr/tex:" to prepend the
 current direcory and ``/home/user/tex'' to the standard search path.
 .TP
-TEXFONTS
-Search path for font metric
-.RI ( .tfm )
-files.
-.TP
 TEXFORMATS
 Search path for format files.
 .TP
 TEXPOOL
 search path for
-.B einitex
+.B etex
 internal strings.
 .TP
 TEXEDIT
 Command template for switching to editor.  The default, usually
 .BR vi ,
 is set when e-\*(TX is compiled.
+.TP
+TFMFONTS
+Search path for font metric
+.RI ( .tfm )
+files.
 .\"=====================================================================
 .SH FILES
 The location of the files mentioned below varies from system to
@@ -276,7 +358,7 @@ system.  Use the
 utility to find their locations.
 .TP
 .I etex.pool
-Encoded text of e-\*(TX's messages.
+Text file containing e-\*(TX's internal strings.
 .TP
 .I texfonts.map
 Filename mapping definitions.
@@ -284,8 +366,8 @@ Filename mapping definitions.
 .I *.tfm
 Metric files for e-\*(TX's fonts.
 .TP
-.I *.efmt
-Predigested e-\*(TX format (.\|efmt) files.
+.I *.fmt
+Predigested e-\*(TX format (.\|fmt) files.
 .br
 .\"=====================================================================
 .SH BUGS
@@ -306,3 +388,17 @@ file will be invalid.
 .SH "SEE ALSO"
 .BR tex (1),
 .BR mf (1).
+.\"=====================================================================
+.SH AUTHORS
+e-\*(TX was developed by Peter Breitenlohner (and the NTS team).
+.PP
+\*(TX was designed by Donald E. Knuth,
+who implemented it using his \*(WB system for Pascal programs.
+It was ported to Unix at Stanford by Howard Trickey, and
+at Cornell by Pavel Curtis.
+The version now offered with the Unix \*(TX distribution is that
+generated by the \*(WB to C system
+.RB ( web2c ),
+originally written by Tomas Rokicki and Tim Morgan.
+.PP
+The enc\*(TX extensions were written by Petr Olsak.

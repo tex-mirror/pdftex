@@ -17,6 +17,14 @@ cd goo
 del libGoo.a
 %LIBPROG% -rc libGoo.a GHash.o GList.o GString.o gmempp.o gfile.o gmem.o parseargs.o
 
+cd ..\fofi
+%CXX% %CXXFLAGS% -c FoFiBase.cc
+%CXX% %CXXFLAGS% -c FoFiEncodings.cc
+%CXX% %CXXFLAGS% -c FoFiTrueType.cc
+%CXX% %CXXFLAGS% -c FoFiType1.cc
+%CXX% %CXXFLAGS% -c FoFiType1C.cc
+%LIBPROG% -rc libfofi.a FoFiBase.o FoFiEncodings.o FoFiTrueType.o FoFiType1.o FoFiType1C.o
+
 cd ..\xpdf
 del *.o
 %CXX% %CXXFLAGS% -c Annot.cc
@@ -30,14 +38,15 @@ del *.o
 %CXX% %CXXFLAGS% -c Dict.cc
 %CXX% %CXXFLAGS% -c Error.cc
 %CXX% %CXXFLAGS% -c FontEncodingTables.cc
-%CXX% %CXXFLAGS% -c FontFile.cc
 %CXX% %CXXFLAGS% -c Function.cc
 %CXX% %CXXFLAGS% -c Gfx.cc
 %CXX% %CXXFLAGS% -c GfxFont.cc
 %CXX% %CXXFLAGS% -c GfxState.cc
 %CXX% %CXXFLAGS% -c GlobalParams.cc
 %CXX% %CXXFLAGS% -c ImageOutputDev.cc
+%CXX% %CXXFLAGS% -c JArithmeticDecoder.cc
 %CXX% %CXXFLAGS% -c JBIG2Stream.cc
+%CXX% %CXXFLAGS% -c JPXStream.cc
 %CXX% %CXXFLAGS% -c Lexer.cc
 %CXX% %CXXFLAGS% -c Link.cc
 %CXX% %CXXFLAGS% -c NameToCharCode.cc
@@ -53,6 +62,7 @@ del *.o
 %CXX% %CXXFLAGS% -c Stream.cc
 %CXX% %CXXFLAGS% -c TextOutputDev.cc
 %CXX% %CXXFLAGS% -c UnicodeMap.cc
+%CXX% %CXXFLAGS% -c UnicodeTypeTable.cc
 %CXX% %CXXFLAGS% -c XRef.cc
 del libxpdf.a
 %LIBPROG% -rc libxpdf.a *.o
@@ -66,5 +76,7 @@ del libxpdf.a
 %CXX% %CXXFLAGS% -o pdffonts.exe pdffonts.cc libxpdf.a ..\goo\libGoo.a
 
 %CXX% %CXXFLAGS% -o pdfimages.exe pdfimages.cc libxpdf.a ..\goo\libGoo.a
+
+%CXX% %CXXFLAGS% -o pdftoppm.exe pdftoppm.cc libxpdf.a ..\goo\libGoo.a
 
 cd ..

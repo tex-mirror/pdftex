@@ -1,7 +1,8 @@
 {This file defines symbols in addition to those in `common.defines',
  for use in the TeX, Metafont, and MetaPost change files.  Public domain.}
 
-@define const TEXPOOLNAME;
+@define const TEXMFPOOLNAME;
+@define const TEXMFENGINENAME;
 
 @define @field b0;
 @define @field b1;
@@ -53,9 +54,9 @@
 @define procedure paintrow ();
 @define procedure put2bytes ();
 @define procedure put4bytes ();
+@define procedure readtcxfile;
 @define procedure remembersourceinfo ();
 @define procedure setupboundvariable ();
-@define procedure setupcharset;
 @define procedure system ();
 @define procedure topenin;
 @define procedure undumphh ();

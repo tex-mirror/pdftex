@@ -57,13 +57,17 @@ char*	tex_preverb1 = "";			/* if very first instance */
 char*	tex_preverb = "%% line %d %s\n";	/* all other instances */
 char*	tex_postverb = "%\n";
 
+/* According to CSTR #54 the ".lf" directive should be ".lf %d %s",
+ * not ".lf line %d %s" as used in the original code.  This affects
+ * troff_pretex1, troff_pretex, troff_preverb1, troff_preverb.
+ */
 char*	troff_predoc = ".po 0\n";
 char*	troff_postdoc = "";
-char*	troff_pretex1 = ".lf line %d %s\n";	/* first instance */
-char*	troff_pretex = ".bp\n.lf line %d %s\n";	/* subsequent instances */
+char*	troff_pretex1 = ".lf %d %s\n";	/* first instance */
+char*	troff_pretex = ".bp\n.lf %d %s\n";	/* subsequent instances */
 char*	troff_posttex = "\n";
-char*	troff_preverb1 = ".lf line %d %s\n";
-char*	troff_preverb = ".lf line %d %s\n";
+char*	troff_preverb1 = ".lf %d %s\n";
+char*	troff_preverb = ".lf %d %s\n";
 char*	troff_postverb = "\n";
 
 char*	predoc;
@@ -270,7 +274,7 @@ int main P2C(int, argc, char **, argv)
 	  fputs ("Try `mpto --help' for more information.\n", stderr);
 	  exit(1);
 	} else if (argc > 1 && strcmp (argv[1], "--help") == 0) {
-	  usagehelp (MPTOHELP);
+            usagehelp (MPTOHELP, NULL);
 	} else if (argc > 1 && strcmp (argv[1], "--version") == 0) {
           printf ("mpto%s 0.63\n\
 Copyright (C) 1996 AT&T Bell Laboratories.\n\

@@ -135,7 +135,6 @@ maketex P2C(kpse_file_format_type, format, string*, args)
   /* New implementation, use fork/exec pair instead of popen, since
    * the latter is virtually impossible to make safe.
    */
-  int i;
   unsigned len;
   string *s;
   string ret;
@@ -162,7 +161,7 @@ maketex P2C(kpse_file_format_type, format, string*, args)
     ret = system(cmd) == 0 ? getenv ("LAST_FONT_CREATED"): NULL;
     free (cmd);
   }
-#elif defined (MSDOS)
+#elif defined (MSDOS) && !defined(DJGPP)
 #error Implement new MSDOS mktex call interface here
 #elif defined (WIN32)
   /* We would vastly prefer to link directly with mktex.c here.
@@ -173,11 +172,9 @@ maketex P2C(kpse_file_format_type, format, string*, args)
   {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
-    DWORD dwCode;
 
     HANDLE child_in, child_out, child_err;
-    HANDLE father_in, father_out;
-    HANDLE father_in_dup, father_out_dup;
+    HANDLE father_in, father_out_dup;
     HANDLE current_pid;
     SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE};
     string new_cmd = NULL, app_name = NULL;
@@ -273,7 +270,7 @@ maketex P2C(kpse_file_format_type, format, string*, args)
            && num > 0) {
       if (num <= 0) {
         if (GetLastError() != ERROR_BROKEN_PIPE) {
-          FATAL1("kpathsea: read() error code for `%s' (Error %d)", GetLastError());
+          FATAL2("kpathsea: read() error code for `%s' (Error %d)", new_cmd, GetLastError());
           break;
         }
       } else {
@@ -480,7 +477,7 @@ kpse_make_tex P2C(kpse_file_format_type, format,  const_string, base)
      * Check whether the name we were given is likely to be a problem.
      * Right now we err on the side of strictness:
      * - may not start with a hyphen (fixable in the scripts).
-     * - allowed are: alphanumeric, underscore, hyphen, period
+     * - allowed are: alphanumeric, underscore, hyphen, period, plus
      * ? also allowed DIRSEP, as we can be fed that when creating pk fonts
      * No doubt some possibilities were overlooked.
      */
@@ -492,6 +489,7 @@ kpse_make_tex P2C(kpse_file_format_type, format,  const_string, base)
     for (i = 0; base[i]; i++) {
       if (!ISALNUM(base[i])
           && base[i] != '-'
+          && base[i] != '+'
           && base[i] != '_'
           && base[i] != '.'
           && !IS_DIR_SEP(base[i]))

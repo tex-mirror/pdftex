@@ -11,6 +11,7 @@
   \centerline{(Version 3.64)}
   \vfill}
 @y
+\def\Kpathsea/{{\mc KPATHSEA\spacefactor1000}}
 \def\title{Common code for CTANGLE and CWEAVE (Version 3.64k)}
 \def\topofcontents{\null\vfill
   \centerline{\titlefont Common code for {\ttitlefont CTANGLE} and
@@ -163,10 +164,10 @@ This version uses the \Kpathsea/ mechanism for searching files.
 The directories to be searched for come from three sources:
 
  (a)~a user-set environment variable \.{CWEBINPUTS}
-    (overriden by \.{CWEBINPUTS\_nls});\par
+    (overriden by \.{CWEBINPUTS\_cweb});\par
  (b)~a line in \Kpathsea/ configuration file \.{texmf.cnf},\hfil\break
     e.g. \.{CWEBINPUTS=.:$TEXMF/texmf/cweb//}
-    or \.{CWEBINPUTS.nls=.:$TEXMF/texmf/cweb//};\hangindent=2\parindent\par
+    or \.{CWEBINPUTS.cweb=.:$TEXMF/texmf/cweb//};\hangindent=2\parindent\par
  (c)~compile-time default directories \.{.:$TEXMF/texmf/cweb//}
     (specified in \.{texmf.in}).
 
@@ -484,7 +485,6 @@ Debugging output is always written to |stderr|, and begins with the string
 show_banner=show_happiness=show_progress=1;
 @y
 show_banner=show_happiness=show_progress=1;
-kpathsea_debug=0;
 @z
 
 Section 69.
@@ -603,7 +603,7 @@ extern char* strncpy(); /* copy up to $n$ string characters */
 @ Modules for dealing with help messages and version info.
 
 @<Display help message and exit@>=
-usagehelp(program==ctangle ? CTANGLEHELP : CWEAVEHELP);
+usagehelp(program==ctangle ? CTANGLEHELP : CWEAVEHELP, NULL);
 @.--help@>
 
 @ Will have to change these if the version numbers change (ouch).

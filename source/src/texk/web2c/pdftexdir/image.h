@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/image.h#12 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/image.h#8 $
 */
 
 #include <png.h>
@@ -65,7 +65,7 @@ typedef struct {
     } image_struct;
 } image_entry;
 
-extern image_entry *image_ptr, *image_tab;
+extern image_entry *image_ptr, *image_array;
 extern integer image_max;
 
 #define IMAGE_TYPE_NONE 0
@@ -78,7 +78,7 @@ extern integer image_max;
 #define IMAGE_COLOR_C   2
 #define IMAGE_COLOR_I   4
 
-#define img_ptr(N)      (image_tab + (N))
+#define img_ptr(N)      (image_array + (N))
 #define img_name(N)     (img_ptr(N)->image_name)
 #define img_type(N)     (img_ptr(N)->image_type)
 #define img_color(N)    (img_ptr(N)->color_type)

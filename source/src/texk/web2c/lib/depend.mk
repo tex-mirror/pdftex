@@ -3,8 +3,7 @@ alloca.o: alloca.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -13,8 +12,7 @@ basechsuffix.o: basechsuffix.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -23,8 +21,7 @@ chartostring.o: chartostring.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -33,8 +30,7 @@ coredump.o: coredump.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -43,8 +39,7 @@ eofeoln.o: eofeoln.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -53,8 +48,7 @@ fprintreal.o: fprintreal.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -63,8 +57,7 @@ input2int.o: input2int.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -73,8 +66,7 @@ inputint.o: inputint.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -83,8 +75,7 @@ main.o: main.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -94,8 +85,7 @@ openclose.o: openclose.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
@@ -107,8 +97,7 @@ printversion.o: printversion.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -117,8 +106,7 @@ uexit.o: uexit.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -127,8 +115,7 @@ usage.o: usage.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -138,8 +125,7 @@ win32main.o: win32main.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 
@@ -148,8 +134,7 @@ zround.o: zround.c ../config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
   $(kpathsea_srcdir)/c-memstr.h \
   $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h \
-  $(kpathsea_srcdir)/c-limits.h \
+  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
   $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
   $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../../web2c/c-auto.h \
   $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h 

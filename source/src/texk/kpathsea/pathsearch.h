@@ -84,5 +84,10 @@ extern KPSEDLL string kpse_path_search_list P3H(const_string path,
 extern KPSEDLL string *kpse_all_path_search P2H(const_string path,
                                                 const_string name);
 
+/* Like `kpse_path_search_list' with MUST_EXIST true, but return a list of
+   all the filenames (or NULL if none), instead of taking the first.  */
+extern KPSEDLL string *kpse_all_path_search_list P2H(const_string path,
+                                                     const_string* names);
+
 #endif /* not KPATHSEA_PATHSEARCH_H */
 

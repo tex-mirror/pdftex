@@ -5,7 +5,7 @@
 Makefile: $(srcdir)/pdfetexdir/pdfetex.mk
 
 # We build pdfetex
-pdfetex = pdfetex
+pdfetex = @PETEX@ pdfetex
 pdfetexdir = pdfetexdir
 
 # The C sources.
@@ -21,43 +21,39 @@ $(pdfetex_c) pdfetexcoerce.h pdfetexd.h: pdfetex.p $(web2c_texmf)
 	$(web2c) pdfetex
 pdfetexextra.c: lib/texmfmp.c
 	sed s/TEX-OR-MF-OR-MP/pdfetex/ $(srcdir)/lib/texmfmp.c >$@
+pdfetexdir/pdfetexextra.h: pdfetexdir/pdfetexextra.in pdftexdir/pdftex.version etexdir/etex.version
+	sed -e s/PDFTEX-VERSION/`cat pdftexdir/pdftex.version`/ \
+	    -e s/ETEX-VERSION/`cat etexdir/etex.version`/ \
+	  $(srcdir)/pdfetexdir/pdfetexextra.in >$@
 
 # Tangling
 pdfetex.p pdfetex.pool: tangle pdfetex.web pdfetex.ch
-	./tangle pdfetex.web pdfetex.ch
+	$(TANGLE) pdfetex.web pdfetex.ch
 
 # Generation of the web and ch file.
-pdfetex.web: tie tex.web \
-             etexdir/etex.ch0 \
-             etexdir/etex.ch \
-             etexdir/etex.fix \
-             etexdir/etex.ch1 \
-             pdfetexdir/pdfetex.ch1 \
-             pdftexdir/pdftex.ch \
-             pdfetexdir/pdfetex.ch2 \
-             pdfetexdir/pdfetex.h \
-             pdfetexdir/pdfetex.defines \
-             pdfetexdir/pdfetex.mk
-	./tie -m pdfetex.web $(srcdir)/tex.web \
-		$(srcdir)/etexdir/etex.ch0 \
-		$(srcdir)/etexdir/etex.ch \
-		$(srcdir)/etexdir/etex.fix \
-		$(srcdir)/etexdir/etex.ch1 \
-		$(srcdir)/pdfetexdir/pdfetex.ch1 \
-		$(srcdir)/pdftexdir/pdftex.ch \
-		$(srcdir)/pdfetexdir/pdfetex.ch2
-pdfetex.ch: tie pdfetex.web pdfetexdir/tex.ch0 tex.ch etexdir/tex.ch1 \
-            etexdir/tex.ech etexdir/tex.ch2 pdfetexdir/tex.ch1 \
-	    pdftexdir/tex.pch pdfetexdir/tex.ch2 pdfetexdir/pdfetex.mk
-	./tie -c pdfetex.ch pdfetex.web \
-		$(srcdir)/pdfetexdir/tex.ch0 \
-		$(srcdir)/tex.ch \
-		$(srcdir)/etexdir/tex.ch1 \
-		$(srcdir)/etexdir/tex.ech \
-		$(srcdir)/etexdir/tex.ch2 \
-		$(srcdir)/pdfetexdir/tex.ch1 \
-		$(srcdir)/pdftexdir/tex.pch \
-		$(srcdir)/pdfetexdir/tex.ch2
+#   Sources for pdfetex.web:
+pdfetex_web_srcs = $(srcdir)/tex.web \
+  $(srcdir)/etexdir/etex.ch \
+  $(srcdir)/etexdir/etex.fix \
+  $(srcdir)/pdfetexdir/pdfetex.ch1 \
+  $(srcdir)/pdftexdir/pdftex.ch \
+  $(srcdir)/pdftexdir/hz.ch \
+  $(srcdir)/pdftexdir/misc.ch \
+  $(srcdir)/pdftexdir/vadjust.ch \
+  $(srcdir)/pdfetexdir/pdfetex.ch2
+#   Sources for pdfetex.ch:
+pdfetex_ch_srcs = pdfetex.web \
+  $(srcdir)/pdfetexdir/tex.ch0 \
+  $(srcdir)/tex.ch \
+  $(srcdir)/etexdir/tex.ch1 \
+  $(srcdir)/etexdir/tex.ech \
+  $(srcdir)/pdfetexdir/tex.ch1 \
+  $(srcdir)/pdftexdir/tex.pch
+#   Rules:
+pdfetex.web: tie pdfetexdir/pdfetex.mk $(pdfetex_web_srcs)
+	$(TIE) -m pdfetex.web $(pdfetex_web_srcs)
+pdfetex.ch: $(pdfetex_ch_srcs)
+	$(TIE) -c pdfetex.ch $(pdfetex_ch_srcs)
 
 $(srcdir)/pdfetexdir/pdfetex.h: $(srcdir)/pdftexdir/pdftex.h
 	cp -f $(srcdir)/pdftexdir/pdftex.h $@
@@ -65,29 +61,32 @@ $(srcdir)/pdfetexdir/pdfetex.h: $(srcdir)/pdftexdir/pdftex.h
 $(srcdir)/pdfetexdir/pdfetex.defines: $(srcdir)/pdftexdir/pdftex.defines
 	cp -f $(srcdir)/pdftexdir/pdftex.defines $@
 
-check: pdfetex-check
-pdfetex-check: pdfetex pdfetex.efmt
+check: @PETEX@ pdfetex-check
+pdfetex-check: pdfetex pdfetex.fmt
 
 clean:: pdfetex-clean
 pdfetex-clean:
 	$(LIBTOOL) --mode=clean $(RM) pdfetex
 	rm -f $(pdfetex_o) $(pdfetex_c) pdfetexextra.c pdfetexcoerce.h
+	rm -f pdfetexdir/pdfetexextra.h
 	rm -f pdfetexd.h pdfetex.p pdfetex.pool pdfetex.web pdfetex.ch
-	rm -f pdfetex.efmt pdfetex.log
+	rm -f pdfetex.fmt pdfetex.log
 
 # Dumps
-all_pdfefmts = pdfetex.efmt $(pdfefmts)
+all_pdfefmts = @FMU@ pdfetex.fmt $(pdfefmts)
+
+dumps: @PETEX@ pdfefmts
 pdfefmts: $(all_pdfefmts)
 
-pdfetex.efmt: pdfetex
+pdfefmtdir = $(web2cdir)/pdfetex
+$(pdfefmtdir)::
+	$(SHELL) $(top_srcdir)/../mkinstalldirs $(pdfefmtdir)
+
+pdfetex.fmt: pdfetex
 	$(dumpenv) $(MAKE) progname=pdfetex files="etex.src plain.tex cmr10.tfm" prereq-check
 	$(dumpenv) ./pdfetex --progname=pdfetex --jobname=pdfetex --ini \*\\pdfoutput=1\\input etex.src \\dump </dev/null
 
-pdfelatex.efmt: pdfetex
-	$(dumpenv) $(MAKE) progname=pdfelatex files="latex.ltx" prereq-check
-	$(dumpenv) ./pdfetex --progname=pdfelatex --jobname=pdfelatex --ini \*\\pdfoutput=1\\input latex.ltx </dev/null
-
-pdflatex.efmt: pdfetex
+pdflatex.fmt: pdfetex
 	$(dumpenv) $(MAKE) progname=pdflatex files="latex.ltx" prereq-check
 	$(dumpenv) ./pdfetex --progname=pdflatex --jobname=pdflatex --ini \*\\pdfoutput=1\\input latex.ltx </dev/null
 
@@ -95,29 +94,30 @@ pdflatex.efmt: pdfetex
 # Installation.
 install-pdfetex: install-pdfetex-exec install-pdfetex-data
 install-pdfetex-exec: install-pdfetex-links
-install-pdfetex-data:: install-pdfetex-dumps
+install-pdfetex-data: install-pdfetex-pool @FMU@ install-pdfetex-dumps
 install-pdfetex-dumps: install-pdfetex-fmts
 
 # The actual binary executables and pool files.
-install-programs: install-pdfetex-programs
+install-programs: @PETEX@ install-pdfetex-programs
 install-pdfetex-programs: $(pdfetex) $(bindir)
 	for p in pdfetex; do $(INSTALL_LIBTOOL_PROG) $$p $(bindir); done
 
-install-links: install-pdfetex-links
+install-links: @PETEX@ install-pdfetex-links
 install-pdfetex-links: install-pdfetex-programs
-	cd $(bindir) && (rm -f inipdfetex virpdfetex; \
-	  $(LN) pdfetex inipdfetex; $(LN) pdfetex virpdfetex)
-	pdfefmts="$(pdfefmts)";
-	  for f in $$pdfefmts; do base=`basename $$f .efmt`; \
+	#cd $(bindir) && (rm -f pdfeinitex pdfevirtex; \
+	#  $(LN) pdfetex pdfeinitex; $(LN) pdfetex pdfevirtex)
+
+install-fmts: @PETEX@ install-pdfetex-fmts
+install-pdfetex-fmts: pdfefmts $(pdfefmtdir)
+	pdfefmts="$(all_pdfefmts)"; \
+	  for f in $$pdfefmts; do $(INSTALL_DATA) $$f $(pdfefmtdir)/$$f; done
+	pdfefmts="$(pdfefmts)"; \
+	  for f in $$pdfefmts; do base=`basename $$f .fmt`; \
 	    (cd $(bindir) && (rm -f $$base; $(LN) pdfetex $$base)); done
 
-install-fmts: install-pdfetex-fmts
-install-pdfetex-fmts: pdfefmts $(fmtdir)
-	pdfefmts="$(all_pdfefmts)";
-	  for f in $$pdfefmts; do $(INSTALL_DATA) $$f $(fmtdir)/$$f; done
-
 # Auxiliary files.
-install-data install-pdfetex-data:: $(texpooldir)
+install-data:: @PETEX@ install-pdfetex-data
+install-pdfetex-pool: pdfetex.pool $(texpooldir)
 	$(INSTALL_DATA) pdfetex.pool $(texpooldir)/pdfetex.pool
 
 # end of pdfetex.mk

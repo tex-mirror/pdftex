@@ -1,4 +1,25 @@
 This file records noteworthy changes.
+7.5.3
+* ctie: New program, from Julian Gilbey.
+* TeX, MF, MP: We now save the name of the engine in the dump, in
+  order to be able to give better error messages in case a dump
+  written by another engine is being read.
+* TeX, MF, MP: We now dump the xord, xchr, and xprn arrays, so if
+  if a TCX file was loaded in INI mode, that will be retained
+  when the dump is loaded.  (Doesn't apply to Omega family.)
+* TeX, MF, MP: Add -8bit option, which makes all characters
+  printable by default.  Note that a TCX file can change this.
+  (Doesn't apply to Omega family.)
+* TeX, MF, MP: In TCX files, a third number (0 or 1) can be
+  used to set printability.  (Doesn't apply to Omega family.)
+* TeX: Include encTeX extension.
+* mft: Allow more than one -style option.
+* pdfxTeX: New.
+* DVItoMP: Now supports color specials, like those added by the
+  colordvi package.  Note that this feature should be considered
+  experimental, and may change in the future.
+* PATGEN: Peter Breitenlohner fixed some typos in text in patgen.web.
+
 7.5.2 (19 February 2003)
 * e-TeX: Remove last bits of support for installing it as 'tex'.
 * Makefile fixes.

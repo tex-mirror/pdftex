@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ptexlib.h#14 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#22 $
 */
 
 #ifndef PDFTEXLIB
 #define PDFTEXLIB
 
 /* WEB2C macros and prototypes */
-#if !defined(PDFTEXCOERCE) && !defined(PDFETEXCOERCE)
+#if !defined(PDFTEXCOERCE) && !defined(PDFETEXCOERCE) && !defined(PDFXTEXCOERCE)
 #ifdef pdfTeX
 #undef pdfTeX /* to avoid warning about redefining pdfTeX in pdftexd.h */
 #endif /* pdfTeX */
@@ -47,35 +47,40 @@ typedef struct {
 } key_entry;
 
 typedef struct {
-    boolean loaded;     /* the encoding has been loaded? */
-    boolean updated;    /* glyph names have been updated for 0--32 chars? */
+    boolean loaded;                 /* the encoding has been loaded? */
+    boolean updated;                /* glyph names have been updated for 0--32 chars? */
     internalfontnumber firstfont;   /* first font that has accessed to this
                                        encoding; move chars 0--32 to higher
                                        area according to this font */
-    char *name;         /* encoding file name */
-    integer objnum;     /* object number */
+    char *name;                     /* encoding file name */
+    integer objnum;                 /* object number */
     char **glyph_names;
 } enc_entry;
 
 typedef struct {
-    char *tfm_name;         /* TFM file name */
-    char *ps_name;          /* PostScript name */
-    integer flags;          /* font flags */
-    char *ff_name;          /* font file name */
-    char *subset_tag;       /* pseudoUniqueTag for subsetted font */
-    int encoding;           /* index to table of encoding vectors */
+    char *tfm_name;             /* TFM file name */
+    char *ps_name;              /* PostScript name */
+    integer flags;              /* font flags */
+    char *ff_name;              /* font file name */
+    char *subset_tag;           /* pseudoUniqueTag for subsetted font */
+    enc_entry *encoding;        /* pointer to corresponding encoding */
     internalfontnumber tfm_num; /* number of first TFM using this entry */
-    int type;               /* font type (T1/TTF/...) */
-    integer slant;          /* SlantFont */
-    integer extend;         /* ExtendFont */
-    int expansion;          /* expansion */
-    integer ff_objnum;      /* FontFile object number */
-    integer fn_objnum;      /* FontName/BaseName object number */
-    integer fd_objnum;      /* FontDescriptor object number */
-    char *charset;          /* string containing used glyphs */
-    boolean found;          /* to avoid researching fonts that have been found */
-    boolean all_glyphs;     /* embed all glyphs */
+    unsigned short type;        /* font type (T1/TTF/...) */
+    short slant;                /* SlantFont */
+    short extend;               /* ExtendFont */
+    integer ff_objnum;          /* FontFile object number */
+    integer fn_objnum;          /* FontName/BaseName object number */
+    integer fd_objnum;          /* FontDescriptor object number */
+    char *charset;              /* string containing used glyphs */
+    boolean all_glyphs;         /* embed all glyphs? */
+    unsigned short links;       /* link flags from tfm_tree and ps_tree */
+    short tfm_avail;            /* flags whether a tfm is available */
 } fm_entry;
+
+typedef struct {
+    char *ff_name;              /* base name of font file */
+    char *ff_path;              /* full path to font file */
+} ff_entry;
 
 typedef short shalfword ;
 typedef struct {
@@ -96,23 +101,17 @@ extern boolean true_dimen;
 extern boolean write_ttf_glyph_names;
 extern char **t1_glyph_names, *t1_builtin_glyph_names[];
 extern char *cur_file_name;
-extern char *mapfiles;
 extern const char notdef[];
-extern enc_entry *enc_ptr, *enc_tab;
-extern fm_entry *fm_cur, *fm_ptr, *fm_tab;
+extern enc_entry *enc_ptr, *enc_array;
+extern fm_entry *fm_cur;
 extern integer t1_length1, t1_length2, t1_length3;
 extern integer ttf_length;
 extern internalfontnumber tex_font;
 extern key_entry font_keys[];
 extern strnumber last_tex_string;
-extern long int last_tab_index;
+extern size_t last_ptr_index;
 
 /* pdftexlib function prototypes */
-
-/* config.c */
-extern integer cfgpar(integer);
-extern boolean iscfgtruedimen(integer);
-extern void readconfigfile(void);
 
 /* epdf.c */
 extern integer get_fontfile_num(int);
@@ -122,14 +121,15 @@ extern void epdf_free(void);
 /* mapfile.c */
 extern char *mk_basename(char *);
 extern char *mk_exname(char *, int);
-extern int lookup_fontmap(char *);
-extern integer fmlookup(internalfontnumber);
-extern internalfontnumber tfmoffm(integer);
+extern fm_entry * lookup_fontmap(char *);
+extern boolean hasfmentry(internalfontnumber);
+extern internalfontnumber tfmoffm(fmentryptr);
 extern void checkextfm(strnumber, integer);
-extern void fix_ffname(fm_entry *, char *);
 extern void fm_free(void);
 extern void fm_read_info(void);
+extern ff_entry * check_ff_exist(fm_entry *);
 extern void pdfmapfile(integer);
+extern void pdfmapline(integer);
 
 /* papersiz.c */
 extern integer myatodim(char **);
@@ -144,14 +144,14 @@ extern char *makecstring(integer);
 extern int xfflush(FILE *);
 extern int xgetc(FILE *);
 extern int xputc(int, FILE *);
-extern integer ff_offset(void);
 extern scaled extxnoverd(scaled, scaled, scaled);
 extern size_t xfwrite(void *, size_t size, size_t nmemb, FILE *);
 extern strnumber getresnameprefix(void);
 extern strnumber maketexstring(const char *);
-extern void ff_flush(void);
-extern void ff_putchar(eightbits b);
-extern void ff_seek(integer);
+extern integer fb_offset(void);
+extern void fb_flush(void);
+extern void fb_putchar(eightbits b);
+extern void fb_seek(integer);
 extern void libpdffinish(void);
 extern void make_subset_tag(fm_entry *, integer);
 extern void pdf_printf(const char *,...);
@@ -161,7 +161,7 @@ extern void pdftex_warn(const char *,...);
 extern void setjobid(int, int, int, int, int, int);
 extern void tex_printf(const char *, ...);
 extern void writestreamlength(integer, integer);
-extern void convertStringToPDFString(char *in, char *out);
+extern char *convertStringToPDFString(char *in);
 extern void printID(strnumber);
 
 /* vfpacket.c */
@@ -176,11 +176,11 @@ extern void vf_free(void);
 /* writeenc.c */
 extern boolean get_enc(fm_entry *);
 extern boolean indexed_enc(fm_entry *);
-extern integer add_enc(char *);
+extern enc_entry *add_enc(char *);
 extern void enc_free(void);
-extern void read_enc(integer);
+extern void read_enc(enc_entry *);
 extern void setcharmap(internalfontnumber);
-extern void write_enc(char **, integer);
+extern void write_enc(char **, enc_entry *, integer);
 
 /* writefont.c */
 extern void dopdffont(integer, internalfontnumber);
@@ -209,6 +209,7 @@ extern boolean t1_read_enc(fm_entry *);
 extern boolean t1_subset(char *, char *, unsigned char *);
 extern void load_enc(char *, char **);
 extern void writet1(void);
+extern void t1_free(void);
 
 /* writet3.c */
 extern void writet3(int, internalfontnumber);
@@ -220,5 +221,9 @@ extern void writeotf(void);
 
 /* writezip.c */
 extern void writezip(boolean);
+
+/* avlstuff.c */
+extern void avlputobj(integer, integer);
+extern integer avlfindobj(integer, integer, integer);
 
 #endif  /* PDFTEXLIB */

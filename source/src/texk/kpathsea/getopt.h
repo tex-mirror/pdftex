@@ -26,16 +26,15 @@
 #ifndef __STDC__
 #define __STDC__ 1
 #endif
-#if defined (KPSE_DLL) || defined (GNUW32_DLL)
-#if defined (MAKE_KPSE_DLL) || defined (MAKE_GNUW32_DLL)
-#define KPSEDLL __declspec( dllexport)
-#else
-#define KPSEDLL __declspec( dllimport)
 #endif
-#else
-#define KPSEDLL
+
+#if defined (KPSE_DLL) && (defined (WIN32) || defined (__CYGWIN__))
+#ifdef MAKE_KPSE_DLL
+#define KPSEDLL __declspec(dllexport)
+#else /* ! MAKE_KPSE_DLL */
+#define KPSEDLL __declspec(dllimport)
 #endif
-#else /* ! WIN32 */
+#else /* ! (KPSE_DLL && (WIN32 || __CYGWIN__)) */
 #define KPSEDLL
 #endif
 

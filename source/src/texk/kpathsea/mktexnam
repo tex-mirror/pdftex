@@ -3,7 +3,7 @@
 # te@dbs.uni-hannover.de, kb@mail.tug.org, and infovore@xs4all.nl.
 # Public domain.
 
-version='$Id: mktexnam,v 1.28 2002/10/22 18:34:24 olaf Exp $'
+version='$Id: mktexnam,v 1.29 2004/02/25 08:26:29 olaf Exp $'
 usage="Usage: $0 NAME [DPI MODE] [DESTDIR].
   Output the PK, TFM, and MF names for a font NAME."
 mt_max_args=4
@@ -138,7 +138,7 @@ test -n "$MT_MKTEXNAM_OPT" && . "$MT_MKTEXNAM_OPT"
 # Adjust MT_DESTROOT, if necessary.
 if test -n "${MT_DESTROOT}"; then
   # Do we have write access and permission?
-  access -w "$MT_DESTROOT" || USE_ALTERNATE=1
+  kpseaccess -w "$MT_DESTROOT" || USE_ALTERNATE=1
   test -w "$MT_DESTROOT" || USE_ALTERNATE=1
   # We distinguish system trees from the rest.
   systexmf="`kpsewhich --expand-path='{$SYSTEXMF}/fonts'`$SEP$MT_VARTEXFONTS"

@@ -52,17 +52,6 @@ extern struct sym_entry sym_table[];
 extern int next_sym_free, next_string_free;
 extern int mark_sym_free, mark_string_free;
 
-/* configure tries to figure out lex's convention for yytext.  */
-#ifdef YYTEXT_POINTER
-extern char *yytext;
-#else
-#ifdef YYTEXT_UCHAR
-extern unsigned char yytext[];
-#else
-extern char yytext[];
-#endif
-#endif
-
 extern void find_next_temp P1H(void);
 extern void normal P1H(void);
 extern void new_line P1H(void);
@@ -74,6 +63,10 @@ extern void initialize P1H(void);
 extern int add_to_table P1H(string);
 extern int search_table P1H(const_string);
 extern int yyerror P1H(string);
+
+extern void get_string_literal P1H(char*);
+extern void get_single_char P1H(char*);
+extern void get_return_type P1H(char*);
 
 /* No prototypes for these two. As used, neither takes arguments. */
 extern int yylex(), yyparse();

@@ -38,6 +38,17 @@ INSTALL_LIBTOOL_PROG = $(LIBTOOL) --mode=install $(INSTALL_PROGRAM)
 # Creating (symbolic) links.
 LN = @LN_S@
 
+# Removing files.
+RM = rm -f
+
+# Uninstall.
+UNINSTALL = $(RM)
+UNINSTALL_PROGRAM = $(RM)
+UNINSTALL_SCRIPT = $(RM)
+UNINSTALL_DATA = $(RM)
+UNINSTALL_LIBTOOL_LIBS = $(LIBTOOL) --mode=uninstall $(RM)
+UNINSTALL_LIBTOOL_PROG = $(LIBTOOL) --mode=uninstall $(RM)
+
 # We use these for many things.
 kpathsea_parent = ..
 kpathsea_dir = $(kpathsea_parent)/kpathsea

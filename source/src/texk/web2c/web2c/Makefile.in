@@ -8,6 +8,7 @@
 # These get expanded from the parent directory, not this one.
 ac_include ../make/common.mk
 ac_include ../make/programs.mk
+ac_include ../make/cross.mk
 ac_include kpathsea.mk
 
 LEX = @LEX@
@@ -15,13 +16,12 @@ LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
 YACC = @YACC@
 
-proglib = ../lib/lib.a
 programs = web2c fixwrites splitup
 
-web2c_objects = main.o y_tab.o $(LEX_OUTPUT_ROOT).o
+web2c_objects = kps.o main.o y_tab.o $(LEX_OUTPUT_ROOT).o
 all: $(programs)
 web2c: $(web2c_objects)
-	$(kpathsea_link) $(web2c_objects) $(LEXLIB) $(LOADLIBES) 
+	$(build_link_command) $(web2c_objects) $(LEXLIB)
 
 # We use y_tab.* for the sake of MS-DOS.
 main.o: main.c y_tab.h
@@ -34,22 +34,29 @@ $(LEX_OUTPUT_ROOT).o: y_tab.h
 $(LEX_OUTPUT_ROOT).c: web2c.l
 	$(LEX) $(srcdir)/web2c.l
 
-fixwrites: fixwrites.o
-	$(kpathsea_link) fixwrites.o $(LOADLIBES)
-splitup: splitup.o
-	$(kpathsea_link) splitup.o $(LOADLIBES)
-regfix: regfix.o
-	$(kpathsea_link) regfix.o $(LOADLIBES)
+fixwrites: fixwrites.o kps.o
+	$(build_link_command) fixwrites.o kps.o
+splitup: splitup.o kps.o
+	$(build_link_command) splitup.o kps.o
+regfix: regfix.o kps.o
+	$(build_link_command) regfix.o kps.o
 
-$(programs): $(proglib) $(kpathsea)
+$(programs):
 
-@MAINT@# It's really not worth srcdir etc. here.
-@MAINT@lib_sources = $(addprefix ../lib/,alloca.c basechsuffix.c chartostring.c \
-@MAINT@  eofeoln.c fprintreal.c input2int.c inputint.c main.c openclose.c \
-@MAINT@  uexit.c usage.c version.c zround.c)
-@MAINT@$(proglib): $(lib_sources)
-@MAINT@	cd ../lib && $(MAKE)
-@MAINT@always:
+main.o: main.c
+	$(build_compile) -c $<
+kps.o: kps.c
+	$(build_compile) -c $<
+y_tab.o: y_tab.c
+	$(build_compile) -c $<
+$(LEX_OUTPUT_ROOT).o: $(LEX_OUTPUT_ROOT).c
+	$(build_compile) -c $<
+fixwrites.o: fixwrites.c
+	$(build_compile) -c $<
+splitup.o: splitup.c
+	$(build_compile) -c $<
+regfix.o: regfix.c
+	$(build_compile) -c $<
 
 Makefile: Makefile.in ../config.status
 	cd .. && $(SHELL) config.status

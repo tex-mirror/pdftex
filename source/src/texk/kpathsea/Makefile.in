@@ -36,9 +36,9 @@ library = kpathsea
 KPATHSEA_CC = $(LIBTOOL) --mode=compile "$(CC)"
 .SUFFIXES: .lo
 .c.lo:
-	$(KPATHSEA_CC) $(ALL_CFLAGS) -c $<
+	$(KPATHSEA_CC) $(ALL_CFLAGS) -DMAKE_KPSE_DLL -c $<
 
-default all: kpsewhich kpsestat access readlink $(library).info manfiles
+default all: kpsewhich kpsestat kpseaccess kpsereadlink $(library).info manfiles
 
 kpsewhich: $(kpathsea) kpsewhich.o
 	$(kpathsea_link) kpsewhich.o $(LOADLIBES)
@@ -46,10 +46,10 @@ kpsewhich: $(kpathsea) kpsewhich.o
 kpsestat: kpsestat.o
 	$(link_command) kpsestat.o
 
-access: access.o
+kpseaccess: access.o
 	$(link_command) access.o
 
-readlink: readlink.o
+kpsereadlink: readlink.o
 	$(link_command) readlink.o
 
 $(kpathsea): $(objects)
@@ -78,6 +78,7 @@ texmf.sed: Makefile
 # likely to have been mangled as well.
 	echo '/^ *TEXMFMAIN[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 	echo '/^[% ]*TEXMFLOCAL[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFDIST[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 	echo '/^[% ]*VARTEXMF[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 	echo '/^[% ]*TEXMFCNF[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 # And fill in the last clause of TEXMFCNF with an absolute path.
@@ -176,10 +177,14 @@ install-exec: kpsewhich
 	$(INSTALL_LIBTOOL_LIBS) lib$(library).la $(libdir)
 	$(INSTALL_LIBTOOL_PROG) kpsewhich $(bindir)
 	$(INSTALL_PROGRAM) kpsestat $(bindir)
-	$(INSTALL_PROGRAM) access $(bindir)
-	$(INSTALL_PROGRAM) readlink $(bindir)
+	$(INSTALL_PROGRAM) kpseaccess $(bindir)
+	$(INSTALL_PROGRAM) kpsereadlink $(bindir)
 uninstall-exec:
-	rm -f $(bindir)/kpsewhich
+	$(UNINSTALL_LIBTOOL_LIBS) $(libdir)/lib$(library).la
+	$(UNINSTALL_LIBTOOL_PROG) $(bindir)/kpsewhich
+	$(UNINSTALL_PROGRAM) $(bindir)/kpsestat
+	$(UNINSTALL_PROGRAM) $(bindir)/kpseaccess
+	$(UNINSTALL_PROGRAM) $(bindir)/kpsereadlink
 
 install-data: texmf.cnf kpathsea.info install-man
 	$(SHELL) $(top_srcdir)/../mkinstalldirs $(texmf) $(infodir) $(web2cdir)
@@ -252,13 +257,13 @@ $(library).info: bugs.texi hier.texi install.texi unixtex.texi
 ac_include ../make/clean.mk
 
 mostlyclean::
-	rm -f kpsewhich kpsestat access readlink *.lo
+	rm -f kpsewhich kpsestat kpseaccess kpsereadlink *.lo
 	$(LIBTOOL) --mode=clean $(RM) lib$(library).la
 distclean::
 	rm -f paths.h texmf.cnf texmf.sed stamp-paths
 
 # The manual pages
-manfiles = access.1 kpsestat.1 kpsewhich.1 readlink.1 \
+manfiles = kpseaccess.1 kpsestat.1 kpsewhich.1 kpsereadlink.1 \
            mktexlsr.1 mktexmf.1 mktextfm.1 mktexpk.1
 
 ac_include ../make/man.mk

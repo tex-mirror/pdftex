@@ -1,7 +1,7 @@
 #include "config.h"
 
 /* The entry point: set up for reading the command line, which will
-   happen in `topenin', then call the main body.  */
+   happen in `topenin', then call the main body.  Public domain. */
 
 extern TEXDLL void mainbody P1H(void);
 extern TEXDLL void maininit P2H(int, string *);

@@ -64,9 +64,13 @@ if test "x$datadir" != 'x${prefix}/share'; then
   else
     AC_MSG_RESULT([not found])
     AC_MSG_WARN([No texmf tree found at $texmfmain.
-  If you do not have the files, you can retrieve a minimal set from
-  ftp://ftp.tug.org/tex/texklib.tar.gz, which is mirrored on CTAN hosts
-  in systems/web2c.  Winging it.])
+  *****************************************************************
+  * Error: The main texmf tree was not found.                     *
+  * If you do not have the files, you should be able to them from *
+  * the same place you got these sources from, or from one of the *
+  * CTAN hosts.                                                   *
+  *****************************************************************
+  Winging it.])
   fi
 else
   # Second case, datadir is default...
@@ -81,18 +85,26 @@ else
       break
     fi
   done
+  if test -z "$texmfmain" && test "x$prefix" = "xNONE"; then
+     # Still no texmfmain found, no prefix set, perhaps kpsewhich is
+     # installed and can help us out.
+     texmfmain=`kpsewhich --expand-path='$TEXMFMAIN'` 2>/dev/null
+  fi
   texmfmain=`echo "$texmfmain" | sed 's,//*,/,g'`
   if test -n "$texmfmain"; then
     AC_MSG_RESULT("$texmfmain")
   else
     eval texmfmain="$datadir/texmf"
     AC_MSG_RESULT([not found])
-    AC_MSG_WARN([The main texmf tree was not found.
-  Specify the location of its parent directory with the --datadir option.
-  If you do not have the files, you can retrieve a minimal set from
-  ftp://ftp.tug.org/tex/texklib.tar.gz, which is mirrored on CTAN hosts
-  in systems/web2c.  Winging it by using the default location
-  $texmfmain.])
+    AC_MSG_WARN([The main texmf tree was not found at $texmfmain.
+  *****************************************************************
+  * Error: The main texmf tree was not found.                     *
+  * Use the --datadir option to specify its parent directory.     *
+  * If you do not have the files, you should be able to them from *
+  * the same place you got these sources from, or from one of the *
+  * CTAN hosts.                                                   *
+  *****************************************************************
+  Winging it by pretending $texmfmain is correct.])
   fi
 fi
 AC_SUBST(texmfmain)

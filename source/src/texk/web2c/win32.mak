@@ -3,7 +3,7 @@
 # Makefile  : Web2C
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/09/13 21:57:45 popineau>
+# Time-stamp: <04/03/20 16:25:18 popineau>
 #
 ################################################################################
 
@@ -14,14 +14,15 @@ version = 7.5.1
 # install-fmts/install-bases/install-mems will install. plain.* is
 # created automatically (as a link).  See the Formats node in
 # doc/web2c.texi for details on the fmts.
-fmts = olatex.fmt # amstex.fmt eplain.fmt texinfo.fmt
-efmts = latex.efmt
-pdffmts = pdfolatex.fmt
-pdfefmts = pdflatex.efmt
-ofmts = lambda.oft
-eofmts = elambda.eoft
-bases = # I do not recommend building cmmf.base.
-mems =  # mfplain.mem is probably not generally useful.
+#FMU fmts = olatex.fmt # amstex.fmt eplain.fmt texinfo.fmt
+#FMU efmts = latex.efmt
+#FMU pdffmts = pdfolatex.fmt
+#FMU pdfefmts = pdflatex.efmt
+#FMU pdfxfmts = pdflatex.xfmt
+#FMU ofmts = lambda.oft
+#FMU eofmts = elambda.eoft
+#FMU bases = # I do not recommend building cmmf.base.
+#FMU mems =  # mfplain.mem is probably not generally useful.
 
 # The name of the file that defines your local devices for Metafont.
 # (Only relevant during `make bases'.)  I recommend `modes.mf', which
@@ -34,7 +35,11 @@ DIFF = diff
 DIFFFLAGS =
 
 root_srcdir=..\..
+!ifdef DEVELOPMENT
+INCLUDE=$(INCLUDE);$(root_srcdir)\texk.development
+!else
 INCLUDE=$(INCLUDE);$(root_srcdir)\texk
+!endif
 
 USE_KPATHSEA = 1
 USE_GETURL = 1
@@ -60,10 +65,6 @@ DEFS = -I. $(DEFS) -DHAVE_CONFIG_H -DOEM -DJOBTIME -DTIME_STATS \
 !ifdef TEX_DLL
 DEFS = $(DEFS) -DMAKE_TEX_DLL
 !endif
-
-# pdfTeX version
-verpdftexdir = pdftexdir
-verpdfetexdir = pdfetexdir
 
 # With --enable-ipc, TeX may need to link with -lsocket.
 socketlibs = delayimp.lib /delayload:wsock32.dll # @socketlibs@
@@ -117,7 +118,7 @@ mpware = mpware\$(objdir)\dmp.exe ..\contrib\$(objdir)\makempx.exe mpware\$(objd
 mpware_sources = mpware\dmp.c ..\contrib\makempx.c mpware\mpto.c mpware\newer.c
 
 #  
-default all: programs manpages doc\web2c.info # dumps
+default all: programs manpages doc\web2c.info #FMU dumps
 check: dumps
 
 $(objdir)\bibtex.exe: $(objdir)\bibtex.obj $(objdir)\bibtex.res $(kpathsealib) $(proglib)
@@ -137,7 +138,9 @@ bibtex-check: $(objdir)\bibtex.exe
 clean:: bibtex-clean
 bibtex-clean:
 #	$(LIBTOOL) --mode=clean $(del) bibtex
-	-@$(del) $(objdir)\bibtex.obj bibtex.c bibtex.h bibtex.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\bibtex.obj bibtex.c bibtex.h bibtex.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\exampl.blg tests\exampl.bbl $(redir_stderr)
 
 $(objdir)\cweave.exe: $(objdir)\cweave.obj $(objdir)\cweb.obj
@@ -154,7 +157,9 @@ cweave-check: $(objdir)\cweave.exe
 clean:: cweave-clean
 cweave-clean:
 #	$(LIBTOOL) --mode=clean $(del) cweave
-	-@$(del) $(objdir)\cweave.obj cweave.c $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\cweave.obj cweave.c) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) common.tex common.scn common.idx $(redir_stderr)
 
 $(objdir)\dvicopy.exe: $(objdir)\dvicopy.obj $(objdir)\dvicopy.res $(kpathsealib) $(proglib)
@@ -175,7 +180,9 @@ dvicopy-check: $(objdir)\dvicopy.exe
 clean:: dvicopy-clean
 dvicopy-clean:
 #	$(LIBTOOL) --mode=clean $(del) dvicopy
-	-@$(del) $(objdir)\dvicopy.obj dvicopy.c dvicopy.h dvicopy.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\dvicopy.obj dvicopy.c dvicopy.h dvicopy.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xstory.dvi tests\xpplr.dvi $(redir_stderr)
 
 $(objdir)\dvitomp.exe: $(objdir)\dvitomp.obj $(objdir)\dvitomp.res $(kpathsealib) $(proglib)
@@ -196,7 +203,9 @@ dvitomp-check: $(objdir)\dvitomp.exe
 clean:: dvitomp-clean
 dvitomp-clean:
 #	$(LIBTOOL) --mode=clean $(del) dvitomp
-	-@$(del) $(objdir)\dvitomp.obj dvitomp.c dvitomp.h dvitomp.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\dvitomp.obj dvitomp.c dvitomp.h dvitomp.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xstory.mpx tests\xptmr.mpx $(redir_stderr)
 
 $(objdir)\dvitype.exe: $(objdir)\dvitype.obj $(objdir)\dvitype.res $(kpathsealib) $(proglib)
@@ -208,11 +217,13 @@ dvitype.p: $(tangle) dvitype.web dvitype.ch
 check: dvitype-check
 dvitype-check: $(objdir)\dvitype.exe
 	.\$(objdir)\dvitype -show-opcodes $(srcdir)\tests\story >tests\xstory.dvityp
-	.\$(objdir)\dvitype --p=*.*.2 $(srcdir)\tests\pagenum.dvi >tests\xpagenum.typ
+	.\$(objdir)\dvitype -p=*.*.2 $(srcdir)\tests\pagenum.dvi >tests\xpagenum.typ
 clean:: dvitype-clean
 dvitype-clean:
 #	$(LIBTOOL) --mode=clean $(del) dvitype
-	-@$(del) $(objdir)\dvitype.obj dvitype.c dvitype.h dvitype.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\dvitype.obj dvitype.c dvitype.h dvitype.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xstory.dvityp tests\xpagenum.typ $(redir_stderr)
 
 $(objdir)\gftodvi.exe: $(objdir)\gftodvi.obj $(objdir)\gftodvi.res $(kpathsealib) $(proglib)
@@ -229,7 +240,9 @@ gftodvi-check: $(objdir)\gftodvi.exe
 clean:: gftodvi-clean
 gftodvi-clean:
 #	$(LIBTOOL) --mode=clean $(del) gftodvi
-	-@$(del) $(objdir)\gftodvi.obj gftodvi.c gftodvi.h gftodvi.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\gftodvi.obj gftodvi.c gftodvi.h gftodvi.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xcmr10.dvi $(redir_stderr)
 
 $(objdir)\gftopk.exe: $(objdir)\gftopk.obj $(objdir)\gftopk.res $(kpathsealib) $(proglib)
@@ -245,7 +258,9 @@ gftopk-check: $(objdir)\gftopk.exe
 clean:: gftopk-clean
 gftopk-clean:
 #	$(LIBTOOL) --mode=clean $(del) gftopk
-	-@$(del) $(objdir)\gftopk.obj gftopk.c gftopk.h gftopk.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\gftopk.obj gftopk.c gftopk.h gftopk.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xcmr10.pk $(redir_stderr)
 
 $(objdir)\gftype.exe: $(objdir)\gftype.obj $(objdir)\gftype.res $(kpathsealib) $(proglib)
@@ -261,7 +276,9 @@ gftype-check: $(objdir)\gftype.exe
 clean:: gftype-clean
 gftype-clean:
 #	$(LIBTOOL) --mode=clean $(del) gftype
-	-@$(del) $(objdir)\gftype.obj gftype.c gftype.h gftype.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\gftype.obj gftype.c gftype.h gftype.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xcmr10.gft1 tests\xcmr10.gft2 $(redir_stderr)
 
 $(objdir)\mft.exe: $(objdir)\mft.obj $(objdir)\mft.res $(kpathsealib) $(proglib)
@@ -276,7 +293,9 @@ mft-check: $(objdir)\mft.exe
 clean:: mft-clean
 mft-clean:
 #	$(LIBTOOL) --mode=clean $(del) mft
-	-@$(del) $(objdir)\mft.obj mft.c mft.h mft.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\mft.obj mft.c mft.h mft.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\io.tex $(redir_stderr)
 
 $(objdir)\patgen.exe: $(objdir)\patgen.obj $(objdir)\patgen.res $(kpathsealib) $(proglib)
@@ -292,7 +311,9 @@ patgen-check: $(objdir)\patgen.exe
 clean:: patgen-clean
 patgen-clean:
 #	$(LIBTOOL) --mode=clean $(del) patgen
-	-@$(del) $(objdir)\patgen.obj patgen.c patgen.h patgen.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\patgen.obj patgen.c patgen.h patgen.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xout pattmp.1 $(redir_stderr)
 
 $(objdir)\pktogf.exe: $(objdir)\pktogf.obj $(objdir)\pktogf.res $(kpathsealib) $(proglib)
@@ -308,7 +329,9 @@ pktogf-check: $(objdir)\pktogf.exe
 clean:: pktogf-clean
 pktogf-clean:
 #	$(LIBTOOL) --mode=clean $(del) pktogf
-	-@$(del) $(objdir)\pktogf.obj pktogf.c pktogf.h pktogf.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\pktogf.obj pktogf.c pktogf.h pktogf.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xcmr10.600gf $(redir_stderr)
 
 $(objdir)\pktype.exe: $(objdir)\pktype.obj $(objdir)\pktype.res $(kpathsealib) $(proglib)
@@ -323,7 +346,9 @@ pktype-check: $(objdir)\pktype.exe
 clean:: pktype-clean
 pktype-clean:
 #	$(LIBTOOL) --mode=clean $(del) pktype
-	-@$(del) $(objdir)\pktype.obj pktype.c pktype.h pktype.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\pktype.obj pktype.c pktype.h pktype.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xcmr10.pktyp $(redir_stderr)
 
 $(objdir)\pltotf.exe: $(objdir)\pltotf.obj $(objdir)\pltotf.res $(kpathsealib) $(proglib)
@@ -338,7 +363,9 @@ pltotf-check: $(objdir)\pltotf.exe
 clean:: pltotf-clean
 pltotf-clean:
 #	$(LIBTOOL) --mode=clean $(del) pltotf
-	-@$(del) $(objdir)\pltotf.obj pltotf.c pltotf.h pltotf.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\pltotf.obj pltotf.c pltotf.h pltotf.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xcmr10.tfm $(redir_stderr)
 
 $(objdir)\pooltype.exe: $(objdir)\pooltype.obj $(objdir)\pooltype.res $(kpathsealib) $(proglib)
@@ -354,7 +381,9 @@ pooltype-check: $(objdir)\pooltype.exe
 clean:: pooltype-clean
 pooltype-clean:
 #	$(LIBTOOL) --mode=clean $(del) pooltype
-	-@$(del) $(objdir)\pooltype.obj pooltype.c pooltype.h pooltype.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\pooltype.obj pooltype.c pooltype.h pooltype.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xtexpool.typ $(redir_stderr)
 
 $(objdir)\tie.exe: $(objdir)\tie.obj $(kpathsealib) $(proglib)
@@ -366,7 +395,9 @@ tie.c: $(objdir)\ctangle.exe tiedir\tie.w tiedir\tie-w2c.ch
 clean:: tie-clean
 tie-clean:
 #	$(LIBTOOL) --mode=clean $(del) tie
-	-@$(del) $(objdir)\tie.obj tie.c $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\tie.obj tie.c) do $(del) %%i $(redir_stderr) \
+	)
 
 $(objdir)\tftopl.exe: $(objdir)\tftopl.obj $(objdir)\tftopl.res $(kpathsealib) $(proglib)
 	$(link) $(**) $(conlibs)
@@ -380,7 +411,9 @@ tftopl-check: $(objdir)\tftopl.exe
 clean:: tftopl-clean
 tftopl-clean:
 #	$(LIBTOOL) --mode=clean $(del) tftopl
-	-@$(del) $(objdir)\tftopl.obj tftopl.c tftopl.h tftopl.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\tftopl.obj tftopl.c tftopl.h tftopl.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xcmr10.pl $(redir_stderr)
 
 $(objdir)\vftovp.exe: $(objdir)\vftovp.obj $(objdir)\vftovp.res $(kpathsealib) $(proglib)
@@ -397,7 +430,9 @@ vftovp-check: $(objdir)\vftovp.exe
 clean:: vftovp-clean
 vftovp-clean:
 #	$(LIBTOOL) --mode=clean $(del) vftovp
-	-@$(del) $(objdir)\vftop.obj vftovp.c vftovp.h vftovp.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\vftop.obj vftovp.c vftovp.h vftovp.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xptmr.vpl $(redir_stderr)
 
 $(objdir)\vptovf.exe: $(objdir)\vptovf.obj $(objdir)\vptovf.res $(kpathsealib) $(proglib)
@@ -412,7 +447,9 @@ vptovf-check: $(objdir)\vptovf.exe
 clean:: vptovf-clean
 vptovf-clean:
 #	$(LIBTOOL) --mode=clean $(del) vptovf
-	-@$(del) $(objdir)\vptovf.obj vptovf.c vptovf.h vptovf.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\vptovf.obj vptovf.c vptovf.h vptovf.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) tests\xptmr.vf tests\xptmr.tfm $(redir_stderr)
 
 $(objdir)\weave.exe: $(objdir)\weave.obj $(objdir)\weave.res $(kpathsealib) $(proglib)
@@ -427,7 +464,9 @@ weave-check: $(objdir)\weave.exe
 clean:: weave-clean
 weave-clean:
 #	$(LIBTOOL) --mode=clean $(del) weave
-	-@$(del) $(objdir)\weave.obj weave.c weave.h weave.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\weave.obj weave.c weave.h weave.p) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(del) pooltype.tex $(redir_stderr)
 
 # 
@@ -493,14 +532,15 @@ mf-check: trap mf.base
 	.\$(objdir)\mf --progname=mf "&./mf $(srcdir)\tests\uno.dos"
 clean:: mf-clean
 mf-clean: trap-clean
+	-@echo $(verbose) & ( \
+		for %%i in ($(mf_c) mfcoerce.h mfd.h mf.p mf.pool  \
+                            $(mfw_o) mfextra.c $(mfn_o) mfnowin.c  \
+                            mf.base mf.log mfput.log online.2602gf \
+                            online.log one.two.log uno.log) do $(del) %%i $(redir_stderr) \
+	)
 #	$(LIBTOOL) --mode=clean $(del) mf
-	-@$(del) $(mf_c) mfcoerce.h mfd.h mf.p mf.pool $(redir_stderr)
 #	$(LIBTOOL) --mode=clean $(del) mfw
-	-@$(del) $(mfw_o) mfextra.c $(redir_stderr)
 #	$(LIBTOOL) --mode=clean $(del) mf-nowin
-	-@$(del) $(mfn_o) mfnowin.c $(redir_stderr)
-	-@$(del) mf.base mf.log $(redir_stderr)
-	-@$(del) mfput.log online.2602gf online.log one.two.log uno.log $(redir_stderr)
 
 # Can't run trap and mptrap in parallel, because both write trap.{log,tfm}.
 trap: mf tftopl gftype trap-clean
@@ -508,7 +548,8 @@ trap: $(objdir)\mf.exe $(objdir)\tftopl.exe $(objdir)\gftype.exe
 	@echo ">>> See $(testdir)\mftrap.diffs for example of acceptable diffs."
 	set TEXMFCNFOLD=$(TEXMFCNF)
 	set TEXMFCNF=$(testdir)
-	-@$(del) trap.mf & $(copy) $(testdir)\trap.mf . # get same filename in log $(redir_stderr)
+# get same filename in log
+	-@$(del) trap.mf & $(copy) $(testdir)\trap.mf . $(redir_stderr)
 	-.\$(objdir)\mf -progname=inimf < $(testdir)\mftrap1.in > mftrapin.fot
 	$(move) trap.log mftrapin.log
 	-$(diff) $(testdir)\mftrapin.log mftrapin.log
@@ -524,10 +565,11 @@ trap: $(objdir)\mf.exe $(objdir)\tftopl.exe $(objdir)\gftype.exe
 	set TEXMFCNF=$(TEXMFCNFOLD)
 
 trap-clean:
-	-@$(del) trap.mf trap.base $(redir_stderr)
-	-@$(del) mftrapin.fot mftrapin.log $(redir_stderr)
-	-@$(del) mftrap.fot mftrap.log mftrap.tfm $(redir_stderr)
-	-@$(del) mftrap.pl trap.72270gf trap.typ $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in (trap.mf trap.base mftrapin.fot mftrapin.log \
+                            mftrap.fot mftrap.log mftrap.tfm mftrap.pl  \
+			    trap.72270gf trap.typ) do $(del) %%i $(redir_stderr) \
+	)
 # 
 # MetaPost
 mp_c = mp.c
@@ -565,10 +607,12 @@ mpost-check: mptrap mpost.mem $(mpware)
 	.\$(objdir)\mpost --progname=mpost $(srcdir)\tests\uno.dos
 clean:: mpost-clean
 mpost-clean: mptrap-clean
+	-@echo $(verbose) & ( \
+		for %%i in ($(mp_o) $(mp_c) mpextra.c mpcoerce.h mpd.h \
+                            mp.p mp.pool mpost.mem mpost.log mpout.log \
+                            mptest.log one.two.log uno.log) do $(del) %%i $(redir_stderr) \
+	)
 #	$(LIBTOOL) --mode=clean $(del) mpost
-	-@$(del) $(mp_o) $(mp_c) mpextra.c mpcoerce.h mpd.h mp.p mp.pool $(redir_stderr)
-	-@$(del) mpost.mem mpost.log $(redir_stderr)
-	-@$(del) mpout.log mptest.log one.two.log uno.log $(redir_stderr)
 
 # Can't run trap and mptrap in parallel, because both write trap.{log,tfm}.
 mptrap: mpost pltotf tftopl mptrap-clean
@@ -576,7 +620,8 @@ mptrap: $(objdir)\mpost.exe $(objdir)\pltotf.exe $(objdir)\tftopl.exe mptrap-cle
 	@echo ">>> See $(testdir)\mptrap.diffs for example of acceptable diffs." >&2
 	set TEXMFCNFOLD=$(TEXMFCNF)
 	set TEXMFCNF=$(testdir)
-	-@$(del) mtrap.mp & $(copy) $(testdir)\mtrap.mp . # get same filename in log $(redir_stderr)
+# get same filename in log 
+	-@$(del) mtrap.mp & $(copy) $(testdir)\mtrap.mp . $(redir_stderr)
 	.\$(objdir)\pltotf $(testdir)\trapf.pl trapf.tfm
 	-.\$(objdir)\mpost -progname=inimpost mtrap
 	-$(diff) $(testdir)\mtrap.log mtrap.log
@@ -607,15 +652,17 @@ mptrap: $(objdir)\mpost.exe $(objdir)\pltotf.exe $(objdir)\tftopl.exe mptrap-cle
 	-$(diff) $(testdir)\mptrap.pl mptrap.pl
 	set TEXMFCNF=$(TEXMFCNFOLD)
 mptrap-clean:
-	-@$(del) mtrap.mp mtrap.mem trapf.tfm $(redir_stderr)
-	-@$(del) mtrap.log mtrap.0 mtrap.1 writeo writeo.log writeo.2 $(redir_stderr)
-	-@$(del) trap.mp trap.mpx mptrapin.fot mptrapin.log $(redir_stderr)
-	-@$(del) mptrap.fot mptrap.log mptrap.tfm $(redir_stderr)
-	-@$(del) trap.ps trap.mem trap.0 trap.5 trap.6 trap.95 trap.96 trap.97 $(redir_stderr)
-	-@$(del) trap.98 trap.99 trap.100 trap.101 trap.102 trap.103 trap.104 $(redir_stderr)
-	-@$(del) trap.105 trap.106 trap.107 trap.108 trap.109 trap.148 $(redir_stderr)
-	-@$(del) trap.149 trap.150 trap.151 trap.197 trap.200 $(redir_stderr)
-	-@$(del) mptrap.pl $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in (mtrap.mp mtrap.mem trapf.tfm \
+			    mtrap.log mtrap.0 mtrap.1 writeo writeo.log writeo.2 \
+			    trap.mp trap.mpx mptrapin.fot mptrapin.log \
+			    mptrap.fot mptrap.log mptrap.tfm \
+			    trap.ps trap.mem trap.0 trap.5 trap.6 trap.95 trap.96 trap.97 \
+			    trap.98 trap.99 trap.100 trap.101 trap.102 trap.103 trap.104 \
+			    trap.105 trap.106 trap.107 trap.108 trap.109 trap.148 \
+			    trap.149 trap.150 trap.151 trap.197 trap.200 \
+			    mptrap.pl) do $(del) %%i $(redir_stderr) \
+	)
 # 
 # TeX
 tex_c = tex.c
@@ -643,60 +690,70 @@ tex-w32.ch: $(objdir)\tie.exe tex.ch tex-supp-w32.ch
 	$(objdir)\tie.exe -c tex-w32.ch tex.web tex.ch tex-supp-w32.ch
 check: tex-check
 tex-check: trip tex.fmt
-# Test truncation (but don't bother showing the warning msg).
-	.\$(objdir)\tex --progname=tex --output-comment=$(outcom) $(srcdir)\tests\hello > nul \
-	  & .\$(objdir)\dvitype hello.dvi | grep olaf@infovore.xs4all.nl > nul
-# \openout should show up in \write's.
-	.\$(objdir)\tex --progname=tex $(srcdir)\tests\openout & grep xfoo openout.log
-# one.two.tex -> one.two.log
-	.\$(objdir)\tex --progname=tex $(srcdir)\tests\one.two & dir /n one.two.log
-# uno.dos -> uno.log
-	.\$(objdir)\tex --progname=tex $(srcdir)\tests\uno.dos & dir /n uno.log
-	.\$(objdir)\tex --progname=tex $(srcdir)\tests\just.texi & dir /n just.log
-	-.\$(objdir)\tex --progname=tex $(srcdir)\tests\batch.tex
-	.\$(objdir)\tex --progname=tex --shell $(srcdir)\tests\write18 | grep echo
-	.\$(objdir)\tex --mltex --progname=initex $(srcdir)\tests\mltextst
-	-.\$(objdir)\tex --progname=tex <nul
-	set PATH=$(kpathseadir);$(kpathsea_srcdir);$(PATH)
-	set WEB2C=$(kpathsea_srcdir)
-	set TMPDIR=..
-	-.\$(objdir)\tex --progname=tex "\nonstopmode\font\foo=nonesuch\end"
+	@echo <<.\tex-check.bat
+PATH = .\$(objdir);$(kpathseadir)\$(objdir);$(geturldir)\$(objdir);c:\windows\system32;C:\WINDOWS\system32\wbem;c:\windows
+rem Test truncation (but don't bother showing the warning msg).
+.\$(objdir)\tex --progname=tex --output-comment=$(outcom) $(srcdir)\tests\hello > nul \
+  & .\$(objdir)\dvitype hello.dvi | grep olaf@infovore.xs4all.nl > nul
+rem \openout should show up in \write's.
+.\$(objdir)\tex --progname=tex $(srcdir)\tests\openout & grep xfoo openout.log
+rem one.two.tex -> one.two.log
+.\$(objdir)\tex --progname=tex $(srcdir)\tests\one.two & dir /n one.two.log
+rem uno.dos -> uno.log
+.\$(objdir)\tex --progname=tex $(srcdir)\tests\uno.dos & dir /n uno.log
+.\$(objdir)\tex --progname=tex $(srcdir)\tests\just.texi & dir /n just.log
+.\$(objdir)\tex --progname=tex $(srcdir)\tests\batch.tex
+.\$(objdir)\tex --progname=tex --shell $(srcdir)\tests\write18 | grep echo
+.\$(objdir)\tex --mltex --progname=initex $(srcdir)\tests\mltextst
+.\$(objdir)\tex --progname=tex <nul
+set WEB2C=$(kpathsea_srcdir)
+set TMPDIR=..
+.\$(objdir)\tex --progname=tex "\nonstopmode\font\foo=nonesuch\end"
+<<NOKEEP
+	.\tex-check.bat
+
 clean:: tex-clean
 tex-clean: trip-clean
 #	$(LIBTOOL) --mode=clean $(del) tex
-	-@$(del) $(tex_o) $(tex_c) texextra.c texcoerce.h texd.h $(redir_stderr)
-	-@$(del) tex.p tex.pool $(redir_stderr)
-	-@$(del) tex.fmt tex.log $(redir_stderr)
-	-@$(del) hello.dvi hello.log xfoo.out openout.log on.two.log uno.log $(redir_stderr)
-	-@$(del) just.log batch.log write18.log mltextst.log texput.log $(redir_stderr)
-	-@$(del) missfont.log $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(tex_o) $(tex_c) texextra.c texcoerce.h texd.h \
+			    tex.p tex.pool tex.fmt tex.log \
+			    hello.dvi hello.log xfoo.out openout.log on.two.log uno.log \
+			    just.log batch.log write18.log mltextst.log texput.log \
+			    missfont.log) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(deldir) tfm $(redir_stderr)
 
 trip: $(objdir)\dvitype.exe $(objdir)\pltotf.exe $(objdir)\tftopl.exe $(objdir)\tex.exe trip-clean
 	@echo ">>> See $(testdir)\trip.diffs for example of acceptable diffs."
-	set TEXMFCNFOLD=$(TEXMFCNF)
-	set TEXMFCNF=$(testdir)
-	.\$(objdir)\pltotf $(testdir)\trip.pl trip.tfm
-	.\$(objdir)\tftopl .\trip.tfm trip.pl
-	-$(diff) $(testdir)\trip.pl trip.pl
-	-@$(del) trip.tex
-# get same filename in log $(redir_stderr)
-	-$(copy) $(testdir)\trip.tex . 
-	-.\$(objdir)\tex -progname=initex < $(testdir)\trip1.in >tripin.fot
-	$(move) trip.log tripin.log
-	-$(diff) $(testdir)\tripin.log tripin.log
-# May as well test non-ini second time through.
-	-.\$(objdir)\tex < $(testdir)\trip2.in >trip.fot
-	-$(diff) $(testdir)\trip.fot trip.fot
-# We use $(diff) instead of `diff' only for those files where there
-# might actually be legitimate numerical differences.
-	-$(diff) $(diffflags) $(testdir)\trip.log trip.log
-	-.\$(objdir)\dvitype $(dvitype_args) trip.dvi >trip.typ
-	-$(diff) $(diffflags) $(testdir)\trip.typ trip.typ
-	set TEXMFCNF=$(TEXMFCNFOLD)
+	@echo <<.\trip.bat
+set TEXMFCNF=$(testdir)
+PATH = .\$(objdir);$(kpathseadir)\$(objdir);$(geturldir)\$(objdir);c:\windows\system32;C:\WINDOWS\system32\wbem;c:\windows
+.\$(objdir)\pltotf $(testdir)\trip.pl trip.tfm
+.\$(objdir)\tftopl .\trip.tfm trip.pl
+$(diff) $(testdir)\trip.pl trip.pl
+rem get same filename in log 
+$(del) trip.tex & $(copy) $(testdir)\trip.tex . $(redir_stderr)
+.\$(objdir)\tex -progname=initex < $(testdir)\trip1.in >tripin.fot
+$(move) trip.log tripin.log
+$(diff) $(testdir)\tripin.log tripin.log
+rem May as well test non-ini second time through.
+.\$(objdir)\tex < $(testdir)\trip2.in >trip.fot
+$(diff) $(testdir)\trip.fot trip.fot
+rem We use $(diff) instead of `diff' only for those files where there
+rem might actually be legitimate numerical differences.
+$(diff) $(diffflags) $(testdir)\trip.log trip.log
+.\$(objdir)\dvitype $(dvitype_args) trip.dvi >trip.typ
+$(diff) $(diffflags) $(testdir)\trip.typ trip.typ
+<<NOKEEP
+	.\trip.bat
+
 trip-clean:
-	-@$(del) trip.tfm trip.pl trip.tex trip.fmt tripin.fot tripin.log $(redir_stderr)
-	-@$(del) trip.fot trip.log trip.dvi trip.typ tripos.tex 8terminal.tex $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in (trip.tfm trip.pl trip.tex trip.fmt tripin.fot tripin.log \
+			    trip.fot trip.log trip.dvi trip.typ tripos.tex 8terminal.tex \
+			    ) do $(del) %%i $(redir_stderr) \
+	)
 	-@$(deldir) tfm $(redir_stderr)
 
 # The stub with main() for win32
@@ -708,8 +765,10 @@ $(objdir)\win32main.obj: $(objdir) .\lib\win32main.c config.h
 !include <etexdir/etex.mak>
 !include <omegadir$(omegaversion)/omega.mak>
 !include <eomegadir/eomega.mak>
+!include <alephdir/aleph.mak>
 !include <pdftexdir/pdftex.mak>
 !include <pdfetexdir/pdfetex.mak>
+#!include <pdfxtexdir/pdfxtex.mak>
 # 
 # Common
 programs = $(objdir)\bibtex.exe $(objdir)\ctangle.exe $(objdir)\cweave.exe \
@@ -719,8 +778,12 @@ programs = $(objdir)\bibtex.exe $(objdir)\ctangle.exe $(objdir)\cweave.exe \
 	$(objdir)\pktogf.exe $(objdir)\pktype.exe $(objdir)\pltotf.exe \
 	$(objdir)\pooltype.exe $(objdir)\tangle.exe $(objdir)\tftopl.exe \
 	$(objdir)\tie.exe $(ttf2afm) $(objdir)\vftovp.exe $(objdir)\vptovf.exe \
-	$(objdir)\weave.exe $(tex) $(etex) $(pdftosrc) $(ttf2afm) \
-	$(omega) $(eomega) $(pdftex) $(pdfetex) $(mf) $(mfn) $(mpost)
+	$(objdir)\weave.exe \
+	$(pdftosrc) $(ttf2afm) $(tex) \
+	$(omega) $(aleph) \
+	$(pdfetex) $(pdfxtex) \
+	$(mf) $(mfn) $(mpost)
+# $(etex) $(eomega) $(pdftex) 
 
 programs: $(objdir) $(programs) $(mpware) $(omegafonts_programs) $(otps_programs) $(pdftosrc)
 
@@ -761,7 +824,9 @@ tangle.web:
 clean:: tangle-clean
 tangle-clean:
 #	$(LIBTOOL) --mode=clean $(del) tangle
-	-@$(del) tangle.o tangle.c tangle.h tangle.p $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\tangle.obj tangle.c tangle.h tangle.p) do $(del) %%i $(redir_stderr) \
+	)
 
 $(objdir)\tangleboot.exe: $(objdir) $(objdir)\tangleboot.obj
 	$(link) $(objdir)\tangleboot.obj $(kpathsealib) $(proglib) $(conlibs)
@@ -794,7 +859,9 @@ tangleboot.p: tangle.web tangle.ch
 clean:: tangleboot-clean
 tangleboot-clean:
 #	$(LIBTOOL) --mode=clean $(del) tangleboot
-	-@$(del) $(objdir)\tangleboot.obj tangleboot.c tangleboot.h $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\tangleboot.obj tangleboot.c tangleboot.h ) do $(del) %%i $(redir_stderr) \
+	)
 
 # Bootstrapping ctangle requires making it with itself.  We use the opportunity
 # to create an up-to-date ctangleboot as well.
@@ -813,9 +880,13 @@ clean:: ctangle-clean
 clean:: cweb-clean
 ctangle-clean:
 #	$(LIBTOOL) --mode=clean $(del) ctangle
-	-@$(del) $(objdir)\ctangle.obj ctangle.c $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\ctangle.obj ctangle.c) do $(del) %%i $(redir_stderr) \
+	)
 cweb-clean:
-	-@$(del) $(objdir)\cweb.obj cweb.c $(redir_stderr)
+	-@echo $(verbose) & ( \
+		for %%i in ($(objdir)\cweb.obj cweb.c) do $(del) %%i $(redir_stderr) \
+	)
 
 $(objdir)\ctangleboot.exe: $(objdir)\ctangleboot.obj $(objdir)\cwebboot.obj $(kpathsealib) $(proglib)
 	$(link) $(**) $(conlibs)
@@ -881,7 +952,7 @@ pdflib_sources = $(srcdir)\pdftexdir\*.c $(srcdir)\pdftexdir\*.cc \
 	$(srcdir)\pdftexdir\*.h
 $(pdflib): $(pdflib_sources)
 	-@echo $(verbose) & ( \
-		pushd $(pdftexdir) & $(make) all & popd \
+		pushd pdftexdir & $(make) all & popd \
 	)
 
 # The web2c program consists of several executables.
@@ -896,43 +967,46 @@ web2c\$(objdir)\web2c.exe: web2c\main.c web2c\web2c.h web2c\web2c.l web2c\web2c.
 
 # 
 # Making dumps.
-all_fmts = tex.fmt $(fmts)
-all_formats = $(all_fmts) $(all_efmts) $(all_ofmts) $(all_pdffmts) $(all_pdfefmts)
-all_bases = mf.base $(bases)
-all_mems = mpost.mem $(mems)
+# all_fmts = tex.fmt $(fmts)
+# all_formats = $(all_fmts) $(all_efmts) $(all_ofmts) $(all_pdffmts) $(all_pdfefmts) $(all_pdfxfmts)
+# all_bases = mf.base $(bases)
+# all_mems = mpost.mem $(mems)
 
-dumps: fmts bases mems
-fmts: $(all_fmts)
-bases: $(all_bases)
-mems: $(all_mems)
-
-tex.fmt: $(tex)
-	$(dumpenv) $(make) progname=tex files="plain.tex cmr10.tfm" prereq-check
-	$(dumpenv) .\$(objdir)\tex --progname=tex --jobname=tex --ini "\input plain \dump" <nul
-
-latex.fmt: $(tex)
-	$(dumpenv) $(make) progname=latex files="latex.ltx" prereq-check
-	$(dumpenv) .\$(objdir)\tex --progname=latex --jobname=latex --ini "\input latex.ltx" <nul
-
-olatex.fmt: $(tex)
-	$(dumpenv) $(make) progname=olatex files="latex.ltx" prereq-check
-	$(dumpenv) .\$(objdir)\tex --progname=olatex --jobname=olatex --ini "\input latex.ltx" <nul
-
-mltex.fmt: $(tex)
-	$(dumpenv) $(make) progname=mltex files="plain.tex cmr10.tfm" prereq-check
-	$(dumpenv) .\$(objdir)\tex --mltex --progname=mltex --jobname=mltex --ini "\input plain \dump" <nul
-
-mllatex.fmt: $(tex)
-	$(dumpenv) $(make) progname=mllatex files="latex.ltx" prereq-check
-	$(dumpenv) .\$(objdir)\tex --mltex --progname=mllatex --jobname=mllatex --ini "\input latex.ltx" <nul
-
-mf.base: $(mf)
-	$(dumpenv) $(make) progname=mf files="plain.mf cmr10.mf $(localmodes).mf" prereq-check
-	$(dumpenv) .\$(objdir)\mf --progname=mf --jobname=mf --ini "\input plain input $(localmodes) dump" <nul
-
-mpost.mem: $(mpost)
-	$(dumpenv) $(make) progname=mpost files=plain.mp prereq-check
-	$(dumpenv) .\$(objdir)\mpost --progname=mpost --jobname=mpost --ini "\input plain dump" <nul
+dumps:
+	@echo Dumps are generated by fmtutil!
+#	set TEXMFMAIN
+#	..\contrib\$(objdir)\fmtutil --cnffile="$(texmf)\web2c\fmtutil.cnf" --all --dolinks
+# fmts: $(all_fmts)
+# bases: $(all_bases)
+# mems: $(all_mems)
+# 
+# tex.fmt: $(tex)
+# 	$(dumpenv) $(make) progname=tex files="plain.tex cmr10.tfm" prereq-check
+# 	$(dumpenv) .\$(objdir)\tex --progname=tex --jobname=tex --ini "\input plain \dump" <nul
+# 
+# latex.fmt: $(tex)
+# 	$(dumpenv) $(make) progname=latex files="latex.ltx" prereq-check
+# 	$(dumpenv) .\$(objdir)\tex --progname=latex --jobname=latex --ini "\input latex.ltx" <nul
+# 
+# olatex.fmt: $(tex)
+# 	$(dumpenv) $(make) progname=olatex files="latex.ltx" prereq-check
+# 	$(dumpenv) .\$(objdir)\tex --progname=olatex --jobname=olatex --ini "\input latex.ltx" <nul
+# 
+# mltex.fmt: $(tex)
+# 	$(dumpenv) $(make) progname=mltex files="plain.tex cmr10.tfm" prereq-check
+# 	$(dumpenv) .\$(objdir)\tex --mltex --progname=mltex --jobname=mltex --ini "\input plain \dump" <nul
+# 
+# mllatex.fmt: $(tex)
+# 	$(dumpenv) $(make) progname=mllatex files="latex.ltx" prereq-check
+# 	$(dumpenv) .\$(objdir)\tex --mltex --progname=mllatex --jobname=mllatex --ini "\input latex.ltx" <nul
+# 
+# mf.base: $(mf)
+# 	$(dumpenv) $(make) progname=mf files="plain.mf cmr10.mf $(localmodes).mf" prereq-check
+# 	$(dumpenv) .\$(objdir)\mf --progname=mf --jobname=mf --ini "\input plain input $(localmodes) dump" <nul
+# 
+# mpost.mem: $(mpost)
+# 	$(dumpenv) $(make) progname=mpost files=plain.mp prereq-check
+# 	$(dumpenv) .\$(objdir)\mpost --progname=mpost --jobname=mpost --ini "\input plain dump" <nul
 
 # This is meant to be called recursively, with $(files) set.
 prereq-check: $(kpathseadir)\$(objdir)\kpsewhich.exe
@@ -969,10 +1043,22 @@ eplain.fmt: tex.fmt
 # 
 !include <msvc/install.mak>
 
-install:: install-exec install-data
+install:: install-exec install-data install-doc
 install-exec:: install-links
-install-data:: # install-dumps
-install-dumps: install-fmts install-bases install-mems
+install-data::
+# FIXME!!! I hate to do this, but all this stuff relies more heavily
+# on fmtutil than on mere makefiles.
+install-dumps:
+	@echo <<install-dumps.bat
+@echo off
+set TEXMFCNF=$(TEXMFCNF)
+set TEXMFMAIN=$(TEXMFMAIN)
+set TEXMFDIST=$(TEXMFDIST)
+set VARTEXMF=$(VARTEXMF)
+xcopy /d ..\contrib\$(objdir)\fmtutil.exe $(bindir)\fmtutil.exe
+$(bindir)\fmtutil --cnffile="$(texmf)\web2c\fmtutil.cnf" --all --dolinks --force
+<<NOKEEP
+	-@.\install-dumps.bat
 
 # Installation directories.
 $(bindir)::
@@ -994,80 +1080,79 @@ $(web2cdir)::
 
 # The actual binary executables and pool files.
 install-programs: $(programs)
-	echo $(programs)
 	pushd mpware & $(make) install-exec & popd
 	-@echo $(verbose) & ( \
 	  for %%p in ($(programs)) do $(copy) %%p $(bindir) \
 	) $(redir_stdout)
 
 # The links to {mf,mp,tex} for each format and for {ini,vir}{mf,mp,tex},
-# plus the equivalents for e-TeX, Omega, pdfTeX, and pdfeTeX.
-install-links: install-programs
-	-@echo $(verbose) & ( \
-	  pushd $(bindir) & \
-	    $(del) .\initex.exe .\virtex.exe & \
-	    $(lnexe) .\tex.exe $(bindir)\initex.exe & \
-	    $(lnexe) .\tex.exe $(bindir)\virtex.exe & \
-	  popd \
-	) $(redir_stdout)
-	-@echo $(verbose) & ( \
-	  pushd $(bindir) & \
-	    $(del) .\inimf.exe .\virmf.exe & \
-	    $(lnexe) .\mf.exe $(bindir)\inimf.exe & \
-	    $(lnexe) .\mf.exe $(bindir)\virmf.exe & \
-#	    $(lnexe) .\mf.exe $(bindir)\mfw.exe & \
-	  popd \
-	) $(redir_stdout)
-	-@echo $(verbose) & ( \
-	  pushd $(bindir) & \
-	    $(del) .\inimpost.exe .\virmpost.exe & \
-	    $(lnexe) .\mpost.exe $(bindir)\inimpost.exe & \
-	    $(lnexe) .\mpost.exe $(bindir)\virmpost.exe & \
-	  popd \
-	) $(redir_stdout)
-	-@echo $(verbose) & ( \
-	  if NOT "$(fmts)"=="" \
-	    for %%i in ($(fmts)) do \
-              pushd $(bindir) & \
-	        $(del) .\%%~ni.exe & \
-	        $(lnexe) .\tex.exe $(bindir)\%%~ni.exe & \
-	      popd \
-	) $(redir_stdout)
-	-@echo $(verbose) & ( \
-	  if not "$(bases)"=="" \
-	    for %%i in ($(bases)) do \
-              pushd $(bindir) & \
-                $(del) .\%%~ni.exe & \
-	        $(lnexe) .\mf.exe $(bindir)\%%~ni.exe & \
-	      popd \
-	) $(redir_stdout)
-	-@echo $(verbose) & ( \
-	  if not "$(mems)"=="" \
-	    for %%i in ($(mems)) do \
-              pushd $(bindir) & \
-                $(del) .\%%~ni.exe & \
-	        $(lnexe) .\mpost.exe $(bindir)\%%~ni.exe & \
-	      popd \
-	) $(redir_stdout)
+# plus the equivalents for e-TeX, Omega, and pdf[ex]TeX.
+install-links: install-programs install-dumps
+#FMU 	-@echo $(verbose) & ( \
+#FMU 	    pushd $(bindir) & \
+#FMU 	    $(del) .\initex.exe .\virtex.exe & \
+#FMU 	    $(lnexe) .\tex.exe $(bindir)\initex.exe & \
+#FMU 	    $(lnexe) .\tex.exe $(bindir)\virtex.exe & \
+#FMU 	    popd \
+#FMU 	) $(redir_stdout)
+#FMU 	-@echo $(verbose) & ( \
+#FMU 	  pushd $(bindir) & \
+#FMU 	    $(del) .\inimf.exe .\virmf.exe & \
+#FMU 	    $(lnexe) .\mf.exe $(bindir)\inimf.exe & \
+#FMU 	    $(lnexe) .\mf.exe $(bindir)\virmf.exe & \
+#FMU #	    $(lnexe) .\mf.exe $(bindir)\mfw.exe & \
+#FMU 	  popd \
+#FMU 	) $(redir_stdout)
+#FMU 	-@echo $(verbose) & ( \
+#FMU 	  pushd $(bindir) & \
+#FMU 	    $(del) .\inimpost.exe .\virmpost.exe & \
+#FMU 	    $(lnexe) .\mpost.exe $(bindir)\inimpost.exe & \
+#FMU 	    $(lnexe) .\mpost.exe $(bindir)\virmpost.exe & \
+#FMU 	  popd \
+#FMU 	) $(redir_stdout)
+# 	-@echo $(verbose) & ( \
+# 	  if NOT "$(fmts)"=="" \
+# 	    for %%i in ($(fmts)) do \
+#               pushd $(bindir) & \
+# 	        $(del) .\%%~ni.exe & \
+# 	        $(lnexe) .\tex.exe $(bindir)\%%~ni.exe & \
+# 	      popd \
+# 	) $(redir_stdout)
+# 	-@echo $(verbose) & ( \
+# 	  if not "$(bases)"=="" \
+# 	    for %%i in ($(bases)) do \
+#               pushd $(bindir) & \
+#                 $(del) .\%%~ni.exe & \
+# 	        $(lnexe) .\mf.exe $(bindir)\%%~ni.exe & \
+# 	      popd \
+# 	) $(redir_stdout)
+# 	-@echo $(verbose) & ( \
+# 	  if not "$(mems)"=="" \
+# 	    for %%i in ($(mems)) do \
+#               pushd $(bindir) & \
+#                 $(del) .\%%~ni.exe & \
+# 	        $(lnexe) .\mpost.exe $(bindir)\%%~ni.exe & \
+# 	      popd \
+# 	) $(redir_stdout)
 
 # Always do plain.*, so examples from the TeXbook (etc.) will work.
-install-fmts: $(all_fmts)
-	-@echo $(verbose) & ( \
-	  for %%f in ($(all_fmts)) do $(copy) %%f $(fmtdir)\%%f \
-	) $(redir_stdout)
-	-@$(del) -f $(fmtdir)\plain.fmt & $(LN) tex.fmt $(fmtdir)\plain.fmt $(redir_stderr)
-
-install-bases: $(all_bases)
-	-@echo $(verbose) & ( \
-	  for %%f in ($(all_bases)) do $(copy) %%f $(basedir)\%%f \
-	) $(redir_stdout)
-	-@$(del) -f $(basedir)\plain.base & $(LN) mf.base $(basedir)\plain.base $(redir_stderr)
-
-install-mems: $(all_mems)
-	-@echo $(verbose) & ( \
-	  for %%f in ($(all_mems)) do $(copy) %%f $(memdir)\%%f \
-	) $(redir_stdout)
-	-@$(del) -f $(memdir)\plain.mem & $(LN) mpost.mem $(memdir)\plain.mem $(redir_stderr)
+# install-fmts: $(all_fmts)
+# 	-@echo $(verbose) & ( \
+# 	  for %%f in ($(all_fmts)) do $(copy) %%f $(fmtdir)\%%f \
+# 	) $(redir_stdout)
+# 	-@$(del) -f $(fmtdir)\plain.fmt & $(LN) tex.fmt $(fmtdir)\plain.fmt $(redir_stderr)
+# 
+# install-bases: $(all_bases)
+# 	-@echo $(verbose) & ( \
+# 	  for %%f in ($(all_bases)) do $(copy) %%f $(basedir)\%%f \
+# 	) $(redir_stdout)
+# 	-@$(del) -f $(basedir)\plain.base & $(LN) mf.base $(basedir)\plain.base $(redir_stderr)
+# 
+# install-mems: $(all_mems)
+# 	-@echo $(verbose) & ( \
+# 	  for %%f in ($(all_mems)) do $(copy) %%f $(memdir)\%%f \
+# 	) $(redir_stdout)
+# 	-@$(del) -f $(memdir)\plain.mem & $(LN) mpost.mem $(memdir)\plain.mem $(redir_stderr)
 
 # Auxiliary files.
 install-data:: $(texpooldir) $(mfpooldir) $(mppooldir)
@@ -1079,6 +1164,13 @@ install-data:: $(texpooldir) $(mfpooldir) $(mppooldir)
 	@$(copy) $(srcdir)\tiedir\tie.1 $(man1dir)\tie.$(manext) $(redir_stdout)
 	@$(copy) $(srcdir)\cwebdir\cweb.1 $(man1dir)\cweb.$(manext) $(redir_stdout)
 #	@$(copy) fmtutil.cnf $(web2cdir)\fmtutil.cnf $(redir_stdout)
+
+install-doc::
+	-@echo $(verbose) & ( \
+	  for %d in (doc man) do \
+	    echo Entering %d for install & \
+	    pushd %d & $(make) install & popd \
+	)
 
 # The distribution comes with up-to-date .info* files,
 # so this should never be used unless something goes wrong
@@ -1104,7 +1196,7 @@ installcheck:
 	tex "\nonstopmode \tracingstats=1 \input story \bye"
 # 
 # Cleaning.
-all_subdirs = doc lib man mpware web2c window $(omegafonts) $(otps) $(pdftexdir) $(pdfetexdir)
+all_subdirs = doc lib man mpware web2c window $(omegafonts) $(otps) pdftexdir # pdfetexdir pdfxtexdir
 
 # Having a multiple-target rule with the subdir loop fails because of
 # the dependencies introduced by clean.mk.  Yet, we want the
@@ -1125,8 +1217,10 @@ clean::
 	    echo Entering %d for $@ & \
             pushd %d & $(make) $@ & popd \
 	)
-	-@$(del) *.log *.fmt *.efmt *.oft *.eoft *.base *.mem *.fls *.ofl *.aux $(redir_stderr)
-	-@$(del) mf-w32.ch mp-w32.ch tex-w32.ch
+	-@echo $(verbose) & ( \
+		for %%i in (*.log *.fmt *.efmt *.oft *.eoft *.base *.mem *.fls *.ofl *.aux \
+                            mf-w32.ch mp-w32.ch tex-w32.ch) do $(del) %%i $(redir_stderr) \
+	)
 distclean::
 	-@echo $(verbose) & ( \
 	  for %d in ($(all_subdirs)) do \

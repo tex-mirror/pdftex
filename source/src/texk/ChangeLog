@@ -1,3 +1,93 @@
+2004-09-07  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* config.guess: Update to 2004-09-07.
+
+2004-08-26  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etc/autoconf/acspecific.m4: Fix an ancient autoconf-2.13 bug
+	(INSTALL_SCRIPT should default to INSTALL instead of
+	INSTALL_PROGRAM, in case INSTALL_PROGRAM is defined as
+	'${INSTALL} -s' from the command line or via "install-strip").
+
+2004-09-07  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* withenable.ac: Add --without-dvipng.  (Sync with TeX-live.)
+
+	* config.guess: Update to 2004-08-29.
+
+	* config.sub: Update to 2004-08-29.
+
+2004-08-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in (various recursive rules): Check that
+	<subdir>/Makefile exists, not just for <subdir>.
+
+2004-08-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* config.guess: Update to 2004-08-13.
+
+2004-08-06  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* config.guess: Update to 2004-07-19.
+
+	* config.sub: Update to 2004-06-24.
+
+2004-07-04  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etc/texinfo.tex: Removing.  There's little point in lugging yet
+	another likely-out-of-date copy around.
+
+2004-07-03  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etc/autoconf/acsite.m4 (KPSE_CROSS_BUILD_VAR): Single-quote the
+	second argument when setting it -- this means we can use values
+	like $(VAL) without having to quote them in the call (which seems
+	to be the most intuitive way of working).
+
+	* etc/autoconf/acsite.m4 (KPSE_CROSS_PATH_PROG): New macro, used
+	to find binaries in the path iff we are cross-compiling.
+	(KPSE_CROSS_BUILD_VAR): New macro, used to set BUILD<VAR> to <VAR> if
+	not cross-compiling, and to a given value (which may come from the
+	environment) if not.  Will complain if the environment contains
+	the variable while we are not cross-compiling.
+
+	* etc/autoconf/acspecific.m4 (AC_PATH_X): Add -rpath for OSF1* and
+	IRIX* cases so they are guaranteed to find the X libraries.
+	From TeX-live.
+	
+	* etc/autoconf/acgeneral.m4: Remove trailing /bin from path since
+	the current teTeX paths look like
+	'/usr/local/teTeX/bin/i686-pc-linux-gnu/tex'.  From TeX-live.
+	Will need special handling when we move to current autoconf.
+
+	* etc/texinfo.tex: Update to 2004-04-29.05.
+
+	* configure.in: Sync with TeX-live.
+
+	* config.sub: Update to 2004-06-24.
+
+	* config.guess: Update to 2004-06-24.
+
+2004-03-25  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* configure.in: Remove oxdvik-related code.
+
+	* config.sub: To version 2004-01-05.
+
+	* config.guess: To version 2004-01-24.
+
+2004-02-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etc/autoconf/acspecific.m4: Define AC_PROG_AR.
+
+	* etc/autoconf/acprograms: Add ar.
+
+	* etc/autoconf/acmakevars: Add AR.
+
+2004-01-01  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etc/texinfo.tex: Update to 2003-12-21.10.
+
 2003-02-19  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* etc/autoconf/acspecific.m4: Merge of patch from Albert

@@ -32,22 +32,22 @@ kpathsea_parent = .
 # Use if ... rather than || or && because Ultrix sh exits for
 # no good reason with the latter.
 default all: do-kpathsea
-	for d in $(programs); do if test -d $$d; then \
+	for d in $(programs); do if test -f $$d/Makefile; then \
 	  (cd $$d && $(MAKE) $(makeargs) $@) || exit 1; else true; fi; done
 
 install install-data install-exec:
-	for d in kpathsea $(programs); do if test -d $$d; then \
+	for d in kpathsea $(programs); do if test -f $$d/Makefile; then \
 	  (cd $$d && $(MAKE) $(installargs) $@) || exit 1; else true; fi; done
 
 # Other standard targets for everything.
 uninstall uninstall-exec uninstall-data \
 mostlyclean clean realclean extraclean configclean \
 info dvi check depend::
-	for d in $(all_dirs); do if test -d $$d; then \
+	for d in $(all_dirs); do if test -f $$d/Makefile; then \
 	  (cd $$d && $(MAKE) $(makeargs) $@) || exit 1; else true; fi; done
 
 distclean::
-	for d in $(all_dirs); do if test -d $$d; then \
+	for d in $(all_dirs); do if test -f $$d/Makefile; then \
 	  (cd $$d && $(MAKE) $(makeargs) $@) || exit 1; else true; fi; done
 
 distclean realclean::

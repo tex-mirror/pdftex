@@ -42,9 +42,6 @@ $(prefix):
 	-if not exist $(prefix) $(mkdir) $(prefix)
 !endif
 
-install::
-	-@xcopy mswin32\bin\* $(bindir) /r/i/e/d
-
 !include <msvc/subdirs.mak>
 !include <msvc/clean.mak>
 

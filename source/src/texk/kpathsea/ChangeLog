@@ -1,3 +1,347 @@
+2004-08-24  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mktex.opt: Correct syntax error.  Reported by Staszek
+	Wawrykiewicz <staw@gust.org.pl>.
+
+2004-08-23  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.in: The TEXINPUTS.pdftexinfo entry in obsolete, and will
+	be removed in the future.  Alert by Vladimir Volovich
+	<vvv@vsu.ru>.
+
+	* tex-file.c (kpse_find_file): Make debug message conditional
+	KPSE_DEBUG_SEARCH being set.
+
+	* kpsewhich.c: Remove spurious space in usage message.
+
+	* tex-file.c (kpse_find_file): Add debug message to clarify what
+	the library is doing when.  From Karl Berry <karl@tug.org>.
+	
+	* tex-file.c: Add TEXFONTS to the environment variables for all
+	kinds of font-related stuff.  This means you can, if you want to,
+	just dump all font-related files in a single directory and set a
+	single variable to point to it.  It doesn't have a default.
+	Suggested by Karl Berry, Hans Hagen, Akira Kakuto.
+
+	
+2004-08-17  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mktexlsr, mktex.opt: Use "test ... || test ..." instead of
+	"test ... -o ...".
+
+2004-08-06  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* xdirname.c: Cygwin also understands UNC names.  From Jan
+	Nieuwenhuizen <janneke@gnu.org>.
+
+	* config.h: Do not define DOSISH for Cygwin.  After Jan
+	Nieuwenhuizen <janneke@gnu.org>.
+
+	* mktex.opt: Refine the test of $COMPSEC a bit, to accomodate
+	Cygwin.  After Jan Nieuwenhuizen <janneke@gnu.org>.
+
+	* mktexlsr: Refine the test for $COMSPEC a bit, to accomodate
+	Cygwin.  After Jan Nieuwenhuizen <janneke@gnu.org>.
+
+	* Makefile.in: Define MAKE_KPSE_DLL when compiling the library to
+	support ugly windows declspec stuff.  From Jan Nieuwenhuizen
+	<janneke@gnu.org>.
+
+	* c-proto.h: Clean up the defines for KPSEDLL a bit.  From Jan
+	Nieuwenhuizen <janneke@gnu.org>.
+
+	* getopt.h: Clean up defines for KPSEDLL a bit.  From Jan
+	Nieuwenhuizen <janneke@gnu.org>.
+
+2004-08-01  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.in: Undoing some simplifications of the search paths, in
+	particular the texmf/{engine1,engine2,...} style paths are back to
+	accomodate older texmf trees.
+
+2004-07-23  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.in: Adapt TRFONTS to Linux groff path, which is the most
+	useful variant these days.
+
+2004-07-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in (uninstall-exec): Add removal rules for libkpathsea
+	and the programs other than kpsewhich.
+
+	* kpathsea.texi: Push copyright to bottom of page.
+
+	* texmf.in: Add paths for pdfxtex, pdfxlatex.  After Peter
+	Breitenlohner <peb@mppmu.mpg.de>.
+
+	* texmf.in: Updates/simplifications to paths, from Thomas.
+
+2004-07-19  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* db.c (kpse_db_search_list): Add cast to suppress warning about
+	discarding "const".
+
+2004-07-03  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* common.ac: No m4 quoting needed in the KPSE_CROSS_BUILD_VAR
+	calls.
+
+	* common.ac: Add some invocations of KPSE_CROSS_BUILD_VAR matching
+	usage in ../make/cross.mk.
+
+	* mktextfm: Use the same code as mktexpk for ignoring metafont
+	errors, to ensure that mktextfm and mktexpk ignore identical sets
+	of metafont errors.
+
+2004-06-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* kpathsea.texi: Use @copying, so the license ends up in the HTML
+	output.  Use @ifnottex instead of @ifinfo, so that makeinfo --html
+	works without further effort.  From Karl Berry.
+
+	* install.texi: Name of bash manual is now "bash".  From Karl
+	Berry.
+
+2004-06-22  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* c-memstr.h [HAVE_STRINGS_H]: Include strings.h if it is
+	available, as opposed to just doing if HAVE_STRING_H is not
+	defined.  Otherwise we give conflicting information whether
+	certain old-style functions like index, rindex are defined.
+	* common.ac: Also check for strings.h.
+
+	* c-memstr.h: Add definitions for index and rindex in terms of
+	strchr and strrchr, as we've got some old code in TeX-live that
+	needs this on some platforms.
+
+2004-06-15  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* install.texi: Karl Berry pointed out that GNU fileutils is now
+	GNU coreutils.
+
+2004-06-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* kpathsea.texi: Make it more obvious that applications will often
+	just want to use <kpathsea/kpathsea.h> rather than pick and choose
+	headers.
+
+2004-06-11  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* kpsewhich.c: Update copyright dates.
+
+2004-05-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mktexlsr: Rename readlink to kpsereadlink to avoid name clash.
+
+	* Makefile.in: Rename readlink to kpsereadlink to avoid name
+	clash.
+
+2004-05-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex-file.c: Make .fmt the only "true" suffix for format files,
+	and add all other suffixes to the list of alternates.  In the next
+	version, these alternates will be dropped entirely.
+
+2004-05-11  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in (mostlyclean): access -> kpseaccess.  From Thomas.
+
+2004-05-08  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mktexlsr: Widen the matches for the lsR-pattern, so we omit the
+	temporary directory we used.
+
+2004-05-07  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.in: Use $engine in some paths.
+
+	* kpathsea.texi: Date is May 2004.
+
+	* kpathsea.texi: Document --engine.
+
+	* kpsewhich.man: Document -engine.
+
+	* kpsewhich.c: Implement -engine option.
+
+2004-04-24  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* cnf.c (read_all_cnf): Fix memory leak.
+
+	* mktexupd: Fix logic error.  Found by Thomas Esser.
+
+	* tex-file.c (kpse_init_fallback_resolutions): Fix memory leak.
+
+2004-04-23  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* db.c (kpse_db_search_list): Allow matches like base/plain.tex
+	when a db is used.  This was a regression introduced by the switch
+	to kpse_db_search_list.  Like the original code, this only works
+	with '/' used for dirsep.  Reported by Wlodzimierz Bzyl
+	<matwb@univ.gda.pl>.
+
+2004-04-17  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* kpsewhich.c (lookup): Partial implementation of -all option.
+	Works only in combination with the -path option.
+	* tex-file.c: Add to list of suffixes that may be used for format
+	files.
+
+	* kpathsea.texi: Document -var-value option kpsewhich.
+
+	* kpsewhich.man: Document -var-value.
+
+	* kpsewhich.c: Add -var-value option.  Change loop that checks for
+	a kpse_file_format_type to check kpse_format_fmt last.
+
+	* texmf.in: Add TEXINPUTS.aleph, TEXINPUTS.alambda.
+
+2004-04-01  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mktexpk: Use dpdfezzz if given 8000 for BDPI.  Apparently this
+	is what -Ppdf ends up giving the script.
+
+2004-03-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in (install): access -> kpseaccess
+
+2004-03-23  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* db.c (kpse_init_db): Look for both "ls-R" and "ls-r" files.
+	Same contents, but when working cross-platform the all-lowercase
+	name is easier to work with.
+
+	* tex-file.c: Add .afmt as recognized suffix to kpse_fmt_format
+	(for Aleph).  Add ls-r as recognized suffix to kpse_db_format.
+
+	* mktexlsr: Allow both ls-R and ls-r as names for an existing
+	directory tree index file.  Always create ls-R.
+
+	* mktexupd: Check for both ls-R and ls-r.
+
+	* pathsearch.h (kpse_all_path_search_list): New function.  Like
+	kpse_path_search_list, with must_exist true, but returns a list of
+	filenames instead of the first hit.
+
+	* pathsearch.c (kpse_all_path_search_list): New function.  Like
+	kpse_path_search_list, with must_exist true, but returns a list of
+	filenames instead of the first hit.
+
+	* tex-make.c [WIN32] (maketex): Code to print error message for
+	ERROR_BROKEN_PIPE didn't match the format.
+
+	* mktexpk: Allow 'angle(0,0)' errors without aborting.  From
+	Andreas Degert <ad@papyrus-gmbh.de>.
+
+	* unixtex.texi: Update from Karl Berry.
+
+2004-03-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* withenable.ac: Make the warnings more obvious if the search for
+	the texmf tree fails.  Also try to fall back on kpsewhich if we
+	fail to find anything.  A simplified version of code proposed by
+	Stefan Ulrich <stefan.ulrich@zen.co.uk> for xdvik.
+
+2004-03-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.in: Add file_line_error_style variable, default to false.
+
+2004-02-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex-make.c (maketex): Clean up unused variables.
+
+	* texmf.in: Update link in comment for TEXFONTMAPS.
+
+2004-02-25  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mktexnam: Use kpseaccess instead of access.
+
+	* mktexlsr: Use kpseaccess instead of access.
+
+	* Makefile.in: Rename the access executable to kpseaccess, as the
+	old name tended to interfere.
+
+	* kpseaccess.man: Formerly known as access.man.
+
+	* mktexlsr: Only check for magic string in ls-R file if the file
+	size is larger than 0.  Assume that a 0-length ls-R can be
+	overwritten without penalty.
+
+	* mktexlsr: Use a more accurate method to ensure that directory
+	names, and only directory names, start with ./ in the ls-R file.
+
+2004-02-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex-file.c: Rename kpse_script_format to
+	kpse_texmfscripts_format.
+
+	* tex-file.h: Rename kpse_script_format to
+	kpse_texmfscripts_format.
+
+2004-02-15  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mktexpk: psfonts.map and ps2pk.map now found through the map
+	format.
+
+	* kpsewhich.c (find_format): psfonts.map and pdftex.map are no
+	longer special case, pdftex.cfg is a special case now.
+
+	* kpathsea.texi: Update for new formats (misc fonts, web, cweb,
+	enc, cmap, sfd, opentype fonts, pdftex config, lig files,
+	texmfscripts).
+
+	* tex-file.c: Add kpse_lig_format and kpse_script_format.
+
+	* tex-file.h: Add kpse_lig_format and kpse_script_format.
+
+	* texmf.in: Add LIGFONTS and TEXMFSCRIPTS.
+
+2004-02-10  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* db.c (kpse_db_search_list): An absolute or explicit relative
+	name that makes it here would not be found anyway, so test for it
+	and skip.
+
+	* pathsearch.c (search_list): If we're given only absolute or
+	relative filenames, then there is no need to dig into the database
+	or filesystem.
+	(dir_list_search_list): Skip any absolute filenames that make it here.
+
+2004-02-08  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in (stamp-paths): Add TEXMFDIST.  Suggested by Thomas.
+
+	* texmf.in: Add TEXMFDIST, suggested by Thomas.
+
+2004-01-09  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex-file.c: Add kpse_pdftex_config_format.  From Thomas.
+
+	* tex-file.h: Add kpse_pdftex_config_format.  From Thomas.
+
+2004-01-04  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmf.in: Modifications to several paths suggested by Thomas.
+
+2003-12-17  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex-make.c (kpse_make_tex): Allow '+' is font names as well.
+	Reported by Hartmut Henkel <hartmut_henkel@gmx.de>.
+
+2003-12-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* progname.c: Set "progname" in the environment.
+
+	* tex-file.h: Add new formats: kpse_enc_format, kpse_cmap_format,
+	kpse_sfd_format, kpse_opentype_format.  Requested by Thomas.
+
+	* tex-file.c: Add new formats: kpse_enc_format, kpse_cmap_format,
+	kpse_sfd_format, kpse_opentype_format.  Requested by Thomas.
+
+2003-02-27  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mktexmf: csso12[0-5][0-9] are from CJK package; unsupported by
+	mktexmf.  Fix by Werner Lemberg <wl@gnu.org>.
+
 2003-02-19  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* kpathsea.texi: Version 3.5.2.

@@ -7,7 +7,7 @@
 # te@dbs.uni-hannover.de, kb@mail.tug.org, and infovore@xs4all.nl.
 # Public domain.
 
-version='$Id: mktextfm,v 1.26 2002/11/12 17:56:21 olaf Exp $'
+version='$Id: mktextfm,v 1.27 2004/07/03 19:25:15 olaf Exp $'
 progname=`echo $0 | sed 's%.*/%%'`
 usage="Usage: $progname [--destdir DESTDIR] FONT.
 
@@ -94,11 +94,20 @@ fi
 
 echo "$progname: Running $cmd"
 $cmd </dev/null || {
-  grep '^!' $NAME.log >$$.errs 2>/dev/null
+  # Don't abort if only "Strange path", "bad pos" or "angle(0,0)"
+  # errors occurr.
+  grep '^!' $NAME.log | sort >$$.errs 2>/dev/null
   grep '^! Strange path' $$.errs >$$.strange 2>/dev/null
-  if cmp $$.errs $$.strange >/dev/null 2>&1 \
-    && test -s $$.strange >/dev/null 2>&1; then
-    echo "$progname: warning: \`$cmd' caused strange path errors." >&2
+  grep '^! bad pos.' $$.errs >$$.badpos 2>/dev/null
+  grep '^! angle(0,0) is taken as zero.' $$.errs >$$.angle 2>/dev/null
+  cat $$.badpos $$.strange $$.angle | sort > $$.errs_accept
+  if cmp $$.errs $$.errs_accept >/dev/null 2>&1; then
+    test -s $$.strange >/dev/null 2>&1 \
+      && echo "$progname: warning: \`$cmd' caused strange path errors." >&2
+    test -s $$.badpos >/dev/null 2>&1 \
+      && echo "$progname: warning: \`$cmd' caused bad pos errors." >&2
+    test -s $$.angle >/dev/null 2>&1 \
+      && echo "$progname: warning: \`$cmd' caused angle(0,0) errors." >&2
   else
     echo "$progname: \`$cmd' failed." >&2
     test -s $NAME.log && mv -f $NAME.log "$KPSE_DOT"

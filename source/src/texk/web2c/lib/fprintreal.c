@@ -1,5 +1,5 @@
 /* fprintreal.c: print the real number R in the Pascal format N:M on the
-   file F.  */
+   file F.  Public domain. */
 
 #include "config.h"
 

@@ -63,6 +63,10 @@ Omega was called or a
 .I %&
 line.
 .TP
+.B -halt-on-error
+.rb
+Exit with an error code when an error is encountered during processing.
+.TP
 .B --help
 .rb
 Print help message and exit.
@@ -131,6 +135,13 @@ or
 Use
 .I string
 for the DVI file comment instead of the date.
+.TP
+.BI -output-directory \ directory
+.rb Write output files in
+.I directory
+instead of the current directory.  Look up input files in
+.I directory
+first, the along the normal search path.
 .TP
 .B --parse-first-line
 .rb

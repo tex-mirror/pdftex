@@ -1,5 +1,5 @@
 /* eofeoln.c: implement Pascal's ideas for end-of-file and end-of-line
-   testing.  */
+   testing.  Public domain. */
 
 #include "config.h"
 

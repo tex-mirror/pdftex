@@ -1,3 +1,167 @@
+2004-08-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* openclose.c (open_input,open_output): Implement output_directory
+	option.
+
+	* texmfmp.c: Accept -output-directory option.
+
+2004-07-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (setupcharset): Remove this fuction.  The
+	initialization is performed is done by the engine.
+	(read_char_translation_file): Rename to readtcxfile.
+	(readtcxfile): Some comment changes compared to its previous
+	incarnation.
+
+	* usage.c (usagehelp): Add second argument, email address for bug
+	reports.  Requested by the pdftex team.
+
+	* texmfmp.c: Add -output-format to the long_options array.
+	Also add BUG_ADDRESS to the macros defined for each engine.
+	Call usagehelp with BUG_ADDRESS as second argument.
+	
+2004-07-03  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (parse_options): Make it so that aleph and omega also
+	parse the -translate-file and -8bit options, even though they now
+	silently ignore them.  (They have to ignore them in any case, as
+	neither makes sense for these programs.)
+
+2004-07-02  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c [TeX]: Implement -efmt as alternate spelling for -fmt.
+	This option is only present for backward compatibility, and will
+	go away in the future.
+
+2004-06-29  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Don't include alloca.o in the objects.  It
+	shouldn't be used anywhere.
+
+2004-06-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (get_input_name): Off-by-one errors when
+	erasing/restoring the final quote.  From Akira Kakuto
+	<kakuto@fsci.fuk.kindai.ac.jp>.
+
+2004-06-15  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c: (normalize_quotes): New function, takes a filename
+	and returns an allocated string with the name quoted iff it
+	contains a space.
+	(get_input_file_name): Factor out normalize_quotes.
+	(getjobname): Add quotes if needed.  callmakempx: Add quotes if
+	needed.
+
+2004-06-04  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (get_input_file_name): New function.  Get the name of
+	the input file for use by parse_first_line(), and if the filename
+	contains spaces make sure a properly quoted version will be given
+	to TeX.
+	(parse_first_line): Now takes the name of the input file (or NULL) as
+	an argument, instead of looking for it.
+
+2004-05-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c: Remove -oem code.
+
+2004-05-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c: Remove much of the locale-dependent code.  Some
+	pieces remain because they are related to the Win32 '-oem' option,
+	where I do not know yet whether that option should go as well.
+
+2004-05-10  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (setupcharset): Fixing a regression.  When a line in a
+	TCX file contains two numbers and a comment, set printable=1.
+	Reported by Staszek Wawrykiewicz <staw@gust.org.pl>.
+
+2004-05-08  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (main): We can now put TEXMFENGINENAME into the
+	environment for $engine in all cases.
+
+	* texmfmp.c: Add -halt-on-error option.
+
+2004-05-07  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (maininit): Set $engine appropriately.
+
+	* texmfmp.c: Implement -8bit option.
+
+	* texmfmp.c (makesrcspecial): Always put a space after the line
+	number.
+
+2004-04-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (setupcharset): More compact xprn assignment.
+
+2004-03-28  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c: Implement -no-shell-escape, -no-parse-first-line,
+	-no-file-line-error.
+
+2004-03-25  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c [eTeX](maininit): e-TeX will no longer treat being
+	called as "initex" or "virtex" special.
+	(tcx_get_num): Additional argument, upper bound we're accepting.
+	(read_char_translation_file): Allow for a third integer, 0 or 1, to
+	set printable status.  This way you can translate characters
+	without making them printable.  However, enforce that 7bit ASCII
+	remains printable.
+
+	* texmfmp.c (maininit): Add sanity check for -enc or -mltex
+	without -ini.
+
+2004-03-24  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* zround.c: Add public domain notice.
+
+	* win32main.c: Add public domain notice.
+
+	* version.c: Add public domain notice.
+
+	* uexit.c: Add public domain notice.
+
+	* printversion.c: Bump 2003 to 2004 in copyright notices.
+
+	* main.c: Add public domain notice.
+
+	* inputint.c: Add public domain notice.
+
+	* input2int.c: Add public domain notice.
+
+	* fprintreal.c: Add public domain notice.
+
+	* eofeoln.c: Add public domain notice.
+
+2004-03-22  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (parse_options): Add -output-format for the pdf*TeX
+	family.
+
+	* texmfmp.c: Changes for Aleph.
+
+	* texmfmp.c (long_options): Enable "enc" option.
+
+2004-03-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c: Allow file:line:error style messages to be enabled
+	from texmf.cnf.  From Akira Kakuto <kakuto@fsci.fuk.kindai.ac.jp>.
+
+2004-02-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c: Rename isprintable to xprn.
+
+	* win32main.c: Sync with TeXlive.
+
+	* texmfmp.c: Add -enc option.
+
+	* texmfmp.c: Add support for pdfxTeX.
+
 2003-02-16  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* texmfmp.c: Update banners for TeX 3.141592, MF 2.71828.

@@ -11,6 +11,7 @@
 #define unlink delete
 #endif
 
+char *program_invocation_name;
 int filenumber = 0, ifdef_nesting = 0, lines_in_file = 0;
 char *output_name = NULL;
 boolean has_ini;
@@ -59,10 +60,10 @@ main P2C(int, argc, string *, argv)
   string coerce;
   unsigned coerce_len;
   int option;
-  
-  kpse_set_progname (argv[0]); /* In case we use FATAL.  */
 
-  while ((option = getopt(argc, argv, "+il:")) != -1) {
+  program_invocation_name = argv[0];
+  
+  while ((option = getopt(argc, argv, "il:")) != -1) {
     switch (option) {
     case 'i':
       do_ini = true;
@@ -94,6 +95,9 @@ main P2C(int, argc, string *, argv)
   } else if (STREQ (output_name, "tex")) {
     fputs ("#define INITEX\n#define TeX\n", out);
     coerce = "texcoerce.h";
+  } else if (STREQ (output_name, "aleph")) {
+    fputs ("#define INITEX\n#define TeX\n#define Aleph\n", out);
+    coerce = "alephcoerce.h";
   } else if (STREQ (output_name, "eomega")) {
     fputs ("#define INITEX\n#define TeX\n#define eOmega\n", out);
     coerce = "eomegacoerce.h";
@@ -109,11 +113,14 @@ main P2C(int, argc, string *, argv)
   } else if (STREQ (output_name, "pdfetex")) {
     fputs ("#define INITEX\n#define TeX\n#define pdfeTeX\n", out);
     coerce = "pdfetexcoerce.h";
+  } else if (STREQ (output_name, "pdfxtex")) {
+    fputs ("#define INITEX\n#define TeX\n#define pdfxTeX\n", out);
+    coerce = "pdfxtexcoerce.h";
   } else if (STREQ (output_name, "mp")) {
     fputs ("#define INIMP\n#define MP\n", out);
     coerce = "mpcoerce.h";
   } else
-    FATAL1 ("Can only split mf, mp, tex, etex, omega, eomega, pdftex, or pdfetex, not %s", output_name);
+    FATAL1 ("Can only split mf, mp, tex, etex, omega, eomega, aleph, or pdf[ex]tex,\n not %s", output_name);
   
   coerce_len = strlen (coerce);
   
@@ -202,8 +209,10 @@ main P2C(int, argc, string *, argv)
   if (do_ini)
     xfclose (ini, ini_name);
 
-  if (unlink (tempfile))
-    perror (tempfile), uexit (1);
+  if (unlink (tempfile)) {
+      perror (tempfile);
+      exit (EXIT_FAILURE);
+  }
 
   return EXIT_SUCCESS;
 }

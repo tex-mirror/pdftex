@@ -1,3 +1,61 @@
+2004-07-23  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* makempx.in: Have TROFF use -Tps instead of -Tpost, as the former
+	is what GROFF uses.
+
+	* dmp.c: Changes to support groff (which is the most likely
+	candidate for being actually used these days).
+	(hash): Use unsigned char to calculate hash value.
+	(get_int_map): Variant of get_int() that will accept octal and hex
+	values.
+	(get_float_map): Variant of get_float() that actually just skips over
+	the (comma-separated) list.
+	(scan_desc_line): Use get_int_map() and get_float_map() where
+	relevant.
+	(set_string): Set a word, to implement groff's 't' directive.
+	(do_graphic): Ignore 'Fd'.
+	(do_x_cmd): Account for groff's scaling.
+	(do_page): Account for groff's scaling.  Implement (or ignore)
+	additional groff commands 'F', 'm', 'u' (aborts), 't'.
+	(dmp_usage): Modify help text.
+	These changes were suggested by Michail Vidiassov
+	<master@iaas.msu.ru>.
+
+2004-07-14  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mpto.c (main): Second argument to usagehelp.
+
+2004-06-19  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* makempx.in: Since the trap statement is already quoted, the
+	quotes around $ERRLOG must be escaped.  Found by Werner Lemberg
+	<wl@gnu.org>.
+
+2004-06-15  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* makempx.in: Add quotes in various places to support filenames
+	with spaces in them.
+
+2004-05-29  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* makempx.in: Forgot the filename in the sed command.
+
+	* makempx.in: If the mpxerr.tex begins with a %&-line, get the
+	name of the program to use from it.  The default 'tex' has become
+	a problem now that 'latex' requires the 'etex' engine.  Reported
+	by Lars Madsen <daleif@imf.au.dk>.
+
+2004-04-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* makempx.in: Tell eqn to format for 'post' terminal, just like
+	troff is told to do.  The asusmption here is that when troff
+	supports -Tpost, eqn does as well.  From Michail Vidiassov
+	<master@iaas.msu.ru>.
+
+	* mpto.c: According to CSTR #54 the ".lf" directive should be ".lf
+	%d %s", not ".lf line %d %s" as used in the original code.  Found
+	by Michail Vidiassov <master@iaas.msu.ru>.
+
 2003-02-15  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* Makefile.in: From klibtool to libtool.  Based on patches from

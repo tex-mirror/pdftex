@@ -28,18 +28,30 @@
 
 /* Some things are the same except for the name.  */
 #ifdef TeX
-#if defined(pdfeTeX)
-#define TEXPOOLNAME "pdfetex.pool"
+#if defined (pdfeTeX)
+#define TEXMFPOOLNAME "pdfetex.pool"
+#define TEXMFENGINENAME "pdfetex"
+#elif defined (pdfxTeX)
+#define TEXMFPOOLNAME "pdfxtex.pool"
+#define TEXMFENGINENAME "pdfxtex"
 #elif defined (pdfTeX)
-#define TEXPOOLNAME "pdftex.pool"
+#define TEXMFPOOLNAME "pdftex.pool"
+#define TEXMFENGINENAME "pdftex"
 #elif defined (eTeX)
-#define TEXPOOLNAME "etex.pool"
+#define TEXMFPOOLNAME "etex.pool"
+#define TEXMFENGINENAME "etex"
 #elif defined (Omega)
-#define TEXPOOLNAME "omega.pool"
+#define TEXMFPOOLNAME "omega.pool"
+#define TEXMFENGINENAME "omega"
 #elif defined (eOmega)
-#define TEXPOOLNAME "eomega.pool"
+#define TEXMFPOOLNAME "eomega.pool"
+#define TEXMFENGINENAME "eomega"
+#elif defined (Aleph)
+#define TEXMFPOOLNAME "aleph.pool"
+#define TEXMFENGINENAME "aleph"
 #else
-#define TEXPOOLNAME "tex.pool"
+#define TEXMFPOOLNAME "tex.pool"
+#define TEXMFENGINENAME "tex"
 #endif
 #define DUMP_FILE fmtfile
 #define DUMP_FORMAT kpse_fmt_format
@@ -49,6 +61,8 @@
 #define OUT_BUF dvibuf
 #endif /* TeX */
 #ifdef MF
+#define TEXMFPOOLNAME "mf.pool"
+#define TEXMFENGINENAME "metafont"
 #define DUMP_FILE basefile
 #define DUMP_FORMAT kpse_base_format
 #define writegf write_out
@@ -56,12 +70,15 @@
 #define OUT_BUF gfbuf
 #endif /* MF */
 #ifdef MP
+#define TEXMFPOOLNAME "mp.pool"
+#define TEXMFENGINENAME "metapost"
 #define DUMP_FILE memfile
 #define DUMP_FORMAT kpse_mem_format
 #endif /* MP */
 
 /* Restore underscores.  */
 #define kpsedvipsconfigformat kpse_dvips_config_format
+#define kpsefontmapformat kpse_fontmap_format
 #define kpsemfpoolformat kpse_mfpool_format
 #define kpsempformat kpse_mp_format
 #define kpsemppoolformat kpse_mppool_format
@@ -75,9 +92,9 @@ extern int tfmtemp, texinputtype;
 extern boolean openinnameok P1H(const_string);
 extern boolean openoutnameok P1H(const_string);
 
-/* All but Omega use this. */
-#if !defined(Omega) && !defined(eOmega)
-extern void setupcharset P1H(void);
+/* All but the Omega family use this. */
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
+extern void readtcxfile P1H(void);
 extern string translate_filename;
 #define translatefilename translate_filename
 #endif

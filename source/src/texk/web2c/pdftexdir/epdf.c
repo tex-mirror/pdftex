@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/epdf.c#11 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/epdf.c#7 $
 */
 
 #include "ptexlib.h"
@@ -28,24 +28,22 @@ integer pdfbufmax = pdfbufsize;
 
 extern void epdf_check_mem(void);
 
-int is_subsetable(int i)
+int is_subsetable(fm_entry *fm)
 {
-    fm_entry *fm = fm_tab + i;
     return is_included(fm) && is_subsetted(fm);
 }
 
-int is_type1(int i)
+int is_type1(fm_entry *fm)
 {
-    fm_entry *fm = fm_tab + i;
     return is_t1fontfile(fm);
 }
 
-void mark_glyphs(int i, char *charset)
+void mark_glyphs(fm_entry *fm, char *charset)
 {
-    char *new_charset = fm_tab[i].charset;
-    if (charset == 0)
+    char *new_charset = fm->charset;
+    if (charset == NULL)
         return;
-    if (new_charset == 0)
+    if (new_charset == NULL)
         new_charset = xstrdup(charset);
     else {
         new_charset = xretalloc(new_charset, 
@@ -53,24 +51,24 @@ void mark_glyphs(int i, char *charset)
                                 char);
         strcat(new_charset, charset);
     }
-    fm_tab[i].charset = new_charset;
+    fm->charset = new_charset;
 }
 
-void embed_whole_font(int i)
+void embed_whole_font(fm_entry *fm)
 {
-    fm_tab[i].all_glyphs = true;
+    fm->all_glyphs = true;
 }
 
-integer get_fontfile(int i)
+integer get_fontfile(fm_entry *fm)
 {
-    return fm_tab[i].ff_objnum;
+    return fm->ff_objnum;
 }
 
-integer get_fontname(int i)
+integer get_fontname(fm_entry *fm)
 {
-    if (fm_tab[i].fn_objnum == 0)
-        fm_tab[i].fn_objnum = pdfnewobjnum();
-    return fm_tab[i].fn_objnum;
+    if (fm->fn_objnum == 0)
+        fm->fn_objnum = pdfnewobjnum();
+    return fm->fn_objnum;
 }
 
 void epdf_free(void)

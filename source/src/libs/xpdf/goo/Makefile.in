@@ -9,9 +9,9 @@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-kpathsea_include_dir = -I$(srcdir)/../../../texk -I../../../texk
-ALLCFLAGS = $(CFLAGS) @DEFS@ -I.. -I$(srcdir) -I. $(kpathsea_include_dir)
-ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ -I.. -I$(srcdir) -I. $(kpathsea_include_dir)
+kpathsea_include_dir = -I../../../texk -I$(srcdir)/../../../texk
+ALLCFLAGS = $(CFLAGS) @DEFS@ -I.. -I$(srcdir)/.. -I. -I$(srcdir) $(kpathsea_include_dir)
+ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ -I.. -I$(srcdir)/.. -I. -I$(srcdir) $(kpathsea_include_dir)
 CXXFLAGS = @CXXFLAGS@
 CC = @CC@
 CXX = @CXX@
@@ -66,9 +66,8 @@ distclean maintainer-clean extraclean: clean
 #------------------------------------------------------------------------
 
 depend:
-	$(CXX) $(CXXFLAGS) -MM $(CXX_SRC) >Makefile.dep
-	$(CC) $(CFLAGS) -MM $(C_SRC) >>Makefile.dep
-	cat Makefile.dep | sed 's|$(srcdir)|$$(srcdir)|' > $(srcdir)/depend.mk
-	cd ..; config.status
+	($(CXX) $(ALLCXXFLAGS) -MM $(srcdir)/*.cc; \
+	 $(CC) $(ALLCFLAGS) -MM $(srcdir)/*.c) \
+	   | sed 's|$(srcdir)|$$(srcdir)|' > $(srcdir)/depend.mk
 
 ac_include goo/depend.mk

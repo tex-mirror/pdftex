@@ -9,7 +9,7 @@ library = lib
 # We don't make `texmfmp.o', since TeX, Metafont, and MetaPost need to
 # use different routine names, hence they need different .o files. Maybe
 # we should change this via #define's someday ...
-objects = alloca.o basechsuffix.o chartostring.o coredump.o \
+objects = basechsuffix.o chartostring.o coredump.o \
   eofeoln.o fprintreal.o inputint.o input2int.o main.o \
   openclose.o printversion.o uexit.o usage.o version.o zround.o
 

@@ -1,4 +1,103 @@
 ------------------------------------------------
+pdfTeX 3.141592-1.20a was released on 2004-09-06
+------------------------------------------------
+
+Major changes since 1.11b
+-------------------------
+- There is a new program pdfxtex, which contains experimental features which
+  might end up in pdftex in the future.
+
+- Most distributions now use eTeX as the default engine, so when you call
+  pdftex you will get pdfeTeX. Most distributions now also use pdfTeX as the
+  default engine, so when you call latex you will get pdfeTeX running LaTeX.:-)
+
+- We are setting up pdfTeX as a project at sarovar
+  (http://sarovar.org/projects/pdftex/). Please report bugs etc. through the
+  site.
+
+- Support for the file pdftex.cfg is gone completely. All parameters that had
+  previously been set by it can be set through primitives; their values are
+  dumped to the format file.
+  
+- The searchpath for encoding and mapfiles has been changed.
+  See http://tug.org/pipermail/tex-live/2004-January/004734.html and
+  http://tug.org/pipermail/tex-live/2004-January/004791.html
+
+- eTeX is now version 2.2, incorporating the last changes to TeX (3.141592).
+
+- New options for \pdfmapfile:
+  General functionality: Map items (map files, new: also single map lines; see
+  \pdfmapline) are put in list of pending map items. During the next shipout,
+  pending map items are sequentially scanned for their map entries, and an
+  internal map entry database is updated, using the modes below. Then the list
+  of pending map items is cleared. Map entries of fonts already in use are left
+  untouched. New: All \pdfmapfile and \pdfmapline commands can also be given
+  after shipout of the first page.
+  - \pdfmapfile {foo.map} clears the list of pending map items and starts a new
+    list with the only pending file foo.map. When the map entry lines of
+    foo.map are scanned, duplicate map entries are ignored and a warning is
+    issued. This is the old behaviour.
+  - \pdfmapfile {+foo.map} puts foo.map in the list of pending map items. When
+    the map entry lines of foo.map are scanned, duplicate map entries are
+    ignored and a warning is issued.
+  - \pdfmapfile {=foo.map} puts foo.map in the list of pending map items. When
+    foo.map is scanned, matching map entries in database are replaced by new
+    entries from foo.map.
+  - \pdfmapfile {-foo.map} puts foo.map in the list of pending map items. When
+    foo.map is scanned, matching map entries are deleted from database.
+  - \pdfmapfile {} clears the list of pending map items. It does not affect map
+    entries already registered into the database. This is the old behaviour.
+
+- New command \pdfmapline {line}. It's like \pdfmapfile but here you can set
+  single map lines like in the map files directly. The modifiers (+-=) have the
+  same effect as with \pdfmapfile.
+
+- Simplified the handling of the 14 Type 1 "standard fonts" (Times,
+  Helvetica...): They are now more or less handled like any other Type 1 font.
+  See http://www.ntg.nl/pipermail/ntg-pdftex/2004-July/000648.html
+
+- hz: So far the font expansion feature required that the user must be able to
+  create expanded tfms (eg cmr10+10.tfm). Now font expansion can be used
+  without creating these tfms.
+  See http://www.ntg.nl/pipermail/ntg-pdftex/2004-May/000504.html
+  
+- hz: Changed \pdffontexpand primitive --> the expand factor is now fixed to
+  1000 and the argument is ignored. This will lead to spurious texts of "1000"
+  in your output if you compile old documents.
+
+- New command \pdftexbanner which returns a string with the full banner of the
+  current binary (e.g. "This is pdfTeX, Version 3.141592-1.20a (Web2C 7.5.3)
+  kpathsea version 3.5.3")
+
+- The PTEX.FullBanner key is now inserted in the document info dict instead of
+  the catalog. Newer versions of Acrobat display it.
+  
+- Now includes support for encTeX.
+
+- Extended \pdfannot to use reserveobjnum/useobjnum 
+  See http://www.ntg.nl/pipermail/ntg-pdftex/2004-March/000424.html
+
+- Bugfix: pdfTeX would read an .xpdfrc when including pdfs.
+  See http://tug.org/pipermail/pdftex/2004-March/004835.html
+
+- Bugfix: The strings in /ID would sometimes be empty.
+  
+- Bugfix: Even when mapfiles or encodings or PostScript font files were
+  missing, pdfTeX still produced a (most often corrupt) pdf. Now it aborts with
+  an error in these cases.
+
+- numerous small bugfixes.
+  
+- pdfTeX now uses the GNU libavl from Ben Pfaff for managing of fontmap
+  entries.
+  
+- pdfTeX uses zlib 1.2.1
+
+- pdfTeX uses xpdf 3.00
+
+- pdfTeX uses libpng 1.2.7
+  
+------------------------------------------------
 pdfTeX 3.141592-1.11b was released on 2003-10-06
 ------------------------------------------------
 
@@ -128,7 +227,7 @@ Major changes since 1.0
   versions <= 1.3 . 
     The default for \pdfoptionpdfminorversion is 4 for pdf 1.4
     This must appear before any data is written to the generated pdf file, so
-  you should it put at the very start of your files.
+  you should put it at the very start of your files.
     This can also be set in pdftex.cfg with pdf_minorversion
 
 - It is now possible to specify the pdf page box to use when including pdfs.
@@ -161,7 +260,7 @@ Major changes since 1.0
   pdfTeX code overly complex. Those needing pdf encryption are encouraged to
   produce a standalone program for encrypting pdfs.
 
-- pdfTeX now writes a usage statistic about the pdftex specific memory to the
+- pdfTeX now writes a usage statistic about the pdfTeX specific memory to the
   log.
 
 - numerous bugfixes, most of them in the inclusion of pdfs.
@@ -182,5 +281,5 @@ pdfTeX 3.14159-1.00a-pretest-20010806 was released on 2001-08-06
 pdfTeX 3.14159-1.00a-pretest-20010804 was released on 2001-08-04
 ----------------------------------------------------------------
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/NEWS#10 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#68 $
 // vim: tw=79:ts=2:expandtab:autoindent

@@ -10,7 +10,7 @@
    thing, the messages have a lot in common, so it's nice to have them
    in one place.)
 
-Copyright (C) 1995, 96 Karl Berry, 2001 O.Weber.
+Copyright (C) 1995, 96 Karl Berry, 2001, 03, 04 Olaf Weber.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -180,6 +180,7 @@ const_string MFTHELP[] = {
     "-change=CHFILE  apply the change file CHFILE as with tangle and weave",
     "-metapost       assume NAME is a METAPOST source file",
     "-style=MFTNAME  use MFTNAME instead of plain.mft (or mplain.mft)",
+    "                 (this option can be given more than once)",
     "-help           display this help and exit",
     "-version        output version information and exit",
     NULL

@@ -1,4 +1,4 @@
-% The e-TRIP manual: How to validate e-TeX - last modified 24 Jan 1998
+% The e-TRIP manual: How to validate e-TeX - last modified 25 Aug 2004
 %
 % some e-TeX numbers
 %
@@ -50,7 +50,7 @@
 \vfill
 \centerline{\titlefont A torture test for \eTeX}
 \vskip 6pt
-\centerline{({\sl Version 2, January 1998\/})}
+\centerline{({\sl Version 2.2, August 2004\/})}
 \vskip 18pt
 \centerline{by The \NTS\ Team}
 \vskip 6pt
@@ -113,9 +113,10 @@ must be happy with the way it works at his or her installation; and
 (2)~the program must produce the correct results from the \.{e-TRIP}
 test.  Hence we are planning to do whatever we can to suppress any
 systems that call themselves \eTeX\ without meeting conditions (1)
-and~(2).  We have copyrighted the programs so that we have some chance
-to forbid unauthorized copies; we explicitly authorize copying of
-correct \eTeX\ implementations, and not of incorrect ones!
+and~(2).  We have copyrighted the program (1994,98 by The \NTS\ Team,
+1999-2004 by P.~Breitenlohner) so that we have some chance to forbid
+unauthorized copies; we explicitly authorize copying of correct \eTeX\
+implementations, and not of incorrect ones!
 
 The process of generating an \eTeX\ implementation for a particular
 system [2] is based on that of generating a \TeX\ implementation for the
@@ -154,7 +155,7 @@ special font called \.{etrip}.
 Appendix E is \.{eTRIPIN.LOG}, a correct transcript file \.{eTRIP.LOG}
 that results if \.{e-TRIPTEX} is applied to \.{eTRIP.TEX}.
 This run of \.{e-TRIPTEX} also creates a binary format file called
-\.{eTRIP.FMT} or similar.)
+\.{eTRIP.FMT} (or similar).
 
 Appendix F is a correct transcript file \.{eTRIP.LOG} that results if
 \.{e-TRIPTEX} or any other version of \eTeX\ is applied to \.{eTRIP.TEX}
@@ -263,21 +264,10 @@ dumped by the first \.{e-TRIPTEX} run may vary by $\pm2$.
 \itemitem{g)} Both \.{e-TRIPTEX} runs report \extracs~additional
 multiletter control sequences (in the \.{TRIP.LOG} files).
 
-\itemitem{f)} The second \.{e-TRIPTEX} run reports different memory
-usage statistics during the output of pages; there will be the three
-(non consecutive) lines\verblines 3
-Memory usage before: 151&313; after: 102&278; still untouched: 1613
-Memory usage before: 851&436; after: 290&417; still untouched: 175
-Memory usage before: 330&428; after: 292&415; still untouched: 175
-instead of\verblines 3
-Memory usage before: 159&313; after: 102&278; still untouched: 1613
-Memory usage before: 895&436; after: 290&417; still untouched: 175
-Memory usage before: 334&428; after: 292&415; still untouched: 175
-The first and third of these appear on the terminal and in the
-\.{TRIP.LOG} file, the second one in \.{TRIP.LOG} only.  Next the second
-run reports the unfinished group(s) when the program terminates; there
-are three additional lines (the first of them blank) on the terminal and
-in the \.{TRIP.LOG} file\verblines 3
+\itemitem{f)} The second \.{e-TRIPTEX} run reports the unfinished
+group(s) when the program terminates; there are three additional lines
+(the first of them blank) on the terminal and in the \.{TRIP.LOG}
+file\verblines 3
 
 ### semi simple group (level 1) entered at line 429 (begingroup)
 ### bottom level

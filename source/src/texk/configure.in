@@ -42,18 +42,16 @@ AC_PROG_LIBTOOL
 
 if test "x$with_omega" = xno; then
   with_odvipsk=no
-  with_oxdvik=no
 fi
 
 if test "x$with_x" = xno; then
   with_xdvik=no
-  with_oxdvik=no
 fi
 
 PKGS='
-  bibtex8 cjkutils detex devnag dtl dvi2tty dvidvi dviljk dvipdfm dvipsk gsftopk 
-  lacheck makeindexk musixflx odvipsk oxdvik ps2pkm seetexk tetex tex4htk
-  texlive ttf2pk tth xdvik
+  afm2pl bibtex8 cjkutils detex devnag dtl dvi2tty dvidvi dviljk dvipdfm
+  dvipng dvipsk gsftopk lacheck makeindexk musixflx odvipsk ps2pkm
+  seetexk tetex tex4htk texlive ttf2pk tth xdvik
 '
 
 ESUBDIRS=

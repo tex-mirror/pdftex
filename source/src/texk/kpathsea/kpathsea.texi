@@ -2,8 +2,8 @@
 @setfilename kpathsea.info
 @settitle Kpathsea: A library for path searching
 
-@set version 3.5.2
-@set month-year February 2003
+@set version 3.5.3
+@set month-year May 2004
 
 @c Define new indices for commands, filenames, and options.
 @defcodeindex cm
@@ -31,10 +31,10 @@
 * mktexlsr: (kpathsea)Filename database.      Update ls-R.
 @end direntry
 
-@ifinfo
+@copying
 This file documents the Kpathsea library for path searching.
 
-Copyright (C) 1993-2001 K. Berry & O. Weber.
+Copyright (C) 1993-2004 Karl Berry & Olaf Weber.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -56,7 +56,7 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation.
-@end ifinfo
+@end copying
 
 
 @titlepage
@@ -64,31 +64,16 @@ approved by the Free Software Foundation.
 @title Kpathsea library
 @subtitle for version @value{version}
 @subtitle @value{month-year}
-@author K. Berry (@email{kb@@mail.tug.org})
-@author O. Weber (@email{infovore@@xs4all.nl})
+@author Karl Berry (@email{kb@@mail.tug.org})
+@author Olaf Weber (@email{infovore@@xs4all.nl})
 
 @page
-
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1993, 94, 95, 96, 97 K. Berry & O. Weber.
-
-Permission is granted to make and distribute verbatim copies of this
-manual provided the copyright notice and this permission notice are
-preserved on all copies.
-
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided that the
-entire resulting derived work is distributed under the terms of a
-permission notice identical to this one.
-
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions,
-except that this permission notice may be stated in a translation
-approved by the Free Software Foundation.
+@insertcopying
 @end titlepage
 
 
-@ifinfo
+@ifnottex
 @node Top
 @top Kpathsea library
 
@@ -107,7 +92,7 @@ released in @value{month-year}.
 
 * Index::                       General index.
 @end menu
-@end ifinfo
+@end ifnottex
 
 
 @node Introduction
@@ -1075,6 +1060,13 @@ Set the resolution to @var{num}; this only affects @samp{gf} and
 @samp{pk} lookups.  @samp{-D} is a synonym, for compatibility with
 Dvips.  Default is 600.
 
+@item --engine=@var{name}
+@opindex --engine=@var{name}
+@cindex engine name
+Set the engine name to @var{name}.  By default it is not set.  The
+engine name is used in some search paths to allow files with the same
+name but used by different engines to coexist.
+
 @item --format=@var{name}
 @opindex --format=@var{name}
 Set the format for lookup to @var{name}.  By default, the format is
@@ -1131,6 +1123,16 @@ type42 fonts
 web2c files
 other text files
 other binary files
+misc fonts
+web: .web
+cweb: .w .web
+enc: .enc
+cmap: .cmap
+sfd: .sfd
+opentype fonts
+pdftex config
+lig files: .lig
+texmfscripts
 @end example
 
 This option and @samp{--path} are mutually exclusive.
@@ -1192,6 +1194,10 @@ lookup:
 @opindex --debug=@var{num}
 @samp{--debug=@var{num}} sets the debugging options to @var{num}.
 @xref{Debugging}.
+
+@item
+@opindex --var-value=@var{variable}
+@samp{--var-value=@var{variable}} output the value of @var{variable}.
 
 @item
 @opindex --expand-braces=@var{string}
@@ -1327,6 +1333,13 @@ style files, web2c, Web2c})
 @code{BSTINPUTS};
 suffix @samp{.bst}.
 
+@item cmap
+@flindex .cmap
+@vindex CMAPFONTS
+(character map files)
+@code{CMAPFONTS};
+suffix @samp{.cmap}.
+
 @item cnf
 @flindex .cnf
 @vindex TEXMFCNF
@@ -1334,12 +1347,28 @@ suffix @samp{.bst}.
 @code{TEXMFCNF};
 suffix @samp{.cnf}.
 
+@item cweb
+@flindex .w
+@flindex .web
+@vindex CWEBINPUTS
+(CWEB input files)
+@code{CWEBINPUTS};
+suffixes @samp{.w}, @samp{.web};
+additional suffix @samp{.ch}.
+
 @item dvips config
 @vindex TEXCONFIG
 @flindex config.ps@r{, search path for}
 (Dvips @samp{config.*} files, such as @file{config.ps}, @pxref{Config
 files,,, dvips, Dvips})
 @code{TEXCONFIG}.
+
+@item enc files
+@flindex .enc
+@vindex ENCFONTS
+(encoding vectors)
+@code{ENCFONTS};
+suffix @samp{.enc}.
 
 @item fmt
 @flindex .fmt
@@ -1374,6 +1403,13 @@ additional suffixes: @samp{.eps}, @samp{.epsi}.
 (makeindex style files)
 @code{TEXINDEXSTYLE}, @code{INDEXSTYLE};
 suffix @samp{.ist}.
+
+@item lig files
+@flindex .lig
+@vindex LIGFONTS
+(ligature definition files)
+@code{LIGFONTS};
+suffix @samp{.lig}.
 
 @item ls-R
 @flindex ls-R
@@ -1423,6 +1459,11 @@ suffix @samp{.pool}.
 @code{MFTINPUTS};
 suffix @samp{.mft}.
 
+@item misc fonts
+@vindex MISCFONTS
+(font-related files that don't fit the other categories)
+@code{MISCFONTS}
+
 @item mp
 @flindex .mp
 @vindex MPINPUTS
@@ -1453,6 +1494,11 @@ dynamic creation program: @code{MakeOmegaOCP}.
 suffixes @samp{.ofm}, @samp{.tfm};
 dynamic creation program: @code{MakeOmegaOFM}.
 
+@item opentype fonts
+@vindex OPENTYPEFONTS
+(OpenType fonts)
+@code{OPENTYPEFONTS}.
+
 @item opl
 @flindex .opl
 (Omega property lists)
@@ -1480,6 +1526,11 @@ suffix @samp{.ovf}.
 @code{OVPFONTS}, @code{TEXFONTS};
 suffix @samp{.ovp}.
 
+@item pdftex config
+@vindex PDFTEXCONFIG
+(PDF@TeX{}-specific configuration files)
+@code{PDFTEXCONFIG}.
+
 @item pk
 @flindex .pk
 @vindex PKFONTS
@@ -1499,6 +1550,13 @@ dynamic creation program: @code{mktexpk}.
 (downloadable PostScript, @pxref{Header files,,, dvips, Dvips})
 @code{TEXPSHEADERS}, @code{PSHEADERS};
 additional suffix @samp{.pro}.
+
+@item subfont definition files
+@flindex .sfd
+@vindex SFDFONTS
+(subfont definition files)
+@code{SFDFONTS}
+suffix @samp{.sfd}.
 
 @item tex
 @flindex .tex
@@ -1520,6 +1578,11 @@ dynamic creation program: @code{mktextex}.
 @vindex TEXSOURCES
 (Source files for the @TeX{} system)
 @code{TEXSOURCES}.
+
+@item texmfscripts
+@vindex TEXMFSCRIPTS
+(Architecture-independent executables distributed in the texmf tree)
+@code{TEXMFSCRIPTS}.
 
 @item texpool
 @flindex .pool
@@ -1571,6 +1634,19 @@ suffixes @samp{.pfa}, @samp{.pfb}.
 (virtual fonts, @pxref{Virtual fonts,,, dvips, Dvips})
 @code{VFFONTS}, @code{TEXFONTS};
 suffix @samp{.vf}.
+
+@item web
+@flindex .web
+@vindex WEBINPUTS
+(WEB input files)
+@code{WEBINPUTS};
+suffix @samp{.web};
+additional suffix @samp{.ch}.
+
+@item web2c files
+@vindex WEB2C
+(files specific to the web2c implementation)
+@code{WEB2C}.
 @end table
 
 There are two special cases, because the paths and environment variables
@@ -1925,8 +2001,17 @@ describe the interfaces and functionality (and of course the @file{.c}
 files define the actual routines, which are the ultimate documentation).
 @file{pathsearch.h} declares the basic searching routine.
 @file{tex-file.h} and @file{tex-glyph.h} define the interfaces for
-looking up particular kinds of files.  You may wish to use
-@code{#include <kpathsea/kpathsea.h>}, which includes every Kpathsea header.
+looking up particular kinds of files.  In view of the way the headers
+depend on each other, it is recommended to use @code{#include
+<kpathsea/kpathsea.h>}, which includes every Kpathsea header.
+
+@flindex config.h
+@flindex c-auto.h
+If you want to include only specific headers, you should still consider
+including @file{kpathsea/config.h} before including any other Kpathsea
+header, as it provides symbols used in the other headers.  Note that
+@file{kpathsea/config.h} includes @file{kpathsea/c-auto.h}, which is
+generated by Autoconf.
 
 @cindex file types, registering new
 The library provides no way for an external program to register new file

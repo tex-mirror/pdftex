@@ -1,7 +1,7 @@
 /* tex-file.c: high-level file searching by format.
 
 Copyright (C) 1993, 94, 95, 96, 97 Karl Berry.
-Copyright 1998, 1998 Olaf Weber.
+Copyright 1998-2004 Olaf Weber.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -46,14 +46,14 @@ kpse_format_info_type kpse_format_info[kpse_last_format];
 #define PK_ENVS "PKFONTS", "TEXPKS", GLYPH_ENVS
 #define GLYPH_ENVS "GLYPHFONTS", "TEXFONTS"
 #define TFM_ENVS "TFMFONTS", "TEXFONTS"
-#define AFM_ENVS "AFMFONTS"
+#define AFM_ENVS "AFMFONTS", "TEXFONTS"
 #define BASE_ENVS "MFBASES", "TEXMFINI"
 #define BIB_ENVS "BIBINPUTS", "TEXBIB"
 #define BST_ENVS "BSTINPUTS"
 #define CNF_ENVS "TEXMFCNF"
 #define DB_ENVS "TEXMFDBS"
 #define FMT_ENVS "TEXFORMATS", "TEXMFINI"
-#define FONTMAP_ENVS "TEXFONTMAPS"
+#define FONTMAP_ENVS "TEXFONTMAPS", "TEXFONTS"
 #define MEM_ENVS "MPMEMS", "TEXMFINI"
 #define MF_ENVS "MFINPUTS"
 #define MFPOOL_ENVS "MFPOOL", "TEXMFINI"
@@ -74,16 +74,23 @@ kpse_format_info_type kpse_format_info[kpse_last_format];
 #define TEXSOURCE_ENVS "TEXSOURCES"
 #define TEX_PS_HEADER_ENVS "TEXPSHEADERS", "PSHEADERS"
 #define TROFF_FONT_ENVS "TRFONTS"
-#define TYPE1_ENVS "T1FONTS", "T1INPUTS", TEX_PS_HEADER_ENVS
+#define TYPE1_ENVS "T1FONTS", "T1INPUTS", "TEXFONTS", TEX_PS_HEADER_ENVS
 #define VF_ENVS "VFFONTS", "TEXFONTS"
 #define DVIPS_CONFIG_ENVS "TEXCONFIG"
 #define IST_ENVS "TEXINDEXSTYLE", "INDEXSTYLE"
-#define TRUETYPE_ENVS "TTFONTS"
-#define TYPE42_ENVS "T42FONTS"
+#define TRUETYPE_ENVS "TTFONTS", "TEXFONTS"
+#define TYPE42_ENVS "T42FONTS", "TEXFONTS"
 #define WEB2C_ENVS "WEB2C"
-#define MISCFONTS_ENVS "MISCFONTS"
+#define MISCFONTS_ENVS "MISCFONTS", "TEXFONTS"
 #define WEB_ENVS "WEBINPUTS"
 #define CWEB_ENVS "CWEBINPUTS"
+#define ENC_ENVS "ENCFONTS", "TEXFONTS"
+#define CMAP_ENVS "CMAPFONTS", "TEXFONTS"
+#define SFD_ENVS "SFDFONTS", "TEXFONTS"
+#define OPENTYPE_ENVS "OPENTYPEFONTS", "TEXFONTS"
+#define PDFTEXCONFIG_ENVS "PDFTEXCONFIG"
+#define LIG_ENVS "LIGFONTS", "TEXFONTS"
+#define TEXMFSCRIPTS_ENVS "TEXMFSCRIPTS"
 
 /* The compiled-in default list, DEFAULT_FONT_SIZES, is intended to be
    set from the command line (presumably via the Makefile).  */
@@ -95,7 +102,7 @@ kpse_format_info_type kpse_format_info[kpse_last_format];
 void
 kpse_init_fallback_resolutions P1C(string, envvar)
 {
-  string size, orig_size_list;
+  string size;
   const_string size_var = ENVVAR (envvar, "TEXSIZES");
   string size_str = getenv (size_var);
   unsigned *last_resort_sizes = NULL;
@@ -105,8 +112,6 @@ kpse_init_fallback_resolutions P1C(string, envvar)
                          : DEFAULT_FONT_SIZES; 
   string size_list = kpse_expand_default (size_str, default_sizes);
   
-  orig_size_list = size_list; /* For error messages.  */
-
   /* Initialize the list of last-resort sizes.  */
   for (size = kpse_path_element (size_list); size != NULL;
        size = kpse_path_element (NULL))
@@ -131,9 +136,7 @@ kpse_init_fallback_resolutions P1C(string, envvar)
   XRETALLOC (last_resort_sizes, size_count, unsigned);
   last_resort_sizes[size_count - 1] = 0;
 
-  /* If we didn't expand anything, we won't have allocated anything.  */
-  if (size_str && size_list != size_str)
-    free (size_list);
+  free (size_list);
     
   kpse_fallback_resolutions = last_resort_sizes;
 }
@@ -443,14 +446,15 @@ kpse_init_format P1C(kpse_file_format_type, format)
       break;
     case kpse_db_format:
       INIT_FORMAT ("ls-R", DEFAULT_TEXMFDBS, DB_ENVS);
-      SUFFIXES ("ls-R");
+#define LSR_SUFFIXES "ls-R", "ls-r"
+      SUFFIXES (LSR_SUFFIXES);
       FMT_INFO.path = remove_dbonly (FMT_INFO.path);
       break;
     case kpse_fmt_format:
       init_maketex (format, "mktexfmt", NULL);
       INIT_FORMAT ("fmt", DEFAULT_TEXFORMATS, FMT_ENVS);
       SUFFIXES (".fmt");
-#define FMT_SUFFIXES ".efmt",".efm",".oft",".eoft",".eof",".pfmt",".epfmt"
+#define FMT_SUFFIXES ".efmt",".efm",".ofmt",".ofm",".oft",".eofmt",".eoft",".eof",".pfmt",".pfm",".epfmt",".epf",".xpfmt",".xpf",".afmt",".afm"
       ALT_SUFFIXES (FMT_SUFFIXES);
       FMT_INFO.binmode = true;
       break;
@@ -541,7 +545,7 @@ kpse_init_format P1C(kpse_file_format_type, format)
       INIT_FORMAT ("PostScript header", DEFAULT_TEXPSHEADERS,
                    TEX_PS_HEADER_ENVS);
 /* Unfortunately, dvipsk uses this format for type1 fonts.  */
-#define TEXPSHEADER_SUFFIXES ".pro", ".enc"
+#define TEXPSHEADER_SUFFIXES ".pro"
       ALT_SUFFIXES (TEXPSHEADER_SUFFIXES);
       FMT_INFO.binmode = true;
       break;
@@ -619,6 +623,32 @@ kpse_init_format P1C(kpse_file_format_type, format)
 #define CWEB_SUFFIXES ".w", ".web"
       SUFFIXES (CWEB_SUFFIXES);
       ALT_SUFFIXES (".ch");
+      break;
+    case kpse_enc_format:
+      INIT_FORMAT ("enc files", DEFAULT_ENCFONTS, ENC_ENVS);
+      SUFFIXES (".enc");
+      break;
+    case kpse_cmap_format:
+      INIT_FORMAT ("cmap files", DEFAULT_CMAPFONTS, CMAP_ENVS);
+      SUFFIXES (".cmap");      
+      break;
+    case kpse_sfd_format:
+      INIT_FORMAT ("subfont definition files", DEFAULT_SFDFONTS, SFD_ENVS);
+      SUFFIXES (".sfd");
+      break;
+    case kpse_opentype_format:
+      INIT_FORMAT ("opentype fonts", DEFAULT_OPENTYPEFONTS, OPENTYPE_ENVS);
+      FMT_INFO.binmode = true;
+      break;
+    case kpse_pdftex_config_format:
+      INIT_FORMAT ("pdftex config", DEFAULT_PDFTEXCONFIG, PDFTEXCONFIG_ENVS);
+      break;
+    case kpse_lig_format:
+      INIT_FORMAT ("lig files", DEFAULT_LIGFONTS, LIG_ENVS);
+      SUFFIXES (".lig");
+      break;
+    case kpse_texmfscripts_format:
+      INIT_FORMAT ("texmfscripts", DEFAULT_TEXMFSCRIPTS, TEXMFSCRIPTS_ENVS);
       break;
     default:
       FATAL1 ("kpse_init_format: Unknown format %d", format);
@@ -707,6 +737,10 @@ kpse_find_file P3C(const_string, name,  kpse_file_format_type, format,
   
   if (FMT_INFO.path == NULL)
     kpse_init_format (format);
+
+  if (KPSE_DEBUG_P(KPSE_DEBUG_SEARCH))
+    DEBUGF3 ("kpse_find_file: searching for %s of type %s (from %s)\n",
+             name, FMT_INFO.type, FMT_INFO.path_source);
 
   /* Does NAME already end in a possible suffix?  */
   name_len = strlen (name);
@@ -864,6 +898,7 @@ kpse_reset_program_name P1C(const_string, progname)
 
   free (kpse_program_name);
   kpse_program_name = xstrdup (progname);
+  xputenv("progname", kpse_program_name);
   
   /* Clear paths -- do we want the db path to be cleared? */
   for (i = 0; i != kpse_last_format; ++i) {

@@ -1,7 +1,7 @@
 /* kpsewhich -- standalone path lookup and variable expansion for Kpathsea.
    Ideas from Thomas Esser and Pierre MacKay.
 
-Copyright (C) 1995 - 2002 Karl Berry & Olaf Weber.
+Copyright (C) 1995 - 2004 Karl Berry & Olaf Weber.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -40,6 +40,7 @@ string var_to_expand = NULL;
 string braces_to_expand = NULL;
 string path_to_expand = NULL;
 string path_to_show = NULL;
+string var_to_value = NULL;
 
 /* The file type and path for lookups.  (-format, -path) */
 kpse_file_format_type user_format = kpse_last_format;
@@ -60,6 +61,9 @@ string mode = NULL;
 
 /* The program name, for `.PROG' construct in texmf.cnf.  (-program) */
 string progname = NULL;
+
+/* The engine name, for '$engine' construct in texmf.cnf.  (-engine) */
+string engine = NULL;
 
 /* Return the <number> substring in `<name>.<number><stuff>', if S has
    that form.  If it doesn't, return 0.  */
@@ -91,12 +95,10 @@ find_format P2C(string, name, boolean, is_filename)
   
   if (is_filename && user_format != kpse_last_format) {
     ret = user_format;
-  } else if (FILESTRCASEEQ (name, "psfonts.map") ||
-             FILESTRCASEEQ (name, "pdftex.map")) {
-    ret = kpse_dvips_config_format;
+  } else if (FILESTRCASEEQ (name, "pdftex.cfg")) {
+    ret = kpse_pdftex_config_format;
   } else {
     int f;  /* kpse_file_format_type */
-    boolean found = false;
     unsigned name_len = strlen (name);
 
 /* Have to rely on `try_len' being declared here, since we can't assume
@@ -106,19 +108,21 @@ find_format P2C(string, name, boolean, is_filename)
   (ftry) && try_len <= name_len \
      && FILESTRCASEEQ (ftry, name + name_len - try_len))
 
-    for (f = 0; !found && f < kpse_last_format; f++) {
+    f = 0;
+    while (f != kpse_last_format) {
       unsigned try_len;
       const_string *ext;
       const_string ftry;
+      boolean found = false;
       
       if (!kpse_format_info[f].type)
         kpse_init_format ((kpse_file_format_type)f);
 
       if (!is_filename) {
-          /* Allow the long name, but only in the -format option.  We don't
-             want a filename confused with a format name.  */
-          ftry = kpse_format_info[f].type;
-          found = TRY_SUFFIX (ftry);
+        /* Allow the long name, but only in the -format option.  We don't
+           want a filename confused with a format name.  */
+        ftry = kpse_format_info[f].type;
+        found = TRY_SUFFIX (ftry);
       }
       for (ext = kpse_format_info[f].suffix; !found && ext && *ext; ext++){
         found = TRY_SUFFIX (*ext);
@@ -126,9 +130,28 @@ find_format P2C(string, name, boolean, is_filename)
       for (ext = kpse_format_info[f].alt_suffix; !found && ext && *ext; ext++){
         found = TRY_SUFFIX (*ext);
       }
+
+      if (found)
+        break;
+
+      /* Some trickery here: the extensions for kpse_fmt_format can
+       * clash with other extensions in use, and we prefer for those
+       * others to be preferred.  And we don't want to change the
+       * integer value of kpse_fmt_format.  So skip it when first
+       * enountered, then use it when we've done everything else,
+       * and use it as the end-guard.
+       */
+      if (f == kpse_fmt_format) {
+        f = kpse_last_format;
+      } else if (++f == kpse_fmt_format) {
+        f++;
+      } else if (f == kpse_last_format) {
+        f = kpse_fmt_format;
+      }
     }
+
     /* If there was a match, f will be one past the correct value.  */
-    ret = found ? (kpse_file_format_type)(f - 1) : kpse_last_format;
+    ret = f;
   }
   
   return ret;
@@ -139,12 +162,18 @@ find_format P2C(string, name, boolean, is_filename)
 static unsigned
 lookup P1C(string, name)
 {
-  string ret;
+  string ret = NULL;
+  string *ret_list = NULL;
+  int i;
   unsigned local_dpi;
   kpse_glyph_file_type glyph_ret;
   
   if (user_path) {
-    ret = kpse_path_search (user_path, name, must_exist);
+    if (show_all) {
+      ret_list = kpse_all_path_search (user_path, name);
+    } else {
+       ret = kpse_path_search (user_path, name, must_exist);
+    }
     
   } else {
     /* No user-specified search path, check user format or guess from NAME.  */
@@ -173,6 +202,13 @@ lookup P1C(string, name)
   
   if (ret)
     puts (ret);
+  if (ret_list) {
+    for (i = 0; ret_list[i]; i++)
+      puts (ret_list[i]);
+    /* Save whether we found anything */
+    ret = ret_list[0];
+    free (ret_list);
+  }
   
   return ret == NULL;
 }
@@ -184,6 +220,7 @@ lookup P1C(string, name)
 \n\
 -debug=NUM             set debugging flags.\n\
 -D, -dpi=NUM           use a base resolution of NUM; default 600.\n\
+-engine=STRING         set engine name to STRING.\n\
 -expand-braces=STRING  output variable and brace expansion of STRING.\n\
 -expand-path=STRING    output complete path expansion of STRING.\n\
 -expand-var=STRING     output variable expansion of STRING.\n\
@@ -197,7 +234,8 @@ lookup P1C(string, name)
 -path=STRING           search in the path STRING.\n\
 -progname=STRING       set program name to STRING.\n\
 -show-path=NAME        output search path for file type NAME (see list below).\n\
--version               print version number and exit.\n\
+-var-value=STRING      output the value of variable $STRING.\n\
+-version               print version number and exit.\n \
 "
 
 /* Test whether getopt found an option ``A''.
@@ -211,6 +249,7 @@ static struct option long_options[]
       { "all",			0, (int *) &show_all, 1 },
       { "debug",		1, 0, 0 },
       { "dpi",			1, 0, 0 },
+      { "engine",		1, 0, 0 },
       { "expand-braces",	1, 0, 0 },
       { "expand-path",		1, 0, 0 },
       { "expand-var",		1, 0, 0 },
@@ -225,6 +264,7 @@ static struct option long_options[]
       { "progname",		1, 0, 0 },
       { "separator",		1, 0, 0 },
       { "show-path",		1, 0, 0 },
+      { "var-value",		1, 0, 0 },
       { "version",              0, 0, 0 },
       { 0, 0, 0, 0 } };
 
@@ -251,6 +291,9 @@ read_command_line P2C(int, argc,  string *, argv)
     } else if (ARGUMENT_IS ("dpi") || ARGUMENT_IS ("D")) {
       dpi = atoi (optarg);
 
+    } else if (ARGUMENT_IS ("engine")) {
+      engine = optarg;
+      
     } else if (ARGUMENT_IS ("expand-braces")) {
       braces_to_expand = optarg;
       
@@ -312,10 +355,13 @@ read_command_line P2C(int, argc,  string *, argv)
       path_to_show = optarg;
       user_format_string = optarg;
 
+    } else if (ARGUMENT_IS ("var-value")) {
+      var_to_value = optarg;
+
     } else if (ARGUMENT_IS ("version")) {
       extern KPSEDLL char *kpathsea_version_string; /* from version.c */
       puts (kpathsea_version_string);
-      puts ("Copyright (C) 1997 - 2002 K. Berry & O. Weber.\n\
+      puts ("Copyright (C) 1997 - 2004 K. Berry & O. Weber.\n\
 There is NO warranty.  You may redistribute this software\n\
 under the terms of the GNU General Public License.\n\
 For more information about these matters, see the files named COPYING.");
@@ -332,8 +378,8 @@ For more information about these matters, see the files named COPYING.");
     exit (1);
   }
 
-  if (optind == argc && !var_to_expand && !braces_to_expand
-                     && !path_to_expand && !path_to_show) {
+  if (optind == argc && !var_to_expand && !braces_to_expand && !path_to_expand
+                     && !path_to_show && !var_to_value) {
     fputs ("Missing argument. Try `kpsewhich --help' for more information.\n",
            stderr);
     exit (1);
@@ -348,6 +394,9 @@ main P2C(int, argc,  string *, argv)
   read_command_line (argc, argv);
 
   kpse_set_program_name (argv[0], progname);
+
+  if (engine)
+    xputenv("engine", engine);
   
   /* NULL for no fallback font.  */
   kpse_init_prog (uppercasify (kpse_program_name), dpi, mode, NULL);
@@ -360,6 +409,7 @@ main P2C(int, argc,  string *, argv)
   if (var_to_expand)
     puts (kpse_var_expand (var_to_expand));
 
+  /* Brace expansion. */
   if (braces_to_expand)
     puts (kpse_brace_expand (braces_to_expand));
   
@@ -378,6 +428,16 @@ main P2C(int, argc,  string *, argv)
     }
   }
 
+  /* Var to value. */
+  if (var_to_value) {
+    string value = kpse_var_value (var_to_value);
+    if (!value) {
+      unfound++;
+      value="";
+    }
+    puts (value);
+  }
+  
   for (; optind < argc; optind++) {
     unfound += lookup (argv[optind]);
   }
