@@ -3,10 +3,17 @@
 # builds new pdftex binaries
 MAKE=make
 STRIP=strip
-# clean up
-$MAKE distclean;
+# this deletes all previous builds. 
+# comment out the rm and mkdir if you want to keep them (and uncomment and
+# change the $MAKE distclean below)
+rm -rf build
+mkdir build
+cd build
+# clean up (uncomment the next line if you have commented out the rm and
+# mkdir above)
+# $MAKE distclean;
 # do a configure without all the things we don't need
-./configure --without-bibtex8   \
+../src/configure --without-bibtex8   \
             --without-t1utils   \
             --without-dialog    \
             --without-texinfo   \
@@ -37,6 +44,6 @@ $MAKE pdftex pdfetex || exit 1
 # strip them
 $STRIP pdf*tex
 # go back
-cd ../..
+cd ../../..
 # show the results
-ls -l texk/web2c/pdf*tex texk/web2c/pdf*tex.pool
+ls -l build/texk/web2c/pdf*tex build/texk/web2c/pdf*tex.pool
