@@ -1,0 +1,9 @@
+LIBRARY		"libxpdf"
+
+DESCRIPTION	'"""XPDF library"""'
+
+VERSION		0.7a
+
+HEAPSIZE	1048576,4096
+
+
