@@ -1,0 +1,8 @@
+% Bugfixes for etex.ch version 2.1
+% Public Domain.
+
+@x l.5503
+  if cur_ptr<>0 then
+@y
+  if cur_ptr<>null then
+@z

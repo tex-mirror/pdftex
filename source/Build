@@ -1,0 +1,42 @@
+#! /usr/bin/env bash
+# $Id$
+# builds new pdftex binaries
+MAKE=make
+STRIP=strip
+# clean up
+$MAKE distclean;
+# do a configure without all the things we don't need
+./configure --without-bibtex8   \
+            --without-t1utils   \
+            --without-dialog    \
+            --without-texinfo   \
+            --without-dtl       \
+            --without-dvi2tty   \
+            --without-dvidvi    \
+            --without-dviljk    \
+            --without-dvipdfm   \
+            --without-dvipsk    \
+            --without-gsftopk   \
+            --without-lacheck   \
+            --without-makeindexk\
+            --without-musixflx  \
+            --without-odvipsk   \
+            --without-oxdvik    \
+            --without-ps2pkm    \
+            --without-seetexk   \
+            --without-tetex     \
+            --without-tex4htk   \
+            --without-texlive   \
+            --without-tth       \
+            --without-xdvik     \
+            --without-omega    || exit 1 
+# switch to the right dir
+cd texk/web2c || exit 1
+# make the binaries
+$MAKE pdftex pdfetex || exit 1
+# strip them
+$STRIP pdf*tex
+# go back
+cd ../..
+# show the results
+ls -l texk/web2c/pdf*tex texk/web2c/pdf*tex.pool

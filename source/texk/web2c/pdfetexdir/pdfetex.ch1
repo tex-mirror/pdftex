@@ -1,0 +1,119 @@
+%
+% Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+%
+% This file is part of pdfTeX.
+%
+% pdfTeX is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% pdfTeX is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with pdfTeX; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+%
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.ch1#4 $
+%
+@x [61]
+wterm(eTeX_banner);
+@y
+wterm(banner);
+@z
+
+@x [212]
+@d err_help_loc=token_base+9 {points to token list for \.{\\errhelp}}
+@d toks_base=token_base+10 {table of 256 token list registers}
+@y
+@d err_help_loc=local_base+9 {points to token list for \.{\\errhelp}}
+@d toks_base=local_base+10 {table of 256 token list registers}
+@z
+
+@x [307]
+@d write_text=16 {|token_type| code for \.{\\write}}
+@y
+@d write_text=15 {|token_type| code for \.{\\write}}
+@z
+
+@x [416]
+|glue_val|, |last_node_type_code|, |input_line_no_code|, |badness_code|,
+|eTeX_version_code|, or one of the other codes for \eTeX\ extensions.
+
+@d last_node_type_code=glue_val+1 {code for \.{\\lastnodetype}}
+@d input_line_no_code=glue_val+2 {code for \.{\\inputlineno}}
+@d badness_code=glue_val+3 {code for \.{\\badness}}
+@d eTeX_int=glue_val+4 {first of \eTeX\ codes for integers}
+@d eTeX_dim=eTeX_int+8 {first of \eTeX\ codes for dimensions}
+@d eTeX_glue=eTeX_dim+9 {first of \eTeX\ codes for glue}
+@d eTeX_mu=eTeX_glue+1 {first of \eTeX\ codes for muglue}
+@d eTeX_expr=eTeX_mu+1 {first of \eTeX\ codes for expressions}
+@y
+|glue_val|, |input_line_no_code|, or |badness_code|.
+
+@d input_line_no_code=glue_val+1 {code for \.{\\inputlineno}}
+@d badness_code=glue_val+2 {code for \.{\\badness}}
+@z
+
+@x [424]
+if m>last_node_type_code then
+ if m>=eTeX_glue then @<Process an expression and |return|@>@;
+ else if m>=eTeX_dim then
+  begin case m of
+  @/@<Cases for fetching a dimension value@>@/
+  end; {there are no other cases}
+  cur_val_level:=dimen_val;
+  end
+ else begin case m of
+  input_line_no_code: cur_val:=line;
+  badness_code: cur_val:=last_badness;
+  @/@<Cases for fetching an integer value@>@/
+  end; {there are no other cases}
+@y
+if cur_chr>glue_val then
+  begin if cur_chr=input_line_no_code then cur_val:=line
+  else cur_val:=last_badness; {|cur_chr=badness_code|}
+@z
+
+@x [536]
+begin wlog(eTeX_banner);
+@y
+begin wlog(banner);
+@z
+
+@x [622]
+kern_node:cur_h:=cur_h+width(p);
+math_node:begin if eTeX_ex then
+    @<Adjust \(t)the LR stack for the |hlist_out| routine; if necessary
+      reverse an hlist segment and |goto reswitch|@>;
+  cur_h:=cur_h+width(p);
+  end;
+@y
+kern_node,math_node:cur_h:=cur_h+width(p);
+@z
+
+@x [649]
+exit: if TeXXeT_en then @<Check for LR anomalies at the end of |hpack|@>;
+hpack:=r;
+@y
+exit: hpack:=r;
+@z
+
+@x [651] 
+  kern_node: x:=x+width(p);
+  math_node: begin x:=x+width(p);
+    if TeXXeT_en then @<Adjust \(t)the LR stack for the |hpack| routine@>;
+    end;
+@y
+  kern_node,math_node: x:=x+width(p);
+@z
+
+@x [1147] 
+kern_node: d:=width(p);
+@t\4@>@<Cases of `Let |d| be the natural width' that need special treatment@>@;
+@y
+kern_node,math_node: d:=width(p);
+@z

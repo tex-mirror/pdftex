@@ -1,0 +1,146 @@
+This is web2c.info, produced by makeinfo version 4.3 from web2c.texi.
+
+INFO-DIR-SECTION TeX
+START-INFO-DIR-ENTRY
+* Web2c: (web2c).                    TeX, Metafont, and companion programs.
+* bibtex: (web2c)bibtex invocation.             Maintaining bibliographies.
+* dmp: (web2c)dmp invocation.                   Troff->MPX (MetaPost pictures).
+* dvicopy: (web2c)dvicopy invocation.           Virtual font expansion
+* dvitomp: (web2c)dvitomp invocation.           DVI to MPX (MetaPost pictures).
+* dvitype: (web2c)dvitype invocation.           DVI to human-readable text.
+* gftodvi: (web2c)gftodvi invocation.           Generic font proofsheets.
+* gftopk: (web2c)gftopk invocation.             Generic to packed fonts.
+* gftype: (web2c)gftype invocation.             GF to human-readable text.
+* inimf: (web2c)inimf invocation.               Initial Metafont.
+* inimpost: (web2c)inimpost invocation.         Initial MetaPost.
+* initex: (web2c)initex invocation.             Initial TeX.
+* makempx: (web2c)makempx invocation.           MetaPost label typesetting.
+* mf: (web2c)mf invocation.                     Creating typeface families.
+* mft: (web2c)mft invocation.                   Prettyprinting Metafont source.
+* mltex: (web2c)MLTeX.                          Multi-lingual TeX.
+* mpost: (web2c)mpost invocation.               Creating technical diagrams.
+* mpto: (web2c)mpto invocation.                 MetaPost label extraction.
+* newer: (web2c)newer invocation.               Compare modification times.
+* patgen: (web2c)patgen invocation.             Creating hyphenation patterns.
+* pktogf: (web2c)pktogf invocation.             Packed to generic fonts.
+* pktype: (web2c)pktype invocation.             PK to human-readable text.
+* pltotf: (web2c)pltotf invocation.             Property list to TFM.
+* pooltype: (web2c)pooltype invocation.         Display WEB pool files.
+* tangle: (web2c)tangle invocation.             WEB to Pascal.
+* tex: (web2c)tex invocation.                   Typesetting.
+* tftopl: (web2c)tftopl invocation.             TFM -> property list.
+* vftovp: (web2c)vftovp invocation.             Virtual font -> virtual pl.
+* virmf: (web2c)virmf invocation.               Virgin Metafont.
+* virmpost: (web2c)virmpost invocation.         Virgin MetaPost.
+* virtex: (web2c)virtex invocation.             Virgin TeX.
+* vptovf: (web2c)vptovf invocation.             Virtual pl -> virtual font.
+* weave: (web2c)weave invocation.               WEB to TeX.
+END-INFO-DIR-ENTRY
+
+  This file documents the installation and use of the programs in Web2c,
+an implementation of Donald Knuth's TeX system.
+
+  Copyright (C) 1996-2002 K. Berry & O. Weber.
+
+  Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+  Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+  Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation
+
+
+Indirect:
+web2c.info-1: 3298
+web2c.info-2: 52240
+web2c.info-3: 101252
+web2c.info-4: 147425
+
+Tag Table:
+(Indirect)
+Node: Top3298
+Node: Introduction4299
+Node: Installation7471
+Node: configure options9631
+Node: Compile-time options11844
+Node: Additional targets12960
+Node: Triptrap14243
+Node: Runtime options15762
+Node: Commonalities17525
+Node: Option conventions18150
+Node: Common options19347
+Node: Path searching22704
+Node: Output file location23719
+Node: Three programs24679
+Node: Initial and virgin25432
+Node: Preloaded executables26898
+Node: Memory dumps28392
+Node: Creating memory dumps28849
+Node: Determining the memory dump to use30091
+Node: Hardware and memory dumps31701
+Node: Editor invocation34157
+Node: \input filenames34876
+Node: TeX37267
+Node: tex invocation38390
+Node: initex invocation45894
+Node: virtex invocation47270
+Node: Formats47743
+Node: Languages and hyphenation50243
+Node: MLTeX50665
+Node: \charsubdef52240
+Node: \tracingcharsubdef54544
+Node: TCX files55104
+Node: patgen invocation59178
+Node: IPC and TeX59881
+Node: TeX extensions60474
+Node: Metafont61748
+Node: mf invocation63086
+Node: inimf invocation66808
+Node: virmf invocation68441
+Node: Modes68964
+Node: Online Metafont graphics71203
+Node: gftodvi invocation74462
+Node: mft invocation76708
+Node: MetaPost80751
+Node: mpost invocation81823
+Node: inimpost invocation86722
+Node: virmpost invocation88176
+Node: makempx invocation88686
+Node: dvitomp invocation92177
+Node: dmp invocation92799
+Node: mpto invocation96807
+Node: newer invocation97782
+Node: BibTeX98577
+Node: bibtex invocation98936
+Node: Basic BibTeX style files101252
+Node: WEB102593
+Node: tangle invocation103872
+Node: weave invocation105985
+Node: pooltype invocation107385
+Node: DVI utilities108506
+Node: dvicopy invocation109446
+Node: dvitype invocation110736
+Node: dvitype output example113083
+Node: Font utilities116128
+Node: Font file formats117303
+Node: gftopk invocation120583
+Node: pktogf invocation121776
+Node: pktype invocation122944
+Node: gftype invocation125766
+Node: tftopl invocation130264
+Node: pltotf invocation134885
+Node: vftovp invocation135939
+Node: vptovf invocation138212
+Node: Font utilities available elsewhere139253
+Node: Legalisms140898
+Node: References143164
+Node: Index147425
+
+End Tag Table
