@@ -1,0 +1,94 @@
+The pdfTeX team is happy to announce the release of a new stable version:
+
+===========================================================================
+                           pdfTeX 1.21a
+===========================================================================
+
+This is the announcement of pdfTeX 1.21a, an extended version of TeX that
+can create PDF directly from TeX source files and enhance the result of TeX
+typesetting with the help of PDF.
+
+===========================================================================
+  Main change of pdfTeX 1.21a:
+===========================================================================
+
+- ttf2afm 1.0:
+    - added support for refering to glyphs via unicode in encoding files (ie
+      'uniXXX')
+    - added some more info to the AFM output
+    - some minor bug fixes
+    - a short documentation available
+
+- pdftex now understand forms 'uniXXXX' in encoding files (only makes sense
+  with TrueType fonts)
+
+- added subset tag for TrueType fonts
+
+- Fixed a bug in the scanning of map lines introduced in the the fix of bug
+  #242 in 1.20b.
+  
+- Fixed three problems in xpdf; xpdf is now 3.00pl3
+
+- \ifeof18 is a simple method to test if \write18 is enabled.
+
+- a few extensions in pdfxtex:
+    - \pdflastximagecolordepth returns the last color depth
+    - \pdfximage supports a keyword "colorspace" following an object number
+      representing a ColorSpace object
+    - \pdfstrcmp compares two strings
+    - \pdfescapestring/\pdflastescapedstring provide a mean to escape string
+    - \pdffirstlineheight/\pdflastlinedepth/\pdfeachlineheight/\pdfeachlinedepth
+      allow fixing line dimen
+    - patches from Taco
+        - px dimen unit
+        - tagcode patch
+        - quitvmode patch
+
+For complete release notes see http://www.pdftex.org/NEWS
+
+===========================================================================
+  Legal notice / license
+===========================================================================
+
+pdfTeX is copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
+
+pdfTeX is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+For a complete README (with a full discussion of the license)
+please look at http://www.pdftex.org/README
+
+===========================================================================
+  The files / installation
+===========================================================================
+
+You should first try to get a new version of pdfTeX through your
+distribution.
+
+If you want to compile it yourself or want precompiled binaries, have a
+look at http://www.pdftex.org -- there you can find links to the pdfTeX
+sources on CTAN and precompiled binaries for most operating systems. And
+some useful documentation. 
+
+===========================================================================
+  Mailing lists / web pages:
+===========================================================================
+
+  Mailing list:
+    http://tug.org/mailman/listinfo/pdftex
+
+  Related web pages:
+    http://www.pdftex.org
+    http://sarovar.org/projects/pdftex/
+    http://www.tug.org/tex-live/
+    http://www.tug.org/tetex/
+    http://www.tex.ac.uk/cgi-bin/texfaq2html?introduction=yes
+    http://www.dante.de/
+    http://tug.org/
+    http://www.pragma-ade.com/
+
+Have fun!
+
+Martin Schröder (ms@pdftex.org) for the pdfTeX team, February 2005
