@@ -1,5 +1,5 @@
 # Makefile for libpdf - te@dbs.uni-hannover.de
-# $Id$
+# $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/Makefile.in#16 $
 
 ac_include ../make/common.mk
 ac_include ../make/programs.mk

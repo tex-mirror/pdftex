@@ -66,6 +66,18 @@ pdf\*(TX is beta software.
 .SH OPTIONS
 This version of pdf\*(TX understands the following command line options.
 .TP
+.BI --default-translate-file \ tcxname
+.rb
+Use the default
+.I tcxname
+translation table. The
+.BI --translate-file
+can overwrite this setting.
+.TP
+.B --enc
+.rb
+Enable enc\*(TX extension by Petr Olsak, see the file encdoc-e.pdf.
+.TP
 .B --file-line-error-style
 .rb
 Print error messages in the form

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id$
+$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/utils.c#13 $
 */
 
 #include "ptexlib.h"
@@ -29,7 +29,7 @@ $Id$
 #include <time.h>
 
 static const char perforce_id[] = 
-    "$Id$";
+    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/utils.c#13 $";
 
 char *cur_file_name = 0;
 strnumber last_tex_string;

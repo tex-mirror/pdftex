@@ -279,7 +279,7 @@ else  begin
   if string_ptr = 256 then begin
     {Change |".web"| to |".pool"| and use the current directory.}
     pool_name := basename_change_suffix (web_name, '.web', '.pool');
-    rewrite (pool, pool_name);
+    rewritebin (pool, pool_name);
   end;
   equiv[p]:=string_ptr+@'10000000000;
   l:=l-double_chars-1;

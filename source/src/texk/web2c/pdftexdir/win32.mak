@@ -3,7 +3,7 @@
 # Makefile  : Web2C / pdftexdir
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <02/07/09 00:56:45 popineau>
+# Time-stamp: <03/08/13 10:18:05 popineau>
 #
 ################################################################################
 root_srcdir = ..\..\..
@@ -15,6 +15,7 @@ USE_ZLIB = 1
 USE_PNG = 1
 USE_JPEG = 1
 USE_TEX = 1
+USE_MD5 = 1
 USE_GNUW32 = 1
 USE_KPATHSEA = 1
 
@@ -34,8 +35,8 @@ default: all
 
 all: $(objdir) libpdftoepdf $(objdir)\libpdf.lib
 
-$(objdir)\libpdf.lib: $(objdir) $(objects)
-	$(archive) $(objects) 
+$(objdir)\libpdf.lib: $(objdir) $(objects) $(md5lib)
+	$(archive) $(objects) $(md5lib)
 
 libpdftoepdf: $(objdir) $(objdir)\libpdftoepdf.lib
 

@@ -30,7 +30,7 @@ goto omega_or_eomega
 :eomega
 if NOT %2==eomega goto pdf
 :omega_or_eomega
-	cat %srcdir%\web2c\common.defines %srcdir%\web2c\texmf.defines %srcdir%\omegadir\omega.defines %2.p | %srcdir%\web2c\%objdir%\web2c -htexmfmp.h -t -c%2coerce | %srcdir%\web2c\%objdir%\fixwrites -t %2 | perl %perldir%\splitup.pl --name=%2 --dfile > %2.c
+	cat %srcdir%\web2c\common.defines %srcdir%\web2c\texmf.defines %srcdir%\%2dir\%2.defines %2.p | %srcdir%\web2c\%objdir%\web2c -htexmfmp.h -t -c%2coerce | %srcdir%\web2c\%objdir%\fixwrites -t %2 | perl %perldir%\splitup.pl --name=%2 --dfile > %2.c
 	copy .\%2coerce.h+%srcdir%\web2c\coerce.h .\x%2coerce.h
 	copy .\x%2coerce.h .\%2coerce.h
 rem	sed -f %win32seddir%\tex-deopt.sed < %srcdir%\%2.c > %srcdir%\%2.c.opt

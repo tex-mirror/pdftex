@@ -16,7 +16,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id$
+% $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/tex.pch#22 $
 
 @x [4.51] - Change `tex.pool' to `pdftex.pool' in error messages
 else  bad_pool('! I can''t read tex.pool; bad path?')

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id$
+$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#19 $
 */
 
 #include <stdlib.h>
@@ -46,7 +46,7 @@ $Id$
 #include "epdf.h"
 
 static const char perforce_id[] = 
-    "$Id$";
+    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#19 $";
 
 /* we avoid reading all necessary kpathsea headers, but we need xstrdup */
 #ifdef __cplusplus
@@ -784,6 +784,11 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
             pagebox = page->getArtBox();
             }
         }
+#ifdef DEBUG
+    fprintf(stderr, 
+            "\npagebox->x1: %.8f, pagebox->x2: %.8f, pagebox->y1: %.8f, pagebox->y2: %.8f\n", 
+            pagebox->x1, pagebox->x2, pagebox->y1, pagebox->y2);
+#endif
     epdf_width = pagebox->x2 - pagebox->x1;
     epdf_height = pagebox->y2 - pagebox->y1;
     epdf_orig_x = pagebox->x1;
@@ -895,6 +900,11 @@ write_epdf(void)
             pagebox = page->getArtBox();
             }
         }
+#ifdef DEBUG
+    fprintf(stderr, 
+            "\npagebox->x1: %.8f, pagebox->x2: %.8f, pagebox->y1: %.8f, pagebox->y2: %.8f\n", 
+            pagebox->x1, pagebox->x2, pagebox->y1, pagebox->y2);
+#endif
 
     // handle page rotation
     if (rotate != 0) {
@@ -907,9 +917,9 @@ write_epdf(void)
             // counterclockwise :-%
             tex_printf (", page is rotated %d degrees", rotate);
             switch (rotate) {
-                case  90: scale[1] = -1; scale[2] = 1; scale[5] = pagebox->x1 + pagebox->x2; break;
+                case  90: scale[1] = -1; scale[2] = 1; scale[4] = pagebox->x1 - pagebox->y1; scale[5] = pagebox->y1 + pagebox->x2; break;
                 case 180: scale[0] = scale[3] = -1;    scale[4] = pagebox->x1 + pagebox->x2; scale[5] = pagebox->y1 + pagebox->y2; break; // width and height are exchanged
-                case 270: scale[1] = 1; scale[2] = -1; scale[4] = pagebox->y1 + pagebox->y2; break;
+                case 270: scale[1] = 1; scale[2] = -1; scale[4] = pagebox->x1 + pagebox->y2; scale[5] = pagebox->y1 - pagebox->x1; break;
                 }
             }
         }

@@ -136,7 +136,7 @@ begin
   pool_name := extend_filename (cmdline (optind), 'pool');
   {Try opening the file here, to avoid printing the first 256 strings if
    they give a bad filename.}
-  reset (pool_file, pool_name); 
+  resetbin (pool_file, pool_name); 
 end;
 
 @ Here are the options we allow.  The first is one of the standard GNU options.

@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id$
+$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writefont.c#12 $
 */
 
 #include "ptexlib.h"
 
 static const char perforce_id[] = 
-    "$Id$";
+    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writefont.c#12 $";
 
 key_entry font_keys[FONT_KEYS_NUM] = {
     {"Ascent",       "Ascender",     {0}, false},

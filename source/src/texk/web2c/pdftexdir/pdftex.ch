@@ -23,7 +23,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id$
+% $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftex.ch#18 $
 %
 % The TeX program is copyright (C) 1982 by D. E. Knuth.
 % TeX is a trademark of the American Mathematical Society.
@@ -48,8 +48,8 @@
 @d banner=='This is pdfTeX, Version 3.141592','-',pdftex_version_string
    {printed when \pdfTeX\ starts}
 @d pdftex_version==111 { \.{\\pdftexversion} }
-@d pdftex_revision=="a" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='1.11a' {current pdf\TeX\ version}
+@d pdftex_revision=="b" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='1.11b' {current pdf\TeX\ version}
 
 @z
 
@@ -1738,21 +1738,21 @@ the same type.
     int0, int1, int2, int3: integer;
 end;
 
-@ The first field of |obj_entry| contains link to the next
-object in |obj_tab| if this object in linked in a list.
-
-The second field contains information representing identifier of this object.
-Tt is usally a number for most of object types, but it may be a string number
+@ The first field contains information representing identifier of this object.
+It is usally a number for most of object types, but it may be a string number
 for named destination or named thread.
 
-The third field usually represents the pointer to some auxiliary data
-structure depending on the object type; however it may be used as a counter as
-well.
+The second field of |obj_entry| contains link to the next
+object in |obj_tab| if this object in linked in a list.
 
-The last field holds the byte offset of the object in the output PDF file.
+The third field holds the byte offset of the object in the output PDF file.
 Objects that have been not written yet have this field set to zero. However
 sometimes we have to use this field to store some info before the object is
 written out.
+
+The last field usually represents the pointer to some auxiliary data
+structure depending on the object type; however it may be used as a counter as
+well.
 
 @d obj_info(#) == obj_tab[#].int0 {information representing identifier of this object}
 @d obj_link(#) == obj_tab[#].int1 {link to the next entry in linked list}

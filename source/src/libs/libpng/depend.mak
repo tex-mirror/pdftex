@@ -1,56 +1,108 @@
-# DO NOT DELETE
+$(objdir)/pngwutil.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
 
-$(objdir)/png.obj: png.c png.h $(zlibdir)/zlib.h $(zlibdir)/zconf.h \
-	pngconf.h \
-	png.h
-$(objdir)/pngerror.obj: pngerror.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pnggccrd.obj: pnggccrd.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pngget.obj: pngget.c $(zlibdir)/zlib.h $(zlibdir)/zconf.h \
-	pngconf.h \
-	png.h
-$(objdir)/pngmem.obj: pngmem.c $(zlibdir)/zlib.h $(zlibdir)/zconf.h \
-	pngconf.h \
-	png.h
-$(objdir)/pngpread.obj: pngpread.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pngread.obj: pngread.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pngrio.obj: pngrio.c $(zlibdir)/zlib.h $(zlibdir)/zconf.h \
-	pngconf.h \
-	png.h
-$(objdir)/pngrtran.obj: pngrtran.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pngrutil.obj: pngrutil.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pngset.obj: pngset.c $(zlibdir)/zlib.h $(zlibdir)/zconf.h \
-	pngconf.h \
-	png.h
-$(objdir)/pngtest.obj: pngtest.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pngtrans.obj: pngtrans.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pngvcrd.obj: pngvcrd.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pngwio.obj: pngwio.c $(zlibdir)/zlib.h $(zlibdir)/zconf.h \
-	pngconf.h \
-	png.h
-$(objdir)/pngwrite.obj: pngwrite.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pngwtran.obj: pngwtran.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	png.h
-$(objdir)/pngwutil.obj: pngwutil.c $(zlibdir)/zlib.h \
-	$(zlibdir)/zconf.h pngconf.h \
-	
+$(objdir)/pngvcrd.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngrutil.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngget.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngwio.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngrio.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngread.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pnggccrd.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngwtran.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngtest.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngpread.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngrtran.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngmem.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngwrite.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngtrans.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngerror.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/pngset.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+
+$(objdir)/png.obj: \
+	png.h \
+	$(zlibdir)/zlib.h \
+	$(zlibdir)/zconf.h \
+	pngconf.h
+

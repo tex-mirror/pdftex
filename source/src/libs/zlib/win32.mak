@@ -3,7 +3,7 @@
 # Makefile  : Zlib
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/01/28 21:37:13 popineau>
+# Time-stamp: <03/07/06 03:01:05 popineau>
 #
 ################################################################################
 root_srcdir=..\..
@@ -54,7 +54,7 @@ $(zlibdef): zlib.def
 	sed -e "/^NAME/s/^.*$$/NAME $(library_prefix)zlib.dll/" < $(**) > $@
 
 $(zliblib): $(zlibdef) $(objects)
-	$(archive) /DEF:$(zlibdef) $(objects)
+	$(archive) /DEF $(objects)
 
 $(zlibdll): $(objects) $(objdir)\zlib.res $(gnuw32lib)
 	$(link_dll) $(objects) $(zliblib:.lib=.exp) $(objdir)\zlib.res $(conlibs) $(gnuw32lib)

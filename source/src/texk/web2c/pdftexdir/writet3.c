@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id$
+$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writet3.c#12 $
 */
 
 #include "ptexlib.h"
@@ -30,7 +30,7 @@ $Id$
 #define T3_TYPE_PGC   1
 
 static const char perforce_id[] = 
-    "$Id$";
+    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writet3.c#12 $";
 
 static char t3_line[T3_BUF_SIZE], *t3_line_ptr;
 FILE *t3_file;

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id$
+$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ttf2afm.c#14 $
 */
 
 /*
@@ -36,7 +36,7 @@ $Id$
 #include <pdftexdir/ptexmac.h>
 
 static const char perforce_id[] = 
-    "$Id$";
+    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/ttf2afm.c#14 $";
 
 typedef unsigned char   TTF_BYTE;
 typedef signed char     TTF_CHAR;
@@ -387,7 +387,7 @@ void read_encoding(char *encname)
     if (*enc_line != '/' || (r = strchr(enc_line, '[')) == 0)
         ttf_fail("invalid encoding vector: name or `[' missing:\n%s", enc_line);
     for (i = 0; i <= MAX_CHAR_CODE; i++)
-        enc_names[i] = notdef;
+        enc_names[i] = xstrdup(notdef);
     if (r[1] == 32)
         r += 2;
     else
@@ -477,7 +477,7 @@ void read_font()
     switch (post_format) {
     case 0x00010000:
         for (pm = mtx_tab; pm - mtx_tab < NMACGLYPHS; pm++)
-            pm->name = mac_glyph_names[pm - mtx_tab];
+            pm->name = xstrdup(mac_glyph_names[pm - mtx_tab]);
         break;
     case 0x00020000:
         l = get_ushort(); /* some fonts have this value different from nglyphs */
@@ -496,7 +496,7 @@ void read_font()
         }
         for (pm = mtx_tab; pm - mtx_tab < l; pm++) {
             if (pm->index < NMACGLYPHS)
-                pm->name = mac_glyph_names[pm->index];
+                pm->name = xstrdup(mac_glyph_names[pm->index]);
             else {
                 k = pm->index - NMACGLYPHS;
                 if (k < m) {

@@ -10,7 +10,7 @@
 /*
  * Use A4 paper size instead of Letter for PostScript output.
  */
-#undef A4_PAPER
+#define A4_PAPER 1
 
 /*
  * Do not allow text selection.
@@ -20,7 +20,7 @@
 /*
  * Include support for OPI comments.
  */
-#undef OPI_SUPPORT
+#define OPI_SUPPORT 1
 
 /*
  * Enable multithreading support.
@@ -48,7 +48,7 @@
 #undef HAVE_SYS_BSDTYPES_H
 #undef HAVE_STRINGS_H
 #undef HAVE_BSTRING_H
-#undef HAVE_POPEN
+#define HAVE_POPEN 1
 #undef HAVE_MKSTEMP
 #undef SELECT_TAKES_INT
 #undef HAVE_FSEEK64

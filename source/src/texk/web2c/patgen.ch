@@ -62,17 +62,29 @@ begin
 @z
 
 @x Increase constants.
+@!trie_size=55000; {space for pattern trie}
+@!triec_size=26000; {space for pattern count trie, must be less than
+ |trie_size| and greater than the number of occurrences of any pattern in
+ the dictionary}
+@y
+@!trie_size=550000; {space for pattern trie}
+@!triec_size=260000; {space for pattern count trie, must be less than
+ |trie_size| and greater than the number of occurrences of any pattern in
+ the dictionary}
+@z
+
+@x
 @!max_buf_len=80; {maximum length of input lines, must be at least |max_len|}
 @y
 @!max_buf_len=3000; {maximum length of input lines, must be at least |max_len|}
 @z
 
-@x Remove file close
+@x Close both input and output files.
 @d close_out(#)==close(#) {close an output file}
 @d close_in(#)==do_nothing {close an input file}
 @y
-@d close_out(#)== {close an output file}
-@d close_in(#)== {close an input file}
+@d close_out(#)==xfclose(#, 'inputfile') {close an output file}
+@d close_in(#)==xfclose(#, 'outputfile') {close an input file}
 @z
 
 @x Add f_name declaration, and temporaries for efficiency printing.

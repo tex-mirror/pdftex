@@ -26,7 +26,7 @@ $Id$
    (generated from ../lib/texmfmp.c).
 */
 
-#define BANNER "This is pdfeTeX, Version 3.141592-1.11a-2.1"
+#define BANNER "This is pdfeTeX, Version 3.141592-1.11b-2.1"
 #define COPYRIGHT_HOLDER "The NTS Team (eTeX)/Han The Thanh (pdfTeX)"
 #define AUTHOR NULL
 #define PROGRAM_HELP PDFETEXHELP

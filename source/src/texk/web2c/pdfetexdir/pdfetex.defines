@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.defines#4 $
+$Id$
 }
 
 { pdftex.defines: additions for pdfTeX }
@@ -49,6 +49,8 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.defines#
 @define function extxnoverd();
 @define procedure libpdffinish;
 @define procedure writestreamlength();
+@define procedure printID();
+@define procedure printcreationdate;
 
 { functions from vfpacket.c }
 @define function newvfpacket();

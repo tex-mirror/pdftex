@@ -1,10 +1,10 @@
 pdfTeX
 ======
 
-README for version 3.14159-1.11a of $Date$
+README for version 3.14159-1.11b of $Date: 2003/10/08 $
 =======================================================
 
-This directory contains the version 1.10b of pdfTeX, an extended version of
+This directory contains the version 1.11b of pdfTeX, an extended version of
 TeX that can create PDF directly from TeX source files and enhance the
 result of TeX typesetting with the help of PDF. When PDF output is not
 selected, pdfTeX produces normal DVI output, otherwise it produces PDF
@@ -81,7 +81,7 @@ paragraph optimization is inspired by the work of Hermann Zapf.
 
 See the file TODO for work to be done.
 
-Please send bug reports, offers of help, etc. to thanh@pdftex.org
+Please send bug reports, offers of help, etc. to martin@pdftex.org
 
-$Id$
+$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/README#11 $
 // vim: tw=75

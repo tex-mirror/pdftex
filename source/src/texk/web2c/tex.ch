@@ -799,7 +799,7 @@ if @<Character |s| is the current new-line character@> then
   end;
 k:=s;
 if ((selector<=no_print)and(@<Character |k| cannot be printed@>))
-   or((selector>no_print)and(not isprint(k)))
+   or((selector>no_print)and(not isprint(xchr[k])))
 then begin print_visible_char("^"); print_visible_char("^");
   if s<64 then print_visible_char(s+64)
   else if s<128 then print_visible_char(s-64)

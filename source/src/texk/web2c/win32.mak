@@ -3,7 +3,7 @@
 # Makefile  : Web2C
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/06/10 19:32:49 popineau>
+# Time-stamp: <03/09/13 21:57:45 popineau>
 #
 ################################################################################
 
@@ -438,7 +438,7 @@ etrip = etrip
 triptrap: $(trip) trap mptrap $(etrip)
 testdir = $(srcdir)\triptrap
 testenv = TEXMFCNF=$(testdir)
-dvitype_args = -output-level=2 -dpi=72.27 -page-start='*.*.*.*.*.*.*.*.*.*'
+dvitype_args = -output-level=2 -dpi=72.27 -page-start="*.*.*.*.*.*.*.*.*.*"
 
 # 
 # Metafont
@@ -672,7 +672,6 @@ tex-clean: trip-clean
 	-@$(del) missfont.log $(redir_stderr)
 	-@$(deldir) tfm $(redir_stderr)
 
-trip: dvitype pltotf tftopl tex trip-clean
 trip: $(objdir)\dvitype.exe $(objdir)\pltotf.exe $(objdir)\tftopl.exe $(objdir)\tex.exe trip-clean
 	@echo ">>> See $(testdir)\trip.diffs for example of acceptable diffs."
 	set TEXMFCNFOLD=$(TEXMFCNF)
@@ -680,7 +679,9 @@ trip: $(objdir)\dvitype.exe $(objdir)\pltotf.exe $(objdir)\tftopl.exe $(objdir)\
 	.\$(objdir)\pltotf $(testdir)\trip.pl trip.tfm
 	.\$(objdir)\tftopl .\trip.tfm trip.pl
 	-$(diff) $(testdir)\trip.pl trip.pl
-	-@$(del) trip.tex & $(copy) $(testdir)\trip.tex . # get same filename in log $(redir_stderr)
+	-@$(del) trip.tex
+# get same filename in log $(redir_stderr)
+	-$(copy) $(testdir)\trip.tex . 
 	-.\$(objdir)\tex -progname=initex < $(testdir)\trip1.in >tripin.fot
 	$(move) trip.log tripin.log
 	-$(diff) $(testdir)\tripin.log tripin.log
@@ -706,7 +707,7 @@ $(objdir)\win32main.obj: $(objdir) .\lib\win32main.c config.h
 # Makefile fragments:
 !include <etexdir/etex.mak>
 !include <omegadir$(omegaversion)/omega.mak>
-!include <eomegadir$(omegaversion)/eomega.mak>
+!include <eomegadir/eomega.mak>
 !include <pdftexdir/pdftex.mak>
 !include <pdfetexdir/pdfetex.mak>
 # 
@@ -1014,7 +1015,7 @@ install-links: install-programs
 	    $(del) .\inimf.exe .\virmf.exe & \
 	    $(lnexe) .\mf.exe $(bindir)\inimf.exe & \
 	    $(lnexe) .\mf.exe $(bindir)\virmf.exe & \
-	    $(lnexe) .\mf.exe $(bindir)\mfw.exe & \
+#	    $(lnexe) .\mf.exe $(bindir)\mfw.exe & \
 	  popd \
 	) $(redir_stdout)
 	-@echo $(verbose) & ( \

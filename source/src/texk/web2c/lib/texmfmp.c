@@ -652,6 +652,11 @@ setupcharset P1H(void)
     translate_filename = kpse_var_value ("CHARTRANSLATE");
   }
 #endif
+  
+  /* Load up cp8bit.tcx to do 1->1 translation if not other
+     mapping is specified. */
+  if (!translate_filename)
+      translate_filename = "cp8bit";
 
   /* The expansion is nonempty if the variable is set.  */
   if (translate_filename) {

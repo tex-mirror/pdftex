@@ -222,7 +222,7 @@ nameptr:=nameptr+1;if buffer[idfirst]<>34 then ilk[p]:=t else{64:}
 begin ilk[p]:=1;
 if l-doublechars=2 then equiv[p]:=buffer[idfirst+1]+1073741824 else
 begin if stringptr=256 then begin poolname:=basenamechangesuffix(webname
-,'.web','.pool');rewrite(pool,poolname);end;
+,'.web','.pool');rewritebin(pool,poolname);end;
 equiv[p]:=stringptr+1073741824;l:=l-doublechars-1;
 if l>99 then begin writeln(stdout);
 write(stdout,'! Preprocessed string is too long');error;end;

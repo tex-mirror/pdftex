@@ -189,7 +189,7 @@ check_for_shared_memory P1H(void)
 {
   HANDLE hash_handle;
 
-  hash_handle = OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, "kpse_hash_memory");
+  hash_handle = OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, HASH_MAPPING_NAME);
 
   if (hash_handle == 0) {
     printf("No kpathsea file mapping set up.\n");

@@ -337,7 +337,7 @@ hash_extend_memory ()
   
   /* Now, create the actual named, shareable bloc */
   if ((new_hash_handle = CreateFileMapping(INVALID_HANDLE_VALUE, &sa, PAGE_READWRITE,
-					   0, hash_memory_size, "kpse_hash_memory")) == 0) {
+					   0, hash_memory_size, HASH_MAPPING_NAME)) == 0) {
     /* Report an error. */
     FATAL2("Can't CreateFileMapping() of size %ul (Error %d)!\n", new_hash_memory_size, GetLastError());
   };

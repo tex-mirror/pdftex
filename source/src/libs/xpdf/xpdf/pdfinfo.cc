@@ -171,8 +171,8 @@ int main(int argc, char *argv[]) {
 	(fabs(w - 792) < 0.1 && fabs(h - 612) < 0.1)) {
       printf(" (letter)");
     } else {
-      hISO = sqrt(sqrt(2)) * 7200 / 2.54;
-      wISO = hISO / sqrt(2);
+      hISO = sqrt(sqrt(2.0)) * 7200 / 2.54;
+      wISO = hISO / sqrt(2.0);
       for (i = 0; i <= 6; ++i) {
 	if ((fabs(w - wISO) < 1 && fabs(h - hISO) < 1) ||
 	    (fabs(w - hISO) < 1 && fabs(h - wISO) < 1)) {
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
 	  break;
 	}
 	hISO = wISO;
-	wISO /= sqrt(2);
+	wISO /= sqrt(2.0);
       }
     }
     printf("\n");

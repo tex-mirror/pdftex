@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id$
+$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writeimg.c#14 $
 */
 
 #include "ptexlib.h"
@@ -26,7 +26,7 @@ $Id$
 #include <kpathsea/c-memstr.h>
 
 static const char perforce_id[] = 
-    "$Id$";
+    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writeimg.c#14 $";
     
 #define bp2int(p)    round(p*(onehundredbp/100.0))
 

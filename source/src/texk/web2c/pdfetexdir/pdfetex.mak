@@ -3,7 +3,7 @@
 # Makefile  : pdfeTeX, web2c win32.mak makefile fragment to build pdfe-TeX
 # Author    : Fabrice Popineau <Fabrice.Popineau@supelec.fr>
 # Platform  : Win32, Microsoft VC++ 6.0, depends upon fpTeX 0.5 sources
-# Time-stamp: <03/02/19 19:38:34 popineau>
+# Time-stamp: <03/08/17 15:32:39 popineau>
 #
 ################################################################################
 

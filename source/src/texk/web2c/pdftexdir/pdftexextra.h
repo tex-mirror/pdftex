@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id$
+$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftexextra.h#16 $
 */
 
 /* pdftexextra.h: banner etc. for pdfTeX.
@@ -26,7 +26,7 @@ $Id$
    (generated from ../lib/texmfmp.c).
 */
 
-#define BANNER "This is pdfTeX, Version 3.141592-1.11a"
+#define BANNER "This is pdfTeX, Version 3.141592-1.11b"
 #define COPYRIGHT_HOLDER "Han The Thanh"
 #define AUTHOR NULL
 #define PROGRAM_HELP PDFTEXHELP
