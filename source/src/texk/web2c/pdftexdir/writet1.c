@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#20 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#21 $
 */
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#20 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#21 $";
 
 #ifdef pdfTeX /* writet1 used with pdfTeX */
 #include "ptexlib.h"           
@@ -167,7 +167,7 @@ char *t1_builtin_glyph_names[MAX_CHAR_CODE + 1];
 static boolean read_encoding_only;
 static int t1_encoding;
 
-#define T1_BUF_SIZE   0x4000
+#define T1_BUF_SIZE   0x10
 #define ENC_BUF_SIZE  0x1000
 
 #define ENC_STANDARD  0
@@ -236,7 +236,7 @@ define_array(t1_line);
 typedef char t1_buf_entry;
 define_array(t1_buf);   
 
-static char *cs_start;
+static int cs_start;
 
 static cs_entry *cs_tab, *cs_ptr, *cs_notdef;
 static char *cs_dict_start, *cs_dict_end;
@@ -546,7 +546,7 @@ restart:
             while (*p != ' ')
                 p--;
             t1_cslen = l = t1_scan_num(p + 1, 0);
-            cs_start = t1_line_ptr;
+            cs_start = t1_line_ptr - t1_line_array; /* cs_start is an index now */
             alloc_array(t1_line, l, T1_BUF_SIZE);
             while (l-- > 0)
                 *t1_line_ptr++ = edecrypt(t1_getbyte());
@@ -1106,9 +1106,9 @@ static void cs_store(boolean is_subr)
             ptr->name = xstrdup(t1_buf_array + 1); 
     }
     /* copy " RD " + cs data to t1_buf_array */
-    memcpy(t1_buf_array, cs_start - 4, (unsigned)(t1_cslen + 4));
+    memcpy(t1_buf_array, t1_line_array + cs_start - 4, (unsigned)(t1_cslen + 4));
     /* copy the end of cs data to t1_buf_array */
-    for (p = cs_start + t1_cslen, t1_buf_ptr = t1_buf_array + t1_cslen + 4; 
+    for (p = t1_line_array + cs_start + t1_cslen, t1_buf_ptr = t1_buf_array + t1_cslen + 4; 
          *p != 10; *t1_buf_ptr++ = *p++);
     *t1_buf_ptr++ = 10;
     if (is_subr && cs_token_pair == NULL)
@@ -1436,8 +1436,7 @@ static void t1_mark_glyphs(void);
 
 static void t1_read_subrs(void)
 {
-    int i;
-    char *s;
+    int i, s;
     cs_entry *ptr;
     t1_getline();
     while (!(t1_charstrings() || t1_subrs())) {
@@ -1478,15 +1477,14 @@ found:
        Subrs is found
      */
 #define POST_SUBRS_SCAN     5
-    s = t1_buf_array;
+    s = 0;
     *t1_buf_array = 0;
     for (i = 0; i < POST_SUBRS_SCAN; i++) {
         if (t1_charstrings())
                break;
-        alloc_array(t1_buf, (t1_line_ptr - t1_line_array) + (s - t1_buf_array), 
-                    T1_BUF_SIZE);
-        strcat(t1_buf_array, t1_line_array);
         s += t1_line_ptr - t1_line_array;
+        alloc_array(t1_buf, s, T1_BUF_SIZE);
+        strcat(t1_buf_array, t1_line_array);
         t1_getline();
     }
     subr_array_end = xstrdup(t1_buf_array);

@@ -1,5 +1,5 @@
 ----------------------------------------------------
-pdfTeX 3.141592-1.20b-rc5 was released on 2004-12-09
+pdfTeX 3.141592-1.20b-rc6 was released on 2004-12-20
 ----------------------------------------------------
 - Fixed some minor bugs, mostly with hz
 
@@ -299,5 +299,5 @@ pdfTeX 3.14159-1.00a-pretest-20010806 was released on 2001-08-06
 pdfTeX 3.14159-1.00a-pretest-20010804 was released on 2001-08-04
 ----------------------------------------------------------------
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#75 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#76 $
 // vim: tw=79:ts=2:expandtab:autoindent
