@@ -1,0 +1,134 @@
+%% This is the list of new or extended primitives provided by pdftex.
+%% Used convention for syntax rules is borrowed from `TeXbook naruby' by 
+%% Petr Olsak.
+%% $Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/pdftex-syntax.txt#2 $
+
+%% integer registers:
+\pdfoutput                                              (integer)
+\pdfadjustspacing                                       (integer)
+\pdfcompresslevel                                       (integer)
+\pdfdecimaldigits                                       (integer)
+\pdfmovechars                                           (integer)
+\pdfimageresolution                                     (integer)
+\pdfpkresolution                                        (integer)
+\pdfuniqueresname                                       (integer)
+\pdfprotrudechars                                       (integer)
+\pdfavoidoverfull                                       (integer)
+\pdfoptionpdfminorversion                               (integer)
+\pdfoptionalwaysusepdfpagebox                           (integer)
+\pdfoptionpdfinclusionerrorlevel                        (integer)
+
+%% dimen registers:
+\pdfhorigin                                             (dimen)
+\pdfvorigin                                             (dimen)
+\pdfpagewidth                                           (dimen)
+\pdfpageheight                                          (dimen)
+\pdflinkmargin                                          (dimen)
+\pdfdestmargin                                          (dimen)
+\pdfthreadmargin                                        (dimen)
+
+%% tokens registers:
+\pdfpagesattr                                           (tokens)
+\pdfpageattr                                            (tokens)
+\pdfpageresources                                       (tokens)
+
+%% expandable commands:
+\pdftexrevision                                         (expandable)
+\pdffontname <font>                                     (expandable)
+\pdffontobjnum <font> <general text>                    (expandable)
+\pdfincludechars <font> <general text>                  (expandable)
+
+%% read-only integers:
+\pdftexversion                                          (read-only integer)
+\pdflastobj                                             (read-only integer)
+\pdflastxform                                           (read-only integer)
+\pdflastximage                                          (read-only integer)
+\pdflastximagepages                                     (read-only integer)
+\pdflastannot                                           (read-only integer)
+\pdflastxpos                                            (read-only integer)
+\pdflastypos                                            (read-only integer)
+\pdflastdemerits                                        (read-only integer)
+\pdflastvbreakpenalty                                   (read-only integer)
+
+%% general commands:
+\pdfliteral [direct] <general text>                     (h, v, m)
+\pdfobj <object type spec>                              (h, v, m)
+\pdfrefobj <object number>                              (h, v, m)
+\pdfxform [<xform attr spec>] <box number>              (h, v, m)
+\pdfrefxform <object number>                            (h, v, m)
+\pdfximage [<image attr spec>] <general text>           (h, v, m)
+\pdfrefximage <object number>                           (h, v, m)
+\pdfannot [<rule spec>] <general text>                  (h, v, m)
+\pdfstartlink [<rule spec>] [<attr spec>] <action spec> (h, m)
+\pdfendlink                                             (h, m)
+\pdfoutline <outline spec>                              (h, v, m)
+\pdfdest <dest spec>                                    (h, v, m)
+\pdfthread <thread spec>                                (h, v, m)
+\pdfstartthread <thread spec>                           (v, m)
+\pdfendthread                                           (v, m)
+\pdfsavepos                                             (h, v, m)
+\pdfsnaprefpoint                                        (h, v, m)
+\pdfsnapx <glue spec>                                   (h, v, m)
+\pdfsnapy <glue spec>                                   (h, v, m)
+\pdflinesnapx <glue spec>                               (h, v, m)
+\pdflinesnapy <glue spec>                               (h, v, m)
+\pdfinfo <general text>
+\pdfcatalog <general text> [<open action spec>]
+\pdfnames <general text>
+\pdfmapfile <general text>
+\pdffontattr <font> <general text>
+\pdftrailer <general text>
+
+\pdffontexpand <font> <expand spec>
+\efcode <8-bit number>                      restricted  (integer)
+\lpcode <8-bit number>                      restricted  (integer)
+\rpcode <8-bit number>                      restricted  (integer)
+\vadjust <pre spec> <filler>{<vertical material>}       (h, m)
+
+%% syntax rules
+<general text> --> {<balanced text>}
+<attr spec>     --> attr <general text>
+<rule spec>     --> width <dimen> [<rule spec>]
+<rule spec>     --> height <dimen> [<rule spec>]
+<rule spec>     --> depth <dimen> [<rule spec>]
+<object type spec> --> reserveobjnum
+                     | [useobjnum <number>] [<attr spec>] [stream [<attr spec>]] <object contents>
+<object contents> --> <file spec>
+                    | <general text>
+<xform attr spec> --> [<attr spec>] [<resources spec>] 
+<resources spec> --> resources <general text>
+<image attr spec> --> [<rule spec>] [<attr spec>] [<page spec>] [<pdf box spec>]
+<outline spec> --> <attr spec> <action spec> [count <number>] <general text>
+<action spec> --> <select action spec>
+<select action spec> --> user <user-action spec>
+                       | goto <goto-action spec>
+                       | thread <thread-action spec>
+<user-action spec> --> user <general text>
+<goto-action spec> --> <numid>
+                     | [<file spec>] <nameid> [<newwindow spec>]
+                     | [<file spec>] [<page spec>] <general text> [<newwindow spec>]
+<pdf box spec> --> artbox|trimbox|bleedbox|cropbox|mediabox
+<numid> --> num <number>
+<nameid> --> name <general text>
+<newwindow spec> --> newwindow
+                   | nonewwindow
+<thread-action spec> --> [<file spec>] <numid> 
+                       | [<file spec>] <nameid>
+<dest spec> --> <numid> <dest type>
+              | <nameid> <dest type>
+<dest type> --> xyz [zoom <number>] 
+              | fitbh 
+              | fitbv 
+              | fitb 
+              | fith 
+              | fitv 
+              | fit
+              | fitr <rule spec>
+<thread spec> --> <numid> | <nameid>
+<file spec> --> file <general text>
+<page spec> --> page <number>
+<expand spec> --> <stretch> <shrink> <step> <scale>
+<stretch> --> <number>
+<shrink> --> <number>
+<step> --> <number>
+<scale> --> <number>

@@ -1,0 +1,76 @@
+2003-02-19  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etex.mk: Installation of formats is no longer done via
+	install-data in this file, but just from the install-data ->
+	install-dumps -> install-fmts in the main Makefile.  That way we
+	can prevent automatic installation with a single change in that
+	Makefile.
+	(etex.p): Depend on tangle.
+	(triptrap): Depend on etrip.
+	(install-etex-data): Double-colon rule.
+	(install-data): Combine with install-etex-data.
+
+2003-02-17  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etex.ch1: Reduce to banner changes.
+
+	* etex.ch0: Slightly extend the reverted bits here, so they can be
+	cleared out of etex.ch1 and are now all in one file.
+
+2003-02-16  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etex.ch1: Correct the banners, and revert a final few bits of
+	TeX that use a variable that doesn't exist in e-TeX.
+
+	* etex.ch0: TeX 3.141592 and e-TeX 2.1 require reconciliation.
+	Revert some of TeX's code to 3.14159 to get e-TeX 2.1 to tangle.
+
+	* etexextra.h: Update banner for 3.141592-2.1.
+
+	* etex.mk (etex.web): Add etex.ch0 and etex.ch1 to build rules.
+
+2003-02-15  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etex.mk: From klibtool to libtool.  Based on patches from Albert
+	Chin-A-Young <china@thewrittenword.com>.
+
+	* etex.mk: Changes to make e-TeX, in extended mode, the engine
+	under LaTeX2e.
+
+2003-02-07  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etex.mk: Reorganized to match the new Makefile.in.
+
+2003-01-15  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etex.mk (etestenv): Add LC_ALL=C to the etrip environment.
+
+2002-10-11  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch1: Settle on a text for the not-TeX banner.
+
+2002-06-02  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch0, tex.ch1: Changes to account for the banner changing
+	when certain options are specified that make the program
+	not-strictly TeX.
+
+	* tex.ch2: Commented-out changes deleted.  These changes became
+	active in tex.ch1.
+
+Mon Feb 01 18:35:30 1999  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Version 2.1 for Web2c Version 7.2
+
+Thu Feb 19 18:03:12 1998  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Version 2.0 for Web2c Version 7.2
+
+Sat Aug 23 14:14:12 1997  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Integrated e-TeX Version 1.1 into Web2c Version 7.0
+	(by Karl Berry, as of Feb  7 1997.
+
+	All e-TeX (and e-TRIP) source files as well as a Makefile fragment
+	are in a separate directory: web2c/etexdir. This will certainly make
+	it easier to switch to e-TeX Version 2.
