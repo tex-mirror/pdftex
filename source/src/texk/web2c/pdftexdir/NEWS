@@ -1,5 +1,5 @@
 ----------------------------------------------------
-pdfTeX 3.141592-1.20b-rc3 was released on 2004-11-26
+pdfTeX 3.141592-1.20b-rc4 was released on 2004-11-29
 ----------------------------------------------------
 - Fixed some minor bugs, mostly with hz
 
@@ -14,7 +14,7 @@ pdfTeX 3.141592-1.20b-rc3 was released on 2004-11-26
 
 - pdfTeX uses xpdf 3.00pl1
 
-- pdfTeX uses libpng 1.2.8rc1, which fixes some png-related bugs.
+- pdfTeX uses libpng 1.2.8rc3, which fixes some png-related bugs.
 
 ------------------------------------------------
 pdfTeX 3.141592-1.20a was released on 2004-09-06
@@ -299,5 +299,5 @@ pdfTeX 3.14159-1.00a-pretest-20010806 was released on 2001-08-06
 pdfTeX 3.14159-1.00a-pretest-20010804 was released on 2001-08-04
 ----------------------------------------------------------------
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#73 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#74 $
 // vim: tw=79:ts=2:expandtab:autoindent
