@@ -34,9 +34,9 @@ test "x$needs_ncurses" != xno && test "$using_system_ncurses"  != yes \
   && subconfigures="$subconfigures ncurses"
 test "x$needs_libxpdf" != xno \
   && subconfigures="$subconfigures xpdf"
-test "x$needs_freetype" != xno \
+test "x$needs_freetype" != xno && test "$using_system_freetype" != yes \
   && subconfigures="$subconfigures freetype"
-test "x$needs_gd" != xno \
+test "x$needs_gd" != xno && test "$using_system_gd" != yes \
   && subconfigures="$subconfigures gd"
 
 outfiles=

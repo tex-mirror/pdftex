@@ -4,22 +4,22 @@
 % Note: This file, pdftex.ch, defines pdftex.web in terms of changes to be
 % applied to tex.web; in terms of a program such as TIE (or equivalent),
 %
-%	tex.web			)
-%	   +			)   =>   tie -m ...   =>   etex.web
-%	pdftexdir/pdftex.ch	)
+%   tex.web             )
+%      +                )   =>   tie -m ...   =>   etex.web
+%   pdftexdir/pdftex.ch )
 %
 % In addition, this file is used to define pdfetex.web, a combination
 % of e-TeX and pdfTeX as follows:
 %
-%	tex.web			)
-%	   +			)
-%	etexdir/etex.ch		)
-%	   +			)
-%	pdfetexdir/pdfetex.ch1	)   =>   tie -m ...   =>   pdfetex.web
-%	   +			)
-%	pdftexdir/pdftex.ch	)
-%	   +			)
-%	pdfetexdir/pdfetex.ch2	)
+%   tex.web                 )
+%      +                    )
+%   etexdir/etex.ch         )
+%      +                    )
+%   pdfetexdir/pdfetex.ch1  )   =>   tie -m ...   =>   pdfetex.web
+%      +                    )
+%   pdftexdir/pdftex.ch     )
+%      +                    )
+%   pdfetexdir/pdfetex.ch2  )
 %
 % where the two (small) files pdfetexdir/pdfetex.ch[12] take care of
 % interferences between e-Tex changes (etexdir/etex.ch) and pdfTeX changes
@@ -66,9 +66,9 @@
 @x [2] - This change is made for TeX 3.141592
 @d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
 @y
-@d pdftex_version==121 { \.{\\pdftexversion} }
-@d pdftex_revision=="a" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.21a' {current \pdfTeX\ version}
+@d pdftex_version==130 { \.{\\pdftexversion} }
+@d pdftex_revision=="0" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='-1.30.0-beta-20050615' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -97,7 +97,8 @@
 @d pdf_pages_attr_loc     = pdftex_first_loc + 0 {points to token list for \.{\\pdfpagesattr}}
 @d pdf_page_attr_loc      = pdftex_first_loc + 1 {points to token list for \.{\\pdfpageattr}}
 @d pdf_page_resources_loc = pdftex_first_loc + 2 {points to token list for \.{\\pdfpageresources}}
-@d pdf_toks=pdftex_first_loc+3 {end of \pdfTeX's token list parameters}
+@d pdf_pk_mode_loc        = pdftex_first_loc + 3 {points to token list for \.{\\pdfpkmode}}
+@d pdf_toks=pdftex_first_loc+4 {end of \pdfTeX's token list parameters}
 @#
 @d toks_base=pdf_toks {table of 256 token list registers}
 @z
@@ -109,6 +110,7 @@
 @d pdf_pages_attr==equiv(pdf_pages_attr_loc)
 @d pdf_page_attr==equiv(pdf_page_attr_loc)
 @d pdf_page_resources==equiv(pdf_page_resources_loc)
+@d pdf_pk_mode==equiv(pdf_pk_mode_loc)
 @z
 
 @x [230]
@@ -123,6 +125,8 @@ primitive("pdfpageattr",assign_toks,pdf_page_attr_loc);
 @!@:pdf_page_attr_}{\.{\\pdfpageattr} primitive@>
 primitive("pdfpageresources",assign_toks,pdf_page_resources_loc);
 @!@:pdf_page_resources_}{\.{\\pdfpageresources} primitive@>
+primitive("pdfpkmode",assign_toks,pdf_pk_mode_loc);
+@!@:pdf_pk_mode_}{\.{\\pdfpkmode} primitive@>
 @z
 
 @x [231]
@@ -131,6 +135,7 @@ primitive("pdfpageresources",assign_toks,pdf_page_resources_loc);
   pdf_pages_attr_loc: print_esc("pdfpagesattr");
   pdf_page_attr_loc: print_esc("pdfpageattr");
   pdf_page_resources_loc: print_esc("pdfpageresources");
+  pdf_pk_mode_loc: print_esc("pdfpkmode");
   othercases print_esc("errhelp")
 @z
 
@@ -151,7 +156,15 @@ primitive("pdfpageresources",assign_toks,pdf_page_resources_loc);
 @d pdf_option_pdf_minor_version_code = pdftex_first_integer_code + 7 {fractional part of the pdf version produced}
 @d pdf_option_always_use_pdfpagebox_code = pdftex_first_integer_code + 8 {if the pdf inclusion should always use a specific pdf page box}
 @d pdf_option_pdf_inclusion_errorlevel_code = pdftex_first_integer_code + 9 {if the pdf inclusion should treat pdfs newer than |pdf_option_pdf_minor_version| as an error}
-@d pdf_int_pars=pdftex_first_integer_code + 10 {total number of \pdfTeX's integer parameters}
+@d pdf_minor_version_code = pdftex_first_integer_code + 10 {fractional part of the pdf version produced}
+@d pdf_force_pagebox_code = pdftex_first_integer_code + 11 {if the pdf inclusion should always use a specific pdf page box}
+@d pdf_inclusion_errorlevel_code = pdftex_first_integer_code + 12 {if the pdf inclusion should treat pdfs newer than |pdf_minor_version| as an error}
+@d pdf_gamma_code            = pdftex_first_integer_code + 13
+@d pdf_image_gamma_code      = pdftex_first_integer_code + 14
+@d pdf_image_hicolor_code    = pdftex_first_integer_code + 15
+@d pdf_image_apply_gamma_code = pdftex_first_integer_code + 16
+@d pdf_px_dimen_code = pdftex_first_integer_code + 17 {the code for the pixel dimen value}
+@d pdf_int_pars=pdftex_first_integer_code + 18 {total number of \pdfTeX's integer parameters}
 @#
 @d int_pars=pdf_int_pars {total number of integer parameters}
 @z
@@ -171,6 +184,14 @@ primitive("pdfpageresources",assign_toks,pdf_page_resources_loc);
 @d pdf_option_pdf_minor_version == int_par(pdf_option_pdf_minor_version_code)
 @d pdf_option_always_use_pdfpagebox == int_par(pdf_option_always_use_pdfpagebox_code)
 @d pdf_option_pdf_inclusion_errorlevel == int_par(pdf_option_pdf_inclusion_errorlevel_code)
+@d pdf_minor_version == int_par(pdf_minor_version_code)
+@d pdf_force_pagebox == int_par(pdf_force_pagebox_code)
+@d pdf_inclusion_errorlevel == int_par(pdf_inclusion_errorlevel_code)
+@d pdf_gamma            == int_par(pdf_gamma_code)
+@d pdf_image_gamma      == int_par(pdf_image_gamma_code)
+@d pdf_image_hicolor    == int_par(pdf_image_hicolor_code)
+@d pdf_image_apply_gamma == int_par(pdf_image_apply_gamma_code)
+@d pdf_px_dimen == int_par(pdf_px_dimen_code)
 @z
 
 @x [237]
@@ -188,6 +209,14 @@ pdf_unique_resname_code:   print_esc("pdfuniqueresname");
 pdf_option_pdf_minor_version_code: print_esc("pdfoptionpdfminorversion");
 pdf_option_always_use_pdfpagebox_code: print_esc("pdfoptionalwaysusepdfpagebox");
 pdf_option_pdf_inclusion_errorlevel_code: print_esc("pdfoptionpdfinclusionerrorlevel");
+pdf_minor_version_code: print_esc("pdfminorversion");
+pdf_force_pagebox_code: print_esc("pdfforcepagebox");
+pdf_inclusion_errorlevel_code: print_esc("pdfinclusionerrorlevel");
+pdf_gamma_code:            print_esc("pdfgamma");
+pdf_image_gamma_code:      print_esc("pdfimagegamma");
+pdf_image_hicolor_code:    print_esc("pdfimagehicolor");
+pdf_image_apply_gamma_code: print_esc("pdfimageapplygamma");
+pdf_px_dimen_code: print_esc("pdfpxdimen");
 @z
 
 @x [238]
@@ -216,6 +245,29 @@ primitive("pdfoptionalwaysusepdfpagebox",assign_int,int_base+pdf_option_always_u
 @!@:pdf_option_always_use_pdfpagebox_}{\.{\\pdfoptionalwaysusepdfpagebox} primitive@>
 primitive("pdfoptionpdfinclusionerrorlevel",assign_int,int_base+pdf_option_pdf_inclusion_errorlevel_code);@/
 @!@:pdf_option_pdf_inclusion_errorlevel_}{\.{\\pdfoptionpdfinclusionerrorlevel} primitive@>
+primitive("pdfminorversion",assign_int,int_base+pdf_minor_version_code);@/
+@!@:pdf_minor_version_}{\.{\\pdfminorversion} primitive@>
+primitive("pdfforcepagebox",assign_int,int_base+pdf_force_pagebox_code);@/
+@!@:pdf_force_pagebox_}{\.{\\pdfforcepagebox} primitive@>
+primitive("pdfinclusionerrorlevel",assign_int,int_base+pdf_inclusion_errorlevel_code);@/
+@!@:pdf_inclusion_errorlevel_}{\.{\\pdfinclusionerrorlevel} primitive@>
+primitive("pdfgamma",assign_int,int_base+pdf_gamma_code);@/
+@!@:pdf_gamma_}{\.{\\pdfgamma} primitive@>
+primitive("pdfimagegamma",assign_int,int_base+pdf_image_gamma_code);@/
+@!@:pdf_image_gamma_}{\.{\\pdfimagegamma} primitive@>
+primitive("pdfimagehicolor",assign_int,int_base+pdf_image_hicolor_code);@/
+@!@:pdf_image_hicolor_}{\.{\\pdfimagehicolor} primitive@>
+primitive("pdfimageapplygamma",assign_int,int_base+pdf_image_apply_gamma_code);@/
+@!@:pdf_image_apply_gamma_}{\.{\\pdfimageapplygamma} primitive@>
+primitive("pdfpxdimen",assign_int,int_base+pdf_px_dimen_code);@/
+@!@:pdf_px_dimen_}{\.{\\pdfpxdimen} primitive@>
+@z
+
+@x [240] - pxdimen
+for k:=int_base to del_code_base-1 do eqtb[k].int:=0;
+@y
+for k:=int_base to del_code_base-1 do eqtb[k].int:=0;
+pdf_px_dimen := unity;
 @z
 
 % Define pdftex dimension parameters
@@ -231,7 +283,11 @@ primitive("pdfoptionpdfinclusionerrorlevel",assign_int,int_base+pdf_option_pdf_i
 @d pdf_link_margin_code    = pdftex_first_dimen_code + 4 {link margin in the PDF output}
 @d pdf_dest_margin_code    = pdftex_first_dimen_code + 5 {dest margin in the PDF output}
 @d pdf_thread_margin_code  = pdftex_first_dimen_code + 6 {thread margin in the PDF output}
-@d pdftex_last_dimen_code  = pdftex_first_dimen_code + 6 {last number defined in this section}
+@d pdf_first_line_height_code = pdftex_first_dimen_code + 7
+@d pdf_last_line_depth_code   = pdftex_first_dimen_code + 8
+@d pdf_each_line_height_code  = pdftex_first_dimen_code + 9
+@d pdf_each_line_depth_code   = pdftex_first_dimen_code + 10
+@d pdftex_last_dimen_code  = pdftex_first_dimen_code + 10 {last number defined in this section}
 @z
 
 @x
@@ -251,6 +307,10 @@ primitive("pdfoptionpdfinclusionerrorlevel",assign_int,int_base+pdf_option_pdf_i
 @d pdf_link_margin   == dimen_par(pdf_link_margin_code)
 @d pdf_dest_margin   == dimen_par(pdf_dest_margin_code)
 @d pdf_thread_margin == dimen_par(pdf_thread_margin_code)
+@d pdf_first_line_height == dimen_par(pdf_first_line_height_code)
+@d pdf_last_line_depth   == dimen_par(pdf_last_line_depth_code)
+@d pdf_each_line_height  == dimen_par(pdf_each_line_height_code)
+@d pdf_each_line_depth   == dimen_par(pdf_each_line_depth_code)
 @z
 
 @x [247]
@@ -264,6 +324,10 @@ pdf_page_height_code:   print_esc("pdfpageheight");
 pdf_link_margin_code:   print_esc("pdflinkmargin");
 pdf_dest_margin_code:   print_esc("pdfdestmargin");
 pdf_thread_margin_code: print_esc("pdfthreadmargin");
+pdf_first_line_height_code: print_esc("pdffirstlineheight");
+pdf_last_line_depth_code: print_esc("pdflastlinedepth");
+pdf_each_line_height_code: print_esc("pdfeachlineheight");
+pdf_each_line_depth_code: print_esc("pdfeachlinedepth");
 @z
 
 @x [248]
@@ -286,6 +350,14 @@ primitive("pdfdestmargin",assign_dimen,dimen_base+pdf_dest_margin_code);@/
 @!@:pdf_dest_margin_}{\.{\\pdfdestmargin} primitive@>
 primitive("pdfthreadmargin",assign_dimen,dimen_base+pdf_thread_margin_code);@/
 @!@:pdf_thread_margin_}{\.{\\pdfthreadmargin} primitive@>
+primitive("pdffirstlineheight",assign_dimen,dimen_base+pdf_first_line_height_code);@/
+@!@:pdf_first_line_height_}{\.{\\pdffirstlineheight} primitive@>
+primitive("pdflastlinedepth",assign_dimen,dimen_base+pdf_last_line_depth_code);@/
+@!@:pdf_last_line_depth_}{\.{\\pdflastlinedepth} primitive@>
+primitive("pdfeachlineheight",assign_dimen,dimen_base+pdf_each_line_height_code);@/
+@!@:pdf_each_line_height_}{\.{\\pdfeachlineheight} primitive@>
+primitive("pdfeachlinedepth",assign_dimen,dimen_base+pdf_each_line_depth_code);@/
+@!@:pdf_each_line_depth_}{\.{\\pdfeachlinedepth} primitive@>
 @z
 
 % Define some read-only pdfTeX primitives
@@ -310,7 +382,10 @@ primitive("pdfthreadmargin",assign_dimen,dimen_base+pdf_thread_margin_code);@/
 @d pdf_last_annot_code        = pdftex_first_rint_code + 5 {code for \.{\\pdflastannot}}
 @d pdf_last_x_pos_code        = pdftex_first_rint_code + 6 {code for \.{\\pdflastxpos}}
 @d pdf_last_y_pos_code        = pdftex_first_rint_code + 7 {code for \.{\\pdflastypos}}
-@d pdftex_last_item_codes     = pdftex_first_rint_code + 7 {end of \pdfTeX's command codes}
+@d pdf_retval_code            = pdftex_first_rint_code + 8 {global multi-purpose return value}
+@d pdf_last_ximage_colordepth_code = pdftex_first_rint_code + 9 {code for \.{\\pdflastximagecolordepth}}
+@d elapsed_time_code          = pdftex_first_rint_code + 10 {code for \.{\\elapsedtime}}
+@d pdftex_last_item_codes     = pdftex_first_rint_code + 10 {end of \pdfTeX's command codes}
 @z
 
 @x [416]
@@ -335,6 +410,12 @@ primitive("pdflastxpos",last_item,pdf_last_x_pos_code);@/
 @!@:pdf_last_x_pos_}{\.{\\pdflastxpos} primitive@>
 primitive("pdflastypos",last_item,pdf_last_y_pos_code);@/
 @!@:pdf_last_y_pos_}{\.{\\pdflastypos} primitive@>
+primitive("pdfretval",last_item,pdf_retval_code);@/
+@!@:pdf_retval_}{\.{\\pdfretval} primitive@>
+primitive("pdflastximagecolordepth",last_item,pdf_last_ximage_colordepth_code);@/
+@!@:pdf_last_ximage_colordepth_}{\.{\\pdflastximagecolordepth} primitive@>
+primitive("elapsedtime",last_item,elapsed_time_code);
+@!@:elapsed_time_}{\.{\\elapsedtime} primitive@>
 @z
 
 @x [417]
@@ -348,16 +429,19 @@ primitive("pdflastypos",last_item,pdf_last_y_pos_code);@/
   pdf_last_annot_code:  print_esc("pdflastannot");
   pdf_last_x_pos_code:  print_esc("pdflastxpos");
   pdf_last_y_pos_code:  print_esc("pdflastypos");
+  pdf_retval_code:      print_esc("pdfretval");
+  pdf_last_ximage_colordepth_code: print_esc("pdflastximagecolordepth");
+  elapsed_time_code: print_esc("elapsedtime");
   othercases print_esc("badness")
 @z
 
-@x [26.424] l.8506
+@x [424]
 if cur_chr>glue_val then
 @y
 if m>=input_line_no_code then
 @z
 
-@x [26.424] l.8507
+@x [424]
   begin if cur_chr=input_line_no_code then cur_val:=line
   else cur_val:=last_badness; {|cur_chr=badness_code|}
 @y
@@ -372,11 +456,62 @@ if m>=input_line_no_code then
   pdf_last_annot_code:  cur_val := pdf_last_annot;
   pdf_last_x_pos_code:  cur_val := pdf_last_x_pos;
   pdf_last_y_pos_code:  cur_val := pdf_last_y_pos;
+  pdf_retval_code:      cur_val := pdf_retval;
+  pdf_last_ximage_colordepth_code: cur_val := pdf_last_ximage_colordepth;
+  elapsed_time_code: cur_val := get_microinterval;
   end; {there are no other cases}
 @z
 
+@x [455] - pxdimen
+else if scan_keyword("ex") then v:=(@<The x-height for |cur_font|@>)
+@.ex@>
+@y
+else if scan_keyword("ex") then v:=(@<The x-height for |cur_font|@>)
+@.ex@>
+else if scan_keyword("px") then v:=pdf_px_dimen
+@.px@>
+@z
+
+@x new Didot (1nd=0.375mm), new Cicero (1nc=12nd)
+@ The necessary conversion factors can all be specified exactly as
+fractions whose numerator and denominator are 32768 or less.
+According to the definitions here, $\rm2660\,dd\approx1000.33297\,mm$;
+this agrees well with the value $\rm1000.333\,mm$ cited by Bosshard
+@^Bosshard, Hans Rudolf@>
+in {\sl Technische Grundlagen zur Satzherstellung\/} (Bern, 1980).
+@y
+@ The necessary conversion factors can all be specified exactly as
+fractions whose numerator and denominator are 65535 or less.
+According to the definitions here, $\rm2660\,dd\approx1000.33297\,mm$;
+this agrees well with the value $\rm1000.333\,mm$ cited by Bosshard
+@^Bosshard, Hans Rudolf@>
+in {\sl Technische Grundlagen zur Satzherstellung\/} (Bern, 1980).
+The Didot point has been newly standardized in 1978;
+it's now exactly $\rm 1\,nd=0.375\,mm$.
+Conversion uses the equation $0.375=21681/20320/72.27\cdot25.4$.
+The new Cicero follows the new Didot point; $\rm 1\,nc=12\,nd$.
+@z
+
+@x new Didot (1nd=0.375mm), new Cicero (1nc=12nd)
+else if scan_keyword("cc") then set_conversion(14856)(1157)
+@.cc@>
+@y
+else if scan_keyword("cc") then set_conversion(14856)(1157)
+@.cc@>
+else if scan_keyword("nd") then set_conversion(21681)(20320)
+@.nd@>
+else if scan_keyword("nc") then set_conversion(65043)(5080)
+@.nc@>
+@z
+
+@x new Didot (1nd=0.375mm), new Cicero (1nc=12nd)
+  ("cm, mm, dd, cc, bp, or sp; but yours is a new one!")@/
+@y
+  ("cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!")@/
+@z
+
 % Define some char token producing pdfTeX primitives
-@x [27.468] l.9202
+@x [468]
 @d number_code=0 {command code for \.{\\number}}
 @y
 \pdfTeX\ adds \.{\\eTeXrevision}, \.{\\pdftexrevision}, \.{\\pdftexbanner},
@@ -386,7 +521,7 @@ such that |job_name_code| remains last.
 @d number_code=0 {command code for \.{\\number}}
 @z
 
-@x [27.468] l.9207
+@x [468]
 @d job_name_code=5 {command code for \.{\\jobname}}
 @y
 @d pdftex_first_expand_code = 5 {base for \pdfTeX's command codes}
@@ -396,11 +531,13 @@ such that |job_name_code| remains last.
 @d pdf_font_objnum_code     = pdftex_first_expand_code + 3 {command code for \.{\\pdffontobjnum}}
 @d pdf_font_size_code       = pdftex_first_expand_code + 4 {command code for \.{\\pdffontsize}}
 @d pdf_page_ref_code        = pdftex_first_expand_code + 5 {command code for \.{\\pdfpageref}}
-@d pdftex_convert_codes     = pdftex_first_expand_code + 6 {end of \pdfTeX's command codes}
+@d pdf_xform_name_code      = pdftex_first_expand_code + 6 {command code for \.{\\pdfxformname}}
+@d pdf_last_escaped_string_code = pdftex_first_expand_code + 7 {command code for \.{\\pdflastescapedstring}}
+@d pdftex_convert_codes     = pdftex_first_expand_code + 8 {end of \pdfTeX's command codes}
 @d job_name_code=pdftex_convert_codes {command code for \.{\\jobname}}
 @z
 
-@x [27.468] l.9220
+@x [468]
 primitive("jobname",convert,job_name_code);@/
 @y
 @#
@@ -416,6 +553,10 @@ primitive("pdffontsize",convert,pdf_font_size_code);@/
 @!@:pdf_font_size_}{\.{\\pdffontsize} primitive@>
 primitive("pdfpageref",convert,pdf_page_ref_code);@/
 @!@:pdf_page_ref_}{\.{\\pdfpageref} primitive@>
+primitive("pdfxformname",convert,pdf_xform_name_code);@/
+@!@:pdf_xform_name_}{\.{\\pdfxformname} primitive@>
+primitive("pdflastescapedstring",convert,pdf_last_escaped_string_code);@/
+@!@:pdf_last_escaped_string_}{\.{\\pdflastescapedstring} primitive@>
 @#
 primitive("jobname",convert,job_name_code);@/
 @z
@@ -429,7 +570,16 @@ primitive("jobname",convert,job_name_code);@/
   pdf_font_objnum_code: print_esc("pdffontobjnum");
   pdf_font_size_code:   print_esc("pdffontsize");
   pdf_page_ref_code:    print_esc("pdfpageref");
+  pdf_xform_name_code:  print_esc("pdfxformname");
+  pdf_last_escaped_string_code:    print_esc("pdflastescapedstring");
   othercases print_esc("jobname")
+@z
+
+@x [465] - pdfescapestring
+@!b:pool_pointer; {base of temporary string}
+@y
+@!b:pool_pointer; {base of temporary string}
+@!i, l: integer; {index to access escaped string}
 @z
 
 @x [471]
@@ -452,6 +602,11 @@ pdf_page_ref_code: begin
     if cur_val <= 0 then
         pdf_error("pageref", "invalid page number");
 end;
+pdf_xform_name_code: begin
+    scan_int;
+    pdf_check_obj(obj_type_xform, cur_val);
+end;
+pdf_last_escaped_string_code: do_nothing;
 job_name_code: if job_name=0 then open_log_file;
 @z
 
@@ -467,9 +622,43 @@ pdf_font_name_code, pdf_font_objnum_code: begin
     else
         print_int(pdf_font_num[ff]);
 end;
-pdf_font_size_code: print_scaled(font_size[cur_val]);
+pdf_font_size_code: begin
+    print_scaled(font_size[cur_val]);
+    print("pt");
+end;
 pdf_page_ref_code: print_int(get_obj(obj_type_page, cur_val, false));
+pdf_xform_name_code: print_int(obj_info(cur_val));
+pdf_last_escaped_string_code: begin
+    l := escapedstrlen;
+    for i := 0 to l - 1 do
+        print_char(getescapedchar(i));
+end;
 job_name_code: print(job_name);
+@z
+
+@x [577] - tagcode
+@<Declare procedures that scan font-related stuff@>=
+procedure scan_font_ident;
+@y
+@<Declare procedures that scan font-related stuff@>=
+function get_tag_code(f: internal_font_number; c: eight_bits): integer;
+var i:small_number;
+begin
+    if is_valid_char(c) then
+      begin i := char_tag(char_info(f)(c));
+      if i = lig_tag then
+        get_tag_code := 1
+	  else if i = list_tag then
+        get_tag_code := 2
+	  else if i = ext_tag then
+        get_tag_code := 4
+	  else
+	    get_tag_code := 0;
+      end
+   else
+       get_tag_code := -1;
+end;
+procedure scan_font_ident;
 @z
 
 % Shipping out to PDF
@@ -491,28 +680,7 @@ ready for the |dvi_ship_out| routine that gets them started in the first place.
 
 @* \[32a] \pdfTeX\ basic.
 
-@<Constants...@>=
-cfg_output_code = pdf_output_code;
-cfg_compress_level_code = pdf_compress_level_code;
-cfg_decimal_digits_code = pdf_decimal_digits_code;
-cfg_move_chars_code = pdf_move_chars_code;
-cfg_image_resolution_code = pdf_image_resolution_code;
-cfg_pk_resolution_code = pdf_pk_resolution_code;
-cfg_unique_resname_code = pdf_unique_resname_code;
-cfg_h_origin_code = pdf_h_origin_code;
-cfg_v_origin_code = pdf_v_origin_code;
-cfg_page_height_code = pdf_page_height_code;
-cfg_page_width_code = pdf_page_width_code;
-cfg_link_margin_code = pdf_link_margin_code;
-cfg_dest_margin_code = pdf_dest_margin_code;
-cfg_thread_margin_code = pdf_thread_margin_code;
-cfg_pdf12_compliant_code = pdf_thread_margin_code + 1;
-cfg_pdf13_compliant_code = cfg_pdf12_compliant_code + 1;
-cfg_pdf_minor_version_code = pdf_option_pdf_minor_version_code;
-cfg_always_use_pdf_pagebox_code = 71; {must be the same as the definition in epdf.h}
-cfg_pdf_option_pdf_inclusion_errorlevel_code = pdf_option_pdf_inclusion_errorlevel_code;
-
-@ Initialize pdftex's parameters to some useful default value.   
+Initialize pdftex's parameters to some useful default value.   
 Helpful in case one forgets to set them during initex run.
 
 @<Initialize table entries...@>=
@@ -521,7 +689,11 @@ pdf_v_origin := (one_hundred_inch + 50) div 100;
 pdf_compress_level := 9;
 pdf_decimal_digits := 4;
 pdf_image_resolution := 72;
-pdf_option_pdf_minor_version := 4;
+pdf_minor_version := 4;
+pdf_gamma := 1000;
+pdf_image_gamma := 2200;
+pdf_image_hicolor := 1;
+pdf_image_apply_gamma := 0;
 
 @ The subroutines define the corresponding macros so we can use them
 in C.
@@ -531,9 +703,9 @@ in C.
 @d is_valid_char(#)==((font_bc[f] <= #) and (# <= font_ec[f]) and 
                       char_exists(char_info(f)(#)))
 
-@p function get_int_par(p: integer): integer;
+@p function get_pdf_compress_level: integer;
 begin
-    get_int_par := int_par(p);
+    get_pdf_compress_level := pdf_compress_level;
 end;
 
 function get_nullfont: internal_font_number;
@@ -737,9 +909,15 @@ end
 @!pdf_save_offset: integer; {to save |pdf_offset|}
 @!zip_write_state: integer; {which state of compression we are in}
 @!fixed_pdf_minor_version: integer; {fixed minor part of the pdf version}
-@!pdf_minor_version_has_been_written: boolean; {flag if the pdf version has been written}
+@!pdf_minor_version_written: boolean; {flag if the pdf version has been written}
 @!fixed_pdfoutput: integer; {fixed output format}
 @!fixed_pdfoutput_set: boolean; {|fixed_pdfoutput| has been set?}
+@!fixed_gamma: integer;
+@!fixed_image_gamma: integer;
+@!fixed_image_hicolor: boolean;
+@!fixed_image_apply_gamma: integer;
+@!epochseconds: integer;
+@!microseconds: integer;
 
 @ @<Set init...@>=
 pdf_buf[0] := "%";
@@ -751,11 +929,21 @@ pdf_buf[5] := "1";
 pdf_buf[6] := ".";
 pdf_buf[7] := "4";
 pdf_buf[8] := pdf_new_line_char;
-pdf_ptr := 9;
+pdf_buf[9] := "%";
+pdf_buf[10] := 208;
+pdf_buf[11] := 212;
+pdf_buf[12] := 197;
+pdf_buf[13] := 216;
+pdf_buf[14] := pdf_new_line_char;
+pdf_ptr := 15;
 pdf_gone := 0;
 zip_write_state := no_zip;
-pdf_minor_version_has_been_written := false;
+pdf_minor_version_written := false;
 fixed_pdfoutput_set := false;
+fixed_gamma := 1000;
+fixed_image_gamma := 2200;
+fixed_image_hicolor := 1;
+fixed_image_apply_gamma := 0;
 
 @ @p 
 function fix_int(val, min, max: integer): integer;
@@ -768,34 +956,38 @@ begin
         fix_int := val;
 end;
 
-@ This checks that |pdfoptionpdfminorversion| can only be set before any
+@ This checks that |pdfminorversion| can only be set before any
 bytes have been written to the generated pdf file. It should be called
 directly every after |ensure_pdf_open|.
 
-@p procedure check_and_set_pdfoptionpdfminorversion;
+@p procedure check_pdfminorversion;
 begin
-    if not pdf_minor_version_has_been_written then begin
-        pdf_minor_version_has_been_written := true;
-        if (pdf_option_pdf_minor_version < 0) or (pdf_option_pdf_minor_version > 9) then begin
-        print_err("pdfTeX error (illegal pdfoptionpdfminorversion)");
-        print_ln;
-        help2 ("The pdfoptionpdfminorversion must be between 0 and 9.")@/
-            ("I changed this to 4.");
-        int_error (pdf_option_pdf_minor_version);
-        pdf_option_pdf_minor_version := 4;
+    if not pdf_minor_version_written then begin
+        if pdf_option_pdf_minor_version <> 0 then begin
+            pdf_warning(0,"Primitive \pdfoptionpdfminorversion is obsolete; use \pdfminorversion instead.",true);
+            pdf_minor_version := pdf_option_pdf_minor_version;
         end;
-        fixed_pdf_minor_version := pdf_option_pdf_minor_version;
+        pdf_minor_version_written := true;
+        if (pdf_minor_version < 0) or (pdf_minor_version > 9) then begin
+            print_err("pdfTeX error (illegal pdfminorversion)");
+            print_ln;
+            help2 ("The pdfminorversion must be between 0 and 9.")@/
+                ("I changed this to 4.");
+            int_error (pdf_minor_version);
+            pdf_minor_version := 4;
+        end;
+        fixed_pdf_minor_version := pdf_minor_version;
         pdf_buf[7] := chr(ord("0") + fixed_pdf_minor_version);
     end
     else begin
-        if fixed_pdf_minor_version <> pdf_option_pdf_minor_version then
+        if fixed_pdf_minor_version <> pdf_minor_version then
             pdf_error("setup", 
-               "\pdfoptionpdfminorversion cannot be changed after data is written to the pdf file");
+               "\pdfminorversion cannot be changed after data is written to the pdf file");
     end;
 end;
 
 @ Checks that we have a name for the generated pdf file and that it's open.
-|check_and_set_pdfoptionpdfminorversion| should be called directly
+|check_pdfminorversion| should be called directly
 hereafter.
 
 @p procedure ensure_pdf_open;
@@ -818,7 +1010,7 @@ to finish it. The stream contents will be compressed if compression is turn on.
 @p procedure pdf_flush; {flush out the |pdf_buf|}
 begin
     ensure_pdf_open;
-    check_and_set_pdfoptionpdfminorversion;
+    check_pdfminorversion;
     case zip_write_state of
         no_zip: if pdf_ptr > 0 then begin
             write_pdf(0, pdf_ptr - 1);
@@ -837,7 +1029,7 @@ end;
 procedure pdf_begin_stream; {begin a stream}
 begin
     ensure_pdf_open;
-    check_and_set_pdfoptionpdfminorversion;
+    check_pdfminorversion;
     pdf_print_ln("/Length           ");
     pdf_stream_length_offset := pdf_offset - 11;
     pdf_stream_length := 0;
@@ -1026,7 +1218,7 @@ begin
 end;
 
 procedure pdf_print_int(n:integer); {print out a integer to PDF buffer}
-var k:0..23; {index to current digit; we assume that $|n|<10^{23}$}
+var k:integer; {index to current digit ($0\le k\le23$); we assume that $|n|<10^{23}$}
 m:integer; {used to negate |n| in possibly dangerous cases}
 begin
   k:=0;
@@ -1749,7 +1941,7 @@ end;
 procedure pdf_begin_obj(i: integer); {begin a PDF object}
 begin
     ensure_pdf_open;
-    check_and_set_pdfoptionpdfminorversion;
+    check_pdfminorversion;
     obj_offset(i) := pdf_offset;
     pdf_print_int(i);
     pdf_print_ln(" 0 obj");
@@ -1826,7 +2018,7 @@ end;
 
 @p procedure pdf_print_fw_int(n, w: integer); {print out an integer with 
 fixed width; used for outputting cross-reference table}
-var k:0..23;
+var k:integer; {$0\le k\le23$}
 begin
   k:=0;
   repeat dig[k]:=n mod 10; n:=n div 10; incr(k);
@@ -1877,8 +2069,10 @@ var i, j, k: pool_pointer;
 begin
     i := str_start[s];
     j := i + length(s) - 1;
-    if (i > j) then
-        return; {null string}
+    if i > j then begin
+        pdf_print("()"); {null string}
+        return;
+    end; 
     if (str_pool[i] = '(') and (str_pool[j] = ')') then begin
         pdf_print(s);
         return;
@@ -1995,7 +2189,10 @@ begin
     pdf_font_size[f] := scaled_out;
     font_used[f] := true;
     pdf_font_num[f] := fontnum;
-    set_char_map(f);
+    if pdf_move_chars > 0 then begin
+        pdf_warning(0,"Primitive \pdfmovechars is obsolete.",true);
+        pdf_move_chars := 0; {warn only once}
+    end;
 end;
 
 procedure pdf_create_font_obj; 
@@ -3664,7 +3861,7 @@ end;
 
 @ @<Initialize variables for \.{PDF} output@>=
 ensure_pdf_open;
-check_and_set_pdfoptionpdfminorversion;
+check_pdfminorversion;
 prepare_mag;
 fixed_decimal_digits := fix_int(pdf_decimal_digits, 0, 4);
 min_bp_val := 
@@ -3672,7 +3869,12 @@ min_bp_val :=
 fixed_pk_resolution := fix_int(pdf_pk_resolution, 72, 2400);
 pk_scale_factor := 
     divide_scaled(72, fixed_pk_resolution, 5 + fixed_decimal_digits);
-kpse_init_prog ('PDFTEX', fixed_pk_resolution, nil, nil);
+if pdf_pk_mode <> null then begin
+    kpse_init_prog('PDFTEX', fixed_pk_resolution, 
+                   make_cstring(tokens_to_string(pdf_pk_mode)), nil);
+    flush_string;
+end else 
+    kpse_init_prog('PDFTEX', fixed_pk_resolution, nil, nil);
 if not kpse_var_value('MKTEXPK') then
     kpse_set_program_enabled (kpse_pk_format, 1, kpse_src_cmdline);
 set_job_id(year, month, day, time, pdftex_version, pdftex_revision); 
@@ -4102,6 +4304,7 @@ pdf_print("/Producer (pdfTeX-");
 pdf_print_int(pdftex_version div 100);
 pdf_out(".");
 pdf_print_int(pdftex_version mod 100);
+pdf_out(".");
 pdf_print(pdftex_revision);
 pdf_print_ln(")")
 
@@ -4154,25 +4357,80 @@ pdf_print_ln("%%EOF")
 @* \[33] Packaging.
 @z
 
-@x [33.649] l.12912
+@x [649]
 exit: hpack:=r;
 @y
 exit: {|hpack|}
 hpack:=r;
 @z
 
-@x [33.651] l.12936
+@x [651]
   kern_node,math_node: x:=x+width(p);
 @y
   kern_node: x:=x+width(p);
   math_node: x:=x+width(p);
 @z
 
-@x [39.889] l.17408
+@x [888] - fixlinedimen
+append_to_vlist(just_box);
+@y
+if pdf_each_line_height <> 0 then
+    height(just_box) := pdf_each_line_height;
+if pdf_each_line_depth <> 0 then
+    depth(just_box) := pdf_each_line_depth;
+if (pdf_first_line_height <> 0) and (cur_line = prev_graf + 1) then
+    height(just_box) := pdf_first_line_height;
+if (pdf_last_line_depth <> 0) and (cur_line + 1 = best_line) then
+    depth(just_box) := pdf_last_line_depth;
+append_to_vlist(just_box);
+@z
+
+@x [889]
 adjust_tail:=adjust_head; just_box:=hpack(q,cur_width,exactly);
 @y
 adjust_tail:=adjust_head;
 just_box:=hpack(q,cur_width,exactly);
+@z
+
+@x [1088] - quitvmode
+@ A paragraph begins when horizontal-mode material occurs in vertical mode,
+or when the paragraph is explicitly started by `\.{\\indent}' or
+`\.{\\noindent}'.
+
+@<Put each...@>=
+primitive("indent",start_par,1);
+@!@:indent_}{\.{\\indent} primitive@>
+primitive("noindent",start_par,0);
+@!@:no_indent_}{\.{\\noindent} primitive@>
+@y
+@ Here is a really small patch to add a new primitive called
+\.{\\quitvmode}. In vertical modes, it is identical to \.{\\indent},
+but in horizontal and math modes it is really a no-op (as opposed to
+\.{\\indent}, which executes the |indent_in_hmode| procedure). 
+
+A paragraph begins when horizontal-mode material occurs in vertical mode,
+or when the paragraph is explicitly started by `\.{\\quitvmode}', 
+`\.{\\indent}' or `\.{\\noindent}'.
+
+@<Put each...@>=
+primitive("indent",start_par,1);
+@!@:indent_}{\.{\\indent} primitive@>
+primitive("noindent",start_par,0);
+@!@:no_indent_}{\.{\\noindent} primitive@>
+primitive("quitvmode",start_par,2);
+@!@:quit_vmode_}{\.{\\quitvmode} primitive@>
+@z
+
+@x [1089] - quitvmode
+start_par: if chr_code=0 then print_esc("noindent")@+ else print_esc("indent");
+@y
+start_par: if chr_code=0 then print_esc("noindent")@+ else if chr_code=1 then print_esc("indent")@+ else print_esc("quitvmode");
+@z
+
+@x [1092] - quitvmode
+hmode+start_par,mmode+start_par: indent_in_hmode;
+@y
+hmode+start_par,mmode+start_par: if cur_chr<>2 then indent_in_hmode;
 @z
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -4287,7 +4545,10 @@ pdf_init_map_file('pdftex.map');
 @d pdf_map_file_code           == pdftex_first_extension_code + 21
 @d pdf_map_line_code           == pdftex_first_extension_code + 22
 @d pdf_trailer_code            == pdftex_first_extension_code + 23
-@d pdftex_last_extension_code  == pdftex_first_extension_code + 23
+@d pdf_strcmp_code             == pdftex_first_extension_code + 24
+@d pdf_escape_string_code      == pdftex_first_extension_code + 25
+@d reset_timer_code            == pdftex_first_extension_code + 26
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 26
 @z
 
 @x [1344]
@@ -4344,6 +4605,12 @@ primitive("pdfmapline",extension,pdf_map_line_code);@/
 @!@:pdf_map_line_}{\.{\\pdfmapline} primitive@>
 primitive("pdftrailer",extension,pdf_trailer_code);@/
 @!@:pdf_trailer_}{\.{\\pdftrailer} primitive@>
+primitive("pdfstrcmp",extension,pdf_strcmp_code);@/
+@!@:pdf_strcmp_}{\.{\\pdfstrcmp} primitive@>
+primitive("pdfescapestring",extension,pdf_escape_string_code);@/
+@!@:pdf_escape_string_}{\.{\\pdfescapestring} primitive@>
+primitive("resettimer",extension,reset_timer_code);@/
+@!@:reset_timer_}{\.{\\resettimer} primitive@>
 @z
 
 @x [1346]
@@ -4374,6 +4641,9 @@ primitive("pdftrailer",extension,pdf_trailer_code);@/
   pdf_map_file_code: print_esc("pdfmapfile");
   pdf_map_line_code: print_esc("pdfmapline");
   pdf_trailer_code: print_esc("pdftrailer");
+  pdf_strcmp_code: print_esc("pdfstrcmp");
+  pdf_escape_string_code: print_esc("pdfescapestring");
+  reset_timer_code: print_esc("resettimer");
 @z
 
 @x [1348]
@@ -4406,6 +4676,9 @@ pdf_font_attr_code: @<Implement \.{\\pdffontattr}@>;
 pdf_map_file_code: @<Implement \.{\\pdfmapfile}@>;
 pdf_map_line_code: @<Implement \.{\\pdfmapline}@>;
 pdf_trailer_code: @<Implement \.{\\pdftrailer}@>;
+pdf_strcmp_code: @<Implement \.{\\pdfstrcmp}@>;
+pdf_escape_string_code: @<Implement \.{\\pdfescapestring}@>;
+reset_timer_code: @<Implement \.{\\resettimer}@>;
 @z
 
 @x [1354]
@@ -4465,6 +4738,46 @@ begin
     call_func(scan_toks(false, true)); {like \.{\\special}}
 end;
 
+procedure compare_strings; {to implement \.{\\pdfstrcmp}}
+label done;
+var s1, s2: str_number;
+    i1, i2, j1, j2: pool_pointer;
+    result: integer;
+begin
+    call_func(scan_toks(false, true));
+    s1 := tokens_to_string(def_ref);
+    delete_token_ref(def_ref);
+    call_func(scan_toks(false, true));
+    s2 := tokens_to_string(def_ref);
+    delete_token_ref(def_ref);
+    i1 := str_start[s1];
+    j1 := str_start[s1 + 1];
+    i2 := str_start[s2];
+    j2 := str_start[s2 + 1];
+    while (i1 < j1) and (i2 < j2) do begin
+        if str_pool[i1] < str_pool[i2] then begin
+            result := -1;
+            goto done;
+        end;
+        if str_pool[i1] > str_pool[i2] then begin
+            result := 1;
+            goto done;
+        end;
+        incr(i1);
+        incr(i2);
+    end;
+    if (i1 = j1) and (i2 = j2) then
+        result := 0
+    else if i1 < j1 then
+        result := 1
+    else
+        result := -1;
+done:
+    pdf_retval := result;
+    flush_str(s2);
+    flush_str(s1);
+end;
+
 @ @<Implement \.{\\pdfliteral}@>=
 begin
     check_pdfoutput("\pdfliteral");
@@ -4491,6 +4804,7 @@ end
 begin
     check_pdfoutput("\pdfobj");
     if scan_keyword("reserveobjnum") then begin
+        @<Scan an optional space@>;
         incr(pdf_obj_count);
         pdf_create_obj(obj_type_obj, pdf_obj_count);
         pdf_last_obj := obj_ptr;
@@ -4606,6 +4920,7 @@ end
 @<Glob...@>=
 @!pdf_last_ximage: integer;
 @!pdf_last_ximage_pages: integer;
+@!pdf_last_ximage_colordepth: integer;
 @!alt_rule: pointer;
 @!pdf_last_pdf_box_spec: integer;
 
@@ -4785,28 +5100,39 @@ begin
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
-    if pdf_option_always_use_pdfpagebox > 0 then begin
+    if pdf_option_always_use_pdfpagebox <> 0 then begin
+        pdf_warning(0,"Primitive \pdfoptionalwaysusepdfpagebox is obsolete; use \pdfforcepagebox instead.",true);
+        pdf_force_pagebox := pdf_option_always_use_pdfpagebox;
+        pdf_option_always_use_pdfpagebox := 0; {warn once}
+    end;
+    if pdf_option_pdf_inclusion_errorlevel <> 0 then begin
+        pdf_warning(0,"Primitive \pdfoptionpdfinclusionerrorlevel is obsolete; use \pdfinclusionerrorlevel instead.",true);
+        pdf_inclusion_errorlevel := pdf_option_pdf_inclusion_errorlevel;
+        pdf_option_pdf_inclusion_errorlevel := 0; {warn once}
+    end;
+    if pdf_force_pagebox > 0 then begin
         print_err("pdfTeX warning (image inclusion): ");
-        print ("\pdfoptionalwaysusepdfpagebox is in use ("); 
-        print_int (pdf_option_always_use_pdfpagebox); 
+        print ("\pdfforcepagebox is in use ("); 
+        print_int (pdf_force_pagebox); 
         print (")");
         print_ln;
     end;
     obj_ximage_data(k) := read_image(s, page, named, colorspace,
-                                     pdf_option_pdf_minor_version, 
-                                     pdf_option_always_use_pdfpagebox,
-                                     pdf_option_pdf_inclusion_errorlevel);
+                                     pdf_minor_version, 
+                                     pdf_force_pagebox,
+                                     pdf_inclusion_errorlevel);
     if named <> 0 then flush_str(named);
     flush_str(s);
     scale_image(k);
     pdf_last_ximage := k;
     pdf_last_ximage_pages := image_pages(obj_ximage_data(k));
+    pdf_last_ximage_colordepth := image_colordepth(obj_ximage_data(k));
 end;
 
 @ @<Implement \.{\\pdfximage}@>=
 begin
     check_pdfoutput("\pdfximage");
-    check_and_set_pdfoptionpdfminorversion;
+    check_pdfminorversion;
     scan_image;
 end
 
@@ -4870,6 +5196,19 @@ begin
     get_obj := r;
 end;
 
+function get_microinterval:integer;
+var s,@!m:integer; {seconds and microseconds}
+begin
+   seconds_and_micros(s,m);
+   if (s-epochseconds)>32767 then
+     get_microinterval := max_integer
+   else if (microseconds>m)  then
+     get_microinterval := ((s-1-epochseconds)*65536)+ (((m+1000000-microseconds)/100)*65536)/10000
+   else
+     get_microinterval := ((s-epochseconds)*65536)  + (((m-microseconds)/100)*65536)/10000;
+end;
+
+
 @ @<Declare procedures needed in |do_ext...@>=
 function scan_action: pointer; {read an action specification}
 var p, t: integer;
@@ -4926,10 +5265,12 @@ begin
     end
     else
         pdf_error("ext1", "identifier type missing");
-    if scan_keyword("newwindow") then
-        pdf_action_new_window(p) := 1
-    else if scan_keyword("nonewwindow") then
-        pdf_action_new_window(p) := 2
+    if scan_keyword("newwindow") then begin
+        pdf_action_new_window(p) := 1;
+        @<Scan an optional space@>; end
+    else if scan_keyword("nonewwindow") then begin
+        pdf_action_new_window(p) := 2;
+        @<Scan an optional space@>; end
     else
         pdf_action_new_window(p) := 0;
     if (pdf_action_new_window(p) > 0) and
@@ -4973,8 +5314,9 @@ end;
 @ @<Implement \.{\\pdfannot}@>=
 begin
     check_pdfoutput("\pdfannot");
-    if scan_keyword("reserveobjnum") then
-        pdf_last_annot := pdf_new_objnum
+    if scan_keyword("reserveobjnum") then begin
+        pdf_last_annot := pdf_new_objnum;
+        @<Scan an optional space@>; end
     else begin
         if scan_keyword("useobjnum") then begin
             scan_int;
@@ -5170,6 +5512,7 @@ begin
         pdf_dest_type(tail) := pdf_dest_fit
     else
         pdf_error("ext1", "destination type missing");
+    @<Scan an optional space@>;
     if pdf_dest_type(tail) = pdf_dest_fitr then begin
         scan_alt_rule; {scans |<rule spec>| to |alt_rule|}
         pdf_width(tail) := width(alt_rule);
@@ -5300,6 +5643,28 @@ begin
     check_pdfoutput("\pdftrailer");
     scan_pdf_ext_toks;
     pdf_trailer_toks := concat_tokens(pdf_trailer_toks, def_ref);
+end
+
+@ @<Implement \.{\\pdfescapestring}@>=
+begin
+    scan_pdf_ext_toks;
+    escapestr(tokens_to_string(def_ref));
+    flush_str(last_tokens_string);
+    delete_token_ref(def_ref);
+end
+
+@ @<Glob...@>=
+@!pdf_retval: integer; {global multi-purpose return value}
+
+@ @<Implement \.{\\pdfstrcmp}@>=
+compare_strings
+
+@ @<Set initial values of key variables@>=
+  seconds_and_micros(epochseconds,microseconds);
+
+@ @<Implement \.{\\resettimer}@>=
+begin
+  seconds_and_micros(epochseconds,microseconds);
 end
 
 

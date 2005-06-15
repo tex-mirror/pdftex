@@ -25,14 +25,15 @@ pdfetex, pdfeinitex, pdfevirtex \- PDF output from e-TeX
 .SH SYNOPSIS
 .B pdfetex
 .RI [ options ]
-.RI [\fB& format ]
-.RI [ file [ .tex ]\ |\ [\fB\e commands ]]
+[\fB&\fR \fIformat\fR ]
+[ \fIfile\fR | \fB\e\fR \fIcommands\fR ]
 .\"=====================================================================
 .SH DESCRIPTION
 Run the pdfe\*(TX typesetter on
 .IR file ,
 usually creating
 .IR file.pdf .
+If the file argument has no extension, ".tex" will be appended to it. 
 Instead of a filename, a set of pdfe\*(TX commands can be given, the first
 of which must start with a backslash.
 With a 

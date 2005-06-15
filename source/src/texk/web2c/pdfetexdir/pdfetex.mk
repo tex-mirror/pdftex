@@ -17,7 +17,7 @@ pdfetex: pdftexd.h $(pdfetex_o) $(pdfetexextra_o) $(pdftexlibsdep)
 	@CXXHACKLINK@ $(pdfetex_o) $(pdfetexextra_o) $(pdftexlibs) $(socketlibs) @CXXHACKLDLIBS@ @CXXLDEXTRA@
 
 # C file dependencies.
-$(pdfetex_c) pdfetexcoerce.h pdfetexd.h: pdfetex.p $(web2c_texmf)
+$(pdfetex_c) pdfetexcoerce.h pdfetexd.h: pdfetex.p $(web2c_texmf) $(srcdir)/pdfetexdir/pdfetex.defines
 	$(web2c) pdfetex
 pdfetexextra.c: pdfetexdir/pdfetexextra.h lib/texmfmp.c
 	sed s/TEX-OR-MF-OR-MP/pdfetex/ $(srcdir)/lib/texmfmp.c >$@

@@ -24,6 +24,10 @@ exec_prefix = @exec_prefix@
 bindir = @bindir@
 scriptdir = $(bindir)
 texmf = @texmfmain@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_DATA = @INSTALL_DATA@
 
 NCURSESDIR=libs/ncurses
 ZLIBDIR=libs/zlib
@@ -50,31 +54,33 @@ install: all
 	     (cd $$dir && PATH=$(scriptdir):$(bindir):$(PATH) \
                 $(MAKE) $@) || exit 1; \
 	done
+	if test -d $(texmf) && test -f $(srcdir)/release-tetex-src.txt; then \
+	  $(INSTALL_DATA) $(srcdir)/release-tetex-src.txt $(texmf); \
+	fi
 @FMU@
 @FMU@install-extra:
-	# temporary fix for missing links
-	test -x texk/web2c/omegafonts/omfonts && \
+# temporary fix for missing links
+	test -f texk/web2c/omegafonts/omfonts && \
 	  cd texk/web2c/omegafonts; $(MAKE) install-links
-
 	$(srcdir)/selfautofix "$(bindir)" "$(texmf)/web2c"
-	if test -f $(scriptdir)/mktexlsr; then \
+	- if test -f $(scriptdir)/mktexlsr; then \
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
 	    $(scriptdir)/mktexlsr; \
 	else :; fi
-	if test -f $(scriptdir)/fmtutil; then \
+	- if test -f $(scriptdir)/fmtutil-sys; then \
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
-	    $(scriptdir)/fmtutil --all; \
+	    $(scriptdir)/fmtutil-sys --all; \
 	else :; fi
-	if test -f $(scriptdir)/texlinks; then \
+	- if test -f $(scriptdir)/texlinks; then \
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
 	    $(scriptdir)/texlinks; \
 	else :; fi
-	if test -f $(scriptdir)/updmap \
+	- if test -f $(scriptdir)/updmap-sys \
 	  && TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
-	       kpsewhich --format='web2c files' updmap.cfg >/dev/null; \
+	       $(scriptdir)/kpsewhich --format='web2c files' updmap.cfg >/dev/null; \
 	then \
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
-	    $(scriptdir)/updmap; \
+	    $(scriptdir)/updmap-sys; \
 	else :; fi
 
 install-exec:
@@ -85,11 +91,10 @@ install-exec:
 	done
 @FMU@
 @FMU@install-exec-extra:
-	# temporary fix for missing links
-	test -x texk/web2c/omegafonts/omfonts && \
+# temporary fix for missing links
+	test -f texk/web2c/omegafonts/omfonts && \
 	  cd texk/web2c/omegafonts; $(MAKE) install-links
-
-	if test -f $(scriptdir)/texlinks; then \
+	- if test -f $(scriptdir)/texlinks; then \
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
 	    $(scriptdir)/texlinks; \
 	else :; fi
@@ -97,7 +102,7 @@ install-exec:
 strip:
 
 check:
-	cd texk; TEXMF=$(texmf) TEXMFCNF=$(texmf)/web2c $(MAKE) $@
+	cd texk; TEXMF='{$(texmf),$(texmf)-dist}' TEXMFCNF=$(texmf)/web2c $(MAKE) $@
 
 uninstall:
 	for dir in $(INSTDIRS); do \
@@ -110,28 +115,14 @@ Makefile: Makefile.in config.status
 
 all: @LIBSDEP@
 all clean mostlyclean:
-	esubdirs="$(ESUBDIRS)"; \
+	esubdirs="$(LIBSDIRS) $(ESUBDIRS)"; \
 	  for dir in $$esubdirs; do \
 	    echo making $@ in $$dir; \
 	    (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) $@; else true; fi) || exit 1; \
 	  done
 
-libsclean:
-	libsdirs="$(LIBSDIRS)"; \
-	  for dir in $$libsdirs; do \
-	    echo making clean in $$dir; \
-	    (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) clean; else true; fi) || exit 1; \
-	  done
-
-libsdistclean:
-	libsdirs="$(LIBSDIRS)"; \
-	  for dir in $$libsdirs; do \
-	    echo making distclean in $$dir; \
-	    (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) distclean; else true; fi) || exit 1; \
-	  done
-
 distclean: clean
-	cleandirs="$(ESUBDIRS)"; \
+	cleandirs="$(LIBSDIRS) $(ESUBDIRS)"; \
 	  for dir in $$cleandirs; do \
 	    echo making $@ in $$dir; \
 	    (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) $@; else true; fi) || exit 1; \
@@ -145,15 +136,12 @@ tags TAGS:
 	find . -name '*.[ch]' -print | xargs etags --append -o TAGS
 
 
-clean mostlyclean: libsclean
-distclean: libsdistclean
 realclean: distclean
 world: all install
-pdftex pdfetex pdfxtex:
+pdftex pdfetex:
 	cd texk/web2c; $(MAKE) $@
 	test -f texk/web2c/pdftex && ls -l texk/web2c/pdftex
 	test -f texk/web2c/pdfetex && ls -l texk/web2c/pdfetex
-	test -f texk/web2c/pdfxtex && ls -l texk/web2c/pdfxtex
 
 $(NCURSESDIR)/lib/libncurses.a:
 	cd $(NCURSESDIR); $(MAKE)

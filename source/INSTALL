@@ -1,8 +1,8 @@
 pdfTeX
 ======
 
-INSTALL for pdfTeX 1.20b
-========================
+INSTALL for pdfTeX 1.30.0
+=========================
 
 This distribution is a stripped-down version of the TeXlive distribution.
 All source code is in the directory src; the script Build will generate and

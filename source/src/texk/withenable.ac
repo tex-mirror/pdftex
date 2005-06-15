@@ -28,10 +28,6 @@ AC_ARG_WITH(makeindexk,
 	[  --without-makeindexk       do not build the makeindexk package])
 AC_ARG_WITH(musixflx,
 	[  --without-musixflx         do not build the musixflx package])
-AC_ARG_WITH(odvipsk,
-	[  --without-odvipsk          do not build the odvipsk package])
-AC_ARG_WITH(oxdvik,
-	[  --without-oxdvik           do not build the oxdvik package])
 AC_ARG_WITH(ps2pkm,
 	[  --without-ps2pkm           do not build the ps2pkm package])
 AC_ARG_WITH(seetexk,

@@ -59,6 +59,12 @@
 @z
 
 @x (MLTeX)
+      begin i := char_tag(char_info(f)(c));
+@y
+      begin i := char_tag(orig_char_info(f)(c));
+@z
+
+@x (MLTeX)
 @d is_valid_char(#)==((font_bc[f] <= #) and (# <= font_ec[f]) and 
                       char_exists(char_info(f)(#)))
 @y
@@ -203,47 +209,6 @@ found: @<Print character substition tracing log@>;
          goto common_ending;
        end
     end
-@z
-
-
-@x [50.1302] l.23694 - Dump |pdf_output| to fmt file
-@<Dump constants for consistency check@>;
-@y
-@<Dump constants for consistency check@>;
-dump_int(pdf_output);
-dump_int(pdf_compress_level);
-dump_int(pdf_decimal_digits);
-dump_int(pdf_move_chars);
-dump_int(pdf_image_resolution);
-dump_int(pdf_pk_resolution);
-dump_int(pdf_unique_resname);
-dump_int(pdf_option_pdf_minor_version);
-dump_int(pdf_option_always_use_pdfpagebox);
-dump_int(pdf_option_pdf_inclusion_errorlevel);
-dump_int(pdf_h_origin);
-dump_int(pdf_v_origin);
-dump_int(pdf_page_width);
-dump_int(pdf_page_height);
-@z
-
-@x
-begin @<Undump constants for consistency check@>;
-@y
-begin @<Undump constants for consistency check@>;
-undump_int(pdf_output);   {undump |pdf_output| mode flag}
-undump_int(pdf_compress_level);
-undump_int(pdf_decimal_digits);
-undump_int(pdf_move_chars);
-undump_int(pdf_image_resolution);
-undump_int(pdf_pk_resolution);
-undump_int(pdf_unique_resname);
-undump_int(pdf_option_pdf_minor_version);
-undump_int(pdf_option_always_use_pdfpagebox);
-undump_int(pdf_option_pdf_inclusion_errorlevel);
-undump_int(pdf_h_origin);
-undump_int(pdf_v_origin);
-undump_int(pdf_page_width);
-undump_int(pdf_page_height);
 @z
 
 @x (WEB2C!)

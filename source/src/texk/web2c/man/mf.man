@@ -1,11 +1,12 @@
+.\" t
 .TH MF 1 "10 November 2001" "Web2C @VERSION@"
 .\"=====================================================================
 .if n .ds MF Metafont
 .if t .ds MF M\s-2ETAFONT\s0
 .if t .ds TX \fRT\\h'-0.1667m'\\v'0.20v'E\\v'-0.20v'\\h'-0.125m'X\fP
 .if n .ds TX TeX
-.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
-.el .ds OX TeX\" for nroff
+.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP for troff
+.el .ds OX TeX for nroff
 .\" the same but obliqued
 .\" BX definition must follow TX so BX can use TX
 .if t .ds BX \fRB\s-2IB\s0\fP\*(TX
@@ -137,166 +138,19 @@ A listing of
 .I gf
 numbers for 118-dpi, 240-dpi and 300-dpi fonts
 is shown below.
-.ds f. mf.tbl \" tbl output inserted here
-.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
-.de 35
-.ps \n(.s
-.vs \n(.vu
-.in \n(.iu
-.if \n(.u .fi
-.if \n(.j .ad
-.if \n(.j=0 .na
-..
-.nf
-.nr #~ 0
-.if n .nr #~ 0.6n
-.ds #d .d
-.if \(ts\n(.z\(ts\(ts .ds #d nl
-.fc
-.nr 33 \n(.s
-.rm 80 81 82 83
-.nr 80 0
-.nr 38 \w\s-2MAGSTEP\s0
-.if \n(80<\n(38 .nr 80 \n(38
-.nr 38 \wmag=magstep(0)
-.if \n(80<\n(38 .nr 80 \n(38
-.nr 38 \wmag=magstep(0.5)
-.if \n(80<\n(38 .nr 80 \n(38
-.nr 38 \wmag=magstep(1)
-.if \n(80<\n(38 .nr 80 \n(38
-.nr 38 \wmag=magstep(2)
-.if \n(80<\n(38 .nr 80 \n(38
-.nr 38 \wmag=magstep(3)
-.if \n(80<\n(38 .nr 80 \n(38
-.nr 38 \wmag=magstep(4)
-.if \n(80<\n(38 .nr 80 \n(38
-.nr 38 \wmag=magstep(5)
-.if \n(80<\n(38 .nr 80 \n(38
-.80
-.rm 80
-.nr 81 0
-.nr 38 \w118 dpi
-.if \n(81<\n(38 .nr 81 \n(38
-.nr 38 \w118
-.if \n(81<\n(38 .nr 81 \n(38
-.nr 38 \w129
-.if \n(81<\n(38 .nr 81 \n(38
-.nr 38 \w142
-.if \n(81<\n(38 .nr 81 \n(38
-.nr 38 \w170
-.if \n(81<\n(38 .nr 81 \n(38
-.nr 38 \w204
-.if \n(81<\n(38 .nr 81 \n(38
-.nr 38 \w245
-.if \n(81<\n(38 .nr 81 \n(38
-.nr 38 \w294
-.if \n(81<\n(38 .nr 81 \n(38
-.81
-.rm 81
-.nr 82 0
-.nr 38 \w240 dpi
-.if \n(82<\n(38 .nr 82 \n(38
-.nr 38 \w240
-.if \n(82<\n(38 .nr 82 \n(38
-.nr 38 \w263
-.if \n(82<\n(38 .nr 82 \n(38
-.nr 38 \w288
-.if \n(82<\n(38 .nr 82 \n(38
-.nr 38 \w346
-.if \n(82<\n(38 .nr 82 \n(38
-.nr 38 \w415
-.if \n(82<\n(38 .nr 82 \n(38
-.nr 38 \w498
-.if \n(82<\n(38 .nr 82 \n(38
-.nr 38 \w597
-.if \n(82<\n(38 .nr 82 \n(38
-.82
-.rm 82
-.nr 83 0
-.nr 38 \w300 dpi
-.if \n(83<\n(38 .nr 83 \n(38
-.nr 38 \w300
-.if \n(83<\n(38 .nr 83 \n(38
-.nr 38 \w329
-.if \n(83<\n(38 .nr 83 \n(38
-.nr 38 \w360
-.if \n(83<\n(38 .nr 83 \n(38
-.nr 38 \w432
-.if \n(83<\n(38 .nr 83 \n(38
-.nr 38 \w518
-.if \n(83<\n(38 .nr 83 \n(38
-.nr 38 \w622
-.if \n(83<\n(38 .nr 83 \n(38
-.nr 38 \w746
-.if \n(83<\n(38 .nr 83 \n(38
-.83
-.rm 83
-.nr 38 1n
-.nr 79 0
-.nr 40 \n(79+(0*\n(38)
-.nr 80 +\n(40
-.nr 41 \n(80+(3*\n(38)
-.nr 81 +\n(41
-.nr 42 \n(81+(3*\n(38)
-.nr 82 +\n(42
-.nr 43 \n(82+(3*\n(38)
-.nr 83 +\n(43
-.nr TW \n(83
-.if t .if \n(TW>\n(.li .tm Table at line 13 file mf.tbl is too wide - \n(TW units
-.nr #I \n(.i
-.in +(\n(.lu-\n(TWu-\n(.iu)/2u
-.fc  
-.nr #T 0-1
-.nr #a 0-1
-.eo
-.de T#
-.ds #d .d
-.if \(ts\n(.z\(ts\(ts .ds #d nl
-.mk ##
-.nr ## -1v
-.ls 1
-.ls
-..
-.ec
-.ta \n(80u \n(81u \n(82u \n(83u
-.nr 31 \n(.f
-.nr 35 1m
-\&\h'|\n(40u'\s-2MAGSTEP\s0\h'|\n(41u'118 dpi\h'|\n(42u'240 dpi\h'|\n(43u'300 dpi
-.ta \n(80u \n(81u \n(82u \n(83u
-.nr 31 \n(.f
-.nr 35 1m
-\&\h'|\n(40u'mag=magstep(0)\h'|\n(41u'118\h'|\n(42u'240\h'|\n(43u'300
-.ta \n(80u \n(81u \n(82u \n(83u
-.nr 31 \n(.f
-.nr 35 1m
-\&\h'|\n(40u'mag=magstep(0.5)\h'|\n(41u'129\h'|\n(42u'263\h'|\n(43u'329
-.ta \n(80u \n(81u \n(82u \n(83u
-.nr 31 \n(.f
-.nr 35 1m
-\&\h'|\n(40u'mag=magstep(1)\h'|\n(41u'142\h'|\n(42u'288\h'|\n(43u'360
-.ta \n(80u \n(81u \n(82u \n(83u
-.nr 31 \n(.f
-.nr 35 1m
-\&\h'|\n(40u'mag=magstep(2)\h'|\n(41u'170\h'|\n(42u'346\h'|\n(43u'432
-.ta \n(80u \n(81u \n(82u \n(83u
-.nr 31 \n(.f
-.nr 35 1m
-\&\h'|\n(40u'mag=magstep(3)\h'|\n(41u'204\h'|\n(42u'415\h'|\n(43u'518
-.ta \n(80u \n(81u \n(82u \n(83u
-.nr 31 \n(.f
-.nr 35 1m
-\&\h'|\n(40u'mag=magstep(4)\h'|\n(41u'245\h'|\n(42u'498\h'|\n(43u'622
-.ta \n(80u \n(81u \n(82u \n(83u
-.nr 31 \n(.f
-.nr 35 1m
-\&\h'|\n(40u'mag=magstep(5)\h'|\n(41u'294\h'|\n(42u'597\h'|\n(43u'746
-.fc
-.nr T. 1
-.T# 1
-.in \n(#Iu
-.35
-.if \n-(b.=0 .nr c. \n(.c-\n(d.-12
-.\" end of tbl output.
+.TS
+tab(:);
+c c c c
+l l l l.
+MAGSTEP:118 dpi:240 dpi:300 dpi
+mag=magstep(0):118:240:300
+mag=magstep(0.5):129:263:329
+mag=magstep(1):142:288:360
+mag=magstep(2):170:346:432
+mag=magstep(3):204:415:518
+mag=magstep(4):245:498:622
+mag=magstep(5):294:597:746
+.TE
 .PP
 Magnification can also be specified not as a magstep but as an
 arbitrary value, such as 1.315, to create special character sizes.

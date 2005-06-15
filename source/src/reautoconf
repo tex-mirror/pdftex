@@ -87,8 +87,6 @@ dir=texk/makeindexk
 (test -d $dir || exit; cd $dir; echo $dir; autoconf -m ../etc/autoconf)
 dir=texk/musixflx
 (test -d $dir || exit; cd $dir; echo $dir; autoconf -m ../etc/autoconf)
-dir=texk/odvipsk
-(test -d $dir || exit; cd $dir; echo $dir; autoconf -m ../etc/autoconf)
 dir=texk/owindvi
 (test -d $dir || exit; cd $dir; echo $dir; autoconf -m ../etc/autoconf)
 dir=texk/ps2pkm

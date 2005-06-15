@@ -7,7 +7,7 @@
 # te@dbs.uni-hannover.de, kb@mail.tug.org, and infovore@xs4all.nl.
 # Public domain.
 
-version='$Id: mktexpk,v 1.32 2004/12/19 12:47:02 olaf Exp $'
+version='$Id: mktexpk,v 1.33 2005/01/07 09:43:08 olaf Exp $'
 progname=`echo $0 | sed 's%.*/%%'`
 usage="Usage: $progname [OPTIONS] NAME [REDIRECT],
   Create a PK font.

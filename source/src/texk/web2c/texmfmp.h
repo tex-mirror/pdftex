@@ -31,9 +31,6 @@
 #if defined (pdfeTeX)
 #define TEXMFPOOLNAME "pdfetex.pool"
 #define TEXMFENGINENAME "pdfetex"
-#elif defined (pdfxTeX)
-#define TEXMFPOOLNAME "pdfxtex.pool"
-#define TEXMFENGINENAME "pdfxtex"
 #elif defined (pdfTeX)
 #define TEXMFPOOLNAME "pdftex.pool"
 #define TEXMFENGINENAME "pdftex"
@@ -119,6 +116,10 @@ extern string translate_filename;
 #endif
 typedef GLUERATIO_TYPE glueratio;
 
+#if defined(__DJGPP__) && defined (IPC)
+#undef IPC
+#endif
+
 #ifdef IPC
 extern void ipcpage P1H(int);
 #endif /* IPC */
@@ -150,6 +151,9 @@ extern boolean input_line P1H(FILE *);
 /* This routine has to return four values.  */
 #define	dateandtime(i,j,k,l) get_date_and_time (&(i), &(j), &(k), &(l))
 extern void get_date_and_time P4H(integer *, integer *, integer *, integer *);
+
+#define	secondsandmicros(i,j) get_seconds_and_micros (&(i), &(j))
+extern void get_seconds_and_micros P2H(integer *, integer *);
 
 /* This routine has to return a scaled value. */
 extern integer getrandomseed P1H(void);

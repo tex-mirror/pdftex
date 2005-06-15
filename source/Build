@@ -48,7 +48,7 @@ cd build
 (cd texk/web2c/web2c; $MAKE) || exit 1
 (cd texk/web2c; $MAKE ../kpathsea/libkpathsea.la) || exit 1
 (cd texk/web2c/lib; $MAKE) || exit 1
-(cd texk/web2c; $MAKE pdftex pdfetex pdfxtex) || exit 1
+(cd texk/web2c; $MAKE pdftex pdfetex) || exit 1
 # strip them
 $STRIP texk/web2c/pdf*tex
 # go back

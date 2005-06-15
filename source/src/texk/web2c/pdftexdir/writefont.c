@@ -88,30 +88,6 @@ static void getbbox(void)
         dividescaled(getcharheight(tex_font, 'H'), pdffontsize[tex_font], 3);
 }
 
-/*
- * update glyph names of an encoding (either external or internal) 
- * when fontec[f] < 128 
- */
-void update_enc(internalfontnumber f, char **glyph_names)
-{
-    int i;
-    fm_entry *fm = (fm_entry *) pdffontmap[f];
-    if (fontec[f] > 127 || (hasfmentry(f) &&
-         (is_reencoded(fm) && (fm->encoding)->updated)))
-        return;
-    for (i = fontbc[f]; i <= 32; i++)
-        if (pdfcharmap[f][i] != i) {
-            if (glyph_names[i + MOVE_CHARS_OFFSET] != notdef)
-                xfree(glyph_names[i + MOVE_CHARS_OFFSET]);
-            if (glyph_names[i] != notdef)
-                glyph_names[i + MOVE_CHARS_OFFSET] = xstrdup(glyph_names[i]);
-            else
-                glyph_names[i + MOVE_CHARS_OFFSET] = (char*) notdef;
-        }
-    if (is_reencoded(fm))
-        (fm->encoding)->updated = true;
-}
-
 static void get_char_widths(void)
 {
     int i;
@@ -142,10 +118,6 @@ static void get_char_widths(void)
                                           pdffontsize[tex_font], 3);
         else
             char_widths[i] = 0;
-    if (is_reencoded(fm_cur) && pdfmovechars > 0) {
-        read_enc(fm_cur->encoding);
-        update_enc(f, (fm_cur->encoding)->glyph_names);
-    }
 }
 
 static void write_char_widths(void)
@@ -188,7 +160,7 @@ static void write_fontobj(integer font_objnum)
         pdfprint(pdffontattr[tex_font]);
         pdf_puts("\n");
     }
-    if (is_basefont(fm_cur) && !is_included(fm_cur)) {
+    if (no_font_desc(fm_cur)) {
         pdf_printf("/BaseFont /%s\n", fm_cur->ps_name);
         pdfenddict();
         return;
@@ -324,7 +296,7 @@ void dopdffont(integer font_objnum, internalfontnumber f)
     }
     if (!write_fontfile_only)
         write_fontobj(font_objnum);
-    if (is_basefont(fm_cur) && !is_included(fm_cur))
+    if (no_font_desc(fm_cur))
         return;
     if (!write_fontfile_only) {
         write_fontdescriptor();

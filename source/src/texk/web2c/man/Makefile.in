@@ -54,7 +54,6 @@ manfiles=		\
 	patgen.1	\
 	pdfetex.1	\
 	pdftex.1	\
-	pdfxtex.1	\
 	pktogf.1	\
 	pktype.1	\
 	pltotf.1	\

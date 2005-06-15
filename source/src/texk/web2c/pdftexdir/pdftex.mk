@@ -10,7 +10,7 @@
 
 Makefile: pdftexdir/pdftex.mk
 
-pdftex_bin = pdftex pdfetex pdfxtex ttf2afm pdftosrc
+pdftex_bin = pdftex pdfetex ttf1afm pdftosrc
 linux_build_dir = $(HOME)/pdftex/build/linux/texk/web2c
 
 # We build pdftex
@@ -50,7 +50,8 @@ pdftex_web_srcs = $(srcdir)/tex.web \
   $(srcdir)/pdftexdir/pdftex.ch \
   $(srcdir)/pdftexdir/hz.ch  \
   $(srcdir)/pdftexdir/misc.ch \
-  $(srcdir)/pdftexdir/vadjust.ch
+  $(srcdir)/pdftexdir/vadjust.ch \
+  $(srcdir)/pdftexdir/pdftex2.ch
 #   Sources for etex.ch:
 pdftex_ch_srcs = pdftex.web \
   $(srcdir)/pdftexdir/tex.ch0 \

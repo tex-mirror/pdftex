@@ -717,6 +717,16 @@ other cases the working directory is used.
      `USE_VARTEXFONTS' environment variable: if set to `1', the feature
      is enabled, and if set to `0', the feature is disabled.
 
+`texmfvar'
+     Force generated files that would go into a system tree (as defined
+     by SYSTEXMF) into TEXMFVAR. Starting with teTeX-3.0, the variable
+     TEXMFVAR is always set.  The varfonts feature takes precedence if
+     also set.
+
+     A user can override this setting in either direction by setting
+     USE_TEXMFVAR to 1 or 0.
+
+
 `mktex' script names
 ....................
 

@@ -80,6 +80,14 @@ texmf.sed: Makefile
 	echo '/^[% ]*TEXMFLOCAL[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 	echo '/^[% ]*TEXMFDIST[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 	echo '/^[% ]*VARTEXMF[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFSYSVAR[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFSYSCONFIG[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFSYSVAR[ =]/s%$(texmf)MAIN%\$$TEXMFMAIN%' >>$@
+	echo '/^[% ]*TEXMFSYSCONFIG[ =]/s%$(texmf)MAIN%\$$TEXMFMAIN%' >>$@
+	echo '/^[% ]*TEXMFVAR[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFCONFIG[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFVAR[ =]/s%$(texmf)MAIN%\$$TEXMFMAIN%' >>$@
+	echo '/^[% ]*TEXMFCONFIG[ =]/s%$(texmf)MAIN%\$$TEXMFMAIN%' >>$@
 	echo '/^[% ]*TEXMFCNF[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 # And fill in the last clause of TEXMFCNF with an absolute path.
 	echo '/^ *TEXMFCNF[ =]/s%@web2c@%$(web2cdir)%' >>$@
@@ -200,13 +208,18 @@ install-data: texmf.cnf kpathsea.info install-man
 	for f in $(install_headers); do \
 	  $(INSTALL_DATA) $$f $(includedir)/kpathsea/; done
 	rm -f $(includedir)/kpathsea/acconfig.h
-	$(POSTINSTALL)
+	$(POST_INSTALL)
 	test -r $(infodir)/dir || $(INSTALL_DATA) $(top_srcdir)/../dir $(infodir)
 	if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
 	  install-info --info-dir=$(infodir) $(infodir)/kpathsea.info; \
 	else true; fi
 
 uninstall-data:
+	$(PRE_UNINSTALL)
+	if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
+	  install-info --delete --info-dir=$(infodir) $(infodir)/kpathsea.info; \
+	else true; fi
+	$(NORMAL_UNINSTALL)
 	rm -f $(infodir)/kpathsea.i*
 #	for f in $(install_headers); do rm -f $(includedir)/`basename $$f`; done
 

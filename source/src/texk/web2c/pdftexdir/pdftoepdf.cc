@@ -389,7 +389,7 @@ static void copyProcSet(Object *obj)
 
 static void copyFont(char *tag, Object *fontRef)
 {
-    PdfObject fontdict, subtype, basefont, fontdescRef, fontdesc, charset;
+    PdfObject fontdict, subtype, basefont, fontdescRef, fontdesc, charset, fontfile;
     GfxFont *gfont;
     fm_entry *fontmap;
     // Check whether the font has already been embedded before analysing it.
@@ -402,45 +402,43 @@ static void copyFont(char *tag, Object *fontRef)
             return;
         }
     }
-    fontRef->fetch(xref, &fontdict);
-    if (!fontdict->isDict())
-        pdftex_fail("pdf inclusion: invalid font dict type <%s>", 
-                    fontdict->getTypeName());
-    fontdict->dictLookup("Subtype", &subtype);
-    if (!subtype->isName())
-        pdftex_fail("pdf inclusion: invalid font Subtype entry type <%s>", 
-                    subtype->getTypeName());
-    /* only handle Type1 fonts; others will be copied */
-    if (strcmp(subtype->getName(), "Type1") != 0 ) {
-        copyName(tag);
-        pdf_puts(" ");
-        copyObject(fontRef);
-        return;
-    }
-    fontdict->dictLookup("BaseFont", &basefont);
-    if (!basefont->isName())
-        pdftex_fail("pdf inclusion: invalid font BaseFont entry type <%s>", 
-                    basefont->getTypeName());
-    fontmap = lookup_fontmap(basefont->getName());
-    if (fontmap != NULL && is_type1(fontmap) &&
-        fontdict->dictLookupNF("FontDescriptor", &fontdescRef) && 
-        fontdescRef->isRef() && fontdescRef->fetch(xref, &fontdesc) &&
-        fontdesc->isDict()) {
-        if (fontdesc->dictLookup("CharSet", &charset) && 
-                charset->isString() && is_subsetable(fontmap))
-            mark_glyphs(fontmap, charset->getString()->getCString());
-        else
-            embed_whole_font(fontmap);
-        addFontDesc(fontdescRef->getRef(), fontmap);
+    /* only handle included Type1 fonts; anything else will be copied */
+    if (fontRef->fetch(xref, &fontdict) &&
+        fontdict->isDict() &&
+        fontdict->dictLookup("Subtype", &subtype) &&
+        subtype->isName() &&
+        fontdict->dictLookup("BaseFont", &basefont) &&
+        basefont->isName() &&
+        fontdict->dictLookupNF("FontDescriptor", &fontdescRef) &&
+        fontdescRef->isRef() &&
+        fontdescRef->fetch(xref, &fontdesc) &&
+        fontdesc->isDict() &&
+        fontdesc->dictLookupNF("FontDescriptor", &fontdescRef) &&
+        ((strcmp(subtype->getName(), "Type1") == 0 && 
+          fontdesc->dictLookup("FontFile", &fontfile)) ||
+         (strcmp(subtype->getName(), "Type1C") == 0 && 
+          fontdesc->dictLookup("FontFile3", &fontfile))) &&
+        fontfile->isStream()
+       ) {
+            fontmap = lookup_fontmap(basefont->getName());
+            if (fontmap != NULL) {
+                if (fontdesc->dictLookup("CharSet", &charset) && 
+                    charset->isString() && is_subsetable(fontmap))
+                    mark_glyphs(fontmap, charset->getString()->getCString());
+                else
+                    embed_whole_font(fontmap);
+                addFontDesc(fontdescRef->getRef(), fontmap);
+                copyName(tag);
+                gfont = GfxFont::makeFont(xref, tag, fontRef->getRef(), 
+                                          fontdict->getDict());
+                pdf_printf(" %d 0 R ", addFont(fontRef->getRef(), fontmap,
+                                               addEncoding(gfont)));
+                return;
+            }
     }
     copyName(tag);
-    if (fontdesc->isDict()) {
-        gfont = GfxFont::makeFont(xref, tag, fontRef->getRef(), fontdict->getDict());
-        pdf_printf(" %d 0 R ", addFont(fontRef->getRef(), fontmap, 
-                                       addEncoding(gfont)));
-    }
-    else
-        pdf_printf(" %d 0 R ", addOther(fontRef->getRef()));
+    pdf_puts(" ");
+    copyObject(fontRef);
 }
 
 static void copyFontResources(Object *obj)

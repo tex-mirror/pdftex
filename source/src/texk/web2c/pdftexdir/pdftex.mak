@@ -13,9 +13,9 @@
 
 Makefile: pdftexdir\pdftex.mk
 
-pdftex_bin = $(objdir)\pdftex.exe $(objdir)\pdfetex.exe $(objdir)\pdfxtex.exe $(objdir)\ttf2afm.exe $(objdir)\pdftosrc.exe
-# pdftex_exe = pdftex.exe pdfetex.exe pdfxtex.exe ttf2afm.exe pdftosrc.exe
-pdftex_pool = pdftex.pool pdfetex.pool pdfxtex.pool
+pdftex_bin = $(objdir)\pdftex.exe $(objdir)\pdfetex.exe $(objdir)\ttf2afm.exe $(objdir)\pdftosrc.exe
+# pdftex_exe = pdftex.exe pdfetex.exe ttf2afm.exe pdftosrc.exe
+pdftex_pool = pdftex.pool pdfetex.pool
 # linux_build_dir = $(HOME)\pdftex\build\linux\texk\web2c
 
 # We build pdftex

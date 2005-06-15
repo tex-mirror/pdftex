@@ -574,7 +574,7 @@ void read_font()
     if ((pd = name_lookup("PCLT")) != NULL) {
         ttf_seek_off("PCLT", pd->offset + TTF_FIXED_SIZE + TTF_ULONG_SIZE + TTF_USHORT_SIZE);
         XHeight = get_ushort();
-        if (XHeight > FontBBox3) {
+        if (XHeight > FontBBox4) {
             ttf_warn("XHeight is too big (%i)\n"
                      "This is likely a font bug, so I discarded this parameter.", 
                      (int)get_ttf_funit(XHeight));
@@ -582,7 +582,7 @@ void read_font()
         }
         ttf_skip(2*TTF_USHORT_SIZE);
         CapHeight = get_ushort();
-        if (CapHeight > FontBBox3) {
+        if (CapHeight > FontBBox4) {
             ttf_warn("CapHeight is too big (%i)\n"
                      "This is likely a font bug, so I discarded this parameter.", 
                      (int)get_ttf_funit(CapHeight));

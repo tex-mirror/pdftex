@@ -3,6 +3,44 @@ AC_INIT(texk/make/common.mk)
 AC_CONFIG_AUX_DIR(config)
 AC_SET_MAKE
 AC_PROG_CC
+AC_PROG_CXX
+
+AC_PROG_LEX
+case $LEX in
+  lex)
+    OLDIFS=$IFS; IFS=:
+    foundLEX=false
+    for p in $PATH; do
+      if test -f "$p/lex"; then
+        foundLEX=true
+        break
+      fi
+    done
+    IFS=$OLDIFS
+  ;;
+esac
+if $foundLEX; then :; else
+  AC_MSG_ERROR(no working lexical scanner (lex/flex) found)
+fi
+
+AC_PROG_YACC
+case $YACC in
+  yacc)
+    OLDIFS=$IFS; IFS=:
+    foundYACC=false
+    for p in $PATH; do
+      if test -f "$p/yacc"; then
+        foundYACC=true
+        break
+      fi
+    done
+    IFS=$OLDIFS
+  ;;
+esac
+if $foundYACC; then :; else
+  AC_MSG_ERROR(no working parser generator (yacc/bison) found)
+fi
+
 AC_CANONICAL_SYSTEM
 
 dnl Various compiler directives
@@ -49,12 +87,10 @@ sinclude(xdvik.ac)
 sinclude(withenable.ac)
 sinclude(utils/dialog/withenable.ac)
 sinclude(texk/withenable.ac)
+sinclude(texk/kpathsea/xt.ac)
 sinclude(texk/kpathsea/withenable.ac)
-dnl xdvik's xt.ac has much more to offer
-dnl sinclude(texk/kpathsea/xt.ac)
 sinclude(texk/web2c/withenable.ac)
 sinclude(texk/xdvik/withenable.ac)
-sinclude(texk/xdvik/xt.ac)
 sinclude(libs/ncurses/withenable.ac)
 sinclude(libs/libpng/withenable.ac)
 sinclude(libs/t1lib/withenable.ac)
@@ -88,30 +124,27 @@ test "$with_dialog"  != no    && : ${needs_ncurses=yes}
 : ${needs_ncurses=no}
 export needs_ncurses
 
-# we need pnglib for dvipng, pdf[ex]tex
+# we need pnglib for dvipng, pdftex
 test ! -d $srcdir/$LIBPNGDIR  && : ${needs_pnglib=no}
 test "$with_dvipng"  != no    && : ${needs_pnglib=yes}
 test "$with_pdftex"  != no    && : ${needs_pnglib=yes}
 test "$with_pdfetex" != no    && : ${needs_pnglib=yes}
-test "$with_pdfxtex" != no    && : ${needs_pnglib=yes}
 : ${needs_pnglib=no}
 export needs_pnglib
 
-# we need zlib for dvipng, texinfo, pdf[ex]tex
+# we need zlib for dvipng, texinfo, pdftex
 test ! -d $srcdir/$ZLIBDIR    && : ${needs_zlib=no}
 test "$with_dvipng"  != no    && : ${needs_zlib=yes}
 test "$with_pdftex"  != no    && : ${needs_zlib=yes}
 test "$with_pdfetex" != no    && : ${needs_zlib=yes}
-test "$with_pdfxtex" != no    && : ${needs_zlib=yes}
 test "$with_texinfo" != no    && : ${needs_zlib=yes}
 : ${needs_zlib=no}
 export needs_zlib
 
-# we need libxpdf for pdf[ex]tex
+# we need libxpdf for pdftex
 test ! -d $srcdir/$LIBXPDFDIR && : ${needs_libxpdf=no}
 test "$with_pdftex"  != no    && : ${needs_libxpdf=yes}
 test "$with_pdfetex"  != no    && : ${needs_libxpdf=yes}
-test "$with_pdfxtex"  != no    && : ${needs_libxpdf=yes}
 : ${needs_libxpdf=no}
 export needs_libxpdf
 
@@ -148,11 +181,11 @@ test "$needs_zlib" = yes && test "$using_system_zlib" != yes \
   && LIBSDIRS="$ZLIBDIR $LIBSDIRS"
 test "$needs_libxpdf" = yes \
   && LIBSDIRS="$LIBXPDFDIR $LIBSDIRS"
-test "$needs_libt1" = yes \
+test "$needs_libt1" = yes && test "$using_system_t1lib" != yes \
   && LIBSDIRS="$LIBT1DIR $LIBTYPE1DIR $LIBSDIRS"
-test "$needs_gd" = yes \
+test "$needs_gd" = yes && test "$using_system_gd" != yes \
   && LIBSDIRS="$GDDIR $LIBSDIRS"
-test "$needs_freetype" = yes \
+test "$needs_freetype" = yes && test "$using_system_freetype" != yes \
   && LIBSDIRS="$FREETYPEDIR $LIBSDIRS"
 
 PKGS='texinfo dialog t1utils lcdf-typetools psutils texi2html'
@@ -171,7 +204,7 @@ AC_SUBST(LIBSDEP)
 AC_SUBST(LIBSDIRS)
 
 # initialize texmf tree with fmtutil only for teTeX and TeX Live
-if test ! -d $srcdir/texk/tetex || test -n "$xdvik_standalone"; then
+if test ! -d $srcdir/texk/tetex || test -n "$xdvik_standalone" || test "x$cross_compiling" = xyes; then
   FMU=
 else
   FMU='# '

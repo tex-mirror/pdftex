@@ -13,7 +13,7 @@
 # <te@dbs.uni-hannover.de>, Okt., 1994.
 # Public domain.
 
-version='$Id: mktexlsr,v 1.42 2004/12/19 12:45:00 olaf Exp $'
+version='$Id: mktexlsr,v 1.45 2005/01/21 19:13:57 olaf Exp $'
 progname=`echo $0 | sed 's%.*/%%'`
 usage="Usage: $progname [DIRS ...]
 
@@ -66,9 +66,16 @@ old_ls_R_magic='% ls-R -- maintained by MakeTeXls-R; do not change this line.'
 
 trap 'cd / ; test -z "$db_dir_tmp" || rm -rf "$db_dir_tmp"; exit' 0 1 2 3 7 13 15
 
+# Get list of directories from $TEXMFDBS; eliminate duplicates.
 test $# = 0 && {
-  OIFS=$IFS; IFS=$SEP; set x `kpsewhich --show-path=ls-R 2>/dev/null`; shift; IFS=$OIFS
+  OIFS=$IFS
+  IFS='
+'
+  set x `kpsewhich --show-path=ls-R | tr : '
+' | sort | uniq`; shift
+  IFS=$OIFS
 }
+
 for TEXMFLS_R in "$@"; do
   # Prepend cwd if the directory was relative.
   case "$TEXMFLS_R" in

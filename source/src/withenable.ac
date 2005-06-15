@@ -12,3 +12,9 @@ AC_ARG_WITH(lcdf-typetools,
 
 AC_ARG_WITH(psutils,
         [  --without-psutils       do not build the psutils package])
+
+AC_ARG_WITH(texi2html,
+        [  --without-texi2html       do not build the texi2html package])
+
+AC_ARG_ENABLE(multiplatform,
+	[  --enable-multiplatform     put executables in bin/PLATFORM])

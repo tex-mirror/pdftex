@@ -134,91 +134,12 @@ enc_entry *add_enc(char *s)
     } else
 	enc_ptr->name = NULL;
     enc_ptr->loaded = false;
-    enc_ptr->updated = false;
-    enc_ptr->firstfont = getnullfont();
     enc_ptr->objnum = 0;
     enc_ptr->glyph_names = xtalloc(MAX_CHAR_CODE + 1, char *);
     for (i = 0; i <= MAX_CHAR_CODE; i++)
 	enc_ptr->glyph_names[i] = (char *) notdef;
 
     return enc_ptr;
-}
-
-/**********************************************************************/
-
-/* get encoding for map entry fm. When encoding vector is not given, try to
- * get it from T1 font file, in this case t1_read_enc sets the font being
- * reencoded, so next calls for the same entry doesn't cause reading the font
- * again
- */
-boolean get_enc(fm_entry *fm)
-{
-    int i;
-    char **glyph_names;
-    if (is_reencoded(fm)) { /* external encoding vector available */
-        read_enc(fm->encoding);
-        return true;
-    }
-    if (!is_t1fontfile(fm)) /* get built-in encoding for T1 fonts only */
-        return false;
-    if (t1_read_enc(fm)) { /* encoding read into t1_builtin_glyph_names */
-        fm->encoding = add_enc(NULL);
-        glyph_names = (fm->encoding)->glyph_names;
-        for (i = 0; i <= MAX_CHAR_CODE; i++)
-            glyph_names[i] = t1_builtin_glyph_names[i];
-        (fm->encoding)->loaded = true;
-        return true;
-    }
-    return false;
-}
-
-/* check whether an encoding contains indexed glyph in form "/index123" */
-/* boolean indexed_enc(fm_entry *fm) */
-/* { */
-/*     char **s = enc_array[fm->encoding].glyph_names; */
-/*     int i, n; */
-/*     for (i = 0; i <= MAX_CHAR_CODE; i++, s++) */
-/*         if (*s != NULL && *s != notdef &&  */
-/*             sscanf(*s,  INDEXED_GLYPH_PREFIX "%i", &n) == 1) */
-/*                 return true; */
-/*     return false; */
-/* } */
-
-void setcharmap(internalfontnumber f)
-{
-    fm_entry *fm;
-    enc_entry *e;
-    char **glyph_names;
-    int i, k;
-    if (pdfmovechars == 0 || fontbc[f] > 32 || !hasfmentry(f))
-        return;
-    if (fontec[f] < 128) {
-        for (i = fontbc[f]; i <= 32; i++)
-            pdfcharmap[f][i] = i + MOVE_CHARS_OFFSET;
-        return;
-    }
-    fm = (fm_entry *) pdffontmap[f];
-    if (pdfmovechars == 1 || !get_enc(fm))
-        return;
-    e = fm->encoding;
-    if (e->firstfont != getnullfont()) {
-        for (i = fontbc[f]; i <= 32; i++)
-            pdfcharmap[f][i] = pdfcharmap[e->firstfont][i];
-        return;
-    }
-    e->firstfont = f;
-    glyph_names = e->glyph_names;
-    for (i = 32, k = MAX_CHAR_CODE; i >= fontbc[f] && k > 127; i--) {
-        if (glyph_names[i] == notdef)
-            continue;
-        while (glyph_names[k] != notdef && k > 127)
-            k--;
-        if (k < 128)
-            return;
-        glyph_names[k] = glyph_names[i];
-        glyph_names[i] = (char*) notdef;
-        pdfcharmap[f][i] = k;
-    }
 }
 
 /**********************************************************************/

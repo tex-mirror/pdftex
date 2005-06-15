@@ -15,9 +15,9 @@
 \pdfpkresolution                                        (integer)
 \pdfuniqueresname                                       (integer)
 \pdfprotrudechars                                       (integer)
-\pdfoptionpdfminorversion                               (integer)
-\pdfoptionalwaysusepdfpagebox                           (integer)
-\pdfoptionpdfinclusionerrorlevel                        (integer)
+\pdfminorversion                                        (integer)
+\pdfforcepagebox                                        (integer)
+\pdfinclusionerrorlevel                                 (integer)
 
 %% dimen registers:
 \pdfhorigin                                             (dimen)

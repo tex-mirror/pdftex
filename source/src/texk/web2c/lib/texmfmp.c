@@ -44,8 +44,6 @@
 #include <pdftexdir/pdftexextra.h>
 #elif defined (pdfeTeX)
 #include <pdfetexdir/pdfetexextra.h>
-#elif defined (pdfxTeX)
-#include <pdfxtexdir/pdfxtexextra.h>
 #elif defined (Omega)
 #include <omegadir/omegaextra.h>
 #elif defined (eOmega)
@@ -150,7 +148,7 @@ static string get_input_file_name P1H(void);
 static int eightbitp;
 #endif /* Omega || eOmega || Aleph */
 
-#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+#if defined(pdfTeX) || defined(pdfeTeX)
 char *ptexbanner;
 #endif
 
@@ -174,7 +172,7 @@ maininit P2C(int, ac, string *, av)
   /* Must be initialized before options are parsed.  */
   interactionoption = 4;
 
-#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+#if defined(pdfTeX) || defined(pdfeTeX)
   ptexbanner = BANNER;
 #endif
 
@@ -394,6 +392,10 @@ topenin P1H(void)
 /* IPC for TeX.  By Tom Rokicki for the NeXT; it makes TeX ship out the
    DVI file in a pipe to TeXView so that the output can be displayed
    incrementally.  Shamim Mohamed adapted it for Web2c.  */
+#if defined(__DJGPP__) && defined (IPC)
+#undef IPC
+#endif
+
 #if defined (TeX) && defined (IPC)
 
 #include <sys/socket.h>
@@ -777,9 +779,9 @@ static struct option long_options[]
 #endif /* !Omega && !eOmega && !Aleph */
       { "output-comment",            1, 0, 0 },
       { "output-directory",          1, 0, 0 },
-#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+#if defined(pdfTeX) || defined(pdfeTeX)
       { "output-format",             1, 0, 0 },
-#endif /* pdfTeX or pdfeTeX or pdfxTeX */
+#endif /* pdfTeX or pdfeTeX */
       { "shell-escape",              0, &shellenabledp, 1 },
       { "no-shell-escape",           0, &shellenabledp, -1 },
       { "debug-format",              0, &debugformatfile, 1 },
@@ -893,7 +895,7 @@ parse_options P2C(int, argc,  string *, argv)
           parse_src_specials_option(optarg);
        }
 #endif /* TeX */
-#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+#if defined(pdfTeX) || defined(pdfeTeX)
     } else if (ARGUMENT_IS ("output-format")) {
        pdfoutputoption = 1;
        if (strcmp(optarg, "dvi") == 0) {
@@ -904,7 +906,7 @@ parse_options P2C(int, argc,  string *, argv)
          WARNING1 ("Ignoring unknown value `%s' for --output-format", optarg);
          pdfoutputoption = 0;
        }
-#endif /* pdfTeX || pdfeTeX || pdfxTeX */
+#endif /* pdfTeX || pdfeTeX */
 #if defined (TeX) || defined (MF) || defined (MP)
     } else if (ARGUMENT_IS ("translate-file")) {
       translate_filename = optarg;
@@ -1249,6 +1251,28 @@ get_date_and_time P4C(integer *, minutes,  integer *, day,
   }
 }
 
+
+void
+get_seconds_and_micros P2C(integer *, seconds,  integer *, micros)
+{
+#if defined (HAVE_GETTIMEOFDAY)
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  *seconds =tv.tv_sec;
+  *micros =tv.tv_usec;
+#elif defined (HAVE_FTIME)
+  struct timeb tb;
+  ftime(&tb);
+  *seconds =tb.time;
+  *micros =tb.millitm*1000;
+#else
+  time_t clock = time ((time_t*)NULL);
+  *seconds = clock;
+  *micros = 0;
+#endif
+}
+
+
 /*
   Generating a better seed numbers
   */
@@ -1575,7 +1599,7 @@ checkpoolpointer (poolpointer poolptr, size_t len)
   }
 }
 
-#if !defined(pdfTeX) && !defined(pdfeTeX) && !defined(pdfxTeX)
+#if !defined(pdfTeX) && !defined(pdfeTeX)
 static int
 maketexstring(const_string s)
 {

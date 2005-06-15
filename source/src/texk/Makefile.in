@@ -47,6 +47,9 @@ info dvi check depend::
 	  (cd $$d && $(MAKE) $(makeargs) $@) || exit 1; else true; fi; done
 
 distclean::
+	rm -rf conftest*
+
+distclean::
 	for d in $(all_dirs); do if test -f $$d/Makefile; then \
 	  (cd $$d && $(MAKE) $(makeargs) $@) || exit 1; else true; fi; done
 

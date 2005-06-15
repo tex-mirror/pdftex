@@ -13,10 +13,10 @@ dnl We default to yes if the sources are available.
 AC_ARG_WITH(omega,
 [  --without-omega            don't compile and install Omega])
 
-dnl Do we compile e-Omega?
+dnl Do we compile Aleph?
 dnl We default to yes if the sources are available.
-AC_ARG_WITH(eomega,
-[  --without-eomega            don't compile and install e-Omega])
+AC_ARG_WITH(aleph,
+[  --without-aleph            don't compile and install Aleph])
 
 dnl Do we compile pdfTeX?
 dnl We default to yes if the sources are available.
@@ -27,11 +27,6 @@ dnl Do we compile pdfeTeX?
 dnl We default to yes if the sources are available.
 AC_ARG_WITH(pdfetex,
 [  --without-pdfetex          don't compile and install pdfeTeX])
-
-dnl Do we compile pdfxTeX?
-dnl We default to yes if the sources are available.
-AC_ARG_WITH(pdfxtex,
-[  --without-pdfxtex          don't compile and install pdfxTeX])
 
 dnl Try to link C++ runtime statically?
 dnl Only important, if you want to create binaries which are slightly

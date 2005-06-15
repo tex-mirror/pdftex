@@ -43,6 +43,7 @@
 @define procedure calledit ();
 @define procedure clearterminal;
 @define procedure dateandtime ();
+@define procedure secondsandmicros ();
 @define procedure dumpcore;
 @define procedure dumphh ();
 @define procedure dumpint ();

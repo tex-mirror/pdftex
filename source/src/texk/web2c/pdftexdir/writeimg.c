@@ -248,8 +248,8 @@ static void checktypebyextension(integer img)
 }
 
 integer readimage(strnumber s, integer page_num, strnumber page_name, integer colorspace,
-                  integer pdfversion, integer pdfoptionalwaysusepdfpagebox,
-                  integer pdf_option_pdf_inclusion_errorlevel)
+                  integer pdfversion, integer pdfforcepagebox,
+                  integer pdfinclusionerrorlevel)
 {
     char *dest = NULL;
     integer img = new_image_entry();
@@ -284,10 +284,10 @@ integer readimage(strnumber s, integer page_num, strnumber page_name, integer co
     case IMAGE_TYPE_PDF:
         pdf_ptr(img) = xtalloc(1, pdf_image_struct);
         pdf_ptr(img)->page_box = pdflastpdfboxspec;
-        pdf_ptr(img)->always_use_pdfpagebox = pdfoptionalwaysusepdfpagebox;
+        pdf_ptr(img)->always_use_pdfpagebox = pdfforcepagebox;
         page_num = read_pdf_info(img_name(img), dest, page_num, 
-                                     pdfversion, pdfoptionalwaysusepdfpagebox,
-                                     pdf_option_pdf_inclusion_errorlevel);
+                                     pdfversion, pdfforcepagebox,
+                                     pdfinclusionerrorlevel);
         img_width(img) = bp2int(epdf_width);
         img_height(img) = bp2int(epdf_height);
         img_pages(img) = epdf_num_pages;

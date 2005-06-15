@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.defines#11 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#13 $
 }
 
 { pdftex.defines: additions for pdfTeX }
@@ -41,23 +41,25 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.defines#
 @define procedure pdfinitmapfile();
 
 { functions from utils.c }
-@define function getresnameprefix;
-@define procedure setjobid();
-@define procedure makepdftexbanner;
+@define function escapedstrlen;
 @define function extxnoverd();
+@define function getescapedchar();
+@define function getresnameprefix;
+@define function makecstring();
+@define procedure escapestr();
 @define procedure libpdffinish;
-@define procedure writestreamlength();
-@define procedure printID();
+@define procedure makepdftexbanner;
 @define procedure printcreationdate;
+@define procedure printID();
+@define procedure setjobid();
+@define procedure writestreamlength();
+
 
 { functions from vfpacket.c }
 @define function newvfpacket();
 @define function packetbyte;
 @define procedure startpacket();
 @define procedure storepacket();
-
-{ functions from writeenc.c }
-@define procedure setcharmap();
 
 { functions from writefont.c }
 @define procedure dopdffont();
@@ -70,6 +72,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.defines#
 @define function epdforigy();
 @define function imageheight();
 @define function imagepages();
+@define function imagecolordepth();
 @define function imagewidth();
 @define function imagexres();
 @define function imageyres();

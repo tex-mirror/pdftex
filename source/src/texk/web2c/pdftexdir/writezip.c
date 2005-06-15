@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writezip.c#12 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writezip.c#5 $
 */
 
 #include "ptexlib.h"
 #include "zlib.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source/TeX/texk/web2c/pdftexdir/writezip.c#12 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writezip.c#5 $";
 
 #define ZIP_BUF_SIZE  32768
 
@@ -32,7 +32,6 @@ static const char perforce_id[] =
     if (f != Z_OK)                                         \
         pdftex_fail("zlib: %s() failed", fn)
 
-#define fixedcompresslevel  fixint(getintpar(cfgcompresslevelcode), 0, 9)
 
 static char zipbuf[ZIP_BUF_SIZE];
 static z_stream c_stream; /* compression stream */
@@ -41,7 +40,7 @@ void writezip(boolean finish)
 {
     int err;
 
-    if (!fixedcompresslevel) {
+    if (!getpdfcompresslevel()) {
         if (pdfptr) {
             pdfgone += xfwrite(pdfbuf, 1, pdfptr, pdffile);
             pdfstreamlength += pdfptr;
@@ -54,7 +53,7 @@ void writezip(boolean finish)
         c_stream.zalloc = (alloc_func)0;
         c_stream.zfree = (free_func)0;
         c_stream.opaque = (voidpf)0;
-        check_err(deflateInit(&c_stream, fixedcompresslevel), "deflateInit");
+        check_err(deflateInit(&c_stream, getpdfcompresslevel()), "deflateInit");
         c_stream.next_out = (Bytef*)zipbuf;
         c_stream.avail_out = ZIP_BUF_SIZE;
     }
