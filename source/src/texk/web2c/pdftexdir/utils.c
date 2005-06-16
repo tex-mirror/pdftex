@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2003 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -36,6 +36,7 @@ static char print_buf[PRINTF_BUF_SIZE];
 static char *jobname_cstr = NULL;
 static char *job_id_string = NULL;
 static char *escaped_string = NULL;
+static char *escaped_name = NULL;
 extern string ptexbanner; /* from web2c/lib/texmfmp.c */
 extern string versionstring; /* from web2c/lib/version.c */         
 extern KPSEDLL string kpathsea_version_string; /* from kpathsea/version.c */
@@ -388,7 +389,9 @@ void libpdffinish()
 
 /* Converts any string given in in in an allowed PDF string which can be
  * handled by printf et.al.: \ is escaped to \\, paranthesis are escaped and
- * control characters are hexadecimal encoded.
+ * control characters are octal encoded.
+ * This assumes that the string does not contain any already escaped
+ * characters!
  */
 char *convertStringToPDFString (char *in)
 {
@@ -396,16 +399,17 @@ char *convertStringToPDFString (char *in)
     char *out = pstrbuf;
     int lin = strlen (in);
     int i, j;
-    char buf[4];
+    char buf[5];
     j = 0;
     for (i = 0; i < lin; i++) {
         check_buf(j + sizeof(buf), MAX_PSTRING_LEN);
-        if ((unsigned char)in[i] < ' ') {
-            /* convert control characters into hex */
-            sprintf (buf, "#%02x", (unsigned int)(unsigned char)in[i]);
+        if (((unsigned char)in[i] < '!') || ((unsigned char)in[i] > '~')){
+            /* convert control characters into oct */
+            sprintf (buf, "\\%03o", (unsigned int)(unsigned char)in[i]);
             out[j++] = buf[0];
             out[j++] = buf[1];
             out[j++] = buf[2];
+            out[j++] = buf[3];
             }
         else if ((in[i] == '(') || (in[i] == ')')) {
             /* escape paranthesis */
@@ -425,6 +429,37 @@ char *convertStringToPDFString (char *in)
     out[j] = '\0';
     return pstrbuf;
 }
+
+
+/* Converts any string given in in in an allowed PDF Name which can be handled
+ * by printf et.al.: non-printable characters are hexadecimal encoded.
+ */
+char *convertStringToPDFName (char *in)
+{
+    static char pstrbuf[MAX_PSTRING_LEN];
+    char *out = pstrbuf;
+    int lin = strlen (in);
+    int i, j;
+    char buf[3];
+    j = 0;
+    for (i = 0; i < lin; i++) {
+        check_buf(j + sizeof(buf), MAX_PSTRING_LEN);
+        if (((unsigned char)in[i] < '!') || ((unsigned char)in[i] > '~')){
+            /* convert control characters into hex */
+            sprintf (buf, "#%02X", (unsigned int)(unsigned char)in[i]);
+            out[j++] = buf[0];
+            out[j++] = buf[1];
+            out[j++] = buf[2];
+            }
+        else {
+            /* copy char :-) */
+            out[j++] = in[i];
+            }
+        }
+    out[j] = '\0';
+    return pstrbuf;
+}
+
 
 /* Converts any string given in in in an allowed PDF string which is 
  * hexadecimal encoded and enclosed in '<' and '>'.
@@ -622,9 +657,27 @@ integer escapedstrlen()
     return strlen(escaped_string);
 }
 
-ASCIIcode getescapedchar(integer index)
+ASCIIcode getescapedstrchar(integer index)
 {
     if (index < 0 || index >= strlen(escaped_string))
-        pdftex_fail("getescapedchar(): index out of range");
+        pdftex_fail("getescapedstrchar(): index out of range");
     return escaped_string[index];
+}
+
+void escapename(strnumber s)
+{
+    escaped_name = convertStringToPDFName(makecstring(s));
+}
+
+integer escapednamelen()
+{
+    assert(escaped_name != NULL);
+    return strlen(escaped_name);
+}
+
+ASCIIcode getescapednamechar(integer index)
+{
+    if (index < 0 || index >= strlen(escaped_name))
+        pdftex_fail("getescapednamechar(): index out of range");
+    return escaped_name[index];
 }

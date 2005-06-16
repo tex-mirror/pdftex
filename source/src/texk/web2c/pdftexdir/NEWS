@@ -1,40 +1,16 @@
--------------------------------------------------
-pdfTeX 3.141592-1.30.0 was released on 2005-06-??
--------------------------------------------------
+-----------------------------------------------------
+pdfTeX 3.141592-1.30.0-rc1 was released on 2005-06-16
+-----------------------------------------------------
 
-- Some primites have been renamed; the old names will still work, but are
+- pdfxtex (introduced with 1.20a) is gone; all extensions are now in pdf(e)tex.
+- Some primitives have been renamed; the old names will still work, but are
   deprecated and give a warning that they are obsolete:
     \pdfoptionpdfminorversion         -> \pdfminorversion
     \pdfoptionalwaysusepdfpagebox     -> \pdfforcepagebox
     \pdfoptionpdfinclusionerrorlevel  -> \pdfinclusionerrorlevel
-
-- pdfxtex (introduced with 1.20a) is gone; all extensions are now in pdftex.
-
-- pdftex nows two new units:
+- pdftex knows two new units:
   - new Didot (1nd=0.375mm)
   - new Cicero (1nc=12nd)
-
-- New primitive \pdfpkmode, which is a token register that sets the MF mode for
-  pixel font generation. The contents of this register is dumped into the
-  format, so one can (optionally) preset it e.g. in part of pdftexconfig.tex.
-
-- New primitives: pdfTeX now has an interface to the precise system time (if
-  available) as an aid in benchmarking TeX macro code. 
-  Two new primitives are provided:
-  - \elapsedtime is a read-only integer that (initially) returns the amount of
-    time passed since the start of this run. This amount is given in `scaled
-    seconds': the value 65536 counts as one second. If more time has passed
-    than 32767 seconds, (2^31)-1 will be returned.
-  - \resettime updates the internal timer, such that subsequent calls to
-    \elapsedtime will restart from 0.
-
-- New primitive \pdfxformname <object number>, which expands to the number
-  in the corresponding form XObject name.
-
-- New primitives \leftmarginkern <box number> and \rightmarginkern <box number>
-  for specifying the margin kern at the left and right side of the horizontal
-  list stored in box <box number>.
-
 - Inclusion of pngs has been greatly improved: It now does
   - alpha channel and transparency (only if %!PDF >=1.4)
   - 16-bit colour (only if %!PDF >=1.5); this must be enabled by setting
@@ -42,7 +18,24 @@ pdfTeX 3.141592-1.30.0 was released on 2005-06-??
   - gamma correction; this must be enabled by setting \pdfimageapplygamma to 1.
     The device gamma is taken from \pdfgamma. If no embedded value can be found
     in the png image, then the value of \pdfimagegamma is used instead.
-
+  - fast direct embedding of png streams, if their structure allows this; the
+    automatic fall-back is to decompress and re-compress as before.
+- New primitives: pdfTeX now has an interface to the precise system time (if
+  available) as an aid in benchmarking TeX macro code. 
+  - \elapsedtime is a read-only integer that (initially) returns the amount of
+    time passed since the start of this run. This amount is given in `scaled
+    seconds': the value 65536 counts as one second. If more time has passed
+    than 32767 seconds, (2^31)-1 will be returned.
+  - \resettime updates the internal timer, such that subsequent calls to
+    \elapsedtime will restart from 0.
+- New primitive \pdfxformname <object number>, which expands to the number
+  in the corresponding form XObject name.
+- New primitives \leftmarginkern <box number> and \rightmarginkern <box number>
+  that tell the margin kern at the left and right side of the horizontal list
+  stored in box <box number>.
+- New primitive \pdfpkmode, which is a token register that sets the MF mode for
+  pixel font generation. The contents of this register is dumped into the
+  format, so one can (optionally) preset it e.g. in part of pdftexconfig.tex.
 - The effects of font expansion can now be logged:
   There is now a new integer variable \pdftracingfonts. It is zero by default,
   then we get a log (with fontexpansion) like this
@@ -54,21 +47,17 @@ pdfTeX 3.141592-1.30.0 was released on 2005-06-??
   ...\xivtt (cmtt10@14.0pt) t
   ...\xivtt (cmtt10+20@14.0pt) e
   See also bug 304.
-
+- New primitives \pdfescapename/\pdflastescapedname provide a way to escape
+  names like \pdfescapestring/\pdflastescapedstring.
 - The primitive \pdfmovechar has been removed (bug 294)
-
 - Bugfix: empty strings are not supressed anymore (bug 335)
-
 - Bugfix: \unhboxing and character protusion didn't work well together (bug
   292)
-
 - Bugfix: --jobname didn't work if there was no filename at all (bug 302)
-
 - Bugfix: Some problem with fonts on solaris (bug 315)
-
+- Bugfix: Dangling font objects with non-replacable fonts (bug 311).
 - Bugfix: \pdfxform didn't work with box>255 (bug 310)
-
-- Bugfix: protruding can lead to "This can't happen(paragraph)." (bug 292)
+- Bugfix: cmap: unicode ???? is mapped to multiple glyphs (bug 306).
 
 ------------------------------------------------
 pdfTeX 3.141592-1.21a was released on 2005-02-04
@@ -103,7 +92,7 @@ pdfTeX 3.141592-1.21a was released on 2005-02-04
     - \pdfximage supports a keyword "colorspace" following an object number
       representing a ColorSpace object
     - \pdfstrcmp compares two strings
-    - \pdfescapestring/\pdflastescapedstring provide a mean to escape string
+    - \pdfescapestring/\pdflastescapedstring provide a way to escape string
     - \pdffirstlineheight/\pdflastlinedepth/\pdfeachlineheight/\pdfeachlinedepth
       allow fixing line dimen
     - patches from Taco

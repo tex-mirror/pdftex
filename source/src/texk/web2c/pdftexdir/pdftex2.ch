@@ -2,7 +2,7 @@
 % instead of pdftex.ch due to changes files coming after pdftex.ch (hz.ch &
 % vadjust.ch)
 %
-% Copyright (c) 1996-2002 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 1996-2005 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
 % This file is part of pdfTeX.
 %

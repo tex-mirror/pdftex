@@ -68,7 +68,7 @@
 @y
 @d pdftex_version==130 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.30.0-beta-20050615' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.30.0-beta-rc1' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -533,7 +533,8 @@ such that |job_name_code| remains last.
 @d pdf_page_ref_code        = pdftex_first_expand_code + 5 {command code for \.{\\pdfpageref}}
 @d pdf_xform_name_code      = pdftex_first_expand_code + 6 {command code for \.{\\pdfxformname}}
 @d pdf_last_escaped_string_code = pdftex_first_expand_code + 7 {command code for \.{\\pdflastescapedstring}}
-@d pdftex_convert_codes     = pdftex_first_expand_code + 8 {end of \pdfTeX's command codes}
+@d pdf_last_escaped_name_code = pdftex_first_expand_code + 8 {command code for \.{\\pdflastescapename}}
+@d pdftex_convert_codes     = pdftex_first_expand_code + 9 {end of \pdfTeX's command codes}
 @d job_name_code=pdftex_convert_codes {command code for \.{\\jobname}}
 @z
 
@@ -557,6 +558,8 @@ primitive("pdfxformname",convert,pdf_xform_name_code);@/
 @!@:pdf_xform_name_}{\.{\\pdfxformname} primitive@>
 primitive("pdflastescapedstring",convert,pdf_last_escaped_string_code);@/
 @!@:pdf_last_escaped_string_}{\.{\\pdflastescapedstring} primitive@>
+primitive("pdflastescapedname",convert,pdf_last_escaped_name_code);@/
+@!@:pdf_last_escaped_name_}{\.{\\pdflastescapedname} primitive@>
 @#
 primitive("jobname",convert,job_name_code);@/
 @z
@@ -572,6 +575,7 @@ primitive("jobname",convert,job_name_code);@/
   pdf_page_ref_code:    print_esc("pdfpageref");
   pdf_xform_name_code:  print_esc("pdfxformname");
   pdf_last_escaped_string_code:    print_esc("pdflastescapedstring");
+  pdf_last_escaped_name_code:      print_esc("pdflastescapedname");
   othercases print_esc("jobname")
 @z
 
@@ -579,7 +583,7 @@ primitive("jobname",convert,job_name_code);@/
 @!b:pool_pointer; {base of temporary string}
 @y
 @!b:pool_pointer; {base of temporary string}
-@!i, l: integer; {index to access escaped string}
+@!i, l: integer; {index to access escaped string or name}
 @z
 
 @x [471]
@@ -607,6 +611,7 @@ pdf_xform_name_code: begin
     pdf_check_obj(obj_type_xform, cur_val);
 end;
 pdf_last_escaped_string_code: do_nothing;
+pdf_last_escaped_name_code: do_nothing;
 job_name_code: if job_name=0 then open_log_file;
 @z
 
@@ -631,7 +636,12 @@ pdf_xform_name_code: print_int(obj_info(cur_val));
 pdf_last_escaped_string_code: begin
     l := escapedstrlen;
     for i := 0 to l - 1 do
-        print_char(getescapedchar(i));
+        print_char(getescapedstrchar(i));
+end;
+pdf_last_escaped_name_code: begin
+    l := escapednamelen;
+    for i := 0 to l - 1 do
+        print_char(getescapednamechar(i));
 end;
 job_name_code: print(job_name);
 @z
@@ -4547,8 +4557,9 @@ pdf_init_map_file('pdftex.map');
 @d pdf_trailer_code            == pdftex_first_extension_code + 23
 @d pdf_strcmp_code             == pdftex_first_extension_code + 24
 @d pdf_escape_string_code      == pdftex_first_extension_code + 25
-@d reset_timer_code            == pdftex_first_extension_code + 26
-@d pdftex_last_extension_code  == pdftex_first_extension_code + 26
+@d pdf_escape_name_code        == pdftex_first_extension_code + 26
+@d reset_timer_code            == pdftex_first_extension_code + 27
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 27
 @z
 
 @x [1344]
@@ -4609,6 +4620,8 @@ primitive("pdfstrcmp",extension,pdf_strcmp_code);@/
 @!@:pdf_strcmp_}{\.{\\pdfstrcmp} primitive@>
 primitive("pdfescapestring",extension,pdf_escape_string_code);@/
 @!@:pdf_escape_string_}{\.{\\pdfescapestring} primitive@>
+primitive("pdfescapename",extension,pdf_escape_name_code);@/
+@!@:pdf_escape_name_}{\.{\\pdfescapename} primitive@>
 primitive("resettimer",extension,reset_timer_code);@/
 @!@:reset_timer_}{\.{\\resettimer} primitive@>
 @z
@@ -4643,6 +4656,7 @@ primitive("resettimer",extension,reset_timer_code);@/
   pdf_trailer_code: print_esc("pdftrailer");
   pdf_strcmp_code: print_esc("pdfstrcmp");
   pdf_escape_string_code: print_esc("pdfescapestring");
+  pdf_escape_name_code: print_esc("pdfescapename");
   reset_timer_code: print_esc("resettimer");
 @z
 
@@ -4678,6 +4692,7 @@ pdf_map_line_code: @<Implement \.{\\pdfmapline}@>;
 pdf_trailer_code: @<Implement \.{\\pdftrailer}@>;
 pdf_strcmp_code: @<Implement \.{\\pdfstrcmp}@>;
 pdf_escape_string_code: @<Implement \.{\\pdfescapestring}@>;
+pdf_escape_name_code: @<Implement \.{\\pdfescapename}@>;
 reset_timer_code: @<Implement \.{\\resettimer}@>;
 @z
 
@@ -5649,6 +5664,14 @@ end
 begin
     scan_pdf_ext_toks;
     escapestr(tokens_to_string(def_ref));
+    flush_str(last_tokens_string);
+    delete_token_ref(def_ref);
+end
+
+@ @<Implement \.{\\pdfescapename}@>=
+begin
+    scan_pdf_ext_toks;
+    escapename(tokens_to_string(def_ref));
     flush_str(last_tokens_string);
     delete_token_ref(def_ref);
 end

@@ -1,5 +1,5 @@
 {
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -41,11 +41,14 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#13
 @define procedure pdfinitmapfile();
 
 { functions from utils.c }
+@define function escapednamelen;
 @define function escapedstrlen;
 @define function extxnoverd();
-@define function getescapedchar();
+@define function getescapednamechar();
+@define function getescapedstrchar();
 @define function getresnameprefix;
 @define function makecstring();
+@define procedure escapename();
 @define procedure escapestr();
 @define procedure libpdffinish;
 @define procedure makepdftexbanner;

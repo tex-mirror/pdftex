@@ -185,11 +185,11 @@ end;
 @z
 
 @x [468]
-@d pdftex_convert_codes     = pdftex_first_expand_code + 8 {end of \pdfTeX's command codes}
+@d pdftex_convert_codes     = pdftex_first_expand_code + 9 {end of \pdfTeX's command codes}
 @y
-@d left_margin_kern_code    = pdftex_first_expand_code + 8 {command code for \.{\\leftmarginkern}}
-@d right_margin_kern_code   = pdftex_first_expand_code + 9 {command code for \.{\\rightmarginkern}}
-@d pdftex_convert_codes     = pdftex_first_expand_code + 10 {end of \pdfTeX's command codes}
+@d left_margin_kern_code    = pdftex_first_expand_code + 9 {command code for \.{\\leftmarginkern}}
+@d right_margin_kern_code   = pdftex_first_expand_code + 10 {command code for \.{\\rightmarginkern}}
+@d pdftex_convert_codes     = pdftex_first_expand_code + 11 {end of \pdfTeX's command codes}
 @z
 
 @x [468]
@@ -1864,10 +1864,10 @@ endcases;
 @z
 
 @x [1344]
-@d pdftex_last_extension_code  == pdftex_first_extension_code + 26
-@y
-@d pdf_font_expand_code        == pdftex_first_extension_code + 27
 @d pdftex_last_extension_code  == pdftex_first_extension_code + 27
+@y
+@d pdf_font_expand_code        == pdftex_first_extension_code + 28
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 28
 @z
 
 @x [1344]

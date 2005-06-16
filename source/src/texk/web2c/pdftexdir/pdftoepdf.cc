@@ -818,6 +818,7 @@ write_epdf(void)
     int i, l;
     int rotate;
     double scale[6] = {0, 0, 0, 0, 0, 0};
+    bool writematrix = false;
     PdfDocument *pdf_doc = (PdfDocument *) epdf_doc;
     (pdf_doc->occurences)--;
 #ifdef DEBUG
@@ -905,23 +906,21 @@ write_epdf(void)
             // counterclockwise :-%
             tex_printf (", page is rotated %d degrees", rotate);
             switch (rotate) {
-                case  90: scale[1] = -1; scale[2] = 1; scale[4] = pagebox->x1 - pagebox->y1; scale[5] = pagebox->y1 + pagebox->x2; break;
-                case 180: scale[0] = scale[3] = -1;    scale[4] = pagebox->x1 + pagebox->x2; scale[5] = pagebox->y1 + pagebox->y2; break; // width and height are exchanged
-                case 270: scale[1] = 1; scale[2] = -1; scale[4] = pagebox->x1 + pagebox->y2; scale[5] = pagebox->y1 - pagebox->x1; break;
+                case  90: scale[1] = -1; scale[2] = 1; scale[4] = pagebox->x1 - pagebox->y1; scale[5] = pagebox->y1 + pagebox->x2; writematrix = true; break;
+                case 180: scale[0] = scale[3] = -1;    scale[4] = pagebox->x1 + pagebox->x2; scale[5] = pagebox->y1 + pagebox->y2; writematrix = true; break; // width and height are exchanged
+                case 270: scale[1] = 1; scale[2] = -1; scale[4] = pagebox->x1 + pagebox->y2; scale[5] = pagebox->y1 - pagebox->x1; writematrix = true; break;
+                }
+            if (writematrix) { // The matrix is only written if the image is rotated.
+                pdf_printf("/Matrix [%.8f %.8f %.8f %.8f %.8f %.8f]\n",
+                    scale[0],
+                    scale[1],
+                    scale[2],
+                    scale[3],
+                    scale[4],
+                    scale[5]);
                 }
             }
         }
-    else {
-        scale[0] = scale[3] = 1;
-        }
-
-    pdf_printf("/Matrix [%.8f %.8f %.8f %.8f %.8f %.8f]\n",
-        scale[0],
-        scale[1],
-        scale[2],
-        scale[3],
-        scale[4],
-        scale[5]);
 
     pdf_printf("/BBox [%.8f %.8f %.8f %.8f]\n",
                pagebox->x1,
