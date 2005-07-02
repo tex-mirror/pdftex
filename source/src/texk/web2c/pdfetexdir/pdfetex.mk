@@ -48,12 +48,22 @@ pdfetex_ch_srcs = pdfetex.web \
   $(srcdir)/etexdir/tex.ch1 \
   $(srcdir)/etexdir/tex.ech \
   $(srcdir)/pdfetexdir/tex.ch1 \
-  $(srcdir)/pdftexdir/tex.pch
+  $(srcdir)/pdftexdir/tex.pch \
+  $(srcdir)/pdftexdir/pdf_mem.ch \
+  $(srcdir)/pdftexdir/noligatures.ch \
+  $(srcdir)/pdftexdir/pdfstrcmp.ch \
+  $(srcdir)/pdftexdir/randoms.ch
 #   Rules:
 pdfetex.web: tie pdfetexdir/pdfetex.mk $(pdfetex_web_srcs)
 	$(TIE) -m pdfetex.web $(pdfetex_web_srcs)
 pdfetex.ch: $(pdfetex_ch_srcs)
 	$(TIE) -c pdfetex.ch $(pdfetex_ch_srcs)
+
+# for developing only
+pdfetex-org.web: $(pdfetex_ch_srcs_org)
+	$(TIE) -m $@ $(pdfetex_ch_srcs_org)
+pdfetex-all.web: pdfetex.web pdfetex.ch
+	$(TIE) -m $@ pdfetex.web pdfetex.ch
 
 $(srcdir)/pdfetexdir/pdfetex.h: $(srcdir)/pdftexdir/pdftex.h
 	cp -f $(srcdir)/pdftexdir/pdftex.h $@

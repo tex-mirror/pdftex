@@ -54,6 +54,8 @@
 %   o  extension of \font
 %   o  \efcode
 %   o  \lpcode, \rpcode
+%   o  \leftmarginkern, \rightmarginkern
+% General (non-pdf) new primitives have the prefix "\ptex"
     
 @x limbo
 \def\PASCAL{Pascal}
@@ -68,7 +70,7 @@
 @y
 @d pdftex_version==130 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.30.0-beta-rc1' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.30.0-rc2' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -384,7 +386,7 @@ primitive("pdfeachlinedepth",assign_dimen,dimen_base+pdf_each_line_depth_code);@
 @d pdf_last_y_pos_code        = pdftex_first_rint_code + 7 {code for \.{\\pdflastypos}}
 @d pdf_retval_code            = pdftex_first_rint_code + 8 {global multi-purpose return value}
 @d pdf_last_ximage_colordepth_code = pdftex_first_rint_code + 9 {code for \.{\\pdflastximagecolordepth}}
-@d elapsed_time_code          = pdftex_first_rint_code + 10 {code for \.{\\elapsedtime}}
+@d elapsed_time_code          = pdftex_first_rint_code + 10 {code for \.{\\ptexelapsedtime}}
 @d pdftex_last_item_codes     = pdftex_first_rint_code + 10 {end of \pdfTeX's command codes}
 @z
 
@@ -410,12 +412,12 @@ primitive("pdflastxpos",last_item,pdf_last_x_pos_code);@/
 @!@:pdf_last_x_pos_}{\.{\\pdflastxpos} primitive@>
 primitive("pdflastypos",last_item,pdf_last_y_pos_code);@/
 @!@:pdf_last_y_pos_}{\.{\\pdflastypos} primitive@>
-primitive("pdfretval",last_item,pdf_retval_code);@/
+primitive("ptexretval",last_item,pdf_retval_code);@/
 @!@:pdf_retval_}{\.{\\pdfretval} primitive@>
 primitive("pdflastximagecolordepth",last_item,pdf_last_ximage_colordepth_code);@/
 @!@:pdf_last_ximage_colordepth_}{\.{\\pdflastximagecolordepth} primitive@>
-primitive("elapsedtime",last_item,elapsed_time_code);
-@!@:elapsed_time_}{\.{\\elapsedtime} primitive@>
+primitive("ptexelapsedtime",last_item,elapsed_time_code);
+@!@:elapsed_time_}{\.{\\ptexelapsedtime} primitive@>
 @z
 
 @x [417]
@@ -429,9 +431,9 @@ primitive("elapsedtime",last_item,elapsed_time_code);
   pdf_last_annot_code:  print_esc("pdflastannot");
   pdf_last_x_pos_code:  print_esc("pdflastxpos");
   pdf_last_y_pos_code:  print_esc("pdflastypos");
-  pdf_retval_code:      print_esc("pdfretval");
+  pdf_retval_code:      print_esc("ptexretval");
   pdf_last_ximage_colordepth_code: print_esc("pdflastximagecolordepth");
-  elapsed_time_code: print_esc("elapsedtime");
+  elapsed_time_code: print_esc("ptexelapsedtime");
   othercases print_esc("badness")
 @z
 
@@ -4350,7 +4352,7 @@ end
 
 @ @<Output the trailer@>=
 pdf_print_ln("trailer");
-pdf_print_ln("<<");
+pdf_print("<< ");
 pdf_int_entry_ln("Size", obj_ptr + 1);
 pdf_indirect_ln("Root", root);
 pdf_indirect_ln("Info", obj_ptr);
@@ -4359,7 +4361,7 @@ if pdf_trailer_toks <> null then begin
     delete_toks(pdf_trailer_toks);
 end;
 print_ID(output_file_name);
-pdf_print_ln(">>");
+pdf_print_ln(" >>");
 pdf_print_ln("startxref");
 pdf_print_int_ln(pdf_save_offset);
 pdf_print_ln("%%EOF")
@@ -4616,14 +4618,14 @@ primitive("pdfmapline",extension,pdf_map_line_code);@/
 @!@:pdf_map_line_}{\.{\\pdfmapline} primitive@>
 primitive("pdftrailer",extension,pdf_trailer_code);@/
 @!@:pdf_trailer_}{\.{\\pdftrailer} primitive@>
-primitive("pdfstrcmp",extension,pdf_strcmp_code);@/
-@!@:pdf_strcmp_}{\.{\\pdfstrcmp} primitive@>
+primitive("ptexstrcmp",extension,pdf_strcmp_code);@/
+@!@:pdf_strcmp_}{\.{\\ptexstrcmp} primitive@>
 primitive("pdfescapestring",extension,pdf_escape_string_code);@/
 @!@:pdf_escape_string_}{\.{\\pdfescapestring} primitive@>
 primitive("pdfescapename",extension,pdf_escape_name_code);@/
 @!@:pdf_escape_name_}{\.{\\pdfescapename} primitive@>
-primitive("resettimer",extension,reset_timer_code);@/
-@!@:reset_timer_}{\.{\\resettimer} primitive@>
+primitive("ptexresettimer",extension,reset_timer_code);@/
+@!@:reset_timer_}{\.{\\ptexresettimer} primitive@>
 @z
 
 @x [1346]
@@ -4654,10 +4656,10 @@ primitive("resettimer",extension,reset_timer_code);@/
   pdf_map_file_code: print_esc("pdfmapfile");
   pdf_map_line_code: print_esc("pdfmapline");
   pdf_trailer_code: print_esc("pdftrailer");
-  pdf_strcmp_code: print_esc("pdfstrcmp");
+  pdf_strcmp_code: print_esc("ptexstrcmp");
   pdf_escape_string_code: print_esc("pdfescapestring");
   pdf_escape_name_code: print_esc("pdfescapename");
-  reset_timer_code: print_esc("resettimer");
+  reset_timer_code: print_esc("ptexresettimer");
 @z
 
 @x [1348]
@@ -4690,10 +4692,10 @@ pdf_font_attr_code: @<Implement \.{\\pdffontattr}@>;
 pdf_map_file_code: @<Implement \.{\\pdfmapfile}@>;
 pdf_map_line_code: @<Implement \.{\\pdfmapline}@>;
 pdf_trailer_code: @<Implement \.{\\pdftrailer}@>;
-pdf_strcmp_code: @<Implement \.{\\pdfstrcmp}@>;
+pdf_strcmp_code: @<Implement \.{\\ptexstrcmp}@>;
 pdf_escape_string_code: @<Implement \.{\\pdfescapestring}@>;
 pdf_escape_name_code: @<Implement \.{\\pdfescapename}@>;
-reset_timer_code: @<Implement \.{\\resettimer}@>;
+reset_timer_code: @<Implement \.{\\ptexresettimer}@>;
 @z
 
 @x [1354]
@@ -4753,7 +4755,7 @@ begin
     call_func(scan_toks(false, true)); {like \.{\\special}}
 end;
 
-procedure compare_strings; {to implement \.{\\pdfstrcmp}}
+procedure compare_strings; {to implement \.{\\ptexstrcmp}}
 label done;
 var s1, s2: str_number;
     i1, i2, j1, j2: pool_pointer;
@@ -5679,13 +5681,13 @@ end
 @ @<Glob...@>=
 @!pdf_retval: integer; {global multi-purpose return value}
 
-@ @<Implement \.{\\pdfstrcmp}@>=
+@ @<Implement \.{\\ptexstrcmp}@>=
 compare_strings
 
 @ @<Set initial values of key variables@>=
   seconds_and_micros(epochseconds,microseconds);
 
-@ @<Implement \.{\\resettimer}@>=
+@ @<Implement \.{\\ptexresettimer}@>=
 begin
   seconds_and_micros(epochseconds,microseconds);
 end

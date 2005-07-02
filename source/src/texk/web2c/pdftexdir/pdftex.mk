@@ -57,12 +57,22 @@ pdftex_ch_srcs = pdftex.web \
   $(srcdir)/pdftexdir/tex.ch0 \
   $(srcdir)/tex.ch \
   $(srcdir)/pdftexdir/tex.ch1 \
-  $(srcdir)/pdftexdir/tex.pch
+  $(srcdir)/pdftexdir/tex.pch \
+  $(srcdir)/pdftexdir/pdf_mem.ch \
+  $(srcdir)/pdftexdir/noligatures.ch \
+  $(srcdir)/pdftexdir/pdfstrcmp.ch \
+  $(srcdir)/pdftexdir/randoms.ch
 #   Rules:
 pdftex.web: tie pdftexdir/pdftex.mk $(pdftex_web_srcs)
 	$(TIE) -m pdftex.web $(pdftex_web_srcs)
 pdftex.ch: $(pdftex_ch_srcs)
 	$(TIE) -c pdftex.ch $(pdftex_ch_srcs)
+
+# for developing only
+pdftex-org.web: $(pdftex_ch_srcs_org)
+	$(TIE) -m $@ $(pdftex_ch_srcs_org)
+pdftex-all.web: pdftex.web pdftex.ch
+	$(TIE) -m $@ pdftex.web pdftex.ch
 
 # Tests...
 check: @PTEX@ pdftex-check

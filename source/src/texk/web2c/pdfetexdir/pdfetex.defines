@@ -41,20 +41,27 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#13
 @define procedure pdfinitmapfile();
 
 { functions from utils.c }
-@define function escapednamelen;
-@define function escapedstrlen;
-@define function extxnoverd();
-@define function getescapednamechar();
-@define function getescapedstrchar();
-@define function getresnameprefix;
-@define function makecstring();
+@define procedure escapehex();
 @define procedure escapename();
-@define procedure escapestr();
+@define procedure escapestring();
+@define function extxnoverd();
+@define procedure getcreationdate;
+@define procedure getfiledump();
+@define procedure getfilemoddate();
+@define procedure getfilesize();
+@define procedure getmatch();
+@define procedure getmd5sum();
+@define function getresnameprefix;
+@define procedure initstarttime;
+@define function isquotebad;
+@define function makecstring();
+@define procedure matchstrings();
 @define procedure libpdffinish;
 @define procedure makepdftexbanner;
 @define procedure printcreationdate;
 @define procedure printID();
 @define procedure setjobid();
+@define procedure unescapehex();
 @define procedure writestreamlength();
 
 

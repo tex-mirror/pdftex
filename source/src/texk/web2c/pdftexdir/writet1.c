@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -92,6 +92,7 @@ extern char *fb_array;
 #define embed_all_glyphs(tex_font)  false
 #undef pdfmovechars
 #ifdef SHIFTLOWCHARS
+extern char errbuf[];
 extern Boolean shiftlowchars;
 #define pdfmovechars shiftlowchars
 #define t1_char(c)          T1Char(c)
@@ -1063,8 +1064,10 @@ static void t1_include(void)
 #else /* not pdfTeX */
 static boolean t1_open_fontfile(char *open_name_prefix)
 {
-    if (!t1_open())
-        return false;
+    if (!t1_open()) {
+        (void)sprintf(errbuf, "! Couldn't find font file %s", cur_file_name);
+        error(errbuf);
+    }
     t1_init_params(open_name_prefix);
     return true;
 }

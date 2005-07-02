@@ -837,7 +837,8 @@ write_epdf(void)
 
     // write additional information
     pdf_printf("/%s.FileName (%s)\n", pdfkeyprefix, 
-               convertStringToPDFString(pdf_doc->file_name));
+               convertStringToPDFString(pdf_doc->file_name,
+                                        strlen(pdf_doc->file_name)));
     pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, epdf_selected_page);
     pdf_doc->doc->getDocInfoNF(&info);
     if (info.isRef()) {

@@ -20,11 +20,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#21 $
 */
 
+#include "sys/types.h"
+#include "regex.h"
 #include "ptexlib.h"
 #include "zlib.h"
 #include "md5.h"
 #include <kpathsea/c-vararg.h>
 #include <kpathsea/c-proto.h>
+#include <kpathsea/c-stat.h>
+#include <kpathsea/c-fopen.h>
 #include <time.h>
 
 static const char perforce_id[] = 
@@ -35,8 +39,6 @@ strnumber last_tex_string;
 static char print_buf[PRINTF_BUF_SIZE];
 static char *jobname_cstr = NULL;
 static char *job_id_string = NULL;
-static char *escaped_string = NULL;
-static char *escaped_name = NULL;
 extern string ptexbanner; /* from web2c/lib/texmfmp.c */
 extern string versionstring; /* from web2c/lib/version.c */         
 extern KPSEDLL string kpathsea_version_string; /* from kpathsea/version.c */
@@ -388,20 +390,19 @@ void libpdffinish()
 }
 
 /* Converts any string given in in in an allowed PDF string which can be
- * handled by printf et.al.: \ is escaped to \\, paranthesis are escaped and
+ * handled by printf et.al.: \ is escaped to \\, parenthesis are escaped and
  * control characters are octal encoded.
  * This assumes that the string does not contain any already escaped
  * characters!
  */
-char *convertStringToPDFString (char *in)
+char *convertStringToPDFString (char *in, int len)
 {
     static char pstrbuf[MAX_PSTRING_LEN];
     char *out = pstrbuf;
-    int lin = strlen (in);
     int i, j;
     char buf[5];
     j = 0;
-    for (i = 0; i < lin; i++) {
+    for (i = 0; i < len; i++) {
         check_buf(j + sizeof(buf), MAX_PSTRING_LEN);
         if (((unsigned char)in[i] < '!') || ((unsigned char)in[i] > '~')){
             /* convert control characters into oct */
@@ -431,52 +432,222 @@ char *convertStringToPDFString (char *in)
 }
 
 
-/* Converts any string given in in in an allowed PDF Name which can be handled
- * by printf et.al.: non-printable characters are hexadecimal encoded.
+/* Converts any string given in in in an allowed PDF string which can be
+ * handled by printf et.al.: \ is escaped to \\, parenthesis are escaped and
+ * control characters are octal encoded.
+ * This assumes that the string does not contain any already escaped
+ * characters!
+ *
+ * See escapename for parameter description.
  */
-char *convertStringToPDFName (char *in)
+void escapestring(poolpointer in)
 {
-    static char pstrbuf[MAX_PSTRING_LEN];
-    char *out = pstrbuf;
-    int lin = strlen (in);
-    int i, j;
-    char buf[3];
-    j = 0;
-    for (i = 0; i < lin; i++) {
-        check_buf(j + sizeof(buf), MAX_PSTRING_LEN);
-        if (((unsigned char)in[i] < '!') || ((unsigned char)in[i] > '~')){
-            /* convert control characters into hex */
-            sprintf (buf, "#%02X", (unsigned int)(unsigned char)in[i]);
-            out[j++] = buf[0];
-            out[j++] = buf[1];
-            out[j++] = buf[2];
-            }
-        else {
-            /* copy char :-) */
-            out[j++] = in[i];
-            }
+    poolpointer out = poolptr;
+    unsigned char ch;
+    while (in < out) {
+        if (poolptr + 4 >= poolsize) {
+            poolptr = poolsize;
+            /* error by str_toks that calls str_room(1) */
+            return;
         }
-    out[j] = '\0';
-    return pstrbuf;
+        
+        ch = (unsigned char)strpool[in++];
+        
+        if ((ch < '!') || (ch > '~')) {
+            /* convert control characters into oct */
+            sprintf (&strpool[poolptr], "\\%.3o", (unsigned int)ch);
+            poolptr += 4;
+            continue;
+        }
+        if ((ch == '(') || (ch == ')') || (ch == '\\')) {
+            /* escape parenthesis and backslash */
+            strpool[poolptr++] = '\\';
+        }
+        /* copy char :-) */
+        strpool[poolptr++] = ch;
+    }
+}
+
+
+/* Convert any given string in a PDF name using escaping mechanism
+   of PDF 1.2. The result does not include the leading slash.
+   
+   PDF specification 1.6, section 3.2.6 "Name Objects" explains:
+   <blockquote>
+    Beginning with PDF 1.2, any character except null (character code 0) may
+    be included in a name by writing its 2-digit hexadecimal code, preceded
+    by the number sign character (#); see implementation notes 3 and 4 in
+    Appendix H. This syntax is required to represent any of the delimiter or
+    white-space characters or the number sign character itself; it is
+    recommended but not required for characters whose codes are outside the
+    range 33 (!) to 126 (~).
+   </blockquote>
+   The following table shows the conversion that are done by this
+   function:
+     code      result   reason
+     -----------------------------------
+     0         ignored  not allowed
+     1..32     escaped  must for white-space:
+                          9 (tab), 10 (lf), 12 (ff), 13 (cr), 32 (space)
+                        recommended for the other control characters
+     35        escaped  escape char "#"
+     37        escaped  delimiter "%"
+     40..41    escaped  delimiters "(" and ")"
+     47        escaped  delimiter "/"
+     60        escaped  delimiter "<"
+     62        escaped  delimiter ">"
+     91        escaped  delimiter "["
+     93        escaped  delimiter "]"
+     123       escaped  delimiter "{"
+     125       escaped  delimiter "}"
+     127..255  escaped  recommended
+     else      copy     regular characters
+     
+   Parameter "in" is a pointer into the string pool where
+   the input string is located. The output string is written
+   as temporary string right after the input string.
+   Thus at the begin of the procedure the global variable
+   "poolptr" points to the start of the output string and
+   after the end when the procedure returns.
+*/
+void escapename(poolpointer in)
+{
+    poolpointer out = poolptr;
+    unsigned char ch;
+    
+    while (in < out) {
+        if (poolptr + 3 >= poolsize) {
+            poolptr = poolsize;
+            /* error by str_toks that calls str_room(1) */
+            return;
+        }
+        
+        ch = (unsigned char)strpool[in++];
+        
+        if ((ch >= 1 && ch <= 32) || ch >= 127) {
+            /* escape */
+            sprintf(&strpool[poolptr], "#%.2X", (unsigned int)ch);
+            poolptr += 3;
+            continue;
+        }
+        switch (ch) {
+        case 0:
+            /* ignore */
+            break;
+        case 35:
+        case 37:
+        case 40:
+        case 41:
+        case 47:
+        case 60:
+        case 62:
+        case 91:
+        case 93:
+        case 123:
+        case 125:
+            /* escape */
+            sprintf(&strpool[poolptr], "#%.2X", (unsigned int)ch);
+            poolptr += 3;
+            break;
+        default:
+            /* copy */
+            strpool[poolptr++] = ch;
+        }
+    }
+}
+
+/* Convert any given string in a PDF hexadecimal string. The
+   result does not include the angle brackets.
+   
+   This procedure uses uppercase hexadecimal letters.
+   
+   See escapename for description of parameters.
+*/
+void escapehex(poolpointer in)
+{
+    poolpointer out = poolptr;
+    unsigned char ch;
+    
+    while (in < out) {
+        if (poolptr + 2 >= poolsize) {
+            poolptr = poolsize;
+            /* error by str_toks that calls str_room(1) */
+            return;
+        }
+
+        ch = (unsigned char)strpool[in++];
+    
+        sprintf(&strpool[poolptr], "%.2X", (unsigned int)ch);
+        poolptr += 2;
+    }
+}
+
+/* Unescape any given hexadecimal string.
+
+   Last hex digit can be omitted, it is replaced by zero, see
+   PDF specification.
+   
+   Invalid digits are silently ignored.
+
+   See escapename for description of parameters.
+*/
+void unescapehex(poolpointer in)
+{
+    poolpointer out = poolptr;
+    unsigned char ch, a;
+    boolean first = true;
+    
+    while (in < out) {
+        if (poolptr + 1 >= poolsize) {
+            poolptr = poolsize;
+            /* error by str_toks that calls str_room(1) */
+            return;
+        }
+
+        ch = (unsigned char)strpool[in++];
+
+        if ((ch >= '0') && (ch <= '9')) {
+            ch -= '0';
+        }
+        else if ((ch >= 'A') && (ch <= 'F')) {
+            ch -= 'A' - 10;
+        }
+        else if ((ch >= 'a') && (ch <= 'f')) {
+            ch -= 'a' - 10;
+        }
+        else {
+            continue; /* ignore wrong character */
+        }
+        
+        if (first) {
+            a = ch << 4;
+            first = false;
+            continue;
+        }
+        
+        strpool[poolptr++] = a + ch;
+        first = true;
+    }
+    if (!first) { /* last hex digit is omitted */
+        strpool[poolptr++] = ch << 4;
+    }
 }
 
 
 /* Converts any string given in in in an allowed PDF string which is 
- * hexadecimal encoded and enclosed in '<' and '>'.
- * sizeof(out) should be at least lin*2+3.
+ * hexadecimal encoded;
+ * sizeof(out) should be at least lin*2+1.
  */
 void convertStringToHexString (char *in, char *out, int lin)
 {
     int i, j;
     char buf[3];
-    out[0] = '<';
-    j = 1;
+    j = 0;
     for (i = 0; i < lin; i++) {
         sprintf (buf, "%02X", (unsigned int)(unsigned char)in[i]);
         out[j++] = buf[0];
         out[j++] = buf[1];
         }
-    out[j++] = '>';
     out[j] = '\0';
 }
 
@@ -538,7 +709,7 @@ void printID (strnumber filename)
     md5_finish(&state, digest);
     /* write the IDs */
     convertStringToHexString ((char*)digest, id, 16);
-    pdf_printf("/ID [%s %s]\n", id, id);
+    pdf_printf("/ID [<%s> <%s>]", id, id);
 }
 
 /* Print the /CreationDate entry.
@@ -590,34 +761,37 @@ void printID (strnumber filename)
   C99 (e.g. newer glibc) with %z, but we have to work with other systems (e.g.
   Solaris 2.5). 
 */
-void printcreationdate()
+
+time_t start_time = 0;
+#define TIME_STR_SIZE 30
+char start_time_str[TIME_STR_SIZE];
+char time_str[TIME_STR_SIZE];
+    /* minimum size for time_str is 24: "D:YYYYmmddHHMMSS+HH'MM'" */
+    
+void makepdftime(time_t t, char *time_str)
 {
             
-    time_t t;
     struct tm lt, gmt;
     size_t size;
-    /* minimum size for time_str is 22: "YYYYmmddHHMMSS+HH'MM'" */
-    char time_str[40]; /* larger value for safety */
     int off, off_hours, off_mins;
  
     /* get the time */
-    t = time(NULL);
     lt = *localtime(&t);
-    size = strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", &lt);
+    size = strftime(time_str, TIME_STR_SIZE, "D:%Y%m%d%H%M%S", &lt);
     /* expected format: "YYYYmmddHHMMSS" */
-    if (size != 14) {
-        /* An unexpected result of strftime */
-        pdftex_warn("/CreationDate dropped because of "
-                    "unexpected result of strftime()");
+    if (size == 0) {
+        /* unexpected, contents of time_str is undefined */
+        time_str[0] = '\0';
         return;
     }
 
     /* correction for seconds: %S can be in range 00..61,
        the PDF reference expects 00..59,   
        therefore we map "60" and "61" to "59" */
-    if (time_str[12] == '6') {
-        time_str[12] = '5';
-        time_str[13] = '9'; /* we have checked for size above */
+    if (time_str[14] == '6') {
+        time_str[14] = '5';
+        time_str[15] = '9';
+        time_str[16] = '\0'; /* for safety */
     }
 
     /* get the time zone offset */
@@ -641,43 +815,326 @@ void printcreationdate()
         off_mins = abs(off - off_hours*60);
         sprintf(&time_str[size], "%+03i'%02d'", off_hours, off_mins);
     }
-
-    /* print result */
-    pdf_printf("/CreationDate (D:%s)\n", time_str);
 }
 
-void escapestr(strnumber s)
-{
-    escaped_string = convertStringToPDFString(makecstring(s));
+void initstarttime() {
+    if (start_time == 0) {
+        start_time = time((time_t *) NULL);
+        makepdftime(start_time, start_time_str);
+    }
 }
 
-integer escapedstrlen()
-{
-    assert(escaped_string != NULL);
-    return strlen(escaped_string);
+void printcreationdate() {
+    initstarttime();
+    pdf_printf("/CreationDate (%s)\n", start_time_str);
 }
 
-ASCIIcode getescapedstrchar(integer index)
+void getcreationdate()
 {
-    if (index < 0 || index >= strlen(escaped_string))
-        pdftex_fail("getescapedstrchar(): index out of range");
-    return escaped_string[index];
+    /* put creation date on top of string pool and update poolptr */
+    poolpointer out = poolptr;
+    unsigned char ch;
+    int len = strlen(start_time_str);
+    
+    initstarttime();
+    
+    if (poolptr + len >= poolsize) {
+        poolptr = poolsize;
+        /* error by str_toks that calls str_room(1) */
+        return;
+    }
+
+    memcpy(&strpool[poolptr], start_time_str, len);
+    poolptr += len;
 }
 
-void escapename(strnumber s)
-{
-    escaped_name = convertStringToPDFName(makecstring(s));
+void getfilemoddate(strnumber s) {
+    struct stat file_data;
+    
+    char *file_name = kpse_find_tex(makecfilename(s));
+    if (file_name == NULL) {
+        return; /* empty string */
+    }
+    
+    /* get file status */
+    if (stat(file_name, &file_data) == 0) {
+        int len;
+        
+        makepdftime(file_data.st_mtime, time_str);
+        len = strlen(time_str);
+        if (poolptr + len >= poolsize) {
+            poolptr = poolsize;
+            /* error by str_toks that calls str_room(1) */
+        }
+        else {
+            memcpy(&strpool[poolptr], time_str, len);
+            poolptr += len;
+        }
+    }
+    /* else { errno contains error code } */
+    
+    xfree(file_name);
 }
 
-integer escapednamelen()
-{
-    assert(escaped_name != NULL);
-    return strlen(escaped_name);
+void getfilesize(strnumber s) {
+    struct stat file_data;
+    
+    char *file_name = kpse_find_tex(makecfilename(s));
+    if (file_name == NULL) {
+        return; /* empty string */
+    }
+    
+    /* get file status */
+    if (stat(file_name, &file_data) == 0) {
+        int len;
+        char buf[20];
+        
+        /* st_size has type off_t */
+        sprintf(buf, "%lu", (long unsigned int)file_data.st_size);
+        len = strlen(buf);
+        if (poolptr + len >= poolsize) {
+            poolptr = poolsize;
+            /* error by str_toks that calls str_room(1) */
+        }
+        else {
+            memcpy(&strpool[poolptr], buf, len);
+            poolptr += len;
+        }
+    }
+    /* else { errno contains error code } */
+    
+    xfree(file_name);
 }
 
-ASCIIcode getescapednamechar(integer index)
-{
-    if (index < 0 || index >= strlen(escaped_name))
-        pdftex_fail("getescapednamechar(): index out of range");
-    return escaped_name[index];
+#define DIGEST_SIZE 16
+#define FILE_BUF_SIZE 1024
+
+void getmd5sum(strnumber s, boolean file) {
+    md5_state_t state;
+    md5_byte_t digest[DIGEST_SIZE];
+    char outbuf[2 * DIGEST_SIZE + 1];
+    int len = 2 * DIGEST_SIZE;
+    
+    if (file) {
+        char file_buf[FILE_BUF_SIZE];
+        int read = 0;
+        FILE *f;
+        
+        char *file_name = kpse_find_tex(makecfilename(s));
+        if (file_name == NULL) {
+            return; /* empty string */
+        }
+        /* in case of error the empty string is returned,
+           no need for xfopen that aborts on error.
+        */
+        f = fopen(file_name, FOPEN_RBIN_MODE);
+        if (f == NULL) {
+            xfree(file_name);
+            return;
+        }
+        md5_init(&state);
+        while ((read = fread(&file_buf, sizeof(char),
+                             FILE_BUF_SIZE, f)) > 0) {
+            md5_append(&state, (const md5_byte_t *)file_buf, read);
+        }
+        md5_finish(&state, digest);
+        fclose(f);
+        
+        xfree(file_name);
+    }
+    else {
+      /* s contains the data */
+      md5_init(&state);
+      md5_append(&state,
+          (const md5_byte_t *)&strpool[strstart[s]],
+          strstart[s + 1] - strstart[s]);
+      md5_finish(&state, digest);
+    }
+    
+    if (poolptr + len >= poolsize) {
+        /* error by str_toks that calls str_room(1) */
+        return;
+    }
+    convertStringToHexString((char*)digest, outbuf, DIGEST_SIZE);
+    memcpy(&strpool[poolptr], outbuf, len);
+    poolptr += len;
+}
+
+void getfiledump(strnumber s, int offset, int length) {
+    FILE *f;
+    int read;
+    poolpointer data_ptr;
+    poolpointer data_end;
+    char *file_name;
+
+    if (length == 0) {
+        /* empty result string */
+        return;
+    }
+    
+    if (poolptr + 2 * length + 1 >= poolsize) {
+        /* no place for result */
+        poolptr = poolsize;
+        /* error by str_toks that calls str_room(1) */
+        return;
+    }
+    
+    file_name = kpse_find_tex(makecfilename(s));
+    if (file_name == NULL) {
+        return; /* empty string */
+    }
+    
+    /* read file data */
+    f = fopen(file_name, FOPEN_RBIN_MODE);
+    if (f == NULL) {
+        xfree(file_name);
+        return;
+    }
+    if (fseek(f, (long)offset, SEEK_SET) != 0) {
+        xfree(file_name);
+        return;
+    }
+    /* there is enough space in the string pool, the read
+       data are put in the upper half of the result, thus
+       the conversion to hex can be done without overwriting
+       unconverted bytes. Be aware that sprintf also appends
+       a nul byte at the end. */
+    data_ptr = poolptr + length;
+    read = fread(&strpool[data_ptr],
+                 sizeof(char), length, f);
+    fclose(f);
+
+    /* convert to hex */
+    data_end = data_ptr + read;
+    for (; data_ptr < data_end; data_ptr++) {
+        sprintf(&strpool[poolptr], "%.2X",
+                (unsigned int)strpool[data_ptr]);
+        poolptr += 2;
+    }
+    xfree(file_name);
+}
+
+#define DEFAULT_SUB_MATCH_COUNT 10
+int sub_match_count = DEFAULT_SUB_MATCH_COUNT;
+regmatch_t *pmatch = NULL;
+char *match_string = NULL;
+
+void matchstrings(strnumber s, strnumber t, int subcount, boolean icase) {
+    regex_t preg;
+    int cflags = REG_EXTENDED;
+    int eflags = 0;
+    int ret;
+    char *str;
+    
+    if (icase) {
+        cflags |= REG_ICASE;
+    }
+    
+    if (poolptr + 10 >= poolsize) {
+        poolptr = poolsize;
+        return;
+    }
+    
+    str = makecstring(s);
+    ret = regcomp(&preg, str, cflags);
+    if (ret != 0) {
+        int size = regerror(ret, &preg, NULL, 0);
+        str = xtalloc(size, char);
+        regerror(ret, &preg, str, size);
+        pdftex_warn("%s%s", "\\pdfmatch: ", str);
+        xfree(str);
+        strpool[poolptr++] = '-';
+        strpool[poolptr++] = '1';
+    }
+    else {
+        str = makecstring(t);
+        sub_match_count = ((subcount < 0) ?
+                           DEFAULT_SUB_MATCH_COUNT : subcount);
+        xfree(pmatch);
+        if (sub_match_count > 0) {
+           pmatch = xtalloc(sub_match_count, regmatch_t);
+        }
+        ret = regexec(&preg, str, sub_match_count, pmatch, eflags);
+        xfree(match_string);
+        match_string = xstrdup(str);
+        if (ret == 0) {
+            strpool[poolptr++] = '1';
+        }
+        else { /* REG_NOMATCH */
+            strpool[poolptr++] = '0';
+        }
+    }
+    
+    regfree(&preg);
+}
+
+void getmatch(int i) {
+    int size = 0;
+    int len = 0;
+    
+    boolean found = i < sub_match_count
+                    && match_string != NULL
+                    && pmatch[i].rm_so >= 0
+                    && i >= 0;
+    
+    if (found) {
+        len = pmatch[i].rm_eo - pmatch[i].rm_so;
+        size = 20 + len;
+        /* 20: place for integer number and '->' */
+    }
+    else {
+        size = 4;
+    }
+    
+    if (poolptr + size >= poolsize) {
+        poolptr = poolsize;
+        return;
+    }
+    
+    if (found) {
+        sprintf(&strpool[poolptr], "%d", pmatch[i].rm_so);
+        poolptr += strlen(&strpool[poolptr]);
+        strpool[poolptr++] = '-';
+        strpool[poolptr++] = '>';
+        memcpy(&strpool[poolptr], &match_string[pmatch[i].rm_so], len);
+        poolptr += len;
+        return;
+    }
+    
+    strpool[poolptr++] = '-';
+    strpool[poolptr++] = '1';
+    strpool[poolptr++] = '-';
+    strpool[poolptr++] = '>';
+}
+
+
+/* makecfilename
+  input/ouput same as makecstring:
+    input: string number
+    output: C string (buffer address that contains the string)
+  WIN32: quotes are removed.
+*/
+char *makecfilename(strnumber s) {
+    char *name = makecstring(s);
+#ifdef WIN32
+    /* unquote file name */
+    if (*cur_file_name == '"') {
+        char *p = cur_file_name;
+        char *q = cur_file_name;
+        while (p && *p) {
+            *q = (*p == '"' ? *(++p) : *p);
+            p++, q++;
+        }
+        *q = '\0';
+    }
+    fprintf(stderr, " %s\n", cur_file_name);
+#endif
+}
+
+boolean isquotebad() {
+#ifdef WIN32
+    return true;
+#else
+    return false;
+#endif
 }
