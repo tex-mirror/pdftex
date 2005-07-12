@@ -1,5 +1,6 @@
 /* tilde.c: Expand user's home directories.
 
+Copyright (C) 2005, Olaf Weber.
 Copyright (C) 1993, 95, 96, 97 Karl Berry.
 
 This library is free software; you can redistribute it and/or
@@ -35,11 +36,25 @@ kpse_tilde_expand P1C(const_string, name)
 {
   const_string expansion;
   const_string home;
+  const_string prefix;
   
   assert (name);
+
+  /* If there is a leading "!!", set prefix to "!!", otherwise use
+     the empty string.  After this, we can test whether a prefix was
+     found by checking *prefix, and it is safe to unconditionally
+     prepend it. */
+  if (name[0] == '!' && name[1] == '!') {
+    name += 2;
+    prefix = "!!";
+  } else {
+    prefix = "";
+  }
   
-  /* If no leading tilde, do nothing.  */
+  /* If no leading tilde, do nothing, and return the original string.  */
   if (*name != '~') {
+    if (*prefix)
+      name -= 2;
     expansion = name;
   
   /* If a bare tilde, return the home directory or `.'.  (Very unlikely
@@ -49,7 +64,7 @@ kpse_tilde_expand P1C(const_string, name)
     if (!home) {
       home = ".";
     }
-    expansion = xstrdup (home);
+    expansion = concat (prefix, home);
   
   /* If `~/', remove any trailing / or replace leading // in $HOME.
      Should really check for doubled intermediate slashes, too.  */
@@ -65,13 +80,12 @@ kpse_tilde_expand P1C(const_string, name)
     if (IS_DIR_SEP (home[strlen (home) - 1])) {        /* omit / after ~ */
       c++;
     }
-    expansion = concat (home, name + c);
+    expansion = concat3 (prefix, home, name + c);
   
   /* If `~user' or `~user/', look up user in the passwd database (but
      OS/2 doesn't have this concept.  */
-  } else
+  } else {
 #ifdef HAVE_PWD_H
-    {
       struct passwd *p;
       string user;
       unsigned c = 2;
@@ -95,12 +109,15 @@ kpse_tilde_expand P1C(const_string, name)
       if (IS_DIR_SEP (home[strlen (home) - 1]) && name[c] != 0)
         c++; /* If HOME ends in /, omit the / after ~user. */
 
-      expansion = name[c] == 0 ? xstrdup (home) : concat (home, name + c);
-    }
+      expansion = concat3 (prefix, home, name + c);
 #else /* not HAVE_PWD_H */
-    expansion = name;
+      /* Since we don't know how to look up a user name, just return the
+         original string. */
+      if (*prefix)
+        name -= 2;
+      expansion = name;
 #endif /* not HAVE_PWD_H */
-
+  }
   /* We may return the same thing as the original, and then we might not
      be returning a malloc-ed string.  Callers beware.  Sorry.  */
   return (string) expansion;
@@ -128,6 +145,12 @@ main ()
   test_expand_tilde ("~root");
   test_expand_tilde ("~");
   test_expand_tilde ("foo~bar");
+
+  test_expand_tilde ("!!");
+  test_expand_tilde ("!!none");
+  test_expand_tilde ("!!~root");
+  test_expand_tilde ("!!~");
+  test_expand_tilde ("!!foo~bar");
   
   return 0;
 }

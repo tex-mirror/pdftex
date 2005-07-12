@@ -6,7 +6,7 @@
 #
 # Heavily modified for pdftex by Thomas Esser, 1998, 1999
 #
-# $Id: //depot/Build/source.development/TeX/libs/xpdf/xpdf/Makefile.in#25 $
+# $Id: //depot/Build/source.development/TeX/libs/xpdf/xpdf/Makefile.in#26 $
 #========================================================================
 
 VPATH = @srcdir@
@@ -20,7 +20,7 @@ CXX = @CXX@
 ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ $(XCFLAGS) -I.. -I$(srcdir)/.. -I$(goodir) -I$(fofidir) -I. -I$(srcdir) \
 	-DPDF_PARSER_ONLY
 
-ac_include ../../texk/make/library.mk
+kpse_include ../../texk/make/library.mk
 
 .SUFFIXES:
 .SUFFIXES: .cc .o
@@ -60,4 +60,4 @@ depend:
 
 #------------------------------------------------------------------------
 
-ac_include xpdf/depend.mk
+kpse_include xpdf/depend.mk

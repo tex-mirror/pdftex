@@ -1,6 +1,6 @@
 dnl Included by web2c and xdvik to handle the obsolete --with-x-toolkit option.
 
-AC_ARG_WITH(x-toolkit,
+AC_ARG_WITH([x-toolkit],
 [  --with-x-toolkit=KIT    OBSOLETE: use --with-mf-x-toolkit and/or
                           --with-xdvi-x-toolkit instead.],
 [

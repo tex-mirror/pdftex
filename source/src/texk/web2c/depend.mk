@@ -858,92 +858,6 @@ pdftexini.o: pdftexini.c pdftexd.h texmfmp.h cpascal.h config.h \
   $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
   texmfmem.h pdftexcoerce.h pdftexdir/pdftex.h pdftexdir/ptexlib.h \
   pdftexdir/ptexmac.h
-pdfxtex0.o: pdfxtex0.c pdfxtexd.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h \
-  $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
-  pdftexdir/ptexmac.h
-pdfxtex1.o: pdfxtex1.c pdfxtexd.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h \
-  $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
-  pdftexdir/ptexmac.h
-pdfxtex2.o: pdfxtex2.c pdfxtexd.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h \
-  $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
-  pdftexdir/ptexmac.h
-pdfxtex3.o: pdfxtex3.c pdfxtexd.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h \
-  $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
-  pdftexdir/ptexmac.h
-pdfxtexextra.o: pdfxtexextra.c pdfxtexd.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h \
-  $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
-  pdftexdir/ptexmac.h $(kpathsea_srcdir)/line.h $(kpathsea_srcdir)/readable.h \
-  $(kpathsea_srcdir)/variable.h $(kpathsea_srcdir)/absolute.h \
-  texmfmp-help.h pdfxtexdir/pdfxtexextra.h 
-pdfxtexini.o: pdfxtexini.c pdfxtexd.h texmfmp.h cpascal.h config.h \
-  $(kpathsea_srcdir)/config.h $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
-  $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
-  $(kpathsea_srcdir)/c-memstr.h \
-  $(kpathsea_srcdir)/c-errno.h \
-  $(kpathsea_srcdir)/c-minmax.h $(kpathsea_srcdir)/c-limits.h \
-  $(kpathsea_srcdir)/c-proto.h $(kpathsea_srcdir)/debug.h $(kpathsea_srcdir)/types.h \
-  $(kpathsea_srcdir)/lib.h $(kpathsea_srcdir)/progname.h ../web2c/c-auto.h \
-  $(kpathsea_srcdir)/c-vararg.h $(kpathsea_srcdir)/c-fopen.h \
-  $(kpathsea_srcdir)/getopt.h $(kpathsea_srcdir)/proginit.h \
-  $(kpathsea_srcdir)/tex-file.h help.h $(kpathsea_srcdir)/c-pathch.h \
-  $(kpathsea_srcdir)/c-ctype.h $(kpathsea_srcdir)/tex-make.h \
-  texmfmem.h pdfxtexcoerce.h pdfxtexdir/pdfxtex.h pdftexdir/ptexlib.h \
-  pdftexdir/ptexmac.h
 pktogf.o: pktogf.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \
@@ -1121,7 +1035,7 @@ ttf2afm.o: ttf2afm.c $(kpathsea_srcdir)/kpathsea.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_srcdir)/tex-glyph.h $(kpathsea_srcdir)/tex-hush.h $(kpathsea_srcdir)/tex-make.h \
   $(kpathsea_srcdir)/tilde.h $(kpathsea_srcdir)/truncate.h $(kpathsea_srcdir)/variable.h \
   $(kpathsea_srcdir)/xopendir.h $(kpathsea_srcdir)/xstat.h pdftexdir/ptexmac.h \
-  macnames.c
+  pdftexdir/writettf.h macnames.c
 vftovp.o: vftovp.c cpascal.h config.h $(kpathsea_srcdir)/config.h \
   $(kpathsea_dir)/c-auto.h $(kpathsea_srcdir)/c-std.h \
   $(kpathsea_srcdir)/c-unistd.h $(kpathsea_srcdir)/systypes.h \

@@ -1,6 +1,6 @@
 /* expand.c: general expansion.
 
-Copyright (C) 1993, 94, 95, 96, 97, 98 Karl Berry & Olaf Weber.
+Copyright (C) 1993, 94, 95, 96, 97, 98, 05 Karl Berry & Olaf Weber.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -271,6 +271,7 @@ static str_list_type brace_expand P1C(const_string *, text)
     result = str_list_init();
     partial = str_list_init();
     for (p = *text; *p && *p != '}'; ++p) {
+        /* FIXME: Should be IS_ENV_SEP(*p) */
         if (*p == ENV_SEP || *p == ',') {
             expand_append(&partial, *text, p);
             str_list_concat(&result, partial);

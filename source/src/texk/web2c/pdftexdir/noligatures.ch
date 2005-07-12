@@ -34,8 +34,6 @@ back to |char_info|. It would not compile without using the
 |orig| trick because |effective_char| is not yet known at the spot 
 where |test_no_ligatures| is used. sigh.
 
-Released to the public domain by the author, Taco Hoekwater
-
 @x [230]
 @d ef_code_base == 4
 @y
@@ -65,7 +63,7 @@ var c:integer;
 begin
  test_no_ligatures:= 1;
  for c := font_bc[f] to font_ec[f] do
-	if char_exists(orig_char_info(f)(c)) then
+    if char_exists(orig_char_info(f)(c)) then
       if odd(char_tag(orig_char_info(f)(c))) then begin
         test_no_ligatures:= 0;
         return;
@@ -82,10 +80,10 @@ function init_font_base(v: integer): integer;
 procedure set_no_ligatures(f: internal_font_number);
 var c:integer; 
 begin
- for c := font_bc[f] to font_ec[f] do
-	if char_exists(orig_char_info(f)(c)) then
-      if odd(char_tag(orig_char_info(f)(c))) then
-        op_byte(orig_char_info(f)(c)) := (op_byte(orig_char_info(f)(c))) - lig_tag;
+    for c := font_bc[f] to font_ec[f] do
+        if char_exists(orig_char_info(f)(c)) then
+            if char_tag(orig_char_info(f)(c))=lig_tag then
+                op_byte(orig_char_info(f)(c)) := (op_byte(orig_char_info(f)(c))) - lig_tag;
 end;
 
 function init_font_base(v: integer): integer;

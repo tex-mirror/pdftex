@@ -15,10 +15,6 @@ making use of multiple master fonts.
 pdfeTeX is an even more extended version of TeX than pdfTeX because it is
 not based on TeX but on eTeX, an extended version of TeX. 
 
-pdfxTeX is an experimental version of pdfeTeX, which apart from pdfTeX and
-eTeX contains some features for testing purpose. When some feature seems to
-be useful and stable, it can be moved to pdfTeX.
-
 pdfTeX is based on the original TeX sources and Web2c, and has been
 successfully compiled on Unix, Win32 and DOS systems. It is still under
 development and features may change; it produces reasonable PDF code.

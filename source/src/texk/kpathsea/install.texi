@@ -1050,6 +1050,7 @@ The @samp{texmfvar} setting in @code{MT_FEATURES} is overridden by the
 feature is enabled, and if set to @samp{0}, the feature is disabled.
 @end vtable
 
+
 @node mktex script names
 @subsubsection @file{mktex} script names
 

@@ -7,9 +7,9 @@
 # For conditions of distribution and use of the other files in this
 # directory, see copyright notice in png.h.
 
-ac_include ../texk/make/common.mk
-ac_include ../texk/make/programs.mk
-ac_include ../texk/make/library.mk
+kpse_include ../texk/make/common.mk
+kpse_include ../texk/make/programs.mk
+kpse_include ../texk/make/library.mk
 
 ZLIBDIR=../zlib
 ZLIBSRCDIR=$(srcdir)/$(ZLIBDIR)

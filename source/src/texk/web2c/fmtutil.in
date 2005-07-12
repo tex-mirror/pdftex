@@ -34,7 +34,7 @@
 # initex (or another "ini"-engine) on.
 
 # metafont and metapost:
-mf		mf-nowin	-		-translate-file=cp227.tcx mf.ini
+mf		mf		-		-translate-file=cp227.tcx mf.ini
 mpost		mpost		-		-translate-file=cp227.tcx mpost.mp
 metafun		mpost		-		-translate-file=cp227.tcx metafun.mp
 

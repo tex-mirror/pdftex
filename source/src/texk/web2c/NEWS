@@ -1,4 +1,8 @@
 This file records noteworthy changes.
+7.5.5
+* MP: Version 0.9
+* mpware: Brought to the equivalent of version 0.9.
+
 7.5.4 (6 February 2005)
 * TeX: \ifeof18 is false if \write18 is enabled.
 * MF, MP: Prevent pathological code from overflowing the "serial number"

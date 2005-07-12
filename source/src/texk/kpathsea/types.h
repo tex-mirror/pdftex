@@ -1,6 +1,6 @@
 /* types.h: general types.
 
-Copyright (C) 1993, 95, 96 Free Software Foundation, Inc.
+Copyright (C) 1993, 1995, 96, 2005 Free Software Foundation, Inc.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -26,9 +26,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 typedef int boolean;
 /* `true' and `false' are reserved words in C++.  */
 #ifndef __cplusplus
+#ifndef true
 #define true 1
 #define false 0
-#endif /* __cplusplus */
+#endif /* not true */
+#endif /* not __cplusplus */
 #endif /* not HAVE_BOOLEAN */
 
 /* The X library (among other things) defines `FALSE' and `TRUE', and so

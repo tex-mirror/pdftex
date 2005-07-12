@@ -1,5 +1,9 @@
 This file records noteworthy changes.
-3.5.4 (6 February 2005)
+3.5.5
+* On UNIX, accept the semicolon as well as the colon in environment
+  variables like TEXINPUTS.
+
+3.5.4 (7 March 2005)
 * Change of some standard environment/texmf.cnf variables:
   HOMETEXMF -> TEXMFHOME
   VARTEXMF -> TEXMFVAR

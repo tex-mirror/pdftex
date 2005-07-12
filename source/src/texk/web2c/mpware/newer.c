@@ -1,27 +1,16 @@
-/****************************************************************
-Copyright 1990 - 1995 by AT&T Bell Laboratories.
+/* newer - true if any source file is newer than the target file.
+ *
+ * Public domain.
+ *
+ * This program used to be Copyright 1990 - 1995 by AT&T Bell Laboratories,
+ * and the original version was written by John Hobby.  It has since been
+ * placed in the public domain.
+ */
 
-Permission to use, copy, modify, and distribute this software
-and its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the names of AT&T Bell Laboratories or
-any of its entities not be used in advertising or publicity
-pertaining to distribution of the software without specific,
-written prior permission.
-
-AT&T disclaims all warranties with regard to this software,
-including all implied warranties of merchantability and fitness.
-In no event shall AT&T be liable for any special, indirect or
-consequential damages or any damages whatsoever resulting from
-loss of use, data or profits, whether in an action of contract,
-negligence or other tortious action, arising out of or in
-connection with the use or performance of this software.
-****************************************************************/
-
+#ifdef HAVE_CONFIG_H
 #include "c-auto.h"     /* In case we need, e.g., _POSIX_SOURCE */
 #include "config.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #ifndef WIN32
@@ -29,61 +18,127 @@ connection with the use or performance of this software.
 #include <sys/stat.h>
 #endif
 
+/* Exit codes are 0 for success ("true") and 1 for failure ("false"). */
+#define exit_false 1
+#define exit_true  0
+
+/* We may have high-res timers in struct stat.  If we do, use them.  */
+#if HAVE_ST_MTIM
+#define NEWER(S,T) (S.st_mtim.tv_sec > T.st_mtim.tv_sec ||              \
+                    (S.st_mtim.tv_sec  == T.st_mtim.tv_sec &&           \
+                     S.st_mtim.tv_nsec >= T.st_mtim.tv_nsec))
+#else
+#define NEWER(S,T) (S.st_mtime >= T.st_mtime)
+#endif
+
+int i;
+int verbose = 1;
+int missing_source = 0;
+int missing_target = 0;
+int result = exit_false;
+
 /*
- *      newer x y
+ *      newer src1 [ src2 ... srcN ] target
  *
- *      returns 0 if x exists and y does not, or if
- *      files x and y both exist and x was modified
- *      at least as recently as y, and nonzero otherwise.
- *      (i.e., it's really ``is x older than y'', not ``is y newer than x'')
- *      Perhaps this program should be replaced by ls -lt, but then two
- *      files with the same mtime couldn't be handled right ...
+ *      returns 0 if files `src1' ... `srcN' exist and 
+ *      at least one of them is not older than `target'
+ *      or if `target' doesn't exist.
  */
 
-int main P2C(int,argc, char**,argv)
+int
+main(int argc, char **argv)
 {
-        struct stat x, y;
+    struct stat source_stat, target_stat;
 
-        if (argc > 1 && strcmp (argv[1], "--help") == 0) {
-          fputs ("Usage: newer [OPTION]... FILE1 FILE2\n\
-  Exit successfully if FILE1 exists and is at least as recent as FILE2.\n\
+    while ((argc > 1) && (argv[1][0] == '-')) {
+        if (strcmp(argv[1], "-v") == 0 ||
+            strcmp(argv[1], "-verbose") == 0 ||
+            strcmp(argv[1], "--verbose") == 0) {
+
+            verbose = 1;
+            argv++;
+            argc--;
+
+        } else if (strcmp(argv[1], "-q") == 0 ||
+                   strcmp(argv[1], "-quiet") == 0 ||
+                   strcmp(argv[1], "--quiet") == 0) {
+
+            verbose = 0;
+            argv++;
+            argc--;
+
+        } else if (strcmp(argv[1], "-help") == 0 ||
+                   strcmp(argv[1], "--help") == 0) {
+
+            fputs("Usage: newer [OPTION] src1 [ src2 ... srcN ] target\n\
+  Exit successfully if `src1' ... `srcN' exist and at least\n\
+  one of them is not older than `target'.\n\
+  Also exit successfully if `target' doesn't exist.\n\
 \n\
 --help      display this help and exit\n\
+--quiet     do not print anything\n\
+--verbose   list missing input files (default)\n\
 --version   output version information and exit\n\n", stdout);
-          fputs ("Email bug reports to tex-k@mail.tug.org.\n", stdout);
-          exit(0);
-        } else if (argc > 1 && strcmp (argv[1], "--version") == 0) {
-          printf ("newer%s 0.63\n\
-Copyright (C) 1996 AT&T Bell Laboratories.\n\
-There is NO warranty.  You may redistribute this software\n\
-under the terms of the GNU General Public License\n\
-and the newer copyright.\n\
-For more information about these matters, see the files\n\
-named COPYING and the newer source.\n\
-Primary author of newer: John Hobby.\n",
-WEB2CVERSION);
-          exit (0);
-        }
+            fputs ("Email bug reports to metapost@tug.org.\n", stdout);
+            exit(0);
 
-        /* insist on exactly two args */
-        if (argc != 3) {
-          fputs ("newer: Need exactly two arguments.\n", stderr);
-          fputs ("Try `newer --help' for more information.\n", stderr);
-          exit(1);
+        } else if (strcmp(argv[1], "-version") == 0 ||
+                   strcmp(argv[1], "--version") == 0) {
+
+            fputs("newer 0.901\n\
+This program is in the public domain.\n\
+Primary author of newer: John Hobby.\n", stdout);
+            exit(0);
+
+        } else {
+
+            fprintf(stderr, "newer: Unknown option \"%s\"\n", argv[1]);
+            fputs("Try `newer --help' for more information.\n", stderr);
+            exit(1);
+
         }
-        
-        /* does the first file exist? */
-        if (stat (argv[1], &x) < 0)
-                exit(1);
-        
-        /* does the second file exist? */
-        if (stat (argv[2], &y) < 0)
-                exit(0);
-        
-        /* fail if the first file is older than the second */
-        if (x.st_mtime < y.st_mtime)
-                exit(1);
-        
-        /* otherwise, succeed */
-        exit(0);
+    }
+    
+    /* do we have at least two arguments? */
+    if (argc < 3) {
+        fputs ("newer: Too few arguments.\n\
+Try `newer --help' for more information.\n", stderr);
+        exit(1);
+    }
+    
+    /* check the target file */
+    if (stat(argv[argc-1], &target_stat) < 0) {
+        if (verbose) {
+            fprintf(stderr, "newer: target file `%s' doesn't exist.\n",
+                    argv[argc-1]);
+        }
+        missing_target = 1;
+    }
+    
+    /* check the source files */
+    for (i = 1; i < (argc-1); i++) {
+        if (stat(argv[i], &source_stat) < 0) {
+	    if (verbose) {
+                fprintf (stderr, "newer: source file `%s' doesn't exist.\n", 
+                         argv[i]);
+            }
+	    missing_source = 1;
+        } else if (!missing_target) {
+            if (NEWER(source_stat, target_stat)) {
+                result = exit_true;
+            }
+        }
+    }
+
+    /* Adjust result for cases when source or target is missing:
+     *   missing source => exit_false
+     *   missing target => exit_true
+     */
+    if (missing_source) {
+        result = exit_false;
+    } else if (missing_target) {
+        result = exit_true;
+    }
+
+    return result;
 }

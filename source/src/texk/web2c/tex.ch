@@ -203,7 +203,7 @@ versions of the program.
 @d ssup_max_strings == 262143
 {Larger values than 65536 cause the arrays consume much more memory.}
 @d ssup_trie_opcode == 65535
-@d ssup_trie_size == 262143
+@d ssup_trie_size == 4194303
 
 @d ssup_hyph_size == 65535 {Changing this requires changing (un)dumping!}
 @d iinf_hyphen_size == 610 {Must be not less than |hyph_prime|!}
@@ -2241,9 +2241,11 @@ if length(cur_name)=0 then cur_name:=saved_cur_name;
 @!months:^char;
 @z
 
-@x [29.534] l.10289 - Filename change for the recorder.
+@x [29.534] l.10300 - Filename change for the recorder.
+if job_name=0 then job_name:="texput";
 @.texput@>
 @y
+if job_name=0 then job_name:=get_job_name("texput");
 @.texput@>
 pack_job_name(".fls");
 recorder_change_filename(stringcast(name_of_file+1));
@@ -2369,7 +2371,7 @@ if name=str_ptr-1 then {we can try to conserve string pool space now}
 @x [29.537] l.10352 - start_input: was job_name given on the command line?
   begin job_name:=cur_name; open_log_file;
 @y
-  begin job_name:=get_job_name; open_log_file;
+  begin job_name:=get_job_name(cur_name); open_log_file;
 @z
 
 @x [29.537] l.10356 - 

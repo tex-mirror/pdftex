@@ -1,18 +1,18 @@
 AC_INIT(xpdf/Array.cc)
 AC_CONFIG_AUX_DIR(../../config)
-AC_CONFIG_HEADER(aconf.h)
+AC_CONFIG_HEADERS(aconf.h)
 
 dnl ##### Optional features.
-AC_ARG_ENABLE(a4-paper,
+AC_ARG_ENABLE([a4-paper],
 [  --enable-a4-paper       use A4 paper size instead of Letter for
                           PostScript output],
-AC_DEFINE(A4_PAPER))
+[AC_DEFINE(A4_PAPER)])
 AC_ARG_ENABLE(opi,
 [  --enable-opi            include support for OPI comments],
-AC_DEFINE(OPI_SUPPORT))
-AC_ARG_ENABLE(multithreaded,
+[AC_DEFINE(OPI_SUPPORT)])
+AC_ARG_ENABLE([multithreaded],
 [  --enable-multithreaded  include support for multithreading],
-AC_DEFINE(MULTITHREADED))
+[AC_DEFINE(MULTITHREADED)])
 
 dnl ##### Path to xpdfrc.
 dnl This ugly kludge to get the sysconfdir path is needed because
@@ -89,4 +89,6 @@ dnl ##### Back to C for the library tests.
 AC_LANG_C
 
 dnl ##### Write the makefiles.
-AC_OUTPUT(Makefile xpdf/Makefile goo/Makefile fofi/Makefile)
+AC_CONFIG_FILES([Makefile])
+KPSE_CONFIG_FILES([xpdf/Makefile goo/Makefile fofi/Makefile])
+AC_OUTPUT

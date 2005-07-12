@@ -13,7 +13,7 @@
 # <te@dbs.uni-hannover.de>, Okt., 1994.
 # Public domain.
 
-version='$Id: mktexlsr,v 1.45 2005/01/21 19:13:57 olaf Exp $'
+version='$Id: mktexlsr,v 1.46 2005/06/21 14:32:26 olaf Exp $'
 progname=`echo $0 | sed 's%.*/%%'`
 usage="Usage: $progname [DIRS ...]
 
@@ -42,9 +42,11 @@ case $dirname in
   "") # Do nothing
       ;;
   /* | [A-z]:/*) # Absolute name
-      PATH="$dirname$SEP$PATH" ;;
+      PATH="$dirname$SEP$PATH"
+      export PATH ;;
    *)  # Relative name
-      PATH="`pwd`/$dirname$SEP$PATH" ;;
+      PATH="`pwd`/$dirname$SEP$PATH"
+      export PATH ;;
 esac
 
 # A copy of some stuff from mktex.opt, so we can run in the presence of

@@ -141,8 +141,8 @@
 @define function xftell ();
 @define function xmalloc ();
 @define function xmallocarray ();
-@define function xreallocarray ();
 @define function xrealloc ();
+@define function xreallocarray ();
 @define function xstrdup ();
 @define function XTALLOC ();
 

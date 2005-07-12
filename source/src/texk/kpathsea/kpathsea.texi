@@ -2,8 +2,8 @@
 @setfilename kpathsea.info
 @settitle Kpathsea: A library for path searching
 
-@set version 3.5.4
-@set month-year February 2005
+@set version 3.5.5
+@set month-year June 2005
 
 @c Define new indices for commands, filenames, and options.
 @defcodeindex cm
@@ -34,7 +34,7 @@
 @copying
 This file documents the Kpathsea library for path searching.
 
-Copyright (C) 1993-2004 Karl Berry & Olaf Weber.
+Copyright (C) 1993-2005 Karl Berry & Olaf Weber.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -492,8 +492,7 @@ feature is not available on the right-hand side; instead, you must use
 an additional variable (see below for example).  A @samp{;} in
 @var{value} is translated to @samp{:} if running under Unix; this is
 useful to write a single @file{texmf.cnf} which can be used under both
-Unix and NT.  (If you really want @samp{;}'s in your filenames, add
-@samp{-DALLOW_SEMICOLON_IN_FILENAMES} to @code{CFLAGS}.)
+Unix and NT.
 
 @item All definitions are read before anything is expanded, so you can
 use variables before they are defined (like Make, unlike most other

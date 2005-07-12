@@ -16,12 +16,12 @@ dnl to build part of the distribution may not have any given program.
 dnl Even main.c isn't guaranteed, but then nothing is, really ...
 AC_INIT(web2c/main.c)
 
-WEB2CVERSION=7.5.4
+WEB2CVERSION=7.5.5
 AC_SUBST(WEB2CVERSION)
 AC_DEFINE_UNQUOTED(WEB2CVERSION," (Web2C $WEB2CVERSION)")
 
 dnl Write output here, instead of putting a zillion -D's on the command line.
-AC_CONFIG_HEADER(c-auto.h:c-auto.in)
+AC_CONFIG_HEADERS([c-auto.h:c-auto.in], [date >stamp-auto])
 
 AC_PROG_CC
 AC_PROG_INSTALL
@@ -116,8 +116,7 @@ else
 fi
 if test "x$with_omega" = xyes; then
   OMEGA=
-  omegafontsmakefile=omegafonts/Makefile
-  otpsmakefile=otps/Makefile
+  KPSE_CONFIG_FILES([omegafonts/Makefile otps/Makefile])
 else
   OMEGA='#! '
 fi
@@ -294,7 +293,7 @@ if test "x$with_x" = xyes; then
     AC_CHECK_LIB(Xext, XextCreateExtension,
                  x_ext_lib=-lXext, :, $wlibs $X_EXTRA_LIBS $XLFLAG)
   fi
-  if test "x$with_x_toolkit" = xno; then
+  if test "x$with_mf_x_toolkit" = xno; then
     wfile=x11-Xlib.c
   else
     # Effectively demote --with-x-toolkit=athena to xt since 
@@ -326,12 +325,12 @@ AC_SUBST(FMU)
 if test "$with_pdftex" = yes || \
    test "$with_pdfetex" = yes
 then
-  libpdfmakefile=pdftexdir/Makefile
+  KPSE_CONFIG_FILES([pdftexdir/Makefile])
 fi
 
 # Don't bother with pdfelib unless pdfeTeX is requested.
 if test "$with_pdfetex" = yes; then
-  libpdfemakefile=pdfetexdir/Makefile
+  AC_CONFIG_FILES([pdfetexdir/Makefile])
 fi
 
 dnl Create tests subdirectory.
@@ -363,9 +362,7 @@ KPSE_CROSS_PATH_PROG(OTANGLE, otangle, ./otangle)
 fi
 
 dnl Generate `Makefile's, `config.status', and our header file.
-AC_OUTPUT(Makefile doc/Makefile lib/Makefile man/Makefile mpware/Makefile 
-          web2c/Makefile window/Makefile
-          $libpdfmakefile $libpdfemakefile $libpdfxmakefile
-          $omegafontsmakefile $otpsmakefile fmtutil.cnf:fmtutil.in)
-dnl Update stamp-auto, since we just remade `c-auto.h'.
-date >stamp-auto
+KPSE_CONFIG_FILES([Makefile doc/Makefile lib/Makefile man/Makefile mpware/Makefile 
+          web2c/Makefile window/Makefile])
+AC_CONFIG_FILES([fmtutil.cnf:fmtutil.in])
+AC_OUTPUT

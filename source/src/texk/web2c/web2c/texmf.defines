@@ -22,7 +22,7 @@
 @define function callmakempx ();
 @define function floorscaled ();
 @define function floorunscaled ();
-@define function getjobname;
+@define function getjobname ();
 @define function getrandomseed;
 @define function initscreen;
 @define function inputln ();

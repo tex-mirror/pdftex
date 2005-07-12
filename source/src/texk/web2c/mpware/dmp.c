@@ -1,24 +1,13 @@
-/****************************************************************
-Copyright 1990 - 1995 by AT&T Bell Laboratories.
-
-Permission to use, copy, modify, and distribute this software
-and its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the names of AT&T Bell Laboratories or
-any of its entities not be used in advertising or publicity
-pertaining to distribution of the software without specific,
-written prior permission.
-
-AT&T disclaims all warranties with regard to this software,
-including all implied warranties of merchantability and fitness.
-In no event shall AT&T be liable for any special, indirect or
-consequential damages or any damages whatsoever resulting from
-loss of use, data or profits, whether in an action of contract,
-negligence or other tortious action, arising out of or in
-connection with the use or performance of this software.
-****************************************************************/
+/* $Id: dmp.c,v 1.17 2005/06/22 17:31:43 olaf Exp $
+ *
+ * Public domain.
+ *
+ * Previous versions of this file were copyright 1990 - 1995 by AT&T
+ * Bell Laboratories.  It has since been put into the public domain.
+ *
+ * John Hobby wrote the original version, which has since been
+ * modified by several other people.
+ */
 
 /* This program reads device-independent troff output files,
    and converts them into a symbolic form understood by MetaPost.  Some
@@ -1280,7 +1269,7 @@ void dmp_usage P2C(char*,name, int,status)
 --help      display this help and exit\n\
 --version   output version information and exit\n", f);
     putc ('\n', f);
-    fputs (kpse_bug_address, f);
+    fputs ("Email bug reports to metapost@tug.org.\n", f);
     exit(status);
 }
 

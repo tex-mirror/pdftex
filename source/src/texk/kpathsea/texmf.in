@@ -212,6 +212,10 @@ TEXINPUTS.pdfamstex = .;$TEXMF/tex/{amstex,plain,generic,}//
 TEXINPUTS.pdfelatex = .;$TEXMF/tex/{latex,generic,}//
 TEXINPUTS.pdfetex   = .;$TEXMF/tex/{plain,generic,}//
 
+% pdfxTeX.
+TEXINPUTS.pdfxlatex = .;$TEXMF/tex/{latex,generic,}//
+TEXINPUTS.pdfxtex   = .;$TEXMF/tex/{plain,generic,}//
+
 % XeTeX
 TEXINPUTS.xelatex = .;$TEXMF/tex/{latex,generic,}//
 TEXINPUTS.xetex   = .;$TEXMF/tex/{plain,generic,}//

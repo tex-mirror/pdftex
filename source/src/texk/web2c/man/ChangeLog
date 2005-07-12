@@ -1,3 +1,31 @@
+2005-07-12  Martin Schröder <martin@oneiros.de>
+
+	* Makefile.in: Remove support for pdfxtex
+
+        * pdfxtex.man: Removed
+        
+2005-06-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Replace ac_include with kpse_include.  From Peter
+	Breitenlohner.
+
+2005-06-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* newer.man: Update manual page for new interface of newer.
+
+2005-01-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mf.man: Omitted a man page correction. From Eric S. Raymond
+	<esr@thyrsus.com>.
+
+	* amstex.man, bibtex.man, dmp.man, dvitype.man, eplain.man,
+	etex.man, gftodvi.man, gftopk.man, gftype.man, makempx.man,
+	mf.man, mft.man, mpost.man, mpto.man, newer.man, omega.man,
+	patgen.man, pdfetex.man, pdftex.man, pdfxtex.man, pktogf.man,
+	pktype.man, pltotf.man, pooltype.man, tangle.man, tex.man,
+	tftopl.man, vftovp.man, vptovf.man, weave.man: Man page
+	corrections from Eric S. Raymond <esr@thyrsus.com>.
+
 2004-12-19  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* Makefile.in [manfiles]: Add cweb.1.

@@ -44,7 +44,7 @@ rem	copy %srcdir%\%2.c.opt %srcdir%\%2.c && del /f %srcdir%\%2.c.opt
 if NOT %2==pdftex goto pdfetex
 goto pdftex_or_pdfetex
 :pdfetex
-if NOT %2==pdfetex goto tex
+goto pdftex_or_pdfetex
 :pdftex_or_pdfetex
 	cat %srcdir%\web2c\common.defines %srcdir%\web2c\texmf.defines %srcdir%\%2dir\%2.defines %2.p | %srcdir%\web2c\%objdir%\web2c -htexmfmp.h -t -c%2coerce | %srcdir%\web2c\%objdir%\fixwrites -t %2 | perl %perldir%\splitup.pl --name=%2 --dfile > %2.c
 	copy %srcdir%\%2coerce.h+%srcdir%\web2c\coerce.h %srcdir%\x%2coerce.h

@@ -1,5 +1,6 @@
 /* cnf.c: read config files.
 
+Copyright (C) 2005 Olaf Weber.
 Copyright (C) 1994, 95, 96, 97 Karl Berry.
 
 This library is free software; you can redistribute it and/or
@@ -121,21 +122,15 @@ do_line P1C(string, line)
      
      So, simply translate all ;'s in the path
      values to :'s if we are a Unix binary.  (Fortunately we don't use ;
-     in other kinds of texmf.cnf values.)
+     in other kinds of texmf.cnf values.)  */
      
-     If you really want to put ; in your filenames, add
-     -DALLOW_SEMICOLON_IN_FILENAMES.  (And there's no way to get :'s in
-     your filenames, sorry.)  */
-     
-#if IS_ENV_SEP(':') && !defined (ALLOW_SEMICOLON_IN_FILENAMES)
-  {
-    string loc;
-    for (loc = value; *loc; loc++) {
-      if (*loc == ';')
-        *loc = ':';
-    }
+  if (IS_ENV_SEP(':')) {
+      string loc;
+      for (loc = value; *loc; loc++) {
+          if (*loc == ';')
+              *loc = ':';
+      }
   }
-#endif
 
   /* We want TEXINPUTS.prog to override plain TEXINPUTS.  The simplest
      way is to put both in the hash table (so we don't have to write

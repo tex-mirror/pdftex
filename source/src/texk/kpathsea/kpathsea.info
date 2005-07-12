@@ -1,4 +1,4 @@
-This is kpathsea.info, produced by makeinfo version 4.8 from
+This is kpathsea.info, produced by makeinfo version 4.7 from
 kpathsea.texi.
 
 INFO-DIR-SECTION TeX
@@ -14,7 +14,7 @@ END-INFO-DIR-ENTRY
 
   This file documents the Kpathsea library for path searching.
 
-  Copyright (C) 1993-2004 Karl Berry & Olaf Weber.
+  Copyright (C) 1993-2005 Karl Berry & Olaf Weber.
 
   Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -37,8 +37,8 @@ Kpathsea library
 ****************
 
 This manual documents how to install and use the Kpathsea library for
-filename lookup.  It corresponds to version 3.5.4, released in
-February 2005.
+filename lookup.  It corresponds to version 3.5.5, released in
+June 2005.
 
 * Menu:
 
@@ -58,8 +58,8 @@ File: kpathsea.info,  Node: Introduction,  Next: Installation,  Prev: Top,  Up: 
 1 Introduction
 **************
 
-This manual corresponds to version 3.5.4 of the Kpathsea library,
-released in February 2005.
+This manual corresponds to version 3.5.5 of the Kpathsea library,
+released in June 2005.
 
   The library's fundamental purpose is to return a filename from a list
 of directories specified by the user, similar to what shells do when
@@ -1778,19 +1778,35 @@ File: kpathsea.info,  Node: Unable to generate fonts,  Next: TeX or Metafont fai
 2.6.5.3 Unable to generate fonts
 ................................
 
-This can happen if either `mktexpk' hasn't been installed properly, or
-if the local installation of Metafont isn't correct.
+Metafont outputs fonts in bitmap format, tuned for a particular device
+at a particular resolution, in order to allow for the highest-possible
+quality of output.  Some DVI-to-whatever programs, such as Dvips, try
+to generate these on the fly when they are needed, but this generation
+may fail in several cases.
 
-  If `mf' is a command not found by `mktexpk', then you need to install
-Metafont (*note unixtex.ftp::).
+  If `mktexpk' runs, but fails with this error:
+     mktexpk: Can't guess mode for NNN dpi devices.
+     mktexpk: Use a config file to specify the mode, or update me.
+  you need to ensure the resolution and mode match; just specifying the
+resolution, as in `-D 360', is not enough.
 
-  If Metafont runs, but generates fonts at the wrong resolution, you
-need to be sure the `M' and `D' lines in your Dvips configuration file
-match (*note Config files: (dvips)Config files.).  For example, if
-`mktexpk' is generating 300dpi fonts, but you need 600dpi fonts, you
-should have:
-     M ljfour
-     D 600
+  You can specify the mode name with the `-mode' option on the Dvips
+command line, or in a Dvips configuration file (*note Config files:
+(dvips)Config files.), such as `config.ps' in your document directory,
+`~/.dvipsrc' in your home directory, or in a system directory (again
+named `config.ps').  (Other drivers use other files, naturally.)
+
+  For example, if you need 360dpi fonts, you could include this in a
+configuration file:
+     D 360
+     M lqmed
+
+  If Metafont runs, but generates fonts at the wrong resolution or for
+the wrong device, most likely `mktexpk''s built-in guess for the mode
+is wrong, and you should override it as above.
+
+  See `ftp://ftp.tug.org/tex/modes.mf' for a list of resolutions and
+mode names for most devices (additional submissions are welcome).
 
   If Metafont runs but generates fonts at a resolution of 2602dpi (and
 prints out the name of each character as well as just a character
@@ -1807,6 +1823,9 @@ base files are stored on your system (`/usr/local/share/texmf/web2c' by
 default), and make a link (either hard or soft) from `plain.base' to
 `mf.base' in that directory.  *Note inimf invocation: (web2c)inimf
 invocation.
+
+  If `mf' is a command not found at all by `mktexpk', then you need to
+install Metafont (*note unixtex.ftp::).
 
 
 File: kpathsea.info,  Node: TeX or Metafont failing,  Next: Empty Makefiles,  Prev: Unable to generate fonts,  Up: Common problems
@@ -2149,9 +2168,7 @@ mentions most features.  The format of `texmf.cnf' files follows:
      not available on the right-hand side; instead, you must use an
      additional variable (see below for example).  A `;' in VALUE is
      translated to `:' if running under Unix; this is useful to write a
-     single `texmf.cnf' which can be used under both Unix and NT.  (If
-     you really want `;''s in your filenames, add
-     `-DALLOW_SEMICOLON_IN_FILENAMES' to `CFLAGS'.)
+     single `texmf.cnf' which can be used under both Unix and NT.
 
    * All definitions are read before anything is expanded, so you can
      use variables before they are defined (like Make, unlike most other
@@ -3507,7 +3524,7 @@ Index
 * . directories, ignored:                ls-R.                (line  33)
 * . files:                               ls-R.                (line  33)
 * .2602gf:                               Unable to generate fonts.
-                                                              (line  20)
+                                                              (line  36)
 * .afm:                                  Supported file formats.
                                                               (line  20)
 * .base:                                 Supported file formats.
@@ -3592,7 +3609,7 @@ Index
 * /etc/profile and aliases:              ls-R.                (line  21)
 * /var/tmp/texfonts:                     mktex configuration. (line 106)
 * 2602gf:                                Unable to generate fonts.
-                                                              (line  20)
+                                                              (line  36)
 * 8.3 filenames, using:                  mktex configuration. (line  61)
 * : may not be ::                        Searching overview.  (line  13)
 * :: expansion:                          Default expansion.   (line   6)
@@ -3685,7 +3702,7 @@ Index
                                                               (line  36)
 * cmr10, as fallback font:               Fallback font.       (line  15)
 * cmr10.vf:                              Searching overview.  (line  31)
-* cnf.c:                                 Config files.        (line  77)
+* cnf.c:                                 Config files.        (line  75)
 * cnf.h:                                 Programming with config files.
                                                               (line  23)
 * code sharing:                          Shared library.      (line   9)
@@ -3726,7 +3743,7 @@ Index
 * configuration compiler options:        configure environment.
                                                               (line  23)
 * configuration file, source for path:   Path sources.        (line  17)
-* configuration files as shell scripts.: Config files.        (line  69)
+* configuration files as shell scripts.: Config files.        (line  67)
 * configuration of mktex scripts:        mktex configuration. (line   6)
 * configuration of optional features:    configure options.   (line  16)
 * configure error from sed:              Empty Makefiles.     (line   6)
@@ -3768,6 +3785,8 @@ Index
 * DEFS:                                  configure environment.
                                                               (line  31)
 * depot:                                 configure scenarios. (line  29)
+* device, wrong:                         Unable to generate fonts.
+                                                              (line  29)
 * directories, changing default installation: Default path generation.
                                                               (line   6)
 * directories, making append-only:       mktex configuration. (line  54)
@@ -4067,11 +4086,11 @@ Index
 * Metafont failures:                     TeX or Metafont failing.
                                                               (line   6)
 * Metafont installation:                 Unable to generate fonts.
-                                                              (line   9)
+                                                              (line  52)
 * Metafont making too-large fonts:       Unable to generate fonts.
-                                                              (line  20)
-* Metafont using the wrong resolution:   Unable to generate fonts.
-                                                              (line  12)
+                                                              (line  36)
+* Metafont using the wrong device:       Unable to generate fonts.
+                                                              (line  29)
 * MFBASES:                               Supported file formats.
                                                               (line  24)
 * MFINPUTS:                              Supported file formats.
@@ -4099,6 +4118,8 @@ Index
 * mktexmf:                               mktex script names.  (line  17)
 * mktexpk:                               mktex script names.  (line  11)
 * mktexpk , initial runs:                Simple installation. (line  79)
+* mktexpk can't guess mode:              Unable to generate fonts.
+                                                              (line  12)
 * mktextex:                              mktex script names.  (line  14)
 * mktextfm:                              mktex script names.  (line  20)
 * mode directory, omitting:              mktex configuration. (line  91)
@@ -4148,7 +4169,7 @@ Index
 * OFMFONTS:                              Supported file formats.
                                                               (line 116)
 * online Metafont display, spurious:     Unable to generate fonts.
-                                                              (line  20)
+                                                              (line  36)
 * OPENTYPEFONTS:                         Supported file formats.
                                                               (line 120)
 * OpenWin libraries, dynamic linking problems: ShellWidgetClass.
@@ -4201,7 +4222,7 @@ Index
 * PKFONTS:                               Supported file formats.
                                                               (line 139)
 * plain.base:                            Unable to generate fonts.
-                                                              (line  30)
+                                                              (line  46)
 * pointer combination warnings:          Pointer combination warnings.
                                                               (line   6)
 * PostScript driver:                     Kpathsea application distributions.
@@ -4230,7 +4251,7 @@ Index
 * programming with Kpathsea:             Calling sequence.    (line   6)
 * programs using the library:            Introduction.        (line  13)
 * proof mode:                            Unable to generate fonts.
-                                                              (line  20)
+                                                              (line  36)
 * PSHEADERS:                             Supported file formats.
                                                               (line 145)
 * pxp Pascal preprocessor:               History.             (line  12)
@@ -4248,8 +4269,6 @@ Index
 * resident.c:                            Calling sequence.    (line  45)
 * resolution, setting:                   Path searching options.
                                                               (line  15)
-* resolution, wrong:                     Unable to generate fonts.
-                                                              (line  12)
 * resolutions, last-resort:              Fallback font.       (line   6)
 * retrieving TeX:                        unixtex.ftp.         (line   6)
 * right-hand side of variable assignments: Config files.      (line  44)
@@ -4279,7 +4298,7 @@ Index
 * sh5, ok with configure:                configure shells.    (line  25)
 * shar, recommended:                     Bug checklist.       (line  57)
 * shared library, making:                Shared library.      (line   6)
-* shell scripts as configuration files:  Config files.        (line  69)
+* shell scripts as configuration files:  Config files.        (line  67)
 * shell variables:                       Variable expansion.  (line  17)
 * shell_escape, example for code:        Programming with config files.
                                                               (line  10)
@@ -4524,84 +4543,84 @@ Index
 
 Tag Table:
 Node: Top1408
-Node: Introduction2055
-Node: History4041
-Node: Installation8123
-Node: Simple installation8913
-Node: Custom installation12494
-Node: Disk space13666
-Node: Kpathsea application distributions14550
-Node: Changing search paths15664
-Node: Default path features16842
-Node: Default path generation18972
-Node: Running configure20413
-Node: configure shells21462
-Node: configure options22513
-Node: configure environment24018
-Node: configure scenarios25820
-Node: Shared library27406
-Node: Running make28737
-Node: Installing files30778
-Node: Cleaning up32720
-Node: Filename database generation33767
-Node: mktex scripts34332
-Node: mktex configuration35288
-Node: mktex script names40826
-Node: mktex script arguments41921
-Node: Installation testing42810
-Node: Security43174
-Node: TeX directory structure45733
-Node: unixtex.ftp50152
-Node: Electronic distribution52163
-Node: CD-ROM distribution54924
-Node: Other TeX packages55893
-Node: Reporting bugs57187
-Node: Bug checklist57926
-Node: Mailing lists62025
-Node: Debugging63380
-Node: Logging68445
-Node: Common problems69953
-Node: Unable to find files70784
-Node: Slow path searching73195
-Node: Unable to generate fonts74571
-Node: TeX or Metafont failing76129
-Node: Empty Makefiles78002
-Node: XtStrings79228
-Node: dlopen80062
-Node: ShellWidgetClass80878
-Node: Pointer combination warnings82505
-Node: Path searching82894
-Node: Searching overview83541
-Node: Path sources86904
-Node: Config files87973
-Node: Path expansion91476
-Node: Default expansion92425
-Node: Variable expansion94113
-Node: Tilde expansion95510
-Node: Brace expansion96404
-Node: KPSE_DOT expansion97504
-Node: Subdirectory expansion98017
-Node: Filename database100357
-Node: ls-R101668
-Node: Filename aliases104554
-Node: Database format105728
-Node: Invoking kpsewhich106740
-Node: Path searching options107615
-Node: Auxiliary tasks111751
-Node: Standard options113078
-Node: TeX support113398
-Node: Supported file formats114687
-Node: File lookup121830
-Node: Glyph lookup123119
-Node: Basic glyph lookup124244
-Node: Fontmap125121
-Node: Fallback font127733
-Node: Suppressing warnings128698
-Node: Programming129803
-Node: Programming overview130316
-Node: Calling sequence132587
-Node: Program-specific files137614
-Node: Programming with config files138650
-Node: Index139946
+Node: Introduction2051
+Node: History4033
+Node: Installation8115
+Node: Simple installation8905
+Node: Custom installation12486
+Node: Disk space13658
+Node: Kpathsea application distributions14542
+Node: Changing search paths15656
+Node: Default path features16834
+Node: Default path generation18964
+Node: Running configure20405
+Node: configure shells21454
+Node: configure options22505
+Node: configure environment24010
+Node: configure scenarios25812
+Node: Shared library27398
+Node: Running make28729
+Node: Installing files30770
+Node: Cleaning up32712
+Node: Filename database generation33759
+Node: mktex scripts34324
+Node: mktex configuration35280
+Node: mktex script names40818
+Node: mktex script arguments41913
+Node: Installation testing42802
+Node: Security43166
+Node: TeX directory structure45725
+Node: unixtex.ftp50144
+Node: Electronic distribution52155
+Node: CD-ROM distribution54916
+Node: Other TeX packages55885
+Node: Reporting bugs57179
+Node: Bug checklist57918
+Node: Mailing lists62017
+Node: Debugging63372
+Node: Logging68437
+Node: Common problems69945
+Node: Unable to find files70776
+Node: Slow path searching73187
+Node: Unable to generate fonts74563
+Node: TeX or Metafont failing77064
+Node: Empty Makefiles78937
+Node: XtStrings80163
+Node: dlopen80997
+Node: ShellWidgetClass81813
+Node: Pointer combination warnings83440
+Node: Path searching83829
+Node: Searching overview84476
+Node: Path sources87839
+Node: Config files88908
+Node: Path expansion92304
+Node: Default expansion93253
+Node: Variable expansion94941
+Node: Tilde expansion96338
+Node: Brace expansion97232
+Node: KPSE_DOT expansion98332
+Node: Subdirectory expansion98845
+Node: Filename database101185
+Node: ls-R102496
+Node: Filename aliases105382
+Node: Database format106556
+Node: Invoking kpsewhich107568
+Node: Path searching options108443
+Node: Auxiliary tasks112579
+Node: Standard options113906
+Node: TeX support114226
+Node: Supported file formats115515
+Node: File lookup122658
+Node: Glyph lookup123947
+Node: Basic glyph lookup125072
+Node: Fontmap125949
+Node: Fallback font128561
+Node: Suppressing warnings129526
+Node: Programming130631
+Node: Programming overview131144
+Node: Calling sequence133415
+Node: Program-specific files138442
+Node: Programming with config files139478
+Node: Index140774
 
 End Tag Table

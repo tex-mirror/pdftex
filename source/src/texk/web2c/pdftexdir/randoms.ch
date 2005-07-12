@@ -57,11 +57,14 @@
 @y
 @* \[7b] Random numbers.
 
+\font\tenlogo=logo10 % font used for the METAFONT logo
+\def\MP{{\tenlogo META}\-{\tenlogo POST}}
+
 This section is (almost) straight from MetaPost. I had to change
 the types (use |integer| instead of |fraction|), but that should
 not have any influence on the actual calculations (the original
 comments refer to quantities like |fraction_four| ($2^{30}$), and 
-that is the same as the numeric representation of |\maxdimen|).
+that is the same as the numeric representation of |maxdimen|).
 
 I've copied the low-level variables and routines that are needed, but 
 only those (e.g. |m_log|), not the accompanying ones like |m_exp|. Most

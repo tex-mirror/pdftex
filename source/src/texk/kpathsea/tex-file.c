@@ -1,7 +1,7 @@
 /* tex-file.c: high-level file searching by format.
 
+Copyright (C) 1998-2005 Olaf Weber.
 Copyright (C) 1993, 94, 95, 96, 97 Karl Berry.
-Copyright 1998-2004 Olaf Weber.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -210,6 +210,7 @@ static void
 init_path PVAR2C(kpse_format_info_type *, info, const_string, default_path, ap)
 {
   string env_name;
+  string env_value = NULL;
   string var = NULL;
   
   info->default_path = default_path;
@@ -225,7 +226,7 @@ init_path PVAR2C(kpse_format_info_type *, info, const_string, default_path, ap)
     if (!var) {
       /* Try PATH.prog. */
       string evar = concat3 (env_name, ".", kpse_program_name);
-      string env_value = getenv (evar);
+      env_value = getenv (evar);
       if (env_value && *env_value) {
         var = evar;
       } else {
@@ -266,12 +267,26 @@ init_path PVAR2C(kpse_format_info_type *, info, const_string, default_path, ap)
   info->path = info->raw_path = info->default_path;
   info->path_source = "compile-time paths.h";
 
+  /* Translate ';' in the envvar into ':' if that's our ENV_SEP. */
+  if (IS_ENV_SEP(':') && env_value) {
+      string loc;
+      env_value = xstrdup(env_value);  /* Freed below. */
+      for (loc = env_value; *loc; loc++) {
+          if (*loc == ';')
+              *loc = ':';
+      }
+  }
+  
   EXPAND_DEFAULT (info->cnf_path, "texmf.cnf");
   EXPAND_DEFAULT (info->client_path, "program config file");
   if (var)
-    EXPAND_DEFAULT (getenv (var), concat (var, " environment variable"));
+    EXPAND_DEFAULT (env_value, concat (var, " environment variable"));
   EXPAND_DEFAULT (info->override_path, "application override variable");
   info->path = kpse_brace_expand (info->path);
+
+  /* Free the copied env_value. */
+  if (IS_ENV_SEP(':') && env_value)
+      free(env_value);
 }}
 
 
@@ -638,6 +653,7 @@ kpse_init_format P1C(kpse_file_format_type, format)
       break;
     case kpse_opentype_format:
       INIT_FORMAT ("opentype fonts", DEFAULT_OPENTYPEFONTS, OPENTYPE_ENVS);
+      SUFFIXES (".otf");
       FMT_INFO.binmode = true;
       break;
     case kpse_pdftex_config_format:
@@ -742,6 +758,9 @@ kpse_find_file P3C(const_string, name,  kpse_file_format_type, format,
     DEBUGF3 ("kpse_find_file: searching for %s of type %s (from %s)\n",
              name, FMT_INFO.type, FMT_INFO.path_source);
 
+  /* Do variable and tilde expansion. */
+  name = kpse_expand(name);
+  
   /* Does NAME already end in a possible suffix?  */
   name_len = strlen (name);
   if (FMT_INFO.suffix) {
@@ -849,6 +868,8 @@ kpse_find_file P3C(const_string, name,  kpse_file_format_type, format,
   if (!ret && must_exist) {
     ret = kpse_make_tex (format, name);
   }
+
+  free((void*)name);
 
   return ret;
 }

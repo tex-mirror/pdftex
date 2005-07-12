@@ -1,3 +1,36 @@
+2005-06-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Replace ac_include with kpse_include.  From Peter
+	Breitenlohner.
+
+2005-06-22  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* mpto.c: Merge code from version 0.9.
+
+	* Makefile.in (mpto): mpto doesn't need to link with libraries any
+	more.
+
+	* makempx.in: Update to version 0.9.
+
+	* dmp.c: Update copyright notice to indicate dmp is in the public
+	domain.  Change bug report address.
+
+	* README: Update to version from metapost 0.901.
+
+	* newer.c: Use HAVE_CONFIG_H to check whether we can use web2c's
+	c-auto.h and config.h headers.  Use HAVE_ST_MTIM to check whether
+	we have the high-res timers in struct stat.
+
+2005-06-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* newer.c (main): Include web2c version in version output.
+
+	* Makefile.in (newer): Don't link in any libraries (we shouldn't
+	be needing any).
+
+	* newer.c: Extensive rewrite to make it handle multiple arguments.
+	Suggested by Reinhard Kotucha <reinhard.kotucha@web.de>.
+
 2004-12-19  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* dmp.c [Hprime,MAXCHARS]: Larger values as there can be many more

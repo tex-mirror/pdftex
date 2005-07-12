@@ -1,3 +1,36 @@
+2005-07-12  Martin Schröder <martin@oneiros.de>
+
+        * printversion.c: 2004 -> 2005
+
+2005-06-26  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Replace ac_include with kpse_include.  From Peter
+	Breitenlohner.
+
+2005-06-22  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c [MP][BANNER]: Update for MetaPost 0.901.
+
+2005-06-21  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (opennameok,openinnameok,openoutnameok): Add new
+	parameter to opennameok() so its diagnostics are correct wrt to
+	whether we are testing a file name for reading or writing.
+
+2005-04-12  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* texmfmp.c (getjobname): Add a parameter, the string to return if
+	--jobname wasn't given.
+	This is part of a group of changes that fix pdftex bug 302.
+	http://sarovar.org/tracker/?func=detail&atid=493&aid=302&group_id=106
+
+	* openclose.c (open_input): kpse_find_file() always returns a new
+	string, so we can unconditionally deallocate it.
+
+	* texmfmp.c (maininit): Factor out common code into texmf_yesno().
+	(texmf_yesno): New function, return true if a variable is set and set
+	to 't', 'y', or '1' in texmf.cnf or the environment.
+
 2004-12-20  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* texmfmp.c [pdfTeX,pdfeTeX,pdfxTeX]: New variable ptexbanner.

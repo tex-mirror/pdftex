@@ -1,5 +1,6 @@
 /* tex-make.c: Run external programs to make TeX-related files.
 
+Copyright (C) 2005 Olaf Weber.
 Copyright (C) 1993, 94, 95, 96, 97 Karl Berry.
 
 This library is free software; you can redistribute it and/or
@@ -54,21 +55,36 @@ set_maketex_mag P1H(void)
      up DPI, but may as well be safe, and also get the magstep number.  */
   (void) kpse_magstep_fix (dpi, bdpi, &m);
   
-  if (m == 0)
-    sprintf (q, "%d+%d/%d", dpi / bdpi, dpi % bdpi, bdpi);
-  else
-    { /* m is encoded with LSB being a ``half'' bit (see magstep.h).  Are
+  if (m == 0) {
+      if (bdpi <= 4000) {
+          sprintf(q, "%u+%u/%u", dpi / bdpi, dpi % bdpi, bdpi);
+      } else {
+          unsigned f = bdpi/4000;
+          unsigned r = bdpi%4000;
+
+          if (f > 1) {
+              if (r > 0) {
+                  sprintf(q, "%u+%u/(%u*%u + %u)",
+                          dpi/bdpi, dpi%bdpi, f, (bdpi - r)/f, r);
+              } else {
+                  sprintf(q, "%u+%u/(%u*%u)", dpi/bdpi, dpi%bdpi, f, bdpi/f);
+              }
+          } else {
+              sprintf(q, "%u+%u/(4000 + %u)", dpi/bdpi, dpi%bdpi, bdpi, r);
+          }
+      }
+  } else {
+      /* m is encoded with LSB being a ``half'' bit (see magstep.h).  Are
          we making an assumption here about two's complement?  Probably.
          In any case, if m is negative, we have to put in the sign
          explicitly, since m/2==0 if m==-1.  */
       const_string sign = "";
-      if (m < 0)
-        {
+      if (m < 0) {
           m *= -1;
           sign = "-";
-        }
-      sprintf (q, "magstep\\(%s%d.%d\\)", sign, m / 2, (m & 1) * 5);
-    }  
+      }
+      sprintf(q, "magstep\\(%s%d.%d\\)", sign, m / 2, (m & 1) * 5);
+  }
   xputenv ("MAKETEX_MAG", q);
 }
 

@@ -70,7 +70,7 @@
 @y
 @d pdftex_version==130 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.30.0-rc2' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.30.0-rc3' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -970,7 +970,7 @@ end;
 
 @ This checks that |pdfminorversion| can only be set before any
 bytes have been written to the generated pdf file. It should be called
-directly every after |ensure_pdf_open|.
+directly after every |ensure_pdf_open|.
 
 @p procedure check_pdfminorversion;
 begin
@@ -990,6 +990,10 @@ begin
         end;
         fixed_pdf_minor_version := pdf_minor_version;
         pdf_buf[7] := chr(ord("0") + fixed_pdf_minor_version);
+        fixed_gamma             := fix_int(pdf_gamma, 0, 1000000);
+        fixed_image_gamma       := fix_int(pdf_image_gamma, 0, 1000000);
+        fixed_image_hicolor     := fix_int(pdf_image_hicolor, 0, 1);
+        fixed_image_apply_gamma := fix_int(pdf_image_apply_gamma, 0, 1);
     end
     else begin
         if fixed_pdf_minor_version <> pdf_minor_version then

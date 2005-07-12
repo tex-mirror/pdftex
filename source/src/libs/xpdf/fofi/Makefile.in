@@ -16,7 +16,7 @@ CC = @CC@
 CXX = @CXX@
 CFLAGS = @CFLAGS@
 
-ac_include ../../texk/make/library.mk
+kpse_include ../../texk/make/library.mk
 
 
 #------------------------------------------------------------------------
@@ -50,4 +50,4 @@ depend:
 	 $(CC) $(ALLCFLAGS) -MM $(srcdir)/*.c) \
 	   | sed 's|$(srcdir)|$$(srcdir)|' > $(srcdir)/depend.mk
 
-ac_include fofi/depend.mk
+kpse_include fofi/depend.mk

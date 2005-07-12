@@ -1,3 +1,5 @@
+dnl Top-level configure for TeX Live build.  Public domain.
+
 AC_INIT(texk/make/common.mk)
 
 AC_CONFIG_AUX_DIR(config)
@@ -124,7 +126,7 @@ test "$with_dialog"  != no    && : ${needs_ncurses=yes}
 : ${needs_ncurses=no}
 export needs_ncurses
 
-# we need pnglib for dvipng, pdftex
+# we need pnglib for dvipng, pdf[ex]tex
 test ! -d $srcdir/$LIBPNGDIR  && : ${needs_pnglib=no}
 test "$with_dvipng"  != no    && : ${needs_pnglib=yes}
 test "$with_pdftex"  != no    && : ${needs_pnglib=yes}
@@ -132,7 +134,7 @@ test "$with_pdfetex" != no    && : ${needs_pnglib=yes}
 : ${needs_pnglib=no}
 export needs_pnglib
 
-# we need zlib for dvipng, texinfo, pdftex
+# we need zlib for dvipng, texinfo, pdf[ex]tex
 test ! -d $srcdir/$ZLIBDIR    && : ${needs_zlib=no}
 test "$with_dvipng"  != no    && : ${needs_zlib=yes}
 test "$with_pdftex"  != no    && : ${needs_zlib=yes}
@@ -141,7 +143,7 @@ test "$with_texinfo" != no    && : ${needs_zlib=yes}
 : ${needs_zlib=no}
 export needs_zlib
 
-# we need libxpdf for pdftex
+# we need libxpdf for pdf[ex]tex
 test ! -d $srcdir/$LIBXPDFDIR && : ${needs_libxpdf=no}
 test "$with_pdftex"  != no    && : ${needs_libxpdf=yes}
 test "$with_pdfetex"  != no    && : ${needs_libxpdf=yes}
@@ -188,12 +190,15 @@ test "$needs_gd" = yes && test "$using_system_gd" != yes \
 test "$needs_freetype" = yes && test "$using_system_freetype" != yes \
   && LIBSDIRS="$FREETYPEDIR $LIBSDIRS"
 
-PKGS='texinfo dialog t1utils lcdf-typetools psutils texi2html'
+AC_CONFIG_SUBDIRS([libs])
+
+PKGS='dialog lcdf-typetools pdfopen psutils t1utils texi2html texinfo'
 ESUBDIRS=
 for pkg in $PKGS; do
   if test -d $srcdir/utils/$pkg; then
     if eval "test \"`echo '$with_'${pkg}`\" != no"; then
       ESUBDIRS="$ESUBDIRS utils/$pkg"
+      AC_CONFIG_SUBDIRS([utils/$pkg])
       test -d utils || mkdir utils
     fi
   fi
@@ -219,5 +224,6 @@ else
 fi
 AC_SUBST(INSTDIRS)
 
-AC_CONFIG_SUBDIRS(libs $ESUBDIRS texk)
-AC_OUTPUT(Makefile)
+AC_CONFIG_SUBDIRS([texk])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
