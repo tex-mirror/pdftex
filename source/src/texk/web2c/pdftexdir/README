@@ -72,10 +72,10 @@ CONTRIBUTORS
 ============
 
 Peter Breitenlohner, Ricardo Sanchez Carmenes, Otfried Cheong, Thomas
-Esser, Hans Hagen, Hartmut Henkel, Tom Kacvinsky, Akira Kakuto, Reinhard
-Kotucha, Derek B. Noonburg, Heiko Oberdiek, Jiri Osoba, Fabrice Popineau,
-Sebastian Rahtz, Tomas Rokicki, Martin Schröder, Petr Sojka, Olaf Weber,
-Jiri Zlatuska.
+Esser, Hans Hagen, Hartmut Henkel, Taco Hoekwater, Pawel Jackowski, Tom
+Kacvinsky, Akira Kakuto, Reinhard Kotucha, Derek B. Noonburg, Heiko
+Oberdiek, Jiri Osoba, Fabrice Popineau, Sebastian Rahtz, Tomas Rokicki,
+Martin Schröder, Petr Sojka, Olaf Weber, Jiri Zlatuska.
 
 pdfTeX is built on top of TeX, written by Donald Knuth cum suis (Liang and
 so), and eTeX, written by Peter Breitenlohner cum suis; part of the

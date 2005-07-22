@@ -18,7 +18,7 @@
 %
 % $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#163 $
 %
-% experimental patch to make \ptexstrcmp expandable
+% experimental patch to make \pdfstrcmp expandable
 %
 % put it after tex.pch
 %
@@ -29,25 +29,25 @@
 @x 9388
 @d pdftex_last_item_codes     = pdftex_first_rint_code + 10 {end of \pdfTeX's command codes}
 @y
-@d pdf_shell_escape_code      = pdftex_first_rint_code + 11 {code for \.{\\ptexshellescape}}
+@d pdf_shell_escape_code      = pdftex_first_rint_code + 11 {code for \.{\\pdfshellescape}}
 @d pdftex_last_item_codes     = pdftex_first_rint_code + 11 {end of \pdfTeX's command codes}
 @z
 
 @x 9442
-primitive("ptexelapsedtime",last_item,elapsed_time_code);
-@!@:elapsed_time_}{\.{\\ptexelapsedtime} primitive@>
+primitive("pdfelapsedtime",last_item,elapsed_time_code);
+@!@:elapsed_time_}{\.{\\pdfelapsedtime} primitive@>
 @y
-primitive("ptexelapsedtime",last_item,elapsed_time_code);
-@!@:elapsed_time_}{\.{\\ptexelapsedtime} primitive@>
-primitive("ptexshellescape",last_item,pdf_shell_escape_code);
-@!@:elapsed_time_}{\.{\\ptexshellescape} primitive@>
+primitive("pdfelapsedtime",last_item,elapsed_time_code);
+@!@:elapsed_time_}{\.{\\pdfelapsedtime} primitive@>
+primitive("pdfshellescape",last_item,pdf_shell_escape_code);
+@!@:elapsed_time_}{\.{\\pdfshellescape} primitive@>
 @z
 
 @x 9470
-  elapsed_time_code: print_esc("ptexelapsedtime");
+  elapsed_time_code: print_esc("pdfelapsedtime");
 @y
-  elapsed_time_code: print_esc("ptexelapsedtime");
-  pdf_shell_escape_code: print_esc("ptexshellescape");
+  elapsed_time_code: print_esc("pdfelapsedtime");
+  pdf_shell_escape_code: print_esc("pdfshellescape");
 @z
 
 @x 9561
@@ -72,16 +72,16 @@ primitive("ptexshellescape",last_item,pdf_shell_escape_code);
 @x 10336
 @d pdftex_convert_codes     = pdftex_first_expand_code + 11 {end of \pdfTeX's command codes}
 @y
-@d pdf_strcmp_code          = pdftex_first_expand_code + 11 {command code for \.{\\ptexstrcmp}}
+@d pdf_strcmp_code          = pdftex_first_expand_code + 11 {command code for \.{\\pdfstrcmp}}
 @d pdf_escape_hex_code      = pdftex_first_expand_code + 12 {command code for \.{\\pdfescapehex}}
 @d pdf_unescape_hex_code    = pdftex_first_expand_code + 13 {command code for \.{\\pdfunescapehex}}
 @d pdf_creation_date_code   = pdftex_first_expand_code + 14 {command code for \.{\\pdfcreationdate}}
-@d pdf_file_mod_date_code   = pdftex_first_expand_code + 15 {command code for \.{\\ptexfilemoddate}}
-@d pdf_file_size_code       = pdftex_first_expand_code + 16 {command code for \.{\\ptexfilesize}}
-@d pdf_mdfive_sum_code      = pdftex_first_expand_code + 17 {command code for \.{\\ptexmdfivesum}}
+@d pdf_file_mod_date_code   = pdftex_first_expand_code + 15 {command code for \.{\\pdffilemoddate}}
+@d pdf_file_size_code       = pdftex_first_expand_code + 16 {command code for \.{\\pdffilesize}}
+@d pdf_mdfive_sum_code      = pdftex_first_expand_code + 17 {command code for \.{\\pdfmdfivesum}}
 @d pdf_file_dump_code       = pdftex_first_expand_code + 18 {command code for \.{\\pdffiledump}}
-@d pdf_match_code           = pdftex_first_expand_code + 19 {command code for \.{\\ptexmatch}}
-@d pdf_last_match_code      = pdftex_first_expand_code + 20 {command code for \.{\\ptexlastmatch}}
+@d pdf_match_code           = pdftex_first_expand_code + 19 {command code for \.{\\pdfmatch}}
+@d pdf_last_match_code      = pdftex_first_expand_code + 20 {command code for \.{\\pdflastmatch}}
 @d pdftex_convert_codes     = pdftex_first_expand_code + 21 {end of \pdfTeX's command codes}
 @z
 
@@ -103,20 +103,20 @@ primitive("pdfunescapehex",convert,pdf_unescape_hex_code);@/
 @!@:pdf_unescape_hex_}{\.{\\pdfunescapehex} primitive@>
 primitive("pdfcreationdate",convert,pdf_creation_date_code);@/
 @!@:pdf_creation_date_}{\.{\\pdfcreationdate} primitive@>
-primitive("ptexfilemoddate",convert,pdf_file_mod_date_code);@/
-@!@:pdf_file_mod_date_}{\.{\\ptexfilemoddate} primitive@>
-primitive("ptexfilesize",convert,pdf_file_size_code);@/
-@!@:pdf_file_size_}{\.{\\ptexfilesize} primitive@>
-primitive("ptexmdfivesum",convert,pdf_mdfive_sum_code);@/
-@!@:pdf_mdfive_sum_}{\.{\\ptexmdfivesum} primitive@>
+primitive("pdffilemoddate",convert,pdf_file_mod_date_code);@/
+@!@:pdf_file_mod_date_}{\.{\\pdffilemoddate} primitive@>
+primitive("pdffilesize",convert,pdf_file_size_code);@/
+@!@:pdf_file_size_}{\.{\\pdffilesize} primitive@>
+primitive("pdfmdfivesum",convert,pdf_mdfive_sum_code);@/
+@!@:pdf_mdfive_sum_}{\.{\\pdfmdfivesum} primitive@>
 primitive("pdffiledump",convert,pdf_file_dump_code);@/
 @!@:pdf_file_dump_}{\.{\\pdffiledump} primitive@>
-primitive("ptexmatch",convert,pdf_match_code);@/
-@!@:pdf_match_}{\.{\\ptexmatch} primitive@>
-primitive("ptexlastmatch",convert,pdf_last_match_code);@/
-@!@:pdf_last_match_}{\.{\\ptexlastmatch} primitive@>
-primitive("ptexstrcmp",convert,pdf_strcmp_code);@/
-@!@:pdf_strcmp_}{\.{\\ptexstrcmp} primitive@>
+primitive("pdfmatch",convert,pdf_match_code);@/
+@!@:pdf_match_}{\.{\\pdfmatch} primitive@>
+primitive("pdflastmatch",convert,pdf_last_match_code);@/
+@!@:pdf_last_match_}{\.{\\pdflastmatch} primitive@>
+primitive("pdfstrcmp",convert,pdf_strcmp_code);@/
+@!@:pdf_strcmp_}{\.{\\pdfstrcmp} primitive@>
 @z
 
 %***********************************************************************
@@ -130,13 +130,13 @@ primitive("ptexstrcmp",convert,pdf_strcmp_code);@/
   pdf_escape_hex_code:    print_esc("pdfescapehex");
   pdf_unescape_hex_code:  print_esc("pdfunescapehex");
   pdf_creation_date_code: print_esc("pdfcreationdate");
-  pdf_file_mod_date_code: print_esc("ptexfilemoddate");
-  pdf_file_size_code:     print_esc("ptexfilesize");
-  pdf_mdfive_sum_code:    print_esc("ptexmdfivesum");
+  pdf_file_mod_date_code: print_esc("pdffilemoddate");
+  pdf_file_size_code:     print_esc("pdffilesize");
+  pdf_mdfive_sum_code:    print_esc("pdfmdfivesum");
   pdf_file_dump_code:     print_esc("pdffiledump");
-  pdf_match_code:         print_esc("ptexmatch");
-  pdf_last_match_code:    print_esc("ptexlastmatch");
-  pdf_strcmp_code:        print_esc("ptexstrcmp");
+  pdf_match_code:         print_esc("pdfmatch");
+  pdf_last_match_code:    print_esc("pdflastmatch");
+  pdf_strcmp_code:        print_esc("pdfstrcmp");
 @z
 
 %***********************************************************************
@@ -471,8 +471,8 @@ job_name_code: print(job_name);
 %***********************************************************************
 
 @x 32239
-primitive("ptexstrcmp",extension,pdf_strcmp_code);@/
-@!@:pdf_strcmp_}{\.{\\ptexstrcmp} primitive@>
+primitive("pdfstrcmp",extension,pdf_strcmp_code);@/
+@!@:pdf_strcmp_}{\.{\\pdfstrcmp} primitive@>
 primitive("pdfescapestring",extension,pdf_escape_string_code);@/
 @!@:pdf_escape_string_}{\.{\\pdfescapestring} primitive@>
 primitive("pdfescapename",extension,pdf_escape_name_code);@/
@@ -483,7 +483,7 @@ primitive("pdfescapename",extension,pdf_escape_name_code);@/
 %***********************************************************************
 
 @x 32287
-  pdf_strcmp_code: print_esc("ptexstrcmp");
+  pdf_strcmp_code: print_esc("pdfstrcmp");
   pdf_escape_string_code: print_esc("pdfescapestring");
   pdf_escape_name_code: print_esc("pdfescapename");
 @y
@@ -492,7 +492,7 @@ primitive("pdfescapename",extension,pdf_escape_name_code);@/
 %***********************************************************************
 
 @x 32337
-pdf_strcmp_code: @<Implement \.{\\ptexstrcmp}@>;
+pdf_strcmp_code: @<Implement \.{\\pdfstrcmp}@>;
 pdf_escape_string_code: @<Implement \.{\\pdfescapestring}@>;
 pdf_escape_name_code: @<Implement \.{\\pdfescapename}@>;
 @y
@@ -501,7 +501,7 @@ pdf_escape_name_code: @<Implement \.{\\pdfescapename}@>;
 %***********************************************************************
 
 @x 32463
-procedure compare_strings; {to implement \.{\\ptexstrcmp}}
+procedure compare_strings; {to implement \.{\\pdfstrcmp}}
 label done;
 var s1, s2: str_number;
     i1, i2, j1, j2: pool_pointer;
@@ -541,7 +541,7 @@ done:
     flush_str(s1);
 end;
 @y
-procedure compare_strings; {to implement \.{\\ptexstrcmp}}
+procedure compare_strings; {to implement \.{\\pdfstrcmp}}
 label done;
 var s1, s2: str_number;
     i1, i2, j1, j2: pool_pointer;
@@ -603,7 +603,7 @@ end
 @z
 
 @x 33406
-@ @<Implement \.{\\ptexstrcmp}@>=
+@ @<Implement \.{\\pdfstrcmp}@>=
 compare_strings
 @y
 @z

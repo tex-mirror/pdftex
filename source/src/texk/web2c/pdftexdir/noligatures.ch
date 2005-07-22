@@ -17,15 +17,15 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
 % $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#163 $
-@ This change file creates an extra primitive named \.{\\ptexnoligatures}, allowing
+@ This change file creates an extra primitive named \.{\\pdfnoligatures}, allowing
 you to destroy all ligatures of a loaded font. The command code is
 |assign_font_int|, with the new modifier value |no_lig_code|.
 
 Nothing other than the |char_tag| value is changed, and nothing is saved. 
 The primitive works directly on |font_info|, so all changes are global,
 the same as for the other font assignment primitives. Usage is quite
-straightforward: \.{\\ptexnoligatures \\f } disables ligatures for font \.{\\f}.
-The expansion of \.{\\ptexnoligatures \\f } is either |1|, when the font has
+straightforward: \.{\\pdfnoligatures \\f } disables ligatures for font \.{\\f}.
+The expansion of \.{\\pdfnoligatures \\f } is either |1|, when the font has
 no ligatures, or |0|, when the font does have ligatures.
 
 Thanh: this patch uses |orig_char_info| because it is to be inserted
@@ -104,13 +104,13 @@ primitive("efcode",assign_font_int,ef_code_base);
 @y
 primitive("efcode",assign_font_int,ef_code_base);
 @!@:ef_code_}{\.{\\efcode} primitive@>
-primitive("ptexnoligatures",assign_font_int,no_lig_code);
-@!@:no_lig_code_}{\.{\\ptexnoligatures} primitive@>
+primitive("pdfnoligatures",assign_font_int,no_lig_code);
+@!@:no_lig_code_}{\.{\\pdfnoligatures} primitive@>
 @z
 
 @x [1255]
 ef_code_base: print_esc("efcode");
 @y
 ef_code_base: print_esc("efcode");
-no_lig_code: print_esc("ptexnoligatures");
+no_lig_code: print_esc("pdfnoligatures");
 @z

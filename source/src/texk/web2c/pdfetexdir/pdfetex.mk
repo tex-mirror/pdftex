@@ -52,7 +52,8 @@ pdfetex_ch_srcs = pdfetex.web \
   $(srcdir)/pdftexdir/pdf_mem.ch \
   $(srcdir)/pdftexdir/noligatures.ch \
   $(srcdir)/pdftexdir/pdfstrcmp.ch \
-  $(srcdir)/pdftexdir/randoms.ch
+  $(srcdir)/pdftexdir/randoms.ch \
+  $(srcdir)/pdftexdir/pdfliteral.ch
 #   Rules:
 pdfetex.web: tie pdfetexdir/pdfetex.mk $(pdfetex_web_srcs)
 	$(TIE) -m pdfetex.web $(pdfetex_web_srcs)

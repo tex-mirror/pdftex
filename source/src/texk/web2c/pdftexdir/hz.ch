@@ -88,12 +88,12 @@ margin_kern_node: begin
 @z
 
 @x [236]
-@d pdf_int_pars=pdftex_first_integer_code + 18 {total number of \pdfTeX's integer parameters}
+@d pdf_int_pars=pdftex_first_integer_code + 17 {total number of \pdfTeX's integer parameters}
 @y
-@d pdf_adjust_spacing_code   = pdftex_first_integer_code + 18 {level of spacing adjusting}
-@d pdf_protrude_chars_code   = pdftex_first_integer_code + 19 {protrude chars at left/right edge of paragraphs}
-@d pdf_tracing_fonts_code    = pdftex_first_integer_code + 20 {level of font detail in log}
-@d pdf_int_pars=pdftex_first_integer_code + 21 {total number of \pdfTeX's integer parameters}
+@d pdf_adjust_spacing_code   = pdftex_first_integer_code + 17 {level of spacing adjusting}
+@d pdf_protrude_chars_code   = pdftex_first_integer_code + 18 {protrude chars at left/right edge of paragraphs}
+@d pdf_tracing_fonts_code    = pdftex_first_integer_code + 19 {level of font detail in log}
+@d pdf_int_pars=pdftex_first_integer_code + 20 {total number of \pdfTeX's integer parameters}
 @z
 
 @x [236]

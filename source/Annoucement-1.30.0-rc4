@@ -1,20 +1,20 @@
 The pdfTeX team is happy to announce the release of a new stable version:
 
 ===========================================================================
-                           pdfTeX 1.30.0-rc3
+                           pdfTeX 1.30.0-rc4
 ===========================================================================
 
-This is the announcement of pdfTeX 1.30.0-rc3, an extended version of TeX that
+This is the announcement of pdfTeX 1.30.0-rc4 an extended version of TeX that
 can create PDF directly from TeX source files and enhance the result of TeX
 typesetting with the help of PDF.
 
 ===========================================================================
-  Main changes of pdfTeX 1.30.0-rc3
+  Main changes of pdfTeX 1.30.0-rc4
 ===========================================================================
 
 - pdfxtex (introduced with 1.20a) is gone; all extensions are now in pdf(e)tex.
 - Some primitives have been renamed; the old names will still work, but are
-  deprecated and give a warning that they are obsolete:
+  deprecated and some give a warning that they are obsolete:
     \pdfoptionpdfminorversion         -> \pdfminorversion
     \pdfoptionalwaysusepdfpagebox     -> \pdfforcepagebox
     \pdfoptionpdfinclusionerrorlevel  -> \pdfinclusionerrorlevel
@@ -22,9 +22,6 @@ typesetting with the help of PDF.
   - new Didot (1nd=0.375mm)
   - new Cicero (1nc=12nd)
 - New primitives: 
-  - The pdfTeX team now reserves the namespaces \pdf* and \ptex* for new
-    primitives of pdfTeX; \pdf* will be used for pdf-specific primitives and
-    \ptex* for general extensions.
   - Inclusion of pngs has been greatly improved: It now does
     - alpha channel and transparency (only if %!PDF >=1.4)
     - 16-bit colour (only if %!PDF >=1.5); this must be enabled by setting
@@ -36,25 +33,25 @@ typesetting with the help of PDF.
       automatic fall-back is to decompress and re-compress as before.
   - pdfTeX now has an interface to the precise system time (if available) as an
     aid in benchmarking TeX macro code. 
-    - \ptexelapsedtime is a read-only integer that (initially) returns the
+    - \pdfelapsedtime is a read-only integer that (initially) returns the
       amount of time passed since the start of this run. This amount is given
       in `scaled seconds': the value 65536 counts as one second. If more time
       has passed than 32767 seconds, (2^31)-1 will be returned.
-    - \ptexresettimer updates the internal timer, such that subsequent calls to
-      \ptexelapsedtime will restart from 0.
+    - \pdfresettimer updates the internal timer, such that subsequent calls to
+      \pdfelapsedtime will restart from 0.
   - pdfTeX can now generate random numbers.
-    - \ptexuniformdeviate <count> generates a uniformly distributed random
+    - \pdfuniformdeviate <count> generates a uniformly distributed random
       integer value between 0 (inclusive) and <count> (exclusive).
-    - \ptexnormaldeviate expands to a random integer value with a mean of 0 and
+    - \pdfnormaldeviate expands to a random integer value with a mean of 0 and
       a unit of 65536. 
-    - \ptexrandomseed allows access to the current seed value.
-    - \ptexsetrandomseed <count> sets the random seed to a specific value.
-  - \ptexnoligatures\f disables ligatures for the loaded font \f.
-  - \ptexstrcmp{<a>}{<b>} compares two strings and returns the strings "0" if
+    - \pdfrandomseed allows access to the current seed value.
+    - \pdfsetrandomseed <count> sets the random seed to a specific value.
+  - \pdfnoligatures\f disables ligatures for the loaded font \f.
+  - \pdfstrcmp{<a>}{<b>} compares two strings and returns the strings "0" if
     <a> equals <b>, "-1" if <a> is less than <b>, "1" if <a> is greater than
     <b>
-  - \ptexretval is an integer that is either <0, 0, or >0; currently it's used
-    by \ptexstrcmp.
+  - \pdfretval is an integer that is either <0, 0, or >0; currently it's used
+    by \pdfstrcmp.
   - Escaping strings:
     - \pdfescapestring{<a>} escapes the string <a> so that it can be used as
       PDF string.
@@ -65,13 +62,13 @@ typesetting with the help of PDF.
     - \pdfunescapehex{<b>} reverses the effect of \pdfescapehex
   - \pdfcreationdate expands to the date string that pdfTeX uses in the info
     dict as default.
-  - \ptexfilemoddate{<file>} expands to the modification date of <file> in the
+  - \pdffilemoddate{<file>} expands to the modification date of <file> in the
     same format as \pdfcreationdate (PDF date format).
-  - \ptexfilesize{<file>} expands to the size of <file> as string.
-  - \ptexmdfivesum{<abc>} or \ptexmdfivesum file {<file>} calculates the md5
+  - \pdffilesize{<file>} expands to the size of <file> as string.
+  - \pdfmdfivesum{<abc>} or \pdfmdfivesum file {<file>} calculates the md5
     sum (of a string or a file) and converts it to uppercase hexadecimal format
     (same as \pdfescapehex).
-  - \ptexshellescape is a read-only integer that is 1 if \write18 is enabled, 0
+  - \pdfshellescape is a read-only integer that is 1 if \write18 is enabled, 0
     otherwise.
   - \pdfxformname <object number>, which expands to the number in the
     corresponding form XObject name.
@@ -92,13 +89,13 @@ typesetting with the help of PDF.
     ...\xivtt (cmtt10@14.0pt) t
     ...\xivtt (cmtt10+20@14.0pt) e
     See also bug 304.
-  - \ptexfiledump [offset <int>] [length <int>] <general text>
+  - \pdffiledump [offset <int>] [length <int>] <general text>
     Returns a hex dump of file, given in <general text>, starting at given
     offset or 0 with given length.
 - New experimental primitives:
-  - \ptexmatch [icase] [subcount <number>}] {<pattern>}{<string>}
+  - \pdfmatch [icase] [subcount <number>}] {<pattern>}{<string>}
     Implements pattern matching using the POSIX regex.
-    It returns the same values as \ptexstrcmp, but with the following semantics: 
+    It returns the same values as \pdfstrcmp, but with the following semantics: 
       -1: error case (invalid pattern, ...)
        0: no match
        1: match found
@@ -106,8 +103,8 @@ typesetting with the help of PDF.
     * icase: case insensitive matching
     * subcount: it sets the table size for found subpatterns.
       A number "-1" resets the table size to the start default.
-  - \ptexlastmatch <number>
-    The result of \ptexmatch is stored in an array. The entry "0" contains the
+  - \pdflastmatch <number>
+    The result of \pdfmatch is stored in an array. The entry "0" contains the
     match, the following entries submatches. The positions of the matches are
     also available. They are encoded:
       <position> "->" <match string>
@@ -115,6 +112,7 @@ typesetting with the help of PDF.
     set.
 - The primitive \pdfmovechar has been removed (bug 294)
 - Numerous bugfixes
+- pdfTeX uses zlib 1.2.3
   
 For complete release notes see http://www.pdftex.org/NEWS
 
@@ -161,4 +159,4 @@ binaries for most operating systems. And some useful documentation.
 
 Have fun!
 
-Martin Schröder (martin@pdftex.org) for the pdfTeX team, June 2005
+Martin Schröder (martin@pdftex.org) for the pdfTeX team, July 2005

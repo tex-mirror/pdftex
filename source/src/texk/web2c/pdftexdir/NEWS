@@ -1,9 +1,9 @@
 -----------------------------------------------------
-pdfTeX 3.141592-1.30.0-rc3 was released on 2005-07-12
+pdfTeX 3.141592-1.30.0-rc4 was released on 2005-07-22
 -----------------------------------------------------
 - pdfxtex (introduced with 1.20a) is gone; all extensions are now in pdf(e)tex.
 - Some primitives have been renamed; the old names will still work, but are
-  deprecated and give a warning that they are obsolete:
+  deprecated and some give a warning that they are obsolete:
     \pdfoptionpdfminorversion         -> \pdfminorversion
     \pdfoptionalwaysusepdfpagebox     -> \pdfforcepagebox
     \pdfoptionpdfinclusionerrorlevel  -> \pdfinclusionerrorlevel
@@ -11,9 +11,6 @@ pdfTeX 3.141592-1.30.0-rc3 was released on 2005-07-12
   - new Didot (1nd=0.375mm)
   - new Cicero (1nc=12nd)
 - New primitives: 
-  - The pdfTeX team now reserves the namespaces \pdf* and \ptex* for new
-    primitives of pdfTeX; \pdf* will be used for pdf-specific primitives and
-    \ptex* for general extensions.
   - Inclusion of pngs has been greatly improved: It now does
     - alpha channel and transparency (only if %!PDF >=1.4)
     - 16-bit colour (only if %!PDF >=1.5); this must be enabled by setting
@@ -25,25 +22,20 @@ pdfTeX 3.141592-1.30.0-rc3 was released on 2005-07-12
       automatic fall-back is to decompress and re-compress as before.
   - pdfTeX now has an interface to the precise system time (if available) as an
     aid in benchmarking TeX macro code. 
-    - \ptexelapsedtime is a read-only integer that (initially) returns the
+    - \pdfelapsedtime is a read-only integer that (initially) returns the
       amount of time passed since the start of this run. This amount is given
       in `scaled seconds': the value 65536 counts as one second. If more time
       has passed than 32767 seconds, (2^31)-1 will be returned.
-    - \ptexresettimer updates the internal timer, such that subsequent calls to
-      \ptexelapsedtime will restart from 0.
+    - \pdfresettimer updates the internal timer, such that subsequent calls to
+      \pdfelapsedtime will restart from 0.
   - pdfTeX can now generate random numbers.
-    - \ptexuniformdeviate <count> generates a uniformly distributed random
+    - \pdfuniformdeviate <count> generates a uniformly distributed random
       integer value between 0 (inclusive) and <count> (exclusive).
-    - \ptexnormaldeviate expands to a random integer value with a mean of 0 and
+    - \pdfnormaldeviate expands to a random integer value with a mean of 0 and
       a unit of 65536. 
-    - \ptexrandomseed allows access to the current seed value.
-    - \ptexsetrandomseed <count> sets the random seed to a specific value.
-  - \ptexnoligatures\f disables ligatures for the loaded font \f.
-  - \ptexstrcmp{<a>}{<b>} compares two strings and returns the strings "0" if
-    <a> equals <b>, "-1" if <a> is less than <b>, "1" if <a> is greater than
-    <b>
-  - \ptexretval is an integer that is either <0, 0, or >0; currently it's used
-    by \ptexstrcmp.
+    - \pdfrandomseed allows access to the current seed value.
+    - \pdfsetrandomseed <count> sets the random seed to a specific value.
+  - \pdfnoligatures\f disables ligatures for the loaded font \f.
   - Escaping strings:
     - \pdfescapestring{<a>} escapes the string <a> so that it can be used as
       PDF string.
@@ -54,13 +46,16 @@ pdfTeX 3.141592-1.30.0-rc3 was released on 2005-07-12
     - \pdfunescapehex{<b>} reverses the effect of \pdfescapehex
   - \pdfcreationdate expands to the date string that pdfTeX uses in the info
     dict as default.
-  - \ptexfilemoddate{<file>} expands to the modification date of <file> in the
+  - \pdffilemoddate{<file>} expands to the modification date of <file> in the
     same format as \pdfcreationdate (PDF date format).
-  - \ptexfilesize{<file>} expands to the size of <file> as string.
-  - \ptexmdfivesum{<abc>} or \ptexmdfivesum file {<file>} calculates the md5
+  - \pdffilesize{<file>} expands to the size of <file> as string.
+  - \pdfmdfivesum{<abc>} or \pdfmdfivesum file {<file>} calculates the md5
     sum (of a string or a file) and converts it to uppercase hexadecimal format
     (same as \pdfescapehex).
-  - \ptexshellescape is a read-only integer that is 1 if \write18 is enabled, 0
+  - \pdffiledump [offset <int>] [length <int>] <general text>
+    Expands to a hex dump of the file given in <general text>, starting at
+    given offset or 0 with given length.
+  - \pdfshellescape is a read-only integer that is 1 if \write18 is enabled, 0
     otherwise.
   - \pdfxformname <object number>, which expands to the number in the
     corresponding form XObject name.
@@ -81,13 +76,10 @@ pdfTeX 3.141592-1.30.0-rc3 was released on 2005-07-12
     ...\xivtt (cmtt10@14.0pt) t
     ...\xivtt (cmtt10+20@14.0pt) e
     See also bug 304.
-  - \ptexfiledump [offset <int>] [length <int>] <general text>
-    Returns a hex dump of file, given in <general text>, starting at given
-    offset or 0 with given length.
 - New experimental primitives:
-  - \ptexmatch [icase] [subcount <number>}] {<pattern>}{<string>}
+  - \pdfmatch [icase] [subcount <number>}] {<pattern>}{<string>}
     Implements pattern matching using the POSIX regex.
-    It returns the same values as \ptexstrcmp, but with the following semantics: 
+    It returns the same values as \pdfstrcmp, but with the following semantics: 
       -1: error case (invalid pattern, ...)
        0: no match
        1: match found
@@ -95,14 +87,17 @@ pdfTeX 3.141592-1.30.0-rc3 was released on 2005-07-12
     * icase: case insensitive matching
     * subcount: it sets the table size for found subpatterns.
       A number "-1" resets the table size to the start default.
-  - \ptexlastmatch <number>
-    The result of \ptexmatch is stored in an array. The entry "0" contains the
+  - \pdflastmatch <number>
+    The result of \pdfmatch is stored in an array. The entry "0" contains the
     match, the following entries submatches. The positions of the matches are
     also available. They are encoded:
       <position> "->" <match string>
     The position "-1" with an empty string indicates that this entry is not
     set.
-- The primitive \pdfmovechar has been removed (bug 294)
+  - \pdfstrcmp{<a>}{<b>} compares two strings and returns the strings "0" if
+    <a> equals <b>, "-1" if <a> is less than <b>, "1" if <a> is greater than
+    <b>
+- The primitive \pdfmovechars has been removed (bug 294)
 - Bugfixes:
   - empty strings are not supressed anymore (bug 335)
   - \unhboxing and character protusion didn't work well together (bug 292)
@@ -111,7 +106,7 @@ pdfTeX 3.141592-1.30.0-rc3 was released on 2005-07-12
   - Dangling font objects with non-replacable fonts (bug 311).
   - \pdfxform didn't work with box>255 (bug 310)
   - cmap: unicode ???? is mapped to multiple glyphs (bug 306).
-- pdfTeX uses zlib 1.2.2
+- pdfTeX uses zlib 1.2.3
 
 ------------------------------------------------
 pdfTeX 3.141592-1.21a was released on 2005-02-04
@@ -121,26 +116,18 @@ pdfTeX 3.141592-1.21a was released on 2005-02-04
     - added some more info to the AFM output
     - some minor bug fixes
     - a short documentation available
-
 - pdftex now understand forms 'uniXXXX' in encoding files (only makes sense
   with TrueType fonts)
-
 - added subset tag for TrueType fonts
-
 - PDF strings are now printed as following:
     (This is a string) -> (This is a string)
     This is a string -> (This is a string)
     <a1b245c1a2...> -> <a1b245c1a2...>
-
 - check for double newline char to get rid of empty lines in PDF output
-
 - Fixed a bug in the scanning of map lines introduced in the the fix of bug
   #242 in 1.20b.
-  
 - Fixed three problems in xpdf; xpdf is now 3.00pl3
-
 - \ifeof18 is a simple method to test if \write18 is enabled.
-
 - a few extensions in pdfxtex:
     - \pdflastximagecolordepth returns the last color depth
     - \pdfximage supports a keyword "colorspace" following an object number
@@ -158,18 +145,13 @@ pdfTeX 3.141592-1.21a was released on 2005-02-04
 pdfTeX 3.141592-1.20b was released on 2004-12-22
 ------------------------------------------------
 - Fixed some minor bugs, mostly with hz
-
 - The info line "output format initialized to PDF/DVI" isn't shown anymore, as
   this info wasn't reliable (bug 112).
-
 - Now the PDF-related statistics (PDF objects...) in the .log file is only
   shown in PDF output mode. It start with a line "PDF statistics:".
-
 - \pdfimageresolution is not limited to 2400 [dpi] anymore, can now be between
   0 and 65535 [dpi].
-
 - pdfTeX uses xpdf 3.00pl2
-
 - pdfTeX uses libpng 1.2.8, which fixes some png-related bugs.
 
 ------------------------------------------------
@@ -177,25 +159,19 @@ pdfTeX 3.141592-1.20a was released on 2004-09-06
 ------------------------------------------------
 - There is a new program pdfxtex, which contains experimental features which
   might end up in pdftex in the future.
-
 - Most distributions now use eTeX as the default engine, so when you call
   pdftex you will get pdfeTeX. Most distributions now also use pdfTeX as the
   default engine, so when you call latex you will get pdfeTeX running LaTeX.:-)
-
 - We are setting up pdfTeX as a project at sarovar
   (http://sarovar.org/projects/pdftex/). Please report bugs etc. through the
   site.
-
 - Support for the file pdftex.cfg is gone completely. All parameters that had
   previously been set by it can be set through primitives; their values are
   dumped to the format file.
-  
 - The searchpath for encoding and mapfiles has been changed.
   See http://tug.org/pipermail/tex-live/2004-January/004734.html and
   http://tug.org/pipermail/tex-live/2004-January/004791.html
-
 - eTeX is now version 2.2, incorporating the last changes to TeX (3.141592).
-
 - New options for \pdfmapfile:
   General functionality: Map items (map files, new: also single map lines; see
   \pdfmapline) are put in list of pending map items. During the next shipout,
@@ -218,54 +194,38 @@ pdfTeX 3.141592-1.20a was released on 2004-09-06
     foo.map is scanned, matching map entries are deleted from database.
   - \pdfmapfile {} clears the list of pending map items. It does not affect map
     entries already registered into the database. This is the old behaviour.
-
 - New command \pdfmapline {line}. It's like \pdfmapfile but here you can set
   single map lines like in the map files directly. The modifiers (+-=) have the
   same effect as with \pdfmapfile.
-
 - Simplified the handling of the 14 Type 1 "standard fonts" (Times,
   Helvetica...): They are now more or less handled like any other Type 1 font.
   See http://www.ntg.nl/pipermail/ntg-pdftex/2004-July/000648.html
-
 - hz: So far the font expansion feature required that the user must be able to
   create expanded tfms (eg cmr10+10.tfm). Now font expansion can be used
   without creating these tfms.
   See http://www.ntg.nl/pipermail/ntg-pdftex/2004-May/000504.html
-  
 - hz: Changed \pdffontexpand primitive --> the expand factor is now fixed to
   1000 and the argument is ignored. This will lead to spurious texts of "1000"
   in your output if you compile old documents.
-
 - New command \pdftexbanner which returns a string with the full banner of the
   current binary (e.g. "This is pdfTeX, Version 3.141592-1.20a (Web2C 7.5.3)
   kpathsea version 3.5.3")
-
 - The PTEX.FullBanner key is now inserted in the document info dict instead of
   the catalog. Newer versions of Acrobat display it.
-  
 - Now includes support for encTeX.
-
 - Extended \pdfannot to use reserveobjnum/useobjnum 
   See http://www.ntg.nl/pipermail/ntg-pdftex/2004-March/000424.html
-
 - Bugfix: pdfTeX would read an .xpdfrc when including pdfs.
   See http://tug.org/pipermail/pdftex/2004-March/004835.html
-
 - Bugfix: The strings in /ID would sometimes be empty.
-  
 - Bugfix: Even when mapfiles or encodings or PostScript font files were
   missing, pdfTeX still produced a (most often corrupt) pdf. Now it aborts with
   an error in these cases.
-
 - numerous small bugfixes.
-  
 - pdfTeX now uses the GNU libavl from Ben Pfaff for managing of fontmap
   entries.
-  
 - pdfTeX uses zlib 1.2.1
-
 - pdfTeX uses xpdf 3.00
-
 - pdfTeX uses libpng 1.2.7
   
 ------------------------------------------------
@@ -279,17 +239,14 @@ pdfTeX 3.141592-1.11a was released on 2003-08-02
 ------------------------------------------------
 - New command \pdftrailer analogue to \pdfcatalog whose argument ends up in the
   trailer dictionary.
-
 - The behaviour when an included pdf has a newer version than the one specified
   with \pdfoptionpdfminorversion can be controlled by the new internal integer
   \pdfoptionpdfinclusionerrorlevel: If it's 0, pdfTeX gives only a warning; if
   it's 1, it raises an error. 
     This can also be set in pdftex.cfg with pdf_inclusion_errorlevel
-
 - The syntax for outlines has been extended to allow attributes:
   <outline spec> --> <attr spec> <action spec> [count <number>] <general text>
   See http://www.ntg.nl/pipermail/ntg-pdftex/2003-June/000165.html
-
 - The syntax of \pdfobj has been extended:
   \pdfobj <object type spec>                              (h, v, m)
   <object type spec> --> reserveobjnum
@@ -299,28 +256,21 @@ pdfTeX 3.141592-1.11a was released on 2003-08-02
   When the optional keyword `reserveobjnum' and `useobjnum' is not given, the
   behaviour is unchanged. 
   See also http://tug.org/mailman/htdig/pdftex/2003-March/003814.html
-
 - Bugfix: /CreationDate didn't care for the timezone and could be fooled.
   See http://www.ntg.nl/pipermail/ntg-pdftex/2003-July/000223.html
-
 - Bugfix: The translation of 8-bit characters in included pdfs that had their
   eighth bit set sometimes got wrong because of a missing typecast.
   See http://www.ntg.nl/pipermail/ntg-pdftex/2003-July/000216.html
-  
 - Bugfix: pdfTeX -ini would crash with a minimal file because it didn't read
   it's config and so didn't know anything about fonts.
   See http://tug.org/pipermail/pdftex/2003-July/004262.html
-  
 - Bugfix: \pdfstartlink would produce spurious /NewWindow entries. Also the
   syntax of <action spec> and <goto-action spec> has been cleaned up.
   See http://www.ntg.nl/pipermail/ntg-pdftex/2003-June/000167.html 
-
 - Bugfix: \pdffontattr was not used for T3 fonts.
   See http://tug.org/pipermail/pdftex/2003-June/004127.html
-
 - Bugfix: The cropbox of an included pdf would sometimes not be used.
   See http://tug.org/pipermail/pdftex/2003-May/004037.html
-
 - pdfTeX uses xpdf 2.02
 
 ------------------------------------------------
@@ -328,31 +278,23 @@ pdfTeX 3.141592-1.10b was released on 2003-02-26
 ------------------------------------------------
 - The numbers in transformation matrices are allways written with maximum
   precision (see http://tug.org/pipermail/pdftex/2003-February/003596.html).
-
 - Incorporated the new version of TeX: 3.141592
-
 - Bugfix: Numbers in pdfs would sometimes be just a wee bit of (changed
   implementation of pdftoepdf.convertNumToPDF).
-
 - Bugfix: When setting the /Producer, /Creator or /CreationDate keys with
   /pdfinfo pdfTeX would also insert default values which caused duplicate keys
   in the info dict (see
   http://tug.org/pipermail/pdftex/2003-February/003524.html).
-
 - The reading of mapfiles is much faster (see
   http://tug.org/pipermail/pdftex/2002-July/002843.html).
-  
 - Bugfix: AR5 had problems with the CTM when displaying in "fit visible" mode
   (see http://tug.org/pipermail/pdftex/2002-May/002688.html).
-
 - Bugfix: str_in_str had wrong indices (see
   http://tug.org/pipermail/pdftex/2002-March/002367.html).
-
 - Bugfix: decimal_digits defaulted to 0, which caused problems with included
   images when including pdfs (see
   http://tug.org/pipermail/pdftex/2003-February/003518.html). 
   It now defaults to 4.
-  
 - Bugfix: the type of included images was decided based only on the extensions;
   now pdfTeX looks for magic bytes at the start of files (see
   http://tug.org/pipermail/pdftex/2003-February/003519.html)
@@ -378,7 +320,6 @@ pdfTeX 3.14159-1.10a was released on 2003-01-16
       See pdftoepdf.cc for preprocessor flags which allow this behaviour to be
     changed (copying the Page Group (most likely producing incorrect pdf) or
     treating Page Groups as errors).
-    
 - The new primitive \pdfoptionpdfminorversion sets the pdf version of the
   generated file and the latest allowed pdf version of included pdfs:
         \pdfoptionpdfminorversion=3
@@ -388,7 +329,6 @@ pdfTeX 3.14159-1.10a was released on 2003-01-16
     This must appear before any data is written to the generated pdf file, so
   you should put it at the very start of your files.
     This can also be set in pdftex.cfg with pdf_minorversion
-
 - It is now possible to specify the pdf page box to use when including pdfs.
   The syntax has been extended:
     \pdfximage [<image attr spec>] <general text>           (h, v, m)
@@ -403,29 +343,22 @@ pdfTeX 3.14159-1.10a was released on 2003-01-16
   and 5 is artbox. This can only be set once per object, i.e. the value used at
   \pdfximage is remembered.
     See the pdf reference for an explanation of the boxes.
-  
 - The support for the inclusion of jpeg images has been extended to allow the
   inclusion of JPEG/Exif files which are produced by digital photo cameras
   (thanks to Hartmut Henkel).
-
 - The support for the inclusion of tif images has been removed as it was of
   limited use (it worked only for gray-scale and rgb images) and produced wrong
   results (all other images types where treated as rgb images). 
   Tif images can be converted on *nix on-the-fly to pngs with the help of
   ImageMagick, epstopdf.sty or pdftex.def v0.4 or newer, and this rule:
     \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `basename #1 .tif`.png}
-
 - The extensions for pdf encryption have been removed, since they make the
   pdfTeX code overly complex. Those needing pdf encryption are encouraged to
   produce a standalone program for encrypting pdfs.
-
 - pdfTeX now writes a usage statistic about the pdfTeX specific memory to the
   log.
-
 - numerous bugfixes, most of them in the inclusion of pdfs.
-
 - pdfTeX uses xpdf 2.01
-
 - pdfTeX uses libpng 1.2.5
 
 ---------------------------------------------------------------------

@@ -23,25 +23,25 @@
 %
 % There are four new primitives:
 %
-% \ptexuniformdeviate <count>
+% \pdfuniformdeviate <count>
 %   Generates a uniformly distributed random integer value
 %   between 0 (inclusive) and <count> (exclusive).
 %   This primitive expands to a list of tokens.
 %
-% \ptexnormaldeviate
+% \pdfnormaldeviate
 %   Expands to a random integer value with a mean of 0 and a 
 %   unit of 65536. 
 %   This primitive expands to a list of tokens.
 %
-% \ptexrandomseed 
-%   You can use \the\ptexrandomseed to query the current seed value,
+% \pdfrandomseed 
+%   You can use \the\pdfrandomseed to query the current seed value,
 %   so you can e.g. the value to the log file.
 %
 %   The initial value of the seed is derived from the system time, 
 %   and is not more than 1,000,999,999 (this ensures that the value
 %   can be used with commands like \count).
 %
-% \ptexsetrandomseed <count>
+% \pdfsetrandomseed <count>
 %   This sets the random seed to a specific value, allowing you
 %   to re-play sequences of semi-randoms at a later moment. 
 %
@@ -421,25 +421,25 @@ end;
 @x l.388
 @d pdftex_last_item_codes     = pdftex_first_rint_code + 11 {end of \pdfTeX's command codes}
 @y
-@d random_seed_code           = pdftex_first_rint_code + 12 {code for \.{\\ptexrandomseed}}
+@d random_seed_code           = pdftex_first_rint_code + 12 {code for \.{\\pdfrandomseed}}
 @d pdftex_last_item_codes     = pdftex_first_rint_code + 12 {end of \pdfTeX's command codes}
 @z
 
 @x  l.417
-primitive("ptexelapsedtime",last_item,elapsed_time_code);
-@!@:elapsed_time_}{\.{\\ptexelapsedtime} primitive@>
+primitive("pdfelapsedtime",last_item,elapsed_time_code);
+@!@:elapsed_time_}{\.{\\pdfelapsedtime} primitive@>
 @y
-primitive("ptexelapsedtime",last_item,elapsed_time_code);
-@!@:elapsed_time_}{\.{\\ptexelapsedtime} primitive@>
-primitive("ptexrandomseed",last_item,random_seed_code);
-@!@:random_seed_}{\.{\\ptexrandomseed} primitive@>
+primitive("pdfelapsedtime",last_item,elapsed_time_code);
+@!@:elapsed_time_}{\.{\\pdfelapsedtime} primitive@>
+primitive("pdfrandomseed",last_item,random_seed_code);
+@!@:random_seed_}{\.{\\pdfrandomseed} primitive@>
 @z
 
 @x l.434
-  elapsed_time_code: print_esc("ptexelapsedtime");
+  elapsed_time_code: print_esc("pdfelapsedtime");
 @y
-  elapsed_time_code: print_esc("ptexelapsedtime");
-  random_seed_code: print_esc("ptexrandomseed");
+  elapsed_time_code: print_esc("pdfelapsedtime");
+  random_seed_code: print_esc("pdfrandomseed");
 @z
 
 @x l.461
@@ -460,18 +460,18 @@ primitive("ptexrandomseed",last_item,random_seed_code);
 @x
 primitive("jobname",convert,job_name_code);@/
 @y
-primitive("ptexuniformdeviate",convert,uniform_deviate_code);@/
-@!@:uniform_deviate_}{\.{\\ptexuniformdeviate} primitive@>
-primitive("ptexnormaldeviate",convert,normal_deviate_code);@/
-@!@:normal_deviate_}{\.{\\ptexnormaldeviate} primitive@>
+primitive("pdfuniformdeviate",convert,uniform_deviate_code);@/
+@!@:uniform_deviate_}{\.{\\pdfuniformdeviate} primitive@>
+primitive("pdfnormaldeviate",convert,normal_deviate_code);@/
+@!@:normal_deviate_}{\.{\\pdfnormaldeviate} primitive@>
 primitive("jobname",convert,job_name_code);@/
 @z
 
 @x
   othercases print_esc("jobname")
 @y
-  uniform_deviate_code:     print_esc("ptexuniformdeviate");
-  normal_deviate_code:      print_esc("ptexnormaldeviate");
+  uniform_deviate_code:     print_esc("pdfuniformdeviate");
+  normal_deviate_code:      print_esc("pdfnormaldeviate");
   othercases print_esc("jobname")
 @z
 
@@ -528,35 +528,35 @@ init_randoms(random_seed);@/
 @z
 
 @x l.4625
-primitive("ptexresettimer",extension,reset_timer_code);@/
-@!@:reset_timer_}{\.{\\ptexresettimer} primitive@>
+primitive("pdfresettimer",extension,reset_timer_code);@/
+@!@:reset_timer_}{\.{\\pdfresettimer} primitive@>
 @y
-primitive("ptexresettimer",extension,reset_timer_code);@/
-@!@:reset_timer_}{\.{\\ptexresettimer} primitive@>
-primitive("ptexsetrandomseed",extension,set_random_seed_code);@/
-@!@:set_random_seed_code}{\.{\\ptexsetrandomseed} primitive@>
+primitive("pdfresettimer",extension,reset_timer_code);@/
+@!@:reset_timer_}{\.{\\pdfresettimer} primitive@>
+primitive("pdfsetrandomseed",extension,set_random_seed_code);@/
+@!@:set_random_seed_code}{\.{\\pdfsetrandomseed} primitive@>
 @z
 
 @x
-  reset_timer_code: print_esc("ptexresettimer");
+  reset_timer_code: print_esc("pdfresettimer");
 @y
-  reset_timer_code: print_esc("ptexresettimer");
-  set_random_seed_code: print_esc("ptexsetrandomseed");
+  reset_timer_code: print_esc("pdfresettimer");
+  set_random_seed_code: print_esc("pdfsetrandomseed");
 @z
 
 @x
-reset_timer_code: @<Implement \.{\\ptexresettimer}@>;
+reset_timer_code: @<Implement \.{\\pdfresettimer}@>;
 @y
-reset_timer_code: @<Implement \.{\\ptexresettimer}@>;
-set_random_seed_code: @<Implement \.{\\ptexsetrandomseed}@>;
+reset_timer_code: @<Implement \.{\\pdfresettimer}@>;
+set_random_seed_code: @<Implement \.{\\pdfsetrandomseed}@>;
 @z
 
 @x
-@ @<Implement \.{\\ptexresettimer}@>=
+@ @<Implement \.{\\pdfresettimer}@>=
 @y
 @ Negative random seed values are silently converted to positive ones
 
-@<Implement \.{\\ptexsetrandomseed}@>=
+@<Implement \.{\\pdfsetrandomseed}@>=
 begin
   scan_int;
   if cur_val<0 then negate(cur_val); 
@@ -564,6 +564,6 @@ begin
   init_randoms(random_seed);
 end
 
-@ @<Implement \.{\\ptexresettimer}@>=
+@ @<Implement \.{\\pdfresettimer}@>=
 @z
 
