@@ -69,7 +69,7 @@
 @y
 @d pdftex_version==130 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.30.0-rc4' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.30.0-rc5' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -656,12 +656,12 @@ begin
       begin i := char_tag(char_info(f)(c));
       if i = lig_tag then
         get_tag_code := 1
-	  else if i = list_tag then
+          else if i = list_tag then
         get_tag_code := 2
-	  else if i = ext_tag then
+          else if i = ext_tag then
         get_tag_code := 4
-	  else
-	    get_tag_code := 0;
+          else
+            get_tag_code := 0;
       end
    else
        get_tag_code := -1;
@@ -785,7 +785,7 @@ begin
     new_dummy_font := read_font_info(null_cs, "dummy", "", -1000);
 end;
 
-@ Helper for debugging purporses
+@ Helper for debugging purposes
 
 @p procedure short_display_n(@!p, m:integer); {prints highlights of list |p|}
 var n:integer; {for replacement counts}
@@ -842,8 +842,8 @@ end;
 be deallocated then, so we use |pdf_mem| for this purpose.
 
 @<Constants...@>=
-@!inf_pdf_mem_size = 32000; {min size of the |pdf_mem| array}
-@!sup_pdf_mem_size = 524288; {max size of the |pdf_mem| array}
+@!inf_pdf_mem_size = 10000; {min size of the |pdf_mem| array}
+@!sup_pdf_mem_size = 10000000; {max size of the |pdf_mem| array}
 
 @ @<Glob...@>=
 @!pdf_mem_size: integer;
@@ -853,18 +853,28 @@ be deallocated then, so we use |pdf_mem| for this purpose.
 @ @<Set init...@>=
 pdf_mem_ptr := 1; {the first word is not used so we can use zero as a value for testing
 whether a pointer to |pdf_mem| is valid}
+pdf_mem_size := inf_pdf_mem_size; {allocated size of |pdf_mem| array}
 
 @ We use |pdf_get_mem| to allocate memory in |pdf_mem|
 
-@p function pdf_get_mem(s: integer): integer; {allocate |s| words in
-|pdf_mem|}
+@p function pdf_get_mem(s: integer): integer; {allocate |s| words in |pdf_mem|}
+var a: integer;
 begin
-    if pdf_mem_ptr + s > pdf_mem_size then
+    if s > sup_pdf_mem_size - pdf_mem_size then
         overflow("PDF memory size (pdf_mem_size)", pdf_mem_size);
+    if pdf_mem_ptr + s > pdf_mem_size then begin
+        a := 0.2 * pdf_mem_size;
+        if pdf_mem_ptr + s > pdf_mem_size + a then
+            pdf_mem_size := pdf_mem_ptr + s
+        else if pdf_mem_size < sup_pdf_mem_size - a then
+            pdf_mem_size := pdf_mem_size + a
+        else
+            pdf_mem_size := sup_pdf_mem_size;
+        pdf_mem := xrealloc_array(pdf_mem, integer, pdf_mem_size);
+    end;
     pdf_get_mem := pdf_mem_ptr;
     pdf_mem_ptr := pdf_mem_ptr + s;
 end;
-
 
 @* \[32b] \pdfTeX\ output low-level subroutines.
 We use the similiar subroutines to handle the output buffer for
@@ -1063,7 +1073,8 @@ begin
         pdf_stream_length := pdf_offset - pdf_save_offset;
     pdf_flush;
     write_stream_length(pdf_stream_length, pdf_stream_length_offset);
-    pdf_print_nl;
+    if pdf_compress_level > 0 then
+        pdf_out(pdf_new_line_char);
     pdf_print_ln("endstream");
     pdf_end_obj;
 end;
@@ -1192,33 +1203,42 @@ begin
     str_in_str := true;
 end;
 
-procedure literal(s: str_number; reset_origin, is_special, warn: boolean);
+procedure literal(s: str_number; literal_mode: integer; warn: boolean);
 var j: pool_pointer; {current character code position}
 begin
     j:=str_start[s];
-    if is_special then begin
+    if literal_mode = scan_special then begin
         if not (str_in_str(s, "PDF:", 0) or str_in_str(s, "pdf:", 0)) then begin
-            if warn and not (str_in_str(s, "SRC:", 0) or str_in_str(s, "src:", 0) or (length(s) = 0)) then
-                print_nl("Non-PDF special ignored!");
+            if warn and not (str_in_str(s, "SRC:", 0)
+                or str_in_str(s, "src:", 0)
+                or (length(s) = 0)) then
+                    print_nl("Non-PDF special ignored!");
             return;
         end;
         j := j + length("PDF:");
         if str_in_str(s, "direct:", length("PDF:")) then begin
             j := j + length("direct:");
-            reset_origin := false;
-        end
+            literal_mode := direct_always; end
+        else if str_in_str(s, "page:", length("PDF:")) then begin
+            j := j + length("page:");
+            literal_mode := direct_page; end
         else
-            reset_origin := true;
+            literal_mode := reset_origin;
     end;
-    if reset_origin then begin
+    case literal_mode of
+    reset_origin: begin
         pdf_end_text;
         pdf_set_origin;
-    end
-    else begin
+        end;
+    direct_page:
+        pdf_end_text;
+    direct_always: begin
         pdf_first_space_corr := 0;
         pdf_end_string;
         pdf_print_nl;
-    end;
+        end;
+    othercases confusion("literal1")
+    endcases;
     while j<str_start[s+1] do begin
        pdf_out(str_pool[j]);
        incr(j);
@@ -1713,12 +1733,17 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d pdf_height(#)           == mem[# + 2].sc
 @d pdf_depth(#)            == mem[# + 3].sc
 
-@# {data struture for \.{\\pdfliteral}}
+@# {data structure for \.{\\pdfliteral}}
 @d pdf_literal_data(#)     == link(#+1) {data}
-@d pdf_literal_direct(#)   == info(#+1) {write data directly to the page
-                              contents without resetting text matrix}
+@d pdf_literal_mode(#)     == info(#+1) {mode of resetting the text matrix
+                              while writing data to the page stream}
+@# {modes of resetting the text matrix}
+@d reset_origin == 0          {end text (ET) if needed, reset text matrix}
+@d direct_page == 1           {end text (ET) if needed, don't reset text matrix}
+@d direct_always == 2         {don't reset text matrix}
+@d scan_special == 3          {look into special text}
 
-@# {data struture for \.{\\pdfobj} and \.{\\pdfrefobj}}
+@# {data structure for \.{\\pdfobj} and \.{\\pdfrefobj}}
 @d pdf_refobj_node_size    == 2 {size of whatsit node representing the raw object}
 @d pdf_obj_objnum(#)       == info(# + 1) {number of the raw object}
 @d obj_data_ptr            == obj_aux {pointer to |pdf_mem|}
@@ -1732,7 +1757,7 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d obj_obj_is_file(#)      == pdf_mem[obj_data_ptr(#) + 3] {data should be 
                               read from an external file?}
 
-@# {data struture for \.{\\pdfxform} and \.{\\pdfrefxform}}
+@# {data structure for \.{\\pdfxform} and \.{\\pdfrefxform}}
 @d pdf_refxform_node_size  == 5 {size of whatsit node for xform; words 1..3 are
                               form dimensions}
 @d pdf_xform_objnum(#)     == info(# + 4) {object number}
@@ -1748,7 +1773,7 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d obj_xform_resources(#)  == pdf_mem[obj_data_ptr(#) + 5] {additional xform
                               Resources}
 
-@# {data struture for \.{\\pdfximage} and \.{\\pdfrefximage}}
+@# {data structure for \.{\\pdfximage} and \.{\\pdfrefximage}}
 @d pdf_refximage_node_size == 5 {size of whatsit node for ximage; words 1..3
                                are image dimensions}
 @d pdf_ximage_objnum(#)    == info(# + 4) {object number}
@@ -1760,7 +1785,7 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d obj_ximage_attr(#)      == pdf_mem[obj_data_ptr(#) + 3] {additional ximage attributes}
 @d obj_ximage_data(#)      == pdf_mem[obj_data_ptr(#) + 4] {pointer to image data}
 
-@# {data struture of annotations; words 1..4 represent the coordinates of
+@# {data structure of annotations; words 1..4 represent the coordinates of
     the annotation}
 @d obj_annot_ptr           == obj_aux {pointer to corresponding whatsit node}
 @d pdf_annot_node_size     == 7 {size of whatsit node representing annotation}
@@ -2818,7 +2843,7 @@ four_cases(xxx1):  begin
         append_char(packet_byte);
     end;
     s := make_string;
-    literal(s, true, true, false);
+    literal(s, scan_special, false);
     flush_str(s);
 end;
 othercases pdf_error("vf", "invalid DVI command");
@@ -2847,10 +2872,7 @@ begin
     show_token_list(link(pdf_literal_data(p)),null,pool_size-pool_ptr);
     selector:=old_setting;
     s := make_string;
-    if pdf_literal_direct(p) = 1 then
-        literal(s, false, false, false)
-    else
-        literal(s, true, false, false);
+    literal(s, pdf_literal_mode(p), false);
     flush_str(s);
 end;
 
@@ -2862,7 +2884,7 @@ begin
     show_token_list(link(write_tokens(p)),null,pool_size-pool_ptr);
     selector:=old_setting;
     s := make_string;
-    literal(s, true, true, true);
+    literal(s, scan_special, true);
     flush_str(s);
 end;
 
@@ -3856,7 +3878,7 @@ else
     threads := 0
 
 @ Now we are ready to declare our new procedure |ship_out|.  It will call
-|pdf_ship_out| if integer parametr |pdf_output| is positive; otherwise it
+|pdf_ship_out| if the integer parameter |pdf_output| is positive; otherwise it
 will call |dvi_ship_out|, which is the \TeX\ original |ship_out|. 
 
 @p procedure ship_out(p:pointer); {output the box |p|}
@@ -4794,16 +4816,18 @@ begin
     check_pdfoutput("\pdfliteral", true);
     new_whatsit(pdf_literal_node, write_node_size);
     if scan_keyword("direct") then
-        pdf_literal_direct(tail) := 1
+        pdf_literal_mode(tail) := direct_always
+    else if scan_keyword("page") then
+        pdf_literal_mode(tail) := direct_page
     else
-        pdf_literal_direct(tail) := 0;
+        pdf_literal_mode(tail) := reset_origin;
     scan_pdf_ext_toks;
     pdf_literal_data(tail) := def_ref;
 end
 
 @ The \.{\\pdfobj} primitive is to create a ``raw'' object in PDF
   output file. The object contents will be hold in memory and will be written
-  out only when the object je referenced by \.{\\pdfrefobj}. When \.{\\pdfobj}
+  out only when the object is referenced by \.{\\pdfrefobj}. When \.{\\pdfobj}
   is used with \.{\\immediate}, the object contents will be written out
   immediately. Object referenced in current page are appended into
   |pdf_obj_list|.
@@ -5851,8 +5875,15 @@ othercases print("whatsit?")
 @y
 pdf_literal_node: begin
     print_esc("pdfliteral");
-    if pdf_literal_direct(p) > 0 then
+    case pdf_literal_mode(p) of
+    reset_origin:
+        do_nothing;
+    direct_page:
+        print(" page");
+    direct_always:
         print(" direct");
+    othercases confusion("literal2")
+    endcases;
     print_mark(pdf_literal_data(p));
 end;
 pdf_refobj_node: begin

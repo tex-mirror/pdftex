@@ -58,11 +58,9 @@ pdftex_ch_srcs = pdftex.web \
   $(srcdir)/tex.ch \
   $(srcdir)/pdftexdir/tex.ch1 \
   $(srcdir)/pdftexdir/tex.pch \
-  $(srcdir)/pdftexdir/pdf_mem.ch \
   $(srcdir)/pdftexdir/noligatures.ch \
   $(srcdir)/pdftexdir/pdfstrcmp.ch \
-  $(srcdir)/pdftexdir/randoms.ch \
-  $(srcdir)/pdftexdir/pdfliteral.ch
+  $(srcdir)/pdftexdir/randoms.ch
 #   Rules:
 pdftex.web: tie pdftexdir/pdftex.mk $(pdftex_web_srcs)
 	$(TIE) -m pdftex.web $(pdftex_web_srcs)

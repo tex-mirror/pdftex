@@ -149,9 +149,14 @@ void write_png_palette (integer img)
     integer palette_objnum = 0;
     pdfcreateobj(0, 0);
     palette_objnum = objptr;
-    pdf_printf("[/Indexed /DeviceRGB %i %i 0 R]\n",
+    if (img_colorspace_ref(img) != 0) {
+	  pdf_printf("%i 0 R\n", (int)img_colorspace_ref(img));
+    }
+    else {
+	  pdf_printf("[/Indexed /DeviceRGB %i %i 0 R]\n",
 	       (int)(png_info(img)->num_palette - 1),
 	       (int)palette_objnum);
+	}
     pdfbeginstream();
     if (png_info(img)->interlace_type == PNG_INTERLACE_NONE) {
         row = xtalloc(png_info(img)->rowbytes, png_byte);
@@ -185,7 +190,12 @@ void write_png_gray (integer img)
 {
     int i, j, k, l;
     png_bytep row, r, *rows;
-    pdf_puts("/DeviceGray\n");
+    if (img_colorspace_ref(img) != 0) {
+        pdf_printf("%i 0 R\n", (int)img_colorspace_ref(img));
+    }
+    else {
+	  pdf_puts("/DeviceGray\n");
+	}
     pdfbeginstream();
     if (png_info(img)->interlace_type == PNG_INTERLACE_NONE) {
         row = xtalloc(png_info(img)->rowbytes, png_byte);
@@ -215,7 +225,12 @@ void write_png_gray_alpha (integer img)
     integer smask_ptr = 0;
     integer smask_size = 0;
     int bitdepth;
-    pdf_puts("/DeviceGray\n");
+    if (img_colorspace_ref(img) != 0) {
+        pdf_printf("%i 0 R\n", (int)img_colorspace_ref(img));
+    }
+    else {
+	  pdf_puts("/DeviceGray\n");
+	}
     pdfcreateobj(0, 0);
     smask_objnum = objptr;
     pdf_printf("/SMask %i 0 R\n",
@@ -274,7 +289,12 @@ void write_png_rgb (integer img)
 {
     int i, j, k, l;
     png_bytep row, r, *rows;
-    pdf_puts("/DeviceRGB\n");
+    if (img_colorspace_ref(img) != 0) {
+        pdf_printf("%i 0 R\n", (int)img_colorspace_ref(img));
+    }
+    else {
+	  pdf_puts("/DeviceRGB\n");
+	}
     pdfbeginstream();
     if (png_info(img)->interlace_type == PNG_INTERLACE_NONE) {
         row = xtalloc(png_info(img)->rowbytes, png_byte);
@@ -302,7 +322,12 @@ void write_png_rgb_alpha (integer img)
     integer smask_ptr = 0;
     integer smask_size = 0;
     int bitdepth;
-    pdf_puts("/DeviceRGB\n");
+    if (img_colorspace_ref(img) != 0) {
+        pdf_printf("%i 0 R\n", (int)img_colorspace_ref(img));
+    }
+    else {
+	  pdf_puts("/DeviceRGB\n");
+	}
     pdfcreateobj(0, 0);
     smask_objnum = objptr;
     pdf_printf("/SMask %i 0 R\n",
@@ -483,6 +508,10 @@ void write_png (integer img)
 		&& (checked_gamma <= 1.01 && checked_gamma > 0.99)
 		) 
 	  {
+    if (img_colorspace_ref(img) != 0) {
+        pdf_printf("%i 0 R\n", (int)img_colorspace_ref(img));
+    }
+    else {
 	  switch (png_info(img)->color_type) {
 	  case PNG_COLOR_TYPE_PALETTE:
 		pdfcreateobj(0, 0);
@@ -497,6 +526,7 @@ void write_png (integer img)
 	  default: /* RGB */
 		pdf_puts("/DeviceRGB\n");
 	  };
+	}
 	  tex_printf(" (PNG copy)");
 	  copy_png(img);
 	  if (palette_objnum > 0) {

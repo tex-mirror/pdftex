@@ -1,11 +1,12 @@
 % interface=english modes=letter,screen output=pdftex
+% vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.613 2005/07/12 19:58:36 oneiros Exp $
+% $Id: pdftex-t.tex,v 1.619 2005/07/22 16:12:08 oneiros Exp $
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
 
-\setvariables[pdftex][titlepagelines=63]
+\setvariables[pdftex][titlepagelines=62]
 
 %D We use a multi purpose style (using modes) that enable us
 %D to generate an A4, letter and screen version.
@@ -33,7 +34,7 @@
 
 %D ConTeXt defaults to 1.5; we want to be backwards compatible (and we don't
 %D use any features from 1.4++ anyway, do we?)
-\pdfoptionpdfminorversion=3
+\pdfminorversion=3
 
 %D First we define ourselves some abbreviations, if only to force
 %D consistency and to save typing. We use real small capitals, not pseudo
@@ -62,7 +63,7 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.613 2005/07/12 19:58:36 oneiros Exp $
+\rcsscan $Id: pdftex-t.tex,v 1.619 2005/07/22 16:12:08 oneiros Exp $
 
 \def\currentpdftex{1.30.0}
 
@@ -73,13 +74,13 @@
 \def\Eg{E.\,g.}
 
 \abbreviation [AFM]        {afm}        {Adobe Font Metrics}
-\abbreviation [AMIGA]      {Amiga}      {Amiga hardware platform}
-\abbreviation [AMIWEB]     {AmiWeb2c}   {\AMIGA\ distribution}
+%\abbreviation [AMIGA]      {Amiga}      {Amiga hardware platform}
+%\abbreviation [AMIWEB]     {AmiWeb2c}   {\AMIGA\ distribution}
 \abbreviation [ASCII]      {ascii}      {American Standard Code for Information Interchange}
 \abbreviation [CMACTEX]    {CMac\TeX}   {\MAC\ \WEBC\ distribution}
 \abbreviation [CONTEXT]    {\ConTeXt}   {general purpose macro package}
 \abbreviation [CTAN]       {CTAN}       {global \TEX\ archive server}
-\abbreviation [DJGPP]      {djgpp}      {DJ Delorie's \GNU\ Programming Platform}
+%\abbreviation [DJGPP]      {djgpp}      {DJ Delorie's \GNU\ Programming Platform}
 \abbreviation [DVI]        {dvi}        {native \TEX\ Device Independent file format}
 \abbreviation [ENCTEX]     {enc\TeX}    {enc\TeX\ extension to \TEX}
 \abbreviation [EPSTOPDF]   {epstopdf}   {\EPS\ to \PDF\ conversion tool}
@@ -94,6 +95,7 @@
 \abbreviation [LATEX]      {\LaTeX}     {general purpose macro package}
 \abbreviation [MAC]        {Macintosh}  {Macintosh hardware platform}
 \abbreviation [MACOSX]     {Mac\,OS\,X} {Macintosh operating system version 10}
+\abbreviation [MDFIVE]     {md5}        {MD5 message-digest algorithm}
 \abbreviation [METAFONT]   {\MetaFont}  {graphic programming environment, bitmap output}
 \abbreviation [METAPOST]   {\MetaPost}  {graphic programming environment, vector output}
 \abbreviation [MIKTEX]     {MikTeX}     {\WIN\ distribution}
@@ -141,7 +143,7 @@
 
 \useURL [ptex_org]      [http://www.pdftex.org] % links to ptex_examples
 \useURL [ptex_ctan]     [ctan:systems/pdftex]
-\useURL [ptex_devel]    [http://pdftex.sarovar.org/current/]
+%\useURL [ptex_devel]    [http://pdftex.sarovar.org/current/]
 \useURL [ptex_sarovar]  [http://sarovar.org/projects/pdftex/]
 %\useURL [ptex_examples] [http://www.tug.org/applications/pdftex/]
 \useURL [tex_showcase]  [http://www.tug.org/texshowcase]
@@ -150,7 +152,7 @@
 \useURL [texlive]       [http://www.tug.org/tex-live/]
 \useURL [ctan_systems]  [ctan:systems]
 \useURL [win32]         [ctan:systems/win32]
-\useURL [amiga]         [ctan:systems/amiga/amiweb2c/]
+%\useURL [amiga]         [ctan:systems/amiga/amiweb2c/]
 
 \useURL [fabrice]    [mailto:popineau@supelec.fr]
 \useURL [thomas]     [mailto:te@dbs.uni-hannover.de]
@@ -191,6 +193,9 @@
 % hyphenates
 
 \def\Something#1{\Sugar{\mathematics{\langle}\prewordbreak{#1}\prewordbreak\mathematics{\rangle}}}
+
+% introduced
+\def\introduced#1{The primitive has been introduced in \PDFTEX\ #1.}
 
 %D We typeset the \URL's in a monospaced font.
 
@@ -844,7 +849,7 @@ on \UNIX\ systems (including Linux), and \WIN\ systems (Windows 95,
 98, NT, 2000, XP).  The primary location where one can fetch the latest
 released code is at the developers' homepage \from[ptex_sarovar], where
 you also find bug tracking information, and the manual sources. Download
-the \PDFTEX\ tarball from there.
+the \PDFTEX\ archive from there.
 
 The \PDFTEX\ sources can also be found at their canonical place in
 the CTAN network, \from[ptex_ctan].
@@ -863,7 +868,7 @@ needed to compile \PDFTEX:
 
 \startesctyping
 cd $HOME/pdftex
-unzip pdftex-@currentpdftex.zip | tar xvf -
+unzip pdftex-@currentpdftex.zip
 cd pdftex-@currentpdftex
 ./Build
 \stopesctyping
@@ -1300,9 +1305,13 @@ pool_size=500000
 
 \stopitemize
 
+%MS it would be nice if we could get the number of objects directly from TeX,
+%MS but currently even the line given at the end of the log "PDF objects out
+%MS of" is only a minimum as it doesn't include all the objects from the page
+%MS tree and document info...
 Normally the page content takes one object. This means that one seldom finds
 more than a~few hundred objects in a~simple file. This document for instance
-uses about 785 objects. In demanding applications this number can grow quite
+uses about 900 objects. In demanding applications this number can grow quite
 rapidly, especially when one uses a~lot of widget annotations, shared
 annotations or other shared things. In these situations in \filename
 {texmf.cnf} one can enlarge \PDFTEX 's internal object table by adding a~line
@@ -1780,7 +1789,7 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.613 2005/07/12 19:58:36 oneiros Exp $
+%%S $Id: pdftex-t.tex,v 1.619 2005/07/22 16:12:08 oneiros Exp $
 %%S NL
 %%S integer registers:
 
@@ -1796,9 +1805,9 @@ definitions and syntax rules follow after the list of primitives.
 \Tex {\pdfminorversion} \Whatever{integer}
 }
 
-\Syntax {
-\Tex {\pdfoptionpdfminorversion} \Whatever{integer}
-}
+%\Syntax {
+%\Tex {\pdfoptionpdfminorversion} \Whatever{integer}
+%}
 
 \Syntax {
 \Tex {\pdfcompresslevel} \Whatever{integer}
@@ -1874,12 +1883,6 @@ definitions and syntax rules follow after the list of primitives.
 
 \Syntax {
 \Tex {\pdfimagegamma} \Whatever{integer}
-}
-
-% Should we remove this?
-
-\Syntax {
-\Tex {\pdfmovechars} \Whatever{integer}
 }
 
 \stoppacked
@@ -1962,6 +1965,10 @@ definitions and syntax rules follow after the list of primitives.
 }
 
 \Syntax {
+\Tex {\pdfcreationdate} \Whatever{expandable}
+}
+
+\Syntax {
 \Tex {\pdfpageref} \Something{page number} \Whatever{expandable}
 }
 
@@ -2007,6 +2014,38 @@ definitions and syntax rules follow after the list of primitives.
 
 \Syntax {
 \Tex {\pdfunescapehex} \Something{general text} \Whatever{expandable}
+}
+
+% Currently it's only experimental, so don't really document it
+\iffalse
+\Syntax {
+\Tex {\pdfstrcmp} \Something{general text} \Something{general text} \Whatever{expandable}
+}
+\fi
+
+\Syntax {
+\Tex {\pdfuniformdeviate} \Something{number} \Whatever{expandable}
+}
+
+\Syntax {
+\Tex {\pdfnormaldeviate} \Whatever{expandable}
+}
+
+\Syntax {
+\Tex {\pdfmdfivesum} \Optional{file} \Something{general text} \Whatever{expandable}
+}
+
+\Syntax {
+\Tex {\pdffilemoddate} \Something{general text} \Whatever{expandable}
+}
+
+\Syntax {
+\Tex {\pdffilesize} \Something{general text} \Whatever{expandable}
+}
+
+\Syntax {
+\Tex {\pdffiledump} \Optional{offset \Something{number}} \Optional{length \Something{number}} \Something{general text}
+\Whatever{expandable}
 }
 
 \stoppacked
@@ -2055,7 +2094,15 @@ definitions and syntax rules follow after the list of primitives.
 }
 
 \Syntax {
-\Tex {\elapsedtime} \Whatever{read||only integer}
+\Tex {\pdfelapsedtime} \Whatever{read||only integer}
+}
+
+\Syntax {
+\Tex {\pdfrandomseed} \Whatever{read||only integer}
+}
+
+\Syntax {
+\Tex {\pdfshellescape} \Whatever{read||only integer}
 }
 
 % No longer available
@@ -2181,7 +2228,15 @@ definitions and syntax rules follow after the list of primitives.
 }
 
 \Syntax {
-\Tex {\resettimer} \Whatever{read||only integer}
+\Tex {\pdfresettimer}
+}
+
+\Syntax {
+\Tex {\pdfsetrandomseed} \Something{number}
+}
+
+\Syntax {
+\Tex {\pdfnoligatures} \Something{font}
 }
 
 \stoppacked
@@ -2436,13 +2491,18 @@ Some of the object and image related primitives can be prefixed by
 Here follows a~short description of the primitives added by \PDFTEX\
 to the original \TEX\ engine (other extensions by \MLTEX\ and \ENCTEX\
 are not listed).  One way to learn more about how to use these new
-primitives is to have a~look at the file \filename {example.tex} in the
+primitives is to have a~look at the file \filename {samplepdf.tex} in the
 \PDFTEX\ distribution.
 
 Note that if the output is \DVI\ then the \PDFTEX\ specific dimension
 parameters are not used at all. However some \PDFTEX\ integer parameters
 can affect the \DVI\ as well as \PDF\ output (currently \type{\pdfoutput}
 and \type{\pdfadjustspacing}).
+
+%A warning to macro writers: The \PDFTEX-team reserves the namespaces
+%\type{\pdf*} and \type{\ptex*} for use by \PDFTEX; if you define macros
+%whose names start with \type{\pdf} or \type{\ptex}, you risk nameclashes
+%with new primitives introduced in future versions of \PDFTEX.
 
 General warning: many of these new primitives, for example
 \type{\pdfdest} and \type{\pdfoutline}, write their arguments directly
@@ -2683,7 +2743,7 @@ otherwise the document can be invalid.
 \bookmark{\type{\pdftrailer}}
 
 This command puts its argument text verbatim into the file trailer
-dictionary.
+dictionary. \introduced{1.11a}
 
 %***********************************************************************
 
@@ -2881,6 +2941,7 @@ in \Tex{\box} \Something{box number}. The expansion string includes the
 unit \type{pt}. \Eg, when the left margin kern of \type{\box0} amounts
 to $-$10\,pt, \type{\leftmarginkern0} will expand to \type{-10pt}.
 A~similar primitive \type{\rightmarginkern} exists for the right margin.
+\introduced{1.30.0}
 
 These are auxiliary primitives to make character protrusion
 more versatile. When using the \TEX\ primitive \type{\unhbox} or
@@ -2913,6 +2974,7 @@ The \Tex{\rightmarginkern} \Something{box number} primitive expands to
 the width of the margin kern at the right side of the horizontal list
 stored in \Tex{\box} \Something{box number}. See \type{\leftmarginkern}
 for more details.
+\introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdffontattr} \Something{font} \Something{general text}}}
 
@@ -3084,7 +3146,7 @@ quick checks of a~new font map entry, before writing it into
 a~map file.
 
 \type{\pdfmapline {}} clears the list of pending map items a~similar
-way as \type{\pdfmapfile{}} does.
+way as \type{\pdfmapfile{}} does. \introduced{1.20a}
 
 \pdftexprimitive {\Syntax {\Tex {\pdftracingfonts} \Whatever{integer}}}
 
@@ -3108,7 +3170,7 @@ together with the font size, \eg:
 \stoptyping
 
 Setting \type{\pdftracingfonts} to a~value other than~0 or~1 is not
-recommended, to allow future extensions.
+recommended, to allow future extensions.  \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfmovechars} \Whatever{integer}}}
 
@@ -3126,6 +3188,14 @@ its sole purpose was to remedy certain bugs of early \PDF\ viewers.)
 The \type{\pdfpkmode} is a~token register that sets the \METAFONT\ mode for
 pixel font generation. The contents of this register is dumped into the
 format, so one can (optionally) preset it \eg\ in \type{pdftexconfig.tex}.
+\introduced{1.30.0}
+
+\pdftexprimitive {\Syntax {\Tex {\pdfnoligatures} \Something{font}}}
+
+\bookmark{\type{\pdfnoligatures}}
+
+This diables all ligatures in the loaded font \Something{font}.
+\introduced{1.30.0}
 
 %***********************************************************************
 
@@ -3299,7 +3369,7 @@ the prefix~\type{/Fm} followed by a~number, for instance \type{/Fm2}.
 For a~given form XObject number, this primitive expands to the number
 in the corresponding form XObject name. \Eg, if \type{/Fm2} corresponds
 to some form XObject with object number 7, the \type{\pdfxformname7}
-expands to the number~\type{2}.
+expands to the number~\type{2}. \introduced{1.30.0}
 
 %***********************************************************************
 
@@ -3371,7 +3441,7 @@ Starting from \PDFTEX\ 1.21, \type{\pdfximage} command supports
 \type{colorspace} keyword followed by an object number (user||defined
 colorspace for the image being included). This feature works for \JPEG\ images
 only. \PNG s are \RGB\ palettes and \PDF\ images have always self||contained
-colorspace information.
+color space information.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfrefximage} \Something{integer}}}
 
@@ -3477,11 +3547,13 @@ This primitive, when set to~1, enables embedding of \PNG\ images with
 16~bit wide color channels at their full color resolution. As such
 an embedding mode is defined only from \PDF\ version~1.5 onwards,
 the \type{\pdfimagehicolor} functionality is automatically disabled
-in \PDFTEX, if \type{\pdfminorversion}~$<$~5; then each 16~bit
+in \PDFTEX\ if \type{\pdfminorversion}~$<$~5; then each 16~bit
 color channel is reduced to a~width of 8~bit by stripping the lower 8~bits
-before embedding. The same stripping happens, when \type{\pdfimagehicolor}
+before embedding. The same stripping happens when \type{\pdfimagehicolor}
 is set to~0. For \type{\pdfminorversion}~$\ge$~5 the default
-value of \type{\pdfimagehicolor} is~1.
+value of \type{\pdfimagehicolor} is~1. If specified, the parameter
+must appear before any data is written to the \PDF\ output.
+\introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfimageapplygamma} \Whatever{integer}}}
 
@@ -3491,6 +3563,9 @@ This primitive, when set to~1, enables gamma correction while embedding
 \PNG\ images, taking the values of the primitives \type {\pdfgamma} as
 well as the gamma value embedded in the \PNG\ image into account. When
 \type{\pdfimageapplygamma} is set to~0, no gamma correction is performed.
+If specified, the parameter must appear before any data is written to the
+\PDF\ output.
+\introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfgamma} \Whatever{integer}}}
 
@@ -3506,6 +3581,9 @@ based on the  value of the \type{\pdfgamma} primitive and the `assumed
 device gamma' that is derived from the value embedded in the actual
 image. If no embedded value can be found in the \PNG\ image, then the
 value of \type{\pdfimagegamma} is used instead.
+If specified, the parameter must appear before any data is written to the
+\PDF\ output.
+\introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfimagegamma} \Whatever{integer}}}
 
@@ -3521,6 +3599,9 @@ a~device with a~gamma of 2.2. Experiments show that this default setting
 is correct for a~large number of images; however, if your images come
 out too dark, you probably want to set \type{\pdfimagegamma} to a~lower
 value, like~1000.
+If specified, the parameter must appear before any data is written to the
+\PDF\ output.
+\introduced{1.30.0}
 
 %***********************************************************************
 
@@ -3776,9 +3857,13 @@ This is equivalent to \Syntax{\Tex{\pdfliteral} \Lbrace \Something{text} \Rbrace
 
 \pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:direct:} \Something{text} \Rbrace}}
 
-\bookmark{\type{\special\leftargument direct:}}
+\bookmark{\type{\special\ direct}}
 
 This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{direct} \Lbrace \Something{text} \Rbrace}.
+
+%***********************************************************************
+
+\subsection{Strings}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfescapestring} \Something {general text}}}
 
@@ -3787,11 +3872,13 @@ This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{direct} \Lbrace \Someth
 Starting from version 1.30.0, \PDFTEX\ provides a~mechanism for converting
 a~general text into \PDF\ string. Many characters that may be needed inside
 such a~text (especially parenthesis), have a~special meaning inside a~\PDF\
-string object and thus, in such a~case, can't be used literally. The primitive
-replaces each special \PDF\ character by its octal representation preceded by
-backslash character. In example, \type{\pdfescapestring{Text (1)}} will be
-expanded to \type{Text\040\(1\)}. This ensures a~literal interpretation of
-the character by the \PDF\ viewer.
+string object and thus, can't be used literally. The primitive replaces each
+special \PDF\ character by its literal representation by inserting a~backslash
+before that character. Some characters (\eg space) are also converted into
+3||digit octal number. In example, \type{\pdfescapestring{Text (1)}} will be
+expanded to \type{Text\040\(1\)}. This ensures a~literal interpretation of the
+text by the \PDF\ viewer.
+\introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfescapename} \Something {general text}}}
 
@@ -3800,9 +3887,9 @@ the character by the \PDF\ viewer.
 In analogy to \type{\pdfescapestring}, \type{\pdfescapename} replaces each
 special \PDF\ character inside the general text by its hexadecimal
 representation preceded by \type{#} character. This ensures the proper
-interpretation of the text if used as a~\PDF\ name object. In example, \type{My
-Name} will be replaced by \type{Text#20#281#29}. The primitive has been introduced
-in \PDFTEX\ version 1.30.0.
+interpretation of the text if used as a~\PDF\ name object. In example,
+\type{Text (1)} will be replaced by \type{Text#20#281#29}.
+\introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfescapehex} \Something {general text}}}
 
@@ -3810,16 +3897,147 @@ in \PDFTEX\ version 1.30.0.
 
 This command converts each character of \Something{general text} into its
 hexadecimal representation. Each character of the argument becomes a~pair of
-hexadecimal digits. The primitive has been introduced in \PDFTEX\ version
-1.30.0.
+hexadecimal digits. \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfunescapehex} \Something {general text}}}
 
 \bookmark{\type{\pdfunescapehex}}
 
 This command treats each character pair of \Something {general text} as
-a~hexadecimal number and returns an \ASCII\ character of this code. The
-primitive has been introduced in \PDFTEX\ version 1.30.0.
+a~hexadecimal number and returns an \ASCII\ character of this code.
+\introduced{1.30.0}
+
+% Currently it's only experimental, so don't really document it
+\iffalse
+\pdftexprimitive {\Syntax {\Tex {\pdfstrcmp} \Something{general text}
+\Something{general text} \Whatever{expandable}}}
+
+\bookmark{\type{\pdfstrcmp}}
+
+This command compares two strings and expands to 0 if the strings are
+equal, to $-1$ if the first string is $<$ then the second, and to $+1$ if
+the first is $>$ than the second.
+\introduced{1.30.0}
+\fi
+
+\pdftexprimitive{\Syntax {\Tex {\pdfmdfivesum} \Something{general text}
+\Whatever{expandable}}}
+
+\bookmark{\type{\pdfmdfivesum}}
+
+This command expands to the \MDFIVE\ of \Something{general text} in uppercase
+hexadecimal format (same as \type{\pdfescapehex}).
+\introduced{1.30.0}
+
+%***********************************************************************
+
+\subsection{Timekeeping}
+
+\pdftexprimitive {\Syntax {\Tex {\pdfelapsedtime}} \Whatever{read||only
+integer}}
+
+\bookmark{\type{\pdfelapsedtime}}
+
+The command expands to a~number that represents the time elapsed from the
+moment of run start. The elapsed time is returned in `scaled seconds', that
+means seconds divided by 65536, \eg\ \PDFTEX\ has run for \the\pdfelapsedtime\
+`scaled seconds' when this paragraph was typeset. Obviously, the command will
+never return a value greater than the highest number available in \TeX: if
+the time exceeds 32767 seconds, the constant value $2^{31}-1$ will be returned.
+\introduced{1.30.0}
+
+\pdftexprimitive{\type{\pdfresettimer}}
+
+\bookmark{\type{\pdfresettimer}}
+
+The command resets the internal timer so that \type{\pdfelapsedtime}
+starts returning micro||time from~0 again. \introduced{1.30.0}
+
+%***********************************************************************
+
+\subsection{Random numbers}
+
+\pdftexprimitive{\Syntax {\Tex {\pdfuniformdeviate} \Something{number} \Whatever{expandable}}}
+
+\bookmark{\type{\pdfuniformdeviate}}
+
+The commands generates a uniformly distributed random integer value between
+0 (inclusive) and \Something{number} (exclusive). This primitive expands to
+a list of tokens. \introduced{1.30.0}
+
+\pdftexprimitive{\Syntax {\Tex {\pdfnormaldeviate} \Whatever{expandable}}}
+
+\bookmark{\type{\pdfnormaldeviate}}
+
+%MS Hopefully the random number doesn't influce the length of this paragraph;
+%MS otherwise texexec could loop :-)
+The commands generates a random integer value with a mean of 0 and a unit
+of 65\,536, \eg\ $\pdfnormaldeviate$. This primitive expands to a list of
+tokens. \introduced{1.30.0}
+
+\pdftexprimitive {\Syntax {\Tex {\pdfrandomseed}} \Whatever{read||only
+integer}}
+
+\bookmark{\type{\pdfrandomseed}}
+
+You can use \type{\the\pdfrandomseed} to query the current seed value, so
+you can \eg\ write the value to the log file.
+The initial value of the seed is derived from the system time, and is not
+more than 1\,000\,999\,999 (this ensures that the value can be used with
+commands like \type{\count}). \introduced{1.30.0}
+
+\pdftexprimitive{\Syntax {\Tex {\pdfsetrandomseed} \Something{number}}}
+
+\bookmark{\type{\pdfsetrandomseed}}
+
+This sets the random seed (\type{\pdfrandomseed}) to a specific value,
+allowing you to re-play sequences of semi-randoms at a later moment.
+\introduced{1.30.0}
+
+%***********************************************************************
+
+\subsection{Files}
+
+\pdftexprimitive{\Syntax {\Tex {\pdffilemoddate} \Something{general text}
+\Whatever{expandable}}}
+
+\bookmark{\type{\pdffilemoddate}}
+
+Expands to the modification date of file \Something{general text} in the same
+format as for \type{\pdfcreationdate}, \eg\ it's {\tt \pdffilemoddate
+{./pdftex-t.tex}} for the source of this manual.
+\introduced{1.30.0}
+
+\pdftexprimitive{\Syntax {\Tex {\pdffilesize} \Something{general text}
+\Whatever{expandable}}}
+
+\bookmark{\type{\pdffilesize}}
+
+Expands to the size of file \Something{general text}, \eg\ it's {\tt
+\pdffilesize {./pdftex-t.tex}} for the source of this manual.
+\introduced{1.30.0}
+
+\pdftexprimitive{\Syntax {\Tex {\pdfmdfivesum} file \Something{general text}
+\Whatever{expandable}}}
+
+\bookmark{\type{\pdfmdfivesum\ file}}
+
+Expands to the \MDFIVE\ of file \Something{general text} in uppercase
+hexadecimal format (same as \type{\pdfescapehex}), \eg\ it's {\tt
+\pdfmdfivesum file {./pdftex-t.tex}} for the source of this manual.
+\introduced{1.30.0}
+
+\pdftexprimitive{\Syntax {\Tex {\pdffiledump} \Optional{offset
+\Something{number}} \Optional{length \Something{number}} \Something{general
+text} \Whatever{expandable}}}
+
+\bookmark{\type{\pdffiledump}}
+
+Expands to the dump of the file \Something{general text} in uppercase
+hexadecimal format (same as \type{\pdfescapehex}), starting at offset
+\Something{number} or 0 with length \Something{number}, if given. The first ten
+bytes of the source of this manual are {\tt \pdffiledump length 10
+{./pdftex-t.tex}}. \introduced{1.30.0}
 
 %***********************************************************************
 
@@ -3893,26 +4111,24 @@ this document, it returns letter {\tt \pdftexrevision}.
 \bookmark{\type{\pdftexbanner}}
 
 Returns the \PDFTEX\ banner message, \eg\ for the version used here:
-{\tt \pdftexbanner}.
+{\tt \pdftexbanner}. \introduced{1.20a}
 
+\pdftexprimitive {\Syntax {\Tex {\pdfcreationdate} \Whatever{expandable}}}
 
-\pdftexprimitive{\type{\elapsedtime}}
+\bookmark{\type{\pdfcreationdate}}
 
-\bookmark{\type{\elapsedtime}}
+Expands to the date string \PDFTEX\ uses in the info dictionary of the
+document, \eg\ for this file {\tt\pdfcreationdate}. \introduced{1.30.0}
 
-The command expands to a~number that represents the time elapsed from the
-moment of run start. The elapsed time is returned in `scaled seconds', that
-means seconds divided by 65536. Obviously, the command will never return the
-value greater than the highest number available in \TeX. If the time exceeds
-32767 seconds, the constant value $2^{31}-1$ will be returned. The command has
-been introduced in \PDFTEX\ 1.30.0.
+\pdftexprimitive {\Syntax {\Tex {\pdfshellescape} \Whatever{read||only
+integer}}}
 
-\pdftexprimitive{\type{\resettimer}}
+\bookmark{\type{\pdfshellescape}}
 
-\bookmark{\type{\resettimer}}
-
-The command resets the internal timer so that \type{\elapsedtime}
-starts returning micro||time from 0 again.
+This primitive is~1 if \type{\write18} is enabled, 0 otherwise.
+\type{\write18} was \ifnum\pdfshellescape=0\relax not \fi enabled when this
+manual was typeset.
+\introduced{1.30.0}
 
 %***********************************************************************
 

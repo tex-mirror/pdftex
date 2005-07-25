@@ -1,8 +1,27 @@
 % This example shows how to use pdfTeX primitives. High-level macros are provided
 % by macros packages like LaTeX or ConTeXt. We present basic set of commands,
 % extended with some more sophisticated issues (like MP to PDF conversion). All
-% the functionality other than pdfTeX itself is commented by default. Please
-% follow the code below and uncomment fragments you want.
+% the functionality other than provided by pdfTeX itself is commented by default.
+% Please follow the code below and uncomment fragments you want.
+
+% Many new features has been implemented since the first release of pdfTeX. To
+% make this sample version independent, we use compatibility sections.
+
+\def\ifversion#1.#2#3#4 {% 1.20, 1.30.0 ...
+ \ifnum\pdftexversion<#1#2#3
+  \notsupported
+ \else
+  \supported
+ \fi}
+
+\def\supported{\expandafter\iftrue}
+\def\notsupported{\expandafter\iffalse}
+
+\def\feature#1.#2#3#4#{\dofeature{#1#2#3}{#1.#2#3#4}}
+\long\def\dofeature#1#2#3#4\endfeature{%
+ \ifnum#1>\pdftexversion
+  #3 not supported by this version of \pdfTeX.\par
+ \else#4\fi}
 
 \def\pdfTeX{pdf\TeX}
 \def\primitive#1{{\tt\char92\relax#1}}
@@ -19,7 +38,7 @@
 
 % In previous versions of pdfTeX, integer parameters took their corresponding
 % values from pdftex.cfg config file. Starting from pdfTeX 1.20, the config file
-% id not readat all. All the parameters are specified in TeX code, optionally
+% id not read at all. All the parameters are specified in TeX code, optionally
 % dumped into format file.
 
 \pdfoutput=1            % positive value turns on PDF output;
@@ -53,13 +72,6 @@
                         % prefix for each named resources
                         % pdftex-0.14[ef] has a bug with this feature
                         % turned on
-
-\pdfoptionpdfminorversion=5
-%\pdfminorversion=5     % version of created PDF files and allowed PDF inclusions.
-                        % The default value is 4 that is enough in most cases (PDF 1.4).
-                        % However, some pdfTeX features presented here requires
-                        % PDF 1.5. Starting from pdfTeX 1.30.0, the command is called
-                        % \pdfminorversion
 
 % dimension parameters
 
@@ -96,15 +108,56 @@
 \pdfpageresources{/MyPageResourceAttribute /MyValue}
                         % optional page resources dict content
 
+% And some more parameters that need special care.
+
+\ifversion 1.30.0 \else
+ \let\pdfforcepagebox\pdfoptionalwaysusepdfpagebox
+\fi
+
+\pdfforcepagebox=0        % a page box of PDF inclusions to be used
+                          % as a clipping area. Here we use default (CropBox)
+                          % \pdfforcepagebox is a shortened synonym of
+                          % obsolete \pdfoptionalwaysusepdfpagebox.
+
+\ifversion 1.30.0 \else
+ \let\pdfminorversion\pdfoptionpdfminorversion
+\fi
+
+\pdfminorversion=5        % version of created PDF files and allowed PDF inclusions.
+                          % The default value is 4 that is enough in most cases (PDF 1.4).
+                          % However, some pdfTeX features presented here requires
+                          % PDF 1.5. Starting from pdfTeX 1.30.0, the command is called
+                          % \pdfminorversion.
+
+
+
+\ifversion 1.30.0 \else
+ \let\pdfinclusionerrorlevel\pdfoptionpdfinclusionerrorlevel
+\fi
+
+\pdfinclusionerrorlevel=0 % If the version of included PDF is greater than
+                          % the one being typeset, by default an error is issued.
+                          % If \pdfinclusionerrorlevel is set to one, warning only
+                          % (synonym of obsolete \pdfoptionpdfinclusionerrorlevel).
+
+\ifversion1.30.0
+\pdfimagehicolor=1      % enables 16-bit colors for PNG inclusions;
+                        % defaults to 1 if \pdfminorversion>=5,
+\pdfimageapplygamma=1   % enables gamma correction for PNG inclusions,
+\pdfgamma=1000          % sets pdfTeX `device gamma,'
+\pdfimagegamma=2200     % sets image gamma, if can't be taken from the image itself.
+\fi                     % (see below for details).
+
 % Version of pdftex can be accessed via \pdftexversion and \pdftexrevision.
 
-This is version \the\pdftexversion (revision \pdftexrevision) of \pdfTeX.
+This is version \the\pdftexversion\ (revision \pdftexrevision) of \pdfTeX.
 
 % Version of created PDF (and the highest allowed version of PDF inclusions)
 % can be controlled with \pdfminorversion. In pdfTeX versions below 1.30.0, the
 % primitive was called \pdfoptionpdfminorversion.
 
-This file is PDF version 1.\the\pdfoptionpdfminorversion.
+This file is PDF version 1.\the\pdfminorversion.
+\bigskip
 
 % Font resource in the pdf output has the form
 % "/F<number> <object number> 0 R", where <number> is accessible via
@@ -112,6 +165,16 @@ This file is PDF version 1.\the\pdfoptionpdfminorversion.
 
 Font \fontname\font\ has resource name tag
 \pdffontname\font\ and object number \pdffontobjnum\font\ in the PDF output.
+Font size is \pdffontsize\font.\par
+
+\feature 1.30.0 {Disabling ligatures}
+
+Ligatures: ffont, fint, flint\par
+{\font\noli=cmr10 at\pdffontsize\font
+ \pdfnoligatures\noli No ligatures: ffont, fint, flint}
+\bigskip
+
+\endfeature
 
 % \pdfincludechars can be used to ensure certain characters to be
 % included in the font file. Normally only used characters are
@@ -124,10 +187,30 @@ Font \fontname\font\ has resource name tag
 % course). \pdfliteral is intended to replace \special in pdf output mode.
 
 Changing color can be done by inserting `raw' PDF code, like
-\pdfliteral{0 1 1 0 k}      % switch color to red; using \pdfliteral is
-this.                       % recommended
-\special{PDF:0 0 0 1 k}     % switch color back to black; \special can be
-                            % used with prefix "pdf:" or "PDF:"
+\pdfliteral direct{0 1 1 0 k} % switch color to red; using \pdfliteral is
+this.                         % recommended
+
+\special{PDF:0 g}           % switch color back to black; \special can be
+                            % used with prefix "pdf:" or "PDF:", optionally appended with
+                            % "direct:"
+                            % A `direct' keyword is optional; it ensures that what one
+                            % types into \pdfliteral is inserted literally indeed.
+                            % Otherwise pdfTeX moves the space origin to the place after
+                            % the last types item on the page, inserts the user code and
+                            % restores its internal position.
+
+A simple picture:
+\pdfliteral {q 1 j 0 1 0 rg 0 0 1 RG 0 0 10 10 re B Q}
+
+% Roughly speaking, pdfTeX typeset text having an origin in lower-left corner of
+% the page (native PDF space origin). \pdfliteral used without `direct' keyword
+% changes this position temporarily to the point user probably expect. Thanks to
+% that, the rectangle painted above appears in-line, not in the lower-left corner
+% of the page. If one say \pdfliteral{...}\pdfliteral{...}, pdfTeX makes the
+% offset only once; it moves to current point of the page before the first
+% literal content, and comes back after the last one.
+
+\bigskip
 
 % User-defined object can be inserted into the pdf output by \pdfobj. The
 % object is written out as specified, apart from case when \pdfobj is used with
@@ -161,7 +244,7 @@ this.                       % recommended
     file {obj.dat}
 \pdfrefobj \pdflastobj
 
-% \pdflastobj is always global, as all others \pdflast... read-only integers (see
+% \pdflastobj is always global, as all others \pdflast* read-only integers (see
 % below). PDF object numbers are unique within the document. One may notice, that
 % if \pdfobj is preceded by \immediate, \pdflastobj seems to return subsequent
 % values (i.e 5,6,7,8...). Since \pdfobj is not the only command that creates PDF
@@ -169,21 +252,21 @@ this.                       % recommended
 % next one will always return 6. Thus, pdfTeX provides a forward-referencing
 % mechanism (introduced in pdfTeX 1.20).
 
-\ifnum\pdftexversion<120 \else
+\feature 1.20 {Forward object referencing}
 
 \pdfobj reserveobjnum
 We have an access to PDF object numbers, even before defining those objects.
-\pdfobj useobjnum\pdflastobj {(This is object no \the\pdflastobj)}
+\pdfobj useobjnum\pdflastobj {(This is object number \the\pdflastobj)}
 \pdfrefobj\pdflastobj
 
-\fi
+\endfeature
 
 % TeX boxes can be written into so-called XObject form, which is very
 % similar to a normal page in the pdf output. Additional data can be
 % inserted to the XObject form dictionary itself as well as the Resource
 % dictionary of the XObject form
 
-\setbox0=\hbox{This is a box that is outputted as a XObject form}
+\setbox0=\hbox{This is a box saved as a XObject form}
 \pdfxform
    attr      {/MyXObjectFormAttribute         /MyValue}
    resources {/MyXObjectFormResourceAttribute /MyValue}
@@ -206,42 +289,78 @@ We have an access to PDF object numbers, even before defining those objects.
 % Similarly to \pdflastobj, \pdflastxform returns the PDF object number assigned
 % for XObject form just created. pdfTeX also provides \pdfxformname primitive, that
 % returns a resource name identifier of the XObject written to PDF output with given
-% object number (introduced in pdfTeX version 1.30.0).
+% object number.
 
-\ifnum\pdftexversion<130 \else
+XObject above has been written as object \the\pdflastxform.
 
-XObject above has a resource name tag \pdfxformname\pdflastxform\
-and the object number \the\pdflastxform\ ({\tt/Fm\pdfxformname\pdflastxform
-\ \the\pdflastxform\space 0 R} entry in page resources dictionary).
+\feature 1.30.0 {Access to XObject names}
 
-\fi
+Its resource name tag is \pdfxformname\pdflastxform\
+({\tt/Fm\pdfxformname\pdflastxform\ \the\pdflastxform\space 0 R}
+entry in page resources dictionary).
 
-% Thanks to Taco Hoetwater pdfTeX 1.30.0 and higher provides precise time
-% measuring mechanism. \ptexelapsedtime primitive returns the time elapsed from
+\endfeature
+
+\bigskip
+
+% Thanks to Taco Hoekwater pdfTeX 1.30.0 and higher provides precise time
+% measuring mechanism. \pdfelapsedtime primitive returns the time elapsed from
 % the current run start. Time is measured in `scaled seconds' meaning that 65536
-% scaled seconds is 1 second. There is also \\ptexresettimer primitive that causes
+% scaled seconds is 1 second. There is also \pdfresettimer primitive that causes
 % zeroing the internal clock.
 
-\ifnum\pdftexversion<130 \else
-
 {\catcode`\p=12 \catcode`\t=12 \gdef\WITHOUTPT#1pt{#1}}
- \def\withoutpt#1{\expandafter\WITHOUTPT#1}
+ \def\withoutpt#1{\expandafter\WITHOUTPT#1} % returns float-like string
 
-\dimen0=\ptexelapsedtime sp \ptexresettimer
+\feature 1.30.0 {Precise timer}
+
+\dimen0=\pdfelapsedtime sp
+\pdfresettimer
 It took \withoutpt\the\dimen0 \ seconds to typeset the whole stuff above.
-To typeset the last two sentences it took \the\ptexelapsedtime\ `scaled seconds'
+To typeset the last two sentences it took \the\pdfelapsedtime\ `scaled seconds'
 (1s/65536).
+\bigskip
 
-\fi
+\endfeature
+
+% Taco Hoekwater has also implemented random number support (introduced in 1.30.0)
+
+\feature 1.30.0 {Random numbers}
+
+Random seed initialized to \the\pdfrandomseed.
+\pdfsetrandomseed\dimen0 % just saved elapsed time
+We may change it, lets say to \the\pdfrandomseed.\par
+
+10 uniformly distributed random numbers [0..100]:
+\count100=0 \loop
+ \pdfuniformdeviate101
+ \advance\count100 by1
+ \ifnum\count100<10,
+\repeat.\par
+
+10 normally distributed random numbers:
+\count100=0 \loop
+ \dimen0=\pdfnormaldeviate sp
+ $\withoutpt\the\dimen0$%
+ \advance\count100 by1
+ \ifnum\count100<10,
+\repeat.\par
+
+\bigskip
+
+\endfeature
 
 % Starting from pdfTeX 1.30.0, there is an expandable string comparison in pdfTeX.
-% You can compare two strings lexicographically using \ptexstrcmp{<str1>}{<str2>}.
+% You can compare two strings lexicographically using \pdfstrcmp{<str1>}{<str2>}.
 % The command returns -1, 0, or 1 as a comparison result.
-% Both strings are expanded before being compared. Examples:
-% \ptexstrcmp{a}{aa}    returns -1 since 'a'<'aa'
-% \ptexstrcmp{aa}{aa}   returns 0  since 'aa'='aa'
-% \ptexstrcmp{aaa}{abc} returns -1 since 'aaa'<'abc'
-% \ptexstrcmp{abc}{ABC} returns 1  since 'aaa'>'ABC'
+% Both strings are expanded before being compared.
+% \feature 1.30.0 {String comparison}
+% \pdfstrcmp{a}{aa}    returns -1 since 'a'<'aa'
+% \pdfstrcmp{aa}{aa}   returns 0  since 'aa'='aa'
+% \pdfstrcmp{aaa}{abc} returns -1 since 'aaa'<'abc'
+% \pdfstrcmp{abc}{ABC} returns 1  since 'aaa'>'ABC'
+% \endfeature
+% This is still experimental, as well as regex support
 
 % Thanks to Heiko Oberdiek, starting from pdfTeX 1.30.0 a set of expandable
 % string handlers are available. \pdfescapestring converts its parameter into a
@@ -254,20 +373,46 @@ To typeset the last two sentences it took \the\ptexelapsedtime\ `scaled seconds'
 % number and returns an ASCII characters of given codes. All those commands
 % expand their arguments before applying conversion.
 
-\ifnum\pdftexversion<130 \else
+\feature 1.30.0 {PDF string handling}
 
-If there is a text `{\tt Some text/(1)}',\par
-in PDF string one should use {\tt(\pdfescapestring{Some text/(1)})},\par
-and in PDF name it would be  {\tt/\pdfescapename  {Some text/(1)}}.\par
-In hex form it looks like {\tt<\pdfescapehex{Some text/(1)}>},\par
-but you can always reverse it to get {\tt\pdfunescapehex{\pdfescapehex{Some text/(1)}}}.
+\def\sometext{Some text/(1)}
+If there is a text `{\tt\sometext}',\par
+in PDF string one should use {\tt(\pdfescapestring{\sometext}},\par
+and in PDF name it would be  {\tt/\pdfescapename  {\sometext}}.\par
+In hex form it looks like {\tt<\pdfescapehex{\sometext}>},\par
+but you can always reverse it to get {\tt\pdfunescapehex{\pdfescapehex{\sometext}}}.
+\bigskip
 
-\fi
+\endfeature
 
-% todo: \pdfcreationdate, \pdffilemoddate, \pdffilesize, \pdfmdfivesum, \pdfshellescape
-% todo: \pdffirstlineheight, \pdflastlinedepth, \pdfeachlineheight, \pdfeachlinedepth
+% Also handling external files has been greatly improved. Starting from pdfTeX 1.30.0
+% you can check external files modification date, file size and even md5 check sum.
+
+\feature 1.30.0 {External file handling}
+
+The source of this document is {\tt\pdffilesize{\jobname}} bytes long. Last modification date
+is {\tt\pdffilemoddate{\jobname}}. The md5 sum is {\tt\pdfmdfivesum{\jobname}}.
+Bytes 7 to 13 of the source are hex {\tt\pdffiledump offset 7 length 7{\jobname}}
+(string `\pdfunescapehex{\pdffiledump offset 7 length 7 {\jobname}}').
+
+\endfeature
+
+% \pdfsavepos saves coordinates of the current position on the page relative to
+% lower-left corner. \pdflastxpos and \pdflastypos are available while shipping
+% out the page. Both are integers; the position is expressed in scaled points.
+
+\pdfsavepos
+\write16{Position: X=\number\pdflastxpos sp, Y=\number\pdflastypos sp.}
 
 \newpage
+
+% pdfTeX 1.20 and higher allows to get the object number of already typeset page
+
+\feature 1.20 {Page object reference}
+
+The previous page has been written as object \pdfpageref1.
+
+\endfeature
 
 % Images can be included with pdftex using \pdfximage. Supported formats
 % are determined by file name extension:
@@ -277,17 +422,12 @@ but you can always reverse it to get {\tt\pdfunescapehex{\pdfescapehex{Some text
 %
 % Sorry, TIFF files are no longer supported.
 %
-% pdftex itself does not support EPS and Postscript codes at all, however
+% pdfTeX itself does not support EPS and Postscript codes at all, however
 % it's possible to include Metapost output. EPS files can be converted to
-% PDF for use with pdftex. See below for further info about using Metapost
+% PDF for use with pdfTeX. See below for further info about using Metapost
 % and EPS.
 
 \pdfximage {pic.pdf}    % read image pic.pdf (search for it in TEXINPUTS path)
-
-% Since a pdf image may have more than 1 page, the number of the last image
-% opened by \pdfximage is accessible via \pdflastximagepages
-
-The last image has \the\pdflastximagepages\ page(s).
 
 % It also possible to select which page to include. Pages are numbered from
 % 1. Out-of-range values are fixed to 1 and bitmapped images have always 1
@@ -307,7 +447,12 @@ The last image has \the\pdflastximagepages\ page(s).
 % (concerning dimensions and spacing), it's necessary to wrap them into a
 % box.
 
-\pdfrefximage \pdflastximage
+\hbox{\pdfrefximage \pdflastximage}
+
+% Since a pdf image may have more than 1 page, the number of the last image
+% opened by \pdfximage is accessible via \pdflastximagepages
+
+The last image has \the\pdflastximagepages\ page(s).
 
 % The dimensions of the image can be also controlled via <rule spec>. The
 % default values are zero for depth and `running' for height and width. If
@@ -375,76 +520,77 @@ The last image has \the\pdflastximagepages\ page(s).
 % Thanks to Taco Hoekwater pdfTeX 1.30.0 and higher provides advanced PNG
 % inclusions handling. Nonzero \pdfimagehicolor parameter enables embedding
 % of PNG images with 16 bit wide color channels at their full color resolution.
-% This functionality is automatically disabled if \pdfminorversion<5.
-% another primitive -- \pdfimageapplygamma -- enables gamma correction of embedded
+% This functionality is automatically disabled if \pdfminorversion<5, and automatically
+% enabled if \pdfminorversion>=5
+% Another primitive -- \pdfimageapplygamma -- enables gamma correction of embedded
 % PNG files on the base of two parameters:
 %   \pdfgamma      % device gamma for pdfTex
 %   \pdfimagegamma % image gamma (used if one can't be derived from the image)
-% Both values are integers measured in promilles (1000 = gamma 1.0)
+% Both values are integers measured in promile (1000 = gamma 1.0)
+% All the parameters of gamma correction have to be set before any data
+% is written to the PDF output; thus we put them at the very beginning of this sample.
 
-Advanced images handling
-\ifnum\pdftexversion<130 not supported.\else supported.
+% \ifx\undefined\quitvmode % primitive `\leavevmode' introduced in pdfTeX 1.30.0
+%  \let\quitvmode\leavevmode
+% \fi
 
-Here we apply a gamma correction for PNG images.
-
-\ifx\undefined\quitvmode % primitive `\leavevmode' introduced in pdfTeX 1.?0.0
- \let\quitvmode\leavevmode
-\fi
-
-\quitvmode
-% ?
-\pdfimagehicolor=0
 \pdfximage width8cm {pic16.png}%
 \pdfrefximage\pdflastximage
-% ?
-\pdfimagehicolor=1
-\pdfximage width8cm {pic16.png}%
-\pdfrefximage\pdflastximage
+The image had originally 16 bits-per-channel.
 
-\quitvmode
-% ?
-\pdfimageapplygamma=0
-\pdfximage width8cm {pic16.png}%
-\pdfrefximage\pdflastximage
-% ?
-\pdfimageapplygamma=1
-\pdfgamma=1000
-\pdfimagegamma=2200
-\pdfximage width8cm {pic16.png}%
-\pdfrefximage\pdflastximage
+\feature 1.21 {Image color depth info}
+Embedded one has \the\pdflastximagecolordepth\ bits-per-channel;
+\endfeature
 
-The last image has \the\pdflastximagecolordepth\ bits-per-channel.
+\feature 1.30.0 {16-bit color mode for PNG inclusions}
+the image has been read in 16-bit color resolution.
+\endfeature
 
-\fi
+\feature 1.30.0 {Gamma correction}
+Try out different gamma parameters. % we have to set them before any data
+\endfeature                         % is written to the output
 
-% \pdfximage command can be followed by `colorspace <objnum>', where <objnum> is
-% a number of user-defined color space object. Simply speaking, we may
-% instructs the viewer, how the image should be rendered.
-% However, this works only for JPEGs.
-% Here we perform some sort of `color management' by applying a color profile
-% to the JPEG image.
+\bigskip
 
-\ifnum\pdftexversion<130
-\else
+% From pdfTeX 1.21 \pdfximage command can be followed by `colorspace <objnum>',
+% where <objnum> is a number of user-defined color space object. Simply speaking,
+% we may instructs the viewer, how the image should be rendered. However, this
+% works only for JPEGs. Here we perform some sort of `color management' by
+% applying a color profile to the JPEG image.
 
-For JPEG files one may use ICC color profiles instead.
+% Be aware; this is viewer dependent.
+
+\feature 1.21 {User-defined image color space hook}
 
 \immediate\pdfobj
   stream
   attr {/N 3 /Alternate /DeviceRGB}
   file {rgb.icc} % color profile
 
+\immediate\pdfobj{[/ICCBased \the\pdflastobj\space 0 R]}
+
 \edef\objnum{\the\pdflastobj}
 
-\quitvmode
-\pdfximage width 8cm {pic.jpg}% original
+\pdfximage width 8cm colorspace\objnum {pic.jpg}
 \pdfrefximage\pdflastximage
-\pdfximage width 8cm colorspace\objnum {pic.jpg}% calibrated with rgb.icc profile
+The image is calibrated with ICC profile.
+
+\immediate\pdfobj
+ stream attr
+ {/FunctionType 4
+  /Domain [0 1 0 1 0 1]
+  /Range  [0 1 0 1 0 1]}{{exch pop exch pop 0 exch 0 exch}}
+
+\immediate\pdfobj % don't treat it serious %)
+ {[/DeviceN [/Red /Green /Blue] /DeviceRGB \the\pdflastobj\space 0 R]}
+
+\edef\objnum{\the\pdflastobj}
+
+\pdfximage width8cm colorspace\objnum {pic.jpg}
 \pdfrefximage\pdflastximage
+Hacked image color space.
 
-The last image has \the\pdflastximagecolordepth\ bits-per-channel.
-
-\fi
+\endfeature
 
 \newpage
 
@@ -473,7 +619,7 @@ The last image has \the\pdflastximagecolordepth\ bits-per-channel.
 \def\pointB{(400, 250)}
 
 \newwrite\mpfile    % temporary file for metapost code
-\immediate \openout\mpfile = \jobname.mp
+\immediate\openout\mpfile = \jobname.mp
 
 \immediate \write \mpfile {%
 prologues := 1;
@@ -505,25 +651,28 @@ end;
 % in texmf.cnf in order to run it.
 %
 % Starting from pdfTeX 1.21a, one may test if this option is enabled using
-% \ifeof condition:
+% \ifeof condition (distribution dependent):
 
-\ifnum\pdftexversion<121 \else
+\feature 1.21 {Shell escape detection (via \primitive{ifeof})}
+Shell escape (via \primitive{ifeof}) seems to be
+\ifeof18 disabled\else enabled\fi.
+\endfeature
 
-Shell escape seems to be \ifeof18 disabled\else enabled\fi.
+% ...pdfTeX 1.30.0 introduces its own primitive integer flag
 
-\fi
+\feature 1.30.0 {Shell escape detection (via \primitive{ptexshellescape})}
+Shell escape (via \primitive{ptexshellescape}) seems to be
+\ifnum\pdfshellescape=1 disabled\else enabled\fi.
+\endfeature
 
-% Not all distributions support this feature, however. If the trick is not
-% present, \ifeof18 will always return false.
-
-% Uncomment lines below, if there is Metapost available in your system (should be...)
-%\immediate \write 18 {mpost \jobname.mp} % call Metapost on \jobname.mp
-%\convertMPtoPDF{\jobname.0}{1}{1}
-%\convertMPtoPDF{\jobname.1}{1}{1}
+% Uncomment line below, if there is Metapost available in your system (should be!)
+% \immediate \write 18 {mpost \jobname.mp} % call Metapost on \jobname.mp
+\convertMPtoPDF{\jobname.0}{1}{1}
+\convertMPtoPDF{\jobname.1}{1}{1}
 
 \newpage
 
-% EPS pictures cannot be inserted directly by pdftex, but it's possible to
+% EPS pictures cannot be inserted directly by pdfTeX, but it's possible to
 % convert them to PDF using a Postscript-to-PDF converter, like Acrobat
 % Distiller or Ghostscript. The below example calls epstopdf (available
 % from http://www.tug.org/applications/pdftex), which preprocess the EPS
@@ -532,10 +681,12 @@ Shell escape seems to be \ifeof18 disabled\else enabled\fi.
 % required.
 
 % Uncomment line below, if there is epstopdf utility available in your system
+
 %\immediate \write 18 {epstopdf --outfile=tmp.pdf cmr10.103} % call epstopdf
-%\pdfximage height \vsize {tmp.pdf}      % insert the PDF converted from EPS
-%\pdfrefximage \pdflastximage
-%\newpage
+\pdfximage height \vsize {tmp.pdf}      % insert the PDF converted from EPS
+\topskip=0pt
+\pdfrefximage \pdflastximage
+\newpage
 
 % some text to try using threads
 
@@ -607,7 +758,7 @@ nor hunger nor pain, for they were with God.
 
 \def\colsep{\qquad}          % column separator
 \setbox0=\vbox{%
-    \baselineskip=1.2em
+    \baselineskip=1.2em plus 1pt minus 1pt
     \hsize=2in
     \tolerance=1000
     \rightskip=0pt plus 1em
@@ -620,7 +771,8 @@ nor hunger nor pain, for they were with God.
                             % columns so have to use this trick to ensure
                             % that all columns will have \splittopskip glue
                             % properly inserted at the top
-    \text}
+    \text
+    \vfil}
 
 \setbox1=\vsplit0 to 0pt    % remove the null box and insert \splittopskip glue
 \setbox3=\copy0             % make a copy of box0 for later use
@@ -629,7 +781,7 @@ nor hunger nor pain, for they were with God.
 
 \setbox2=\hbox{}
 \loop
-    \setbox1=\vsplit0 to .7\vsize
+    \setbox1=\vsplit0 to .75\vsize
     \setbox2=\hbox{\unhbox2 \vtop{%
         \pdfthread          % add a bead to the thread with id=`num 1' (given
                             % below)
@@ -678,7 +830,7 @@ nor hunger nor pain, for they were with God.
 }
 \setbox2=\hbox{}
 \loop
-    \setbox1=\vsplit0 to .7\vsize
+    \setbox1=\vsplit0 to .75\vsize
     \setbox2=\hbox{\unhbox2 \vtop{\unvbox1}\colsep}
 \ifdim \ht0 > 0pt \repeat
 \box2
@@ -945,12 +1097,12 @@ This is a page containing destination `num 1'
 
 \def\n{^^J}
 
-% If the file is modified oftenly (as this one) it might be convenient to
+% If the file is modified are released oftenly (as this one) it might be convenient to
 % keep trace of modification time. In pdfTeX 1.30.0 there is a
 % \pdfcreationdate that returns a date of the file being created.
 % Date is formated in PDF way.
 
-\ifnum\pdftexversion<130
+\ifversion 1.30.0 \else
 
 \count100=\time
 \divide\count100 by60
@@ -1006,4 +1158,4 @@ openaction goto page 1 {/Fit}           % the action to be activated when
                                         % opening the document; this is the
                                         % same as <action spec> for links
                                         % and outlines
-\bye
+\end

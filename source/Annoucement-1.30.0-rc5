@@ -1,15 +1,15 @@
 The pdfTeX team is happy to announce the release of a new stable version:
 
 ===========================================================================
-                           pdfTeX 1.30.0-rc4
+                           pdfTeX 1.30.0-rc5
 ===========================================================================
 
-This is the announcement of pdfTeX 1.30.0-rc4 an extended version of TeX that
+This is the announcement of pdfTeX 1.30.0-rc5 an extended version of TeX that
 can create PDF directly from TeX source files and enhance the result of TeX
 typesetting with the help of PDF.
 
 ===========================================================================
-  Main changes of pdfTeX 1.30.0-rc4
+  Main changes of pdfTeX 1.30.0-rc5
 ===========================================================================
 
 - pdfxtex (introduced with 1.20a) is gone; all extensions are now in pdf(e)tex.

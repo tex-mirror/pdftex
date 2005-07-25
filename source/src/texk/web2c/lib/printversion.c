@@ -43,7 +43,7 @@ printversionandexit P3C(const_string, banner,
       author = copyright_holder;
   }
 
-  puts ("Kpathsea is copyright (C) 1997-2004 Free Software Foundation, Inc.");
+  puts ("Kpathsea is copyright (C) 1997-2005 Free Software Foundation, Inc.");
 
   puts ("There is NO warranty.  Redistribution of this software is");
   fputs ("covered by the terms of ", stdout);

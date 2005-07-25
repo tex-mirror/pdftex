@@ -1,4 +1,4 @@
-% Copyright (c) 1996-2002 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 1996-2005 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
 % Note: This file, pdftexdir/tex.pch, contains the web2c changes for the
 % pdfTeX specific part of pdftex.web (defined in pdftexdir/pdftex.ch)
@@ -274,7 +274,6 @@ undump_things(font_check[null_font], font_ptr+1-null_font);
 @y
   setup_bound_var (0)('hash_extra')(hash_extra);
   setup_bound_var (65536)('obj_tab_size')(obj_tab_size);
-  setup_bound_var (65536)('pdf_mem_size')(pdf_mem_size);
   setup_bound_var (20000)('dest_names_size')(dest_names_size);
 @z
 
@@ -294,7 +293,7 @@ undump_things(font_check[null_font], font_ptr+1-null_font);
 @y
   hyph_link :=xmalloc_array (hyph_pointer, hyph_size);
   obj_tab:=xmalloc_array (obj_entry, obj_tab_size);
-  pdf_mem:=xmalloc_array (integer, pdf_mem_size);
+  pdf_mem:=xmalloc_array (integer, inf_pdf_mem_size); {will grow dynamically}
   dest_names:=xmalloc_array (dest_name_entry, dest_names_size);
 @z
 

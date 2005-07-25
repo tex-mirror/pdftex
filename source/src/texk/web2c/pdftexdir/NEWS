@@ -1,5 +1,5 @@
 -----------------------------------------------------
-pdfTeX 3.141592-1.30.0-rc4 was released on 2005-07-22
+pdfTeX 3.141592-1.30.0-rc5 was released on 2005-07-25
 -----------------------------------------------------
 - pdfxtex (introduced with 1.20a) is gone; all extensions are now in pdf(e)tex.
 - Some primitives have been renamed; the old names will still work, but are
