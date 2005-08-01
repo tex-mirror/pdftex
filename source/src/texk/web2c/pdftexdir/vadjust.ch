@@ -25,6 +25,10 @@
 @y
 @d adjust_node=5 {|type| of an adjust node}
 @d adjust_pre == subtype  {pre-adjustment?}
+@#{|append_list| is used to append a list to |tail|}
+@d append_list(#) == begin link(tail) := link(#); append_list_end
+@d append_list_end(#) == tail := #; end
+
 @z
 
 @x [162] - pre-vadjust
@@ -157,19 +161,12 @@ init_span(cur_align);
 @z
 
 @x [888] - pre-vadjust
-@ @<Append the new box to the current vertical list...@>=
 append_to_vlist(just_box);
 if adjust_head<>adjust_tail then
   begin link(tail):=link(adjust_head); tail:=adjust_tail;
    end;
 adjust_tail:=null
 @y
-@ |append_list| is used to append a list to |tail|.
-
-@d append_list_end(#) == tail := #; end
-@d append_list(#) == begin link(tail) := link(#); append_list_end
-
-@<Append the new box to the current vertical list...@>=
 if pre_adjust_head <> pre_adjust_tail then
     append_list(pre_adjust_head)(pre_adjust_tail);
 pre_adjust_tail := null;

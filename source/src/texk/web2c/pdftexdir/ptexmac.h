@@ -61,10 +61,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#14 $
 #define pdfoffset()     (pdfgone + pdfptr)
 #define pdfinitfont(f)  {tmpf = f; pdfcreatefontobj();}
 
-#define pdfmovechars        getintpar(cfgmovecharscode)
-
 #define MAX_CHAR_CODE       255
-#define MOVE_CHARS_OFFSET   160
 
 #define PRINTF_BUF_SIZE     1024
 #define MAX_CSTRING_LEN     1024
@@ -172,6 +169,7 @@ size_t          T##_limit
 #define is_subsetted(fm)    ((fm)->type & F_SUBSETTED)
 #define is_truetype(fm)     ((fm)->type & F_TRUETYPE)
 #define is_basefont(fm)     ((fm)->type & F_BASEFONT)
+#define no_font_desc(fm)    (is_basefont(fm) && !is_included(fm))
 
 #define fm_slant(fm)        (fm)->slant
 #define fm_extend(fm)       (fm)->extend

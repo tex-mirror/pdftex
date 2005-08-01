@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -42,7 +42,6 @@ static const char perforce_id[] =
 #define save_offset()       t1_save_offset = t1_offset()
 #define end_last_eexec_line()   \
     t1_eexec_encrypt = false
-#define update_builtin_enc(font, glyph_names)    update_enc(font, glyph_names) 
 #define t1_char(c)          c
 #define embed_all_glyphs(tex_font)  fm_cur->all_glyphs
 #define extra_charset()     fm_cur->charset
@@ -90,10 +89,10 @@ extern char *fb_array;
 #define t1_include()
 #define t1_putchar(c)       fputc(c, bitfile)
 #define t1_scan_keys()
-#define update_builtin_enc(font, glyph_names) 
 #define embed_all_glyphs(tex_font)  false
 #undef pdfmovechars
 #ifdef SHIFTLOWCHARS
+extern char errbuf[];
 extern Boolean shiftlowchars;
 #define pdfmovechars shiftlowchars
 #define t1_char(c)          T1Char(c)
@@ -824,7 +823,7 @@ static void t1_scan_keys(void)
          * is not read; thus we mark the offset of the subset tag and write it
          * later */
         if (is_included(fm_cur) && is_subsetted(fm_cur)) {
-            t1_fontname_offset = fb_offset() + (r - t1_line_array);
+            t1_fontname_offset = t1_offset() + (r - t1_line_array);
             strcpy(t1_buf_array, p);
             sprintf(r, "ABCDEF+%s%s", fontname_buf, t1_buf_array);
             t1_line_ptr = eol(r);
@@ -1022,19 +1021,6 @@ static boolean t1_open_fontfile(const char *open_name_prefix)
     return true;
 }
 
-boolean t1_read_enc(fm_entry *fm)
-{
-    read_encoding_only = true;
-    fm_cur = fm;
-    if (!t1_open_fontfile("{"))
-        return false;
-    while (!t1_prefix("/Encoding"))
-        t1_getline();
-    t1_builtin_enc(); 
-    t1_close_font_file("}");
-    return true;
-}
-
 static void t1_scan_only(void)
 {
     do {
@@ -1050,7 +1036,6 @@ static void t1_scan_only(void)
 
 static void t1_include(void)
 {
-    save_offset();
     do {
         t1_getline();
         t1_scan_param();
@@ -1079,8 +1064,10 @@ static void t1_include(void)
 #else /* not pdfTeX */
 static boolean t1_open_fontfile(char *open_name_prefix)
 {
-    if (!t1_open())
-        return false;
+    if (!t1_open()) {
+        (void)sprintf(errbuf, "! Couldn't find font file %s", cur_file_name);
+        error(errbuf);
+    }
     t1_init_params(open_name_prefix);
     return true;
 }
@@ -1381,7 +1368,6 @@ cs_error: /* an error occured during parsing */
 static void t1_subset_ascii_part(void)
 {
     int i, j;
-    save_offset();
     t1_getline();
     while (!t1_prefix("/Encoding")) {
         t1_scan_param();
@@ -1391,15 +1377,13 @@ static void t1_subset_ascii_part(void)
     t1_builtin_enc(); 
     if (is_reencoded(fm_cur))
         t1_glyph_names = external_enc();
-    else {
+    else
         t1_glyph_names = t1_builtin_glyph_names;
-        update_builtin_enc(tex_font, t1_glyph_names); 
-    }
     if (is_included(fm_cur) && is_subsetted(fm_cur)) {
         make_subset_tag(fm_cur, t1_glyph_names);
         update_subset_tag();
     }
-    if (pdfmovechars == 0 && t1_encoding == ENC_STANDARD)
+    if (t1_encoding == ENC_STANDARD)
         t1_puts("/Encoding StandardEncoding def\n");
     else {
         t1_puts("/Encoding 256 array\n0 1 255 {1 index exch /.notdef put} for\n");
@@ -1717,6 +1701,7 @@ void writet1(void)
 {
     read_encoding_only = false;
 #ifdef pdfTeX
+    t1_save_offset = 0;
     if (strcasecmp(strend(fm_fontfile(fm_cur)) - 4, ".otf") == 0) {
         if (!is_included(fm_cur) || is_subsetted(fm_cur))
             pdftex_fail("OTF fonts must be included entirely");

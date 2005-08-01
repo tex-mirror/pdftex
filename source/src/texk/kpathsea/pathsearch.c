@@ -1,7 +1,7 @@
 /* pathsearch.c: look up a filename in a path.
 
+Copyright (C) 1997-2005 Olaf Weber.
 Copyright (C) 1993, 94, 95, 97 Karl Berry.
-Copyright (C) 1997, 98, 99, 2000 Olaf Weber.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -440,7 +440,7 @@ search_list P4C(const_string, path,  const_string*, names,
              must_exist, all, path);
   }
   
-  /* No need to do any expansion on names.  */
+  /* FIXME: is this really true?  No need to do any expansion on names.  */
 
   /* First catch any absolute or explicit relative names. */
   for (namep = names; *namep; namep++) {

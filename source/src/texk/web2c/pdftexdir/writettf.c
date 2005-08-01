@@ -510,10 +510,14 @@ read_unicode_mapping:
                             index = (index + s->idDelta) & 0xFFFF;
                     }
                     if (index >= glyphs_count)
-                        pdftex_fail("cmap: glyph index out of range [0..%i)", glyphs_count);
+                        pdftex_fail("cmap: glyph index %i out of range [0..%i)", 
+                                    index, glyphs_count);
                     if (unicode_map[i] != NOGLYPH_ASSIGNED_YET)
-                        pdftex_fail("cmap: unicode %.4X is mapped to multiple glyphs", i);
-                    unicode_map[i] = index;
+                        pdftex_warn("cmap: multiple glyphs are mapped to unicode %.4X, "
+                                    "only %i will be used (glyph %i being ignored)",
+                                    i, unicode_map[i], index);
+                    else
+                        unicode_map[i] = index;
                 }
             }
         }

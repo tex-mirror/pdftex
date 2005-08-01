@@ -1,5 +1,5 @@
 {
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -41,26 +41,35 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#13
 @define procedure pdfinitmapfile();
 
 { functions from utils.c }
-@define function getresnameprefix;
-@define procedure setjobid();
-@define procedure makepdftexbanner;
+@define procedure escapehex();
+@define procedure escapename();
+@define procedure escapestring();
 @define function extxnoverd();
+@define procedure getcreationdate;
+@define procedure getfiledump();
+@define procedure getfilemoddate();
+@define procedure getfilesize();
+@define procedure getmatch();
+@define procedure getmd5sum();
+@define function getresnameprefix;
+@define procedure initstarttime;
+@define function isquotebad;
+@define function makecstring();
+@define procedure matchstrings();
 @define procedure libpdffinish;
-@define procedure writestreamlength();
-@define procedure printID();
+@define procedure makepdftexbanner;
 @define procedure printcreationdate;
-@define procedure escapestr();
-@define function  escapedstrlen;
-@define function  getescapedchar();
+@define procedure printID();
+@define procedure setjobid();
+@define procedure unescapehex();
+@define procedure writestreamlength();
+
 
 { functions from vfpacket.c }
 @define function newvfpacket();
 @define function packetbyte;
 @define procedure startpacket();
 @define procedure storepacket();
-
-{ functions from writeenc.c }
-@define procedure setcharmap();
 
 { functions from writefont.c }
 @define procedure dopdffont();

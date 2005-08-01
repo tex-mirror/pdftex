@@ -1,10 +1,10 @@
 pdfTeX
 ======
 
-README for version 3.14159-1.21a of $Date: 2005/02/04 $
-=======================================================
+README for version 3.14159-1.30.0 of $Date: 2005/02/04 $
+========================================================
 
-This directory contains the version 1.21a of pdfTeX, an extended version of
+This directory contains the version 1.30.0 of pdfTeX, an extended version of
 TeX that can create PDF directly from TeX source files and enhance the
 result of TeX typesetting with the help of PDF. When PDF output is not
 selected, pdfTeX produces normal DVI output, otherwise it produces PDF
@@ -14,10 +14,6 @@ making use of multiple master fonts.
 
 pdfeTeX is an even more extended version of TeX than pdfTeX because it is
 not based on TeX but on eTeX, an extended version of TeX. 
-
-pdfxTeX is an experimental version of pdfeTeX, which apart from pdfTeX and
-eTeX contains some features for testing purpose. When some feature seems to
-be useful and stable, it can be moved to pdfTeX.
 
 pdfTeX is based on the original TeX sources and Web2c, and has been
 successfully compiled on Unix, Win32 and DOS systems. It is still under
@@ -76,10 +72,10 @@ CONTRIBUTORS
 ============
 
 Peter Breitenlohner, Ricardo Sanchez Carmenes, Otfried Cheong, Thomas
-Esser, Hans Hagen, Hartmut Henkel, Tom Kacvinsky, Akira Kakuto, Reinhard
-Kotucha, Derek B. Noonburg, Heiko Oberdiek, Jiri Osoba, Fabrice Popineau,
-Sebastian Rahtz, Tomas Rokicki, Martin Schröder, Petr Sojka, Olaf Weber,
-Jiri Zlatuska.
+Esser, Hans Hagen, Hartmut Henkel, Taco Hoekwater, Pawel Jackowski, Tom
+Kacvinsky, Akira Kakuto, Reinhard Kotucha, Derek B. Noonburg, Heiko
+Oberdiek, Jiri Osoba, Fabrice Popineau, Sebastian Rahtz, Tomas Rokicki,
+Martin Schröder, Petr Sojka, Olaf Weber, Jiri Zlatuska.
 
 pdfTeX is built on top of TeX, written by Donald Knuth cum suis (Liang and
 so), and eTeX, written by Peter Breitenlohner cum suis; part of the
@@ -87,8 +83,6 @@ paragraph optimization is inspired by the work of Hermann Zapf.
 
 
 ------------------------------------------------------------------------------
-
-See the file TODO for work to be done.
 
 Please send bug reports, offers of help, etc. to martin@pdftex.org
 

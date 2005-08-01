@@ -3,12 +3,12 @@ version = @KPSEVERSION@
 
 # Add -DNO_DEBUG to disable debugging, for vanishingly better performance.
 
-ac_include ../make/paths.mk
-ac_include ../make/makevars.mk
-ac_include ../make/common.mk
-ac_include ../make/library.mk
-ac_include ../make/programs.mk
-ac_include ../make/texi.mk
+kpse_include ../make/paths.mk
+kpse_include ../make/makevars.mk
+kpse_include ../make/common.mk
+kpse_include ../make/library.mk
+kpse_include ../make/programs.mk
+kpse_include ../make/texi.mk
 
 @MAINT@warn_more = -Wmissing-prototypes -Wwrite-strings -Wshadow
 @MAINT@MAKEINFO_FLAGS := $(MAKEINFO_FLAGS) --no-split
@@ -80,6 +80,14 @@ texmf.sed: Makefile
 	echo '/^[% ]*TEXMFLOCAL[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 	echo '/^[% ]*TEXMFDIST[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 	echo '/^[% ]*VARTEXMF[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFSYSVAR[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFSYSCONFIG[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFSYSVAR[ =]/s%$(texmf)MAIN%\$$TEXMFMAIN%' >>$@
+	echo '/^[% ]*TEXMFSYSCONFIG[ =]/s%$(texmf)MAIN%\$$TEXMFMAIN%' >>$@
+	echo '/^[% ]*TEXMFVAR[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFCONFIG[ =]/s%\$$TEXMF%$(texmf)%' >>$@
+	echo '/^[% ]*TEXMFVAR[ =]/s%$(texmf)MAIN%\$$TEXMFMAIN%' >>$@
+	echo '/^[% ]*TEXMFCONFIG[ =]/s%$(texmf)MAIN%\$$TEXMFMAIN%' >>$@
 	echo '/^[% ]*TEXMFCNF[ =]/s%\$$TEXMF%$(texmf)%' >>$@
 # And fill in the last clause of TEXMFCNF with an absolute path.
 	echo '/^ *TEXMFCNF[ =]/s%@web2c@%$(web2cdir)%' >>$@
@@ -200,13 +208,18 @@ install-data: texmf.cnf kpathsea.info install-man
 	for f in $(install_headers); do \
 	  $(INSTALL_DATA) $$f $(includedir)/kpathsea/; done
 	rm -f $(includedir)/kpathsea/acconfig.h
-	$(POSTINSTALL)
+	$(POST_INSTALL)
 	test -r $(infodir)/dir || $(INSTALL_DATA) $(top_srcdir)/../dir $(infodir)
 	if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
 	  install-info --info-dir=$(infodir) $(infodir)/kpathsea.info; \
 	else true; fi
 
 uninstall-data:
+	$(PRE_UNINSTALL)
+	if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
+	  install-info --delete --info-dir=$(infodir) $(infodir)/kpathsea.info; \
+	else true; fi
+	$(NORMAL_UNINSTALL)
 	rm -f $(infodir)/kpathsea.i*
 #	for f in $(install_headers); do rm -f $(includedir)/`basename $$f`; done
 
@@ -235,7 +248,7 @@ $(library).h: always
 always:
 .PHONY: always
 
-ac_include ../make/config.mk
+kpse_include ../make/config.mk
 
 info: $(library).info
 dvi: $(library).dvi
@@ -254,7 +267,7 @@ $(library).info: bugs.texi hier.texi install.texi unixtex.texi
 @MAINT@	$(MAKEINFO) $(one_info) $(MAKEINFO_FLAGS) $< -o $@
 @MAINT@doc: info HIER BUGS INSTALL unixtex.ftp
 
-ac_include ../make/clean.mk
+kpse_include ../make/clean.mk
 
 mostlyclean::
 	rm -f kpsewhich kpsestat kpseaccess kpsereadlink *.lo
@@ -266,7 +279,7 @@ distclean::
 manfiles = kpseaccess.1 kpsestat.1 kpsewhich.1 kpsereadlink.1 \
            mktexlsr.1 mktexmf.1 mktextfm.1 mktexpk.1
 
-ac_include ../make/man.mk
+kpse_include ../make/man.mk
 
-ac_include ../make/rdepend.mk
-ac_include depend.mk
+kpse_include ../make/rdepend.mk
+kpse_include depend.mk

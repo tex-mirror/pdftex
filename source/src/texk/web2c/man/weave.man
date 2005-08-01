@@ -5,8 +5,8 @@
 .if n .ds TX TeX
 .if t .ds TX \fRT\\h'-0.1667m'\\v'0.20v'E\\v'-0.20v'\\h'-0.125m'X\fP
 .\" the same but obliqued
-.el .ds OX TeX\" for nroff
-.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
+.el .ds OX TeX for nroff
+.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP for troff
 .\" BX definition must follow TX so BX can use TX
 .if n .ds BX BibTeX
 .if t .ds BX \fRB\s-2IB\s0\fP\*(TX

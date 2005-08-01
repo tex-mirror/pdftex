@@ -92,7 +92,7 @@ extern void zpdfcreateobj(integer, integer);
 extern void zpdfnewdict(integer, integer);
 
 /* utils.c */
-extern char *convertStringToPDFString(char *in);
+extern char *convertStringToPDFString(char *in, int len);
 
 /* config.c */
 extern integer cfgpar(integer);

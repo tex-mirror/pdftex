@@ -17,7 +17,7 @@ pdfetex: pdftexd.h $(pdfetex_o) $(pdfetexextra_o) $(pdftexlibsdep)
 	@CXXHACKLINK@ $(pdfetex_o) $(pdfetexextra_o) $(pdftexlibs) $(socketlibs) @CXXHACKLDLIBS@ @CXXLDEXTRA@
 
 # C file dependencies.
-$(pdfetex_c) pdfetexcoerce.h pdfetexd.h: pdfetex.p $(web2c_texmf)
+$(pdfetex_c) pdfetexcoerce.h pdfetexd.h: pdfetex.p $(web2c_texmf) $(srcdir)/pdfetexdir/pdfetex.defines
 	$(web2c) pdfetex
 pdfetexextra.c: pdfetexdir/pdfetexextra.h lib/texmfmp.c
 	sed s/TEX-OR-MF-OR-MP/pdfetex/ $(srcdir)/lib/texmfmp.c >$@
@@ -40,6 +40,7 @@ pdfetex_web_srcs = $(srcdir)/tex.web \
   $(srcdir)/pdftexdir/hz.ch \
   $(srcdir)/pdftexdir/misc.ch \
   $(srcdir)/pdftexdir/vadjust.ch \
+  $(srcdir)/pdftexdir/pdftex2.ch \
   $(srcdir)/pdfetexdir/pdfetex.ch2
 #   Sources for pdfetex.ch:
 pdfetex_ch_srcs = pdfetex.web \
@@ -48,12 +49,21 @@ pdfetex_ch_srcs = pdfetex.web \
   $(srcdir)/etexdir/tex.ch1 \
   $(srcdir)/etexdir/tex.ech \
   $(srcdir)/pdfetexdir/tex.ch1 \
-  $(srcdir)/pdftexdir/tex.pch
+  $(srcdir)/pdftexdir/tex.pch \
+  $(srcdir)/pdftexdir/noligatures.ch \
+  $(srcdir)/pdftexdir/pdfstrcmp.ch \
+  $(srcdir)/pdftexdir/randoms.ch
 #   Rules:
 pdfetex.web: tie pdfetexdir/pdfetex.mk $(pdfetex_web_srcs)
 	$(TIE) -m pdfetex.web $(pdfetex_web_srcs)
 pdfetex.ch: $(pdfetex_ch_srcs)
 	$(TIE) -c pdfetex.ch $(pdfetex_ch_srcs)
+
+# for developing only
+pdfetex-org.web: $(pdfetex_ch_srcs_org)
+	$(TIE) -m $@ $(pdfetex_ch_srcs_org)
+pdfetex-all.web: pdfetex.web pdfetex.ch
+	$(TIE) -m $@ pdfetex.web pdfetex.ch
 
 $(srcdir)/pdfetexdir/pdfetex.h: $(srcdir)/pdftexdir/pdftex.h
 	cp -f $(srcdir)/pdftexdir/pdftex.h $@

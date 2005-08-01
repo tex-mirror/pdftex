@@ -26,7 +26,7 @@
 \def\pdfeTeX{pdf\eTeX}
 @z
 
-@x [1.2] l.188
+@x [2]
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
 @y
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
@@ -35,13 +35,13 @@
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
 @z
 
-@x [1.2] l.188
+@x [2]
 @d banner==pdfTeX_banner
 @y
 @d banner==pdfeTeX_banner
 @z
 
-@x [17.230] l.4727 - first pdfTeX, then e-TeX additional token list parameters
+@x [230] -- first pdfTeX, then e-TeX additional token list parameters
 @d toks_base=pdf_toks {table of 256 token list registers}
 @#
 @d etex_toks_base=tex_toks {base for \eTeX's token list parameters}
@@ -49,7 +49,7 @@
 @d etex_toks_base=pdf_toks {base for \eTeX's token list parameters}
 @z
 
-@x [17.236] l.4960 - first pdfTeX, then e-TeX additional integer parameters
+@x [236] -- first pdfTeX, then e-TeX additional integer parameters
 @d int_pars=pdf_int_pars {total number of integer parameters}
 @#
 @d etex_int_base=tex_int_pars {base for \eTeX's integer parameters}
@@ -57,19 +57,19 @@
 @d etex_int_base=pdf_int_pars {base for \eTeX's integer parameters}
 @z
 
-@x [26.424] l.8507
+@x [424]
  else begin case m of
   begin case m of
 @y
  else begin case m of
 @z
 
-@x [26.424] l.8507
+@x [424]
   end; {there are no other cases}
 @y
 @z
 
-@x [27.468] l.9207 - first e-TeX, then pdfTeX additional command codes
+@x [468] -- first e-TeX, then pdfTeX additional command codes
 @d pdftex_first_expand_code = 5 {base for \pdfTeX's command codes}
 @y
 @d pdftex_first_expand_code = etex_convert_codes {base for \pdfTeX's command codes}
@@ -206,12 +206,37 @@ pdf_print("/Producer (pdfTeX-");
 pdf_print("/Producer (pdfeTeX-");
 @z
 
-@x [33.649] l.12912
+@x [649]
 exit: {|hpack|}
 @y
 @z
 
-@x [33.651] l.12936
+@x [651]
   math_node: x:=x+width(p);
 @y
+@z
+
+@x
+        obj_xform_resources(k) := null;
+    scan_int;
+    if box(cur_val) = null then
+        pdf_error("ext1", "\pdfxform cannot be used with a void box");
+    obj_xform_width(k) := width(box(cur_val));
+    obj_xform_height(k) := height(box(cur_val));
+    obj_xform_depth(k) := depth(box(cur_val));
+    obj_xform_box(k) := box(cur_val); {save pointer to the box}
+    box(cur_val) := null;
+    pdf_last_xform := k;
+@y
+        obj_xform_resources(k) := null;
+    scan_int;
+    fetch_box(p);
+    if p = null then
+        pdf_error("ext1", "\pdfxform cannot be used with a void box");
+    obj_xform_width(k) := width(p);
+    obj_xform_height(k) := height(p);
+    obj_xform_depth(k) := depth(p);
+    obj_xform_box(k) := p; {save pointer to the box}
+    change_box(null);
+    pdf_last_xform := k;
 @z

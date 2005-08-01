@@ -14,7 +14,7 @@ libz.a: $(OBJS)
 
 all: libz.a
 uninstall:
-clean:
+mostlyclean clean:
 	rm -f *.o *~ libz.a
 
 extraclean maintainer-clean distclean:	clean

@@ -1,35 +1,23 @@
-.TH NEWER 1 "4 January 1998" "Web2C @VERSION@"
-.\"=====================================================================
-.if n .ds MP MetaPost
-.if t .ds MP MetaPost
-.if n .ds MF Metafont
-.if t .ds MF M\s-2ETAFONT\s0
-.if t .ds TX \fRT\\h'-0.1667m'\\v'0.20v'E\\v'-0.20v'\\h'-0.125m'X\fP
-.if n .ds TX TeX
-.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
-.el .ds OX TeX\" for nroff
-.\" the same but obliqued
-.\" BX definition must follow TX so BX can use TX
-.if t .ds BX \fRB\s-2IB\s0\fP\*(TX
-.if n .ds BX BibTeX
-.\" LX definition must follow TX so LX can use TX
-.if t .ds LX \fRL\\h'-0.36m'\\v'-0.15v'\s-2A\s0\\h'-0.15m'\\v'0.15v'\fP\*(TX
-.if n .ds LX LaTeX
+.TH NEWER 1 "21 June 2005" "Web2C @VERSION@"
 .\"=====================================================================
 .SH NAME
 newer \- compare file modification times
 .SH SYNOPSIS
 .B newer
 .RI [ option ]
-.I file1 file2
+.I src1 
+[ 
+.I src2 ... srcN
+] 
+.I target
 .\"=====================================================================
 .SH DESCRIPTION
-Exit successfully if
-.I file1
-exists and is not older than
-.IR file2 .
+Exit successfully if files
+.I src1 ... srcN
+exist and at least one of them is not older than
+.IR target .
 Also exit successfully if
-.I file2
+.I target
 doesn't exist.
 .\"=====================================================================
 .SH OPTIONS
@@ -40,6 +28,14 @@ accepts the following options:
 .rb
 Print help message and exit.
 .TP
+.B --quiet, -q
+.rb
+Do not print any output, including error messages.
+.TP
 .B --version
 .rb
 Print version information and exit.
+.TP
+.B --verbose, -v
+.rb
+List missing source files.  This is the default.

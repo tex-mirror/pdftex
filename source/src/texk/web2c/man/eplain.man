@@ -2,8 +2,8 @@
 .\"=====================================================================
 .if t .ds TX \fRT\\h'-0.1667m'\\v'0.20v'E\\v'-0.20v'\\h'-0.125m'X\fP
 .if n .ds TX TeX
-.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
-.el .ds OX TeX\" for nroff
+.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP for troff
+.el .ds OX TeX for nroff
 .\" the same but obliqued
 .\" BX definition must follow TX so BX can use TX
 .if t .ds BX \fRB\s-2IB\s0\fP\*(TX
@@ -20,7 +20,7 @@
 eplain \- extended plain TeX
 .SH SYNOPSIS
 .B eplain
-[ first line ]
+[ first-line ]
 .\"=====================================================================
 .SH DESCRIPTION
 This manual page is not meant to be exhaustive.  The complete
@@ -32,7 +32,6 @@ or manual
 is an extension of plain \*(TX described in the book
 .IR "\*(OX for the Impatient" .
 It adds these features (among others) to plain \*(TX:
-.RS
 .TP \w'\(bu'u+2n
 \(bu
 left-justified displays
@@ -63,7 +62,6 @@ blank and black boxes
 .TP
 \(bu
 citations using \*(BX
-.RE
 .\"=====================================================================
 .SH FILES
 .TP

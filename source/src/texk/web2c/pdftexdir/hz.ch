@@ -24,14 +24,23 @@
 @d acc_kern=2 {|subtype| of kern nodes from accents}
 @y
 @d acc_kern=2 {|subtype| of kern nodes from accents}
+
+@# {memory structure for marginal kerns}
 @d margin_kern_node = 40
 @d margin_kern_node_size = 3
 @d margin_char(#) == info(# + 2)
-@d left_side == 0
+
+@# {|subtype| of marginal kerns}
+@d left_side == 0 
 @d right_side == 1
+
+@# {base for lp/rp/ef codes starts from 2: 
+    0 for |hyphen_char|, 
+    1 for |skew_char|}
 @d lp_code_base == 2
 @d rp_code_base == 3
 @d ef_code_base == 4
+
 @d max_hlist_stack = 512 {maximum fill level for |hlist_stack|}
 {maybe good if larger than |2 * max_quarterword|, so that box nesting level would overflow first}
 @z
@@ -53,12 +62,12 @@
 @x [202] - margin kerning
     kern_node,math_node,penalty_node: do_nothing;
 @y
+    kern_node,math_node,penalty_node: do_nothing;
     margin_kern_node: begin
         free_avail(margin_char(p));
         free_node(p, margin_kern_node_size);
         goto done;
       end;
-    kern_node,math_node,penalty_node: do_nothing;
 @z
 
 @x [206] - margin kerning
@@ -79,11 +88,12 @@ margin_kern_node: begin
 @z
 
 @x [236]
-@d pdf_int_pars=pdftex_first_integer_code + 10 {total number of \pdfTeX's integer parameters}
+@d pdf_int_pars=pdftex_first_integer_code + 17 {total number of \pdfTeX's integer parameters}
 @y
-@d pdf_adjust_spacing_code   = pdftex_first_integer_code + 10 {level of spacing adjusting}
-@d pdf_protrude_chars_code   = pdftex_first_integer_code + 11 {protrude chars at left/right edge of paragraphs}
-@d pdf_int_pars=pdftex_first_integer_code + 12 {total number of \pdfTeX's integer parameters}
+@d pdf_adjust_spacing_code   = pdftex_first_integer_code + 17 {level of spacing adjusting}
+@d pdf_protrude_chars_code   = pdftex_first_integer_code + 18 {protrude chars at left/right edge of paragraphs}
+@d pdf_tracing_fonts_code    = pdftex_first_integer_code + 19 {level of font detail in log}
+@d pdf_int_pars=pdftex_first_integer_code + 20 {total number of \pdfTeX's integer parameters}
 @z
 
 @x [236]
@@ -93,6 +103,7 @@ margin_kern_node: begin
 @#
 @d pdf_adjust_spacing   == int_par(pdf_adjust_spacing_code)
 @d pdf_protrude_chars   == int_par(pdf_protrude_chars_code)
+@d pdf_tracing_fonts    == int_par(pdf_tracing_fonts_code)
 @z
 
 @x [237]
@@ -102,6 +113,7 @@ error_context_lines_code:print_esc("errorcontextlines");
 @#
 pdf_adjust_spacing_code:   print_esc("pdfadjustspacing");
 pdf_protrude_chars_code:   print_esc("pdfprotrudechars");
+pdf_tracing_fonts_code:    print_esc("pdftracingfonts");
 @z
 
 @x [238]
@@ -114,6 +126,35 @@ primitive("pdfadjustspacing",assign_int,int_base+pdf_adjust_spacing_code);@/
 @!@:pdf_adjust_spacing_}{\.{\\pdfadjustspacing} primitive@>
 primitive("pdfprotrudechars",assign_int,int_base+pdf_protrude_chars_code);@/
 @!@:pdf_protrude_chars_}{\.{\\pdfprotrudechars} primitive@>
+primitive("pdftracingfonts",assign_int,int_base+pdf_tracing_fonts_code);@/
+@!@:pdf_tracing_fonts_}{\.{\\pdftracingfonts} primitive@>
+@z
+
+@x [267] - displaying fonts
+@<Print the font identifier for |font(p)|@>=
+print_esc(font_id_text(font(p)))
+@y
+@<Print the font identifier for |font(p)|@>=
+begin
+    print_esc(font_id_text(font(p)));
+    if pdf_tracing_fonts > 0 then begin
+        print(" (");
+        print(font_name[font(p)]);
+        if font_size[font(p)] <> font_dsize[font(p)] then begin
+            print("@@");
+            print_scaled(font_size[font(p)]);
+            print("pt");
+        end;
+        print(")");
+    end else
+        if pdf_font_expand_ratio[font(p)] <> 0 then begin
+            print(" (");
+            if pdf_font_expand_ratio[font(p)] > 0 then
+                print("+");
+            print_int(pdf_font_expand_ratio[font(p)]);
+            print(")");
+	end;
+end
 @z
 
 @x [413] - font expansion
@@ -140,6 +181,94 @@ else begin
     rp_code_base: scanned_result(get_rp_code(n, k))(int_val);
     ef_code_base: scanned_result(get_ef_code(n, k))(int_val);
     end;
+end;
+@z
+
+@x [468]
+@d pdftex_convert_codes     = pdftex_first_expand_code + 9 {end of \pdfTeX's command codes}
+@y
+@d left_margin_kern_code    = pdftex_first_expand_code + 9 {command code for \.{\\leftmarginkern}}
+@d right_margin_kern_code   = pdftex_first_expand_code + 10 {command code for \.{\\rightmarginkern}}
+@d pdftex_convert_codes     = pdftex_first_expand_code + 11 {end of \pdfTeX's command codes}
+@z
+
+@x [468]
+primitive("pdfpageref",convert,pdf_page_ref_code);@/
+@!@:pdf_page_ref_}{\.{\\pdfpageref} primitive@>
+@y
+primitive("pdfpageref",convert,pdf_page_ref_code);@/
+@!@:pdf_page_ref_}{\.{\\pdfpageref} primitive@>
+primitive("leftmarginkern",convert,left_margin_kern_code);@/
+@!@:left_margin_kern_}{\.{\\leftmarginkern} primitive@>
+primitive("rightmarginkern",convert,right_margin_kern_code);@/
+@!@:right_margin_kern_}{\.{\\rightmarginkern} primitive@>
+@z
+
+@x [469]
+  pdf_page_ref_code:    print_esc("pdfpageref");
+@y
+  pdf_page_ref_code:    print_esc("pdfpageref");
+  left_margin_kern_code:    print_esc("leftmarginkern");
+  right_margin_kern_code:   print_esc("rightmarginkern");
+@z
+
+@x [470]
+var old_setting:0..max_selector; {holds |selector| setting}
+@y
+var old_setting:0..max_selector; {holds |selector| setting}
+p, q: pointer;
+@z
+
+@x [471]
+pdf_page_ref_code: begin
+    scan_int;
+    if cur_val <= 0 then
+        pdf_error("pageref", "invalid page number");
+end;
+@y
+pdf_page_ref_code: begin
+    scan_int;
+    if cur_val <= 0 then
+        pdf_error("pageref", "invalid page number");
+end;
+left_margin_kern_code, right_margin_kern_code: begin
+    scan_int;
+    if (box(cur_val) = null) or (type(box(cur_val)) <> hlist_node) then
+        pdf_error("marginkern", "a non-empty hbox expected")
+end;
+@z
+
+@x [472]
+pdf_page_ref_code: print_int(get_obj(obj_type_page, cur_val, false));
+@y
+pdf_page_ref_code: print_int(get_obj(obj_type_page, cur_val, false));
+left_margin_kern_code: begin
+    p := list_ptr(box(cur_val));
+    if (p <> null) and (not is_char_node(p)) and 
+       (type(p) = glue_node) and (subtype(p) = left_skip_code + 1) then
+       p := link(p);
+    if (p <> null) and (not is_char_node(p)) and 
+       (type(p) = margin_kern_node) and (subtype(p) = left_side) then
+        print_scaled(width(p))
+    else
+        print("0");
+    print("pt");
+end;
+right_margin_kern_code: begin
+    q := list_ptr(box(cur_val));
+    p := null;
+    if q <> null then begin
+        p := prev_rightmost(q, null);
+        if (p <> null) and (not is_char_node(p)) and 
+           (type(p) = glue_node) and (subtype(p) = right_skip_code + 1) then
+           p := prev_rightmost(q, p);
+    end;
+    if (p <> null) and (not is_char_node(p)) and 
+       (type(p) = margin_kern_node) and (subtype(p) = right_side) then
+        print_scaled(width(p))
+    else
+        print("0");
+    print("pt");
 end;
 @z
 
@@ -212,6 +341,7 @@ begin
         overflow("maximum internal font number (font_max)", font_max);
     font_name[k] := expand_font_name(f, e);
     font_area[k] := font_area[f];
+    font_id_text(k) := font_id_text(f);
     hyphen_char[k] := hyphen_char[f];
     skew_char[k] := skew_char[f];
     font_bchar[k] := font_bchar[f];
@@ -445,8 +575,9 @@ begin
     if (font_stretch = 0) and (font_shrink = 0) then
         pdf_error("font expansion", "invalid limit");
     auto_expand := false;
-    if scan_keyword("autoexpand") then
+    if scan_keyword("autoexpand") then begin
         auto_expand := true;
+        @<Scan an optional space@>; end;
 
     {check if the font can be expanded}
     if (pdf_font_expand_ratio[f] <> 0) then
@@ -1017,6 +1148,7 @@ procedure try_break(@!pi:integer;@!break_type:small_number);
         or ((type(#) = math_node) and (width(#) = 0))
         or ((type(#) = kern_node) and 
             ((width(#) = 0) or (subtype(#) = normal)))
+        or ((type(#) = glue_node) and (glue_ptr(#) = zero_glue))
         or ((type(#) = hlist_node) and (width(#) = 0) and (height(#) = 0) and 
             (depth(#) = 0) and (list_ptr(#) = null))
     )
@@ -1024,23 +1156,6 @@ procedure try_break(@!pi:integer;@!break_type:small_number);
 
 
 @<Declare subprocedures for |line_break|@>=
-function prev_rightmost(s, e: pointer): pointer;
-{finds the node preceding the rightmost node |e|; |s| is some node 
-before |e|}
-var p: pointer;
-begin
-    prev_rightmost := null;
-    p := s;
-    if p = null then
-        return;
-    while link(p) <> e do begin
-        p := link(p);
-        if p = null then
-            return;
-    end;
-    prev_rightmost := p;
-end;
-
 procedure push_node(p: pointer);
 begin
     if hlist_stack_level > max_hlist_stack then
@@ -1560,7 +1675,7 @@ do_one_seven_eight(reset_disc_width);
     end;
 @z
 
-@x [671] - font expansion
+@x [871] - font expansion
   hlist_node,vlist_node,rule_node,kern_node:
     act_width:=act_width+width(s);
 @y
@@ -1670,29 +1785,26 @@ else
     just_box := hpack(q, cur_width, exactly);
 @z
 
-% @x [1110] - margin kerning
-% var p:pointer; {the box}
-% @y
-% var p:pointer; {the box}
-%     r: pointer; {to remove marginal kern nodes}
-% @z
-% 
-% @x [1110] - margin kerning
-% while link(tail)<>null do tail:=link(tail);
-% @y
-% if c = copy_code then begin
-%     while link(tail)<>null do tail:=link(tail);
-% end
-% else while link(tail) <> null do begin
-%     r := link(tail);
-%     if not is_char_node(r) and (type(r) = margin_kern_node) then begin
-%         link(tail) := link(r);
-%         free_avail(margin_char(r));
-%         free_node(r, margin_kern_node_size);
-%     end;
-%     tail:=link(tail);
-% end;
-% @z
+@x [1110] - margin kerning
+var p:pointer; {the box}
+@y
+var p:pointer; {the box}
+    r: pointer; {to remove marginal kern nodes}
+@z
+
+@x [1110] - margin kerning
+while link(tail)<>null do tail:=link(tail);
+@y
+while link(tail) <> null do begin
+    r := link(tail);
+    if not is_char_node(r) and (type(r) = margin_kern_node) then begin
+        link(tail) := link(r);
+        free_avail(margin_char(r));
+        free_node(r, margin_kern_node_size);
+    end;
+    tail:=link(tail);
+end;
+@z
 
 @x [1147] - margin kerning
 ligature_node:@<Make node |p| look like a |char_node|...@>;
@@ -1752,10 +1864,10 @@ endcases;
 @z
 
 @x [1344]
-@d pdftex_last_extension_code  == pdftex_first_extension_code + 23
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 27
 @y
-@d pdf_font_expand_code        == pdftex_first_extension_code + 24
-@d pdftex_last_extension_code  == pdftex_first_extension_code + 24
+@d pdf_font_expand_code        == pdftex_first_extension_code + 28
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 28
 @z
 
 @x [1344]
@@ -1798,3 +1910,26 @@ end
 @ @<Implement \.{\\pdffontexpand}@>= 
     read_expand_font
 @z
+
+@x [15??]
+@<Declare procedures that need to be declared forward for pdftex@>=
+@y
+@<Declare procedures that need to be declared forward for pdftex@>=
+function prev_rightmost(s, e: pointer): pointer;
+{finds the node preceding the rightmost node |e|; |s| is some node 
+before |e|}
+var p: pointer;
+begin
+    prev_rightmost := null;
+    p := s;
+    if p = null then
+        return;
+    while link(p) <> e do begin
+        p := link(p);
+        if p = null then
+            return;
+    end;
+    prev_rightmost := p;
+end;
+@z
+

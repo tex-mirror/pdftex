@@ -24,7 +24,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#24 $
 #define PDFTEXLIB
 
 /* WEB2C macros and prototypes */
-#if !defined(PDFTEXCOERCE) && !defined(PDFETEXCOERCE) && !defined(PDFXTEXCOERCE)
+#if !defined(PDFTEXCOERCE) && !defined(PDFETEXCOERCE)
 #ifdef pdfTeX
 #undef pdfTeX /* to avoid warning about redefining pdfTeX in pdftexd.h */
 #endif /* pdfTeX */
@@ -45,10 +45,6 @@ typedef struct {
 
 typedef struct {
     boolean loaded;                 /* the encoding has been loaded? */
-    boolean updated;                /* glyph names have been updated for 0--32 chars? */
-    internalfontnumber firstfont;   /* first font that has accessed to this
-                                       encoding; move chars 0--32 to higher
-                                       area according to this font */
     char *name;                     /* encoding file name */
     integer objnum;                 /* object number */
     char **glyph_names;
@@ -150,6 +146,7 @@ extern void fb_flush(void);
 extern void fb_putchar(eightbits b);
 extern void fb_seek(integer);
 extern void libpdffinish(void);
+extern char *makecfilename(strnumber s);
 extern void make_subset_tag(fm_entry *, char **);
 extern void pdf_printf(const char *,...);
 extern void pdf_puts(const char *);
@@ -158,7 +155,7 @@ extern void pdftex_warn(const char *,...);
 extern void setjobid(int, int, int, int, int, int);
 extern void tex_printf(const char *, ...);
 extern void writestreamlength(integer, integer);
-extern char *convertStringToPDFString(char *in);
+extern char *convertStringToPDFString(char *in, int len);
 extern void printID(strnumber);
 
 /* vfpacket.c */
@@ -171,17 +168,14 @@ extern void storepacket(integer, integer, integer);
 extern void vf_free(void);
 
 /* writeenc.c */
-extern boolean get_enc(fm_entry *);
 extern boolean indexed_enc(fm_entry *);
 extern enc_entry *add_enc(char *);
 extern void enc_free(void);
 extern void read_enc(enc_entry *);
-extern void setcharmap(internalfontnumber);
 extern void write_enc(char **, enc_entry *, integer);
 
 /* writefont.c */
 extern void dopdffont(integer, internalfontnumber);
-extern void update_enc(internalfontnumber, char **);
 
 /* writeimg.c */
 extern boolean checkimageb(integer);
@@ -202,7 +196,6 @@ extern void updateimageprocset(integer);
 extern void writeimage(integer);
 
 /* writet1.c */
-extern boolean t1_read_enc(fm_entry *);
 extern boolean t1_subset(char *, char *, unsigned char *);
 extern void load_enc(char *, char **);
 extern void writet1(void);

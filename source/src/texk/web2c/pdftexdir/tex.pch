@@ -1,4 +1,4 @@
-% Copyright (c) 1996-2002 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 1996-2005 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
 % Note: This file, pdftexdir/tex.pch, contains the web2c changes for the
 % pdfTeX specific part of pdftex.web (defined in pdftexdir/pdftex.ch)
@@ -56,6 +56,12 @@
 @y
 @d pdfTeX_banner_k=='This is pdfTeXk, Version 3.141592',pdftex_version_string
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
+@z
+
+@x (MLTeX)
+      begin i := char_tag(char_info(f)(c));
+@y
+      begin i := char_tag(orig_char_info(f)(c));
 @z
 
 @x (MLTeX)
@@ -205,47 +211,6 @@ found: @<Print character substition tracing log@>;
     end
 @z
 
-
-@x [50.1302] l.23694 - Dump |pdf_output| to fmt file
-@<Dump constants for consistency check@>;
-@y
-@<Dump constants for consistency check@>;
-dump_int(pdf_output);
-dump_int(pdf_compress_level);
-dump_int(pdf_decimal_digits);
-dump_int(pdf_move_chars);
-dump_int(pdf_image_resolution);
-dump_int(pdf_pk_resolution);
-dump_int(pdf_unique_resname);
-dump_int(pdf_option_pdf_minor_version);
-dump_int(pdf_option_always_use_pdfpagebox);
-dump_int(pdf_option_pdf_inclusion_errorlevel);
-dump_int(pdf_h_origin);
-dump_int(pdf_v_origin);
-dump_int(pdf_page_width);
-dump_int(pdf_page_height);
-@z
-
-@x
-begin @<Undump constants for consistency check@>;
-@y
-begin @<Undump constants for consistency check@>;
-undump_int(pdf_output);   {undump |pdf_output| mode flag}
-undump_int(pdf_compress_level);
-undump_int(pdf_decimal_digits);
-undump_int(pdf_move_chars);
-undump_int(pdf_image_resolution);
-undump_int(pdf_pk_resolution);
-undump_int(pdf_unique_resname);
-undump_int(pdf_option_pdf_minor_version);
-undump_int(pdf_option_always_use_pdfpagebox);
-undump_int(pdf_option_pdf_inclusion_errorlevel);
-undump_int(pdf_h_origin);
-undump_int(pdf_v_origin);
-undump_int(pdf_page_width);
-undump_int(pdf_page_height);
-@z
-
 @x (WEB2C!)
 param_base:=xmalloc_array(integer, font_max);
 
@@ -309,7 +274,6 @@ undump_things(font_check[null_font], font_ptr+1-null_font);
 @y
   setup_bound_var (0)('hash_extra')(hash_extra);
   setup_bound_var (65536)('obj_tab_size')(obj_tab_size);
-  setup_bound_var (65536)('pdf_mem_size')(pdf_mem_size);
   setup_bound_var (20000)('dest_names_size')(dest_names_size);
 @z
 
@@ -329,7 +293,7 @@ undump_things(font_check[null_font], font_ptr+1-null_font);
 @y
   hyph_link :=xmalloc_array (hyph_pointer, hyph_size);
   obj_tab:=xmalloc_array (obj_entry, obj_tab_size);
-  pdf_mem:=xmalloc_array (integer, pdf_mem_size);
+  pdf_mem:=xmalloc_array (integer, inf_pdf_mem_size); {will grow dynamically}
   dest_names:=xmalloc_array (dest_name_entry, dest_names_size);
 @z
 

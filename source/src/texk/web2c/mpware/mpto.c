@@ -1,58 +1,52 @@
-/****************************************************************
-Copyright 1990 - 1995 by AT&T Bell Laboratories.
+/* $Id: mpto.c,v 1.19 2005/06/22 17:45:41 olaf Exp $
+ * Public domain.
+ *
+ * Previous versions of mpto were copyright 1990 - 1995 by AT&T Bell
+ * Laboratories.  It has since been put into the public domain.
+ *
+ * John Hobby wrote the original version, which has since been
+ * extensively altered.
+ */
 
-Permission to use, copy, modify, and distribute this software
-and its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the names of AT&T Bell Laboratories or
-any of its entities not be used in advertising or publicity
-pertaining to distribution of the software without specific,
-written prior permission.
-
-AT&T disclaims all warranties with regard to this software,
-including all implied warranties of merchantability and fitness.
-In no event shall AT&T be liable for any special, indirect or
-consequential damages or any damages whatsoever resulting from
-loss of use, data or profits, whether in an action of contract,
-negligence or other tortious action, arising out of or in
-connection with the use or performance of this software.
-****************************************************************/
-
-/* This program transforms a MetaPost input file into a TeX or LaTeX input
+/* mpto [-tex|-troff] MPFILE
+ * 
+ * This program transforms a MetaPost input file into a TeX or troff input
  * file by stripping out btex...etex and verbatimtex...etex sections.
  * Leading and trailing spaces and tabs are removed from the extracted
  * material and it is surrounded by the preceding and following strings
  * defined immediately below.  The input file should be given as argument 1
- * and the resulting TeX file is written on standard output.
+ * and the resulting TeX or troff file is written on standard output.
+ *
+ * Changes incorporated from Web2c:
+ * - merged TeX and troff mode
+ * - support -E<errlog>, for AMIGA
  */
 
-/* Or we translate to troff.  Just a matter of different boilerplate.  */
-
-#include "c-auto.h"	/* For WEB2CVERSION */
-#include "cpascal.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <kpathsea/config.h>
-#include <kpathsea/variable.h>
 
 #ifdef WIN32
 #include <string.h>
 #endif
 
 
-/* MetaPost itself has a configurable max line length, copy the limits
-   from mp.ch */
-#define INF_BUF_SIZE  500
-#define SUP_BUF_SIZE  300000
-#define BUF_SIZE_NAME "buf_size"
+/* MetaPost itself has a configurable max line length, but we can afford to
+   use smaller values than that */
+#define bufsize  1000
 
-char*	tex_predoc = "";
+char*	tex_predoc =
+"\\long\\def\\mpxshipout#1{\\shipout\\hbox{%\n"
+"  \\setbox0=\\hbox{#1}%\n"
+"  \\dimen0=\\ht0 \\advance\\dimen0\\dp0\n"
+"  \\dimen1=\\ht0 \\dimen2=\\dp0"
+"  \\ht0=0pt \\dp0=0pt \\box0\n"
+"  \\ifnum\\dimen0>0 \\vrule width1sp height\\dimen1 depth\\dimen2 \n"
+"  \\else \\vrule width1sp height1sp depth0sp\\relax\n"
+"  \\fi}}\n";
 char*	tex_postdoc = "\\end{document}\n";
-char*	tex_pretex1 = "\\shipout\\hbox{\\smash{\\hbox{\\hbox{%% line %d %s\n";
-char*	tex_pretex = "\\shipout\\hbox{\\smash{\\hbox{\\hbox{%% line %d %s\n";
-char*	tex_posttex = "}\\vrule width1sp}}}\n";
+char*	tex_pretex1 = "\\mpxshipout{%% line %d %s\n";
+char*	tex_pretex = "\\mpxshipout{%% line %d %s\n";
+char*	tex_posttex = "}\n";
 char*	tex_preverb1 = "";			/* if very first instance */
 char*	tex_preverb = "%% line %d %s\n";	/* all other instances */
 char*	tex_postverb = "%\n";
@@ -84,18 +78,25 @@ FILE *mpfile;
 int lnno = 0;		/* current line number */
 int texcnt = 0;		/* btex..etex blocks so far */
 int verbcnt = 0;	/* verbatimtex..etex blocks so far */
-char *buf;		/* the input line */
-long bufsize = 0;       /* the buffer size */
 char *bb, *tt, *aa;	/* start of before, token, and after strings */
+char buf[bufsize]; /* the input line */
 
-void err P1C(char *, msg)
+void 
+err (char * msg)
 {
-	fprintf(stderr, "mpto: %s:%d: %s\n",
-		mpname, lnno, msg);
-	exit(1);
+  fprintf(stderr, "mpto: %s:%d: %s\n",mpname, lnno, msg);
+  exit(1);
 }
 
-char *getline()	/* returns NULL on EOF or error, otherwise buf */
+void
+usage (char *progn)
+{
+  fprintf(stderr, "Try `%s --help' for more information\n", progn);
+  exit(1);
+}
+
+char *
+getline(void)	/* returns NULL on EOF or error, otherwise buf */
 {
 	int c;
 	unsigned loc = 0;
@@ -118,7 +119,8 @@ char *getline()	/* returns NULL on EOF or error, otherwise buf */
 /* Return nonzero if a prefix of string s matches the null-terminated string t
  * and the next character is not a letter of an underscore.
  */
-int match_str P2C(char*, s, char *, t)
+int 
+match_str (char *s, char *t)
 {
 	while (*t!=0) {
 		if (*s!=*t) return 0;
@@ -149,7 +151,8 @@ int match_str P2C(char*, s, char *, t)
  * several possible substrings t, we choose the leftmost one.  If there is
  * no such t, we set b=s and return 0.
  */
-int getbta P1C(char *, s)
+int
+getbta (char *s)
 {
 	int ok=1;	/* zero if last character was a-z, A-Z, or _ */
 
@@ -196,7 +199,8 @@ int getbta P1C(char *, s)
 }
 
 
-void copytex()
+void
+copytex(void)
 {
 	char *s;	/* where a string to print stops */
 	char c;
@@ -227,7 +231,8 @@ void copytex()
 }
 
 
-void do_line()
+void
+do_line(void)
 {
 	aa = buf;
 	while (getbta(aa))
@@ -248,133 +253,110 @@ void do_line()
 			printf("%s",postverb);
 		} else err("unmatched etex");
 }
-
-static const_string MPTOHELP[] = {
-    "Usage: mpto [-tex|-troff] MPFILE",
-    "  Strip btex..etex and verbatimtex...etex parts from MetaPost input",
-    "  file MPFILE, converting to either TeX or troff (TeX by default).",
-    "",
-    "--help      display this help and exit",
-    "--version   output version information and exit",
-#ifdef AMIGA
-    "-E <errlog-file>",
-#endif
-    NULL
-};
   
-int main P2C(int, argc, char **, argv)
+int
+main(int argc, char **argv)
 {
-        int mode;
-        char *buf_size_str;
-        
-        kpse_set_program_name(argv[0], NULL);
-	
-	if (argc == 1) {
-	  fputs ("mpto: Need exactly one file argument.\n", stderr);
-	  fputs ("Try `mpto --help' for more information.\n", stderr);
-	  exit(1);
-	} else if (argc > 1 && strcmp (argv[1], "--help") == 0) {
-            usagehelp (MPTOHELP, NULL);
-	} else if (argc > 1 && strcmp (argv[1], "--version") == 0) {
-          printf ("mpto%s 0.63\n\
-Copyright (C) 1996 AT&T Bell Laboratories.\n\
-There is NO warranty.  You may redistribute this software\n\
-under the terms of the GNU General Public License\n\
-and the mpto copyright.\n\
-For more information about these matters, see the files\n\
-named COPYING and the mpto source.\n\
-Primary author of mpto: John Hobby.\n",
-WEB2CVERSION);
-	  exit (0);
-	} else if (argc == 2) {
-	  mpname = argv[1];
-	  mode = 0;
+    int mode;        
+    if (argc == 1) {
+	fputs ("mpto: Need exactly one file argument.\n", stderr);
+	fputs ("Try `mpto --help' for more information.\n", stderr);
+        exit(1);
+    } else if (argc > 1 && (strcmp (argv[1], "--help") == 0
+                            || strcmp (argv[1], "-help") == 0)) {
+	fputs ("Usage: mpto [-tex|-troff] MPFILE",stdout);
 #ifdef AMIGA
-	} else if (argc == 3) {
-	  if (strcmp (argv[1], "-tex") == 0) {
+        fputs (" [-E<errlog-file>]",stdout);
+#endif
+	fputs ("\n  Strip btex..etex and verbatimtex...etex parts from MetaPost input\n\
+  file MPFILE, converting to either TeX or troff (TeX by default).\n\
+\n\
+--help      display this help and exit\n\
+--version   output version information and exit\n",stdout);
+        fputs ("\nEmail bug reports to metapost@tug.org.\n", stdout);
+        exit (0);
+    } else if (argc > 1 && (strcmp (argv[1], "--version") == 0
+                            || strcmp (argv[1], "-version") == 0)) {
+        printf ("mpto 0.9\n\
+This program is in the public domain.\n\
+Primary author of mpto: John Hobby.\n");
+        exit (0);
+    } else if (argc == 2) {
+        mpname = argv[1];
+        mode = 0;
+#ifdef AMIGA
+    } else if (argc == 3) {
+        if (strcmp (argv[1], "-tex") == 0) {
 	    mpname = argv[2];
 	    mode = 0;
-	  } else if (strcmp (argv[1], "-troff") == 0) {
+        } else if (strcmp (argv[1], "-troff") == 0) {
 	    mpname = argv[2];
 	    mode = 1;
-	  } else if (strncmp(argv[2], "-E", 2) || (argv[2]+2 == NULL)) {
+        } else if (strncmp(argv[2], "-E", 2) || (argv[2]+2 == NULL)) {
 	    usage(argv[0]);
-	  } else {
+        } else {
 	    mpname = argv[1];
 	    freopen(argv[2]+2, "w", stderr);
-	  }
-	} else if (argc == 4) {
-	  if (strcmp (argv[1], "-tex") == 0) {
+        }
+    } else if (argc == 4) {
+        if (strcmp (argv[1], "-tex") == 0) {
 	    mode = 0;
-	  } else if (strcmp (argv[1], "-troff") == 0) {
+        } else if (strcmp (argv[1], "-troff") == 0) {
 	    mode = 1;
-	  } else {
+        } else {
 	    usage(argv[0]);
-	  }
-	  if (strncmp(argv[3], "-E", 2) || (argv[3]+2 == NULL)) {
+        }
+        if (strncmp(argv[3], "-E", 2) || (argv[3]+2 == NULL)) {
 	    usage(argv[0]);
-	  } else {
+        } else {
 	    mpname = argv[2];
 	    freopen(argv[3]+2, "w", stderr);
-	  }
-	} else {
-	  usage(argv[0]);
-	}
+        }
 #else /* not AMIGA */
-	} else if (argc == 3) {
-	  if (strcmp (argv[1], "-tex") == 0) {
-	    mode = 0;
-	  } else if (strcmp (argv[1], "-troff") == 0) {
-	    mode = 1;
-	  } else {
-	    usage (argv[0]);
-	  }
-	  mpname = argv[2];
-	} else {
-	  usage(argv[0]);
-	}
+    } else if (argc == 3) {
+        if (strcmp (argv[1], "-tex") == 0) {
+            mode = 0;
+        } else if (strcmp (argv[1], "-troff") == 0) {
+            mode = 1;
+        } else {
+            usage (argv[0]);
+        }
+        mpname = argv[2];
 #endif /* not AMIGA */
-	mpfile = fopen(mpname, "r");
-	if (mpfile==NULL) {
- 	  fprintf (stderr, "%s: ", argv[0]);
-	  perror (mpname);
-	  exit (1);
-	}
+    } else {
+        usage(argv[0]);
+    }
 
-        buf_size_str = kpse_var_value(BUF_SIZE_NAME);
-        if (buf_size_str)
-           bufsize = atoi(buf_size_str);
-        if (bufsize < INF_BUF_SIZE)
-           bufsize = INF_BUF_SIZE;
-        if (bufsize > SUP_BUF_SIZE)
-           bufsize = SUP_BUF_SIZE;
-        buf = (char*)xmalloc(bufsize);
-        if (buf_size_str) free(buf_size_str);
+    mpfile = fopen(mpname, "r");
+    if (mpfile==NULL) {
+        fprintf (stderr, "%s: ", argv[0]);
+        perror (mpname);
+        exit (1);
+    }
 
-	/* This is far from elegant, but life is short.  */
-	if (mode == 0) {
-          predoc = tex_predoc;
-          postdoc = tex_postdoc;
-          pretex1 = tex_pretex1;
-          pretex = tex_pretex;
-          posttex = tex_posttex;
-          preverb1 = tex_preverb1;
-          preverb = tex_preverb;
-          postverb = tex_postverb;
-	} else {
-          predoc = troff_predoc;
-          postdoc = troff_postdoc;
-          pretex1 = troff_pretex1;
-          pretex = troff_pretex;
-          posttex = troff_posttex;
-          preverb1 = troff_preverb1;
-          preverb = troff_preverb;
-          postverb = troff_postverb;
-	}
-	printf("%s",predoc);
-	while (getline()!=NULL)
-		do_line();
-	printf("%s",postdoc);
-        free(buf);
-	exit(0);
+    /* This is far from elegant, but life is short.  */
+    if (mode == 0) {
+        predoc = tex_predoc;
+        postdoc = tex_postdoc;
+        pretex1 = tex_pretex1;
+        pretex = tex_pretex;
+        posttex = tex_posttex;
+        preverb1 = tex_preverb1;
+        preverb = tex_preverb;
+        postverb = tex_postverb;
+    } else {
+        predoc = troff_predoc;
+        postdoc = troff_postdoc;
+        pretex1 = troff_pretex1;
+        pretex = troff_pretex;
+        posttex = troff_posttex;
+        preverb1 = troff_preverb1;
+        preverb = troff_preverb;
+        postverb = troff_postverb;
+    }
+    printf("%s",predoc);
+    while (getline()!=NULL)
+        do_line();
+    printf("%s",postdoc);
+    exit(0);
 }

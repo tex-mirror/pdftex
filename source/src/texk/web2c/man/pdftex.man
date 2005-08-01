@@ -6,8 +6,8 @@
 .if n .ds TX TeX
 .if n .ds MF Metafont
 .if t .ds MF M\s-2ETAFONT\s0
-.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
-.el .ds OX TeX\" for nroff
+.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP for troff
+.el .ds OX TeX for nroff
 .\" the same but obliqued
 .\" BX definition must follow TX so BX can use TX
 .if t .ds BX \fRB\s-2IB\s0\fP\*(TX
@@ -25,14 +25,15 @@ pdftex, pdfinitex, pdfvirtex \- PDF output from TeX
 .SH SYNOPSIS
 .B pdftex
 .RI [ options ]
-.RI [\fB& format ]
-.RI [ file [ .tex ]\ |\ [\fB\e commands ]]
+[\fB&\fR \fIformat\fR ]
+[ \fIfile\fR | \fB\e\fR \fIcommands\fR ]
 .\"=====================================================================
 .SH DESCRIPTION
 Run the pdf\*(TX typesetter on
 .IR file ,
 usually creating
 .IR file.pdf .
+If the file argument has no extension, ".tex" will be appended to it. 
 Instead of a filename, a set of pdf\*(TX commands can be given, the first
 of which must start with a backslash.
 With a 

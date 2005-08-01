@@ -113,9 +113,6 @@ main P2C(int, argc, string *, argv)
   } else if (STREQ (output_name, "pdfetex")) {
     fputs ("#define INITEX\n#define TeX\n#define pdfeTeX\n", out);
     coerce = "pdfetexcoerce.h";
-  } else if (STREQ (output_name, "pdfxtex")) {
-    fputs ("#define INITEX\n#define TeX\n#define pdfxTeX\n", out);
-    coerce = "pdfxtexcoerce.h";
   } else if (STREQ (output_name, "mp")) {
     fputs ("#define INIMP\n#define MP\n", out);
     coerce = "mpcoerce.h";

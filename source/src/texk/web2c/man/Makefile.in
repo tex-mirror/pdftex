@@ -10,8 +10,8 @@ top_srcdir = @top_srcdir@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-ac_include ../make/common.mk
-ac_include kpathsea.mk
+kpse_include ../make/common.mk
+kpse_include kpathsea.mk
 
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -23,7 +23,7 @@ DITROFF = groff
 # directory names.  They should match the system directories so the
 # documentation and the programs will be consistent. They are overridden
 # by make from web2c/Makefile.
-ac_include ../make/paths.mk
+kpse_include ../make/paths.mk
 
 localmodes = modes
 
@@ -54,7 +54,6 @@ manfiles=		\
 	patgen.1	\
 	pdfetex.1	\
 	pdftex.1	\
-	pdfxtex.1	\
 	pktogf.1	\
 	pktype.1	\
 	pltotf.1	\
@@ -68,14 +67,14 @@ manfiles=		\
 
 default all: manfiles
 
-ac_include ../make/man.mk
+kpse_include ../make/man.mk
 
 install install-data: install-man
 
 Makefile: Makefile.in ../config.status
 	(cd ..; $(SHELL) config.status)
 
-ac_include ../make/clean.mk
+kpse_include ../make/clean.mk
 
 # Prevent GNU make 3 from overflowing arg limit on system V.
 .NOEXPORT:

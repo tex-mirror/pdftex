@@ -61,25 +61,57 @@ TEXMFMAIN = @texmf@
 % The main distribution tree:
 TEXMFDIST = @texmf@-dist
 
-% A place for local additions to a "standard" texmf tree. If defined,
-% teTeX's texconfig also stores modified config files here:
+% A place for local additions to a "standard" texmf tree.
+% This tree is not used for local configuration maintained by
+% texconfig, it uses TEXMFCONFIG below.
 TEXMFLOCAL = @texmf@-local
 
-% If defined, teTeX's texconfig stores variable runtime data here
-% (instead of the TEXMFMAIN tree).
-%   VARTEXMF = @texmf@-var
+% TEXMFSYSVAR, where texconfig-sys stores variable runtime data.
+% With teTeX-3.0 or later, this must be set.
+% For sharing this tree with $TEXMFMAIN:
+%   TEXMFSYSVAR = $TEXMFMAIN
+% For using a separate tree:
+%   TEXMFSYSVAR = @texmf@-var
+TEXMFSYSVAR = @texmf@-var
+
+% TEXMFSYSCONFIG, where texconfig-sys stores configuration data.
+% With teTeX-3.0 or later, this must be set.
+% For sharing this tree with $TEXMFMAIN:
+%   TEXMFSYSCONFIG = $TEXMFMAIN
+% For using a separate tree:
+%   TEXMFSYSCONFIG = @texmf@-config
+TEXMFSYSCONFIG = @texmf@-config
 
 % User texmf trees can be catered for like this...
-HOMETEXMF = $HOME/texmf
+% This used to be HOMETEXMF.
+TEXMFHOME = $HOME/texmf
+
+% TEXMFVAR, where texconfig stores variable runtime data.
+% With teTeX-3.0 or later, this must be set.
+% For sharing this tree with $TEXMFMAIN:
+%   TEXMFVAR = $TEXMFMAIN
+% For using a separate tree:
+%   TEXMFVAR = $HOME/.texmf-var
+TEXMFVAR = $HOME/.texmf-var
+
+% TEXMFCONFIG, where texconfig stores configuration data.
+% With teTeX-3.0 or later, this must be set.
+% For sharing this tree with $TEXMFMAIN:
+%   TEXMFCONFIG = $TEXMFMAIN
+% For using a separate tree:
+%   TEXMFCONFIG = $HOME/.texmf-config
+% For using a separate tree:
+%   TEXMFCONFIG = @texmf@-config
+TEXMFCONFIG = $HOME/.texmf-config
 
 % Now, list all the texmf trees. If you have multiple trees you can
 % use shell brace notation, like this:
-% TEXMF = {$HOMETEXMF,!!$TEXMFLOCAL,!!$TEXMFMAIN}
-% The braces are necessary.  If you set VARTEXMF, you also have to
-%   - list $VARTEXMF in the TEXMF definition;
-%   - make sure that $VARTEXMF precedes $TEXMFMAIN in the TEXMF definition.
-% TEXMF = $TEXMFMAIN
-TEXMF = {$HOMETEXMF,!!$TEXMFLOCAL,!!$TEXMFMAIN,!!$TEXMFDIST}
+%   TEXMF = {$TEXMFHOME,!!$TEXMFLOCAL,!!$TEXMFMAIN}
+% The braces are necessary.
+%
+% For texconfig to work properly, TEXMFCONGIG and TEXMFVAR should be named
+% explicitly and before all other trees.
+TEXMF = {!!$TEXMFCONFIG,!!$TEXMFVAR,$TEXMFHOME,!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$TEXMFMAIN,!!$TEXMFLOCAL,!!$TEXMFDIST}
 
 % The system trees.  These are the trees that are shared by all the users.
 SYSTEXMF = $TEXMFLOCAL;$TEXMFMAIN;$TEXMFDIST
@@ -97,11 +129,11 @@ VARTEXFONTS = @vartexfonts@
 TEXMFDBS = $TEXMF;$VARTEXFONTS
 
 % It may be convenient to define TEXMF like this:
-%   TEXMF = {$HOMETEXMF,!!$TEXMFLOCAL,!!$TEXMFMAIN,$HOME}
+%   TEXMF = {$TEXMFHOME,!!$TEXMFLOCAL,!!$TEXMFMAIN,$HOME}
 % which allows users to set up entire texmf trees, and tells TeX to
 % look in places like ~/tex and ~/bibtex.  If you do this, define TEXMFDBS
 % like this:
-%   TEXMFDBS = $HOMETEXMF;$TEXMFLOCAL;$TEXMFMAIN;$VARTEXFONTS
+%   TEXMFDBS = $TEXMFHOME;$TEXMFLOCAL;$TEXMFMAIN;$VARTEXFONTS
 % or mktexlsr will generate an ls-R file for $HOME when called, which is
 % rarely desirable.  If you do this you'll want to define SYSTEXMF like
 % this:
@@ -110,10 +142,10 @@ TEXMFDBS = $TEXMF;$VARTEXFONTS
 %
 % On some systems, there will be a system tree which contains all the font
 % files that may be created as well as the formats.  For example
-%   VARTEXMF = /var/lib/texmf
+%   TEXMFVAR = /var/lib/texmf
 % is used on many Linux systems.  In this case, set VARTEXFONTS like this
-%   VARTEXFONTS = $VARTEXMF/fonts
-% and do not mention it in TEXMFDBS (but _do_ mention VARTEXMF).
+%   VARTEXFONTS = $TEXMFVAR/fonts
+% and do not mention it in TEXMFDBS (but _do_ mention TEXMFVAR).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -180,6 +212,14 @@ TEXINPUTS.pdfamstex = .;$TEXMF/tex/{amstex,plain,generic,}//
 TEXINPUTS.pdfelatex = .;$TEXMF/tex/{latex,generic,}//
 TEXINPUTS.pdfetex   = .;$TEXMF/tex/{plain,generic,}//
 
+% pdfxTeX.
+TEXINPUTS.pdfxlatex = .;$TEXMF/tex/{latex,generic,}//
+TEXINPUTS.pdfxtex   = .;$TEXMF/tex/{plain,generic,}//
+
+% XeTeX
+TEXINPUTS.xelatex = .;$TEXMF/tex/{latex,generic,}//
+TEXINPUTS.xetex   = .;$TEXMF/tex/{plain,generic,}//
+
 % Omega / Aleph
 TEXINPUTS.lamed = .;$TEXMF/tex/{lamed,lambda,latex,generic,}//
 TEXINPUTS.lambda = .;$TEXMF/tex/{lambda,latex,generic,}//
@@ -192,16 +232,8 @@ TEXINPUTS.context = .;$TEXMF/tex/{context,plain,generic,}//
 % odd formats  needing their own paths
 TEXINPUTS.lamstex  = .;$TEXMF/tex/{lamstex,plain,generic,}//
 TEXINPUTS.lollipop = .;$TEXMF/tex/{lollipop,plain,generic,}//
-TEXINPUTS.mex-pl = .;$TEXMF/tex/{mex,plain,generic,}//
 TEXINPUTS.platex-pl  = .;$TEXMF/tex/{platex,latex,generic,}//
 TEXINPUTS.pdfplatex = .;$TEXMF/tex/{platex,latex,generic,}//
-TEXINPUTS.pdfmex-pl = .;$TEXMF/tex/{mex,plain,generic,}//
-TEXINPUTS.pdfemex   = .;$TEXMF/tex/{mex,plain,generic,}//
-TEXINPUTS.pdfemex-pl = .;$TEXMF/tex/{mex,plain,generic,}//
-
-% XeTeX
-TEXINPUTS.xelatex = .;$TEXMF/tex/{latex,generic,}//
-TEXINPUTS.xetex   = .;$TEXMF/tex/{plain,generic,}//
 
 % Earlier entries override later ones, so put this last.
 TEXINPUTS = .;$TEXMF/tex/{$progname,generic,}//
@@ -354,8 +386,10 @@ TEXMFCNF = {$SELFAUTOLOC,$SELFAUTODIR,$SELFAUTOPARENT}{,{/share,}/texmf{-local,}
 
 # $progname: kpathsea v. 3.5.3 or later overwrites this at runtime. To
 # avoid empty expansions from binaries linked against an earlier
-# version of the library, we set $progname to something non-empty:
+# version of the library, we set $progname and $engine to something
+# non-empty:
 progname = unset
+engine = unset
 
 
 %  Part 2: Non-path options.

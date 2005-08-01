@@ -44,8 +44,6 @@
 #include <pdftexdir/pdftexextra.h>
 #elif defined (pdfeTeX)
 #include <pdfetexdir/pdfetexextra.h>
-#elif defined (pdfxTeX)
-#include <pdfxtexdir/pdfxtexextra.h>
 #elif defined (Omega)
 #include <omegadir/omegaextra.h>
 #elif defined (eOmega)
@@ -88,7 +86,7 @@
 #define edit_var "MFEDIT"
 #endif /* MF */
 #ifdef MP
-#define BANNER "This is MetaPost, Version 0.641"
+#define BANNER "This is MetaPost, Version 0.901"
 #define COPYRIGHT_HOLDER "AT&T Bell Laboratories"
 #define AUTHOR "John Hobby"
 #define PROGRAM_HELP MPHELP
@@ -150,7 +148,7 @@ static string get_input_file_name P1H(void);
 static int eightbitp;
 #endif /* Omega || eOmega || Aleph */
 
-#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+#if defined(pdfTeX) || defined(pdfeTeX)
 char *ptexbanner;
 #endif
 
@@ -158,6 +156,14 @@ char *ptexbanner;
 /* name of TeX program to pass to makempx */
 static string mpost_tex_program = "";
 #endif
+
+/* Get a true/false value for a variable from texmf.cnf and the environment. */
+static boolean
+texmf_yesno(const_string var)
+{
+  string value = kpse_var_value (var);
+  return value && (*value == 't' || *value == 'y' || *value == '1');
+}
 
 /* The entry point: set up for reading the command line, which will
    happen in `topenin', then call the main body.  */
@@ -174,7 +180,7 @@ maininit P2C(int, ac, string *, av)
   /* Must be initialized before options are parsed.  */
   interactionoption = 4;
 
-#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+#if defined(pdfTeX) || defined(pdfeTeX)
   ptexbanner = BANNER;
 #endif
 
@@ -199,11 +205,7 @@ maininit P2C(int, ac, string *, av)
   if (filelineerrorstylep < 0) {
     filelineerrorstylep = 0;
   } else if (!filelineerrorstylep) {
-    string file_line_error_style = kpse_var_value ("file_line_error_style");
-    filelineerrorstylep = (file_line_error_style
-                           && (*file_line_error_style == 't'
-                               || *file_line_error_style == 'y'
-                               || *file_line_error_style == '1'));
+    filelineerrorstylep = texmf_yesno ("file_line_error_style");
   }
 
   /* If no dump default yet, and we're not doing anything special on
@@ -212,11 +214,7 @@ maininit P2C(int, ac, string *, av)
   if (parsefirstlinep < 0) {
     parsefirstlinep = 0;
   } else if (!parsefirstlinep) {
-    string parse_first_line = kpse_var_value ("parse_first_line");
-    parsefirstlinep = (parse_first_line
-                       && (*parse_first_line == 't'
-                           || *parse_first_line == 'y'
-                           || *parse_first_line == '1'));
+    parsefirstlinep = texmf_yesno ("parse_first_line");
   }
   if (parsefirstlinep && (!dump_name || !translate_filename)) {
     parse_first_line (main_input_file);
@@ -312,11 +310,7 @@ maininit P2C(int, ac, string *, av)
   if (shellenabledp < 0) {
     shellenabledp = 0;
   } else if (!shellenabledp) {
-    string shell_escape = kpse_var_value ("shell_escape");
-    shellenabledp = (shell_escape
-                     && (*shell_escape == 't'
-                         || *shell_escape == 'y'
-                         || *shell_escape == '1'));
+    shellenabledp = texmf_yesno ("shell_escape");
   }
   if (!outputcomment) {
     outputcomment = kpse_var_value ("output_comment");
@@ -777,9 +771,9 @@ static struct option long_options[]
 #endif /* !Omega && !eOmega && !Aleph */
       { "output-comment",            1, 0, 0 },
       { "output-directory",          1, 0, 0 },
-#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+#if defined(pdfTeX) || defined(pdfeTeX)
       { "output-format",             1, 0, 0 },
-#endif /* pdfTeX or pdfeTeX or pdfxTeX */
+#endif /* pdfTeX or pdfeTeX */
       { "shell-escape",              0, &shellenabledp, 1 },
       { "no-shell-escape",           0, &shellenabledp, -1 },
       { "debug-format",              0, &debugformatfile, 1 },
@@ -893,7 +887,7 @@ parse_options P2C(int, argc,  string *, argv)
           parse_src_specials_option(optarg);
        }
 #endif /* TeX */
-#if defined(pdfTeX) || defined(pdfeTeX) || defined(pdfxTeX)
+#if defined(pdfTeX) || defined(pdfeTeX)
     } else if (ARGUMENT_IS ("output-format")) {
        pdfoutputoption = 1;
        if (strcmp(optarg, "dvi") == 0) {
@@ -904,7 +898,7 @@ parse_options P2C(int, argc,  string *, argv)
          WARNING1 ("Ignoring unknown value `%s' for --output-format", optarg);
          pdfoutputoption = 0;
        }
-#endif /* pdfTeX || pdfeTeX || pdfxTeX */
+#endif /* pdfTeX || pdfeTeX */
 #if defined (TeX) || defined (MF) || defined (MP)
     } else if (ARGUMENT_IS ("translate-file")) {
       translate_filename = optarg;
@@ -1084,9 +1078,19 @@ parse_first_line P1C(const_string, filename)
 /* Return true if FNAME is acceptable as a name for \openout, \openin, or
    \input.  */
 
+typedef enum ok_type {
+    ok_reading,
+    ok_writing
+} ok_type;
+
+static const_string ok_type_name[] = {
+    "reading",
+    "writing"
+};
+
 static boolean
-opennameok P3C(const_string, fname, const_string, check_var,
-               const_string, default_choice)
+opennameok P4C(const_string, fname, const_string, check_var,
+               const_string, default_choice, ok_type, action)
 {
   /* We distinguish three cases:
      'a' (any)        allows any file to be opened.
@@ -1113,8 +1117,9 @@ opennameok P3C(const_string, fname, const_string, check_var,
     /* Disallow .rhosts, .login, etc.  Allow .tex (for LaTeX).  */
     if (base[0] == 0 ||
         (base[0] == '.' && !IS_DIR_SEP(base[1]) && !STREQ (base, ".tex"))) {
-      fprintf(stderr, "%s: Not writing to %s (%s = %s).\n",
-              program_invocation_name, fname, check_var, open_choice);
+      fprintf(stderr, "%s: Not %s to %s (%s = %s).\n",
+              program_invocation_name, ok_type_name[action], fname,
+              check_var, open_choice);
       return false;
     }
   }
@@ -1133,23 +1138,26 @@ opennameok P3C(const_string, fname, const_string, check_var,
     if (!texmfoutput || *texmfoutput == '\0'
         || fname != strstr (fname, texmfoutput)
         || !IS_DIR_SEP(fname[strlen(texmfoutput)])) {
-      fprintf(stderr, "%s: Not writing to %s (%s = %s).\n",
-              program_invocation_name, fname, check_var, open_choice);
+      fprintf(stderr, "%s: Not %s to %s (%s = %s).\n",
+              program_invocation_name, ok_type_name[action], fname,
+              check_var, open_choice);
       return false;
     }
   }
   /* For all pathnames, we disallow "../" at the beginning or "/../"
      anywhere.  */
   if (fname[0] == '.' && fname[1] == '.' && IS_DIR_SEP(fname[2])) {
-    fprintf(stderr, "%s: Not writing to %s (%s = %s).\n",
-            program_invocation_name, fname, check_var, open_choice);
+    fprintf(stderr, "%s: Not %s to %s (%s = %s).\n",
+            program_invocation_name, ok_type_name[action], fname,
+            check_var, open_choice);
     return false;
   } else {
     const_string dotpair = strstr (fname, "..");
     /* If dotpair[2] == DIR_SEP, then dotpair[-1] is well-defined. */
     if (dotpair && IS_DIR_SEP(dotpair[2]) && IS_DIR_SEP(dotpair[-1])) {
-      fprintf(stderr, "%s: Not writing to %s (%s = %s).\n",
-              program_invocation_name, fname, check_var, open_choice);
+      fprintf(stderr, "%s: Not %s to %s (%s = %s).\n",
+              program_invocation_name, ok_type_name[action], fname,
+              check_var, open_choice);
       return false;
     }
   }
@@ -1161,13 +1169,13 @@ opennameok P3C(const_string, fname, const_string, check_var,
 boolean openinnameok P1C(const_string, fname)
 {
     /* For input default to all. */
-    return opennameok (fname, "openin_any", "a");
+    return opennameok (fname, "openin_any", "a", ok_reading);
 }
 
 boolean openoutnameok P1C(const_string, fname)
 {
     /* For output, default to paranoid. */
-    return opennameok (fname, "openout_any", "p");
+    return opennameok (fname, "openout_any", "p", ok_writing);
 }
 
 /* All our interrupt handler has to do is set TeX's or Metafont's global
@@ -1248,6 +1256,28 @@ get_date_and_time P4C(integer *, minutes,  integer *, day,
 #endif /* no SA_INTERRUPT */
   }
 }
+
+
+void
+get_seconds_and_micros P2C(integer *, seconds,  integer *, micros)
+{
+#if defined (HAVE_GETTIMEOFDAY)
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  *seconds =tv.tv_sec;
+  *micros =tv.tv_usec;
+#elif defined (HAVE_FTIME)
+  struct timeb tb;
+  ftime(&tb);
+  *seconds =tb.time;
+  *micros =tb.millitm*1000;
+#else
+  time_t clock = time ((time_t*)NULL);
+  *seconds = clock;
+  *micros = 0;
+#endif
+}
+
 
 /*
   Generating a better seed numbers
@@ -1575,7 +1605,7 @@ checkpoolpointer (poolpointer poolptr, size_t len)
   }
 }
 
-#if !defined(pdfTeX) && !defined(pdfeTeX) && !defined(pdfxTeX)
+#if !defined(pdfTeX) && !defined(pdfeTeX)
 static int
 maketexstring(const_string s)
 {
@@ -1595,10 +1625,12 @@ makefullnamestring()
   return maketexstring(fullnameoffile);
 }
 
+/* Get the job name to be used, which may have been set from the
+   command line. */
 strnumber
-getjobname()
+getjobname(strnumber name)
 {
-    strnumber ret = curname;
+    strnumber ret = name;
     if (job_name != NULL)
       ret = maketexstring(job_name);
     return ret;

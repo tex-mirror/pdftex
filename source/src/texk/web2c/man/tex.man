@@ -6,8 +6,8 @@
 .if n .ds TX TeX
 .if n .ds MF Metafont
 .if t .ds MF M\s-2ETAFONT\s0
-.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
-.el .ds OX TeX\" for nroff
+.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP for troff
+.el .ds OX TeX for nroff
 .\" the same but obliqued
 .\" BX definition must follow TX so BX can use TX
 .if t .ds BX \fRB\s-2IB\s0\fP\*(TX
@@ -17,20 +17,30 @@
 .if n .ds LX LaTeX
 .if n .ds WB Web
 .if t .ds WB W\s-2EB\s0
+.\" EX and EE are used for displays that are pure code
+.de EX
+.nf
+.ft CW
+..
+.de EE
+.ft R
+.fi
+..
 .\"=====================================================================
 .SH NAME
 tex, virtex, initex \- text formatting and typesetting
 .SH SYNOPSIS
 .B tex
 .RI [ options ]
-.RI [\fB& format ]
-.RI [ file [ .tex ]\ |\ [\fB\e commands ]]
+[\fB&\fR \fIformat\fR ]
+[ \fIfile\fR | \fB\e\fR \fIcommands\fR ]
 .\"=====================================================================
 .SH DESCRIPTION
 Run the \*(TX typesetter on
 .IR file ,
 usually creating
 .IR file.dvi .
+If the file argument has no extension, ".tex" will be appended to it. 
 Instead of a filename, a set of \*(TX commands can be given, the first
 of which must start with a backslash.
 With a 
@@ -105,9 +115,9 @@ or a
 .IR &formatname .
 .PP
 The normal usage is to say
-.RS
-.I tex paper
-.RE
+.EX
+tex paper
+.EE
 to start processing
 .IR paper.tex .
 The name
@@ -159,9 +169,9 @@ a TEXEDIT string for
 can be set with the
 .B sh
 command
-.RS
+.EX
 \fITEXEDIT="emacs +%d %s"; export TEXEDIT\fP
-.RE
+.EE
 .PP
 A convenient file in the library is
 .IR null.tex ,
