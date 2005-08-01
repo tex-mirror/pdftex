@@ -69,7 +69,7 @@
 @y
 @d pdftex_version==130 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.30.0-rc5' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.30.0' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}

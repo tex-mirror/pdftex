@@ -1,6 +1,6 @@
------------------------------------------------------
-pdfTeX 3.141592-1.30.0-rc5 was released on 2005-07-25
------------------------------------------------------
+-------------------------------------------------
+pdfTeX 3.141592-1.30.0 was released on 2005-08-01
+-------------------------------------------------
 - pdfxtex (introduced with 1.20a) is gone; all extensions are now in pdf(e)tex.
 - Some primitives have been renamed; the old names will still work, but are
   deprecated and some give a warning that they are obsolete:
@@ -28,7 +28,7 @@ pdfTeX 3.141592-1.30.0-rc5 was released on 2005-07-25
       has passed than 32767 seconds, (2^31)-1 will be returned.
     - \pdfresettimer updates the internal timer, such that subsequent calls to
       \pdfelapsedtime will restart from 0.
-  - pdfTeX can now generate random numbers.
+  - pdfTeX can now generate random numbers:
     - \pdfuniformdeviate <count> generates a uniformly distributed random
       integer value between 0 (inclusive) and <count> (exclusive).
     - \pdfnormaldeviate expands to a random integer value with a mean of 0 and

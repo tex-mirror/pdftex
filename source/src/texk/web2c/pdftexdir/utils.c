@@ -1118,18 +1118,20 @@ char *makecfilename(strnumber s) {
     char *name = makecstring(s);
 #ifdef WIN32
     /* unquote file name */
-    if (*cur_file_name == '"') {
-        char *p = cur_file_name;
-        char *q = cur_file_name;
+    if (*name == '"') {
+        char *p = name;
+        char *q = name;
         while (p && *p) {
             *q = (*p == '"' ? *(++p) : *p);
             p++, q++;
         }
         *q = '\0';
     }
-    fprintf(stderr, " %s\n", cur_file_name);
+    fprintf(stderr, " %s\n", name);
 #endif
+    return name;
 }
+
 
 boolean isquotebad() {
 #ifdef WIN32

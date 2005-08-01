@@ -40,6 +40,7 @@ pdfetex_web_srcs = $(srcdir)/tex.web \
   $(srcdir)/pdftexdir/hz.ch \
   $(srcdir)/pdftexdir/misc.ch \
   $(srcdir)/pdftexdir/vadjust.ch \
+  $(srcdir)/pdftexdir/pdftex2.ch \
   $(srcdir)/pdfetexdir/pdfetex.ch2
 #   Sources for pdfetex.ch:
 pdfetex_ch_srcs = pdfetex.web \
