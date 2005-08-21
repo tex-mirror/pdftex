@@ -1,4 +1,10 @@
 -------------------------------------------------
+pdfTeX 3.141592-1.30.1 was released on 2005-08-21
+-------------------------------------------------
+- the eTeX extensions can now be enabled with the cmdline switch -etex
+- pdfTeX uses xpdf 3.01
+
+-------------------------------------------------
 pdfTeX 3.141592-1.30.0 was released on 2005-08-01
 -------------------------------------------------
 - pdfxtex (introduced with 1.20a) is gone; all extensions are now in pdf(e)tex.
@@ -124,8 +130,8 @@ pdfTeX 3.141592-1.21a was released on 2005-02-04
     This is a string -> (This is a string)
     <a1b245c1a2...> -> <a1b245c1a2...>
 - check for double newline char to get rid of empty lines in PDF output
-- Fixed a bug in the scanning of map lines introduced in the the fix of bug
-  #242 in 1.20b.
+- Fixed a bug in the scanning of map lines introduced in the fix of bug #242 in
+  1.20b.
 - Fixed three problems in xpdf; xpdf is now 3.00pl3
 - \ifeof18 is a simple method to test if \write18 is enabled.
 - a few extensions in pdfxtex:

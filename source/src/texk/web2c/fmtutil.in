@@ -82,20 +82,21 @@ cont-en	pdfetex		cont-usr.tex	-8bit *cont-en.ini
 
 # - Polish:
 platex		pdfetex		language.dat	-translate-file=cp227.tcx *platex.ini
-pdfplatex		pdfetex		language.dat	-translate-file=cp227.tcx *pdfplatex.ini
+pdfplatex	pdfetex		language.dat	-translate-file=cp227.tcx *pdfplatex.ini
 mex		pdfetex		mexconf.tex	-translate-file=cp227.tcx *mex.ini
 pdfmex		pdfetex		mexconf.tex	-translate-file=cp227.tcx *pdfmex.ini
+utf8mex		pdfetex		mexconf.tex	-enc *utf8mex.ini
 
 # - Polish with translated messages (experimental):
 #! platex-pl	pdfetex		-		nls=pdfetex-pl,il2-pl *platex.ini
-#! mex-pl		pdfetex		mexconf.tex	nls=pdfetex-pl,il2-pl *mex.ini
+#! mex-pl	pdfetex		mexconf.tex	nls=pdfetex-pl,il2-pl *mex.ini
 #! pdfmex-pl	pdfetex		mexconf.tex	nls=pdfetex-pl,il2-pl *pdfmex.ini
 
 # - Czech / Slovak:
-csplain	pdfetex		-		-translate-file=cp227.tcx *csplain.ini
-cslatex	pdfetex		-	-translate-file=cp227.tcx *cslatex.ini
-pdfcsplain	pdfetex		-		-translate-file=cp227.tcx *csplain.ini
-pdfcslatex	pdfetex		-    -translate-file=cp227.tcx *cslatex.ini
+csplain		pdfetex		-	-translate-file=cp227.tcx *csplain.ini
+cslatex		pdfetex		-	-translate-file=cp227.tcx *cslatex.ini
+pdfcsplain	pdfetex		-	-translate-file=cp227.tcx *csplain.ini
+pdfcslatex	pdfetex		-	-translate-file=cp227.tcx *cslatex.ini
 
 # formats for mltex extension:
 mltex		pdfetex	-		-translate-file=cp227.tcx -mltex mltex.ini

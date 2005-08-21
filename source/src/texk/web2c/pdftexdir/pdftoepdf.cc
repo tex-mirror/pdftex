@@ -37,6 +37,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#51 $
 #include "Dict.h"
 #include "XRef.h"
 #include "Catalog.h"
+#include "Link.h"
 #include "Page.h"
 #include "GfxFont.h"
 #include "PDFDoc.h"

@@ -18,4 +18,4 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/misc.ch#3 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/misc.ch#5 $

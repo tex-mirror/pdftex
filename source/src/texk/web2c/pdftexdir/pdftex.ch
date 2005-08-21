@@ -68,8 +68,8 @@
 @d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
 @y
 @d pdftex_version==130 { \.{\\pdftexversion} }
-@d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.30.0' {current \pdfTeX\ version}
+@d pdftex_revision=="1" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='-1.30.1' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -4825,11 +4825,11 @@ begin
     pdf_literal_data(tail) := def_ref;
 end
 
-@ The \.{\\pdfobj} primitive is to create a ``raw'' object in PDF
+@ The \.{\\pdfobj} primitive is used to create a ``raw'' object in the PDF
   output file. The object contents will be hold in memory and will be written
   out only when the object is referenced by \.{\\pdfrefobj}. When \.{\\pdfobj}
   is used with \.{\\immediate}, the object contents will be written out
-  immediately. Object referenced in current page are appended into
+  immediately. Objects referenced in the current page are appended into
   |pdf_obj_list|.
 
 @<Glob...@>=
@@ -4845,13 +4845,17 @@ begin
         pdf_last_obj := obj_ptr;
     end
     else begin
+        k := -1;
         if scan_keyword("useobjnum") then begin
             scan_int;
             k := cur_val;
-            if (k <= 0) or (k > obj_ptr) or (obj_data_ptr(k) <> 0) then 
-                pdf_error("ext1", "invalid object number");
-        end
-        else begin
+            if (k <= 0) or (k > obj_ptr) or (obj_data_ptr(k) <> 0) then begin
+                pdf_warning("\pdfobj", "invalid object number being ignored", true);
+                pdf_retval := -1; {signal the problem}
+                k := -1; {will be generated again}
+            end;
+        end;
+        if k < 0 then begin
             incr(pdf_obj_count);
             pdf_create_obj(obj_type_obj, pdf_obj_count);
             k := obj_ptr;

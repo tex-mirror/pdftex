@@ -1,4 +1,24 @@
 make[1]: Entering directory `/home/olaf/web2c/src/texk/texk/web2c'
+cd ../kpathsea && make -w CC='gcc' CFLAGS='-g ' 
+make[2]: Entering directory `/home/olaf/web2c/src/texk/texk/kpathsea'
+make[2]: Nothing to be done for `default'.
+make[2]: Leaving directory `/home/olaf/web2c/src/texk/texk/kpathsea'
+cd lib && make -w CC='gcc' CFLAGS='-g ' LDFLAGS='' 
+make[2]: Entering directory `/home/olaf/web2c/src/texk/texk/web2c/lib'
+make[2]: Nothing to be done for `default'.
+make[2]: Leaving directory `/home/olaf/web2c/src/texk/texk/web2c/lib'
+cd web2c && make -w CC='gcc' CFLAGS='-g ' LDFLAGS=''  fixwrites
+make[2]: Entering directory `/home/olaf/web2c/src/texk/texk/web2c/web2c'
+make[2]: `fixwrites' is up to date.
+make[2]: Leaving directory `/home/olaf/web2c/src/texk/texk/web2c/web2c'
+cd web2c && make -w CC='gcc' CFLAGS='-g ' LDFLAGS=''  splitup
+make[2]: Entering directory `/home/olaf/web2c/src/texk/texk/web2c/web2c'
+make[2]: `splitup' is up to date.
+make[2]: Leaving directory `/home/olaf/web2c/src/texk/texk/web2c/web2c'
+cd web2c && make -w CC='gcc' CFLAGS='-g ' LDFLAGS=''  web2c
+make[2]: Entering directory `/home/olaf/web2c/src/texk/texk/web2c/web2c'
+make[2]: `web2c' is up to date.
+make[2]: Leaving directory `/home/olaf/web2c/src/texk/texk/web2c/web2c'
 rm -f trip.tfm trip.pl trip.tex trip.fmt ctripin.fot ctripin.log
 rm -f ctrip.fot ctrip.log trip.dvi ctrip.typ
 rm -f xtripin.fot xtripin.log
@@ -18,7 +38,7 @@ diff ./triptrap/tripin.log ctripin.log
 1c1
 < This is TeX, Version 3.141592 (INITEX)  20 DEC 2002 20:24
 ---
-> This is e-TeX, Version 3.141592-2.2 (Web2C 7.5.5) (INITEX)  25 JUN 2005 10:24
+> This is e-TeX, Version 3.141592-2.2 (Web2C 7.5.5) (INITEX)  3 AUG 2005 10:50
 3c3
 < (trip.tex
 ---
@@ -27,8 +47,8 @@ diff ./triptrap/tripin.log ctripin.log
 <  (preloaded format=trip 2002.12.20)
 < 1320 strings of total length 23539
 ---
->  (format=trip 2005.6.25)
-> 1479 strings of total length 25863
+>  (format=trip 2005.8.3)
+> 1479 strings of total length 25862
 461c461
 < Hyphenation trie of length 273 has 9 ops out of 500
 ---
@@ -47,7 +67,7 @@ diff  ./triptrap/trip.log ctrip.log
 1c1
 < This is TeX, Version 3.141592 (preloaded format=trip 2002.12.20)  20 DEC 2002 21:28
 ---
-> This is e-TeX, Version 3.141592-2.2 (Web2C 7.5.5) (format=trip 2005.6.25)  25 JUN 2005 10:24
+> This is e-TeX, Version 3.141592-2.2 (Web2C 7.5.5) (format=trip 2005.8.3)  3 AUG 2005 10:50
 3c3
 < (trip.tex ##
 ---
@@ -102,7 +122,7 @@ diff  ./triptrap/trip.log ctrip.log
 <  251 string characters out of 8353
 ---
 >  44 strings out of 1821
->  261 string characters out of 8137
+>  261 string characters out of 8138
 7290c7294
 <  372 multiletter control sequences out of 2100
 ---
@@ -122,7 +142,7 @@ diff  ./triptrap/trip.typ ctrip.typ
 9c9
 < ' TeX output 2002.12.20:2128'
 ---
-> ' TeX output 2005.06.25:1024'
+> ' TeX output 2005.08.03:1050'
 419c419
 < 1121: down4 639342208 
 ---
@@ -258,7 +278,7 @@ diff ./etexdir/etrip/etripin.log etripin.log
 1c1
 < This is e-TeX, Version 3.141592-2.2 (INITEX)  6 SEP 2004 23:13
 ---
-> This is e-TeX, Version 3.141592-2.2 (Web2C 7.5.5) (INITEX)  25 JUN 2005 10:24
+> This is e-TeX, Version 3.141592-2.2 (Web2C 7.5.5) (INITEX)  3 AUG 2005 10:50
 4c4,5
 < (etrip.tex This is the e-Trip test [2004-09-06] for e-TeX v3.141592-2.2.
 ---
@@ -268,8 +288,8 @@ diff ./etexdir/etrip/etripin.log etripin.log
 <  (preloaded format=etrip 2004.9.6)
 < 1435 strings of total length 24590
 ---
->  (format=etrip 2005.6.25)
-> 1480 strings of total length 25894
+>  (format=etrip 2005.8.3)
+> 1480 strings of total length 25893
 35c36
 < Hyphenation trie of length 434 has 12 ops out of 500
 ---
@@ -292,7 +312,7 @@ diff  ./etexdir/etrip/etrip.log etrip.log
 1c1
 < This is e-TeX, Version 3.141592-2.2 (preloaded format=etrip 2004.9.6)  6 SEP 2004 23:13
 ---
-> This is e-TeX, Version 3.141592-2.2 (Web2C 7.5.5) (format=etrip 2005.6.25)  25 JUN 2005 10:24
+> This is e-TeX, Version 3.141592-2.2 (Web2C 7.5.5) (format=etrip 2005.8.3)  3 AUG 2005 10:50
 4c4
 < (etrip.tex e-IniTeX: e-Trip format loaded.
 ---
@@ -313,7 +333,7 @@ diff  ./etexdir/etrip/etrip.log etrip.log
 <  132 string characters out of 8410
 ---
 >  18 strings out of 1820
->  140 string characters out of 8106
+>  140 string characters out of 8107
 4276c4278
 <  408 multiletter control sequences out of 2100
 ---
@@ -332,5 +352,5 @@ diff  ./etexdir/etrip/etrip.typ etrip.typ
 9c9
 < ' TeX output 2004.09.06:2313'
 ---
-> ' TeX output 2005.06.25:1024'
+> ' TeX output 2005.08.03:1050'
 make[1]: Leaving directory `/home/olaf/web2c/src/texk/texk/web2c'

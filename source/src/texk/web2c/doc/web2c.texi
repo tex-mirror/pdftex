@@ -1004,11 +1004,14 @@ to suffice.)
 The program accepts the following options, as well as the standard
 @samp{-help} and @samp{-version} (@pxref{Common options}):
 @table @samp
-@item -[no]-file-line-error
+@item -enc
+@itemx -[no]-file-line-error
 @itemx -fmt=@var{fmtname}
 @itemx -halt-on-error
 @itemx -ini
 @itemx -interaction=@var{string}
+@itemx -ipc
+@itemx -ipc-start
 @itemx -jobname=@var{string}
 @itemx -kpathsea-debug=@var{number}
 @itemx -[no]parse-first-line
@@ -4318,14 +4321,12 @@ be modified only through a @file{.ch} file.
 MetaPost-related files, including @file{mp.web} itself, are copyrighted
 under X-like terms; the precise notice is included below.
 
-Finally, almost all of the Kpathsea library is covered by the GNU
-Library General Public License, but part of one file is covered by the
-regular GNU General Public License (@pxref{Introduction,,, kpathsea,
-Kpathsea}).  Therefore, the @emph{binaries} resulting from a standard
-Web2c compilation are also covered by the GPL; so if you (re)distribute
-the binaries, you must also (offer to) distribute the complete source that
-went into those binaries.  See the files @file{COPYING} and
-@file{COPYING.LIB} for complete details on the GPL and LGPL.
+Finally, the Kpathsea library is covered by the GNU Lesser General
+Public License (@pxref{Introduction,,, kpathsea, Kpathsea}).  Therefore,
+the @emph{binaries} resulting from a standard Web2c compilation are also
+covered by the LGPL; so if you (re)distribute the binaries, you must
+also (offer to) distribute the complete source that went into those
+binaries.  See the file @file{LGPL} for complete details on the LGPL.
 
 The following notice must be included by the terms of the MetaPost
 copyright.

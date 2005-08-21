@@ -1009,11 +1009,14 @@ suffice.)
 
   The program accepts the following options, as well as the standard
 `-help' and `-version' (*note Common options::):
+`-enc'
 `-[no]-file-line-error'
 `-fmt=FMTNAME'
 `-halt-on-error'
 `-ini'
 `-interaction=STRING'
+`-ipc'
+`-ipc-start'
 `-jobname=STRING'
 `-kpathsea-debug=NUMBER'
 `-[no]parse-first-line'
@@ -3490,14 +3493,12 @@ modified only through a `.ch' file.
   MetaPost-related files, including `mp.web' itself, are copyrighted
 under X-like terms; the precise notice is included below.
 
-  Finally, almost all of the Kpathsea library is covered by the GNU
-Library General Public License, but part of one file is covered by the
-regular GNU General Public License (*note Introduction:
-(kpathsea)Introduction.).  Therefore, the _binaries_ resulting from a
-standard Web2c compilation are also covered by the GPL; so if you
-(re)distribute the binaries, you must also (offer to) distribute the
-complete source that went into those binaries.  See the files `COPYING'
-and `COPYING.LIB' for complete details on the GPL and LGPL.
+  Finally, the Kpathsea library is covered by the GNU Lesser General
+Public License (*note Introduction: (kpathsea)Introduction.).
+Therefore, the _binaries_ resulting from a standard Web2c compilation
+are also covered by the LGPL; so if you (re)distribute the binaries,
+you must also (offer to) distribute the complete source that went into
+those binaries.  See the file `LGPL' for complete details on the LGPL.
 
   The following notice must be included by the terms of the MetaPost
 copyright.
@@ -3647,7 +3648,7 @@ Index
 * -- starts option names:                Option conventions.  (line  11)
 * --disable-dump-share configure option: Hardware and memory dumps.
                                                               (line   6)
-* --enable-ipc configure option:         tex invocation.      (line  98)
+* --enable-ipc configure option:         tex invocation.      (line 101)
 * --help common option:                  Common options.      (line  11)
 * --quiet (newer):                       newer invocation.    (line  20)
 * --verbose (newer):                     newer invocation.    (line  23)
@@ -3688,7 +3689,7 @@ Index
 * -D compiler options:                   Compile-time options.
                                                               (line   6)
 * -dpi=REAL:                             dvitype invocation.  (line  24)
-* -enc:                                  tex invocation.      (line  92)
+* -enc:                                  tex invocation.      (line  95)
 * -file-line-error:                      Common options.      (line  25)
 * -file-line-error-style:                Common options.      (line  26)
 * -fmt=DUMPNAME:                         Common options.      (line  34)
@@ -3701,8 +3702,8 @@ Index
 * -ini <1>:                              Initial and virgin.  (line  12)
 * -ini:                                  Common options.      (line  45)
 * -interaction=STRING:                   Common options.      (line  51)
-* -ipc:                                  tex invocation.      (line  98)
-* -ipc-start:                            tex invocation.      (line  98)
+* -ipc:                                  tex invocation.      (line 101)
+* -ipc-start:                            tex invocation.      (line 101)
 * -jobname=STRING:                       Common options.      (line  56)
 * -kpathsea-debug=NUMBER:                Common options.      (line  60)
 * -length=NUMBER:                        tangle invocation.   (line  27)
@@ -3718,16 +3719,16 @@ Index
 * -min-crossrefs=N:                      bibtex invocation.   (line  31)
 * -mixedcase:                            tangle invocation.   (line  35)
 * -mktex=FILETYPE <1>:                   mf invocation.       (line  87)
-* -mktex=FILETYPE:                       tex invocation.      (line 108)
-* -mltex:                                tex invocation.      (line 112)
+* -mktex=FILETYPE:                       tex invocation.      (line 111)
+* -mltex:                                tex invocation.      (line 115)
 * -mnemonics:                            gftype invocation.   (line  29)
 * -no-file-line-error:                   Common options.      (line  26)
 * -no-mktex=FILETYPE <1>:                mf invocation.       (line  87)
-* -no-mktex=FILETYPE:                    tex invocation.      (line 108)
+* -no-mktex=FILETYPE:                    tex invocation.      (line 111)
 * -no-parse-first-line:                  Common options.      (line  78)
-* -no-shell-escape:                      tex invocation.      (line 125)
+* -no-shell-escape:                      tex invocation.      (line 128)
 * -oem:                                  Common options.      (line 108)
-* -output-comment=STRING:                tex invocation.      (line 117)
+* -output-comment=STRING:                tex invocation.      (line 120)
 * -output-directory <1>:                 Output file location.
                                                               (line  15)
 * -output-directory:                     Common options.      (line  67)
@@ -3740,7 +3741,7 @@ Index
                                                               (line  18)
 * -progname=STRING:                      Common options.      (line  83)
 * -recorder:                             Common options.      (line  90)
-* -shell-escape:                         tex invocation.      (line 124)
+* -shell-escape:                         tex invocation.      (line 127)
 * -show-opcodes:                         dvitype invocation.  (line  56)
 * -strict:                               tangle invocation.   (line  46)
 * -style=MFTFILE:                        mft invocation.      (line  68)
@@ -3789,7 +3790,7 @@ Index
 * \countN:                               dvicopy invocation.  (line  28)
 * \font and dynamic generation:          tex invocation.      (line  44)
 * \fontdimen:                            tftopl invocation.   (line 100)
-* \immediate\write18:                    tex invocation.      (line 125)
+* \immediate\write18:                    tex invocation.      (line 128)
 * \input filenames:                      \input filenames.    (line   6)
 * \mag <1>:                              dvitype invocation.  (line  28)
 * \mag:                                  dvicopy invocation.  (line  20)
@@ -3797,7 +3798,7 @@ Index
 * \string:                               \input filenames.    (line  60)
 * \tracingcharsubdef and MLTeX:          \tracingcharsubdef.  (line   6)
 * \tracinglostchars and MLTeX:           \tracingcharsubdef.  (line  11)
-* \write18 shell escape extension:       tex invocation.      (line 125)
+* \write18 shell escape extension:       tex invocation.      (line 128)
 * ^^ notation, avoiding:                 TCX files.           (line  76)
 * `Computer Modern Typefaces', production of: mft invocation. (line  75)
 * abbrv.bst:                             Basic BibTeX style files.
@@ -3862,7 +3863,7 @@ Index
                                                               (line   6)
 * binaries, linking:                     Common options.      (line  83)
 * blank lines, in TCX files:             TCX files.           (line  55)
-* Bourne shell commands in TeX:          tex invocation.      (line 125)
+* Bourne shell commands in TeX:          tex invocation.      (line 128)
 * boxes, memory for:                     Runtime options.     (line  20)
 * breakpoints, memory for:               Runtime options.     (line  20)
 * Breitenlohner, Peter:                  Introduction.        (line   9)
@@ -3968,7 +3969,7 @@ Index
 * DrawPath ditroff command:              dmp invocation.      (line  15)
 * dump file:                             Common options.      (line  34)
 * dumping memory:                        Memory dumps.        (line   6)
-* DVI comment, specifying:               tex invocation.      (line 117)
+* DVI comment, specifying:               tex invocation.      (line 120)
 * DVI files, converting to MPX:          dvitomp invocation.  (line   6)
 * DVI files, creating multiple:          TeX extensions.      (line  31)
 * DVI files, explained:                  Font file formats.   (line  30)
@@ -4065,7 +4066,7 @@ Index
 * Free Software Foundation documentation system: Formats.     (line  47)
 * freedom of Web2c:                      Introduction.        (line  23)
 * ftp.math.utah.edu:                     bibtex invocation.   (line  54)
-* generating source specials:            tex invocation.      (line 143)
+* generating source specials:            tex invocation.      (line 146)
 * geometric designs:                     Metafont.            (line   6)
 * geometric font scaling:                Font file formats.   (line  22)
 * geometry for Metafont:                 Online Metafont graphics.
@@ -4261,7 +4262,7 @@ Index
 * mktexmf, disabling:                    mf invocation.       (line  24)
 * mktextfM, disabling:                   tex invocation.      (line  44)
 * mltex:                                 MLTeX.               (line   6)
-* MLTeX, enabling:                       tex invocation.      (line 112)
+* MLTeX, enabling:                       tex invocation.      (line 115)
 * mode needed to run Metafont:           mf invocation.       (line  48)
 * mode_def:                              Modes.               (line  14)
 * mode_setup:                            Modes.               (line  14)
@@ -4324,7 +4325,7 @@ Index
 * output file location:                  Output file location.
                                                               (line   6)
 * output files, written by TeX programs: tex invocation.      (line  51)
-* output_comment for DVI files:          tex invocation.      (line 117)
+* output_comment for DVI files:          tex invocation.      (line 120)
 * overflow label offset:                 gftodvi invocation.  (line  49)
 * packet length:                         pktype invocation.   (line  50)
 * page, starting <1>:                    dvitype invocation.  (line  50)
@@ -4395,7 +4396,7 @@ Index
 * production use:                        Initial and virgin.  (line  20)
 * program name, determines memory dump:  Determining the memory dump to use.
                                                               (line  32)
-* program names, special <1>:            tex invocation.      (line 112)
+* program names, special <1>:            tex invocation.      (line 115)
 * program names, special:                Common options.      (line  45)
 * prologues:                             mpost invocation.    (line 117)
 * prologues and Troff in MetaPost:       makempx invocation.  (line  39)
@@ -4423,7 +4424,7 @@ Index
                                                               (line  39)
 * Regis graphics support:                Online Metafont graphics.
                                                               (line  40)
-* regression testing:                    tex invocation.      (line 117)
+* regression testing:                    tex invocation.      (line 120)
 * repeated rows:                         pktype invocation.   (line  76)
 * representation of strings:             pooltype invocation. (line  30)
 * right side bearing <1>:                gftype invocation.   (line  82)
@@ -4440,13 +4441,13 @@ Index
                                                               (line  42)
 * security, and \openout:                tex invocation.      (line  51)
 * security, and output files:            tex invocation.      (line  51)
-* security, and shell escapes:           tex invocation.      (line 125)
+* security, and shell escapes:           tex invocation.      (line 128)
 * SetColor ditroff command:              dmp invocation.      (line  15)
 * shapes:                                Metafont.            (line   6)
 * sharing memory dumps:                  Hardware and memory dumps.
                                                               (line   6)
-* shell commands in TeX:                 tex invocation.      (line 125)
-* shell_escape enabling in TeX:          tex invocation.      (line 125)
+* shell commands in TeX:                 tex invocation.      (line 128)
+* shell_escape enabling in TeX:          tex invocation.      (line 128)
 * siam.bst:                              Basic BibTeX style files.
                                                               (line  35)
 * side bearings <1>:                     gftype invocation.   (line  82)
@@ -4484,7 +4485,7 @@ Index
 * swapping bytes:                        Hardware and memory dumps.
                                                               (line  13)
 * syntax of TCX files:                   TCX files.           (line  54)
-* system C library function:             tex invocation.      (line 125)
+* system C library function:             tex invocation.      (line 128)
 * T1 encoding and ISO input:             TCX files.           (line  48)
 * Tachikawa, Elizabeth:                  Font file formats.   (line  63)
 * tangle:                                tangle invocation.   (line   6)
@@ -4570,13 +4571,13 @@ Index
                                                               (line  42)
 * typesetting:                           TeX.                 (line   6)
 * Unicode:                               TeX extensions.      (line  16)
-* Unicode input:                         tex invocation.      (line  92)
+* Unicode input:                         tex invocation.      (line  95)
 * uniterm:                               Online Metafont graphics.
                                                               (line  50)
 * unsrt.bst:                             Basic BibTeX style files.
                                                               (line  39)
 * using local codepage to display messages: Common options.   (line 108)
-* UTF-8 input:                           tex invocation.      (line  92)
+* UTF-8 input:                           tex invocation.      (line  95)
 * validation, of DVI files:              dvitype invocation.  (line   6)
 * validation, of GF files:               gftype invocation.   (line   6)
 * validation, of PK files:               pktype invocation.   (line   6)
@@ -4669,55 +4670,55 @@ Node: Editor invocation33129
 Node: \input filenames33858
 Node: TeX36840
 Node: tex invocation37929
-Node: Initial TeX45825
-Node: Formats47310
-Node: Languages and hyphenation50248
-Node: MLTeX50676
-Node: \charsubdef52167
-Node: \tracingcharsubdef54486
-Node: TCX files55060
-Node: patgen invocation59951
-Node: IPC and TeX60664
-Node: TeX extensions61263
-Node: Metafont62564
-Node: mf invocation63851
-Node: Initial Metafont67723
-Node: Modes69470
-Node: Online Metafont graphics71717
-Node: gftodvi invocation74987
-Node: mft invocation77239
-Node: MetaPost81288
-Node: mpost invocation82308
-Node: Initial MetaPost87474
-Node: makempx invocation89280
-Node: dvitomp invocation92775
-Node: dmp invocation93403
-Node: mpto invocation97417
-Node: newer invocation98398
-Node: BibTeX99333
-Node: bibtex invocation99694
-Node: Basic BibTeX style files102016
-Node: WEB103358
-Node: tangle invocation104639
-Node: weave invocation106759
-Node: pooltype invocation108165
-Node: DVI utilities109292
-Node: dvicopy invocation110234
-Node: dvitype invocation111530
-Node: dvitype output example113883
-Node: Font utilities116933
-Node: Font file formats118112
-Node: gftopk invocation121401
-Node: pktogf invocation122602
-Node: pktype invocation123778
-Node: gftype invocation126608
-Node: tftopl invocation131116
-Node: pltotf invocation135745
-Node: vftovp invocation136807
-Node: vptovf invocation139088
-Node: Font utilities available elsewhere140140
-Node: Legalisms142560
-Node: References144846
-Node: Index149231
+Node: Initial TeX45852
+Node: Formats47337
+Node: Languages and hyphenation50275
+Node: MLTeX50703
+Node: \charsubdef52194
+Node: \tracingcharsubdef54513
+Node: TCX files55087
+Node: patgen invocation59978
+Node: IPC and TeX60691
+Node: TeX extensions61290
+Node: Metafont62591
+Node: mf invocation63878
+Node: Initial Metafont67750
+Node: Modes69497
+Node: Online Metafont graphics71744
+Node: gftodvi invocation75014
+Node: mft invocation77266
+Node: MetaPost81315
+Node: mpost invocation82335
+Node: Initial MetaPost87501
+Node: makempx invocation89307
+Node: dvitomp invocation92802
+Node: dmp invocation93430
+Node: mpto invocation97444
+Node: newer invocation98425
+Node: BibTeX99360
+Node: bibtex invocation99721
+Node: Basic BibTeX style files102043
+Node: WEB103385
+Node: tangle invocation104666
+Node: weave invocation106786
+Node: pooltype invocation108192
+Node: DVI utilities109319
+Node: dvicopy invocation110261
+Node: dvitype invocation111557
+Node: dvitype output example113910
+Node: Font utilities116960
+Node: Font file formats118139
+Node: gftopk invocation121428
+Node: pktogf invocation122629
+Node: pktype invocation123805
+Node: gftype invocation126635
+Node: tftopl invocation131143
+Node: pltotf invocation135772
+Node: vftovp invocation136834
+Node: vptovf invocation139115
+Node: Font utilities available elsewhere140167
+Node: Legalisms142587
+Node: References144753
+Node: Index149138
 
 End Tag Table

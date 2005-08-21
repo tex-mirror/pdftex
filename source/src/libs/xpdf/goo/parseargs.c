@@ -150,7 +150,7 @@ static GBool grabArg(ArgDesc *arg, int i, int *argc, char *argv[]) {
 GBool isInt(char *s) {
   if (*s == '-' || *s == '+')
     ++s;
-  while (isdigit(*s))
+  while (isdigit(*s & 0xff))
     ++s;
   if (*s)
     return gFalse;
@@ -163,13 +163,13 @@ GBool isFP(char *s) {
   if (*s == '-' || *s == '+')
     ++s;
   n = 0;
-  while (isdigit(*s)) {
+  while (isdigit(*s & 0xff)) {
     ++s;
     ++n;
   }
   if (*s == '.')
     ++s;
-  while (isdigit(*s)) {
+  while (isdigit(*s & 0xff)) {
     ++s;
     ++n;
   }
@@ -178,11 +178,11 @@ GBool isFP(char *s) {
     if (*s == '-' || *s == '+')
       ++s;
     n = 0;
-    if (!isdigit(*s))
+    if (!isdigit(*s & 0xff))
       return gFalse;
     do {
       ++s;
-    } while (isdigit(*s));
+    } while (isdigit(*s & 0xff));
   }
   if (*s)
     return gFalse;

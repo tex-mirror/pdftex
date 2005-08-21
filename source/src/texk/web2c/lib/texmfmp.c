@@ -254,17 +254,22 @@ maininit P2C(int, ac, string *, av)
   }
   
 #ifdef TeX
-#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
-  /* Sanity check: -mltex and -enc only work in combination with -ini. */
+  /* Sanity check: -mltex, -enc, -etex only work in combination with -ini. */
   if (!iniversion) {
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
     if (mltexp) {
       fprintf(stderr, "-mltex only works with -ini\n");
     }
     if (enctexp) {
       fprintf(stderr, "-enc only works with -ini\n");
     }
-  }
 #endif
+#if defined(eTeX) || defined(pdfeTeX) || defined(Aleph)
+    if (etexp) {
+      fprintf(stderr, "-etex only works with -ini\n");
+    }
+#endif
+  }
 #endif
   
   /* If we've set up the fmt/base default in any of the various ways
@@ -769,6 +774,9 @@ static struct option long_options[]
       { "mltex",                     0, &mltexp, 1 },
       { "enc",                       0, &enctexp, 1 },
 #endif /* !Omega && !eOmega && !Aleph */
+#if defined (eTeX) || defined(pdfeTeX) || defined(Aleph)
+      { "etex",                      0, &etexp, 1 },
+#endif /* eTeX || pdfeTeX || Aleph */
       { "output-comment",            1, 0, 0 },
       { "output-directory",          1, 0, 0 },
 #if defined(pdfTeX) || defined(pdfeTeX)
@@ -1152,13 +1160,20 @@ opennameok P4C(const_string, fname, const_string, check_var,
             check_var, open_choice);
     return false;
   } else {
-    const_string dotpair = strstr (fname, "..");
-    /* If dotpair[2] == DIR_SEP, then dotpair[-1] is well-defined. */
-    if (dotpair && IS_DIR_SEP(dotpair[2]) && IS_DIR_SEP(dotpair[-1])) {
-      fprintf(stderr, "%s: Not %s to %s (%s = %s).\n",
-              program_invocation_name, ok_type_name[action], fname,
-              check_var, open_choice);
-      return false;
+    /* Check for "/../".  Since more than one characted can be matched
+       by IS_DIR_SEP, we cannot use "/../" itself. */
+    const_string dotpair = strstr(fname, "..");
+    while (dotpair) {
+      /* If dotpair[2] == DIR_SEP, then dotpair[-1] is well-defined,
+         because the "../" case was handled above. */
+      if (IS_DIR_SEP(dotpair[2]) && IS_DIR_SEP(dotpair[-1])) {
+        fprintf(stderr, "%s: Not %s to %s (%s = %s).\n",
+                program_invocation_name, ok_type_name[action], fname,
+                check_var, open_choice);
+        return false;
+      }
+      /* Continue after the dotpair. */
+      dotpair = strstr(dotpair+2, "..");
     }
   }
 
@@ -1257,28 +1272,29 @@ get_date_and_time P4C(integer *, minutes,  integer *, day,
   }
 }
 
-
+/*
+ Getting a high resolution time.
+ */
 void
 get_seconds_and_micros P2C(integer *, seconds,  integer *, micros)
 {
 #if defined (HAVE_GETTIMEOFDAY)
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  *seconds =tv.tv_sec;
-  *micros =tv.tv_usec;
+  *seconds = tv.tv_sec;
+  *micros  = tv.tv_usec;
 #elif defined (HAVE_FTIME)
   struct timeb tb;
   ftime(&tb);
-  *seconds =tb.time;
-  *micros =tb.millitm*1000;
+  *seconds = tb.time;
+  *micros  = tb.millitm*1000;
 #else
-  time_t clock = time ((time_t*)NULL);
+  time_t clock = time((time_t*)NULL);
   *seconds = clock;
-  *micros = 0;
+  *micros  = 0;
 #endif
 }
 
-
 /*
   Generating a better seed numbers
   */

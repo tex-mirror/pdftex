@@ -22,9 +22,6 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "Dict.h"
-#ifndef NO_DECRYPTION
-#include "Decrypt.h"
-#endif
 #include "Error.h"
 #include "ErrorCodes.h"
 #include "XRef.h"
@@ -34,7 +31,6 @@
 #define xrefSearchSize 1024	// read this many bytes at end of file
 				//   to look for 'startxref'
 
-#ifndef NO_DECRYPTION
 //------------------------------------------------------------------------
 // Permission bits
 //------------------------------------------------------------------------
@@ -44,7 +40,6 @@
 #define permCopy     (1<<4)
 #define permNotes    (1<<5)
 #define defPermFlags 0xfffc
-#endif
 
 //------------------------------------------------------------------------
 // ObjectStream
@@ -111,8 +106,8 @@ ObjectStream::ObjectStream(XRef *xref, int objStrNumA) {
   }
 
   objs = new Object[nObjects];
-  objNums = (int *)gmalloc(nObjects * sizeof(int));
-  offsets = (int *)gmalloc(nObjects * sizeof(int));
+  objNums = (int *)gmallocn(nObjects, sizeof(int));
+  offsets = (int *)gmallocn(nObjects, sizeof(int));
 
   // parse the header: object numbers and offsets
   objStr.streamReset();
@@ -195,7 +190,7 @@ Object *ObjectStream::getObject(int objIdx, int objNum, Object *obj) {
 // XRef
 //------------------------------------------------------------------------
 
-XRef::XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword) {
+XRef::XRef(BaseStream *strA) {
   Guint pos;
   Object obj;
 
@@ -206,6 +201,10 @@ XRef::XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword) {
   streamEnds = NULL;
   streamEndsLen = 0;
   objStr = NULL;
+
+  encrypted = gFalse;
+  permFlags = defPermFlags;
+  ownerPasswordOk = gFalse;
 
   // read the trailer
   str = strA;
@@ -251,16 +250,6 @@ XRef::XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword) {
   // now set the trailer dictionary's xref pointer so we can fetch
   // indirect objects from it
   trailerDict.getDict()->setXRef(this);
-
-  // check for encryption
-#ifndef NO_DECRYPTION
-  encrypted = gFalse;
-#endif
-  if (checkEncrypted(ownerPassword, userPassword)) {
-    ok = gFalse;
-    errCode = errEncrypted;
-    return;
-  }
 }
 
 XRef::~XRef() {
@@ -388,7 +377,7 @@ GBool XRef::readXRefTable(Parser *parser, Guint *pos) {
       if (newSize < 0) {
 	goto err1;
       }
-      entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
+      entries = (XRefEntry *)greallocn(entries, newSize, sizeof(XRefEntry));
       for (i = size; i < newSize; ++i) {
 	entries[i].offset = 0xffffffff;
 	entries[i].type = xrefEntryFree;
@@ -461,6 +450,7 @@ GBool XRef::readXRefTable(Parser *parser, Guint *pos) {
     pos2 = (Guint)obj2.getInt();
     readXRef(&pos2);
     if (!ok) {
+      obj2.free();
       goto err1;
     }
   }
@@ -493,7 +483,7 @@ GBool XRef::readXRefStream(Stream *xrefStr, Guint *pos) {
     goto err1;
   }
   if (newSize > size) {
-    entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
+    entries = (XRefEntry *)greallocn(entries, newSize, sizeof(XRefEntry));
     for (i = size; i < newSize; ++i) {
       entries[i].offset = 0xffffffff;
       entries[i].type = xrefEntryFree;
@@ -583,7 +573,7 @@ GBool XRef::readXRefStreamSection(Stream *xrefStr, int *w, int first, int n) {
     if (newSize < 0) {
       return gFalse;
     }
-    entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
+    entries = (XRefEntry *)greallocn(entries, newSize, sizeof(XRefEntry));
     for (i = size; i < newSize; ++i) {
       entries[i].offset = 0xffffffff;
       entries[i].type = xrefEntryFree;
@@ -673,7 +663,7 @@ GBool XRef::constructXRef() {
       obj.initNull();
       parser = new Parser(NULL,
 		 new Lexer(NULL,
-		   str->makeSubStream(start + pos + 7, gFalse, 0, &obj)));
+		   str->makeSubStream(pos + 7, gFalse, 0, &obj)));
       parser->getObj(&newTrailerDict);
       if (newTrailerDict.isDict()) {
 	newTrailerDict.dictLookupNF("Root", &obj);
@@ -719,7 +709,7 @@ GBool XRef::constructXRef() {
 		    return gFalse;
 		  }
 		  entries = (XRefEntry *)
-		      grealloc(entries, newSize * sizeof(XRefEntry));
+		      greallocn(entries, newSize, sizeof(XRefEntry));
 		  for (i = size; i < newSize; ++i) {
 		    entries[i].offset = 0xffffffff;
 		    entries[i].type = xrefEntryFree;
@@ -741,8 +731,8 @@ GBool XRef::constructXRef() {
     } else if (!strncmp(p, "endstream", 9)) {
       if (streamEndsLen == streamEndsSize) {
 	streamEndsSize += 64;
-	streamEnds = (Guint *)grealloc(streamEnds,
-				       streamEndsSize * sizeof(int));
+	streamEnds = (Guint *)greallocn(streamEnds,
+					streamEndsSize, sizeof(int));
       }
       streamEnds[streamEndsLen++] = pos;
     }
@@ -755,140 +745,38 @@ GBool XRef::constructXRef() {
   return gFalse;
 }
 
-#ifndef NO_DECRYPTION
-GBool XRef::checkEncrypted(GString *ownerPassword, GString *userPassword) {
-  Object encrypt, filterObj, versionObj, revisionObj, lengthObj;
-  Object ownerKey, userKey, permissions, fileID, fileID1;
-  GBool encrypted1;
-  GBool ret;
+void XRef::setEncryption(int permFlagsA, GBool ownerPasswordOkA,
+			 Guchar *fileKeyA, int keyLengthA, int encVersionA) {
+  int i;
 
-  keyLength = 0;
-  encVersion = encRevision = 0;
-  ret = gFalse;
-
-  permFlags = defPermFlags;
-  ownerPasswordOk = gFalse;
-  trailerDict.dictLookup("Encrypt", &encrypt);
-  if ((encrypted1 = encrypt.isDict())) {
-    ret = gTrue;
-    encrypt.dictLookup("Filter", &filterObj);
-    if (filterObj.isName("Standard")) {
-      encrypt.dictLookup("V", &versionObj);
-      encrypt.dictLookup("R", &revisionObj);
-      encrypt.dictLookup("Length", &lengthObj);
-      encrypt.dictLookup("O", &ownerKey);
-      encrypt.dictLookup("U", &userKey);
-      encrypt.dictLookup("P", &permissions);
-      trailerDict.dictLookup("ID", &fileID);
-      if (versionObj.isInt() &&
-	  revisionObj.isInt() &&
-	  ownerKey.isString() && ownerKey.getString()->getLength() == 32 &&
-	  userKey.isString() && userKey.getString()->getLength() == 32 &&
-	  permissions.isInt() &&
-	  fileID.isArray()) {
-	encVersion = versionObj.getInt();
-	encRevision = revisionObj.getInt();
-	if (lengthObj.isInt()) {
-	  keyLength = lengthObj.getInt() / 8;
-	} else {
-	  keyLength = 5;
-	}
-        if (keyLength > 16) {
-          keyLength = 16;
-        }
-	permFlags = permissions.getInt();
-	if (encVersion >= 1 && encVersion <= 2 &&
-	    encRevision >= 2 && encRevision <= 3) {
-	  fileID.arrayGet(0, &fileID1);
-	  if (fileID1.isString()) {
-	    if (Decrypt::makeFileKey(encVersion, encRevision, keyLength,
-				     ownerKey.getString(), userKey.getString(),
-				     permFlags, fileID1.getString(),
-				     ownerPassword, userPassword, fileKey,
-				     &ownerPasswordOk)) {
-	      if (ownerPassword && !ownerPasswordOk) {
-		error(-1, "Incorrect owner password");
-	      }
-	      ret = gFalse;
-	    } else {
-	      error(-1, "Incorrect password");
-	    }
-	  } else {
-	    error(-1, "Weird encryption info");
-	  }
-	  fileID1.free();
-	} else {
-	  error(-1, "Unsupported version/revision (%d/%d) of Standard security handler",
-		encVersion, encRevision);
-	}
-      } else {
-	error(-1, "Weird encryption info");
-      }
-      fileID.free();
-      permissions.free();
-      userKey.free();
-      ownerKey.free();
-      lengthObj.free();
-      revisionObj.free();
-      versionObj.free();
-    } else {
-      error(-1, "Unknown security handler '%s'",
-	    filterObj.isName() ? filterObj.getName() : "???");
-    }
-    filterObj.free();
+  encrypted = gTrue;
+  permFlags = permFlagsA;
+  ownerPasswordOk = ownerPasswordOkA;
+  if (keyLengthA <= 16) {
+    keyLength = keyLengthA;
+  } else {
+    keyLength = 16;
   }
-  encrypt.free();
-
-  // this flag has to be set *after* we read the O/U/P strings
-  encrypted = encrypted1;
-
-  return ret;
-}
-#else
-GBool XRef::checkEncrypted(GString *ownerPassword, GString *userPassword) {
-  Object obj;
-  GBool encrypted;
-
-  trailerDict.dictLookup("Encrypt", &obj);
-  if ((encrypted = !obj.isNull())) {
-    error(-1, "PDF file is encrypted and this version of the Xpdf tools");
-    error(-1, "was built without decryption support.");
+  for (i = 0; i < keyLength; ++i) {
+    fileKey[i] = fileKeyA[i];
   }
-  obj.free();
-  return encrypted;
+  encVersion = encVersionA;
 }
-#endif
 
 GBool XRef::okToPrint(GBool ignoreOwnerPW) {
-#ifndef NO_DECRYPTION
   return (!ignoreOwnerPW && ownerPasswordOk) || (permFlags & permPrint);
-#else
-  return gTrue;
-#endif
 }
 
 GBool XRef::okToChange(GBool ignoreOwnerPW) {
-#ifndef NO_DECRYPTION
   return (!ignoreOwnerPW && ownerPasswordOk) || (permFlags & permChange);
-#else
-  return gTrue;
-#endif
 }
 
 GBool XRef::okToCopy(GBool ignoreOwnerPW) {
-#ifndef NO_DECRYPTION
   return (!ignoreOwnerPW && ownerPasswordOk) || (permFlags & permCopy);
-#else
-  return gTrue;
-#endif
 }
 
 GBool XRef::okToAddNotes(GBool ignoreOwnerPW) {
-#ifndef NO_DECRYPTION
   return (!ignoreOwnerPW && ownerPasswordOk) || (permFlags & permNotes);
-#else
-  return gTrue;
-#endif
 }
 
 Object *XRef::fetch(int num, int gen, Object *obj) {
@@ -918,14 +806,14 @@ Object *XRef::fetch(int num, int gen, Object *obj) {
     if (!obj1.isInt() || obj1.getInt() != num ||
 	!obj2.isInt() || obj2.getInt() != gen ||
 	!obj3.isCmd("obj")) {
+      obj1.free();
+      obj2.free();
+      obj3.free();
+      delete parser;
       goto err;
     }
-#ifndef NO_DECRYPTION
     parser->getObj(obj, encrypted ? fileKey : (Guchar *)NULL, keyLength,
 		   num, gen);
-#else
-    parser->getObj(obj);
-#endif
     obj1.free();
     obj2.free();
     obj3.free();

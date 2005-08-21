@@ -103,6 +103,12 @@ combination with
 For documentation of the enc\*(TX extensions see
 .BR http://www.olsak.net/enctex.html .
 .TP
+.B -etex
+.rb
+Enable the e-\*(TX extensions.  This option is only effective in
+combination with
+.BR -ini .
+.TP
 .B -file-line-error
 .rb
 Print error messages in the form

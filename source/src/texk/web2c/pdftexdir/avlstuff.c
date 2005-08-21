@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along
 with this file; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/avlstuff.c#3 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/avlstuff.c#5 $
 
 formatted by indent -kr
 */
@@ -26,7 +26,7 @@ formatted by indent -kr
 #include "avl.h"
 
 static const char perforce_id[] =
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/avlstuff.c#3 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/avlstuff.c#5 $";
 
 /* One AVL tree for each obj_type 0...pdfobjtypemax */
 

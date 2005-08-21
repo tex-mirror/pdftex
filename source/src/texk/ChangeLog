@@ -1,3 +1,24 @@
+2005-08-03  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* config.sub: Update to 2005-07-08.
+
+	* config.guess: Update to 2005-08-03.
+
+2005-07-27  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etc/COPYING: Replace full GPL text with reference to the LGPL
+	and GPL files.
+
+	* etc/GPL: GPL text.
+
+	* etc/LGPL: LGPL 2.1 text.
+
+2005-07-25  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* etc/autoconf/acgeneral.m4: Have AC_CHECK_TYPE include stdint.h
+	if (through HAVE_STDINT_H) we've determined it is available.  The
+	prevents some configure-related misbehaviour.  From Karl Berry.
+
 2005-06-28  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* m4/maintainer-mode.m4: Add copyright.

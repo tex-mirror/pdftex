@@ -33,6 +33,7 @@ kpse_include ../../texk/make/library.mk
 #------------------------------------------------------------------------
 
 CXX_SRC = \
+	$(srcdir)/FixedPoint.cc \
 	$(srcdir)/GHash.cc \
 	$(srcdir)/GList.cc \
 	$(srcdir)/GString.cc \
@@ -45,7 +46,7 @@ C_SRC = \
 
 #------------------------------------------------------------------------
 
-GOO_CXX_OBJS = GHash.o GList.o GString.o gmempp.o gfile.o
+GOO_CXX_OBJS = FixedPoint.o GHash.o GList.o GString.o gmempp.o gfile.o
 GOO_C_OBJS = gmem.o parseargs.o
 GOO_OBJS = $(GOO_CXX_OBJS) $(GOO_C_OBJS)
 

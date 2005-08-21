@@ -1,5 +1,5 @@
 # Makefile for web2c --kb@mail.tug.org. Public domain.
-# $Id: //depot/Build/source.development/TeX/texk/web2c/Makefile.in#65 $
+# $Id: //depot/Build/source.development/TeX/texk/web2c/Makefile.in#66 $
 version = @WEB2CVERSION@
 
 # This makefile uses static rules with many targets (to be compatible to
@@ -567,7 +567,7 @@ engines = $(tex) $(etex) $(mf) $(mfn) $(mpost) \
           $(omega) $(aleph) \
           $(pdftex) $(pdfetex)
 
-programs: $(programs) $(engines) $(mpware) \
+programs: $(programs) $(engines) $(mpware_programs) \
           $(omegafonts_programs) $(otps_programs) $(pdftosrc)
 
 # Additional dependencies for relinking.
@@ -1004,7 +1004,7 @@ manpages:
 @MAINT@	cd $(distdir); bash -c "rm -f cweb.c *{coerce,d}.h"
 @MAINT@	cd $(distdir); bash -c "rm -f omega*.c aleph*.c"
 @MAINT@	cd $(distdir); bash -c "rm -f tex*.c etex*.c"
-@MAINT@	cd $(distdir); bash -c "rm -f pdftex*.c pdfetex*.c
+@MAINT@	cd $(distdir); bash -c "rm -f pdftex*.c pdfetex*.c"
 @MAINT@	cd $(distdir); bash -c "rm -f mf*.c mp*.c"
 @MAINT@	cd $(distdir); bash -c "rm -f macnames.c *extra.c"
 @MAINT@	touch $(distdir)/doc/*.info*
@@ -1114,8 +1114,7 @@ installcheck:
 
 # 
 # Cleaning.
-all_subdirs = doc lib man $(mpware) web2c window $(omegafonts) $(otps) \
-              $(pdftexdir) $(pdfetexdir) 
+all_subdirs = doc lib man $(mpware) web2c window $(omegafonts) $(otps) $(pdftexdir) $(pdfetexdir)
 
 # Having a multiple-target rule with the subdir loop fails because of
 # the dependencies introduced by clean.mk.  Yet, we want the

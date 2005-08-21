@@ -1,21 +1,23 @@
 /* tex-make.c: Run external programs to make TeX-related files.
 
-Copyright (C) 2005 Olaf Weber.
-Copyright (C) 1993, 94, 95, 96, 97 Karl Berry.
+    Copyright 1997, 98, 2001-05 Olaf Weber.
+    Copyright 1993, 94, 95, 96, 97 Karl Berry.
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
 
 #include <kpathsea/config.h>
 
@@ -321,7 +323,8 @@ maketex P2C(kpse_file_format_type, format, string*, args)
 
       ret = len == 0 ? NULL : kpse_readable_file (fn);
       if (!ret && len > 1) {
-        WARNING1 ("kpathsea: mktexpk output `%s' instead of a filename", fn);
+        WARNING2 ("kpathsea: %s output `%s' instead of a filename",
+                  new_cmd, fn);
       }
 
       /* Free the name if we're not returning it.  */
@@ -445,7 +448,8 @@ maketex P2C(kpse_file_format_type, format, string*, args)
 
       ret = len == 0 ? NULL : kpse_readable_file (fn);
       if (!ret && len > 1) {
-        WARNING1 ("kpathsea: mktexpk output `%s' instead of a filename", fn);
+        WARNING2("kpathsea: %s output `%s' instead of a filename",
+                 args[0], fn);
       }
 
       /* Free the name if we're not returning it.  */

@@ -513,7 +513,7 @@ pool_free = 47500
 % German: 14000.
 % US English: 10000.
 % 
-trie_size = 262000
+trie_size = 300000
 
 % Buffer size.  TeX uses the buffer to contain input lines, but macro
 % expansion works by writing material into the buffer and reparsing the

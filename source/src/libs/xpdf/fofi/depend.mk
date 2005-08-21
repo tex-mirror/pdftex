@@ -1,8 +1,29 @@
-$(srcdir)/FoFiBase.o: FoFiBase.cc ../goo/gmem.h FoFiBase.h ../goo/gtypes.h
-$(srcdir)/FoFiEncodings.o: FoFiEncodings.cc FoFiEncodings.h ../goo/gtypes.h
-$(srcdir)/FoFiTrueType.o: FoFiTrueType.cc ../goo/gtypes.h ../goo/gmem.h \
- ../goo/GString.h ../goo/GHash.h FoFiTrueType.h FoFiBase.h
-$(srcdir)/FoFiType1.o: FoFiType1.cc ../goo/gmem.h FoFiEncodings.h \
- ../goo/gtypes.h FoFiType1.h FoFiBase.h
-$(srcdir)/FoFiType1C.o: FoFiType1C.cc ../goo/gmem.h ../goo/GString.h \
- FoFiEncodings.h ../goo/gtypes.h FoFiType1C.h FoFiBase.h
+FoFiBase.o: $(srcdir)/FoFiBase.cc ../aconf.h \
+  ../../../../src/libs/xpdf/aconf2.h ../../../../src/libs/xpdf/goo/gmem.h \
+  $(srcdir)/FoFiBase.h \
+  ../../../../src/libs/xpdf/goo/gtypes.h
+FoFiEncodings.o: $(srcdir)/FoFiEncodings.cc \
+  ../aconf.h ../../../../src/libs/xpdf/aconf2.h \
+  $(srcdir)/FoFiEncodings.h \
+  ../../../../src/libs/xpdf/goo/gtypes.h
+FoFiTrueType.o: $(srcdir)/FoFiTrueType.cc ../aconf.h \
+  ../../../../src/libs/xpdf/aconf2.h \
+  ../../../../src/libs/xpdf/goo/gtypes.h \
+  ../../../../src/libs/xpdf/goo/gmem.h \
+  ../../../../src/libs/xpdf/goo/GString.h \
+  ../../../../src/libs/xpdf/goo/GHash.h \
+  $(srcdir)/FoFiTrueType.h \
+  $(srcdir)/FoFiBase.h
+FoFiType1.o: $(srcdir)/FoFiType1.cc ../aconf.h \
+  ../../../../src/libs/xpdf/aconf2.h ../../../../src/libs/xpdf/goo/gmem.h \
+  $(srcdir)/FoFiEncodings.h \
+  ../../../../src/libs/xpdf/goo/gtypes.h \
+  $(srcdir)/FoFiType1.h \
+  $(srcdir)/FoFiBase.h
+FoFiType1C.o: $(srcdir)/FoFiType1C.cc ../aconf.h \
+  ../../../../src/libs/xpdf/aconf2.h ../../../../src/libs/xpdf/goo/gmem.h \
+  ../../../../src/libs/xpdf/goo/GString.h \
+  $(srcdir)/FoFiEncodings.h \
+  ../../../../src/libs/xpdf/goo/gtypes.h \
+  $(srcdir)/FoFiType1C.h \
+  $(srcdir)/FoFiBase.h
