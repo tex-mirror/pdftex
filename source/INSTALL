@@ -1,0 +1,25 @@
+pdfTeX
+======
+
+INSTALL for pdfTeX 1.30.1
+=========================
+
+This distribution is a stripped-down version of the TeXlive distribution.
+All source code is in the directory src; the script Build will generate and
+populate a directory build.
+
+The code of pdfTeX is in src/texk/web2c/pdftexdir and src/texk/web2c/pdfetexdir
+
+Try the script Build in this directory. If it succeeds, you should end up with
+the files pdftex, pdfetex, pdftex.pool and pdfetex.pool in build/texk/web2c
+
+If you are using a TeX distribution older than 2005 (e.g. teTeX 2.x), please
+first update your complete TeX installation.
+
+Replace the so-named files in your TeX installation with these (if you are
+using a recent distribution most likely pdftex is a symlink to pdfetex, so you
+only need to install pdfetex and pdfetex.pool) and regenerate all formats of
+your TeX installation (e.g. with "fmtutil --refresh").
+
+If all else fails, follow the clues in README, src/texk/INSTALL and
+src/texk/web2c/INSTALL.
