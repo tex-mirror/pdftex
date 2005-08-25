@@ -1,4 +1,9 @@
 -------------------------------------------------
+pdfTeX 3.141592-1.30.2 was released on 2005-08-25
+-------------------------------------------------
+- fixed some build problems and minor bugs introduced in 1.30.1
+
+-------------------------------------------------
 pdfTeX 3.141592-1.30.1 was released on 2005-08-21
 -------------------------------------------------
 - the eTeX extensions can now be enabled with the cmdline switch -etex
@@ -379,5 +384,5 @@ pdfTeX 3.14159-1.00a-pretest-20010806 was released on 2001-08-06
 pdfTeX 3.14159-1.00a-pretest-20010804 was released on 2001-08-04
 ----------------------------------------------------------------
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#80 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#84 $
 // vim: tw=79:ts=2:expandtab:autoindent

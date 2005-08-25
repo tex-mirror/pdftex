@@ -1,9 +1,10 @@
 # Originally written by Thomas Esser, 1998. Public domain.
 # fmtutil.cnf: configuration file for fmtutil.
-#
-# This TeX Live fmtutil.cnf is not kept in sync with the teTeX
+# 
+# This TeX Live fmtutil.cnf is not kept exactly in sync with the teTeX
 # fmtutil.cnf (and not maintained by te), since the two distributions
-# need different settings.
+# need different settings, although they are nearly the same.  The TL
+# version has a few extra entries at the end, mainly.
 
 # Customize this file to your needs, e.g.
 #   - remove or uncomment formats that you don't need
@@ -45,8 +46,6 @@ metafun		mpost		-		-translate-file=cp227.tcx metafun.mp
 # if you want to make all characters directly "printable" for
 # any \write (instead of ^^xy).
 tex		tex		-		tex.ini
-
-@ALEPH@aleph		aleph		-		*aleph.ini
 latex		pdfetex		language.dat	-translate-file=cp227.tcx *latex.ini
 etex		pdfetex		language.def	-translate-file=cp227.tcx *etex.ini
 pdftex		pdfetex		-	-translate-file=cp227.tcx *pdftex.ini
@@ -54,6 +53,7 @@ pdflatex	pdfetex		language.dat	-translate-file=cp227.tcx *pdflatex.ini
 pdfetex		pdfetex		language.def	-translate-file=cp227.tcx *pdfetex.ini
 @OMEGA@omega		omega		-	omega.ini
 @OMEGA@lambda		omega		language.dat	lambda.ini
+@ALEPH@aleph		aleph		-		*aleph.ini
 @ALEPH@lamed		aleph		language.dat	*lambda.ini
 
 # The amstex format:
@@ -110,10 +110,6 @@ eplain	pdfetex		-		-translate-file=cp227.tcx *eplain.ini
 
 # mptopdf utility
 mptopdf		pdfetex	-		-translate-file=cp227.tcx mptopdf.tex
-
-# Texinfo formats
-texinfo		tex	-		-translate-file=cp227.tcx texinfo.ini
-pdftexinfo	pdfetex	-		-translate-file=cp227.tcx *texinfo.ini
 
 # --- strange things
 texsis		pdfetex	-		-translate-file=cp227.tcx texsis.ini

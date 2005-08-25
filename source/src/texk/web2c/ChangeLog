@@ -1,3 +1,8 @@
+2005-08-22  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* bibtex.ch: Make the buffer and related arrays grow dynamically.
+	Fixes a bug reported by Kevin Cahill <cahill@unm.edu>.
+
 2005-08-13  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* tex.ch: An \immediate\write18 on the '**' prompt would crash

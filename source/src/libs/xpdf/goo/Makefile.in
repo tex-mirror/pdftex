@@ -9,6 +9,8 @@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
+srcdirparent = $(srcdir)/..
+
 kpathsea_include_dir = -I../../../texk -I$(srcdir)/../../../texk
 ALLCFLAGS = $(CFLAGS) @DEFS@ -I.. -I$(srcdir)/.. -I. -I$(srcdir) $(kpathsea_include_dir)
 ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ -I.. -I$(srcdir)/.. -I. -I$(srcdir) $(kpathsea_include_dir)
@@ -67,8 +69,10 @@ distclean maintainer-clean extraclean: clean
 #------------------------------------------------------------------------
 
 depend:
-	($(CXX) $(ALLCXXFLAGS) -MM $(srcdir)/*.cc; \
-	 $(CC) $(ALLCFLAGS) -MM $(srcdir)/*.c) \
-	   | sed 's|$(srcdir)|$$(srcdir)|' > $(srcdir)/depend.mk
+	srcdirparent=`(cd $(srcdirparent) >/dev/null; pwd)`; \
+	  ($(CXX) $(ALLCXXFLAGS) -MM $(srcdir)/*.cc; \
+	   $(CC) $(ALLCFLAGS) -MM $(srcdir)/*.c) \
+	     | sed 's|$(srcdir)|$$(srcdir)|' \
+             | sed 's|'$$srcdirparent/'|$$(srcdirparent)/|g' > $(srcdir)/depend.mk
 
 kpse_include goo/depend.mk

@@ -522,7 +522,7 @@ trie_size = 300000
 % handled within a tenth of this size.
 buf_size = 200000
 
-hyph_size = 1000        % number of hyphenation exceptions, >610 and <32767.
+hyph_size = 10007       % number of hyphenation exceptions, >610 and <32767.
 nest_size = 500		% simultaneous semantic levels (e.g., groups)
 max_in_open = 15	% simultaneous input files and error insertions
 param_size = 5000	% simultaneous macro parameters

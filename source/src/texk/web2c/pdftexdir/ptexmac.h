@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#14 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#18 $
 */
 
 #ifndef PDFTEXMAC
@@ -105,7 +105,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#14 $
 #define skip(p, c)   if (*p == c)  p++
 
 #define alloc_array(T, n, s) do {                           \
-    if (T##_array == NULL) {                                   \
+    if (T##_array == NULL) {                                \
         T##_limit = (s);                                    \
         if ((n) > T##_limit)                                \
             T##_limit = (n);                                \
@@ -117,7 +117,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#14 $
         T##_limit *= 2;                                     \
         if (T##_ptr - T##_array + (n) > T##_limit)          \
             T##_limit = T##_ptr - T##_array + (n);          \
-        T##_array = xretalloc(T##_array, T##_limit, T##_entry); \
+        xretalloc(T##_array, T##_limit, T##_entry);         \
         T##_ptr = T##_array + last_ptr_index;               \
     }                                                       \
 } while (0)

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/epdf.c#7 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/epdf.c#10 $
 */
 
 #include "ptexlib.h"
@@ -46,9 +46,7 @@ void mark_glyphs(fm_entry *fm, char *charset)
     if (new_charset == NULL)
         new_charset = xstrdup(charset);
     else {
-        new_charset = xretalloc(new_charset, 
-                                strlen(new_charset) + strlen(charset) + 1,
-                                char);
+        xretalloc(new_charset, strlen(new_charset)+strlen(charset)+1, char);
         strcat(new_charset, charset);
     }
     fm->charset = new_charset;

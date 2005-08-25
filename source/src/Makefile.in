@@ -60,8 +60,9 @@ install: all
 @FMU@
 @FMU@install-extra:
 # temporary fix for missing links
-	test -f texk/web2c/omegafonts/omfonts && \
-	  cd texk/web2c/omegafonts; $(MAKE) install-links
+	- if test -f texk/web2c/omegafonts/omfonts; then \
+	    cd texk/web2c/omegafonts && $(MAKE) install-links; \
+	else :; fi
 	$(srcdir)/selfautofix "$(bindir)" "$(texmf)/web2c"
 	- if test -f $(scriptdir)/mktexlsr; then \
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
@@ -92,8 +93,9 @@ install-exec:
 @FMU@
 @FMU@install-exec-extra:
 # temporary fix for missing links
-	test -f texk/web2c/omegafonts/omfonts && \
-	  cd texk/web2c/omegafonts; $(MAKE) install-links
+	- if test -f texk/web2c/omegafonts/omfonts; then \
+	    cd texk/web2c/omegafonts && $(MAKE) install-links; \
+	else :; fi
 	- if test -f $(scriptdir)/texlinks; then \
 	  TEXMFMAIN=$(texmf) PATH=$(scriptdir):$(bindir):$(PATH) \
 	    $(scriptdir)/texlinks; \

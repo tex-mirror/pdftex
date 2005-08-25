@@ -91,18 +91,18 @@ TEXMFHOME = $HOME/texmf
 % For sharing this tree with $TEXMFMAIN:
 %   TEXMFVAR = $TEXMFMAIN
 % For using a separate tree:
-%   TEXMFVAR = $HOME/.texmf-var
-TEXMFVAR = $HOME/.texmf-var
+%   TEXMFVAR = $HOME/.tetex3.1/texmf-var
+TEXMFVAR = $HOME/.tetex3.1/texmf-var
 
 % TEXMFCONFIG, where texconfig stores configuration data.
 % With teTeX-3.0 or later, this must be set.
 % For sharing this tree with $TEXMFMAIN:
 %   TEXMFCONFIG = $TEXMFMAIN
 % For using a separate tree:
-%   TEXMFCONFIG = $HOME/.texmf-config
+%   TEXMFCONFIG = $HOME/.tetex3.1/texmf-config
 % For using a separate tree:
 %   TEXMFCONFIG = @texmf@-config
-TEXMFCONFIG = $HOME/.texmf-config
+TEXMFCONFIG = $HOME/.tetex3.1/texmf-config
 
 % Now, list all the texmf trees. If you have multiple trees you can
 % use shell brace notation, like this:
@@ -513,7 +513,7 @@ pool_free = 47500
 % German: 14000.
 % US English: 10000.
 % 
-trie_size = 262000
+trie_size = 300000
 
 % Buffer size.  TeX uses the buffer to contain input lines, but macro
 % expansion works by writing material into the buffer and reparsing the
@@ -522,7 +522,7 @@ trie_size = 262000
 % handled within a tenth of this size.
 buf_size = 200000
 
-hyph_size = 1000        % number of hyphenation exceptions, >610 and <32767.
+hyph_size = 10007       % number of hyphenation exceptions, >610 and <32767.
 nest_size = 500		% simultaneous semantic levels (e.g., groups)
 max_in_open = 15	% simultaneous input files and error insertions
 param_size = 5000	% simultaneous macro parameters

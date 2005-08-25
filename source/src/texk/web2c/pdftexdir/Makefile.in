@@ -1,9 +1,9 @@
 # Makefile for libpdf - te@dbs.uni-hannover.de
-# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/Makefile.in#19 $
+# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/Makefile.in#22 $
 
-ac_include ../make/common.mk
-ac_include ../make/programs.mk
-ac_include ../make/library.mk
+kpse_include ../make/common.mk
+kpse_include ../make/programs.mk
+kpse_include ../make/library.mk
 
 kpathsea_srcdir_parent = $(srcdir)/../..
 kpathsea_dir_parent = ../..
@@ -58,4 +58,4 @@ depend:
 	    grep -v "^$(CC)\|$(CXX)\|$(AR)\|make\|klibtool" | \
 	    sed 's: [^ ]*/\.\./libs/[^ ]*::g' > $(srcdir)/depend.mk
 
-ac_include pdftexdir/depend.mk
+kpse_include pdftexdir/depend.mk
