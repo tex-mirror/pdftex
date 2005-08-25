@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE entry SYSTEM "../catalogue.dtd">
+<entry id="pdftex"
+       datestamp="2005/07/12" 
+       modifier="martin@pdftex.org">
+  <about>
+    <name>pdftex</name>
+    <caption>Generate PDF from TeX directly.</caption>
+    <author>
+      <name>Han The Thanh</name>
+    </author>
+    <home>http://www.pdftex.org</home>
+    <license type="gpl"/>
+    <version>
+      <number>1.30.2</number>
+    </version>
+    <xref refid="hyperref"/>
+    <xref refid="thumbpdf"/>
+    <xref refid="hypbmsec"/>
+  </about>
+  <description>
+    <abstract>
+      An extension of TeX which directly generates PDF documents
+      instead of DVI. Various TeX distributions, including <xref
+      refid="tetex">teTeX</xref> and <xref
+      refid="miktex">miktex</xref> include pdftex and pdflatex.
+    </abstract>
+  </description>
+  <distribution>
+    <ctan>systems/web2c</ctan>
+    <texlive>pdftex</texlive>
+  </distribution>
+</entry>
