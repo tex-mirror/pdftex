@@ -14,11 +14,11 @@ libz.a: $(OBJS)
 
 all: libz.a
 uninstall:
-mostlyclean clean:
-	rm -f *.o *~ libz.a
 
-extraclean maintainer-clean distclean:	clean
-	rm -f Makefile
+kpse_include ../texk/make/clean.mk
+
+clean::
+	rm -f libz.a
 
 depend:
 	makedepend -- $(CFLAGS) -- *.[ch]

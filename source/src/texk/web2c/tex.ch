@@ -4965,11 +4965,11 @@ if j=18 then
       system(stringcast(address_of(str_pool[str_start[str_ptr]])));
       print("executed");
       end;
-    pool_ptr:=str_start[str_ptr];  {erase the string}
     end
   else begin print("disabled");
   end;
   print_char("."); print_nl(""); print_ln;
+  pool_ptr:=str_start[str_ptr];  {erase the string}
 end;
 selector:=old_setting;
 @z

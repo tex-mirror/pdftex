@@ -1,5 +1,5 @@
 # Makefile for libpdf - te@dbs.uni-hannover.de
-# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/Makefile.in#22 $
+# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/Makefile.in#23 $
 
 kpse_include ../make/common.mk
 kpse_include ../make/programs.mk
@@ -46,11 +46,10 @@ libpdf.a: $(OBJS)
 	$(AR) $(ARFLAGS) $@  $(OBJS)
 	$(RANLIB) $@
 
-mostlyclean clean:
-	rm -f *.o libpdf.a ttf2afm pdftosrc
+kpse_include ../make/clean.mk
 
-distclean maintainer-clean extraclean: clean
-	rm -f Makefile config.log config.status
+clean::
+	rm -f libpdf.a ttf2afm pdftosrc
 
 depend:
 	rm -f $(OBJS) ttf2afm.o pdftosrc.o

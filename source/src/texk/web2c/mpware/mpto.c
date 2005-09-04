@@ -1,4 +1,4 @@
-/* $Id: mpto.c,v 1.20 2005/08/23 08:29:26 olaf Exp $
+/* $Id: mpto.c,v 1.21 2005/08/28 09:17:25 olaf Exp $
  * Public domain.
  *
  * Previous versions of mpto were copyright 1990 - 1995 by AT&T Bell
@@ -36,9 +36,9 @@
 
 char*	tex_predoc = "";
 char*	tex_postdoc = "\\end{document}\n";
-char*	tex_pretex1 = "\\def\\mpxshipout{\\shipout\\hbox\\bgroup%\n"
+char*	tex_pretex1 = "\\gdef\\mpxshipout{\\shipout\\hbox\\bgroup%\n"
   "  \\setbox0=\\hbox\\bgroup}%\n"
-  "\\def\\stopmpxshipout{\\egroup"
+  "\\gdef\\stopmpxshipout{\\egroup"
   "  \\dimen0=\\ht0 \\advance\\dimen0\\dp0\n"
   "  \\dimen1=\\ht0 \\dimen2=\\dp0\n"
   "  \\setbox0=\\hbox\\bgroup\n"

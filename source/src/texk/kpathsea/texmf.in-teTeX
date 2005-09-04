@@ -109,7 +109,7 @@ TEXMFCONFIG = $HOME/.tetex3.1/texmf-config
 %   TEXMF = {$TEXMFHOME,!!$TEXMFLOCAL,!!$TEXMFMAIN}
 % The braces are necessary.
 %
-% For texconfig to work properly, TEXMFCONGIG and TEXMFVAR should be named
+% For texconfig to work properly, TEXMFCONFIG and TEXMFVAR should be named
 % explicitly and before all other trees.
 TEXMF = {!!$TEXMFCONFIG,!!$TEXMFVAR,$TEXMFHOME,!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$TEXMFMAIN,!!$TEXMFLOCAL,!!$TEXMFDIST}
 
@@ -522,7 +522,8 @@ trie_size = 300000
 % handled within a tenth of this size.
 buf_size = 200000
 
-hyph_size = 10007       % number of hyphenation exceptions, >610 and <32767.
+hyph_size = 8191        % prime number of hyphenation exceptions, >610, <32767.
+			% http://primes.utm.edu/curios/page.php/8191.html
 nest_size = 500		% simultaneous semantic levels (e.g., groups)
 max_in_open = 15	% simultaneous input files and error insertions
 param_size = 5000	% simultaneous macro parameters

@@ -1,3 +1,10 @@
+2005-09-02  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch [53.1370]: Since we generate a string in all cases, we
+	need to erase it in all cases.  Reported by Han The Thanh
+	<hanthethanh@gmail.com>, diagnosed by Akira Kakuto
+	<kakuto@fsci.fuk.kindai.ac.jp>.
+
 2005-08-22  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* bibtex.ch: Make the buffer and related arrays grow dynamically.

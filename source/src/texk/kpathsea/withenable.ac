@@ -42,6 +42,9 @@ dnl Check whether we can find a texmf tree.  Look at the most common spots.
 dnl Not a switch, but something that must be included everywhere, even at
 dnl at the top level, so putting it in common.ac is not enough.
 AC_MSG_CHECKING(where the main texmf tree is located)
+case $prefix in
+  */) prefix=`echo "$prefix" | sed 's@/*$@@'`;;
+esac
 texmfmain=
 if test "x$datadir" != 'x${prefix}/share'; then
   # First case, datadir is defined...
