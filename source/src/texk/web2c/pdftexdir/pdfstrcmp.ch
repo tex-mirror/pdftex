@@ -442,17 +442,6 @@ pdf_strcmp_code: print_int(cur_val);
 job_name_code: print(job_name);
 @z
 
-@x 11447
-@d append_to_name(#)==begin c:=#; if not (c="""") then begin incr(k);
-  if k<=file_name_size then name_of_file[k]:=xchr[c];
-  end end
-@y
-@d append_to_name(#)==begin c:=#; if not (c="""") or not is_quote_bad
-  then begin incr(k);
-  if k<=file_name_size then name_of_file[k]:=xchr[c];
-  end end
-@z
-
 %***********************************************************************
 
 @x 32168

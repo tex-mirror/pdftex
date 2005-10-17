@@ -585,6 +585,17 @@ setenv TEXINPUTS /home/karl:
 /home/karl:.:$TEXMF//tex
 @end example
 
+Put another way, default expansion works on ``formats'' (search
+paths), and not directly on environment variables.  Example, showing
+the trailing @samp{:} ignored in the first case and expanded in the second:
+
+@example
+$ env TTFONTS=/tmp: kpsewhich --expand-path '$TTFONTS'
+/tmp
+$ env TTFONTS=/tmp: kpsewhich --show-path=.ttf
+/tmp:.:/home/olaf/texmf/fonts/truetype//:...
+@end example
+
 Since Kpathsea looks for multiple configuration files, it would be
 natural to expect that (for example) an extra colon in
 @file{./texmf.cnf} would expand to the path in @file{$TEXMF/texmf.cnf}.
@@ -1215,7 +1226,14 @@ hierarchy.  @xref{Path expansion}.
 @samp{--expand-path=@var{string}} outputs the complete expansion of
 @var{string} as a colon-separated path.  This is useful to construct a
 search path for a program that doesn't accept recursive subdirectory
-specifications.
+specifications.  Nonexistent directories are culled from the output:
+
+@example
+$ kpsewhich --expand-path '/tmp'
+@result{} /tmp
+$ kpsewhich --expand-path '/nonesuch'
+@result{}
+@end example
 
 For one-shot uses of an arbitrary (not built in to Kpathsea) path, see
 @samp{--path} in the previous section.

@@ -1,18 +1,20 @@
 The pdfTeX team is happy to announce the release of a new stable version:
 
 ===========================================================================
-                               pdfTeX 1.30.3
+                               pdfTeX 1.30.4
 ===========================================================================
 
-This is the announcement of pdfTeX 1.30.3, an extended version of TeX that
+This is the announcement of pdfTeX 1.30.4, an extended version of TeX that
 can create PDF directly from TeX source files and enhance the result of TeX
 typesetting with the help of PDF.
 
 ===========================================================================
-  Main changes of pdfTeX 1.30.3
+  Main changes of pdfTeX 1.30.4
 ===========================================================================
 
-- fixed a bug in \write18
+- bugfix: whitespaces in filenames didn't work on Unix anymore (bug 377)
+- bugfix: two \immediates cancel themselves (bug 437)
+- bugfix: wrong file name in error messages of image inclusion (bug 435)
   
 For complete release notes see http://www.pdftex.org/NEWS
 
@@ -60,4 +62,4 @@ documentation.
 
 Have fun!
 
-Martin Schröder (martin@pdftex.org) for the pdfTeX team, September 2005
+Martin Schröder (martin@pdftex.org) for the pdfTeX team, October 2005

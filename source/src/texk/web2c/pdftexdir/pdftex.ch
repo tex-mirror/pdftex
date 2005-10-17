@@ -68,8 +68,8 @@
 @d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
 @y
 @d pdftex_version==130 { \.{\\pdftexversion} }
-@d pdftex_revision=="3" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.30.3' {current \pdfTeX\ version}
+@d pdftex_revision=="4" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='-1.30.4' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -3988,7 +3988,7 @@ else begin
     @<Output the |obj_tab|@>;
     @<Output the trailer@>;
     pdf_flush;
-    print_nl("Output written on "); slow_print(output_file_name);
+    print_nl("Output written on "); print_file_name(0, output_file_name, 0);
   @.Output written on x@>
     print(" ("); print_int(total_pages); print(" page");
     if total_pages<>1 then print_char("s");
@@ -6244,6 +6244,7 @@ if cur_cmd=extension then begin
             do_extension; {scan image and set |pdf_last_ximage|}
             pdf_write_image(pdf_last_ximage);
         end;
+        othercases back_input
     endcases;
 end
 else

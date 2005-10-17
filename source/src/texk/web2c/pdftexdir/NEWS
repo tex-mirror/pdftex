@@ -1,7 +1,14 @@
 -------------------------------------------------
+pdfTeX 3.141592-1.30.4 was released on 2005-10-17
+-------------------------------------------------
+- bugfix: whitespaces in filenames didn't work on Unix anymore (bug 377)
+- bugfix: two \immediates cancel themselves (bug 437)
+- bugfix: wrong file name in error messages of image inclusion (bug 435)
+
+-------------------------------------------------
 pdfTeX 3.141592-1.30.3 was released on 2005-09-04
 -------------------------------------------------
-- fixed a bug in \write18
+- bugfix: \write18
 
 -------------------------------------------------
 pdfTeX 3.141592-1.30.2 was released on 2005-08-25

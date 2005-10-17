@@ -1418,16 +1418,17 @@ TCX files were chosen because they follow Knuth's original ideas for
 the use of the @samp{xchr} and @samp{xord} tables.  He ventured that
 these would be changed in the WEB source in order to adjust the actual
 version to a given environment.  It turns out, however, that
-recompiling the WEB sources is not as simple a task as Knuth
-predicted; therefore, TCX files, providing the possibility of changing
-of the conversion tables on on-the-fly, has been implemented instead.
+recompiling the WEB sources is not as simple a task as Knuth may have
+imagined; therefore, TCX files, providing the possibility of changing
+of the conversion tables on on-the-fly, have been implemented instead.
 
 This approach limits the portability of @TeX{} documents, as some
 implementations do not support it (or use a different method for
-input-internal reencoding).  It may also be problematic to determine the
-encoding to use for a @TeX{} document of unknown provenance; in the
-worst case, failure to do so correctly may result in subtle errors in
-the typeset output.
+input-internal reencoding).  It may also be problematic to determine
+the encoding to use for a @TeX{} document of unknown provenance; in
+the worst case, failure to do so correctly may result in subtle errors
+in the typeset output.  But we feel the benefits outweigh these
+disadvantages.
 
 This is entirely independent of the ML@TeX{} extension (@pxref{MLTeX}):
 whereas a TCX file defines how an input keyboard character is mapped to
@@ -1461,6 +1462,7 @@ Initial @TeX{} (@pxref{Initial TeX,,Initial @TeX{}}) ignores TCX files.
 
 @flindex il1-t1.tcx
 @flindex il2-t1.tcx
+@flindex empty.tcx
 @cindex Cork encoding and ISO input
 @cindex T1 encoding and ISO input
 The Web2c distribution comes with a number of TCX files.  Two
@@ -1468,6 +1470,20 @@ important ones are @file{il1-t1.tcx} and @file{il2-t1.tcx}, which
 support ISO Latin 1 and ISO Latin 2, respectively, with Cork-encoded
 fonts (a.k.a.@ the @LaTeX{} T1 encoding).  TCX files for Czech,
 Polish, and Slovak are also provided.
+
+One other notable TCX file is @file{empty.tcx}, which is, well,
+empty.  Its purpose is to reset Web2C's behavior to the default (only
+visible ASCII being printable, as described below) when a format was
+dumped with another TCX being active---which is in fact the case for
+everything but plain @TeX{} in the TeX Live and other distributions.
+Thus:
+
+@example
+latex somefile8.tex
+@result{} terminal etc. output with 8-bit chars
+latex --translate-file=empty.tcx somefile8.tex
+@result{} terminal etc. output with ^^ notation
+@end example
 
 @cindex syntax of TCX files
 Syntax of TCX files:
@@ -1513,13 +1529,12 @@ definition that counts.
 @cindex printable characters, specifying
 @kindex ^^ @r{notation, avoiding}
 Finally, here's what happens: when @TeX{} sees an input character with
-code @var{src}, it 1) changes @var{src} to @var{dest}; and 2) makes code
-the @var{dest} ``printable'', i.e., printed as-is in diagnostics and the
-log file instead of in @samp{^^} notation.
+code @var{src}, it 1) changes @var{src} to @var{dest}; and 2) makes the
+@var{dest} code ``printable'', i.e., printed as-is in diagnostics and the
+log file rather than in @samp{^^} notation.
 
 By default, no characters are translated, and character codes between 32
-and 126 inclusive (decimal) are printable.  It is not possible to make
-these (or any) characters unprintable.
+and 126 inclusive (decimal) are printable.
 
 Specifying translations for the printable ASCII characters (codes
 32--127) will yield unpredictable results.  Additionally you shouldn't
@@ -1539,16 +1554,17 @@ considered printable by default.  If you specify both the @samp{-8bit}
 option and a TCX file, then the TCX can set specific characters to be
 non-printable.
 
-Both the active TCX encoding and whether characters are printable are
-saved in the dump files (like @file{tex.fmt}).  So by giving these
-options in combination with @samp{-ini} you set the defaults seen by
-anyone who uses the resulting dump file.
+Both the specified TCX encoding and whether characters are printable
+are saved in the dump files (like @file{tex.fmt}).  So by giving these
+options in combination with @samp{-ini}, you control the defaults seen
+by anyone who uses the resulting dump file.
 
 When loading a dump, if the @samp{-8bit} option was given, then all
 characters become printable by default.
 
 When loading a dump, if a TCX file was specified, then the TCX data from
 the dump is ignored and the data from the file used instead.
+
 
 @node patgen invocation
 @subsection Patgen: Creating hyphenation patterns
