@@ -3,7 +3,7 @@
 %% pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %% Used convention for syntax rules is borrowed from `TeXbook naruby'
 %% by Petr Olsak.
-%% $Id: pdftex-t.tex,v 1.620 2005/08/21 19:58:16 oneiros Exp $
+%% $Id: pdftex-t.tex,v 1.622 2005/10/17 16:28:46 oneiros Exp $
 
 %% integer registers:
 \pdfoutput                                              (integer)
