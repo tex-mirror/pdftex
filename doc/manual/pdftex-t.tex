@@ -1,12 +1,12 @@
 % interface=english modes=letter,screen output=pdftex
 % vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.622 2005/10/17 16:28:46 oneiros Exp $
+% $Id: pdftex-t.tex,v 1.625 2005/12/04 13:45:30 oneiros Exp $
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
 
-\setvariables[pdftex][titlepagelines=62]
+\setvariables[pdftex][titlepagelines=63]
 
 %D We use a multi purpose style (using modes) that enable us
 %D to generate an A4, letter and screen version.
@@ -63,9 +63,9 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.622 2005/10/17 16:28:46 oneiros Exp $
+\rcsscan $Id: pdftex-t.tex,v 1.625 2005/12/04 13:45:30 oneiros Exp $
 
-\def\currentpdftex{1.30.4}
+\def\currentpdftex{1.30.5}
 
 %***********************************************************************
 
@@ -357,6 +357,7 @@
   % We use adobe metrics instead of urw metrics because tetex only
   % ships the former. Beware, these metrics differ!
 
+  \loadmapfile[context-base.map]
   \usetypescript [adobekb] [\defaultencoding]
   \usetypescript [palatino][\defaultencoding]
 
@@ -1789,7 +1790,7 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.622 2005/10/17 16:28:46 oneiros Exp $
+%%S $Id: pdftex-t.tex,v 1.625 2005/12/04 13:45:30 oneiros Exp $
 %%S NL
 %%S integer registers:
 

@@ -68,8 +68,8 @@
 @d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
 @y
 @d pdftex_version==130 { \.{\\pdftexversion} }
-@d pdftex_revision=="4" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.30.4' {current \pdfTeX\ version}
+@d pdftex_revision=="5" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='-1.30.5' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}

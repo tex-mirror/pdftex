@@ -1,4 +1,11 @@
 -------------------------------------------------
+pdfTeX 3.141592-1.30.5 was released on 2005-12-04
+-------------------------------------------------
+- bugfix: \pdfximage prints the file name twice (bug 441)
+- bugfix: buffer overflow with \pdfmatch (bug 444)
+- bugfix: updated xpdf to 3.01pl1
+
+-------------------------------------------------
 pdfTeX 3.141592-1.30.4 was released on 2005-10-17
 -------------------------------------------------
 - bugfix: whitespaces in filenames didn't work on Unix anymore (bug 377)

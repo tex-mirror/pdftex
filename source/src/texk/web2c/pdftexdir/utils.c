@@ -235,10 +235,25 @@ void pdftex_warn(const char *fmt,...)
 
 char *makecstring(integer s)
 {
-    static char cstrbuf[MAX_CSTRING_LEN];
-    char *p = cstrbuf;
-    int i, l = strstart[s + 1] - strstart[s];
+    static char *cstrbuf = NULL;
+    char *p;
+    static int allocsize;
+    int allocgrow, i, l = strstart[s + 1] - strstart[s];
     check_buf(l + 1, MAX_CSTRING_LEN);
+    if (cstrbuf == NULL) {
+        allocsize = l + 1;
+        cstrbuf = xmallocarray(char, allocsize);
+    } else if (l + 1 > allocsize) {
+        allocgrow = allocsize * 0.2;
+        if (l + 1 - allocgrow > allocsize)
+            allocsize = l + 1;
+        else if (allocsize < MAX_CSTRING_LEN - allocgrow)
+            allocsize += allocgrow;
+        else
+            allocsize = MAX_CSTRING_LEN;
+        cstrbuf = xreallocarray(cstrbuf, char, allocsize);
+    }
+    p = cstrbuf;
     for (i = 0; i < l; i++)
         *p++ = strpool[i + strstart[s]];
     *p = 0;
@@ -1112,6 +1127,8 @@ void getmatch(int i) {
   input/ouput same as makecstring:
     input: string number
     output: C string with quotes removed.
+    That means, file names that are legal on some operation systems
+    cannot any more be used since pdfTeX version 1.30.4.
 */
 char *makecfilename(strnumber s) {
     char *name = makecstring(s);
@@ -1124,6 +1141,5 @@ char *makecfilename(strnumber s) {
         p++;
     }
     *q = '\0';
-    fprintf(stderr, " %s\n", name);
     return name;
 }

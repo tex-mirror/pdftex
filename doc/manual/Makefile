@@ -1,8 +1,8 @@
-# $Id: Makefile,v 1.81 2005/04/28 23:58:56 hhenkel Exp $
+# $Id: Makefile,v 1.82 2005/10/23 22:46:32 hhenkel Exp $
 #
 # Makefile for pdfTeX documentation
 
-pdftexversion=1.21b
+pdftexversion=1.30.4
 mandir=manual
 distdate=`date +%y%m%d`
 distrev=`awk '/Id:/{print $$4; exit}' $(mandir)/pdftex-t.tex`
