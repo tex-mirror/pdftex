@@ -1,4 +1,12 @@
 ---------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-beta-20060213 was released on 2006-02-13
+---------------------------------------------------------------
+- pdftex.web has been improved a bit
+- new patch:
+  - 473 \ifabsnum and \ifabsdim
+- the manual has been updated a bit and is again included
+
+---------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-beta-20060125 was released on 2006-01-25
 ---------------------------------------------------------------
 - pdfTeX now includes pdfeTeX, i.e. there is no way to make a binary without

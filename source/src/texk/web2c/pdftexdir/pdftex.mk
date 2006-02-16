@@ -52,9 +52,11 @@ pdftex_ch_srcs = $(srcdir)/$(pdftexdir)/pdftex.web \
 pdftex.ch: $(TIE) $(pdftex_ch_srcs)
 	$(TIE) -c pdftex.ch $(pdftex_ch_srcs)
 
-# pdfetex:
+# pdfetex: (it's just a copy of pdftex)
 pdfetex: pdftex
 	cp -a pdftex pdfetex
+pdfetex.pool: pdftex.pool
+	cp -a pdftex.pool pdfetex.pool
 
 # for developing only
 pdftex-org.web: $(TIE) $(pdftex_ch_srcs_org)

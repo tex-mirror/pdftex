@@ -1,12 +1,12 @@
 % interface=english modes=letter,screen output=pdftex
 % vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.619 2005/07/22 16:12:08 oneiros Exp $
+% $Id: pdftex-t.tex,v 1.628 2006/02/10 23:32:08 hhenkel Exp $
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
 
-\setvariables[pdftex][titlepagelines=62]
+\setvariables[pdftex][titlepagelines=65]
 
 %D We use a multi purpose style (using modes) that enable us
 %D to generate an A4, letter and screen version.
@@ -63,9 +63,9 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.619 2005/07/22 16:12:08 oneiros Exp $
+\rcsscan $Id: pdftex-t.tex,v 1.628 2006/02/10 23:32:08 hhenkel Exp $
 
-\def\currentpdftex{1.30.0}
+\def\currentpdftex{1.40.0}
 
 %***********************************************************************
 
@@ -357,6 +357,7 @@
   % We use adobe metrics instead of urw metrics because tetex only
   % ships the former. Beware, these metrics differ!
 
+  \loadmapfile[context-base.map]
   \usetypescript [adobekb] [\defaultencoding]
   \usetypescript [palatino][\defaultencoding]
 
@@ -539,7 +540,7 @@
 
 \definecolumnset
   [titlepage]
-  [n=2,distance=0.5cm]
+  [n=2,distance=0.2cm]
 
 \start
 
@@ -755,7 +756,7 @@ entities, not doing any harm but not doing any good either.
 
 When a~viewer opens a~\PDF\ file, it first goes to the end of the file. There
 it finds the keyword \type{startxref}, the signal where to look for the so
-called \quote {object cross reference table}. This table provides fast access
+called \quote {object cross-reference table}. This table provides fast access
 to the objects that make up the file. The actual starting point of the file
 is defined after the \type{trailer}. The \type{/Root} entry points to the
 catalog. In this catalog the viewer can find the page list. In our example we
@@ -870,7 +871,7 @@ needed to compile \PDFTEX:
 cd $HOME/pdftex
 unzip pdftex-@currentpdftex.zip
 cd pdftex-@currentpdftex
-./Build
+./build.sh
 \stopesctyping
 
 The binaries \filename{pdftex} and \filename{pdfetex} are then
@@ -1034,6 +1035,7 @@ even without setting any parameters.
 \NC \type{\pdfoutput}              \NC integer   \NC      0 \NC \DVI                 \NC\NR
 \NC \type{\pdfadjustspacing}       \NC integer   \NC      0 \NC off                  \NC\NR
 \NC \type{\pdfcompresslevel}       \NC integer   \NC      9 \NC best                 \NC\NR
+\NC \type{\pdfobjcompresslevel}    \NC integer   \NC      0 \NC no object streams    \NC\NR
 \NC \type{\pdfdecimaldigits}       \NC integer   \NC      4 \NC max.                 \NC\NR
 \NC \type{\pdfimageresolution}     \NC integer   \NC     72 \NC dpi                  \NC\NR
 \NC \type{\pdfpkresolution}        \NC integer   \NC      0 \NC 72\,dpi              \NC\NR
@@ -1789,7 +1791,7 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.619 2005/07/22 16:12:08 oneiros Exp $
+%%S $Id: pdftex-t.tex,v 1.628 2006/02/10 23:32:08 hhenkel Exp $
 %%S NL
 %%S integer registers:
 
@@ -1811,6 +1813,10 @@ definitions and syntax rules follow after the list of primitives.
 
 \Syntax {
 \Tex {\pdfcompresslevel} \Whatever{integer}
+}
+
+\Syntax {
+\Tex {\pdfobjcompresslevel} \Whatever{integer}
 }
 
 \Syntax {
@@ -2220,7 +2226,7 @@ definitions and syntax rules follow after the list of primitives.
 }
 
 \Syntax {
-\Tex {\pdfliteral} \Optional{\Literal {direct}} \Something{general text} \Whatever{h, v, m}
+\Tex {\pdfliteral} \Optional{\Something {pdfliteral spec}} \Something{general text} \Whatever{h, v, m}
 }
 
 \Syntax {
@@ -2461,6 +2467,11 @@ definitions and syntax rules follow after the list of primitives.
 }
 
 \Syntax {
+\Something{pdfliteral spec} \Means %
+  \Literal{direct} \Or \Literal{page} %
+}
+
+\Syntax {
 \Something{pdfspecial spec} \Means %
   \Lbrace \Optional{\Something{pdfspecial id} \Optional{\Something{pdfspecial modifier}}} %
   \Something{balanced text} \Rbrace
@@ -2566,14 +2577,60 @@ command, that is obsolete by now.
 
 \bookmark{\type{\pdfcompresslevel}}
 
-This integer parameter specifies the level of stream compression (text,
-in||line graphics, and embedded \PNG\ images (only if they are un- and
-re||compressed during the embedding process); all done by the \type{zlib}
-library). Zero means no compression, 1~means fastest, 9~means best, 2..8
-means something in between. A~value outside this range will be adjusted to
-the nearest meaningful value. This parameter is read each time \PDFTEX\
-starts a~stream. Setting \type{\pdfcompresslevel=0} is great for \PDF\
-stream debugging.
+This integer parameter specifies the level of {\em stream} compression
+(text, in||line graphics, and embedded \PNG\ images (only if they are
+un- and re||compressed during the embedding process); all done by the
+\type{zlib} library). Zero means no compression, 1~means fastest, 9~means
+best, 2..8 means something in between. A~value outside this range will
+be adjusted to the nearest meaningful value. This parameter is read
+each time \PDFTEX\ starts a~stream. Setting \type{\pdfcompresslevel=0}
+is great for \PDF\ stream debugging.
+
+\pdftexprimitive {\Syntax {\Tex {\pdfobjcompresslevel} \Whatever{integer}}}
+
+\bookmark{\type{\pdfobjcompresslevel}}
+
+This integer parameter controls the compression of {\em non-stream}
+objects. In the \PDF-1.4 specification these objects still had to go into
+the \PDF\ file as clear text, uncompressed. The \PDF-1.5 specification
+now allows to collect non-stream objects as ``compressed objects'' into
+``object stream'' objects (\type{/Type /ObjStm}, see \PDF\ Ref.\ 5th~ed.,
+sect.~3.4.6). At the \PDF\ file end instead of the object table then
+an \type{/XRef} cross-reference stream is written out. This results in
+considerably smaller \PDF\ files, particularly if lots of annotations
+and links are used.
+\introduced{1.40.0}
+
+The writing of compressed objects is enabled by setting
+\type{\pdfobjcompresslevel} to a value between 1 and~3; it's
+disabled by value~0 (default). Enabling requires that also
+\type{\pdfminorversion}~$>$~4. If \type{\pdfobjcompresslevel}~$>$~0,
+but \type{\pdfminorversion}~$<$~5, a warning is given and object stream
+writing is disabled. The \type{\pdfobjcompresslevel} value is clipped
+to the range 0..3. Using values outside this range is not recommended
+(for future extension).
+
+The \type{\pdfobjcompresslevel} settings have the following effects:
+When set to~0, no object streams are generated at all. When set to~1,
+all non-stream objects are compressed with the exception of any objects
+coming with embedded \PDF\ files (``paranoid'' mode, to avoid yet unknown
+problems), and also the \type{/Info} dictionary is not compressed for
+clear-text legibility. When set to~2, also all non-stream objects coming
+with embedded \PDF\ files are compressed, but the \text{/Info} dictionary
+is still not compressed. Finally, when set to~3, all non-stream objects
+are compressed, including the \text{/Info} dictionary (this means that
+the \text{/Info} can't be read as clear text any more). If object streams
+are to be used, currently \type{\pdfobjcompresslevel=2} is recommended,
+
+\description{Caveats:} The \type{\pdfcompresslevel} feature is new and
+still somewhat experimental (feedback welcome). \PDF\ files generated
+with object streams enabled can't be viewed with (old) \PDF\ readers that
+don't understand \PDF-1.5 files. For widest distribution and unknown
+audience, don't activate object stream writing. The \PDF-1.5 standard
+describes also a hybrid object compression mode that gives some backward
+compatibility, but this is currently not implemented, as \PDF-1.5 seems
+to be rather quickly adopted by modern readers. Also not implemented is
+the optional \type{/Extends} key.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfdecimaldigits} \Whatever{integer}}}
 
@@ -3833,7 +3890,7 @@ an article thread.
 
 \subsection{Literals and specials}
 
-\pdftexprimitive {\Syntax {\Tex {\pdfliteral } \Optional{\Literal {direct}}
+\pdftexprimitive {\Syntax {\Tex {\pdfliteral} \Optional{\Something {pdfliteral spec}}
 \Something{general text}}}
 
 \bookmark{\type{\pdfliteral}}
@@ -3848,6 +3905,16 @@ command appends a~whatsit node to the list being built. \Something{general
 text} is expanded when the whatsit node is created and not when it is shipped
 out, as with \type{\special}.
 
+Starting from version 1.30.0, \PDFTEX\ allows to use \type{page} keyword
+instead of \type{direct}. Both modifies the default behaviour of
+\type{\pdfliteral}, avoiding translation of the coordinates space before
+inserting the literal code. The difference is that \type{page} keyword,
+instructs \PDFTEX\ to close \type{BT ET} block before inserting anything.
+It means that the literal code inserted  refers to the origin (lower-left
+corner of the page) and can be safely enclosed with \type{q Q}. Note, that
+in most cases, using \type{q Q} operators inside \type{\pdfliteral} with
+\type{direct} keyword, will produce corrupted PDF output.
+
 % HE: \unkern is a kludge here; wanted to have tight "{pdf:"
 \pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:} \Something{text} \Rbrace}}
 
@@ -3860,6 +3927,12 @@ This is equivalent to \Syntax{\Tex{\pdfliteral} \Lbrace \Something{text} \Rbrace
 \bookmark{\type{\special\ direct}}
 
 This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{direct} \Lbrace \Something{text} \Rbrace}.
+
+\pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:page:} \Something{text} \Rbrace}}
+
+\bookmark{\type{\special\ page}}
+
+This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{page} \Lbrace \Something{text} \Rbrace}.
 
 %***********************************************************************
 
@@ -4104,7 +4177,7 @@ produce this document, it returns {\tt \number\pdftexversion}.
 
 Returns the revision letter of \PDFTEX, \eg\ for \PDFTEX\ version
 \expandafter\versplit\the\pdftexversion.\pdftexrevision\ used to produce
-this document, it returns letter {\tt \pdftexrevision}.
+this document, it returns the letter {\tt \pdftexrevision}.
 
 \pdftexprimitive {\Syntax {\Tex {\pdftexbanner} \Whatever{expandable}}}
 

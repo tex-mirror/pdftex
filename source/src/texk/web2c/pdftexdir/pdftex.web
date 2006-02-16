@@ -1,4 +1,4 @@
-% Copyright (c) 1996-2006 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 1996-2006 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@@pdftex.org>
 
 % This file is part of pdfTeX.
 
@@ -160,7 +160,7 @@
   \ifon\startsection{\bf\ignorespaces#3.\quad}\ignorespaces}
 \let\?=\relax % we want to be able to \write a \?
 
-\def\title{\eTeX}
+\def\title{\pdfTeX}
 % system dependent redefinitions of \title should come later
 % and should use:
 %    \toks0=\expandafter{\title}
@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-beta-20060125' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-beta-20060213' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -4035,7 +4035,7 @@ for q:=hi_mem_min to mem_end do
 end;
 gubed
 
-@<Declare procedures that need to be declared forward for pdftex@>@;
+@<Declare procedures that need to be declared forward for \pdfTeX@>@;
 
 @* \[12] Displaying boxes.
 We can reinforce our knowledge of the data structures just introduced
@@ -14689,7 +14689,7 @@ while font_ptr>font_base do
 
 @* \[32a] \pdfTeX\ basic.
 
-Initialize pdftex's parameters to some useful default value.
+Initialize \pdfTeX's parameters to some useful default value.
 Helpful in case one forgets to set them during initex run.
 
 @<Initialize table entries...@>=
@@ -15129,7 +15129,7 @@ begin
     pdf_print_nl;
 end
 
-@<Declare procedures that need to be declared forward for pdftex@>=
+@<Declare procedures that need to be declared forward for \pdfTeX@>=
 procedure pdf_error(t, p: str_number);
 begin
     normalize_selector;
@@ -15315,7 +15315,7 @@ init_pdf_output := false;
 
 @ The following function divides |s| by |m|. |dd| is number of decimal digits.
 
-@<Declare procedures that need to be declared forward for pdftex@>=
+@<Declare procedures that need to be declared forward for \pdfTeX@>=
 function divide_scaled(s, m: scaled; dd: integer): scaled;
 var q, r: scaled;
     sign, i: integer;
@@ -15692,10 +15692,10 @@ begin
             j := j + length("page:");
             literal_mode := direct_page; end
         else
-            literal_mode := reset_origin;
+            literal_mode := set_origin;
     end;
     case literal_mode of
-    reset_origin: begin
+    set_origin: begin
         pdf_end_text;
         pdf_set_origin(cur_h, cur_v);
         end;
@@ -15790,11 +15790,11 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d pdf_literal_data(#)     == link(#+1) {data}
 @d pdf_literal_mode(#)     == info(#+1) {mode of resetting the text matrix
                               while writing data to the page stream}
-@# {modes of resetting the text matrix}
-@d reset_origin == 0          {end text (ET) if needed, reset text matrix}
-@d direct_page == 1           {end text (ET) if needed, don't reset text matrix}
-@d direct_always == 2         {don't reset text matrix}
-@d scan_special == 3          {look into special text}
+@# {modes of setting the current transformation matrix (CTM)}
+@d set_origin              == 0 {end text (ET) if needed, set CTM to current point}
+@d direct_page             == 1 {end text (ET) if needed, but don't change the CTM}
+@d direct_always           == 2 {don't end text, don't change the CTM}
+@d scan_special            == 3 {look into special text}
 
 @# {data structure for \.{\\pdfobj} and \.{\\pdfrefobj}}
 @d pdf_refobj_node_size    == 2 {size of whatsit node representing the raw object}
@@ -15849,8 +15849,8 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d pdf_link_objnum(#)      == mem[# + 6].int {object number of corresponding object}
 
 @# {types of actions}
-@d pdf_action_page         == 0 {Goto action}
-@d pdf_action_goto         == 1 {Goto action}
+@d pdf_action_page         == 0 {GoTo action}
+@d pdf_action_goto         == 1 {GoTo action}
 @d pdf_action_thread       == 2 {Thread action}
 @d pdf_action_user         == 3 {user-defined action}
 
@@ -15861,7 +15861,7 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d pdf_action_id           == link {destination/thread name identifier}
 @d pdf_action_file(#)      == info(# + 1) {file name for external action}
 @d pdf_action_new_window(#)== link(# + 1) {open a new window?}
-@d pdf_action_page_tokens(#) == info(# + 2) {specification of goto page action}
+@d pdf_action_page_tokens(#) == info(# + 2) {specification of GoTo page action}
 @d pdf_action_user_tokens(#) == info(# + 2) {user-defined action string}
 @d pdf_action_refcount(#)  == link(# + 2) {counter of references to this action}
 
@@ -15979,7 +15979,6 @@ pdf_box_spec_bleed  := 3;
 pdf_box_spec_trim   := 4;
 pdf_box_spec_art    := 5;
 
-
 @ Here we implement subroutines for work with objects and related things.
 Some of them are used in former parts too, so we need to declare them
 forward.
@@ -15993,7 +15992,7 @@ forward.
         ff := #;
 end
 
-@<Declare procedures that need to be declared forward for pdftex@>=
+@<Declare procedures that need to be declared forward for \pdfTeX@>=
 procedure append_dest_name(s: str_number; n: integer);
 var a: integer;
 begin
@@ -16124,7 +16123,13 @@ begin
     end;
 end;
 
-procedure pdf_end_obj;
+procedure pdf_new_obj(t, i: integer; pdf_os: integer); {begin a new PDF object}
+begin
+    pdf_create_obj(t, i);
+    pdf_begin_obj(obj_ptr, pdf_os);
+end;
+
+procedure pdf_end_obj; {end a PDF object}
 begin
     if pdf_os_mode then begin
         if pdf_os_objidx = pdf_os_max_objs - 1 then
@@ -16148,7 +16153,13 @@ begin
     pdf_print_ln("<<");
 end;
 
-procedure pdf_end_dict; {end a PDF object of type dictionary}
+procedure pdf_new_dict(t, i: integer; pdf_os: integer); {begin a new PDF dictionary object}
+begin
+    pdf_create_obj(t, i);
+    pdf_begin_dict(obj_ptr, pdf_os);
+end;
+
+procedure pdf_end_dict; {end a PDF dictionary object}
 begin
     if pdf_os_mode then begin
         pdf_print_ln(">>");
@@ -16158,14 +16169,16 @@ begin
         pdf_print_ln(">> endobj");
 end;
 
-procedure pdf_os_write_objstream;
-{Write out the accumulated object stream.
+@ Write out an accumulated object stream.
 First the object number and byte offset pairs are generated
 and appended to the ready buffered object stream.
 By this the value of \.{/First} can be calculated.
 Then a new \.{/ObjStm} object is generated, and everything is
 copied to the PDF output buffer, where also compression is done.
-When calling this procedure, |pdf_os_mode| must be |true|.}
+When calling this procedure, |pdf_os_mode| must be |true|.
+
+@<Declare procedures that need to be declared forward for \pdfTeX@>=
+procedure pdf_os_write_objstream;
 var i, j, p, q: pointer;
 begin
     if pdf_os_cur_objnum = 0 then {no object stream started}
@@ -16215,18 +16228,7 @@ begin
     pdf_os_cur_objnum := 0; {to force object stream generation next time}
 end;
 
-procedure pdf_new_obj(t, i: integer; pdf_os: integer); {begin to a new object}
-begin
-    pdf_create_obj(t, i);
-    pdf_begin_obj(obj_ptr, pdf_os);
-end;
-
-procedure pdf_new_dict(t, i: integer; pdf_os: integer); {begin a new object with type dictionary}
-begin
-    pdf_create_obj(t, i);
-    pdf_begin_dict(obj_ptr, pdf_os);
-end;
-
+@ @<Declare procedures that need to be declared forward for \pdfTeX@>=
 function append_ptr(p: pointer; i: integer): pointer; {appends a pointer with
 info |i| to the end of linked list with head |p|}
 var q: pointer;
@@ -16393,15 +16395,15 @@ end;
 
 @* \[32e] Font processing.
 
-As pdfTeX should also act as a back-end driver, it needs to support virtual
-font too. Information about virtual font can be found in source of some
+As \pdfTeX{} should also act as a back-end driver, it needs to support virtual
+fonts too. Information about virtual fonts can be found in the source of some
 \.{DVI}-related programs.
 
 Whenever we want to write out a character in a font to PDF output, we
-should check whether the used font is new font (has not been used yet),
-virtual font or real font. The array |pdf_font_type| holds flag of each used
-font. After initialization flag of each font is set to |new_font_type|.
-The first time when a character of a font is written out, pdfTeX looks for
+should check whether the used font is a new (has not been used yet),
+virtual or real font. The array |pdf_font_type| holds a flag of each used
+font. After initialization the flag of each font is set to |new_font_type|.
+The first time a character of a font is written out, \pdfTeX{} looks for
 the corresponding virtual font. If the corresponding virtual font exists, then
 the font type is set to |virtual_font_type|; otherwise it will be set to
 |real_font_type|. |subst_font_type| indicates fonts that have been substituted
@@ -16425,7 +16427,7 @@ end
         do_vf;
     end
 
-@<Declare procedures that need to be declared forward...@>=
+@<Declare procedures that need to be declared forward for \pdfTeX@>=
 procedure pdf_create_font_obj; forward;
 procedure do_vf; forward;
 procedure scan_pdf_ext_toks; forward;
@@ -16599,10 +16601,6 @@ var k: integer;
     c: eight_bits;
     f: internal_font_number;
 begin
-    breadth_max := 10;
-    depth_threshold := 2;
-    show_node_list(p);
-    print_ln;
     if (not is_char_node(p)) and (type(p) <> ligature_node) then
         return;
     if is_char_node(p) then begin
@@ -18708,7 +18706,7 @@ else begin
     created}
     if total_pages mod pages_tree_kids_max <> 0 then
         obj_info(pdf_last_pages) := total_pages mod pages_tree_kids_max;
-    {last pages object may have less than |pages_tree_kids_max| chilrend}
+    {last pages object may have less than |pages_tree_kids_max| children}
     @<Check for non-existing pages@>;
     @<Reverse the linked list of Page and Pages objects@>;
     @<Check for non-existing destinations@>;
@@ -19163,7 +19161,7 @@ print_ID(output_file_name);
 pdf_print_nl;
 pdf_begin_stream;
 for k := 0 to sys_obj_ptr do begin
-    if obj_offset(k) = 0 then begin {free object}
+    if obj_offset(k) = 0 then begin {a free object}
         pdf_out(0);
         pdf_out_bytes(obj_link(k), xref_offset_width);
         pdf_out(255);
@@ -32271,37 +32269,37 @@ stays the same.
 @d immediate_code=4 {command modifier for \.{\\immediate}}
 @d set_language_code=5 {command modifier for \.{\\setlanguage}}
 @d pdftex_first_extension_code = 6
-@d pdf_literal_node            == pdftex_first_extension_code + 0
-@d pdf_obj_code                == pdftex_first_extension_code + 1
-@d pdf_refobj_node             == pdftex_first_extension_code + 2
-@d pdf_xform_code              == pdftex_first_extension_code + 3
-@d pdf_refxform_node           == pdftex_first_extension_code + 4
-@d pdf_ximage_code             == pdftex_first_extension_code + 5
-@d pdf_refximage_node          == pdftex_first_extension_code + 6
 @d pdf_annot_node              == pdftex_first_extension_code + 7
-@d pdf_start_link_node         == pdftex_first_extension_code + 8
-@d pdf_end_link_node           == pdftex_first_extension_code + 9
-@d pdf_outline_code            == pdftex_first_extension_code + 10
-@d pdf_dest_node               == pdftex_first_extension_code + 11
-@d pdf_thread_node             == pdftex_first_extension_code + 12
-@d pdf_start_thread_node       == pdftex_first_extension_code + 13
-@d pdf_end_thread_node         == pdftex_first_extension_code + 14
-@d pdf_save_pos_node           == pdftex_first_extension_code + 15
-@d pdf_info_code               == pdftex_first_extension_code + 16
 @d pdf_catalog_code            == pdftex_first_extension_code + 17
-@d pdf_names_code              == pdftex_first_extension_code + 18
+@d pdf_dest_node               == pdftex_first_extension_code + 11
+@d pdf_end_link_node           == pdftex_first_extension_code + 9
+@d pdf_end_thread_node         == pdftex_first_extension_code + 14
 @d pdf_font_attr_code          == pdftex_first_extension_code + 19
+@d pdf_font_expand_code        == pdftex_first_extension_code + 25
 @d pdf_include_chars_code      == pdftex_first_extension_code + 20
+@d pdf_info_code               == pdftex_first_extension_code + 16
+@d pdf_literal_node            == pdftex_first_extension_code + 0
 @d pdf_map_file_code           == pdftex_first_extension_code + 21
 @d pdf_map_line_code           == pdftex_first_extension_code + 22
+@d pdf_names_code              == pdftex_first_extension_code + 18
+@d pdf_obj_code                == pdftex_first_extension_code + 1
+@d pdf_outline_code            == pdftex_first_extension_code + 10
+@d pdf_refobj_node             == pdftex_first_extension_code + 2
+@d pdf_refxform_node           == pdftex_first_extension_code + 4
+@d pdf_refximage_node          == pdftex_first_extension_code + 6
+@d pdf_save_pos_node           == pdftex_first_extension_code + 15
+@d pdf_snap_ref_point_node     == pdftex_first_extension_code + 27
+@d pdf_snapy_comp_node         == pdftex_first_extension_code + 29
+@d pdf_snapy_node              == pdftex_first_extension_code + 28
+@d pdf_start_link_node         == pdftex_first_extension_code + 8
+@d pdf_start_thread_node       == pdftex_first_extension_code + 13
+@d pdf_thread_node             == pdftex_first_extension_code + 12
 @d pdf_trailer_code            == pdftex_first_extension_code + 23
+@d pdf_xform_code              == pdftex_first_extension_code + 3
+@d pdf_ximage_code             == pdftex_first_extension_code + 5
 @d reset_timer_code            == pdftex_first_extension_code + 24
-@d pdf_font_expand_code        == pdftex_first_extension_code + 25
 @d set_random_seed_code        == pdftex_first_extension_code + 26
-@d pdf_snap_ref_point_node       == pdftex_first_extension_code + 27
-@d pdf_snapy_node                == pdftex_first_extension_code + 28
-@d pdf_snapy_comp_node           == pdftex_first_extension_code + 29
-@d pdftex_last_extension_code    == pdftex_first_extension_code + 29
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 29
 
 @<Put each...@>=
 primitive("openout",extension,open_node);@/
@@ -32391,36 +32389,36 @@ extension: case chr_code of
   special_node:print_esc("special");
   immediate_code:print_esc("immediate");
   set_language_code:print_esc("setlanguage");
-  pdf_font_expand_code: print_esc("pdffontexpand");
-  pdf_literal_node: print_esc("pdfliteral");
-  pdf_obj_code: print_esc("pdfobj");
-  pdf_refobj_node: print_esc("pdfrefobj");
-  pdf_xform_code: print_esc("pdfxform");
-  pdf_refxform_node: print_esc("pdfrefxform");
-  pdf_ximage_code: print_esc("pdfximage");
-  pdf_refximage_node: print_esc("pdfrefximage");
   pdf_annot_node: print_esc("pdfannot");
-  pdf_start_link_node: print_esc("pdfstartlink");
-  pdf_end_link_node: print_esc("pdfendlink");
-  pdf_outline_code: print_esc("pdfoutline");
-  pdf_dest_node: print_esc("pdfdest");
-  pdf_thread_node: print_esc("pdfthread");
-  pdf_start_thread_node: print_esc("pdfstartthread");
-  pdf_end_thread_node: print_esc("pdfendthread");
-  pdf_save_pos_node: print_esc("pdfsavepos");
-  pdf_info_code: print_esc("pdfinfo");
   pdf_catalog_code: print_esc("pdfcatalog");
-  pdf_names_code: print_esc("pdfnames");
-  pdf_include_chars_code: print_esc("pdfincludechars");
+  pdf_dest_node: print_esc("pdfdest");
+  pdf_end_link_node: print_esc("pdfendlink");
+  pdf_end_thread_node: print_esc("pdfendthread");
   pdf_font_attr_code: print_esc("pdffontattr");
+  pdf_font_expand_code: print_esc("pdffontexpand");
+  pdf_include_chars_code: print_esc("pdfincludechars");
+  pdf_info_code: print_esc("pdfinfo");
+  pdf_literal_node: print_esc("pdfliteral");
   pdf_map_file_code: print_esc("pdfmapfile");
   pdf_map_line_code: print_esc("pdfmapline");
+  pdf_names_code: print_esc("pdfnames");
+  pdf_obj_code: print_esc("pdfobj");
+  pdf_outline_code: print_esc("pdfoutline");
+  pdf_refobj_node: print_esc("pdfrefobj");
+  pdf_refxform_node: print_esc("pdfrefxform");
+  pdf_refximage_node: print_esc("pdfrefximage");
+  pdf_save_pos_node: print_esc("pdfsavepos");
+  pdf_snap_ref_point_node: print_esc("pdfsnaprefpoint");
+  pdf_snapy_comp_node: print_esc("pdfsnapycomp");
+  pdf_snapy_node: print_esc("pdfsnapy");
+  pdf_start_link_node: print_esc("pdfstartlink");
+  pdf_start_thread_node: print_esc("pdfstartthread");
+  pdf_thread_node: print_esc("pdfthread");
   pdf_trailer_code: print_esc("pdftrailer");
+  pdf_xform_code: print_esc("pdfxform");
+  pdf_ximage_code: print_esc("pdfximage");
   reset_timer_code: print_esc("pdfresettimer");
   set_random_seed_code: print_esc("pdfsetrandomseed");
-  pdf_snap_ref_point_node: print_esc("pdfsnaprefpoint");
-  pdf_snapy_node: print_esc("pdfsnapy");
-  pdf_snapy_comp_node: print_esc("pdfsnapycomp");
   othercases print("[unknown extension!]")
   endcases;
 
@@ -32436,42 +32434,42 @@ procedure do_extension;
 var i,@!j,@!k:integer; {all-purpose integers}
 @!p,@!q,@!r:pointer; {all-purpose pointers}
 begin case cur_chr of
-open_node:@<Implement \.{\\openout}@>;
-write_node:@<Implement \.{\\write}@>;
-close_node:@<Implement \.{\\closeout}@>;
-special_node:@<Implement \.{\\special}@>;
-immediate_code:@<Implement \.{\\immediate}@>;
-set_language_code:@<Implement \.{\\setlanguage}@>;
-pdf_font_expand_code: @<Implement \.{\\pdffontexpand}@>;
-pdf_literal_node: @<Implement \.{\\pdfliteral}@>;
-pdf_obj_code: @<Implement \.{\\pdfobj}@>;
-pdf_refobj_node: @<Implement \.{\\pdfrefobj}@>;
-pdf_xform_code: @<Implement \.{\\pdfxform}@>;
-pdf_refxform_node: @<Implement \.{\\pdfrefxform}@>;
-pdf_ximage_code: @<Implement \.{\\pdfximage}@>;
-pdf_refximage_node: @<Implement \.{\\pdfrefximage}@>;
-pdf_annot_node: @<Implement \.{\\pdfannot}@>;
-pdf_start_link_node: @<Implement \.{\\pdfstartlink}@>;
-pdf_end_link_node: @<Implement \.{\\pdfendlink}@>;
-pdf_outline_code: @<Implement \.{\\pdfoutline}@>;
-pdf_dest_node: @<Implement \.{\\pdfdest}@>;
-pdf_thread_node: @<Implement \.{\\pdfthread}@>;
-pdf_start_thread_node: @<Implement \.{\\pdfstartthread}@>;
-pdf_end_thread_node: @<Implement \.{\\pdfendthread}@>;
-pdf_save_pos_node: @<Implement \.{\\pdfsavepos}@>;
-pdf_snap_ref_point_node: @<Implement \.{\\pdfsnaprefpoint}@>;
-pdf_snapy_node: @<Implement \.{\\pdfsnapy}@>;
-pdf_snapy_comp_node: @<Implement \.{\\pdfsnapycomp}@>;
-pdf_info_code: @<Implement \.{\\pdfinfo}@>;
-pdf_catalog_code: @<Implement \.{\\pdfcatalog}@>;
-pdf_names_code: @<Implement \.{\\pdfnames}@>;
-pdf_include_chars_code: @<Implement \.{\\pdfincludechars}@>;
-pdf_font_attr_code: @<Implement \.{\\pdffontattr}@>;
-pdf_map_file_code: @<Implement \.{\\pdfmapfile}@>;
-pdf_map_line_code: @<Implement \.{\\pdfmapline}@>;
-pdf_trailer_code: @<Implement \.{\\pdftrailer}@>;
-reset_timer_code: @<Implement \.{\\pdfresettimer}@>;
-set_random_seed_code: @<Implement \.{\\pdfsetrandomseed}@>;
+  open_node:@<Implement \.{\\openout}@>;
+  write_node:@<Implement \.{\\write}@>;
+  close_node:@<Implement \.{\\closeout}@>;
+  special_node:@<Implement \.{\\special}@>;
+  immediate_code:@<Implement \.{\\immediate}@>;
+  set_language_code:@<Implement \.{\\setlanguage}@>;
+  pdf_annot_node: @<Implement \.{\\pdfannot}@>;
+  pdf_catalog_code: @<Implement \.{\\pdfcatalog}@>;
+  pdf_dest_node: @<Implement \.{\\pdfdest}@>;
+  pdf_end_link_node: @<Implement \.{\\pdfendlink}@>;
+  pdf_end_thread_node: @<Implement \.{\\pdfendthread}@>;
+  pdf_font_attr_code: @<Implement \.{\\pdffontattr}@>;
+  pdf_font_expand_code: @<Implement \.{\\pdffontexpand}@>;
+  pdf_include_chars_code: @<Implement \.{\\pdfincludechars}@>;
+  pdf_info_code: @<Implement \.{\\pdfinfo}@>;
+  pdf_literal_node: @<Implement \.{\\pdfliteral}@>;
+  pdf_map_file_code: @<Implement \.{\\pdfmapfile}@>;
+  pdf_map_line_code: @<Implement \.{\\pdfmapline}@>;
+  pdf_names_code: @<Implement \.{\\pdfnames}@>;
+  pdf_obj_code: @<Implement \.{\\pdfobj}@>;
+  pdf_outline_code: @<Implement \.{\\pdfoutline}@>;
+  pdf_refobj_node: @<Implement \.{\\pdfrefobj}@>;
+  pdf_refxform_node: @<Implement \.{\\pdfrefxform}@>;
+  pdf_refximage_node: @<Implement \.{\\pdfrefximage}@>;
+  pdf_save_pos_node: @<Implement \.{\\pdfsavepos}@>;
+  pdf_snap_ref_point_node: @<Implement \.{\\pdfsnaprefpoint}@>;
+  pdf_snapy_comp_node: @<Implement \.{\\pdfsnapycomp}@>;
+  pdf_snapy_node: @<Implement \.{\\pdfsnapy}@>;
+  pdf_start_link_node: @<Implement \.{\\pdfstartlink}@>;
+  pdf_start_thread_node: @<Implement \.{\\pdfstartthread}@>;
+  pdf_thread_node: @<Implement \.{\\pdfthread}@>;
+  pdf_trailer_code: @<Implement \.{\\pdftrailer}@>;
+  pdf_xform_code: @<Implement \.{\\pdfxform}@>;
+  pdf_ximage_code: @<Implement \.{\\pdfximage}@>;
+  reset_timer_code: @<Implement \.{\\pdfresettimer}@>;
+  set_random_seed_code: @<Implement \.{\\pdfsetrandomseed}@>;
 othercases confusion("ext1")
 @:this can't happen ext1}{\quad ext1@>
 endcases;
@@ -32623,7 +32621,7 @@ begin
     else if scan_keyword("page") then
         pdf_literal_mode(tail) := direct_page
     else
-        pdf_literal_mode(tail) := reset_origin;
+        pdf_literal_mode(tail) := set_origin;
     scan_pdf_ext_toks;
     pdf_literal_data(tail) := def_ref;
 end
@@ -32687,7 +32685,7 @@ end
 
 @ We need to check whether the referenced object exists.
 
-@<Declare procedures that need to be declared forward for pdftex@>=
+@<Declare procedures that need to be declared forward for \pdfTeX@>=
 function prev_rightmost(s, e: pointer): pointer;
 {finds the node preceding the rightmost node |e|; |s| is some node
 before |e|}
@@ -32962,19 +32960,19 @@ begin
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
     if pdf_option_always_use_pdfpagebox <> 0 then begin
-        pdf_warning("pdf inclusion", "Primitive \pdfoptionalwaysusepdfpagebox is obsolete; use \pdfpagebox instead.", true);
+        pdf_warning("PDF inclusion", "Primitive \pdfoptionalwaysusepdfpagebox is obsolete; use \pdfpagebox instead.", true);
         pdf_force_pagebox := pdf_option_always_use_pdfpagebox;
         pdf_option_always_use_pdfpagebox := 0; {warn once}
         warn_pdfpagebox := false;
     end;
     if pdf_option_pdf_inclusion_errorlevel <> 0 then begin
-        pdf_warning("pdf inclusion", "Primitive \pdfoptionpdfinclusionerrorlevel is obsolete; use \pdfinclusionerrorlevel instead.", true);
+        pdf_warning("PDF inclusion", "Primitive \pdfoptionpdfinclusionerrorlevel is obsolete; use \pdfinclusionerrorlevel instead.", true);
         pdf_inclusion_errorlevel := pdf_option_pdf_inclusion_errorlevel;
         pdf_option_pdf_inclusion_errorlevel := 0; {warn once}
     end;
     if pdf_force_pagebox > 0 then begin
         if warn_pdfpagebox then begin
-            pdf_warning("pdf inclusion", "Primitive \pdfforcepagebox is obsolete; use \pdfpagebox instead.", true);
+            pdf_warning("PDF inclusion", "Primitive \pdfforcepagebox is obsolete; use \pdfpagebox instead.", true);
             warn_pdfpagebox := false;
         end;
         pagebox := pdf_force_pagebox;
@@ -33019,7 +33017,7 @@ end
   to declare it together with subroutines needed in |pdf_hlist_out| and
   |pdf_vlist_out|.
 
-@<Declare procedures that need to be declared forward for pdftex@>=
+@<Declare procedures that need to be declared forward for \pdfTeX@>=
 function find_obj(t, i: integer; byname: boolean): integer;
 begin
     find_obj := avl_find_obj(t, i, byname);
@@ -33769,7 +33767,7 @@ language_node:begin print_esc("setlanguage");
 pdf_literal_node: begin
     print_esc("pdfliteral");
     case pdf_literal_mode(p) of
-    reset_origin:
+    set_origin:
         do_nothing;
     direct_page:
         print(" page");
@@ -34403,7 +34401,7 @@ pdf_catalog_openaction := 0;
 pdf_trailer_toks := null;
 
 @ The following procedures are needed for outputing whatsit nodes for
-pdfTeX.
+\pdfTeX{}.
 
 @<Declare procedures needed in |pdf_hlist_out|, |pdf_vlist_out|@>=
 procedure write_action(p: pointer); {write an action specification}
@@ -36604,6 +36602,8 @@ if j=1 then
 @d if_cs_code=18 { `\.{\\ifcsname}' }
 @d if_font_char_code=19 { `\.{\\iffontchar}' }
 @d if_in_csname_code=20 { `\.{\\ifincsname}' }
+@d if_abs_num_code=22 { `\.{\\ifabsnum}' } { 21 = |if_primitive|}
+@d if_abs_dim_code=23 { `\.{\\ifabsdim}' }
 
 @<Generate all \eTeX...@>=
 primitive("unless",expand_after,1);@/
@@ -36616,6 +36616,10 @@ primitive("iffontchar",if_test,if_font_char_code);
 @!@:if_font_char_}{\.{\\iffontchar} primitive@>
 primitive("ifincsname",if_test,if_in_csname_code);
 @!@:if_in_csname_}{\.{\\ifincsname} primitive@>
+primitive("ifabsnum",if_test,if_abs_num_code);
+@!@:if_abs_num_}{\.{\\ifabsnum} primitive@>
+primitive("ifabsdim",if_test,if_abs_dim_code);
+@!@:if_abs_dim_}{\.{\\ifabsdim} primitive@>
 
 @ @<Cases of |expandafter| for |print_cmd_chr|@>=
 else print_esc("unless")
@@ -36625,6 +36629,8 @@ if_def_code:print_esc("ifdefined");
 if_cs_code:print_esc("ifcsname");
 if_font_char_code:print_esc("iffontchar");
 if_in_csname_code:print_esc("ifincsname");
+if_abs_num_code:print_esc("ifabsnum");
+if_abs_dim_code:print_esc("ifabsdim");
 
 @ The result of a boolean condition is reversed when the conditional is
 preceded by \.{\\unless}.
@@ -36691,6 +36697,27 @@ a font.
 
 @<Cases for |conditional|@>=
 if_in_csname_code: b := is_in_csname;
+if_abs_dim_code, if_abs_num_code: begin
+  if this_if=if_abs_num_code then scan_int@+else scan_normal_dimen;
+  n:=cur_val;
+  if n < 0 then negate(n);
+  @<Get the next non-blank non-call...@>;
+  if (cur_tok>=other_token+"<")and(cur_tok<=other_token+">") then
+    r:=cur_tok-other_token
+  else  begin print_err("Missing = inserted for ");
+  @.Missing = inserted@>
+    print_cmd_chr(if_test,this_if);
+    help1("I was expecting to see `<', `=', or `>'. Didn't.");
+    back_error; r:="=";
+    end;
+  if this_if=if_abs_num_code then scan_int@+else scan_normal_dimen;
+  if cur_val < 0 then negate(cur_val);
+  case r of
+  "<": b:=(n<cur_val);
+  "=": b:=(n=cur_val);
+  ">": b:=(n>cur_val);
+  end;
+  end;
 if_font_char_code:begin scan_font_ident; n:=cur_val; scan_char_num;
   if (font_bc[n]<=cur_val)and(font_ec[n]>=cur_val) then
     b:=char_exists(char_info(n)(qi(cur_val)))

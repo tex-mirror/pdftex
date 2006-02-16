@@ -58,8 +58,8 @@
 @d banner==TeX_banner
 @d banner_k==TeX_banner_k
 @y
-@d banner==pdfeTeX_banner
-@d banner_k==pdfeTeX_banner_k
+@d banner==pdfTeX_banner
+@d banner_k==pdfTeX_banner_k
 @z
 
 @x [17.236] l.4960 - first web2c, then e-TeX additional integer parameters

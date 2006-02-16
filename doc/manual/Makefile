@@ -1,8 +1,8 @@
-# $Id: Makefile,v 1.81 2005/04/28 23:58:56 hhenkel Exp $
+# $Id: Makefile,v 1.84 2006/02/10 21:43:21 hhenkel Exp $
 #
 # Makefile for pdfTeX documentation
 
-pdftexversion=1.21b
+pdftexversion=1.30.4
 mandir=manual
 distdate=`date +%y%m%d`
 distrev=`awk '/Id:/{print $$4; exit}' $(mandir)/pdftex-t.tex`
@@ -48,7 +48,7 @@ pdftex-t.txt:	pdftex-w.pdf Makefile
 	cat $< \
 	| expand \
 	| sed -e '/\/Differences/s/\// \//g' \
-	| fmt -s -w45 \
+	| fmt -s -w43 \
 	| sed -e '/Differences/,/endobj/s/ //g' \
 	| grep . \
 	| expand \
@@ -58,7 +58,7 @@ pdftex-w.pdf:	pdftex-w.tex
 	pdfetex $<
 
 pdftex-syntax.txt:	pdftex-t.tex syntaxform.awk
-	awk -f syntaxform.awk $< > $@
+	gawk -f syntaxform.awk $< > $@
 
 # tar/zip including pdftex-a.pdf, pdftex-l.pdf, pdftex-s.pdf:
 
