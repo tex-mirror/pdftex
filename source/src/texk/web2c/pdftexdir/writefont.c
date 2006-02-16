@@ -46,7 +46,7 @@ boolean write_ttf_glyph_names;
 char fontname_buf[FONTNAME_BUF_SIZE];
 
 static int first_char, last_char;
-static integer char_widths[MAX_CHAR_CODE + 1];
+static integer char_widths[256];
 static boolean write_fontfile_only;
 static int char_widths_objnum,
            encoding_objnum;
@@ -91,7 +91,7 @@ static void getbbox(void)
 static void get_char_widths(void)
 {
     int i;
-    for (i = 0; i <= MAX_CHAR_CODE; i++) {
+    for (i = 0; i < 256; i++) {
         if (i < fontbc[tex_font] || i > fontec[tex_font])
             char_widths[i] = 0;
         else
@@ -99,11 +99,11 @@ static void get_char_widths(void)
     }
     for (i = fontbc[tex_font]; i <= 32; i++)
         char_widths[pdfcharmap[tex_font][i]] = char_widths[i];
-    for (i = fontbc[tex_font]; i <= MAX_CHAR_CODE; i++)
+    for (i = fontbc[tex_font]; i < 256; i++)
         if (pdfcharmarked(tex_font, i))
             break;
     first_char = i;
-    for (i = MAX_CHAR_CODE; i > first_char;  i--)
+    for (i = 255; i > first_char;  i--)
         if (pdfcharmarked(tex_font, i))
             break;
     last_char = i;
@@ -238,7 +238,7 @@ static void write_fontdescriptor(void)
         if (is_subsetted(fm_cur) && !is_truetype(fm_cur)) {
             cur_glyph_names = t1_glyph_names;
             pdf_puts("/CharSet (");
-            for (i = 0; i <= MAX_CHAR_CODE; i++)
+            for (i = 0; i < 256; i++)
                 if (pdfcharmarked(tex_font, i) && cur_glyph_names[i] != notdef)
                     pdf_printf("/%s", cur_glyph_names[i]);
             pdf_puts(")\n");
@@ -304,7 +304,7 @@ void dopdffont(integer font_objnum, internalfontnumber f)
         write_char_widths();
     }
     if (cur_glyph_names == t1_builtin_glyph_names) {
-        for (i = 0; i <= MAX_CHAR_CODE; i++)
+        for (i = 0; i <= 256; i++)
             if (cur_glyph_names[i] != notdef)
                 xfree(cur_glyph_names[i]);
     }

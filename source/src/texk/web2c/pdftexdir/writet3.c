@@ -36,8 +36,8 @@ define_array(t3_line);
 FILE *t3_file;
 static boolean t3_image_used;
 
-static integer t3_char_procs[MAX_CHAR_CODE + 1];
-static float t3_char_widths[MAX_CHAR_CODE + 1];
+static integer t3_char_procs[256];
+static float t3_char_widths[256];
 static int t3_glyph_num;
 static float t3_font_scale;
 static integer t3_b0, t3_b1, t3_b2, t3_b3;
@@ -275,7 +275,7 @@ void writet3(int objnum, internalfontnumber f)
     boolean is_notdef;
     t3_glyph_num = 0;
     t3_image_used = false;
-    for (i = 0; i <= MAX_CHAR_CODE; i++) {
+    for (i = 0; i < 256; i++) {
         t3_char_procs[i] = 0;
         t3_char_widths[i] = 0;
     }

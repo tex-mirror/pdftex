@@ -66,8 +66,6 @@ $Id: ptexmac.h,v 1.14 2005/11/29 22:05:23 hahe Exp $
 #define pdfoffset()     (pdfgone + pdfptr)
 #define pdfinitfont(f)  {tmpf = f; pdfcreatefontobj();}
 
-#define MAX_CHAR_CODE       255
-
 #define PRINTF_BUF_SIZE     1024
 #define MAX_CSTRING_LEN     1024
 #define MAX_PSTRING_LEN     1024
@@ -75,9 +73,11 @@ $Id: ptexmac.h,v 1.14 2005/11/29 22:05:23 hahe Exp $
 #define SMALL_ARRAY_SIZE    256
 #define FONTNAME_BUF_SIZE   128 /* a PDF name can be maximum 127 chars long */
 
+#define pdftex_debug    tex_printf
+
 #define check_buf(size, buf_size)                          \
     if ((size) > (buf_size))                               \
-        pdftex_fail("buffer overflow", (buf_size));
+        pdftex_fail("buffer overflow at file %s, line %1", __FILE__,  __LINE__)
 
 #define append_char_to_buf(c, p, buf, buf_size) do {       \
     if (c == 9)                                            \
@@ -157,16 +157,19 @@ size_t          T##_limit
 #define F_SUBSETTED         0x02
 #define F_TRUETYPE          0x04
 #define F_BASEFONT          0x08
+#define F_SUBFONT           0x10
 
 #define set_included(fm)    ((fm)->type |= F_INCLUDED)
 #define set_subsetted(fm)   ((fm)->type |= F_SUBSETTED)
 #define set_truetype(fm)    ((fm)->type |= F_TRUETYPE)
 #define set_basefont(fm)    ((fm)->type |= F_BASEFONT)
+#define set_subfont(fm)     ((fm)->type |= F_SUBFONT)
 
 #define unset_included(fm)  ((fm)->type &= ~F_INCLUDED)
 #define unset_subsetted(fm) ((fm)->type &= ~F_SUBSETTED)
 #define unset_truetype(fm)  ((fm)->type &= ~F_TRUETYPE)
 #define unset_basefont(fm)  ((fm)->type &= ~F_BASEFONT)
+#define unset_subfont(fm)   ((fm)->type &= ~F_SUBFONT)
 
 #define unset_fontfile(fm)  xfree((fm)->ff_name)
 
@@ -174,6 +177,7 @@ size_t          T##_limit
 #define is_subsetted(fm)    ((fm)->type & F_SUBSETTED)
 #define is_truetype(fm)     ((fm)->type & F_TRUETYPE)
 #define is_basefont(fm)     ((fm)->type & F_BASEFONT)
+#define is_subfont(fm)      ((fm)->type & F_SUBFONT)
 #define no_font_desc(fm)    (is_basefont(fm) && !is_included(fm))
 
 #define fm_slant(fm)        (fm)->slant
@@ -197,5 +201,11 @@ size_t          T##_limit
 #define set_cur_file_name(s)      \
     cur_file_name = s;      \
     packfilename(maketexstring(cur_file_name), getnullstr(), getnullstr())
+
+#define cmp_return(a, b) \
+    if (a > b)           \
+        return 1;        \
+    if (a < b)           \
+        return -1
 
 #endif  /* PDFTEXMAC */

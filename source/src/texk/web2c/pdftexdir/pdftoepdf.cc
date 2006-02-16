@@ -49,22 +49,6 @@ $Id: pdftoepdf.cc,v 1.1 2005/11/28 23:44:56 hahe Exp $
 static const char perforce_id[] = 
     "$Id: pdftoepdf.cc,v 1.1 2005/11/28 23:44:56 hahe Exp $";
 
-/* we avoid reading all necessary kpathsea headers, but we need xstrdup */
-#ifdef __cplusplus
-extern "C" {
-  extern KPSEDLL char *xstrdup (const char *);
-}
-#else
-  extern KPSEDLL char *xstrdup (const char *);
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-// FIXME: This definition is a duplicate from ../pdftexcoerce.h, which is
-// not usable here because of different macro definitions.
-extern integer pdflastpdfboxspec ;
-}
-#endif
 
 /*
  * Used flags below:
@@ -80,18 +64,6 @@ extern integer pdflastpdfboxspec ;
  *      an error and abort gracefully. This is only evaluated if
  *      PDFTEX_COPY_PAGEGROUP is set.
  */
-
-// FIXME: These definitions are duplicates from pdftexd.h
-/* #define PDF_PDF_BOX_SPEC_MEDIA 0 */
-/* #define PDF_PDF_BOX_SPEC_CROP  1 */
-/* #define PDF_PDF_BOX_SPEC_BLEED 2 */
-/* #define PDF_PDF_BOX_SPEC_TRIM  3 */
-/* #define PDF_PDF_BOX_SPEC_ART   4 */
-#define pdfpdfboxspecmedia ( 0 ) 
-#define pdfpdfboxspeccrop ( 1 ) 
-#define pdfpdfboxspecbleed ( 2 ) 
-#define pdfpdfboxspectrim ( 3 ) 
-#define pdfpdfboxspecart ( 4 ) 
 
 // The prefix for the PDF keys special to pdfTeX
 // This has been registered with Adobe by Hans Hagen
@@ -649,10 +621,10 @@ static void writeRefs()
 static void writeEncodings()
 {
     UsedEncoding *r, *n;
-    char *glyphNames[MAX_CHAR_CODE + 1], *s;
+    char *glyphNames[256], *s;
     int i;
     for (r = encodingList; r != 0; r = r->next) {
-      for (i = 0; i <= MAX_CHAR_CODE; i++) {
+      for (i = 0; i < 256; i++) {
       if (r->font->isCIDFont()) {
         pdftex_warn("pdf inclusion: CID font included, encoding maybe wrong");
       }
@@ -670,6 +642,25 @@ static void writeEncodings()
     }
 }
 
+// get the pagebox according to the pagebox_spec
+static PDFRectangle *get_pagebox(Page *page, integer pagebox_spec)
+{
+    if (pagebox_spec == pdfboxspecmedia)
+        return page->getMediaBox();
+    else if (pagebox_spec == pdfboxspeccrop)
+        return page->getCropBox();
+    else if (pagebox_spec == pdfboxspecbleed)
+        return page->getBleedBox();
+    else if (pagebox_spec == pdfboxspectrim)
+        return page->getTrimBox();
+    else if (pagebox_spec == pdfboxspecart)
+        return page->getArtBox();
+    else
+        pdftex_fail("pdf inclusion: unknown value of pagebox spec (%i)", 
+                    pagebox_spec);
+}
+
+
 /* Reads various information about the pdf and sets it up for later inclusion.
  * This will fail if the pdf version of the pdf is higher than
  * minor_pdf_version_wanted or page_name is given and can not be found.
@@ -677,9 +668,8 @@ static void writeEncodings()
  * Returns the page number.
  */
 integer 
-read_pdf_info(char *image_name, char *page_name, integer page_num,
-              integer minor_pdf_version_wanted, integer always_use_pdf_pagebox,
-              integer pdf_inclusion_errorlevel)
+read_pdf_info(char *image_name, char *page_name, integer page_num, integer pagebox_spec,
+              integer minor_pdf_version_wanted, integer pdf_inclusion_errorlevel)
 {
     PdfDocument *pdf_doc;
     Page *page;
@@ -695,9 +685,7 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
     // open PDF file
     pdf_doc = find_add_document(image_name);
     epdf_doc = (void *) pdf_doc;
-#ifdef DEBUG
-    fprintf(stderr, "\nReading information on %s\n", pdf_doc->file_name);
-#endif
+
     // check pdf version
     // this works only for pdf 1.x -- but since any versions of pdf newer
     // than 1.x will not be backwards compatible to pdf 1.x, pdfTeX will
@@ -719,74 +707,40 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
         LinkDest *link = pdf_doc->doc->findDest(&name);
         if (link == 0 || !link->isOk())
             pdftex_fail("pdf inclusion: invalid destination <%s>",
-                page_name);
+                        page_name);
         Ref ref = link->getPageRef();
         page_num = pdf_doc->doc->getCatalog()->findPage(ref.num, ref.gen);
         if (page_num == 0)
             pdftex_fail("pdf inclusion: destination is not a page <%s>",
-                page_name);
+                        page_name);
         delete link;
     } else {
         // get page by number
         if (page_num <= 0 || page_num > epdf_num_pages)
-        pdftex_fail("pdf inclusion: required page does not exist <%i>", 
-            epdf_num_pages);
+            pdftex_fail("pdf inclusion: required page does not exist <%i>", 
+                        epdf_num_pages);
     }
     // get the required page
     page = pdf_doc->doc->getCatalog()->getPage(page_num);
 
     // get the pagebox (media, crop...) to use.
-    // always_use_pdf_pagebox can set in the config file to override the
-    // setting through pdfximage.
-    if (always_use_pdf_pagebox < 1) {
-        switch (pdflastpdfboxspec) {
-        case pdfpdfboxspeccrop:
-            pagebox = page->getCropBox();
-            break;
-        
-        case pdfpdfboxspecbleed:
-            pagebox = page->getBleedBox();
-            break;
-        
-        case pdfpdfboxspectrim:
-            pagebox = page->getTrimBox();
-            break;
-        
-        case pdfpdfboxspecart:
-            pagebox = page->getArtBox();
-            break;
-
-        default:
-            pagebox = page->getMediaBox();
-            }
-        }
+    pagebox = get_pagebox(page, pagebox_spec);
+    if (pagebox->x2 > pagebox->x1) {
+        epdf_orig_x = pagebox->x1;
+        epdf_width = pagebox->x2 - pagebox->x1;
+    }
     else {
-        switch (always_use_pdf_pagebox) {
-        case 1 : 
-            pagebox = page->getMediaBox();
-            break;
-        case 2 : 
-            pagebox = page->getCropBox();
-            break;
-        case 3 : 
-            pagebox = page->getBleedBox();
-            break;
-        case 4 : 
-            pagebox = page->getTrimBox();
-            break;
-        default : // 5 and larger
-            pagebox = page->getArtBox();
-            }
-        }
-#ifdef DEBUG
-    fprintf(stderr, 
-            "\npagebox->x1: %.8f, pagebox->x2: %.8f, pagebox->y1: %.8f, pagebox->y2: %.8f\n", 
-            pagebox->x1, pagebox->x2, pagebox->y1, pagebox->y2);
-#endif
-    epdf_width = pagebox->x2 - pagebox->x1;
-    epdf_height = pagebox->y2 - pagebox->y1;
-    epdf_orig_x = pagebox->x1;
-    epdf_orig_y = pagebox->y1;
+        epdf_orig_x = pagebox->x2;
+        epdf_width = pagebox->x1 - pagebox->x2;
+    }
+    if (pagebox->y2 > pagebox->y1) {
+        epdf_orig_y = pagebox->y1;
+        epdf_height = pagebox->y2 - pagebox->y1;
+    }
+    else {
+        epdf_orig_y = pagebox->y2;
+        epdf_height = pagebox->y1 - pagebox->y2;
+    }
     
     rotate = page->getRotate();
     // handle page rotation and adjust dimens as needed
@@ -850,55 +804,8 @@ write_epdf(void)
         pdf_printf("/%s.InfoDict ", pdfkeyprefix);
         pdf_printf("%d 0 R \n", addOther(info.getRef()));
         }
-  
     // get the pagebox (media, crop...) to use.
-    // epdf_always_use_pdf_pagebox is a copy of always_use_pdf_pagebox which
-    // can set in the config file to override the setting through pdfximage.
-    if (epdf_always_use_pdf_pagebox < 1) {
-        switch (epdf_page_box) {
-        case pdfpdfboxspeccrop:
-            pagebox = page->getCropBox();
-            break;
-      
-        case pdfpdfboxspecbleed:
-            pagebox = page->getBleedBox();
-            break;
-        
-        case pdfpdfboxspectrim:
-            pagebox = page->getTrimBox();
-            break;
-        
-        case pdfpdfboxspecart:
-            pagebox = page->getArtBox();
-            break;
-       
-        default:
-            pagebox = page->getMediaBox();
-            }
-        }
-    else {
-        switch (epdf_always_use_pdf_pagebox) {
-        case 1 : 
-            pagebox = page->getMediaBox();
-            break;
-        case 2 : 
-            pagebox = page->getCropBox();
-            break;
-        case 3 : 
-            pagebox = page->getBleedBox();
-            break;
-        case 4 : 
-            pagebox = page->getTrimBox();
-            break;
-        default : // 5 and larger
-            pagebox = page->getArtBox();
-            }
-        }
-#ifdef DEBUG
-    fprintf(stderr, 
-            "\npagebox->x1: %.8f, pagebox->x2: %.8f, pagebox->y1: %.8f, pagebox->y2: %.8f\n", 
-            pagebox->x1, pagebox->x2, pagebox->y1, pagebox->y2);
-#endif
+    pagebox = get_pagebox(page, epdf_page_box);
 
     // handle page rotation
     if (rotate != 0) {
@@ -987,7 +894,8 @@ write_epdf(void)
         // Resources can be missing (files without them have been spotted
         // in the wild). This violates the pdf spec, which claims they are
         // required, but all RIPs accept them.  
-        // We "replace" them with empty Resources.
+        // We "replace" them with empty /Resources, although in form xobjects
+        // /Resources are not required.
         pdftex_warn("pdf inclusion: no /Resources detected. Replacing with empty /Resources.");
         pdf_puts("/Resources <<>>\n");
         }
@@ -1072,4 +980,3 @@ void epdf_check_mem()
     delete globalParams;
     }
 }
-// vi:ts=4:tw=79:expandtab:ai:

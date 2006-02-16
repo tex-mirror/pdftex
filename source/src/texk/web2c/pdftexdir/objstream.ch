@@ -29,10 +29,10 @@
 %***********************************************************************
 
 @x 5773
-@d pdf_int_pars=pdftex_first_integer_code + 20 {total number of \pdfTeX's integer parameters}
-@y
-@d pdf_objectstreams_code    = pdftex_first_integer_code + 20 {activate object streams}
 @d pdf_int_pars=pdftex_first_integer_code + 21 {total number of \pdfTeX's integer parameters}
+@y
+@d pdf_objectstreams_code    = pdftex_first_integer_code + 21 {activate object streams}
+@d pdf_int_pars=pdftex_first_integer_code + 22 {total number of \pdfTeX's integer parameters}
 @z
 
 %***********************************************************************

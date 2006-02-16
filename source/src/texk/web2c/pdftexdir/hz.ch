@@ -18,7 +18,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/hz.ch#12 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/hz.ch#15 $
 
 @x [155] - margin kerning
 @d acc_kern=2 {|subtype| of kern nodes from accents}
@@ -88,12 +88,12 @@ margin_kern_node: begin
 @z
 
 @x [236]
-@d pdf_int_pars=pdftex_first_integer_code + 17 {total number of \pdfTeX's integer parameters}
+@d pdf_int_pars=pdftex_first_integer_code + 18 {total number of \pdfTeX's integer parameters}
 @y
-@d pdf_adjust_spacing_code   = pdftex_first_integer_code + 17 {level of spacing adjusting}
-@d pdf_protrude_chars_code   = pdftex_first_integer_code + 18 {protrude chars at left/right edge of paragraphs}
-@d pdf_tracing_fonts_code    = pdftex_first_integer_code + 19 {level of font detail in log}
-@d pdf_int_pars=pdftex_first_integer_code + 20 {total number of \pdfTeX's integer parameters}
+@d pdf_adjust_spacing_code   = pdftex_first_integer_code + 18 {level of spacing adjusting}
+@d pdf_protrude_chars_code   = pdftex_first_integer_code + 19 {protrude chars at left/right edge of paragraphs}
+@d pdf_tracing_fonts_code    = pdftex_first_integer_code + 20 {level of font detail in log}
+@d pdf_int_pars=pdftex_first_integer_code + 21 {total number of \pdfTeX's integer parameters}
 @z
 
 @x [236]
@@ -1248,12 +1248,12 @@ begin
         l := cur_break(break_node(q));
     r := prev_rightmost(prev_p, p); {get |link(r)=p|}
     {let's look at the right margin first}
-    {|
+    @{
     short_display_n(r, 2);
     print("&");
     short_display_n(p, 2);
     print_ln;
-    |}
+    @}
     if (p <> null) and (type(p) = disc_node) and (pre_break(p) <> null) then  
     {a |disc_node| with non-empty |pre_break|, protrude the last char of |pre_break|}
     begin
@@ -1262,14 +1262,14 @@ begin
             r := link(r);
     end else r := find_protchar_right(l, r);
     {now the left margin}
-    {|
-        short_display_n(l, 2);
-        print_ln;
-        breadth_max := 10;
-        depth_threshold := 2;
-        show_node_list(l);
-        print_ln;
-    |}
+    @{
+    short_display_n(l, 2);
+    print_ln;
+    breadth_max := 10;
+    depth_threshold := 2;
+    show_node_list(l);
+    print_ln;
+    @}
     if (l <> null) and (type(l) = disc_node) then begin
         if post_break(l) <> null then begin
             l := post_break(l); {protrude the first char}
@@ -1477,7 +1477,7 @@ shortfall:=line_width-cur_active_width[1]; {we're this much too short}
 @y
 shortfall:=line_width-cur_active_width[1]; {we're this much too short}
 
-{|
+@{
 if pdf_output > 2 then begin
 print_ln;
 if (r <> null) and (break_node(r) <> null) then
@@ -1486,7 +1486,7 @@ print_ln;
 short_display_n(cur_p, 5);
 print_ln;
 end;
-|}
+@}
 
 if pdf_protrude_chars > 1 then
     shortfall := shortfall + total_pw(r, cur_p);
@@ -1737,10 +1737,10 @@ if pdf_protrude_chars > 0 then begin
         ptmp := p;
         p := find_protchar_right(temp_head, p);
     end;
-    {|
+    @{
     short_display_n(p, 1);
     print_ln;
-    |}
+    @}
     w := right_pw(p);
     if w <> 0 then {we have found a marginal kern, append it after |ptmp|}
     begin

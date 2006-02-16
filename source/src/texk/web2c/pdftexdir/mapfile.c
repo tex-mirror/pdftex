@@ -26,7 +26,6 @@ source code indentation by "indent -kr -nut"
 #include "ptexlib.h"
 #include <kpathsea/c-auto.h>
 #include <kpathsea/c-memstr.h>
-#include "avlstuff.h"
 
 static const char perforce_id[] =
     "$Id: mapfile.c,v 1.20 2005/10/16 17:41:51 hahe Exp hahe $";
@@ -75,6 +74,12 @@ static fm_entry *not_avail_tfm_found;
         goto done;                  \
 } while (0)
 
+#define cmp_return(a, b) \
+    if (a > b)           \
+        return 1;        \
+    if (a < b)           \
+        return -1
+
 fm_entry *new_fm_entry(void)
 {
     fm_entry *fm;
@@ -96,6 +101,9 @@ fm_entry *new_fm_entry(void)
     fm->charset = NULL;
     fm->all_glyphs = false;
     fm->links = 0;
+    fm->pid = -1;
+    fm->eid = -1;
+    fm->subfont = NULL;
     return fm;
 }
 
@@ -169,12 +177,6 @@ static int comp_fm_entry_tfm(const void *pa, const void *pb, void *p)
     return strcmp(((const fm_entry *) pa)->tfm_name,
                   ((const fm_entry *) pb)->tfm_name);
 }
-
-#define cmp_return(a, b) \
-    if (a > b)           \
-        return 1;        \
-    if (a < b)           \
-        return -1
 
 /* AVL sort fm_entry into ps_tree by ps_name, slant, and extend */
 
@@ -358,6 +360,15 @@ int check_fm_entry(fm_entry * fm, boolean warn)
                  fm->tfm_name, fm->extend / 1000.0);
         a += 32;
     }
+    if (fm->pid != -1 && 
+        !(is_truetype(fm) && is_included(fm) && 
+          is_subsetted(fm) && !is_reencoded(fm))) {
+        if (warn)
+            pdftex_warn
+                ("invalid entry for `%s': PidEid can be used only with subsetted non-reencoded TrueType fonts",
+                 fm->tfm_name);
+        a += 64;
+    }
     return a;
 }
 
@@ -500,6 +511,13 @@ static void fm_scan_line()
                 goto bad_line;
             }
             break;
+        case 'P': /* handle cases for subfonts like 'PidEid=3,1' */
+            if (sscanf(r, "PidEid=%i, %i %n", &a, &b, &c) >= 2) {
+                fm->pid = a;
+                fm->eid = b;
+                r += c;
+                break;
+            }
         default:               /* encoding or font file specification */
             a = b = 0;
             if (*r == '<') {
@@ -546,6 +564,8 @@ static void fm_scan_line()
        fm points to a valid, freshly filled-out fm_entry structure.
        Now follows the actual work of registering/deleting.
      */
+    if (handle_subfont_fm(fm, mitem->mode)) /* is this a subfont? */
+        return; 
     if (avl_do_entry(fm, mitem->mode) == 0)     /* if success */
         return;
   bad_line:

@@ -57,6 +57,7 @@ static integer t1_fontname_offset;
 extern char *fb_array;
 
 #else                           /* writet1 used with dvips */
+#include "sysexits.h"
 #include "dvips.h"
 #include "ptexmac.h"
 #undef  fm_extend
@@ -114,7 +115,7 @@ extern FILE *search();
 static char *cur_file_name;
 static char *cur_enc_name;
 static unsigned char *grid;
-static char *ext_glyph_names[MAX_CHAR_CODE + 1];
+static char *ext_glyph_names[256];
 static char print_buf[PRINTF_BUF_SIZE];
 static int hexline_length;
 static char notdef[] = ".notdef";
@@ -133,9 +134,9 @@ static size_t last_ptr_index;
 #define enc_eof()       feof(enc_file)
 #define enc_close()     xfclose(enc_file, cur_file_name)
 
-#define valid_code(c)   (c >= 0 && c <= MAX_CHAR_CODE)
+#define valid_code(c)   (c >= 0 && c <= 256)
 
-static const char *standard_glyph_names[MAX_CHAR_CODE + 1] =
+static const char *standard_glyph_names[256] =
     { notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
     notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
     notdef, notdef, notdef, notdef, notdef, notdef,
@@ -178,7 +179,8 @@ static const char *standard_glyph_names[MAX_CHAR_CODE + 1] =
 static char charstringname[] = "/CharStrings";
 
 char **t1_glyph_names;
-char *t1_builtin_glyph_names[MAX_CHAR_CODE + 1];
+char *t1_builtin_glyph_names[256];
+char charsetstr[0x4000];
 static boolean read_encoding_only;
 static int t1_encoding;
 
@@ -304,7 +306,7 @@ static void pdftex_fail(char *fmt, ...)
         ("\n ==> Fatal error occurred, the output PS file is not finished!\n",
          stderr);
     va_end(args);
-    exit(-1);
+    exit(EX_SOFTWARE);
 }
 
 static void pdftex_warn(char *fmt, ...)
@@ -388,9 +390,8 @@ void load_enc(char *enc_name, char **glyph_names)
                  *p++ = *r++);
             *p = 0;
             skip(r, ' ');
-            if (names_count > MAX_CHAR_CODE)
-                pdftex_fail("encoding vector contains more than %i names",
-                            (int) (MAX_CHAR_CODE + 1));
+            if (names_count > 256)
+                pdftex_fail("encoding vector contains more than 256 names");
             if (strcmp(buf, notdef) != 0)
                 glyph_names[names_count] = xstrdup(buf);
             names_count++;
@@ -907,7 +908,7 @@ static void t1_builtin_enc(void)
     if (t1_suffix("def")) {     /* predefined encoding */
         sscanf(t1_line_array + strlen("/Encoding"), "%256s", t1_buf_array);
         if (strcmp(t1_buf_array, "StandardEncoding") == 0) {
-            for (i = 0; i <= MAX_CHAR_CODE; i++)
+            for (i = 0; i < 256; i++)
                 if (standard_glyph_names[i] == notdef)
                     t1_builtin_glyph_names[i] = (char *) notdef;
                 else
@@ -937,7 +938,7 @@ static void t1_builtin_enc(void)
      *     ...
      *     readonly def
      */
-    for (i = 0; i <= MAX_CHAR_CODE; i++)
+    for (i = 0; i <= 256; i++)
         t1_builtin_glyph_names[i] = (char *) notdef;
     if (t1_prefix("/Encoding [") || t1_prefix("/Encoding[")) {  /* the first case */
         r = strchr(t1_line_array, '[') + 1;
@@ -949,10 +950,8 @@ static void t1_builtin_enc(void)
                      *p++ = *r++);
                 *p = 0;
                 skip(r, ' ');
-                if (counter > MAX_CHAR_CODE)
-                    pdftex_fail
-                        ("encoding vector contains more than %i names",
-                         (int) (MAX_CHAR_CODE + 1));
+                if (counter > 255)
+                    pdftex_fail("encoding vector contains more than 256 names");
                 if (strcmp(t1_buf_array, notdef) != 0)
                     t1_builtin_glyph_names[counter] =
                         xstrdup(t1_buf_array);
@@ -1406,6 +1405,7 @@ static void cs_mark(const char *cs_name, int subr)
 static void t1_subset_ascii_part(void)
 {
     int i, j;
+    char *p;
     t1_getline();
     while (!t1_prefix("/Encoding")) {
         t1_scan_param();
@@ -1426,7 +1426,7 @@ static void t1_subset_ascii_part(void)
     else {
         t1_puts
             ("/Encoding 256 array\n0 1 255 {1 index exch /.notdef put} for\n");
-        for (i = 0, j = 0; i <= MAX_CHAR_CODE; i++) {
+        for (i = 0, j = 0; i <= 256; i++) {
             if (is_used_char(i) && t1_glyph_names[i] != notdef) {
                 j++;
                 t1_printf("dup %i /%s put\n", (int) t1_char(i),
@@ -1654,7 +1654,7 @@ static void t1_mark_glyphs(void)
         return;
     }
     mark_cs(notdef);
-    for (i = 0; i <= MAX_CHAR_CODE; i++)
+    for (i = 0; i < 256; i++)
         if (is_used_char(i)) {
             if (t1_glyph_names[i] == notdef)
                 pdftex_warn("character %i is mapped to %s", i, notdef);
@@ -1791,7 +1791,7 @@ boolean t1_subset(char *fontfile, char *encfile, unsigned char *g)
 {
     int i;
     cur_enc_name = encfile;
-    for (i = 0; i <= MAX_CHAR_CODE; i++)
+    for (i = 0; i <= 256; i++)
         ext_glyph_names[i] = (char *) notdef;
     if (cur_enc_name != NULL)
         load_enc(cur_enc_name, ext_glyph_names);
@@ -1799,7 +1799,7 @@ boolean t1_subset(char *fontfile, char *encfile, unsigned char *g)
     cur_file_name = fontfile;
     hexline_length = 0;
     writet1();
-    for (i = 0; i <= MAX_CHAR_CODE; i++)
+    for (i = 0; i < 256; i++)
         if (ext_glyph_names[i] != notdef)
             free(ext_glyph_names[i]);
     return 1;                   /* note:  there *is* no unsuccessful return */
@@ -1808,14 +1808,14 @@ boolean t1_subset(char *fontfile, char *encfile, unsigned char *g)
 boolean t1_subset_2(char *fontfile, unsigned char *g, char *extraGlyphs)
 {
     int i;
-    for (i = 0; i <= MAX_CHAR_CODE; i++)
+    for (i = 0; i <= 256; i++)
         ext_glyph_names[i] = (char *) notdef;
     grid = g;
     cur_file_name = fontfile;
     hexline_length = 0;
     dvips_extra_charset = extraGlyphs;
     writet1();
-    for (i = 0; i <= MAX_CHAR_CODE; i++)
+    for (i = 0; i <= 256; i++)
         if (ext_glyph_names[i] != notdef)
             free(ext_glyph_names[i]);
     return 1;                   /* note:  there *is* no unsuccessful return */

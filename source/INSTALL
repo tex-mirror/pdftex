@@ -1,8 +1,8 @@
 pdfTeX
 ======
 
-INSTALL for pdfTeX 1.40.0-alpha-20051205
-========================================
+INSTALL for pdfTeX 1.40.0-alpha
+===============================
 
 This distribution is a stripped-down version of the TeXlive distribution.
 All source code is in the directory src; the script build.sh will generate and

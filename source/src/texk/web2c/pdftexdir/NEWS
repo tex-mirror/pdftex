@@ -1,5 +1,12 @@
 ----------------------------------------------------------------
-pdfTeX 3.141592-1.40.0-alpha-20051205 was released on 2005-12-05
+pdfTeX 3.141592-1.40.0-alpha-20051221 was released on 2005-12-21
+----------------------------------------------------------------
+- has a large patch from Thanh
+- pdflastlink has been fixed
+- remove generated pdf in case of fatal error
+
+----------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-alpha-20051208 was released on 2005-12-08
 ----------------------------------------------------------------
 - improved patches:
   - 386	grow obj_tab and dest_names arrays dynamically

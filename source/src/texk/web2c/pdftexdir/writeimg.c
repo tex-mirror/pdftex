@@ -40,7 +40,6 @@ float epdf_orig_y;
 integer epdf_selected_page;
 integer epdf_num_pages;
 integer epdf_page_box;
-integer epdf_always_use_pdf_pagebox;
 void *epdf_doc;
 
 static integer new_image_entry(void)
@@ -247,9 +246,9 @@ static void checktypebyextension(integer img)
         img_type(img) = IMAGE_TYPE_JPG;
 }
 
-integer readimage(strnumber s, integer page_num, strnumber page_name, integer colorspace,
-                  integer pdfversion, integer pdfforcepagebox,
-                  integer pdfinclusionerrorlevel)
+integer readimage(strnumber s, integer page_num, strnumber page_name, 
+                  integer colorspace, integer pagebox,
+                  integer pdfversion, integer pdfinclusionerrorlevel)
 {
     char *dest = NULL;
     integer img = new_image_entry();
@@ -272,11 +271,9 @@ integer readimage(strnumber s, integer page_num, strnumber page_name, integer co
     switch (img_type(img)) {
     case IMAGE_TYPE_PDF:
         pdf_ptr(img) = xtalloc(1, pdf_image_struct);
-        pdf_ptr(img)->page_box = pdflastpdfboxspec;
-        pdf_ptr(img)->always_use_pdfpagebox = pdfforcepagebox;
-        page_num = read_pdf_info(img_name(img), dest, page_num, 
-                                     pdfversion, pdfforcepagebox,
-                                     pdfinclusionerrorlevel);
+        pdf_ptr(img)->page_box = pagebox;
+        page_num = read_pdf_info(img_name(img), dest, page_num, pagebox,
+                                 pdfversion, pdfinclusionerrorlevel);
         img_width(img) = bp2int(epdf_width);
         img_height(img) = bp2int(epdf_height);
         img_pages(img) = epdf_num_pages;
@@ -317,7 +314,6 @@ void writeimage(integer img)
         epdf_doc = pdf_ptr(img)->doc;
         epdf_selected_page = pdf_ptr(img)->selected_page;
         epdf_page_box = pdf_ptr(img)->page_box;
-        epdf_always_use_pdf_pagebox = pdf_ptr(img)->always_use_pdfpagebox;
         write_epdf();
         break;
     default:

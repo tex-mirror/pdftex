@@ -45,7 +45,6 @@ typedef struct {
     integer orig_y;
     integer selected_page;
     integer page_box;
-    integer always_use_pdfpagebox;
     void *doc;
 } pdf_image_struct;
 

@@ -23,7 +23,6 @@ source code indentation by "indent -kr -nut"
 */
 
 #include "ptexlib.h"
-#include "avlstuff.h"
 
 static const char perforce_id[] =
     "$Id: writeenc.c,v 1.1 2005/11/01 20:36:25 hahe Exp $";
@@ -60,7 +59,7 @@ void write_enc(char **glyph_names, enc_entry * e, integer eobjnum)
     }
     pdf_printf("/Type /Encoding\n/Differences [ 0 /%s", g[0]);
     is_notdef = (g[0] == notdef);
-    for (i = 1; i <= MAX_CHAR_CODE; i++) {
+    for (i = 1; i < 256; i++) {
         if (g[i] == notdef) {
             if (!is_notdef) {
                 pdf_printf(" %i/%s", i, notdef);
@@ -110,8 +109,8 @@ enc_entry *add_enc(char *s)
     p->loaded = false;
     p->name = xstrdup(s);
     p->objnum = 0;
-    p->glyph_names = xtalloc(MAX_CHAR_CODE + 1, char *);
-    for (i = 0; i <= MAX_CHAR_CODE; i++)
+    p->glyph_names = xtalloc(256, char *);
+    for (i = 0; i < 256; i++)
         p->glyph_names[i] = (char *) notdef;
     aa = avl_probe(enc_tree, p);
     assert(aa != NULL);
@@ -129,7 +128,7 @@ static void destroy_enc_entry(void *pa, void *pb)
     p = (enc_entry *) pa;
     xfree(p->name);
     if (p->glyph_names != NULL)
-        for (i = 0; i <= MAX_CHAR_CODE; i++)
+        for (i = 0; i < 256; i++)
             if (p->glyph_names[i] != notdef)
                 xfree(p->glyph_names[i]);
     xfree(p->glyph_names);

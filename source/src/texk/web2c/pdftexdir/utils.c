@@ -21,6 +21,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $
 */
 
 #include "sys/types.h"
+#include "sysexits.h"
 #include "regex.h"
 #include "ptexlib.h"
 #include "zlib.h"
@@ -118,9 +119,9 @@ void make_subset_tag(fm_entry *fm_cur, char **glyph_names)
         fnstr_append("built-in");
     fnstr_append(" CharSet: ");
     assert(glyph_names != NULL);
-    for (i = 0; i <= MAX_CHAR_CODE; i++)
+    for (i = 0; i < 256; i++)
         if (pdfcharmarked(tex_font, i) && glyph_names[i] != notdef) {
-            fnstr_append(" /");
+            fnstr_append("/");
             fnstr_append(glyph_names[i]);
         }
     if (fm_cur->charset != NULL) {
@@ -212,9 +213,13 @@ void pdftex_fail(const char *fmt,...)
     safe_print(print_buf);
     va_end(args);
     println();
-    safe_print(" ==> Fatal error occurred, the output PDF file is not finished!");
+    if (!kpathsea_debug && outputfilename) {
+        xfclose(pdffile, makecstring(outputfilename));
+        remove (makecstring(outputfilename));
+    }
+    safe_print(" ==> Fatal error occurred, no output PDF file produced!");
     println();
-    exit(-1);
+    exit(EX_SOFTWARE);
 }
 
 void pdftex_warn(const char *fmt,...)
@@ -402,6 +407,8 @@ void libpdffinish()
     img_free();
     vf_free();
     epdf_free();
+    ttf_free();
+    sfd_free();
 }
 
 /* Converts any string given in in in an allowed PDF string which can be

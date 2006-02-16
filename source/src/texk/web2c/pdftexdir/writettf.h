@@ -106,8 +106,6 @@ typedef unsigned short  TTF_F2DOT14;
 #define GLYPH_PREFIX_INDEX    "index"
 #define GLYPH_PREFIX_UNICODE  "uni"
 
-#define NOGLYPH_ASSIGNED_YET 0xFFFF /* indicating that no glyph is assigned to
-                                       an unicode */
 typedef struct {
     char tag[4];
     TTF_ULONG checksum;

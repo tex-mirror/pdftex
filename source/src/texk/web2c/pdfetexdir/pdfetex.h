@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.h#4 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.h#4 $
 */
 
 /* Additions to texmfmp.h for pdfTeX */
@@ -41,6 +41,21 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdfetexdir/pdfetex.h#4 $
 
 #define getefcode(f, c) \
     (pdffontefbase[f] == 0 ? 1000 : pdfmem[pdffontefbase[f] + c])
+
+#define getknbscode(f, c) \
+    (pdffontknbsbase[f] == 0 ? 0 : pdfmem[pdffontknbsbase[f] + c])
+
+#define getstbscode(f, c) \
+    (pdffontstbsbase[f] == 0 ? 0 : pdfmem[pdffontstbsbase[f] + c])
+
+#define getshbscode(f, c) \
+    (pdffontshbsbase[f] == 0 ? 0 : pdfmem[pdffontshbsbase[f] + c])
+
+#define getknbccode(f, c) \
+    (pdffontknbcbase[f] == 0 ? 0 : pdfmem[pdffontknbcbase[f] + c])
+
+#define getknaccode(f, c) \
+    (pdffontknacbase[f] == 0 ? 0 : pdfmem[pdffontknacbase[f] + c])
 
 #define texbopenin(f) \
     open_input (&(f), kpse_tex_format, FOPEN_RBIN_MODE)

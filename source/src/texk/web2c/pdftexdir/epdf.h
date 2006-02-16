@@ -24,6 +24,8 @@ extern "C" {
 
 #include <kpathsea/c-auto.h>
 
+extern char *xstrdup(const char *);
+
 /* the following code is extremly ugly but needed for including web2c/config.h */
 
 #include <kpathsea/c-proto.h>     /* define P?H macros */
@@ -51,9 +53,14 @@ extern float epdf_orig_y;
 extern integer epdf_selected_page;
 extern integer epdf_num_pages;
 extern integer epdf_page_box;
-extern integer epdf_always_use_pdf_pagebox;
 extern void *epdf_doc;
 extern void *epdf_xref;
+
+extern integer pdfboxspecmedia;
+extern integer pdfboxspeccrop;
+extern integer pdfboxspecbleed;
+extern integer pdfboxspectrim;
+extern integer pdfboxspecart;
 
 extern integer pdfstreamlength;
 extern integer pdfptr;

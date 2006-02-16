@@ -1,4 +1,5 @@
-% WEB change file containing code for pdfTeX features extending TeX; % to be applied to tex.web (Version 3.141592) in order to define the
+% WEB change file containing code for pdfTeX features extending TeX; 
+% to be applied to tex.web (Version 3.141592) in order to define the
 % pdfTeX program.
 %
 % Note: This file, pdftex.ch, defines pdftex.web in terms of changes to be
@@ -69,7 +70,7 @@
 @y
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-alpha-20051208' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-alpha-20051221' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -158,13 +159,14 @@ primitive("pdfpkmode",assign_toks,pdf_pk_mode_loc);
 @d pdf_option_pdf_inclusion_errorlevel_code = pdftex_first_integer_code + 8 {if the pdf inclusion should treat pdfs newer than |pdf_minor_version| as an error}
 @d pdf_minor_version_code = pdftex_first_integer_code + 9 {fractional part of the pdf version produced}
 @d pdf_force_pagebox_code = pdftex_first_integer_code + 10 {if the pdf inclusion should always use a specific pdf page box}
-@d pdf_inclusion_errorlevel_code = pdftex_first_integer_code + 11 {if the pdf inclusion should treat pdfs newer than |pdf_minor_version| as an error}
-@d pdf_gamma_code            = pdftex_first_integer_code + 12
-@d pdf_image_gamma_code      = pdftex_first_integer_code + 13
-@d pdf_image_hicolor_code    = pdftex_first_integer_code + 14
-@d pdf_image_apply_gamma_code = pdftex_first_integer_code + 15
-@d pdf_px_dimen_code = pdftex_first_integer_code + 16 {the code for the pixel dimen value}
-@d pdf_int_pars=pdftex_first_integer_code + 17 {total number of \pdfTeX's integer parameters}
+@d pdf_pagebox_code = pdftex_first_integer_code + 11 {default pagebox to use for pdf inclusion}
+@d pdf_inclusion_errorlevel_code = pdftex_first_integer_code + 12 {if the pdf inclusion should treat pdfs newer than |pdf_minor_version| as an error}
+@d pdf_gamma_code            = pdftex_first_integer_code + 13
+@d pdf_image_gamma_code      = pdftex_first_integer_code + 14
+@d pdf_image_hicolor_code    = pdftex_first_integer_code + 15
+@d pdf_image_apply_gamma_code = pdftex_first_integer_code + 16
+@d pdf_px_dimen_code = pdftex_first_integer_code + 17 {the code for the pixel dimen value}
+@d pdf_int_pars=pdftex_first_integer_code + 18 {total number of \pdfTeX's integer parameters}
 @#
 @d int_pars=pdf_int_pars {total number of integer parameters}
 @z
@@ -185,6 +187,7 @@ primitive("pdfpkmode",assign_toks,pdf_pk_mode_loc);
 @d pdf_option_pdf_inclusion_errorlevel == int_par(pdf_option_pdf_inclusion_errorlevel_code)
 @d pdf_minor_version == int_par(pdf_minor_version_code)
 @d pdf_force_pagebox == int_par(pdf_force_pagebox_code)
+@d pdf_pagebox == int_par(pdf_pagebox_code)
 @d pdf_inclusion_errorlevel == int_par(pdf_inclusion_errorlevel_code)
 @d pdf_gamma            == int_par(pdf_gamma_code)
 @d pdf_image_gamma      == int_par(pdf_image_gamma_code)
@@ -209,6 +212,7 @@ pdf_option_always_use_pdfpagebox_code: print_esc("pdfoptionalwaysusepdfpagebox")
 pdf_option_pdf_inclusion_errorlevel_code: print_esc("pdfoptionpdfinclusionerrorlevel");
 pdf_minor_version_code: print_esc("pdfminorversion");
 pdf_force_pagebox_code: print_esc("pdfforcepagebox");
+pdf_pagebox_code: print_esc("pdfpagebox");
 pdf_inclusion_errorlevel_code: print_esc("pdfinclusionerrorlevel");
 pdf_gamma_code:            print_esc("pdfgamma");
 pdf_image_gamma_code:      print_esc("pdfimagegamma");
@@ -247,6 +251,8 @@ primitive("pdfminorversion",assign_int,int_base+pdf_minor_version_code);@/
 @!@:pdf_minor_version_}{\.{\\pdfminorversion} primitive@>
 primitive("pdfforcepagebox",assign_int,int_base+pdf_force_pagebox_code);@/
 @!@:pdf_force_pagebox_}{\.{\\pdfforcepagebox} primitive@>
+primitive("pdfpagebox",assign_int,int_base+pdf_pagebox_code);@/
+@!@:pdf_pagebox_}{\.{\\pdfpagebox} primitive@>
 primitive("pdfinclusionerrorlevel",assign_int,int_base+pdf_inclusion_errorlevel_code);@/
 @!@:pdf_inclusion_errorlevel_}{\.{\\pdfinclusionerrorlevel} primitive@>
 primitive("pdfgamma",assign_int,int_base+pdf_gamma_code);@/
@@ -1674,7 +1680,6 @@ begin
     end;
 end;
 
-
 procedure pdf_rectangle(left, top, right, bottom: scaled); {output a
 rectangle specification to PDF file}
 begin
@@ -1903,11 +1908,6 @@ so we can use this field for both}
 @!inf_dest_names_size = 10000; {min size of the destination names table for PDF output}
 @!sup_dest_names_size = 131072; {max size of the destination names table for PDF output}
 @!pdf_objtype_max = head_tab_max;
-@!pdf_pdf_box_spec_media  = 0;
-@!pdf_pdf_box_spec_crop   = 1;
-@!pdf_pdf_box_spec_bleed  = 2;
-@!pdf_pdf_box_spec_trim   = 3;
-@!pdf_pdf_box_spec_art    = 4;
 
 @ @<Glob...@>=
 @!obj_tab_size:integer;
@@ -1921,11 +1921,22 @@ so we can use this field for both}
 @!pdf_stream_length_offset: integer; {file offset of the last stream length}
 @!pdf_append_list_arg: integer; {for use with |pdf_append_list|}
 @!ff: integer; {for use with |set_ff|}
+@!pdf_box_spec_media: integer;
+@!pdf_box_spec_crop: integer; 
+@!pdf_box_spec_bleed: integer; 
+@!pdf_box_spec_trim: integer; 
+@!pdf_box_spec_art: integer; 
 
 @ @<Set init...@>=
 obj_ptr := 0;
 for k := 1 to head_tab_max do
     head_tab[k] := 0;
+pdf_box_spec_media  := 1;
+pdf_box_spec_crop   := 2;
+pdf_box_spec_bleed  := 3;
+pdf_box_spec_trim   := 4;
+pdf_box_spec_art    := 5;
+
 
 @ Here we implement subroutines for work with objects and related things.
 Some of them are used in former parts too, so we need to declare them
@@ -4756,9 +4767,9 @@ procedure check_pdfoutput(s: str_number; is_error : boolean);
 begin
     if pdf_output <= 0 then
         if is_error then
-            pdf_error(s, "used while \pdfoutput is not set")
+            pdf_error(s, "not allowed in DVI mode (\pdfoutput <= 0)")
         else 
-            pdf_warning(s, "used while \pdfoutput is not set; ignoring it", true);
+            pdf_warning(s, "not allowed in DVI mode (\pdfoutput <= 0); ignoring it", true);
 end;
 
 procedure scan_pdf_ext_toks;
@@ -4956,10 +4967,11 @@ end
 @!pdf_last_ximage_pages: integer;
 @!pdf_last_ximage_colordepth: integer;
 @!alt_rule: pointer;
-@!pdf_last_pdf_box_spec: integer;
+@!warn_pdfpagebox: boolean;
 
 @ @<Set init...@>=
 alt_rule := null;
+warn_pdfpagebox := true;
 
 @ @<Declare procedures needed in |do_ext...@>=
 procedure scale_image(n: integer);
@@ -5048,20 +5060,19 @@ begin
     end;
 end;
 
-procedure scan_pdf_box_spec; {scans pdf-box-spec to |pdf_last_pdf_box_spec|}
+function scan_pdf_box_spec: integer; {scans pdf pagebox specification}
 begin 
-    pdf_last_pdf_box_spec := pdf_pdf_box_spec_crop; 
-    
+    scan_pdf_box_spec := 0; 
     if scan_keyword("mediabox") then
-        pdf_last_pdf_box_spec := pdf_pdf_box_spec_media
+        scan_pdf_box_spec := pdf_box_spec_media
     else if scan_keyword("cropbox") then 
-        pdf_last_pdf_box_spec := pdf_pdf_box_spec_crop
+        scan_pdf_box_spec := pdf_box_spec_crop
     else if scan_keyword("bleedbox") then 
-        pdf_last_pdf_box_spec := pdf_pdf_box_spec_bleed
+        scan_pdf_box_spec := pdf_box_spec_bleed
     else if scan_keyword("trimbox") then 
-        pdf_last_pdf_box_spec := pdf_pdf_box_spec_trim
+        scan_pdf_box_spec := pdf_box_spec_trim
     else if scan_keyword("artbox") then 
-        pdf_last_pdf_box_spec := pdf_pdf_box_spec_art
+        scan_pdf_box_spec := pdf_box_spec_art
 end;
 
 procedure scan_alt_rule; {scans rule spec to |alt_rule|}
@@ -5096,7 +5107,7 @@ var p: pointer;
     k: integer;
     named: str_number;
     s: str_number;
-    page, colorspace: integer;
+    page, pagebox, colorspace: integer;
 begin
     incr(pdf_ximage_count);
     pdf_create_obj(obj_type_ximage, pdf_ximage_count);
@@ -5130,30 +5141,34 @@ begin
     end
     else
         colorspace := 0;
-    scan_pdf_box_spec; {scans pdf-box-spec to |pdf_last_pdf_box_spec|}
+    pagebox := scan_pdf_box_spec;
+    if pagebox = 0 then
+        pagebox := pdf_pagebox;
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
     if pdf_option_always_use_pdfpagebox <> 0 then begin
-        pdf_warning(0,"Primitive \pdfoptionalwaysusepdfpagebox is obsolete; use \pdfforcepagebox instead.",true);
+        pdf_warning("pdf inclusion", "Primitive \pdfoptionalwaysusepdfpagebox is obsolete; use \pdfpagebox instead.", true);
         pdf_force_pagebox := pdf_option_always_use_pdfpagebox;
         pdf_option_always_use_pdfpagebox := 0; {warn once}
+        warn_pdfpagebox := false;
     end;
     if pdf_option_pdf_inclusion_errorlevel <> 0 then begin
-        pdf_warning(0,"Primitive \pdfoptionpdfinclusionerrorlevel is obsolete; use \pdfinclusionerrorlevel instead.",true);
+        pdf_warning("pdf inclusion", "Primitive \pdfoptionpdfinclusionerrorlevel is obsolete; use \pdfinclusionerrorlevel instead.", true);
         pdf_inclusion_errorlevel := pdf_option_pdf_inclusion_errorlevel;
         pdf_option_pdf_inclusion_errorlevel := 0; {warn once}
     end;
     if pdf_force_pagebox > 0 then begin
-        print_err("pdfTeX warning (image inclusion): ");
-        print ("\pdfforcepagebox is in use ("); 
-        print_int (pdf_force_pagebox); 
-        print (")");
-        print_ln;
+        if warn_pdfpagebox then begin
+            pdf_warning("pdf inclusion", "Primitive \pdfforcepagebox is obsolete; use \pdfpagebox instead.", true);
+            warn_pdfpagebox := false;
+        end;
+        pagebox := pdf_force_pagebox;
     end;
-    obj_ximage_data(k) := read_image(s, page, named, colorspace,
+    if pagebox = 0 then {no pagebox specification given}
+        pagebox := pdf_box_spec_crop;
+    obj_ximage_data(k) := read_image(s, page, named, colorspace, pagebox,
                                      pdf_minor_version, 
-                                     pdf_force_pagebox,
                                      pdf_inclusion_errorlevel);
     if named <> 0 then flush_str(named);
     flush_str(s);

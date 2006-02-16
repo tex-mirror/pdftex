@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#14 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#16 $
 */
 
 #include "ptexlib.h"
 #include "writettf.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#14 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#16 $";
 
 #define DEFAULT_NTABS       14
 #define NEW_CMAP_SIZE       2
@@ -53,7 +53,9 @@ typedef struct {
 
 typedef struct {
     char *name;             /* name of glyph */
+    long code;              /* charcode in case of subfonts */
     short newindex;         /* new index of glyph in output file */
+
 } ttfenc_entry;
 
 typedef struct {
@@ -66,6 +68,13 @@ typedef struct {
     TTF_USHORT new_offset;
     TTF_USHORT new_length;
 } name_record;
+
+typedef struct {
+    char *ttf_name;
+    TTF_USHORT pid;
+    TTF_USHORT eid;
+    short *table;
+} ttf_cmap_entry;
 
 static TTF_USHORT ntabs;
 static TTF_USHORT upem;
@@ -91,16 +100,16 @@ static TTF_ULONG tab_length;
 static TTF_ULONG tmp_ulong;
 static TTF_ULONG checkSumAdjustment_offset;
 static FILE *ttf_file;
-static ttfenc_entry ttfenc_tab[MAX_CHAR_CODE + 1];
+static ttfenc_entry ttfenc_tab[256];
 
-static TTF_USHORT unicode_map[0xFFFF];
-
+static struct avl_table *ttf_cmap_tree = NULL;
 
 integer ttf_length;
 
 #include "macnames.c"
 
 extern char *fb_array;
+extern char charsetstr[];
 
 static const char *newtabnames[] = {
     "OS/2",
@@ -118,6 +127,42 @@ static const char *newtabnames[] = {
     "post",
     "prep"
 };
+
+ttf_cmap_entry *new_ttf_cmap_entry(void)
+{
+    ttf_cmap_entry *e;
+    e = xtalloc(1, ttf_cmap_entry);
+    e->ttf_name = NULL;
+    e->table = NULL;
+}
+
+static void destroy_ttf_cmap_entry(void *pa, void *pb)
+{
+    ttf_cmap_entry *p;
+    p = (ttf_cmap_entry *) pa;
+    xfree(p->ttf_name);
+    xfree(p->table);
+    xfree(p);
+}
+
+void ttf_free(void)
+{
+    if (ttf_cmap_tree != NULL)
+        avl_destroy(ttf_cmap_tree, destroy_ttf_cmap_entry);
+}
+
+static int comp_ttf_cmap_entry(const void *pa, const void *pb, void *p)
+{
+    const ttf_cmap_entry *p1 = (const ttf_cmap_entry *) pa, 
+                         *p2 = (const ttf_cmap_entry *) pb;
+    int i;
+    assert(p1->ttf_name != NULL && p2->ttf_name != NULL);
+    if ((i = strcmp(p1->ttf_name, p2->ttf_name)) != 0)
+        return i;
+    cmp_return(p1->pid, p2->pid);
+    cmp_return(p1->eid, p2->eid);
+    return 0;
+}
 
 static unsigned char ttf_addchksm(unsigned char b)
 {
@@ -208,15 +253,48 @@ static void ttf_seek_off(TTF_LONG offset)
 static void ttf_copy_encoding(void)
 {
     int i;
-    char **glyph_names = (fm_cur->encoding)->glyph_names;
+    char **glyph_names, *p;
+    long *charcodes;
+    static char *charcode_names[256], buf[2048];
+
     ttfenc_entry *e = ttfenc_tab;
     pdfmarkchar(tex_font, 'a'); /* workaround for a bug of AcroReader 4.0 */
-    for (i = 0; i <= MAX_CHAR_CODE; i++, e++) {
-        if (pdfcharmarked(tex_font, i))
-            e->name = glyph_names[i];
-        else
-            e->name = (char*) notdef;
+
+    if (is_reencoded(fm_cur)) {
+        glyph_names = (fm_cur->encoding)->glyph_names;
+        for (i = 0; i < 256; i++, e++) {
+            if (pdfcharmarked(tex_font, i))
+                e->name = glyph_names[i];
+            else
+                e->name = (char*) notdef;
+        }
+        make_subset_tag(fm_cur, glyph_names);
     }
+    else if (is_subfont(fm_cur)) {
+        charcodes = fm_cur->subfont->charcodes;
+        assert(charcodes != NULL);
+        p = buf;
+        for (i = 0; i < 256; i++, e++) {
+            if (pdfcharmarked(tex_font, i)) {
+                e->code = charcodes[i];
+                if (e->code == -1)
+                    pdftex_warn("character %i is not mapped to any charcode", i);
+            }
+            else
+                e->code = -1;
+            if (e->code != -1) {
+                assert(e->code < 0x10000);
+                sprintf(p, "/c%4.4X", e->code);
+                charcode_names[i] = p;
+                p = strend(p) + 1;
+            }
+            else
+                charcode_names[i] = (char *)notdef;
+        }
+        make_subset_tag(fm_cur, charcode_names);
+    }
+    else
+        assert(0);
 }
 
 #define ttf_append_byte(B)\
@@ -428,8 +506,6 @@ static void ttf_read_tabdir()
 {
     int i;
     dirtab_entry *tab;
-/*     if ((version= get_fixed()) != 0x00010000) */
-/*         pdftex_fail("unsupport version 0x%.8X; can handle only version 1.0", (int)version); */
     ttf_skip(TTF_FIXED_SIZE); /* ignore the sfnt number */
     dir_tab = xtalloc(ntabs = get_ushort(), dirtab_entry);
     ttf_skip(3*TTF_USHORT_SIZE);
@@ -442,93 +518,118 @@ static void ttf_read_tabdir()
     }
 }
 
-static void ttf_read_cmap(void)
+static ttf_cmap_entry *ttf_read_cmap(char *ttf_name, int pid, int eid, boolean warn)
 {
     cmap_entry *e;
     seg_entry *seg_tab, *s;
     TTF_USHORT *glyphId, format, segCount;
-    TTF_USHORT ncmapsubtabs;
-    long cmap_offset;
-    long int n, i, j, k, first_code, length, last_sep, index;
-    int unicode_map_count = 0;
-    int select_unicode = 1; /* may be changed later if needed */
+    TTF_USHORT ncmapsubtabs, tmp_pid, tmp_eid;
+    TTF_ULONG cmap_offset, tmp_offset;
+    long n, i, j, k, first_code, length, last_sep, index;
+    ttf_cmap_entry tmp_e, *p;
+    void **aa, *x;
+
+    /* loop up in ttf_cmap_tree first, return if found */
+    tmp_e.ttf_name = ttf_name;
+    tmp_e.pid = pid;
+    tmp_e.eid = eid;
+    if (ttf_cmap_tree == NULL) {
+        ttf_cmap_tree = avl_create(comp_ttf_cmap_entry, NULL, &avl_xallocator);
+        assert(ttf_cmap_tree != NULL);
+    }
+    p = (ttf_cmap_entry *)avl_find(ttf_cmap_tree, &tmp_e);
+    if (p != NULL)
+        return p;
+
+    /* not found, have to read it */
     ttf_seek_tab("cmap", TTF_USHORT_SIZE); /* skip the table vesrion number (=0) */
     ncmapsubtabs = get_ushort();
     cmap_offset = xftell(INFILE, cur_file_name) - 2*TTF_USHORT_SIZE;
     cmap_tab = xtalloc(ncmapsubtabs, cmap_entry);
-    for (e = cmap_tab; e - cmap_tab < ncmapsubtabs; e++) {
-        e->platform_id = get_ushort();
-        e->encoding_id = get_ushort();
-        e->offset = get_ulong();
-    }
-    for (i = 0; i < 0xFFFF; ++i)
-        unicode_map[i] = NOGLYPH_ASSIGNED_YET;
-    for (e = cmap_tab; e - cmap_tab < ncmapsubtabs; e++) {
-        ttf_seek_off(cmap_offset + e->offset);
-        format = get_ushort();
-        if (is_unicode_mapping(e) && format == 4) {
-            ++unicode_map_count;
-            if (unicode_map_count == select_unicode)
-                goto read_unicode_mapping;
-        }
-        continue;
-read_unicode_mapping:
-        length = get_ushort(); /* length of subtable */
-        get_ushort(); /* skip the version number */
-        segCount = get_ushort()/2;
-        get_ushort(); /* skip searchRange */
-        get_ushort(); /* skip entrySelector */
-        get_ushort(); /* skip rangeShift */
-        seg_tab = xtalloc(segCount, seg_entry);
-        for (s = seg_tab; s - seg_tab < segCount; s++)
-            s->endCode = get_ushort();
-        get_ushort(); /* skip reversedPad */
-        for (s = seg_tab; s - seg_tab < segCount; s++)
-            s->startCode = get_ushort();
-        for (s = seg_tab; s - seg_tab < segCount; s++)
-            s->idDelta = get_ushort();
-        for (s = seg_tab; s - seg_tab < segCount; s++)
-            s->idRangeOffset = get_ushort();
-        length -= 8*TTF_USHORT_SIZE + 4*segCount*TTF_USHORT_SIZE;
-        n = length/TTF_USHORT_SIZE; /* number of glyphID's */
-        glyphId = xtalloc(n, TTF_USHORT);
-        for (i = 0; i < n; i++)
-            glyphId[i] = get_ushort();
-        for (s = seg_tab; s - seg_tab < segCount; s++) {
-            for (i = s->startCode; i <= s->endCode; i++) {
-                if (i == 0xFFFF)
-                    break;
-                if (s->idRangeOffset != 0xFFFF) {
-                    if (s->idRangeOffset == 0)
-                        index = (s->idDelta + i) & 0xFFFF;
-                    else {
-                        k = (i - s->startCode) + s->idRangeOffset/2 + 
-                            (s - seg_tab) - segCount ;
-                        assert(k >= 0 && k < n);
-                        index = glyphId[k];
-                        if (index != 0)
-                            index = (index + s->idDelta) & 0xFFFF;
-                    }
-                    if (index >= glyphs_count)
-                        pdftex_fail("cmap: glyph index %i out of range [0..%i)", 
-                                    index, glyphs_count);
-                    if (unicode_map[i] != NOGLYPH_ASSIGNED_YET)
-                        pdftex_warn("cmap: multiple glyphs are mapped to unicode %.4X, "
-                                    "only %i will be used (glyph %i being ignored)",
-                                    i, unicode_map[i], index);
-                    else
-                        unicode_map[i] = index;
-                }
+    for (i = 0; i < ncmapsubtabs; ++i) {
+        tmp_pid = get_ushort();
+        tmp_eid = get_ushort();
+        tmp_offset = get_ulong();
+        if (tmp_pid == pid && tmp_eid == eid) {
+            ttf_seek_off(cmap_offset + tmp_offset);
+            format = get_ushort();
+            if (format == 4)
+                goto read_cmap_format_4;
+            else {
+                if (warn)
+                    pdftex_warn("cmap format %i unsupported");
+                return NULL;
             }
         }
-        xfree(seg_tab);
-        xfree(glyphId);
-        break;
     }
-    if (e - cmap_tab == ncmapsubtabs)
-        pdftex_fail("Invalid argument `-m %i': out of range [1..%i]",
-                 select_unicode, unicode_map_count);
-    xfree(cmap_tab);
+    if (warn)
+        pdftex_warn("cannot find cmap subtable for (pid,eid) = (%i, %i)", 
+                    pid, eid);
+    return NULL;
+read_cmap_format_4:
+    /* initialize the new entry */
+    p = new_ttf_cmap_entry();
+    p->ttf_name = xstrdup(ttf_name);
+    p->pid = pid;
+    p->eid = eid;
+    p->table = xtalloc(0x10000, short);
+    for (i = 0; i < 0x10000; ++i)
+        p->table[i] = -1; /* unassigned yet */
+
+    /* read the subtable */
+    length = get_ushort(); /* length of subtable */
+    get_ushort(); /* skip the version number */
+    segCount = get_ushort()/2;
+    get_ushort(); /* skip searchRange */
+    get_ushort(); /* skip entrySelector */
+    get_ushort(); /* skip rangeShift */
+    seg_tab = xtalloc(segCount, seg_entry);
+    for (s = seg_tab; s - seg_tab < segCount; s++)
+        s->endCode = get_ushort();
+    get_ushort(); /* skip reversedPad */
+    for (s = seg_tab; s - seg_tab < segCount; s++)
+        s->startCode = get_ushort();
+    for (s = seg_tab; s - seg_tab < segCount; s++)
+        s->idDelta = get_ushort();
+    for (s = seg_tab; s - seg_tab < segCount; s++)
+        s->idRangeOffset = get_ushort();
+    length -= 8*TTF_USHORT_SIZE + 4*segCount*TTF_USHORT_SIZE;
+    n = length/TTF_USHORT_SIZE; /* number of glyphID's */
+    glyphId = xtalloc(n, TTF_USHORT);
+    for (i = 0; i < n; i++)
+        glyphId[i] = get_ushort();
+    for (s = seg_tab; s - seg_tab < segCount; s++) {
+        for (i = s->startCode; i <= s->endCode; i++) {
+            if (i == 0xFFFF)
+                break;
+            if (s->idRangeOffset != 0xFFFF) {
+                if (s->idRangeOffset == 0)
+                    index = (s->idDelta + i) & 0xFFFF;
+                else {
+                    k = (i - s->startCode) + s->idRangeOffset/2 + 
+                        (s - seg_tab) - segCount ;
+                    assert(k >= 0 && k < n);
+                    index = glyphId[k];
+                    if (index != 0)
+                        index = (index + s->idDelta) & 0xFFFF;
+                }
+                if (index >= glyphs_count)
+                    pdftex_fail("cmap: glyph index %i out of range [0..%i)", 
+                                index, glyphs_count);
+                if (p->table[i] != -1)
+                    pdftex_warn("cmap: multiple glyphs are mapped to unicode %.4X, "
+                                "only %i will be used (glyph %i being ignored)",
+                                i, p->table[i], index);
+                else
+                    p->table[i] = index;
+            }
+        }
+    }
+    xfree(seg_tab);
+    xfree(glyphId);
+    aa = avl_probe(ttf_cmap_tree, p);
+    assert(aa != NULL);
+    return p;
 }
 
 static void ttf_read_font(void)
@@ -550,7 +651,6 @@ static void ttf_read_font(void)
     ttf_read_post();
     ttf_read_loca();
     ttf_read_name();
-    ttf_read_cmap();
 }
 
 static void ttf_reset_chksm(dirtab_entry *tab)
@@ -581,7 +681,7 @@ static void ttf_copytab(const char *name)
 }
 
 #define BYTE_ENCODING_LENGTH  \
-    ((MAX_CHAR_CODE + 1)*TTF_BYTE_SIZE + 3*TTF_USHORT_SIZE)
+    ((256)*TTF_BYTE_SIZE + 3*TTF_USHORT_SIZE)
 
 static void ttf_byte_encoding(void)
 {
@@ -589,7 +689,7 @@ static void ttf_byte_encoding(void)
     put_ushort(0);  /* format number (0: byte encoding table) */
     put_ushort(BYTE_ENCODING_LENGTH); /* length of table */
     put_ushort(0);  /* version number */
-    for (e = ttfenc_tab; e - ttfenc_tab <= MAX_CHAR_CODE; e++)
+    for (e = ttfenc_tab; e - ttfenc_tab < 256; e++)
         if (e->newindex < 256) {
             put_byte(e->newindex);
         }
@@ -601,7 +701,7 @@ static void ttf_byte_encoding(void)
         }
 }
 
-#define TRIMMED_TABLE_MAP_LENGTH (TTF_USHORT_SIZE*(5 + (MAX_CHAR_CODE + 1)))
+#define TRIMMED_TABLE_MAP_LENGTH (TTF_USHORT_SIZE*(5 + (256)))
 
 static void ttf_trimmed_table_map(void)
 {
@@ -610,12 +710,12 @@ static void ttf_trimmed_table_map(void)
     put_ushort(TRIMMED_TABLE_MAP_LENGTH);
     put_ushort(0);  /* version number (0) */
     put_ushort(0);  /* first character code */
-    put_ushort(MAX_CHAR_CODE + 1);  /* number of character code in table */
-    for (e = ttfenc_tab; e - ttfenc_tab <= MAX_CHAR_CODE; e++)
+    put_ushort(256);  /* number of character code in table */
+    for (e = ttfenc_tab; e - ttfenc_tab < 256; e++)
         put_ushort(e->newindex);
 }
 
-#define SEG_MAP_DELTA_LENGTH ((16 + (MAX_CHAR_CODE + 1))*TTF_USHORT_SIZE)
+#define SEG_MAP_DELTA_LENGTH ((16 + (256))*TTF_USHORT_SIZE)
 
 static void ttf_seg_map_delta(void)
 {
@@ -636,7 +736,7 @@ static void ttf_seg_map_delta(void)
     put_ushort(1); /* idDelta[1] */
     put_ushort(2*TTF_USHORT_SIZE); /* idRangeOffset[0] */
     put_ushort(0); /* idRangeOffset[1] */
-    for (e = ttfenc_tab; e - ttfenc_tab <= MAX_CHAR_CODE; e++)
+    for (e = ttfenc_tab; e - ttfenc_tab < 256; e++)
         put_ushort(e->newindex);
 }
 
@@ -883,16 +983,41 @@ static void ttf_reindex_glyphs(void)
 {
     ttfenc_entry *e;
     glyph_entry *glyph;
-    unsigned int index;
+    int index;
+    short *t;
+    ttf_cmap_entry tmp_e, *cmap = NULL;
+    boolean warn = true, cmap_not_found = false;
+
     /* 
      * reindexing glyphs: we append index of used glyphs to `glyph_index'
      * while going through `ttfenc_tab'. After appending a new entry to
      * `glyph_index' we set field `newindex' of corresponding entries in both
      * `glyph_tab' and `ttfenc_tab' to the newly created index
-     * 
      */
-    for (e = ttfenc_tab; e - ttfenc_tab <= MAX_CHAR_CODE; e++) {
+    for (e = ttfenc_tab; e - ttfenc_tab < 256; e++) {
         e->newindex = 0; /* index of ".notdef" glyph */
+
+        /* handle case of subfonts first */
+        if (is_subfont(fm_cur)) {
+            if (e->code == -1)
+                continue;
+            assert(fm_cur->pid != -1 && fm_cur->eid != -1);
+            if (cmap == NULL && !cmap_not_found) {
+                cmap = ttf_read_cmap(fm_cur->ff_name, fm_cur->pid, fm_cur->eid, 
+                                     true);
+                if (cmap == NULL)
+                    cmap_not_found = true;
+            }
+            if (cmap == NULL)
+                continue;
+            t = cmap->table;
+            assert(t != NULL && e->code < 0x10000);
+            assert(t[e->code] < glyphs_count); /* t has been read from ttf */
+            glyph = glyph_tab + t[e->code];
+            goto append_new_glyph;
+        }
+
+        /* handle case of reencoded fonts */
         if (e->name == notdef)
             continue;
         /* scan form `index123' */
@@ -907,14 +1032,27 @@ static void ttf_reindex_glyphs(void)
         }
         /* scan form `uniABCD' */
         if (sscanf(e->name, GLYPH_PREFIX_UNICODE "%X", &index) == 1) {
-            assert(index <= 0xFFFF);
-            if (unicode_map[index] != NOGLYPH_ASSIGNED_YET) {
-                if (unicode_map[index] >= glyphs_count) {
+            if (cmap == NULL && !cmap_not_found) {
+            /* need to read the unicode mapping, ie (pid,eid) = (3,1) or (0,3) */
+                cmap = ttf_read_cmap(fm_cur->ff_name, 3, 1, false);
+                if (cmap == NULL)
+                    cmap = ttf_read_cmap(fm_cur->ff_name, 0, 3, false);
+                if (cmap == NULL) {
+                    pdftex_warn("no unicode mapping found, all `uniXXXX' names will be ignored");
+                    cmap_not_found = true; /* once only */
+                }
+            }
+            if (cmap == NULL)
+                continue;
+            t = cmap->table;
+            assert(t != NULL);
+            if (t[index] != -1) {
+                if (t[index] >= glyphs_count) {
                     pdftex_warn("`%s' is mapped to index %i which is out of valid range [0..%i)",
-                                e->name, unicode_map[index], glyphs_count);
+                                e->name, t[index], glyphs_count);
                     continue;
                 }
-                glyph = glyph_tab + unicode_map[index];
+                glyph = glyph_tab + t[index];
                 goto append_new_glyph;
             }
             else {
@@ -1145,9 +1283,11 @@ static void ttf_copy_font(void)
 
 void writettf()
 {
+    static char charsetstr[0x4000];
+    char *p;
     set_cur_file_name(fm_cur->ff_name);
-    if (is_subsetted(fm_cur) && !(is_reencoded(fm_cur))) {
-        pdftex_warn("encoding vector required for TrueType font subsetting");
+    if (is_subsetted(fm_cur) && !is_reencoded(fm_cur) && !is_subfont(fm_cur)) {
+        pdftex_warn("Subset TrueType must be a reencoded or a subfont");
         cur_file_name = NULL;
         return;
     }
@@ -1176,7 +1316,6 @@ void writettf()
         pdfflush();
         if (is_subsetted(fm_cur)) {
             ttf_copy_encoding();
-            make_subset_tag(fm_cur, fm_cur->encoding->glyph_names);
             ttf_subset_font();
         }
         else
@@ -1252,6 +1391,4 @@ void writeotf()
 
    The table directory also includes the offset of the associated tagged
    table from the beginning of the font file and the length of that table.
-
-
  */

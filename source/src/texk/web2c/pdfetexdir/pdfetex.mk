@@ -9,15 +9,15 @@ pdfetex = @PETEX@ pdfetex
 pdfetexdir = pdfetexdir
 
 # The C sources.
-pdfetex_c = pdfetexini.c pdfetex0.c pdfetex1.c pdfetex2.c pdfetex3.c
-pdfetex_o = pdfetexini.o pdfetex0.o pdfetex1.o pdfetex2.o pdfetex3.o pdfetexextra.o
+pdfetex_c = pdfetexini.c pdfetex0.c pdfetex1.c pdfetex2.c pdfetex3.c pdfetex4.c
+pdfetex_o = pdfetexini.o pdfetex0.o pdfetex1.o pdfetex2.o pdfetex3.o pdfetex4.o pdfetexextra.o
 
 # Making pdfetex
 pdfetex: pdftexd.h $(pdfetex_o) $(pdfetexextra_o) $(pdftexlibsdep)
 	@CXXHACKLINK@ $(pdfetex_o) $(pdfetexextra_o) $(pdftexlibs) $(socketlibs) @CXXHACKLDLIBS@ @CXXLDEXTRA@
 
 # C file dependencies.
-$(pdfetex_c) pdfetexcoerce.h pdfetexd.h: pdfetex.p $(web2c_texmf) $(srcdir)/pdfetexdir/pdfetex.defines
+$(pdfetex_c) pdfetexcoerce.h pdfetexd.h: pdfetex.p $(web2c_texmf) $(srcdir)/pdfetexdir/pdfetex.defines $(srcdir)/pdfetexdir/pdfetex.h
 	$(web2c) pdfetex
 pdfetexextra.c: pdfetexdir/pdfetexextra.h lib/texmfmp.c
 	sed s/TEX-OR-MF-OR-MP/pdfetex/ $(srcdir)/lib/texmfmp.c >$@
@@ -58,7 +58,8 @@ pdfetex_ch_srcs = pdfetex.web \
   $(srcdir)/pdftexdir/positioning.ch \
   $(srcdir)/pdftexdir/rule.ch \
   $(srcdir)/pdftexdir/objstream.ch \
-  $(srcdir)/pdftexdir/pkdpi.ch
+  $(srcdir)/pdftexdir/pkdpi.ch \
+  $(srcdir)/pdfetexdir/extra.ch
 #   Rules:
 pdfetex.web: tie pdfetexdir/pdfetex.mk $(pdfetex_web_srcs)
 	$(TIE) -m pdfetex.web $(pdfetex_web_srcs)

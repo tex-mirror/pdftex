@@ -46,6 +46,9 @@
 #    endif
 #  endif
 #endif
+#if defined(__DJGPP__)
+typedef unsigned int time_t;
+#endif
 #include "gtypes.h"
 
 class GString;

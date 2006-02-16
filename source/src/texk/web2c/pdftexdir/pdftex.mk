@@ -10,7 +10,8 @@
 
 Makefile: pdftexdir/pdftex.mk
 
-pdftex_bin = pdftex pdfetex ttf2afm pdftosrc
+# pdftex_bin = pdftex pdfetex ttf2afm pdftosrc
+pdftex_bin = pdfetex
 linux_build_dir = $(HOME)/pdftex/build/linux/texk/web2c
 
 # We build pdftex
@@ -65,7 +66,7 @@ pdftex_ch_srcs = pdftex.web \
   $(srcdir)/pdftexdir/positioning.ch \
   $(srcdir)/pdftexdir/rule.ch \
   $(srcdir)/pdftexdir/objstream.ch \
-  $(srcdir)/pdftexdir/pkdpi.ch
+  $(srcdir)/pdftexdir/pkdpi.ch \
 #   Rules:
 pdftex.web: tie pdftexdir/pdftex.mk $(pdftex_web_srcs)
 	$(TIE) -m pdftex.web $(pdftex_web_srcs)

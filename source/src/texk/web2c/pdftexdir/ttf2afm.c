@@ -45,7 +45,10 @@ static const char perforce_id[] =
 #define AS_INDEX        1
 #define AS_UNICODE      2
 
-#define VERSION         "1.0"
+#define VERSION         "1.01"
+
+/* FIXME */
+#define NOGLYPH_ASSIGNED_YET USHRT_MAX
 
 #define enc_getchar()   xgetc(encfile)
 #define enc_eof()       feof(encfile)
@@ -122,7 +125,7 @@ char *ps_glyphs_buf = NULL;
 dirtab_entry *dir_tab;
 mtx_entry *mtx_tab;
 kern_entry *kern_tab;
-char *enc_names[MAX_CHAR_CODE + 1];
+char *enc_names[256];
 
 cmap_entry *cmap_tab;
 TTF_USHORT ncmapsubtabs;
@@ -243,7 +246,7 @@ void free_tabs()
             }
         }
     xfree(mtx_tab);
-    for (i = 0; i <= MAX_CHAR_CODE; i++)
+    for (i = 0; i < 256; i++)
         if (enc_names[i] != notdef)
             free(enc_names[i]);
     if (kern_tab == NULL)
@@ -285,7 +288,7 @@ void read_encoding(char *encname)
     enc_getline();
     if (*enc_line != '/' || (r = strchr(enc_line, '[')) == 0)
         ttf_fail("invalid encoding vector: name or `[' missing:\n%s", enc_line);
-    for (i = 0; i <= MAX_CHAR_CODE; i++)
+    for (i = 0; i < 256; i++)
         enc_names[i] = (char*) notdef;
     if (r[1] == 32)
         r += 2;
@@ -299,9 +302,8 @@ void read_encoding(char *encname)
                 r++;
             if (strcmp(buf, notdef) != 0)
                 enc_names[names_count] = xstrdup(buf);
-            if (names_count++ > MAX_CHAR_CODE)
-                ttf_fail("encoding vector contains more than %i names",
-                     (int)(MAX_CHAR_CODE + 1));
+            if (++names_count > 256)
+                ttf_fail("encoding vector contains more than 256 names");
         }
         if (*r != 10 && *r != '%')
             if (strncmp(r, "] def", strlen("] def")) == 0)
@@ -313,9 +315,9 @@ void read_encoding(char *encname)
     }
 done:
     xfclose(encfile, cur_file_name);
-    if (names_count != MAX_CHAR_CODE + 1)
+    if (names_count != 256)
         ttf_warn("encoding vector contains only %i names (expected %i)", 
-                 names_count, MAX_CHAR_CODE + 1);
+                 names_count, 256);
 }
 
 void append_unicode(long glyph_index, TTF_USHORT code)
@@ -682,7 +684,7 @@ void print_glyph_name(FILE *f, long glyph_index, int convention)
                     assert(strlen(buf) + strlen(GLYPH_PREFIX_UNICODE) + 4 < sizeof(buf));
                     sprintf(strend(buf), "%s%.4X ", GLYPH_PREFIX_UNICODE, u->code);
                 }
-                ttf_warn("glyph %li have multiple encodings: %s", 
+                ttf_warn("glyph %li have multiple encodings (the first one being used): %s", 
                          glyph_index, buf);
             }
         }
@@ -707,7 +709,7 @@ void print_afm(char *date, char *fontname)
 {
     int i, ncharmetrics;
     mtx_entry *pm;
-    short mtx_index[MAX_CHAR_CODE + 1], *idx;
+    short mtx_index[256], *idx;
     unsigned int index;
     char **pe;
     kern_entry *pk, *qk;
@@ -747,7 +749,7 @@ void print_afm(char *date, char *fontname)
         }
     }
     else { /* external encoding vector given */
-        for (idx = mtx_index; idx - mtx_index <= MAX_CHAR_CODE; *idx++ = 0);
+        for (idx = mtx_index; idx - mtx_index < 256; *idx++ = 0);
         for (pe = enc_names; pe - enc_names < names_count; pe++) {
             if (*pe == notdef)
                 continue;
@@ -783,7 +785,7 @@ void print_afm(char *date, char *fontname)
                 ttf_warn("glyph `%s' not found", *pe);
         }
         fprintf(outfile, "StartCharMetrics %u\n", ncharmetrics);
-        for (idx = mtx_index; idx - mtx_index <= MAX_CHAR_CODE; idx++) {
+        for (idx = mtx_index; idx - mtx_index < 256; idx++) {
             if (*idx != 0 && mtx_tab[*idx].found == 1)
                 print_char_metric(outfile, idx - mtx_index, *idx);
         }
@@ -864,7 +866,7 @@ void print_encoding(char *fontname)
         case 0:
             get_ushort(); /* skip length */
             get_ushort(); /* skip version number */
-            for (i = 0; i <= MAX_CHAR_CODE; i++) {
+            for (i = 0; i < 256; i++) {
                 fputs("/", file);
                 print_glyph_name(file, get_byte(), print_glyph);
                 fputs("\n", file);
@@ -886,13 +888,13 @@ void print_encoding(char *fontname)
             length = get_ushort(); /* number of character codes */
             for (i = first_code; i < first_code + length; i++) {
                 k = get_ushort();
-                if (i > MAX_CHAR_CODE)
+                if (i > 255)
                     fputs("% ", file);
                 fputs("/", file);
                 print_glyph_name(file, k, print_glyph);
                 fputs("\n", file);
             }
-            for (i =  first_code + length; i <= MAX_CHAR_CODE; i++)
+            for (i =  first_code + length; i < 256; i++)
                 fprintf(file, "/%s\n", notdef);
             break;
         default:

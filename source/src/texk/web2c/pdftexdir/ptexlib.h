@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#24 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#26 $
 */
 
 #ifndef PDFTEXLIB
@@ -35,6 +35,10 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#24 $
 /* pdftexlib macros */
 #include "ptexmac.h"
 
+/* avl */
+#include "avlstuff.h"
+
+
 /* pdftexlib type declarations */
 typedef struct {
     const char *pdfname;
@@ -49,6 +53,20 @@ typedef struct {
     integer objnum;                 /* object number */
     char **glyph_names;
 } enc_entry;
+
+struct _subfont_entry;
+typedef struct _subfont_entry subfont_entry;
+
+struct _subfont_entry {
+    char *infix;            /* infix for this subfont, eg "01" */
+    long charcodes[256];    /* the mapping for this subfont as read from sfd */
+    subfont_entry *next;
+};
+
+typedef struct {
+    char *name;             /* sfd name, eg "Unicode" */
+    subfont_entry *subfont; /* linked list of subfonts */
+} sfd_entry;
 
 typedef struct {
     char *tfm_name;             /* TFM file name */
@@ -68,6 +86,9 @@ typedef struct {
     boolean all_glyphs;         /* embed all glyphs? */
     unsigned short links;       /* link flags from tfm_tree and ps_tree */
     short tfm_avail;            /* flags whether a tfm is available */
+    short pid;                  /* Pid for truetype fonts */
+    short eid;                  /* Eid for truetype fonts */
+    subfont_entry *subfont;     /* subfont mapping */
 } fm_entry;
 
 typedef struct {
@@ -123,6 +144,9 @@ extern void fm_read_info(void);
 extern ff_entry * check_ff_exist(fm_entry *);
 extern void pdfmapfile(integer);
 extern void pdfmapline(integer);
+extern fm_entry *new_fm_entry(void);
+extern void delete_fm_entry(fm_entry *);
+extern int avl_do_entry(fm_entry *, int);
 
 /* papersiz.c */
 extern integer myatodim(char **);
@@ -208,6 +232,7 @@ extern scaled getpkcharwidth(internalfontnumber, scaled);
 /* writettf.c */
 extern void writettf(void);
 extern void writeotf(void);
+extern void ttf_free(void);
 
 /* writezip.c */
 extern void writezip(boolean);
