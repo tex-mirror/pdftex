@@ -87,6 +87,7 @@ CTANGLEBOOT = @CTANGLEBOOT@
 TANGLE = @TANGLE@
 CTANGLE = @CTANGLE@
 TIE = @TIE@
+WEAVE = weave
 
 # Calling tangle
 tangle = WEBINPUTS=$(srcdir) $(TANGLE)

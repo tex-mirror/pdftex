@@ -1,6 +1,3 @@
-%$Id: objstream.ch,v 1.269 2005/12/04 22:34:18 hahe Exp hahe $
-%
-% PDF-1.5 object streams patch
 %
 % Copyright (c) 2005 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
@@ -20,12 +17,15 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/hz.ch#15 $
+%***********************************************************************
+% $Id: objstream.ch,v 1.277 2005/12/05 20:49:10 hahe Exp hahe $
+%
+% PDF-1.5 object streams, patch 453
 %
 % new primitive: \pdfobjectstreams
 %
-%***********************************************************************
-
+% includes also patch 386 regarding pdf_mem and obj_tab
+%
 %***********************************************************************
 
 @x 5773
@@ -289,9 +289,12 @@ end;
 @z
 
 %***********************************************************************
+% redundant:
+% when a stream starts, pdf_begin_obj() has already been called
 
-@x 15456
+@x 15475
     ensure_pdf_open;
+    check_pdfminorversion;
 @y
 @z
 
@@ -383,6 +386,21 @@ the object is included.
 @z
 
 %***********************************************************************
+% patch 386
+
+@x 16304
+@!inf_obj_tab_size = 32000; {min size of the cross-reference table for PDF output}
+@!sup_obj_tab_size = 8388607; {max size of the cross-reference table for PDF output}
+@!inf_dest_names_size = 10000; {min size of the destination names table for PDF output}
+@!sup_dest_names_size = 131072; {max size of the destination names table for PDF output}
+@y
+@!inf_obj_tab_size = 1000; {min size of the cross-reference table for PDF output}
+@!sup_obj_tab_size = 8388607; {max size of the cross-reference table for PDF output}
+@!inf_dest_names_size = 1000; {min size of the destination names table for PDF output}
+@!sup_dest_names_size = 131072; {max size of the destination names table for PDF output}
+@z
+
+%***********************************************************************
 
 @x 16319
 @!obj_ptr: integer; {objects counter}
@@ -393,15 +411,43 @@ the object is included.
 @z
 
 %***********************************************************************
+% + patch 386
 
 @x 16329
 obj_ptr := 0;
 @y
 obj_ptr := 0;
 sys_obj_ptr := 0;
+obj_tab_size := inf_obj_tab_size; {allocated size of |obj_tab| array}
+dest_names_size := inf_dest_names_size; {allocated size of |dest_names| array}
 @z
 
 %***********************************************************************
+% + patch 386
+
+@x 16347
+procedure append_dest_name(s: str_number; n: integer);
+begin
+    if pdf_dest_names_ptr = dest_names_size then
+        overflow("number of destination names", dest_names_size);
+@y
+procedure append_dest_name(s: str_number; n: integer);
+var a: integer;
+begin
+    if pdf_dest_names_ptr = sup_dest_names_size then
+        overflow("number of destination names (dest_names_size)", dest_names_size);
+    if pdf_dest_names_ptr = dest_names_size then begin
+        a := 0.2 * dest_names_size;
+        if dest_names_size < sup_dest_names_size - a then
+            dest_names_size := dest_names_size + a
+        else
+            dest_names_size := sup_dest_names_size;
+        dest_names := xrealloc_array(dest_names, dest_name_entry, dest_names_size);
+    end;
+@z
+
+%***********************************************************************
+% + patch 386
 
 @x 16356
 procedure pdf_create_obj(t, i: integer); {create an object with type |t| and
@@ -416,10 +462,18 @@ begin
 procedure pdf_create_obj(t, i: integer); {create an object with type |t| and
 identifier |i|}
 label done;
-var p, q: integer;
+var a, p, q: integer;
 begin
-    if sys_obj_ptr = obj_tab_size then
+    if sys_obj_ptr = sup_obj_tab_size then
         overflow("indirect objects table size", obj_tab_size);
+    if sys_obj_ptr = obj_tab_size then begin
+        a := 0.2 * obj_tab_size;
+        if obj_tab_size < sup_obj_tab_size - a then
+            obj_tab_size := obj_tab_size + a
+        else
+            obj_tab_size := sup_obj_tab_size;
+        obj_tab := xrealloc_array(obj_tab, obj_entry, obj_tab_size);
+    end;
     incr(sys_obj_ptr);
     obj_ptr := sys_obj_ptr;
 @z
@@ -520,6 +574,7 @@ end;
 @y
 procedure pdf_begin_dict(i: integer; pdf_os: boolean); {begin a PDF dictionary object}
 begin
+    check_pdfminorversion;
     pdf_os_prepare_obj(i, pdf_os);
     if not pdf_os or not pdf_os_enable then begin
         pdf_print_int(i);
@@ -1293,13 +1348,27 @@ pdf_print_ln("%%EOF")
 @z
 
 %***********************************************************************
+% patch 386
 
-@x 32378
+@x 32321
+  setup_bound_var (65536)('obj_tab_size')(obj_tab_size);
+  setup_bound_var (20000)('dest_names_size')(dest_names_size);
+@y
+@z
+
+%***********************************************************************
+% + patch 386
+
+@x 32376
+  obj_tab:=xmalloc_array (obj_entry, obj_tab_size);
+  pdf_mem:=xmalloc_array (integer, inf_pdf_mem_size); {will grow dynamically}
   dest_names:=xmalloc_array (dest_name_entry, dest_names_size);
 @y
-  dest_names:=xmalloc_array (dest_name_entry, dest_names_size);
+  obj_tab:=xmalloc_array (obj_entry, inf_obj_tab_size); {will grow dynamically}
+  pdf_mem:=xmalloc_array (integer, inf_pdf_mem_size); {will grow dynamically}
+  dest_names:=xmalloc_array (dest_name_entry, inf_dest_names_size); {will grow dynamically}
   pdf_op_buf:=xmalloc_array (eight_bits, pdf_op_buf_size);
-  pdf_os_buf:=xmalloc_array (eight_bits, inf_pdf_os_buf_size);
+  pdf_os_buf:=xmalloc_array (eight_bits, inf_pdf_os_buf_size); {will grow dynamically}
   pdf_os_objnum:=xmalloc_array (integer, pdf_os_max_objs);
   pdf_os_objoff:=xmalloc_array (integer, pdf_os_max_objs);
 @z

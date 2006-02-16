@@ -84,7 +84,7 @@ procedure initialize;
 @!max_names=5000; {number of identifiers, index entries, and module names;
   must be less than 10240}
 @y
-@!max_bytes=65530; {|1/ww| times the number of bytes in identifiers,
+@!max_bytes=65536; {|1/ww| times the number of bytes in identifiers,
   index entries, and module names; must be less than 65536}
 @!max_names=10220; {number of identifiers, index entries, and module names;
   must be less than 10240}

@@ -1,10 +1,10 @@
 pdfTeX
 ======
 
-README for version 3.14159-1.40.0-alpha-20051205
+README for version 3.14159-1.40.0-alpha-20051208
 ================================================
 
-This directory contains the version 1.40.0-alpha-20051205 of pdfTeX, an
+This directory contains the version 1.40.0-alpha-20051208 of pdfTeX, an
 extended version of TeX that can create PDF directly from TeX source files
 and enhance the result of TeX typesetting with the help of PDF. When PDF
 output is not selected, pdfTeX produces normal DVI output, otherwise it
@@ -78,7 +78,7 @@ Peter Breitenlohner, Ricardo Sanchez Carmenes, Otfried Cheong, Thomas
 Esser, Hans Hagen, Hartmut Henkel, Taco Hoekwater, Pawel Jackowski, Tom
 Kacvinsky, Akira Kakuto, Reinhard Kotucha, Derek B. Noonburg, Heiko
 Oberdiek, Jiri Osoba, Fabrice Popineau, Sebastian Rahtz, Tomas Rokicki,
-Martin Schröder, Petr Sojka, Olaf Weber, Jiri Zlatuska.
+Martin Schröder, Petr Sojka, Ralf Utermann. Olaf Weber, Jiri Zlatuska.
 
 pdfTeX is built on top of TeX, written by Donald Knuth cum suis (Liang and
 so), and eTeX, written by Peter Breitenlohner cum suis; part of the

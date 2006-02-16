@@ -46,6 +46,7 @@ pdfetex_web_srcs = $(srcdir)/tex.web \
 pdfetex_ch_srcs = pdfetex.web \
   $(srcdir)/pdfetexdir/tex.ch0 \
   $(srcdir)/tex.ch \
+  $(srcdir)/pdfetexdir/pdfetex.ch3 \
   $(srcdir)/etexdir/tex.ch1 \
   $(srcdir)/etexdir/tex.ech \
   $(srcdir)/pdfetexdir/tex.ch1 \
@@ -69,6 +70,10 @@ pdfetex-org.web: $(pdfetex_ch_srcs_org)
 	$(TIE) -m $@ $(pdfetex_ch_srcs_org)
 pdfetex-all.web: pdfetex.web pdfetex.ch
 	$(TIE) -m $@ pdfetex.web pdfetex.ch
+pdfetex-all.tex: pdfetex-all.web
+	$(WEAVE) pdfetex-all.web
+pdfetex-all.pdf: pdfetex-all.tex
+	$(pdfetex) pdfetex-all.tex
 
 $(srcdir)/pdfetexdir/pdfetex.h: $(srcdir)/pdftexdir/pdftex.h
 	cp -f $(srcdir)/pdftexdir/pdftex.h $@

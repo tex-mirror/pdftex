@@ -69,7 +69,7 @@
 @y
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-alpha-20051205' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-alpha-20051208' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -4511,6 +4511,11 @@ if fixed_pdfoutput > 0 then begin
         print_err(" ==> Fatal error occurred, the output PDF file is not finished!")
     else begin
         @<Finish the PDF file@>;
+        wlog_cr;
+        wlog_ln('PDF statistics:');
+        wlog_ln(' ',obj_ptr:1,' PDF objects out of ',obj_tab_size:1);
+        wlog_ln(' ',pdf_dest_names_ptr:1,' named destinations out of ',dest_names_size:1);
+        wlog_ln(' ',pdf_mem_ptr:1,' words of extra memory for PDF output out of ',pdf_mem_size:1);
     end;
 end
 else begin
@@ -4518,39 +4523,6 @@ else begin
 end;
 @z
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Output statistics about the pdftex specific sizes only in PDF mode.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-@x [1334]
-  wlog_ln(' ',max_in_stack:1,'i,',max_nest_stack:1,'n,',@|
-    max_param_stack:1,'p,',@|
-    max_buf_stack+1:1,'b,',@|
-    max_save_stack+6:1,'s stack positions out of ',@|
-    stack_size:1,'i,',
-    nest_size:1,'n,',
-    param_size:1,'p,',
-    buf_size:1,'b,',
-    save_size:1,'s');
-  end
-@y
-  wlog_ln(' ',max_in_stack:1,'i,',max_nest_stack:1,'n,',@|
-    max_param_stack:1,'p,',@|
-    max_buf_stack+1:1,'b,',@|
-    max_save_stack+6:1,'s stack positions out of ',@|
-    stack_size:1,'i,',
-    nest_size:1,'n,',
-    param_size:1,'p,',
-    buf_size:1,'b,',
-    save_size:1,'s');
-  if (pdf_output > 0) then begin
-    wlog_ln('PDF statistics:');
-    wlog_ln(' ',obj_ptr:1,' PDF objects out of ',obj_tab_size:1);
-    wlog_ln(' ',pdf_dest_names_ptr:1,' named destinations out of ',dest_names_size:1);
-    wlog_ln(' ',pdf_mem_ptr:1,' words of extra memory for PDF output out of ',pdf_mem_size:1);
-  end;
-  end
-@z
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Override pdf_output value from format file with command line option

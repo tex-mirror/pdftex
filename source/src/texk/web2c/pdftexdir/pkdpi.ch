@@ -18,13 +18,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
 %***********************************************************************
+% $Id: pkdpi.ch,v 1.16 2005/12/05 20:35:00 hahe Exp hahe $
 %
-% take PK resolution from "pk_dpi" parameter in texmfmp.c,
-% if it has not been set by the format file or by the user
+% take PK resolution from "pk_dpi" parameter in texmf.cnf,
+% if it has not been set by the format file or by the user.
 %
 %***********************************************************************
-%
-%$Id: pkdpi.ch,v 1.12 2005/12/04 22:50:14 hahe Exp hahe $
 
 @x 16307
 @!sup_dest_names_size = 131072; {max size of the destination names table for PDF output}
@@ -47,9 +46,9 @@ fixed_pk_resolution := fix_int(pdf_pk_resolution, 72, 8000);
 %***********************************************************************
 
 @x 32322
-  setup_bound_var (20000)('dest_names_size')(dest_names_size);
+  setup_bound_var (0)('hash_extra')(hash_extra);
 @y
-  setup_bound_var (20000)('dest_names_size')(dest_names_size);
+  setup_bound_var (0)('hash_extra')(hash_extra);
   setup_bound_var (72)('pk_dpi')(pk_dpi);
 @z
 

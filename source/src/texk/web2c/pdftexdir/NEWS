@@ -1,6 +1,17 @@
 ----------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-alpha-20051205 was released on 2005-12-05
 ----------------------------------------------------------------
+- improved patches:
+  - 386	grow obj_tab and dest_names arrays dynamically
+  - 453	Object Streams for PDF-1.5
+  - take PK resolution from "pk_dpi" parameter in  texmf.cnf, if it has not
+    been set by the format file or by the user
+- write out PDF statistics later to make them correct
+- makefile target pdfetex-all.pdf for a huge file
+
+----------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-alpha-20051205 was released on 2005-12-05
+----------------------------------------------------------------
 - has these patches:
   - 386	grow obj_tab and dest_names arrays dynamically
   - 416	new primitive pdflastlink
@@ -11,8 +22,8 @@ pdfTeX 3.141592-1.40.0-alpha-20051205 was released on 2005-12-05
   - 443	512 zeros in Type1 fonts not copied anymore
   - 447	Don't write /Encoding for non-reencoded fonts
   - 453	Object Streams for PDF-1.5
-  - take PK resolution from "pk_dpi" parameter in texmfmp.c, if it has not been
-    set by the format file or by the user
+  - take PK resolution from "pk_dpi" parameter in  texmf.cnf, if it has not
+    been set by the format file or by the user
 
 -------------------------------------------------
 pdfTeX 3.141592-1.30.5 was released on 2005-12-04
