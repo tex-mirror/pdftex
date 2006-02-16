@@ -23,6 +23,7 @@
 #include <kpathsea/progname.h>
 #include <kpathsea/proginit.h>
 #include <kpathsea/tex-file.h>
+#include <kpathsea/variable.h>
 
 /* Help messages.  */
 #include "help.h"

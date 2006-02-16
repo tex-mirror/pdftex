@@ -1,4 +1,4 @@
-% Copyright (c) 2005 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 2005-2006 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
 % This file is part of pdfTeX.
 %
@@ -17,7 +17,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
 %***********************************************************************
-%$Id: rule.ch,v 1.12 2005/12/23 23:09:31 hahe Exp hahe $
+%$Id: rule.ch,v 1.13 2006/01/08 09:34:24 hahe Exp hahe $
 %
 % rule in a group
 %
@@ -105,6 +105,7 @@ begin
     end;
     pdf_print_ln("Q");
 end;
+
 @z
 
 %***********************************************************************

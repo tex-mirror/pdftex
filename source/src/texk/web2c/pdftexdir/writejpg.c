@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writejpg.c#8 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writejpg.c#10 $
 */
 
 #include "ptexlib.h"
@@ -223,5 +223,5 @@ void write_jpg(integer img)
     pdf_puts("/Filter /DCTDecode\n>>\nstream\n");
     for (l = jpg_ptr(img)->length, f = jpg_ptr(img)->file; l > 0; l--)
         pdfout(xgetc(f));
-    pdf_puts("endstream\nendobj\n");
+    pdfendstream();
 }

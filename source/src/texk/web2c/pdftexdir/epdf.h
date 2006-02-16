@@ -69,6 +69,7 @@ typedef unsigned char eightbits  ;
 extern eightbits * pdfbuf;
 extern integer pdfbufsize;
 extern integer pdfosmode;
+extern eightbits pdflastbyte;
 
 extern char notdef[];
 

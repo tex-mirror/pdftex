@@ -18,7 +18,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
 %***********************************************************************
-% $Id: objstream.ch,v 1.286 2005/12/26 19:05:10 hahe Exp hahe $
+% $Id: objstream.ch,v 1.291 2006/01/06 23:57:24 hahe Exp hahe $
 %
 % PDF-1.5 object streams, patch 453
 %
@@ -152,6 +152,7 @@ end
 @!pdf_os_objnum: ^integer; {array of object numbers within object stream}
 @!pdf_os_objoff: ^integer; {array of object offsets within object stream}
 @!pdf_os_objidx: pointer; {pointer into |pdf_os_objnum| and |pdf_os_objoff|}
+@!pdf_os_cntr: integer; {counter for object stream objects}
 @!pdf_op_ptr: integer; {store for PDF buffer |pdf_ptr| while inside object streams}
 @!pdf_os_ptr: integer; {store for object stream |pdf_ptr| while outside object streams}
 @!pdf_os_mode: boolean; {true if producing object stream}
@@ -204,6 +205,7 @@ pdf_ptr := 0;
 pdf_op_ptr := 0;
 pdf_os_ptr := 0;
 pdf_os_cur_objnum := 0;
+pdf_os_cntr := 0;
 pdf_buf_size := pdf_op_buf_size;
 pdf_os_buf_size := inf_pdf_os_buf_size;
 pdf_buf := pdf_op_buf;
@@ -519,6 +521,7 @@ begin
         if pdf_os_cur_objnum = 0 then begin
             pdf_os_cur_objnum := pdf_new_objnum;
             decr(obj_ptr); {object stream is not accessible to user}
+            incr(pdf_os_cntr); {only for statistics}
             pdf_os_objidx := 0;
             pdf_ptr := 0; {start fresh object stream}
         end else
@@ -1391,6 +1394,27 @@ pdf_print_ln("%%EOF")
     is_names: boolean; {flag for name tree output: is it Names or Kids?}
     root, outlines, threads, names_tree, dests: integer;
     xref_offset_width, names_head, names_tail: integer;
+@z
+
+%***********************************************************************
+% logging
+
+@x 33045
+        wlog_ln('PDF statistics:');
+        wlog_ln(' ',obj_ptr:1,' PDF objects out of ',obj_tab_size:1);
+        wlog_ln(' ',pdf_dest_names_ptr:1,' named destinations out of ',dest_names_size:1);
+        wlog_ln(' ',pdf_mem_ptr:1,' words of extra memory for PDF output out of ',pdf_mem_size:1);
+@y
+        wlog_ln('PDF statistics:');
+        wlog_ln(' ',obj_ptr:1,' PDF objects out of ',obj_tab_size:1,
+            ' (max. ',sup_obj_tab_size:1,')');
+        if pdf_os_cntr > 0 then
+            wlog_ln(' ',((pdf_os_cntr - 1) * pdf_os_max_objs + pdf_os_objidx + 1):1,
+                ' compressed objects within ',pdf_os_cntr:1,' object streams');
+        wlog_ln(' ',pdf_dest_names_ptr:1,' named destinations out of ',dest_names_size:1,
+            ' (max. ',sup_dest_names_size:1,')');
+        wlog_ln(' ',pdf_mem_ptr:1,' words of extra memory for PDF output out of ',pdf_mem_size:1,
+            ' (max. ',sup_pdf_mem_size:1,')');
 @z
 
 %***********************************************************************

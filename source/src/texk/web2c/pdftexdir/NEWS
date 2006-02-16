@@ -1,4 +1,16 @@
 ----------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-alpha-20060111 was released on 2006-01-11
+----------------------------------------------------------------
+- new patches:
+  - 466 \primitive and \ifprimitive
+  - 467 \ifinedef
+- improved patches:
+  - 393 Ensure newline before endstream
+- pdfTeX now sets /ModDate and /Trapped by default (the values can be
+  overridden with /pdfinfo)
+- more fixes to remove warnings from -Wall
+
+----------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-alpha-20060106 was released on 2006-01-06
 ----------------------------------------------------------------
 - many small fixes to remove warnings from -Wall

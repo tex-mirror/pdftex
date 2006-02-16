@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: pdftoepdf.cc,v 1.3 2005/12/26 14:15:35 hahe Exp hahe $
+$Id: pdftoepdf.cc,v 1.6 2006/01/06 22:13:27 hahe Exp hahe $
 */
 
 #include <stdlib.h>
@@ -47,7 +47,7 @@ $Id: pdftoepdf.cc,v 1.3 2005/12/26 14:15:35 hahe Exp hahe $
 #include "epdf.h"
 
 static const char perforce_id[] = 
-    "$Id: pdftoepdf.cc,v 1.3 2005/12/26 14:15:35 hahe Exp hahe $";
+    "$Id: pdftoepdf.cc,v 1.6 2006/01/06 22:13:27 hahe Exp hahe $";
 
 /* 
  * this file is mostly C and not very much C++; it's just used to interface the
@@ -343,6 +343,7 @@ static void copyStream(Stream *str)
     str->reset();
     while ((c = str->getChar()) != EOF)
         pdfout(c);
+    pdflastbyte = pdfbuf[pdfptr - 1];
 }
 
 static void copyProcSet(Object *obj)
@@ -582,7 +583,9 @@ static void copyObject(Object *obj)
         pdf_puts(">>\n");
         pdf_puts("stream\n");
         copyStream(obj->getStream()->getBaseStream());
-        pdf_puts("endstream");
+        if (pdflastbyte != '\n')
+           pdf_puts("\n");
+        pdf_puts("endstream"); /* can't simply write pdfendstream() */
     }
     else if (obj->isRef()) {
         ref = obj->getRef();
@@ -931,8 +934,7 @@ write_epdf(void)
         copyDict(&obj1);
         pdf_puts(">>\nstream\n");
         copyStream(contents->getStream()->getBaseStream());
-        pdf_puts("endstream\n");
-        pdfendobj();
+        pdfendstream();
     }
     else if (contents->isArray()) {
         pdfbeginstream();

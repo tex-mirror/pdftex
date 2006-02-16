@@ -926,6 +926,11 @@ void printcreationdate() {
     pdf_printf("/CreationDate (%s)\n", start_time_str);
 }
 
+void printmoddate() {
+    initstarttime();
+    pdf_printf("/ModDate (%s)\n", start_time_str);
+}
+
 void getcreationdate()
 {
     /* put creation date on top of string pool and update poolptr */

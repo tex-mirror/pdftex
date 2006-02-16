@@ -6,7 +6,7 @@
 # number or how they are configured requires changes to the main distribution
 # anyway.
 
-# $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.mk#38 $
+# $Id: pdftex.mk,v 1.4 2006/01/06 21:18:14 hahe Exp hahe $
 
 Makefile: pdftexdir/pdftex.mk
 
@@ -67,6 +67,8 @@ pdftex_ch_srcs = pdftex.web \
   $(srcdir)/pdftexdir/rule.ch \
   $(srcdir)/pdftexdir/objstream.ch \
   $(srcdir)/pdftexdir/pkdpi.ch \
+  $(srcdir)/pdftexdir/misc-corr.ch \
+  $(srcdir)/pdftexdir/primitive.ch 
 #   Rules:
 pdftex.web: tie pdftexdir/pdftex.mk $(pdftex_web_srcs)
 	$(TIE) -m pdftex.web $(pdftex_web_srcs)
@@ -153,9 +155,9 @@ ttf2afm: ttf2afm.o
 	$(kpathsea_link) ttf2afm.o $(kpathsea)
 ttf2afm.o: ttf2afm.c macnames.c
 	$(compile) -c $< -o $@
-ttf2afm.c:
+ttf2afm.c: $(srcdir)/pdftexdir/ttf2afm.c
 	cp $(srcdir)/pdftexdir/ttf2afm.c .
-macnames.c:
+macnames.c: $(srcdir)/pdftexdir/macnames.c
 	cp $(srcdir)/pdftexdir/macnames.c .
 check: ttf2afm-check
 ttf2afm-check: ttf2afm

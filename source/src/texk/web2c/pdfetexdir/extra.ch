@@ -25,6 +25,8 @@
 % - kbs: kern before interword space and certain characters
 % - \ifincsname
 %
+% Module numbers are taken from the pdfetex sources after all change files
+%
 % $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#163 $
 
 @x [171] kbs
@@ -36,6 +38,8 @@
 @d sh_bs_code_base == 9
 @d kn_bc_code_base == 10
 @d kn_ac_code_base == 11
+
+@d auto_kern == explicit {please don't drop this}
 @z
 
 @x [252] kbs
@@ -58,7 +62,7 @@
 @d pdf_append_kern == int_par(pdf_append_kern_code)
 @z
 
-@x [] kbs
+@x [253] kbs
 pdf_tracing_fonts_code:    print_esc("pdftracingfonts");
 @y
 pdf_tracing_fonts_code:    print_esc("pdftracingfonts");
@@ -82,6 +86,13 @@ primitive("pdfappendkern",assign_int,int_base+pdf_append_kern_code);@/
 @z
 
 @x [382] \ifincsname
+var t:halfword; {token that is being ``expanded after''}
+@y
+var t:halfword; {token that is being ``expanded after''}
+b:boolean; {keep track of nested csnames}
+@z
+
+@x [382] \ifincsname + \ifinedef
 cur_order:=co_backup; link(backup_head):=backup_backup;
 end;
 @y
@@ -90,23 +101,25 @@ end;
 
 @ @<Glob...@>=
 @!is_in_csname: boolean;
+@!is_in_edef: boolean;
 
 @ @<Set init...@>=
 is_in_csname := false;
+is_in_edef := false;
 @z
 
 @x [388] \ifincsname
 begin r:=get_avail; p:=r; {head of the list of characters}
 @y
 begin r:=get_avail; p:=r; {head of the list of characters}
-is_in_csname := true;
+b := is_in_csname; is_in_csname := true;
 @z
 
 @x [388] \ifincsname
 if (cur_cmd<>end_cs_name) or (cur_chr<>0) then @<Complain about missing \.{\\endcsname}@>;
 @y
 if (cur_cmd<>end_cs_name) or (cur_chr<>0) then @<Complain about missing \.{\\endcsname}@>;
-is_in_csname := false;
+is_in_csname := b;
 @z
 
 @x [442] kbs
@@ -192,7 +205,14 @@ job_name_code: print(job_name);
 end {there are no other cases}
 @z
 
-@x [682] snapping
+@x [514]  \ifincsname
+var b:boolean; {is the condition true?}
+@y
+var b:boolean; {is the condition true?}
+e:boolean; {keep track of nested csnames}
+@z
+
+@x [684] snapping
 so we can use this field for both}
 @y
 so we can use this field for both}
@@ -205,7 +225,7 @@ so we can use this field for both}
 @d snapy_comp_ratio(#)       == mem[# + 1].int
 @z
 
-@x [690] kbs
+@x [692] kbs
 function expand_font_name(f: internal_font_number; e: integer): str_number;
 @y
 procedure set_kn_bs_code(f: internal_font_number; c: eight_bits; i: integer);
@@ -298,7 +318,7 @@ begin
     if k = 0 then
         return;
     q := new_kern(round_xn_over_d(quad(f), k, 1000));
-    subtype(q) := explicit;
+    subtype(q) := auto_kern;
     tail_append(q);
 end;
 
@@ -327,14 +347,14 @@ begin
     if k = 0 then
         return;
     q := new_kern(round_xn_over_d(quad(f), k, 1000));
-    subtype(q) := explicit;
+    subtype(q) := auto_kern;
     tail_append(q);
 end;
 
 function expand_font_name(f: internal_font_number; e: integer): str_number;
 @z
 
-@x [690] kbs
+@x [692] kbs
     pdf_font_ef_base[k] := pdf_font_ef_base[f];
 end;
 @y
@@ -358,7 +378,7 @@ end;
 end;
 @z
 
-@x [799] kbs
+@x [802] kbs
 @!pdf_font_ef_base: ^integer; {base of font expansion factor}
 @y
 @!pdf_font_ef_base: ^integer; {base of font expansion factor}
@@ -369,7 +389,7 @@ end;
 @!pdf_font_kn_ac_base: ^integer; {base of kern after character}
 @z
 
-@x [1122] snapping
+@x [1125] snapping
 @p function prune_page_top(@!p:pointer;@!s:boolean):pointer;
 @y
 @d discard_or_move = 60
@@ -377,7 +397,7 @@ end;
 label discard_or_move;
 @z
 
-@x [1122] snapping
+@x [1125] snapping
   whatsit_node,mark_node,ins_node: begin prev_p:=p; p:=link(prev_p);
     end;
   glue_node,kern_node,penalty_node: begin q:=p; p:=link(q); link(q):=null;
@@ -402,7 +422,7 @@ discard_or_move:
     q:=p; p:=link(q); link(q):=null;
 @z
 
-@x [1154] snapping
+@x [1157] snapping
 whatsit_node: @<Prepare to move whatsit |p| to the current page,
   then |goto contribute|@>;
 @y
@@ -417,7 +437,7 @@ whatsit_node: if (page_contents < box_there) and
                      then |goto contribute|@>;
 @z
 
-@x [1184] snapping
+@x [1187] snapping
 hmode+spacer: if space_factor=1000 then goto append_normal_space
   else app_space;
 @y
@@ -427,7 +447,7 @@ hmode+spacer:
   else app_space;
 @z
 
-@x [1190] kbs
+@x [1193] kbs
 tail_append(lig_stack) {|main_loop_lookahead| is next}
 @y
 if pdf_prepend_kern > 0 then
@@ -437,7 +457,7 @@ if pdf_append_kern > 0 then
     auto_append_kern(lig_stack)
 @z
 
-@x [1195] kbs
+@x [1198] kbs
 link(tail):=temp_ptr; tail:=temp_ptr;
 goto big_switch
 @y
@@ -447,7 +467,21 @@ link(tail):=temp_ptr; tail:=temp_ptr;
 goto big_switch
 @z
 
-@x [1407] kbs
+@x [1375] \ifinedef
+  e:=(cur_chr>=2); get_r_token; p:=cur_cs;
+@y
+  e:=(cur_chr>=2); get_r_token; p:=cur_cs;
+  is_in_edef := e;
+@z
+
+@x [1375] \ifinedef
+  define(p,call+(a mod 4),def_ref);
+@y
+  define(p,call+(a mod 4),def_ref);
+  is_in_edef := false;
+@z
+
+@x [1410] kbs
     tag_code: set_tag_code(f, p, cur_val);
 @y
     kn_bs_code_base: set_kn_bs_code(f, p, cur_val);
@@ -457,7 +491,7 @@ goto big_switch
     kn_ac_code_base: set_kn_ac_code(f, p, cur_val);
 @z
 
-@x [1408] kbs
+@x [1411] kbs
 primitive("tagcode",assign_font_int,tag_code);
 @!@:tag_code_}{\.{\\tagcode} primitive@>
 @y
@@ -475,7 +509,7 @@ primitive("knaccode",assign_font_int,kn_ac_code_base);
 @!@:kn_ac_code_}{\.{\\knaccode} primitive@>
 @z
 
-@x [1409] kbs
+@x [1412] kbs
 tag_code: print_esc("tagcode");
 @y
 tag_code: print_esc("tagcode");
@@ -486,7 +520,7 @@ kn_bc_code_base: print_esc("knbccode");
 kn_ac_code_base: print_esc("knaccode");
 @z
 
-@x [1477] kbs
+@x [1480] kbs
 pdf_font_ef_base:=xmalloc_array(integer, font_max);
 @y
 pdf_font_ef_base:=xmalloc_array(integer, font_max);
@@ -497,7 +531,7 @@ pdf_font_kn_bc_base:=xmalloc_array(integer, font_max);
 pdf_font_kn_ac_base:=xmalloc_array(integer, font_max);
 @z
 
-@x [1477] kbs
+@x [1480] kbs
     pdf_font_ef_base[font_k] := 0;
 @y
     pdf_font_ef_base[font_k] := 0;
@@ -508,7 +542,7 @@ pdf_font_kn_ac_base:=xmalloc_array(integer, font_max);
     pdf_font_kn_ac_base[font_k] := 0;
 @z
 
-@x [1491] kbs
+@x [1494] kbs
 pdf_font_ef_base:=xmalloc_array(integer,font_max);
 @y
 pdf_font_ef_base:=xmalloc_array(integer,font_max);
@@ -519,7 +553,7 @@ pdf_font_kn_bc_base:=xmalloc_array(integer, font_max);
 pdf_font_kn_ac_base:=xmalloc_array(integer, font_max);
 @z
 
-@x [1491] kbs
+@x [1494] kbs
     pdf_font_ef_base[font_k] := 0;
 @y
     pdf_font_ef_base[font_k] := 0;
@@ -530,7 +564,7 @@ pdf_font_kn_ac_base:=xmalloc_array(integer, font_max);
     pdf_font_kn_ac_base[font_k] := 0;
 @z
 
-@x [1498] snapping
+@x [1501] snapping
 @d pdftex_last_extension_code  == pdftex_first_extension_code + 26
 @y
 @d pdf_snap_ref_point_node       == pdftex_first_extension_code + 27
@@ -539,7 +573,7 @@ pdf_font_kn_ac_base:=xmalloc_array(integer, font_max);
 @d pdftex_last_extension_code    == pdftex_first_extension_code + 29
 @z
 
-@x [1498] snapping
+@x [1501] snapping
 primitive("pdfsavepos",extension,pdf_save_pos_node);@/
 @!@:pdf_save_pos_}{\.{\\pdfsavepos} primitive@>
 @y
@@ -553,7 +587,7 @@ primitive("pdfsnapycomp",extension,pdf_snapy_comp_node);@/
 @!@:pdf_snapy_comp_}{\.{\\pdfsnapycomp} primitive@>
 @z
 
-@x [1500] snapping
+@x [1503] snapping
   othercases print("[unknown extension!]")
 @y
   pdf_snap_ref_point_node: print_esc("pdfsnaprefpoint");
@@ -562,7 +596,7 @@ primitive("pdfsnapycomp",extension,pdf_snapy_comp_node);@/
   othercases print("[unknown extension!]")
 @z
 
-@x [1502] snapping
+@x [1505] snapping
 pdf_save_pos_node: @<Implement \.{\\pdfsavepos}@>;
 @y
 pdf_save_pos_node: @<Implement \.{\\pdfsavepos}@>;
@@ -571,7 +605,7 @@ pdf_snapy_node: @<Implement \.{\\pdfsnapy}@>;
 pdf_snapy_comp_node: @<Implement \.{\\pdfsnapycomp}@>;
 @z
 
-@x [1538] snapping
+@x [1542] snapping
 @ @<Implement \.{\\pdfendthread}@>=
 begin
     check_pdfoutput("\pdfendthread", true);
@@ -599,7 +633,7 @@ end
 count_do_snapy := 0;
 @z
 
-@x [1540] snapping
+@x [1544] snapping
 @ @<Implement \.{\\pdfsavepos}@>=
 @y
 @ @<Implement \.{\\pdfsnaprefpoint}@>=
@@ -641,7 +675,7 @@ end
 @ @<Implement \.{\\pdfsavepos}@>=
 @z
 
-@x [1558] snapping
+@x [1562] snapping
 othercases print("whatsit?")
 @y
 pdf_snap_ref_point_node: print_esc("pdfsnaprefpoint");
@@ -660,7 +694,7 @@ end;
 othercases print("whatsit?")
 @z
 
-@x [1559] snapping
+@x [1563] snapping
 othercases confusion("ext2")
 @y
 pdf_snap_ref_point_node:
@@ -675,7 +709,7 @@ pdf_snapy_comp_node:
 othercases confusion("ext2")
 @z
 
-@x [1560] snapping
+@x [1564] snapping
 othercases confusion("ext3")
 @y
 pdf_snap_ref_point_node:
@@ -689,7 +723,7 @@ pdf_snapy_comp_node:
 othercases confusion("ext3")
 @z
 
-@x [1588] snapping
+@x [1593] snapping
 @ @<Output the whatsit node |p| in |pdf_vlist_out|@>=
 @y
 function gap_amount(p: pointer; cur_pos: scaled): scaled; {find the gap between
@@ -859,7 +893,7 @@ end
 @z
 
 
-@x [1588] snapping
+@x [1593] snapping
 othercases out_what(p);
 @y
 pdf_snap_ref_point_node:
@@ -871,7 +905,7 @@ pdf_snapy_node:
 othercases out_what(p);
 @z
 
-@x [1591] snapping
+@x [1596] snapping
 @ @<Output a Image node in a vlist@>=
 @y
 @ @<Save current position to |pdf_snapx_refpos|, |pdf_snapy_refpos|@>=
@@ -883,7 +917,7 @@ end
 @ @<Output a Image node in a vlist@>=
 @z
 
-@x [1593] snapping
+@x [1598] snapping
 othercases out_what(p);
 @y
 pdf_snap_ref_point_node:
@@ -893,14 +927,15 @@ pdf_snapy_node: do_nothing; {snapy nodes do nothing in hlist}
 othercases out_what(p);
 @z
 
-@x [1711] \ifincsname
+@x [1716] \ifincsname + \ifinedef
 @d if_font_char_code=19 { `\.{\\iffontchar}' }
 @y
 @d if_font_char_code=19 { `\.{\\iffontchar}' }
 @d if_in_csname_code=20 { `\.{\\ifincsname}' }
+@d if_in_edef_code=22 { `\.{\\ifinedef}' }
 @z
 
-@x [1711] \ifincsname
+@x [1716] \ifincsname + \ifinedef
 primitive("iffontchar",if_test,if_font_char_code);
 @!@:if_font_char_}{\.{\\iffontchar} primitive@>
 @y
@@ -908,18 +943,38 @@ primitive("iffontchar",if_test,if_font_char_code);
 @!@:if_font_char_}{\.{\\iffontchar} primitive@>
 primitive("ifincsname",if_test,if_in_csname_code);
 @!@:if_in_csname_}{\.{\\ifincsname} primitive@>
+primitive("ifinedef",if_test,if_in_edef_code);
+@!@:if_in_edef_}{\.{\\ifinedef} primitive@>
 @z
 
-@x [1713] \ifincsname
+@x [1718] \ifincsname + \ifinedef
 if_font_char_code:print_esc("iffontchar");
 @y
 if_font_char_code:print_esc("iffontchar");
 if_in_csname_code:print_esc("ifincsname");
+if_in_edef_code:print_esc("ifinedef");
 @z
 
-@x [1718] \ifincsname
+@x [1721] \ifincsname
+if_cs_code:begin n:=get_avail; p:=n; {head of the list of characters}
+@y
+if_cs_code:begin n:=get_avail; p:=n; {head of the list of characters}
+e := is_in_csname; is_in_csname := true;
+@z
+
+@x [1721] \ifincsname
+  b:=(eq_type(cur_cs)<>undefined_cs);
+  end;
+@y
+  b:=(eq_type(cur_cs)<>undefined_cs);
+  is_in_csname := e;
+  end;
+@z
+
+@x [1723] \ifincsname + \ifinedef
 if_font_char_code:begin scan_font_ident; n:=cur_val; scan_char_num;
 @y
 if_in_csname_code: b := is_in_csname;
+if_in_edef_code: b := is_in_edef;
 if_font_char_code:begin scan_font_ident; n:=cur_val; scan_char_num;
 @z

@@ -70,7 +70,7 @@
 @y
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-alpha-20060106' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-alpha-20060111' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -2933,8 +2933,7 @@ var s: str_number;
 begin
     s := tokens_to_string(p);
     if length(s) > 0 then begin
-        pdf_print(s);
-        pdf_print_nl;
+        pdf_print_ln(s);
     end;
     flush_str(s);
 end;
@@ -4296,11 +4295,10 @@ if pdf_catalog_openaction <> 0 then
     pdf_indirect_ln("OpenAction", pdf_catalog_openaction);
 pdf_end_dict
 
-@ If the same keys in a dictionary are given several times,
-then it is not defined which value is choosen by an application.
-Therefore the keys |/Producer| and |/Creator| are only set,
-if the token list |pdf_info_toks|, converted to a string does
-not contain these key strings.
+@ If the same keys in a dictionary are given several times, then it is not
+defined which value is choosen by an application.  Therefore the keys
+|/Producer| and |/Creator| are only set if the token list
+|pdf_info_toks| converted to a string does not contain these key strings.
 
 @p function substr_of_str(s, t: str_number):boolean;
 label continue,exit;
@@ -4325,25 +4323,28 @@ end;
 
 procedure pdf_print_info; {print info object}
 var s: str_number;
-    creator_given, producer_given, creationdate_given: boolean;
+    creator_given, producer_given, creationdate_given, moddate_given, trapped_given: boolean;
 begin
     pdf_new_dict(obj_type_others, 0);
     creator_given:=false;
     producer_given:=false;
     creationdate_given:=false;
+    moddate_given:=false;
+    trapped_given:=false;
     if pdf_info_toks <> null then begin
         s:=tokens_to_string(pdf_info_toks);
         creator_given:=substr_of_str("/Creator", s);
         producer_given:=substr_of_str("/Producer", s);
         creationdate_given:=substr_of_str("/CreationDate", s);
+        moddate_given:=substr_of_str("/ModDate", s);
+        trapped_given:=substr_of_str("/Trapped", s);
     end;
     if not producer_given then begin
         @<Print the Producer key@>;
     end;
     if pdf_info_toks <> null then begin
         if length(s) > 0 then begin
-            pdf_print(s);
-            pdf_print_nl;
+            pdf_print_ln(s);
         end;
         flush_str(s);
         delete_toks(pdf_info_toks);
@@ -4352,6 +4353,12 @@ begin
         pdf_str_entry_ln("Creator", "TeX");
     if not creationdate_given then begin
         @<Print the CreationDate key@>;
+    end;
+    if not moddate_given then begin
+        @<Print the ModDate key@>;
+    end;
+    if not trapped_given then begin
+        pdf_print_ln("/Trapped /False");
     end;
     pdf_str_entry_ln("PTEX.Fullbanner", pdftex_banner);
     pdf_end_dict;
@@ -4368,6 +4375,9 @@ pdf_print_ln(")")
 
 @ @<Print the CreationDate key@>=
 print_creation_date;
+
+@ @<Print the ModDate key@>=
+print_mod_date;
 
 @ @<Glob...@>=
 @!pdftex_banner: str_number;   {the complete banner}

@@ -1,5 +1,5 @@
 {
-Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -64,6 +64,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#15
 @define procedure libpdffinish;
 @define procedure makepdftexbanner;
 @define procedure printcreationdate;
+@define procedure printmoddate;
 @define procedure printID();
 @define procedure setjobid();
 @define procedure unescapehex();

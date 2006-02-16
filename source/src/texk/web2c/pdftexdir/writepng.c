@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: writepng.c,v 1.6 2005/12/26 14:25:24 hahe Exp hahe $
+$Id: writepng.c,v 1.2 2006/01/06 22:35:43 hahe Exp hahe $
 */
 
 #include "ptexlib.h"
@@ -25,7 +25,7 @@ $Id: writepng.c,v 1.6 2005/12/26 14:25:24 hahe Exp hahe $
 
 /*@unused@*/
 static const char perforce_id[] = 
-    "$Id: writepng.c,v 1.6 2005/12/26 14:25:24 hahe Exp hahe $";
+    "$Id: writepng.c,v 1.2 2006/01/06 22:35:43 hahe Exp hahe $";
 
 void read_png_info(integer img)
 {
@@ -459,7 +459,7 @@ void copy_png(integer img)
 		pdftex_fail("writepng: fseek in PNG file failed");
 	    break;
 	case SPNG_CHUNK_IEND:	/* done */
-	    pdf_puts("\nendstream\nendobj\n");
+	    pdfendstream();
 	    endflag = true;
 	    break;
 	default:

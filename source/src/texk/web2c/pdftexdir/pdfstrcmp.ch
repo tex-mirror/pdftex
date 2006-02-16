@@ -40,7 +40,7 @@ primitive("pdfelapsedtime",last_item,elapsed_time_code);
 primitive("pdfelapsedtime",last_item,elapsed_time_code);
 @!@:elapsed_time_}{\.{\\pdfelapsedtime} primitive@>
 primitive("pdfshellescape",last_item,pdf_shell_escape_code);
-@!@:elapsed_time_}{\.{\\pdfshellescape} primitive@>
+@!@:pdf_shell_escape_}{\.{\\pdfshellescape} primitive@>
 @z
 
 @x 9470

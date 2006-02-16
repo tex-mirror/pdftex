@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: writefont.c,v 1.5 2005/12/26 14:24:30 hahe Exp hahe $
+$Id: writefont.c,v 1.3 2005/12/27 19:04:42 hahe Exp $
 */
 
 #include "ptexlib.h"
 
 static const char perforce_id[] = 
-    "$Id: writefont.c,v 1.5 2005/12/26 14:24:30 hahe Exp hahe $";
+    "$Id: writefont.c,v 1.3 2005/12/27 19:04:42 hahe Exp $";
 
 key_entry font_keys[FONT_KEYS_NUM] = {
     {"Ascent",       "Ascender",     0, false},
@@ -97,8 +97,6 @@ static void get_char_widths(void)
         else
             char_widths[i] = getcharwidth(tex_font, i);
     }
-    for (i = fontbc[tex_font]; i <= 32; i++)
-        char_widths[pdfcharmap[tex_font][i]] = char_widths[i];
     for (i = fontbc[tex_font]; i < 256; i++)
         if (pdfcharmarked(tex_font, i))
             break;
