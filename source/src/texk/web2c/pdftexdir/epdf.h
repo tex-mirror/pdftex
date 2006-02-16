@@ -104,6 +104,7 @@ extern void zpdfosgetosbuf(integer);
 
 /* utils.c */
 extern char *convertStringToPDFString(char *in, int len);
+extern char *stripzeros(char *a);
 
 /* config.c */
 extern integer cfgpar(integer);

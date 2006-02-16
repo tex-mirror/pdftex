@@ -1237,3 +1237,72 @@ char *makecfilename(strnumber s) {
     *q = '\0';
     return name;
 }
+
+/* function strips trailing zeros in string with numbers; */
+/* leading zeros are not stripped (as in real life) */
+char *stripzeros(char *a)
+{
+    enum { NONUM, DOTNONUM, INT, DOT, LEADDOT, FRAC } s = NONUM, t = NONUM;
+    size_t i, j = 0, k = 0;
+
+    for (i = 0; i < strlen(a) + 1; i++) {
+        switch (s) {
+        case NONUM:
+            if (a[i] >= '0' && a[i] <= '9')
+                s = INT;
+            else if (a[i] == '.')
+                s = LEADDOT;
+            break;
+        case DOTNONUM:
+            if (a[i] != '.' && (a[i] < '0' || a[i] > '9'))
+                s = NONUM;
+            break;
+        case INT:
+            if (a[i] == '.')
+                s = DOT;
+            else if (a[i] < '0' || a[i] > '9')
+                s = NONUM;
+            break;
+        case DOT:
+        case LEADDOT:
+            if (a[i] >= '0' && a[i] <= '9')
+                s = FRAC;
+            else if (a[i] == '.')
+                s = DOTNONUM;
+            else
+                s = NONUM;
+            break;
+        case FRAC:
+            if (a[i] == '.')
+                s = DOTNONUM;
+            else if (a[i] < '0' || a[i] > '9')
+                s = NONUM;
+            break;
+        default:;
+        }
+        switch (s) {
+        case DOT:
+            j = i;
+            break;
+        case LEADDOT:
+            j = i + 1;
+            break;
+        case FRAC:
+            if (a[i] > '0')
+                j = i + 1;
+            break;
+        case NONUM:
+            if ((t == FRAC || t == DOT) && j > 0) {
+                k -= i - j;
+                if (a[k - 1] == '.')    /* was a LEADDOT */
+                    a[k - 1] = '0';
+                j = 0;
+            }
+            break;
+        default:;
+        }
+        a[k++] = a[i];
+        t = s;
+    }
+    return a;
+}

@@ -18,7 +18,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
 %***********************************************************************
-% $Id: objstream.ch,v 1.291 2006/01/06 23:57:24 hahe Exp hahe $
+% $Id: objstream.ch,v 1.293 2006/01/14 19:13:54 hahe Exp hahe $
 %
 % PDF-1.5 object streams, patch 453
 %
@@ -1408,9 +1408,13 @@ pdf_print_ln("%%EOF")
         wlog_ln('PDF statistics:');
         wlog_ln(' ',obj_ptr:1,' PDF objects out of ',obj_tab_size:1,
             ' (max. ',sup_obj_tab_size:1,')');
-        if pdf_os_cntr > 0 then
-            wlog_ln(' ',((pdf_os_cntr - 1) * pdf_os_max_objs + pdf_os_objidx + 1):1,
-                ' compressed objects within ',pdf_os_cntr:1,' object streams');
+        if pdf_os_cntr > 0 then begin
+            wlog(' ',((pdf_os_cntr - 1) * pdf_os_max_objs + pdf_os_objidx + 1):1,
+                ' compressed objects within ',pdf_os_cntr:1,' object stream');
+            if pdf_os_cntr > 1 then
+                wlog('s');
+            wlog_cr;
+        end;
         wlog_ln(' ',pdf_dest_names_ptr:1,' named destinations out of ',dest_names_size:1,
             ' (max. ',sup_dest_names_size:1,')');
         wlog_ln(' ',pdf_mem_ptr:1,' words of extra memory for PDF output out of ',pdf_mem_size:1,

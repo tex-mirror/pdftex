@@ -17,14 +17,15 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: writezip.c,v 1.1 2006/01/06 20:09:34 hahe Exp $
+$Id: writezip.c,v 1.2 2006/01/14 20:35:43 hahe Exp $
 */
 
 #include "ptexlib.h"
 #include "zlib.h"
+#include <assert.h>
 
 static const char perforce_id[] = 
-    "$Id: writezip.c,v 1.1 2006/01/06 20:09:34 hahe Exp $";
+    "$Id: writezip.c,v 1.2 2006/01/14 20:35:43 hahe Exp $";
 
 #define ZIP_BUF_SIZE  32768
 
@@ -38,16 +39,7 @@ static z_stream c_stream; /* compression stream */
 void writezip(boolean finish)
 {
     int err;
-
-    if (!getpdfcompresslevel()) {
-        if (pdfptr) {
-            pdfgone += xfwrite(pdfbuf, 1, pdfptr, pdffile);
-            pdflastbyte = pdfbuf[pdfptr - 1];
-            pdfstreamlength += pdfptr;
-        }
-        return;
-    }
-
+    assert (getpdfcompresslevel() > 0);
     cur_file_name = NULL;
     if (pdfstreamlength == 0) {
         c_stream.zalloc = (alloc_func)0;

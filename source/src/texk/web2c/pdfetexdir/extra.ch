@@ -86,13 +86,6 @@ primitive("pdfappendkern",assign_int,int_base+pdf_append_kern_code);@/
 @z
 
 @x [382] \ifincsname
-var t:halfword; {token that is being ``expanded after''}
-@y
-var t:halfword; {token that is being ``expanded after''}
-b:boolean; {keep track of nested csnames}
-@z
-
-@x [382] \ifincsname + \ifinedef
 cur_order:=co_backup; link(backup_head):=backup_backup;
 end;
 @y
@@ -101,25 +94,23 @@ end;
 
 @ @<Glob...@>=
 @!is_in_csname: boolean;
-@!is_in_edef: boolean;
 
 @ @<Set init...@>=
 is_in_csname := false;
-is_in_edef := false;
 @z
 
 @x [388] \ifincsname
 begin r:=get_avail; p:=r; {head of the list of characters}
 @y
 begin r:=get_avail; p:=r; {head of the list of characters}
-b := is_in_csname; is_in_csname := true;
+is_in_csname := true;
 @z
 
 @x [388] \ifincsname
 if (cur_cmd<>end_cs_name) or (cur_chr<>0) then @<Complain about missing \.{\\endcsname}@>;
 @y
 if (cur_cmd<>end_cs_name) or (cur_chr<>0) then @<Complain about missing \.{\\endcsname}@>;
-is_in_csname := b;
+is_in_csname := false;
 @z
 
 @x [442] kbs
@@ -203,13 +194,6 @@ pdf_ximage_bbox_code: begin
 end;
 job_name_code: print(job_name);
 end {there are no other cases}
-@z
-
-@x [514]  \ifincsname
-var b:boolean; {is the condition true?}
-@y
-var b:boolean; {is the condition true?}
-e:boolean; {keep track of nested csnames}
 @z
 
 @x [684] snapping
@@ -465,20 +449,6 @@ if pdf_adjust_interword_glue > 0 then
     adjust_interword_glue(tail, temp_ptr);
 link(tail):=temp_ptr; tail:=temp_ptr;
 goto big_switch
-@z
-
-@x [1375] \ifinedef
-  e:=(cur_chr>=2); get_r_token; p:=cur_cs;
-@y
-  e:=(cur_chr>=2); get_r_token; p:=cur_cs;
-  is_in_edef := e;
-@z
-
-@x [1375] \ifinedef
-  define(p,call+(a mod 4),def_ref);
-@y
-  define(p,call+(a mod 4),def_ref);
-  is_in_edef := false;
 @z
 
 @x [1410] kbs
@@ -927,15 +897,14 @@ pdf_snapy_node: do_nothing; {snapy nodes do nothing in hlist}
 othercases out_what(p);
 @z
 
-@x [1716] \ifincsname + \ifinedef
+@x [1716] \ifincsname
 @d if_font_char_code=19 { `\.{\\iffontchar}' }
 @y
 @d if_font_char_code=19 { `\.{\\iffontchar}' }
 @d if_in_csname_code=20 { `\.{\\ifincsname}' }
-@d if_in_edef_code=22 { `\.{\\ifinedef}' }
 @z
 
-@x [1716] \ifincsname + \ifinedef
+@x [1716] \ifincsname
 primitive("iffontchar",if_test,if_font_char_code);
 @!@:if_font_char_}{\.{\\iffontchar} primitive@>
 @y
@@ -943,38 +912,18 @@ primitive("iffontchar",if_test,if_font_char_code);
 @!@:if_font_char_}{\.{\\iffontchar} primitive@>
 primitive("ifincsname",if_test,if_in_csname_code);
 @!@:if_in_csname_}{\.{\\ifincsname} primitive@>
-primitive("ifinedef",if_test,if_in_edef_code);
-@!@:if_in_edef_}{\.{\\ifinedef} primitive@>
 @z
 
-@x [1718] \ifincsname + \ifinedef
+@x [1718] \ifincsname
 if_font_char_code:print_esc("iffontchar");
 @y
 if_font_char_code:print_esc("iffontchar");
 if_in_csname_code:print_esc("ifincsname");
-if_in_edef_code:print_esc("ifinedef");
 @z
 
-@x [1721] \ifincsname
-if_cs_code:begin n:=get_avail; p:=n; {head of the list of characters}
-@y
-if_cs_code:begin n:=get_avail; p:=n; {head of the list of characters}
-e := is_in_csname; is_in_csname := true;
-@z
-
-@x [1721] \ifincsname
-  b:=(eq_type(cur_cs)<>undefined_cs);
-  end;
-@y
-  b:=(eq_type(cur_cs)<>undefined_cs);
-  is_in_csname := e;
-  end;
-@z
-
-@x [1723] \ifincsname + \ifinedef
+@x [1723] \ifincsname
 if_font_char_code:begin scan_font_ident; n:=cur_val; scan_char_num;
 @y
 if_in_csname_code: b := is_in_csname;
-if_in_edef_code: b := is_in_edef;
 if_font_char_code:begin scan_font_ident; n:=cur_val; scan_char_num;
 @z

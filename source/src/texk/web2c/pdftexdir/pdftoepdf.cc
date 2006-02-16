@@ -781,6 +781,7 @@ write_epdf(void)
     PdfObject group, metadata, pieceinfo, separationInfo;
     Object info;
     char *key;
+    char s[256];
     int i, l;
     int rotate;
     double scale[6] = {0, 0, 0, 0, 0, 0};
@@ -831,22 +832,24 @@ write_epdf(void)
                 case 270: scale[1] = 1; scale[2] = -1; scale[4] = pagebox->x1 + pagebox->y2; scale[5] = pagebox->y1 - pagebox->x1; writematrix = true; break;
                 }
             if (writematrix) { // The matrix is only written if the image is rotated.
-                pdf_printf("/Matrix [%.8f %.8f %.8f %.8f %.8f %.8f]\n",
+                sprintf(s, "/Matrix [%.8f %.8f %.8f %.8f %.8f %.8f]\n",
                     scale[0],
                     scale[1],
                     scale[2],
                     scale[3],
                     scale[4],
                     scale[5]);
+                pdf_printf(stripzeros(s));
                 }
             }
         }
 
-    pdf_printf("/BBox [%.8f %.8f %.8f %.8f]\n",
+    sprintf(s, "/BBox [%.8f %.8f %.8f %.8f]\n",
                pagebox->x1,
                pagebox->y1,
                pagebox->x2,
                pagebox->y2);
+    pdf_printf(stripzeros(s));
 
     // write the page Group if it's there
     if (page->getGroup() != NULL) {

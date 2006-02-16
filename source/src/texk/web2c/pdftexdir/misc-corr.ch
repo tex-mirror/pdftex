@@ -18,7 +18,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
 %***********************************************************************
-% $Id: misc-corr.ch,v 1.7 2006/01/06 22:45:19 hahe Exp hahe $
+% $Id: misc-corr.ch,v 1.11 2006/01/14 22:20:33 hahe Exp hahe $
 %
 % misc-corr.ch
 %
@@ -92,7 +92,7 @@ pdf_seek_write_length := false;
     if pdf_compress_level > 0 then
         pdf_out(pdf_new_line_char);
 @y
-    if (pdf_compress_level > 0) and (zip_write_state = zip_writing) then
+    if zip_write_state = zip_writing then
         zip_write_state := zip_finish
     else
         pdf_stream_length := pdf_offset - pdf_save_offset;
