@@ -1,5 +1,5 @@
 ---------------------------------------------------------------
-pdfTeX 3.141592-1.40.0-beta-20060124 was released on 2006-01-24
+pdfTeX 3.141592-1.40.0-beta-20060125 was released on 2006-01-25
 ---------------------------------------------------------------
 - pdfTeX now includes pdfeTeX, i.e. there is no way to make a binary without
   eTeX support. Also the sources of TeX, eTeX and pdfTeX have been merged into
