@@ -49,10 +49,10 @@ echo "ignore warnings and errors about the main texmf tree"
 (cd texk/web2c/web2c; $MAKE) || exit 1
 (cd texk/web2c; $MAKE ../kpathsea/libkpathsea.la) || exit 1
 (cd texk/web2c/lib; $MAKE) || exit 1
-(cd texk/web2c; $MAKE pdftex pdfetex pdftosrc ttf2afm) || exit 1
+(cd texk/web2c; $MAKE pdfetex pdftosrc ttf2afm) || exit 1
 # strip them
-$STRIP texk/web2c/{pdf*tex,pdftosrc,ttf2afm}
+$STRIP texk/web2c/{pdfetex,pdftosrc,ttf2afm}
 # go back
 cd ..
 # show the results
-ls -l build/texk/web2c/{pdf*tex,pdf*tex.pool,pdftosrc,ttf2afm}
+ls -l build/texk/web2c/{pdfetex,pdfetex.pool,pdftosrc,ttf2afm}

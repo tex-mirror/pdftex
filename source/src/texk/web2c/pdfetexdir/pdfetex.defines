@@ -22,7 +22,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#15
 
 { pdftex.defines: additions for pdfTeX }
 
-{ macros from pdftex.h }
+{ macros from pdfetex.h }
 @define function pdfcharmarked();
 @define function getlpcode();
 @define function getrpcode();

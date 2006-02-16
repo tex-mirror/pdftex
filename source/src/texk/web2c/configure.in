@@ -47,7 +47,7 @@ AC_TYPE_SIGNAL
 AC_DECL_YYTEXT
 pb_AC_ASM_UNDERSCORE
 
-dnl pdfTeX likes inline functions in C code.
+dnl pdfeTeX likes inline functions in C code.
 AC_C_INLINE
 
 dnl These are standard among *NIX systems, but not when cross-compiling
@@ -138,20 +138,8 @@ else
 fi
 AC_SUBST(ALEPH)
 
-# For pdfTeX.
-if test -d $srcdir/pdftexdir; then
-  # Create build dir, if necessary.
-  test -d pdftexdir || mkdir pdftexdir
-  test "${with_pdftex+set}" = set || with_pdftex=yes
-else
-  if test "x$with_pdftex" = xyes; then
-    AC_MSG_WARN(The pdfTeX sources are not available.)
-  fi
-  with_pdftex=no
-fi
-
 # For pdfeTeX
-if test -d $srcdir/pdfetexdir && test -d $srcdir/pdftexdir \
+if test -d $srcdir/pdfetexdir \
     && test -d $srcdir/etexdir; then
   test "${with_pdfetex+set}" = set || with_pdfetex=yes
 else
@@ -162,8 +150,7 @@ else
 fi
 
 # Check whether C++ compiler works.  Prevent exit if it doesn't.
-if test "x$with_pdftex"  = xyes ||
-   test "x$with_pdfetex" = xyes
+if test "x$with_pdfetex" = xyes
 then
   # First test whether the compiler works in a subshell, and if so,
   # do it again in the main shell so we see the result.
@@ -172,11 +159,8 @@ then
 ) && {
   AC_PROG_CXX
 } || {
-  test "x$with_pdftex" = xyes \
-    && AC_MSG_WARN(No C++ compiler: pdfTeX will not be compiled.)
   test "x$with_pdfetex" = xyes \
     && AC_MSG_WARN(No C++ compiler: pdfeTeX will not be compiled.)
-  with_pdftex=no
   with_pdfetex=no
   true
 }
@@ -193,8 +177,7 @@ CXXLDEXTRA=
 CXXHACKLINK='$(kpathsea_cxx_link)'
 CXXHACKLDLIBS='$(LOADLIBES)'
 if test "x$with_cxx_runtime_hack" = xyes &&
-   { test "x$with_pdftex"  = xyes ||
-     test "x$with_pdfetex" = xyes; }
+   { test "x$with_pdfetex"  = xyes; }
 then
   AC_MSG_CHECKING(for statically linking C++ runtime library)
 
@@ -243,13 +226,6 @@ fi
 AC_SUBST(CXXLDEXTRA)
 AC_SUBST(CXXHACKLINK)
 AC_SUBST(CXXHACKLDLIBS)
-
-if test "x$with_pdftex" = xyes; then
-  PTEX=
-else
-  PTEX='#! '
-fi
-AC_SUBST(PTEX)
 
 if test "x$with_pdfetex" = xyes; then
   PETEX=
@@ -322,10 +298,9 @@ fi
 AC_SUBST(FMU)
 
 # Don't bother with pdflib unless pdf*TeX is requested.
-if test "$with_pdftex" = yes || \
-   test "$with_pdfetex" = yes
+if test "$with_pdfetex" = yes
 then
-  KPSE_CONFIG_FILES([pdftexdir/Makefile])
+  KPSE_CONFIG_FILES([pdfetexdir/Makefile])
 fi
 
 # Don't bother with pdfelib unless pdfeTeX is requested.
