@@ -19,10 +19,10 @@
 @z
 
 @x [252] kbs
-@d pdf_objectstreams_code    = pdftex_first_integer_code + 21 {activate object streams}
+@d pdf_objcompresslevel_code = pdftex_first_integer_code + 21 {activate object streams}
 @d pdf_int_pars=pdftex_first_integer_code + 22 {total number of \pdfTeX's integer parameters}
 @y
-@d pdf_objectstreams_code    = pdftex_first_integer_code + 21 {activate object streams}
+@d pdf_objcompresslevel_code = pdftex_first_integer_code + 21 {activate object streams}
 @d pdf_adjust_interword_glue_code    = pdftex_first_integer_code + 22 {adjust interword glue?}
 @d pdf_prepend_kern_code     = pdftex_first_integer_code + 23 {prepend kern before certain characters?}
 @d pdf_append_kern_code      = pdftex_first_integer_code + 24 {prepend kern before certain characters?}

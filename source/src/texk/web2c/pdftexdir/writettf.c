@@ -134,6 +134,7 @@ ttf_cmap_entry *new_ttf_cmap_entry(void)
     e = xtalloc(1, ttf_cmap_entry);
     e->ttf_name = NULL;
     e->table = NULL;
+    return e;
 }
 
 static void destroy_ttf_cmap_entry(void *pa, void *pb)
@@ -284,7 +285,8 @@ static void ttf_copy_encoding(void)
                 e->code = -1;
             if (e->code != -1) {
                 assert(e->code < 0x10000);
-                sprintf(p, "/c%4.4X", e->code);
+                // FIXME: e->code is long. Do we want multibyte instead of a char?
+                sprintf(p, "/hc%4.4X", (short)e->code);
                 charcode_names[i] = p;
                 p = strend(p) + 1;
             }
@@ -354,7 +356,6 @@ static void ttf_read_name(void)
 
 static void ttf_read_mapx(void)
 {
-    int i;
     glyph_entry *glyph;
     ttf_seek_tab("maxp", TTF_FIXED_SIZE);
     glyph_tab = xtalloc(1 + (glyphs_count = get_ushort()), glyph_entry);
@@ -520,14 +521,13 @@ static void ttf_read_tabdir()
 
 static ttf_cmap_entry *ttf_read_cmap(char *ttf_name, int pid, int eid, boolean warn)
 {
-    cmap_entry *e;
     seg_entry *seg_tab, *s;
     TTF_USHORT *glyphId, format, segCount;
     TTF_USHORT ncmapsubtabs, tmp_pid, tmp_eid;
     TTF_ULONG cmap_offset, tmp_offset;
-    long n, i, j, k, first_code, length, last_sep, index;
+    long n, i, k, length, index;
     ttf_cmap_entry tmp_e, *p;
-    void **aa, *x;
+    void **aa;
 
     /* loop up in ttf_cmap_tree first, return if found */
     tmp_e.ttf_name = ttf_name;
@@ -985,8 +985,8 @@ static void ttf_reindex_glyphs(void)
     glyph_entry *glyph;
     int index;
     short *t;
-    ttf_cmap_entry tmp_e, *cmap = NULL;
-    boolean warn = true, cmap_not_found = false;
+    ttf_cmap_entry *cmap = NULL;
+    boolean cmap_not_found = false;
 
     /* 
      * reindexing glyphs: we append index of used glyphs to `glyph_index'
@@ -1283,8 +1283,6 @@ static void ttf_copy_font(void)
 
 void writettf()
 {
-    static char charsetstr[0x4000];
-    char *p;
     set_cur_file_name(fm_cur->ff_name);
     if (is_subsetted(fm_cur) && !is_reencoded(fm_cur) && !is_subfont(fm_cur)) {
         pdftex_warn("Subset TrueType must be a reencoded or a subfont");

@@ -229,10 +229,9 @@ with the original version.
 
 int avl_do_entry(fm_entry * fp, int mode)
 {
-    fm_entry *p, *p2;
+    fm_entry *p;
     void *a;
     void **aa;
-    struct avl_traverser trav;
 
     /* handle tfm_name link */
 
@@ -671,7 +670,7 @@ static void init_fm(fm_entry * fm, internalfontnumber f)
 
 static fmentryptr fmlookup(internalfontnumber f)
 {
-    char *tfm, *p;
+    char *tfm;
     fm_entry *fm, *exfm;
     fm_entry tmp;
     int ai, e;
@@ -725,7 +724,6 @@ ff_entry *check_ff_exist(fm_entry * fm)
 {
     ff_entry *ff;
     ff_entry tmp;
-    char *ex_ffname;
     void **aa;
 
     assert(fm->ff_name != NULL);
@@ -826,7 +824,6 @@ static fm_entry *lookup_ps_name(fm_entry * fm)
 {
     fm_entry *p, *p2;
     struct avl_traverser t, t2;
-    strnumber s;
     int a;
 
     loaded_tfm_found = NULL;
@@ -902,7 +899,6 @@ fm_entry *lookup_fontmap(char *bname)
     ff_entry *ff;
     char buf[SMALL_BUF_SIZE];
     char *a, *b, *c, *d, *e, *s;
-    strnumber str;
     int i, sl, ex, ai;
     if (tfm_tree == NULL)
         fm_read_info();         /* only to read default map file */

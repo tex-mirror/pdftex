@@ -18,11 +18,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
 %***********************************************************************
-% $Id: objstream.ch,v 1.277 2005/12/05 20:49:10 hahe Exp hahe $
+% $Id: objstream.ch,v 1.286 2005/12/26 19:05:10 hahe Exp hahe $
 %
 % PDF-1.5 object streams, patch 453
 %
-% new primitive: \pdfobjectstreams
+% new primitive: \pdfobjcompresslevel
 %
 % includes also patch 386 regarding pdf_mem and obj_tab
 %
@@ -31,7 +31,7 @@
 @x 5773
 @d pdf_int_pars=pdftex_first_integer_code + 21 {total number of \pdfTeX's integer parameters}
 @y
-@d pdf_objectstreams_code    = pdftex_first_integer_code + 21 {activate object streams}
+@d pdf_objcompresslevel_code = pdftex_first_integer_code + 21 {activate object streams}
 @d pdf_int_pars=pdftex_first_integer_code + 22 {total number of \pdfTeX's integer parameters}
 @z
 
@@ -41,7 +41,7 @@
 @d pdf_compress_level   == int_par(pdf_compress_level_code)
 @y
 @d pdf_compress_level   == int_par(pdf_compress_level_code)
-@d pdf_objectstreams    == int_par(pdf_objectstreams_code)
+@d pdf_objcompresslevel == int_par(pdf_objcompresslevel_code)
 @z
 
 %***********************************************************************
@@ -50,7 +50,7 @@
 pdf_compress_level_code:   print_esc("pdfcompresslevel");
 @y
 pdf_compress_level_code:   print_esc("pdfcompresslevel");
-pdf_objectstreams_code:    print_esc("pdfobjectstreams");
+pdf_objcompresslevel_code: print_esc("pdfobjcompresslevel");
 @z
 
 %***********************************************************************
@@ -61,8 +61,8 @@ primitive("pdfcompresslevel",assign_int,int_base+pdf_compress_level_code);@/
 @y
 primitive("pdfcompresslevel",assign_int,int_base+pdf_compress_level_code);@/
 @!@:pdf_compress_level_}{\.{\\pdfcompresslevel} primitive@>
-primitive("pdfobjectstreams",assign_int,int_base+pdf_objectstreams_code);@/
-@!@:pdf_objectstreams_}{\.{\\pdfobjectstreams} primitive@>
+primitive("pdfobjcompresslevel",assign_int,int_base+pdf_objcompresslevel_code);@/
+@!@:pdf_objcompresslevel_}{\.{\\pdfobjcompresslevel} primitive@>
 @z
 
 %***********************************************************************
@@ -71,7 +71,7 @@ primitive("pdfobjectstreams",assign_int,int_base+pdf_objectstreams_code);@/
 pdf_compress_level := 9;
 @y
 pdf_compress_level := 9;
-pdf_objectstreams := 0;
+pdf_objcompresslevel := 0;
 @z
 
 %***********************************************************************
@@ -165,7 +165,7 @@ end
 @!fixed_pdf_minor_version: integer; {fixed minor part of the pdf version}
 @y
 @!fixed_pdf_minor_version: integer; {fixed minor part of the pdf version}
-@!fixed_pdf_objectstreams: integer; {fixed flag for activating PDF object streams}
+@!fixed_pdf_objcompresslevel: integer; {fixed level for activating PDF object streams}
 @z
 
 %***********************************************************************
@@ -225,13 +225,13 @@ fixed_pdfoutput_set := false;
         fixed_image_gamma       := fix_int(pdf_image_gamma, 0, 1000000);
         fixed_image_hicolor     := fix_int(pdf_image_hicolor, 0, 1);
         fixed_image_apply_gamma := fix_int(pdf_image_apply_gamma, 0, 1);
-        fixed_pdf_objectstreams := fix_int(pdf_objectstreams, 0, 1);
-        if (fixed_pdf_minor_version >= 5) and (fixed_pdf_objectstreams > 0) then
+        fixed_pdf_objcompresslevel := fix_int(pdf_objcompresslevel, 0, 3);
+        if (fixed_pdf_minor_version >= 5) and (fixed_pdf_objcompresslevel > 0) then
             pdf_os_enable := true
         else begin
-            if fixed_pdf_objectstreams > 0 then begin
-                pdf_warning("\pdfobjectstreams", "Can't be used with \pdfminorversion < 5. Disabled now.", true);
-                fixed_pdf_objectstreams := 0;
+            if fixed_pdf_objcompresslevel > 0 then begin
+                pdf_warning("Object streams", "\pdfobjcompresslevel > 0 requires \pdfminorversion > 4. Object streams disabled now.", true);
+                fixed_pdf_objcompresslevel := 0;
             end;
             pdf_os_enable := false;
         end;
@@ -511,11 +511,11 @@ begin
     end;
 end;
 
-procedure pdf_os_prepare_obj(i: integer; pdf_os: boolean); {create new \.{/ObjStm} object
+procedure pdf_os_prepare_obj(i: integer; pdf_os_level: integer); {create new \.{/ObjStm} object
 if required, and set up cross reference info}
 begin
-    pdf_os_switch(pdf_os);
-    if pdf_os and pdf_os_enable then begin
+    pdf_os_switch((pdf_os_level > 0) and (fixed_pdf_objcompresslevel >= pdf_os_level));
+    if pdf_os_mode then begin
         if pdf_os_cur_objnum = 0 then begin
             pdf_os_cur_objnum := pdf_new_objnum;
             decr(obj_ptr); {object stream is not accessible to user}
@@ -533,11 +533,15 @@ begin
     end;
 end;
 
-procedure pdf_begin_obj(i: integer; pdf_os: boolean); {begin a PDF object}
+procedure pdf_begin_obj(i: integer; pdf_os_level: integer); {begin a PDF object}
 begin
     check_pdfminorversion;
-    pdf_os_prepare_obj(i, pdf_os);
-    if not pdf_os or not pdf_os_enable then begin
+    pdf_os_prepare_obj(i, pdf_os_level);
+    if not pdf_os_mode then begin
+        pdf_print_int(i);
+        pdf_print_ln(" 0 obj");
+    end else if pdf_compress_level = 0 then begin
+        pdf_print("% "); {debugging help}
         pdf_print_int(i);
         pdf_print_ln(" 0 obj");
     end;
@@ -572,13 +576,17 @@ begin
     pdf_print_ln(" 0 obj <<");
 end;
 @y
-procedure pdf_begin_dict(i: integer; pdf_os: boolean); {begin a PDF dictionary object}
+procedure pdf_begin_dict(i: integer; pdf_os_level: integer); {begin a PDF dictionary object}
 begin
     check_pdfminorversion;
-    pdf_os_prepare_obj(i, pdf_os);
-    if not pdf_os or not pdf_os_enable then begin
+    pdf_os_prepare_obj(i, pdf_os_level);
+    if not pdf_os_mode then begin
         pdf_print_int(i);
         pdf_print(" 0 obj ");
+    end else if pdf_compress_level = 0 then begin
+        pdf_print("% "); {debugging help}
+        pdf_print_int(i);
+        pdf_print_ln(" 0 obj");
     end;
     pdf_print_ln("<<");
 end;
@@ -632,7 +640,7 @@ begin
     end;
     pdf_buf[pdf_ptr - 1] := pdf_new_line_char; {no risk of flush, as we are in |pdf_os_mode|}
     q := pdf_ptr;
-    pdf_begin_dict(pdf_os_cur_objnum, false); {switch to PDF stream writing}
+    pdf_begin_dict(pdf_os_cur_objnum, 0); {switch to PDF stream writing}
     pdf_print_ln("/Type /ObjStm");
     pdf_print("/N ");
     pdf_print_int_ln(pdf_os_objidx + 1);
@@ -669,7 +677,7 @@ begin
     pdf_begin_obj(obj_ptr);
 end;
 @y
-procedure pdf_new_obj(t, i: integer; pdf_os: boolean); {begin to a new object}
+procedure pdf_new_obj(t, i: integer; pdf_os: integer); {begin to a new object}
 begin
     pdf_create_obj(t, i);
     pdf_begin_obj(obj_ptr, pdf_os);
@@ -685,7 +693,7 @@ begin
     pdf_begin_dict(obj_ptr);
 end;
 @y
-procedure pdf_new_dict(t, i: integer; pdf_os: boolean); {begin a new object with type dictionary}
+procedure pdf_new_dict(t, i: integer; pdf_os: integer); {begin a new object with type dictionary}
 begin
     pdf_create_obj(t, i);
     pdf_begin_dict(obj_ptr, pdf_os);
@@ -744,7 +752,7 @@ end;
 @x 18121
     pdf_begin_dict(pdf_cur_form);
 @y
-    pdf_begin_dict(pdf_cur_form, false);
+    pdf_begin_dict(pdf_cur_form, 0);
 @z
 
 %***********************************************************************
@@ -752,7 +760,7 @@ end;
 @x 18132
     pdf_new_dict(obj_type_others, 0);
 @y
-    pdf_new_dict(obj_type_others, 0, false);
+    pdf_new_dict(obj_type_others, 0, 0);
 @z
 
 %***********************************************************************
@@ -760,7 +768,7 @@ end;
 @x 18227
 pdf_begin_dict(pdf_last_resources);
 @y
-pdf_begin_dict(pdf_last_resources, true);
+pdf_begin_dict(pdf_last_resources, 1);
 @z
 
 %***********************************************************************
@@ -768,7 +776,7 @@ pdf_begin_dict(pdf_last_resources, true);
 @x 18322
 pdf_begin_dict(pdf_last_page);
 @y
-pdf_begin_dict(pdf_last_page, true);
+pdf_begin_dict(pdf_last_page, 1);
 @z
 
 %***********************************************************************
@@ -776,7 +784,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18379
         pdf_begin_dict(n);
 @y
-        pdf_begin_dict(n, false);
+        pdf_begin_dict(n, 0);
 @z
 
 %***********************************************************************
@@ -784,7 +792,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18387
         pdf_begin_obj(n);
 @y
-        pdf_begin_obj(n, true);
+        pdf_begin_obj(n, 1);
 @z
 
 %***********************************************************************
@@ -792,7 +800,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18470
     pdf_begin_dict(n);
 @y
-    pdf_begin_dict(n, false);
+    pdf_begin_dict(n, 0);
 @z
 
 %***********************************************************************
@@ -800,7 +808,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18502
         pdf_begin_dict(info(k));
 @y
-        pdf_begin_dict(info(k), true);
+        pdf_begin_dict(info(k), 1);
 @z
 
 %***********************************************************************
@@ -808,7 +816,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18521
     pdf_begin_dict(info(k));
 @y
-    pdf_begin_dict(info(k), true);
+    pdf_begin_dict(info(k), 1);
 @z
 
 %***********************************************************************
@@ -816,7 +824,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18557
                 pdf_begin_dict(info(k));
 @y
-                pdf_begin_dict(info(k), true);
+                pdf_begin_dict(info(k), 1);
 @z
 
 %***********************************************************************
@@ -824,7 +832,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18561
                 pdf_begin_obj(info(k));
 @y
-                pdf_begin_obj(info(k), true);
+                pdf_begin_obj(info(k), 1);
 @z
 
 %***********************************************************************
@@ -832,7 +840,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18628
         pdf_new_obj(obj_type_others, 0);
 @y
-        pdf_new_obj(obj_type_others, 0, true);
+        pdf_new_obj(obj_type_others, 0, 1);
 @z
 
 %***********************************************************************
@@ -840,7 +848,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18646
     pdf_new_dict(obj_type_others, 0);
 @y
-    pdf_new_dict(obj_type_others, 0, true);
+    pdf_new_dict(obj_type_others, 0, 1);
 @z
 
 %***********************************************************************
@@ -848,7 +856,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18676
     pdf_begin_dict(k);
 @y
-    pdf_begin_dict(k, true);
+    pdf_begin_dict(k, 1);
 @z
 
 %***********************************************************************
@@ -856,7 +864,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18701
     pdf_new_obj(obj_type_others, 0);
 @y
-    pdf_new_obj(obj_type_others, 0, true);
+    pdf_new_obj(obj_type_others, 0, 1);
 @z
 
 %***********************************************************************
@@ -883,7 +891,7 @@ pdf_begin_dict(pdf_last_page, true);
 @x 18862
     pdf_begin_obj(k);
 @y
-    pdf_begin_obj(k, true);
+    pdf_begin_obj(k, 1);
 @z
 
 %***********************************************************************
@@ -1015,7 +1023,7 @@ until false;
 done:
 
 @ @<Output the current Pages object in this level@>=
-pdf_begin_dict(l, true);
+pdf_begin_dict(l, 1);
 pdf_print_ln("/Type /Pages");
 pdf_int_entry_ln("Count", obj_info(l));
 if not is_root then
@@ -1162,7 +1170,7 @@ repeat
 until false;
 done1:
 if (dests <> 0) or (pdf_names_toks <> null) then begin
-    pdf_new_dict(obj_type_others, 0, true);
+    pdf_new_dict(obj_type_others, 0, 1);
     if (dests <> 0) then
         pdf_indirect_ln("Dests", dests);
     if pdf_names_toks <> null then begin
@@ -1176,7 +1184,7 @@ else
     names_tree := 0
 
 @ @<Output the current node in this level@>=
-pdf_begin_dict(l, true);
+pdf_begin_dict(l, 1);
 j := 0;
 if is_names then begin
     obj_info(l) := dest_names[k].objname;
@@ -1226,7 +1234,7 @@ pdf_end_dict;
 @x 19096
 pdf_new_dict(obj_type_others, 0);
 @y
-pdf_new_dict(obj_type_others, 0, true);
+pdf_new_dict(obj_type_others, 0, 1);
 @z
 
 %***********************************************************************
@@ -1234,7 +1242,7 @@ pdf_new_dict(obj_type_others, 0, true);
 @x 19145
     pdf_new_dict(obj_type_others, 0);
 @y
-    pdf_new_dict(obj_type_others, 0, false); {keep Info readable}
+    pdf_new_dict(obj_type_others, 0, 3); {keep Info readable unless explicitely forced}
 @z
 
 %***********************************************************************
@@ -1253,7 +1261,7 @@ end
 end
 
 @ @<Output the cross-reference stream dictionary@>=
-pdf_new_dict(obj_type_others, 0, false);
+pdf_new_dict(obj_type_others, 0, 0);
 if obj_offset(sys_obj_ptr) > 16777215 then
     xref_offset_width := 4
 else if obj_offset(sys_obj_ptr) > 65535 then
@@ -1390,7 +1398,7 @@ pdf_print_ln("%%EOF")
 @x 33855
     pdf_new_obj(obj_type_others, 0);
 @y
-    pdf_new_obj(obj_type_others, 0, true);
+    pdf_new_obj(obj_type_others, 0, 1);
 @z
 
 %***********************************************************************
@@ -1398,7 +1406,7 @@ pdf_print_ln("%%EOF")
 @x 33865
     pdf_new_obj(obj_type_others, 0);
 @y
-    pdf_new_obj(obj_type_others, 0, true);
+    pdf_new_obj(obj_type_others, 0, 1);
 @z
 
 %***********************************************************************
@@ -1406,7 +1414,7 @@ pdf_print_ln("%%EOF")
 @x 34098
             pdf_new_obj(obj_type_others, 0);
 @y
-            pdf_new_obj(obj_type_others, 0, true);
+            pdf_new_obj(obj_type_others, 0, 1);
 @z
 
 %***********************************************************************
@@ -1414,7 +1422,7 @@ pdf_print_ln("%%EOF")
 @x 34235
     pdf_new_dict(obj_type_others, 0);
 @y
-    pdf_new_dict(obj_type_others, 0, false);
+    pdf_new_dict(obj_type_others, 0, 0);
 @z
 
 %***********************************************************************
@@ -1422,7 +1430,7 @@ pdf_print_ln("%%EOF")
 @x 34246
     pdf_begin_dict(thread);
 @y
-    pdf_begin_dict(thread, true);
+    pdf_begin_dict(thread, 1);
 @z
 
 %***********************************************************************
@@ -1430,7 +1438,7 @@ pdf_print_ln("%%EOF")
 @x 34262
     pdf_begin_dict(thread);
 @y
-    pdf_begin_dict(thread, true);
+    pdf_begin_dict(thread, 1);
 @z
 
 %***********************************************************************
@@ -1438,7 +1446,7 @@ pdf_print_ln("%%EOF")
 @x 34281
         pdf_begin_dict(a);
 @y
-        pdf_begin_dict(a, true);
+        pdf_begin_dict(a, 1);
 @z
 
 %***********************************************************************

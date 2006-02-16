@@ -66,6 +66,7 @@ $Id: ptexmac.h,v 1.14 2005/11/29 22:05:23 hahe Exp $
 #define pdfoffset()     (pdfgone + pdfptr)
 #define pdfinitfont(f)  {tmpf = f; pdfcreatefontobj();}
 
+#define MAX_CHAR_CODE       255
 #define PRINTF_BUF_SIZE     1024
 #define MAX_CSTRING_LEN     1024
 #define MAX_PSTRING_LEN     1024

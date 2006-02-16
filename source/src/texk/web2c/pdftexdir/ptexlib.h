@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -131,6 +131,7 @@ extern char fontname_buf[];
 extern integer get_fontfile_num(int);
 extern integer get_fontname_num(int);
 extern void epdf_free(void);
+extern int is_type1(fm_entry *);
 
 /* mapfile.c */
 extern char *mk_basename(char *);
@@ -154,6 +155,10 @@ extern integer myatol(char **);
 
 /* pkin.c */
 extern int readchar(boolean, chardesc *);
+
+/* subfont.c */
+extern void sfd_free(void);
+extern boolean handle_subfont_fm(fm_entry *fm, int mode);
 
 /* utils.c */
 extern boolean str_eq_cstr(strnumber, char *);

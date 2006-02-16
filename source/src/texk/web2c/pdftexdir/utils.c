@@ -219,7 +219,11 @@ void pdftex_fail(const char *fmt,...)
     }
     safe_print(" ==> Fatal error occurred, no output PDF file produced!");
     println();
-    exit(EX_SOFTWARE);
+    if (kpathsea_debug) {
+        abort();
+    } else {
+        exit(EX_SOFTWARE);
+    }
 }
 
 void pdftex_warn(const char *fmt,...)
@@ -854,8 +858,6 @@ void printcreationdate() {
 void getcreationdate()
 {
     /* put creation date on top of string pool and update poolptr */
-    poolpointer out = poolptr;
-    unsigned char ch;
     int len = strlen(start_time_str);
     
     initstarttime();

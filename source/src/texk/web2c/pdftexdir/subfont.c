@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 2005 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -48,6 +48,7 @@ static sfd_entry *new_sfd_entry(void)
     sfd = xtalloc(1, sfd_entry);
     sfd->name = NULL;
     sfd->subfont = NULL;
+    return sfd;
 }
 
 static void destroy_sfd_entry(void *pa, void *pb)
@@ -105,7 +106,7 @@ static sfd_entry *read_sfd(char *sfd_name)
     subfont_entry *sf;
     char buf[SMALL_BUF_SIZE], *p;
     long int i, j, k;
-    int m, n;
+    int n;
     /* check whether this sfd has been read */
     tmp_sfd.name = sfd_name;
     if (sfd_tree == NULL) {
@@ -174,7 +175,7 @@ read_ranges:
 
 boolean handle_subfont_fm(fm_entry *fm, int mode)
 {
-    int i, l;
+    int l;
     char *p, *q, *r;
     sfd_entry *sfd;
     subfont_entry *sf;

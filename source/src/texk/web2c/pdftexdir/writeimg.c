@@ -132,6 +132,7 @@ integer imagecolordepth(integer img)
         return 0;
     default:
         pdftex_fail("unknown type of image");
+        return -1; /* to make the compiler happy */
     }
 }
 

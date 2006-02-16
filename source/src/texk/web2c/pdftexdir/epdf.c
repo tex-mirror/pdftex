@@ -17,14 +17,12 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: epdf.c,v 1.1 2005/11/01 20:53:47 hahe Exp hahe $
+$Id: epdf.c,v 1.2 2005/12/26 13:21:22 hahe Exp hahe $
 */
 
 #include "ptexlib.h"
 #include <kpathsea/c-vararg.h>
 #include <kpathsea/c-proto.h>
-
-/*integer pdfbufmax = pdfbufsize;*/
 
 extern void epdf_check_mem(void);
 

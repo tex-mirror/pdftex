@@ -172,7 +172,7 @@ register halfword i, j ;
     { if ( i == 14 ) repeatcount = pkpackednum () ; 
       else repeatcount = 1 ; 
 #ifdef DEBUG
-      printf("[%d]", repeatcount);
+      printf("[%d]", (int)repeatcount);
 #endif
       return ( (*realfunc)() ) ;
       } 
@@ -272,8 +272,8 @@ static void unpack(chardesc *cd)
         while ( rowsleft > 0 ) 
           { count = (*realfunc)() ; 
 #ifdef DEBUG
-            if (turnon) printf("(%d) ",count);
-            else printf("%d ",count);
+            if (turnon) printf("(%d) ",(int)count);
+            else printf("%d ",(int)count);
 #endif
             while ( count != 0 ) 
               { if ( ( count < wordweight ) && ( count < hbit ) ) 

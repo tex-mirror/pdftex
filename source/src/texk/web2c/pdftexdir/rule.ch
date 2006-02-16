@@ -17,10 +17,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
 %***********************************************************************
+%$Id: rule.ch,v 1.12 2005/12/23 23:09:31 hahe Exp hahe $
 %
 % rule in a group
+%
 %***********************************************************************
-%$Id: rule.ch,v 1.10 2005/10/09 12:56:57 hahe Exp $
 
 @x 15882
     pdf_last_v := pdf_origin_v;
@@ -84,22 +85,20 @@ procedure pdf_set_rule(x, y, w, h: scaled); {draw a rule}
 begin
     pdf_end_text;
     pdf_print_ln("q");
-    pdf_set_origin_temp(cur_h, cur_v);
     if h <= one_bp then begin
+        pdf_set_origin_temp(cur_h, cur_v - (h + 1)/2);
         pdf_print("[]0 d 0 J ");
-        pdf_print_bp(h); pdf_print_ln(" w");
-        pdf_print("0 "); pdf_print_bp((h + 1)/2); pdf_print(" m ");
-        pdf_print_bp(w); pdf_print(" "); pdf_print_bp((h + 1)/2);
-        pdf_print_ln(" l S");
+        pdf_print_bp(h); pdf_print(" w 0 0 m ");
+        pdf_print_bp(w); pdf_print_ln(" 0 l S");
     end
     else if w <= one_bp then begin
+        pdf_set_origin_temp(cur_h + (w + 1)/2, cur_v);
         pdf_print("[]0 d 0 J ");
-        pdf_print_bp(w); pdf_print_ln(" w");
-        pdf_print_bp((w + 1)/2); pdf_print(" 0 m ");
-        pdf_print_bp((w + 1)/2); pdf_print(" "); pdf_print_bp(h);
-        pdf_print_ln(" l S");
+        pdf_print_bp(w); pdf_print(" w 0 0 m 0 ");
+        pdf_print_bp(h); pdf_print_ln(" l S");
     end
     else begin
+        pdf_set_origin_temp(cur_h, cur_v);
         pdf_print("0 0 ");
         pdf_print_bp(w); pdf_out(" ");
         pdf_print_bp(h); pdf_print_ln(" re f");

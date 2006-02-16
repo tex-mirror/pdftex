@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: writet3.c,v 1.7 2005/11/26 20:52:09 hahe Exp hahe $
+$Id: writet3.c,v 1.10 2005/12/26 14:26:18 hahe Exp hahe $
 */
 
 #include "ptexlib.h"
@@ -27,7 +27,7 @@ $Id: writet3.c,v 1.7 2005/11/26 20:52:09 hahe Exp hahe $
 #define T3_BUF_SIZE   1024
 
 static const char perforce_id[] = 
-    "$Id: writet3.c,v 1.7 2005/11/26 20:52:09 hahe Exp hahe $";
+    "$Id: writet3.c,v 1.10 2005/12/26 14:26:18 hahe Exp hahe $";
 
 /* define t3_line_ptr, t3_line_array & t3_line_limit */
 typedef char t3_line_entry;
@@ -133,7 +133,7 @@ static void t3_write_glyph(internalfontnumber f)
     }
     update_bbox(llx, lly, urx, ury, t3_glyph_num == 0);
     t3_glyph_num++;
-    pdfnewdict(0, 0, false);
+    pdfnewdict(0, 0, 0);
     t3_char_procs[glyph_index] = objptr;
     if (width == 0) 
         t3_char_widths[glyph_index] = 
@@ -188,7 +188,6 @@ static boolean writepk(internalfontnumber f)
     chardesc cd;
     boolean is_null_glyph, check_preamble;
     integer dpi;
-    int e;
     dpi = kpse_magstep_fix(
              round(fixedpkresolution*(((float)pdffontsize[f])/fontdsize[f])),
              fixedpkresolution, NULL);
@@ -229,7 +228,7 @@ static boolean writepk(internalfontnumber f)
         ury = cd.cheight + lly;
         update_bbox(llx, lly, urx, ury, t3_glyph_num == 0);
         t3_glyph_num++;
-        pdfnewdict(0, 0, false);
+        pdfnewdict(0, 0, 0);
         t3_char_procs[cd.charcode] = objptr;
         pdfbeginstream();
         pdfprintreal(t3_char_widths[cd.charcode], 2);
@@ -268,7 +267,7 @@ end_stream:
 void writet3(int objnum, internalfontnumber f)
 {
     static char t3_font_scale_str[] = "\\pdffontscale";
-    int i, e;
+    int i;
     integer wptr, eptr, cptr;
     int first_char, last_char;
     integer pk_font_scale;
@@ -311,7 +310,7 @@ write_font_dict:
         if (pdfcharmarked(f, i))
             break;
     last_char = i;
-    pdfbegindict(objnum, true); /* Type 3 font dictionary */
+    pdfbegindict(objnum, 1); /* Type 3 font dictionary */
     pdf_puts("/Type /Font\n/Subtype /Type3\n");
     pdf_printf("/Name /F%i\n", (int)f);
     if (pdffontattr[f] != getnullstr()) {
@@ -342,7 +341,7 @@ write_font_dict:
     pdf_printf("/Widths %i 0 R\n/Encoding %i 0 R\n/CharProcs %i 0 R\n", 
                wptr, eptr, cptr);
     pdfenddict();
-    pdfbeginobj(wptr, true); /* chars width array */
+    pdfbeginobj(wptr, 1); /* chars width array */
     pdf_puts("[");
     if (is_pk_font)
         for (i = first_char; i <= last_char; i++) {
@@ -354,7 +353,7 @@ write_font_dict:
             pdf_printf("%i ", (int)t3_char_widths[i]);
     pdf_puts("]\n");
     pdfendobj();
-    pdfbegindict(eptr, true); /* encoding dictionary */
+    pdfbegindict(eptr, 1); /* encoding dictionary */
     pdf_printf("/Type /Encoding\n/Differences [%i", first_char);
     if (t3_char_procs[first_char] == 0) {
         pdf_printf("/%s", notdef);
@@ -381,7 +380,7 @@ write_font_dict:
     }
     pdf_puts("]\n");
     pdfenddict();
-    pdfbegindict(cptr, true); /* CharProcs dictionary */
+    pdfbegindict(cptr, 1); /* CharProcs dictionary */
     for (i = first_char; i <= last_char; i++)
         if (t3_char_procs[i] != 0)
             pdf_printf("/a%i %i 0 R\n", (int)i, (int)t3_char_procs[i]);

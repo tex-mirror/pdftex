@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: pdftoepdf.cc,v 1.1 2005/11/28 23:44:56 hahe Exp $
+$Id: pdftoepdf.cc,v 1.3 2005/12/26 14:15:35 hahe Exp hahe $
 */
 
 #include <stdlib.h>
@@ -47,7 +47,7 @@ $Id: pdftoepdf.cc,v 1.1 2005/11/28 23:44:56 hahe Exp $
 #include "epdf.h"
 
 static const char perforce_id[] = 
-    "$Id: pdftoepdf.cc,v 1.1 2005/11/28 23:44:56 hahe Exp $";
+    "$Id: pdftoepdf.cc,v 1.3 2005/12/26 14:15:35 hahe Exp hahe $";
 
 
 /*
@@ -604,9 +604,9 @@ static void writeRefs()
         r->written = 1;
         xref->fetch(r->ref.num, r->ref.gen, &obj1);
         if (obj1.isStream())
-            zpdfbeginobj(r->num, false);
+            zpdfbeginobj(r->num, 0);
         else
-            zpdfbeginobj(r->num, true);
+            zpdfbeginobj(r->num, 2); /* \pdfobjcompresslevel = 2 is for this */
         if (r->type == objFont || r->type == objFontDesc)
             copyFontDict(&obj1, r);
         else
@@ -658,6 +658,7 @@ static PDFRectangle *get_pagebox(Page *page, integer pagebox_spec)
     else
         pdftex_fail("pdf inclusion: unknown value of pagebox spec (%i)", 
                     pagebox_spec);
+        return page->getMediaBox(); // to make the compiler happy
 }
 
 

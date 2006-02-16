@@ -26,30 +26,30 @@ static const char perforce_id[] =
     "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#25 $";
 
 #ifdef pdfTeX                   /* writet1 used with pdfTeX */
-#include "ptexlib.h"
-#define t1_log(s)           tex_printf(s)
-#define t1_open()           \
+#  include "ptexlib.h"
+#  define t1_log(s)           tex_printf(s)
+#  define t1_open()           \
     open_input(&t1_file, kpse_type1_format, FOPEN_RBIN_MODE)
-#define enc_open()          \
+#  define enc_open()          \
     open_input(&enc_file, kpse_enc_format, FOPEN_RBIN_MODE)
-#define external_enc()      (fm_cur->encoding)->glyph_names
-#define full_file_name()    (char*)nameoffile + 1
-#define get_length1()       t1_length1 = t1_offset() - t1_save_offset
-#define get_length2()       t1_length2 = t1_offset() - t1_save_offset
-#define get_length3()       t1_length3 = fixedcontent? t1_offset() - t1_save_offset : 0
-#define is_used_char(c)     pdfcharmarked(tex_font, c)
-#define t1_putchar          fb_putchar
-#define t1_offset           fb_offset
-#define out_eexec_char      t1_putchar
-#define save_offset()       t1_save_offset = t1_offset()
-#define end_last_eexec_line() \
+#  define external_enc()      (fm_cur->encoding)->glyph_names
+#  define full_file_name()    (char*)nameoffile + 1
+#  define get_length1()       t1_length1 = t1_offset() - t1_save_offset
+#  define get_length2()       t1_length2 = t1_offset() - t1_save_offset
+#  define get_length3()       t1_length3 = fixedcontent? t1_offset() - t1_save_offset : 0
+#  define is_used_char(c)     pdfcharmarked(tex_font, c)
+#  define t1_putchar          fb_putchar
+#  define t1_offset           fb_offset
+#  define out_eexec_char      t1_putchar
+#  define save_offset()       t1_save_offset = t1_offset()
+#  define end_last_eexec_line() \
     t1_eexec_encrypt = false
-#define t1_char(c)          c
-#define embed_all_glyphs(tex_font)  fm_cur->all_glyphs
-#define extra_charset()     fm_cur->charset
-#define update_subset_tag() \
+#  define t1_char(c)          c
+#  define embed_all_glyphs(tex_font)  fm_cur->all_glyphs
+#  define extra_charset()     fm_cur->charset
+#  define update_subset_tag() \
     strncpy(fb_array + t1_fontname_offset, fm_cur->subset_tag, 6)
-#define fixedcontent        false
+#  define fixedcontent        false
 
 integer t1_length1, t1_length2, t1_length3;
 static integer t1_save_offset;
@@ -57,57 +57,57 @@ static integer t1_fontname_offset;
 extern char *fb_array;
 
 #else                           /* writet1 used with dvips */
-#include "sysexits.h"
-#include "dvips.h"
-#include "ptexmac.h"
-#undef  fm_extend
-#define fm_extend(f)        0
-#undef  fm_slant
-#define fm_slant(f)         0
-#undef  is_reencoded
-#define is_reencoded(f)     (cur_enc_name != NULL)
-#undef  is_subsetted
-#define is_subsetted(f)     true
-#undef  is_included
-#define is_included(f)      true
-#undef  set_cur_file_name
-#define set_cur_file_name(s)    cur_file_name = s
-#define t1_open()           \
+#  include "sysexits.h"
+#  include "dvips.h"
+#  include "ptexmac.h"
+#  undef  fm_extend
+#  define fm_extend(f)        0
+#  undef  fm_slant
+#  define fm_slant(f)         0
+#  undef  is_reencoded
+#  define is_reencoded(f)     (cur_enc_name != NULL)
+#  undef  is_subsetted
+#  define is_subsetted(f)     true
+#  undef  is_included
+#  define is_included(f)      true
+#  undef  set_cur_file_name
+#  define set_cur_file_name(s)    cur_file_name = s
+#  define t1_open()           \
     ((t1_file = search(headerpath, cur_file_name, FOPEN_RBIN_MODE)) != NULL)
-#define enc_open()          \
+#  define enc_open()          \
     ((enc_file = search(encpath, cur_file_name, FOPEN_RBIN_MODE)) != NULL)
-#define external_enc()      ext_glyph_names
-#define full_file_name()    cur_file_name
-#define get_length1()
-#define get_length2()
-#define get_length3()
-#define is_used_char(c)     (grid[c] == 1)
-#define out_eexec_char      t1_outhex
-#define save_offset()
-#define end_last_eexec_line()       \
+#  define external_enc()      ext_glyph_names
+#  define full_file_name()    cur_file_name
+#  define get_length1()
+#  define get_length2()
+#  define get_length3()
+#  define is_used_char(c)     (grid[c] == 1)
+#  define out_eexec_char      t1_outhex
+#  define save_offset()
+#  define end_last_eexec_line()       \
     hexline_length = HEXLINE_WIDTH; \
     end_hexline();                  \
     t1_eexec_encrypt = false
-#define t1_log(s)
-#define t1_scan_only()
-#define t1_include()
-#define t1_putchar(c)       fputc(c, bitfile)
-#define t1_scan_keys()
-#define embed_all_glyphs(tex_font)  false
-#undef pdfmovechars
-#ifdef SHIFTLOWCHARS
+#  define t1_log(s)
+#  define t1_scan_only()
+#  define t1_include()
+#  define t1_putchar(c)       fputc(c, bitfile)
+#  define t1_scan_keys()
+#  define embed_all_glyphs(tex_font)  false
+#  undef pdfmovechars
+#  ifdef SHIFTLOWCHARS
 extern char errbuf[];
 extern Boolean shiftlowchars;
-#define pdfmovechars shiftlowchars
-#define t1_char(c)          T1Char(c)
-#else                           /* SHIFTLOWCHARS */
-#define t1_char(c)          c
-#define pdfmovechars 0
-#endif                          /* SHIFTLOWCHARS */
-#define extra_charset()     dvips_extra_charset
-#define make_subset_tag(a, b)
-#define update_subset_tag()
-#define fixedcontent        true
+#    define pdfmovechars shiftlowchars
+#    define t1_char(c)          T1Char(c)
+#  else                         /* SHIFTLOWCHARS */
+#    define t1_char(c)          c
+#    define pdfmovechars 0
+#  endif                        /* SHIFTLOWCHARS */
+#  define extra_charset()     dvips_extra_charset
+#  define make_subset_tag(a, b)
+#  define update_subset_tag()
+#  define fixedcontent        true
 
 static char *dvips_extra_charset;
 extern FILE *bitfile;
@@ -118,7 +118,7 @@ static unsigned char *grid;
 static char *ext_glyph_names[256];
 static char print_buf[PRINTF_BUF_SIZE];
 static int hexline_length;
-static char notdef[] = ".notdef";
+static const char notdef[] = ".notdef";
 static size_t last_ptr_index;
 #endif                          /* pdfTeX */
 
@@ -134,7 +134,7 @@ static size_t last_ptr_index;
 #define enc_eof()       feof(enc_file)
 #define enc_close()     xfclose(enc_file, cur_file_name)
 
-#define valid_code(c)   (c >= 0 && c <= 256)
+#define valid_code(c)   (c >= 0 && c < 256)
 
 static const char *standard_glyph_names[256] =
     { notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
@@ -323,7 +323,7 @@ static void pdftex_warn(char *fmt, ...)
     va_end(args);
 }
 
-#define HEXLINE_WIDTH 64
+#  define HEXLINE_WIDTH 64
 
 static void end_hexline()
 {
@@ -355,7 +355,8 @@ static void enc_getline(void)
     do {
         c = enc_getchar();
         append_char_to_buf(c, p, enc_line, ENC_BUF_SIZE);
-    } while (c != 10);
+    }
+    while (c != 10);
     append_eol(p, enc_line, ENC_BUF_SIZE);
     if (p - enc_line < 2 || *enc_line == '%')
         goto restart;
@@ -391,7 +392,8 @@ void load_enc(char *enc_name, char **glyph_names)
             *p = 0;
             skip(r, ' ');
             if (names_count > 256)
-                pdftex_fail("encoding vector contains more than 256 names");
+                pdftex_fail
+                    ("encoding vector contains more than 256 names");
             if (strcmp(buf, notdef) != 0)
                 glyph_names[names_count] = xstrdup(buf);
             names_count++;
@@ -701,15 +703,15 @@ static void t1_stop_eexec(void)
 
 #ifdef pdfTeX
 /* macros for various transforms; currently only slant and extend are used */
-#define do_xshift(x,a) {x[4]+=a;}
-#define do_yshift(x,a) {x[5]+=a;}
-#define do_xscale(x,a) {x[0]*=a; x[2]*=a; x[4]*=a;}
-#define do_yscale(x,a) {x[1]*=a; x[3]*=a; x[5]*=a;}
-#define do_extend(x,a) {do_xscale(x,a);}
-#define do_scale(x,a)  {do_xscale(x,a); do_yscale(x,a);}
-#define do_slant(x,a)  {x[0]+=x[1]*(a); x[2]+=x[3]*(a); x[4]+=x[5]*(a);}
-#define do_shear(x,a)  {x[1]+=x[0]*(a); x[3]+=x[2]*(a); x[5]+=x[4]*(a);}
-#define do_rotate(x,a)          \
+#  define do_xshift(x,a) {x[4]+=a;}
+#  define do_yshift(x,a) {x[5]+=a;}
+#  define do_xscale(x,a) {x[0]*=a; x[2]*=a; x[4]*=a;}
+#  define do_yscale(x,a) {x[1]*=a; x[3]*=a; x[5]*=a;}
+#  define do_extend(x,a) {do_xscale(x,a);}
+#  define do_scale(x,a)  {do_xscale(x,a); do_yscale(x,a);}
+#  define do_slant(x,a)  {x[0]+=x[1]*(a); x[2]+=x[3]*(a); x[4]+=x[5]*(a);}
+#  define do_shear(x,a)  {x[1]+=x[0]*(a); x[3]+=x[2]*(a); x[5]+=x[4]*(a);}
+#  define do_rotate(x,a)          \
   {float t, u=cos(a), v=sin(a); \
   t    =x[0]*u+x[1]*-v;         \
   x[1] =x[0]*v+x[1]* u; x[0]=t; \
@@ -860,8 +862,8 @@ static void t1_scan_keys(void)
         }
         return;
     }
-    if ((k == STEMV_CODE || k == FONTBBOX1_CODE) &&
-        (*p == '[' || *p == '{'))
+    if ((k == STEMV_CODE || k == FONTBBOX1_CODE)
+        && (*p == '[' || *p == '{'))
         p++;
     if (k == FONTBBOX1_CODE) {
         for (i = 0; i < 4; i++) {
@@ -938,7 +940,7 @@ static void t1_builtin_enc(void)
      *     ...
      *     readonly def
      */
-    for (i = 0; i <= 256; i++)
+    for (i = 0; i < 256; i++)
         t1_builtin_glyph_names[i] = (char *) notdef;
     if (t1_prefix("/Encoding [") || t1_prefix("/Encoding[")) {  /* the first case */
         r = strchr(t1_line_array, '[') + 1;
@@ -951,7 +953,8 @@ static void t1_builtin_enc(void)
                 *p = 0;
                 skip(r, ' ');
                 if (counter > 255)
-                    pdftex_fail("encoding vector contains more than 256 names");
+                    pdftex_fail
+                        ("encoding vector contains more than 256 names");
                 if (strcmp(t1_buf_array, notdef) != 0)
                     t1_builtin_glyph_names[counter] =
                         xstrdup(t1_buf_array);
@@ -1040,7 +1043,6 @@ static void t1_check_end(void)
 #ifdef pdfTeX
 static boolean t1_open_fontfile(const char *open_name_prefix)
 {
-    char *ex_ffname = NULL;
     ff_entry *ff;
     ff = check_ff_exist(fm_cur);
     if (ff->ff_path != NULL)
@@ -1060,12 +1062,14 @@ static void t1_scan_only(void)
     do {
         t1_getline();
         t1_scan_param();
-    } while (t1_in_eexec == 0);
+    }
+    while (t1_in_eexec == 0);
     t1_start_eexec();
     do {
         t1_getline();
         t1_scan_param();
-    } while (!(t1_charstrings() || t1_subrs()));
+    }
+    while (!(t1_charstrings() || t1_subrs()));
 }
 
 static void t1_include(void)
@@ -1074,24 +1078,28 @@ static void t1_include(void)
         t1_getline();
         t1_scan_param();
         t1_putline();
-    } while (t1_in_eexec == 0);
+    }
+    while (t1_in_eexec == 0);
     t1_start_eexec();
     do {
         t1_getline();
         t1_scan_param();
         t1_putline();
-    } while (!(t1_charstrings() || t1_subrs()));
+    }
+    while (!(t1_charstrings() || t1_subrs()));
     t1_cs = true;
     do {
         t1_getline();
         t1_putline();
-    } while (!t1_end_eexec());
+    }
+    while (!t1_end_eexec());
     t1_stop_eexec();
     if (fixedcontent) {         /* copy 512 zeros (not needed for PDF) */
         do {
             t1_getline();
             t1_putline();
-        } while (!t1_cleartomark());
+        }
+        while (!t1_cleartomark());
         t1_check_end();         /* write "{restore}if" if found */
     }
     get_length3();
@@ -1360,8 +1368,8 @@ static void cs_mark(const char *cs_name, int subr)
                 cc_pop(1);
                 mark_subr(a1);
                 if (!subr_tab[a1].valid) {
-                    cs_warn(cs_name, subr,
-                            "cannot call subr (%i)", (int) a1);
+                    cs_warn(cs_name, subr, "cannot call subr (%i)",
+                            (int) a1);
                     goto cs_error;
                 }
                 break;
@@ -1405,7 +1413,6 @@ static void cs_mark(const char *cs_name, int subr)
 static void t1_subset_ascii_part(void)
 {
     int i, j;
-    char *p;
     t1_getline();
     while (!t1_prefix("/Encoding")) {
         t1_scan_param();
@@ -1426,7 +1433,7 @@ static void t1_subset_ascii_part(void)
     else {
         t1_puts
             ("/Encoding 256 array\n0 1 255 {1 index exch /.notdef put} for\n");
-        for (i = 0, j = 0; i <= 256; i++) {
+        for (i = 0, j = 0; i < 256; i++) {
             if (is_used_char(i) && t1_glyph_names[i] != notdef) {
                 j++;
                 t1_printf("dup %i /%s put\n", (int) t1_char(i),
@@ -1445,7 +1452,8 @@ static void t1_subset_ascii_part(void)
         t1_scan_param();
         if (!t1_prefix("/UniqueID"))    /* ignore UniqueID for subsetted fonts */
             t1_putline();
-    } while (t1_in_eexec == 0);
+    }
+    while (t1_in_eexec == 0);
 }
 
 #define t1_subr_flush()  t1_flush_cs(true)
@@ -1791,7 +1799,7 @@ boolean t1_subset(char *fontfile, char *encfile, unsigned char *g)
 {
     int i;
     cur_enc_name = encfile;
-    for (i = 0; i <= 256; i++)
+    for (i = 0; i < 256; i++)
         ext_glyph_names[i] = (char *) notdef;
     if (cur_enc_name != NULL)
         load_enc(cur_enc_name, ext_glyph_names);
@@ -1808,14 +1816,14 @@ boolean t1_subset(char *fontfile, char *encfile, unsigned char *g)
 boolean t1_subset_2(char *fontfile, unsigned char *g, char *extraGlyphs)
 {
     int i;
-    for (i = 0; i <= 256; i++)
+    for (i = 0; i < 256; i++)
         ext_glyph_names[i] = (char *) notdef;
     grid = g;
     cur_file_name = fontfile;
     hexline_length = 0;
     dvips_extra_charset = extraGlyphs;
     writet1();
-    for (i = 0; i <= 256; i++)
+    for (i = 0; i < 256; i++)
         if (ext_glyph_names[i] != notdef)
             free(ext_glyph_names[i]);
     return 1;                   /* note:  there *is* no unsuccessful return */

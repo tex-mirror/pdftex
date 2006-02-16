@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: writepng.c,v 1.3 2005/11/01 20:41:10 hahe Exp hahe $
+$Id: writepng.c,v 1.6 2005/12/26 14:25:24 hahe Exp hahe $
 */
 
 #include "ptexlib.h"
@@ -26,8 +26,7 @@ $Id: writepng.c,v 1.3 2005/11/01 20:41:10 hahe Exp hahe $
 
 
 static const char perforce_id[] = 
-    "$Id: writepng.c,v 1.3 2005/11/01 20:41:10 hahe Exp hahe $";
-
+    "$Id: writepng.c,v 1.6 2005/12/26 14:25:24 hahe Exp hahe $";
 
 void read_png_info(integer img)
 {
@@ -174,7 +173,7 @@ void write_png_palette (integer img)
     }
     pdfendstream();
     if (palette_objnum > 0) {
-        pdfbegindict(palette_objnum, false);
+        pdfbegindict(palette_objnum, 0);
         pdfbeginstream();
         for (i = 0; i < png_info(img)->num_palette; i++) {
             pdfroom(3);
@@ -265,7 +264,7 @@ void write_png_gray_alpha (integer img)
     /* now write the Smask object */
     if (smask_objnum > 0) {
 	  bitdepth = (int)png_info(img)->bit_depth;
-      pdfbegindict(smask_objnum, false);
+      pdfbegindict(smask_objnum, 0);
       pdf_puts("/Type /XObject\n/Subtype /Image\n");
       pdf_printf("/Width %i\n/Height %i\n/BitsPerComponent %i\n",
 		 (int)png_info(img)->width,
@@ -362,7 +361,7 @@ void write_png_rgb_alpha (integer img)
     /* now write the Smask object */
     if (smask_objnum > 0) {
 	  bitdepth = (int)png_info(img)->bit_depth;
-      pdfbegindict(smask_objnum, false);
+      pdfbegindict(smask_objnum, 0);
       pdf_puts("/Type /XObject\n/Subtype /Image\n");
       pdf_printf("/Width %i\n/Height %i\n/BitsPerComponent %i\n",
 		 (int)png_info(img)->width,
@@ -401,7 +400,7 @@ static int spng_getint(FILE * fp)
     unsigned char buf[4];
     if (fread(buf, 1, 4, fp) != 4)
 	pdftex_fail("writepng: reading chunk type failed");
-    return (((((int) buf[0] << 8) + buf[1]) << 8) + buf[2] << 8) + buf[3];
+    return ((((((int) buf[0] << 8) + buf[1]) << 8) + buf[2]) << 8) + buf[3];
 }
 
 #define SPNG_CHUNK_IDAT 0x49444154
@@ -530,7 +529,7 @@ void write_png (integer img)
 	  tex_printf(" (PNG copy)");
 	  copy_png(img);
 	  if (palette_objnum > 0) {
-		pdfbegindict(palette_objnum, false);
+		pdfbegindict(palette_objnum, 0);
 		pdfbeginstream();
 		for (i = 0; i < png_info(img)->num_palette; i++) {
 		  pdfroom(3);

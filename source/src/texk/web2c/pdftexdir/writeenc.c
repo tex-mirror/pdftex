@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: writeenc.c,v 1.1 2005/11/01 20:36:25 hahe Exp $
+$Id: writeenc.c,v 1.3 2005/12/26 14:20:13 hahe Exp hahe $
 
 source code indentation by "indent -kr -nut"
 */
@@ -25,7 +25,7 @@ source code indentation by "indent -kr -nut"
 #include "ptexlib.h"
 
 static const char perforce_id[] =
-    "$Id: writeenc.c,v 1.1 2005/11/01 20:36:25 hahe Exp $";
+    "$Id: writeenc.c,v 1.3 2005/12/26 14:20:13 hahe Exp hahe $";
 
 void read_enc(enc_entry * e)
 {
@@ -50,11 +50,11 @@ void write_enc(char **glyph_names, enc_entry * e, integer eobjnum)
         assert(e != NULL);
         if (e->objnum != 0)     /* the encoding has been written already */
             return;
-        pdfnewdict(0, 0, true);
+        pdfnewdict(0, 0, 1);
         e->objnum = objptr;
         g = e->glyph_names;
     } else {
-        pdfbegindict(eobjnum, true);
+        pdfbegindict(eobjnum, 1);
         g = glyph_names;
     }
     pdf_printf("/Type /Encoding\n/Differences [ 0 /%s", g[0]);

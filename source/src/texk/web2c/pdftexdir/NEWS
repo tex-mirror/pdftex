@@ -1,4 +1,16 @@
 ----------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-alpha-20051226 was released on 2005-12-26
+----------------------------------------------------------------
+- improved patches:
+  - 453	Object Streams for PDF-1.5
+  - take PK resolution from "pk_dpi" parameter in  texmf.cnf, if it has not
+    been set by the format file or by the user
+  - 432	Rules in a PDF qQ group
+- some fixes for Thanhs patch
+- some improvements from -Wall
+- .indent.pro for indent
+
+----------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-alpha-20051221 was released on 2005-12-21
 ----------------------------------------------------------------
 - has a large patch from Thanh
