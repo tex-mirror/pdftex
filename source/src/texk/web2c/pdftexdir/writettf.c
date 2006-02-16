@@ -22,6 +22,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#16 $
 
 #include "ptexlib.h"
 #include "writettf.h"
+#include <string.h>
 
 static const char perforce_id[] =
     "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#16 $";

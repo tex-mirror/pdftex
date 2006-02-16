@@ -57,4 +57,4 @@ depend:
 	    grep -v "^$(CC)\|$(CXX)\|$(AR)\|make\|klibtool" | \
 	    sed 's: [^ ]*/\.\./libs/[^ ]*::g' > $(srcdir)/depend.mk
 
-kpse_include pdfetexdir/depend.mk
+kpse_include pdftexdir/depend.mk

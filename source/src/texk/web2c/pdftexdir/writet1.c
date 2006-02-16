@@ -124,6 +124,7 @@ static size_t last_ptr_index;
 
 #include <kpathsea/c-vararg.h>
 #include <kpathsea/c-proto.h>
+#include <string.h>
 
 #define t1_getchar()    getc(t1_file)
 #define t1_ungetchar(c) ungetc(c, t1_file)

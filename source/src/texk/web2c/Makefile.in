@@ -551,13 +551,13 @@ trip-clean:
 	rm -rf tfm
 # 
 # Helper makefile fragment for pdf*tex.
-kpse_include pdfetexdir/pdfetexlib.mk
+kpse_include pdftexdir/pdftexlib.mk
 # 
 # Makefile fragments:
 kpse_include etexdir/etex.mk
 kpse_include omegadir/omega.mk
 kpse_include alephdir/aleph.mk
-kpse_include pdfetexdir/pdfetex.mk
+kpse_include pdftexdir/pdftex.mk
 # 
 # Common
 programs = bibtex ctangle ctie cweave dvicopy dvitomp dvitype gftodvi gftopk \
@@ -565,7 +565,7 @@ programs = bibtex ctangle ctie cweave dvicopy dvitomp dvitype gftodvi gftopk \
  pooltype tangle tftopl tie $(ttf2afm) vftovp vptovf weave
 engines = $(tex) $(etex) $(mf) $(mfn) $(mpost) \
           $(omega) $(aleph) \
-          $(pdfetex)
+          $(pdftex) $(pdfetex)
 
 programs: $(programs) $(engines) $(mpware_programs) \
           $(omegafonts_programs) $(otps_programs) $(pdftosrc)
@@ -913,7 +913,7 @@ manpages:
 # 
 # make dist won't work for anyone but me. Sorry.
 
-@MAINT@all-dist: dist web-dist etex-dist omega-dist aleph-dist pdfetex-dist libs-dist
+@MAINT@all-dist: dist web-dist etex-dist omega-dist aleph-dist pdftex-dist libs-dist
 @MAINT@
 @MAINT@distname = web2c
 @MAINT@program_files = PROJECTS *.ac *.ch tangleboot.p
@@ -1004,7 +1004,7 @@ manpages:
 @MAINT@	cd $(distdir); bash -c "rm -f cweb.c *{coerce,d}.h"
 @MAINT@	cd $(distdir); bash -c "rm -f omega*.c aleph*.c"
 @MAINT@	cd $(distdir); bash -c "rm -f tex*.c etex*.c"
-@MAINT@	cd $(distdir); bash -c "rm -f pdfetex*.c"
+@MAINT@	cd $(distdir); bash -c "rm -f pdftex*.c"
 @MAINT@	cd $(distdir); bash -c "rm -f mf*.c mp*.c"
 @MAINT@	cd $(distdir); bash -c "rm -f macnames.c *extra.c"
 @MAINT@	touch $(distdir)/doc/*.info*
@@ -1113,7 +1113,7 @@ installcheck:
 
 # 
 # Cleaning.
-all_subdirs = doc lib man $(mpware) web2c window $(omegafonts) $(otps) $(pdfetexdir)
+all_subdirs = doc lib man $(mpware) web2c window $(omegafonts) $(otps) $(pdftexdir)
 
 # Having a multiple-target rule with the subdir loop fails because of
 # the dependencies introduced by clean.mk.  Yet, we want the

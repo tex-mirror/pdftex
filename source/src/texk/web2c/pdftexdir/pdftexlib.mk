@@ -1,11 +1,11 @@
-## pdfetexlib.mk - Makefile fragment for libraries used by pdf[ex]tex.
+## pdftexlib.mk - Makefile fragment for libraries used by pdf[ex]tex.
 # Public domain.
 
 # The pdf*tex programs depend on a number of libraries.
 # Include dependencies to get the built if we don't do make
 # from the top-level directory.
 
-Makefile: pdfetexdir/pdfetexlib.mk
+Makefile: pdftexdir/pdftexlib.mk
 
 # libz
 
@@ -60,17 +60,17 @@ md5lib-clean:
 
 
 # libpdf itself
-pdflib = pdfetexdir/libpdf.a
-pdflib_sources = $(srcdir)/pdfetexdir/*.c $(srcdir)/pdfetexdir/*.cc \
-	$(srcdir)/pdfetexdir/*.h
+pdflib = pdftexdir/libpdf.a
+pdflib_sources = $(srcdir)/pdftexdir/*.c $(srcdir)/pdftexdir/*.cc \
+	$(srcdir)/pdftexdir/*.h
 
-pdfetexdir/libpdf.a: $(pdflib_sources) pdfetexdir/pdfetexextra.h
-	cd pdfetexdir && $(MAKE) $(common_makeargs) libpdf.a
+pdftexdir/libpdf.a: $(pdflib_sources) pdftexdir/pdftexextra.h
+	cd pdftexdir && $(MAKE) $(common_makeargs) libpdf.a
 
 
 # Convenience variables.
 
-pdfetexlibs = $(pdflib) $(LDLIBPNG) $(LDZLIB) $(LDLIBXPDF) $(LIBMD5DEP)
-pdfetexlibsdep = $(pdflib) $(LIBPNGDEP) $(ZLIBDEP) $(LIBXPDFDEP) $(LIBMD5DEP)
+pdftexlibs = $(pdflib) $(LDLIBPNG) $(LDZLIB) $(LDLIBXPDF) $(LIBMD5DEP)
+pdftexlibsdep = $(pdflib) $(LIBPNGDEP) $(ZLIBDEP) $(LIBXPDFDEP) $(LIBMD5DEP)
 
-## end of pdfetexlib.mk - Makefile fragment for libraries used by pdf[ex]tex.
+## end of pdftexlib.mk - Makefile fragment for libraries used by pdf[ex]tex.

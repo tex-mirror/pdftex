@@ -23,6 +23,7 @@ $Id: writet3.c,v 1.10 2005/12/26 14:26:18 hahe Exp hahe $
 #include "ptexlib.h"
 #include <kpathsea/tex-glyph.h>
 #include <kpathsea/magstep.h>
+#include <string.h>
 
 #define T3_BUF_SIZE   1024
 

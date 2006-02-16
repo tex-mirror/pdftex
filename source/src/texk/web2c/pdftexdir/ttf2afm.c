@@ -34,8 +34,9 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#21 $
 #include <kpathsea/kpathsea.h>
 #include <time.h>
 #include <libgen.h>
-#include <pdfetexdir/ptexmac.h>
-#include <pdfetexdir/writettf.h>
+#include <pdftexdir/ptexmac.h>
+#include <pdftexdir/writettf.h>
+#include <string.h>
 
 static const char perforce_id[] =
     "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#21 $";

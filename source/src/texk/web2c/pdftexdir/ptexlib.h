@@ -25,11 +25,11 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#26 $
 
 /* WEB2C macros and prototypes */
 #  if !defined(PDFTEXCOERCE) && !defined(PDFETEXCOERCE)
-#    ifdef pdfeTeX
-#      undef pdfeTeX 		/* to avoid warning about redefining pdfTeX in pdfetexd.h */
+#    ifdef pdfTeX
+#      undef pdfTeX 		/* to avoid warning about redefining pdfTeX in pdftexd.h */
 #    endif                      /* pdfTeX */
 #    define EXTERN extern
-#    include "pdfetexd.h"
+#    include "pdftexd.h"
 #  endif
 
 /* pdftexlib macros */

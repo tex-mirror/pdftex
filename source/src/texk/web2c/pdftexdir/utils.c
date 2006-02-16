@@ -30,6 +30,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $
 #include <kpathsea/c-proto.h>
 #include <kpathsea/c-stat.h>
 #include <kpathsea/c-fopen.h>
+#include <string.h>
 #include <time.h>
 
 /*@unused@*/
@@ -1235,65 +1236,64 @@ char *makecfilename (strnumber s)
 char *stripzeros (char *a)
 {
     enum { NONUM, DOTNONUM, INT, DOT, LEADDOT, FRAC } s = NONUM, t = NONUM;
-    size_t i, j = 0, k = 0;
-
-    for (i = 0; i < strlen (a) + 1; i++) {
+    char *p, *q, *r;
+    for (p = q = r = a; *q != '\0';) {
         switch (s) {
         case NONUM:
-            if (a[i] >= '0' && a[i] <= '9')
+            if (*p >= '0' && *p <= '9')
                 s = INT;
-            else if (a[i] == '.')
+            else if (*p == '.')
                 s = LEADDOT;
             break;
         case DOTNONUM:
-            if (a[i] != '.' && (a[i] < '0' || a[i] > '9'))
+            if (*p != '.' && (*p < '0' || *p > '9'))
                 s = NONUM;
             break;
         case INT:
-            if (a[i] == '.')
+            if (*p == '.')
                 s = DOT;
-            else if (a[i] < '0' || a[i] > '9')
+            else if (*p < '0' || *p > '9')
                 s = NONUM;
             break;
         case DOT:
         case LEADDOT:
-            if (a[i] >= '0' && a[i] <= '9')
+            if (*p >= '0' && *p <= '9')
                 s = FRAC;
-            else if (a[i] == '.')
+            else if (*p == '.')
                 s = DOTNONUM;
             else
                 s = NONUM;
             break;
         case FRAC:
-            if (a[i] == '.')
+            if (*p == '.')
                 s = DOTNONUM;
-            else if (a[i] < '0' || a[i] > '9')
+            else if (*p < '0' || *p > '9')
                 s = NONUM;
             break;
         default:;
         }
         switch (s) {
         case DOT:
-            j = i;
+            r = q;
             break;
         case LEADDOT:
-            j = i + 1;
+            r = q + 1;
             break;
         case FRAC:
-            if (a[i] > '0')
-                j = i + 1;
+            if (*p > '0')
+                r = q + 1;
             break;
         case NONUM:
-            if ((t == FRAC || t == DOT) && j > 0) {
-                k -= i - j;
-                if (a[k - 1] == '.')    /* was a LEADDOT */
-                    a[k - 1] = '0';
-                j = 0;
+            if ((t == FRAC || t == DOT) && r != a) {
+                q = r--;
+                if (*r == '.')  /* was a LEADDOT */
+                    *r = '0';
+                r = a;
             }
             break;
         default:;
         }
-        a[k++] = a[i];
+        *q++ = *p++;
         t = s;
     }
     return a;

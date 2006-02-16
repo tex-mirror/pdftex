@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -62,4 +62,4 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.h#4 $
 #define vfbopenin(f) \
     open_input (&(f), kpse_vf_format, FOPEN_RBIN_MODE)
 
-#include <pdfetexdir/ptexlib.h>
+#include <pdftexdir/ptexlib.h>

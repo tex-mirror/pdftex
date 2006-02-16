@@ -42,7 +42,7 @@ extern "C" {
 #include <web2c/c-auto.h>       /* define SIZEOF_LONG */
 #include <web2c/config.h>       /* define type integer */
 
-#include <web2c/pdfetexdir/ptexmac.h>
+#include <web2c/pdftexdir/ptexmac.h>
 
 /* #-define pdfbufsize      pdfbufmax */
 

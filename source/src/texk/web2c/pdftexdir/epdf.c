@@ -23,6 +23,7 @@ $Id: epdf.c,v 1.2 2005/12/26 13:21:22 hahe Exp hahe $
 #include "ptexlib.h"
 #include <kpathsea/c-vararg.h>
 #include <kpathsea/c-proto.h>
+#include <string.h>
 
 extern void epdf_check_mem (void);
 

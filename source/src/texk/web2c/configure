@@ -18,6 +18,8 @@ ac_help="$ac_help
 ac_help="$ac_help
   --without-aleph            don't compile and install Aleph"
 ac_help="$ac_help
+  --without-pdftex           don't compile and install pdfTeX"
+ac_help="$ac_help
   --without-pdfetex          don't compile and install pdfeTeX"
 ac_help="$ac_help
   --with-cxx-runtime-hack    link C++ runtime statically"
@@ -1963,6 +1965,13 @@ if test "${with_aleph+set}" = set; then
 fi
 
 
+# Check whether --with-pdftex or --without-pdftex was given.
+if test "${with_pdftex+set}" = set; then
+  withval="$with_pdftex"
+  :
+fi
+
+
 # Check whether --with-pdfetex or --without-pdfetex was given.
 if test "${with_pdfetex+set}" = set; then
   withval="$with_pdfetex"
@@ -2785,9 +2794,20 @@ else
 fi
 
 
+# For pdfTeX.
+if test -d $srcdir/pdftexdir; then
+  # Create build dir, if necessary.
+  test -d pdftexdir || mkdir pdftexdir
+  test "${with_pdftex+set}" = set || with_pdftex=yes
+else
+  if test "x$with_pdftex" = xyes; then
+    echo "configure: warning: The pdfTeX sources are not available." 1>&2
+  fi
+  with_pdftex=no
+fi
+
 # For pdfeTeX
-if test -d $srcdir/pdfetexdir \
-    && test -d $srcdir/etexdir; then
+if test -d $srcdir/pdftexdir; then
   test "${with_pdfetex+set}" = set || with_pdfetex=yes
 else
   if test "x$with_pdfetex" = xyes; then
@@ -2797,7 +2817,8 @@ else
 fi
 
 # Check whether C++ compiler works.  Prevent exit if it doesn't.
-if test "x$with_pdfetex" = xyes
+if test "x$with_pdftex"  = xyes ||
+   test "x$with_pdfetex" = xyes
 then
   # First test whether the compiler works in a subshell, and if so,
   # do it again in the main shell so we see the result.
@@ -3092,8 +3113,11 @@ else
 fi
 
 } || {
+  test "x$with_pdftex" = xyes \
+    && echo "configure: warning: No C++ compiler: pdfTeX will not be compiled." 1>&2
   test "x$with_pdfetex" = xyes \
     && echo "configure: warning: No C++ compiler: pdfeTeX will not be compiled." 1>&2
+  with_pdftex=no
   with_pdfetex=no
   true
 }
@@ -3110,7 +3134,8 @@ CXXLDEXTRA=
 CXXHACKLINK='$(kpathsea_cxx_link)'
 CXXHACKLDLIBS='$(LOADLIBES)'
 if test "x$with_cxx_runtime_hack" = xyes &&
-   { test "x$with_pdfetex" = xyes; }
+   { test "x$with_pdftex"  = xyes ||
+     test "x$with_pdfetex" = xyes; }
 then
   echo $ac_n "checking for statically linking C++ runtime library""... $ac_c" 1>&6
 echo "configure:3143: checking for statically linking C++ runtime library" >&5
@@ -3159,6 +3184,13 @@ EOF
 fi
 
 
+
+
+if test "x$with_pdftex" = xyes; then
+  PTEX=
+else
+  PTEX='#! '
+fi
 
 
 if test "x$with_pdfetex" = xyes; then
@@ -4114,6 +4146,14 @@ else
 fi
 
 
+# Don't bother with pdflib unless pdf*TeX is requested.
+if test "$with_pdftex" = yes || \
+   test "$with_pdfetex" = yes
+then
+  ac_config_files="$ac_config_files pdftexdir/Makefile"
+
+fi
+
 # Don't bother with pdfelib unless pdfeTeX is requested.
 if test "$with_pdfetex" = yes; then
   ac_config_files="$ac_config_files pdfetexdir/Makefile"
@@ -4681,6 +4721,7 @@ s%@CXX@%$CXX%g
 s%@CXXLDEXTRA@%$CXXLDEXTRA%g
 s%@CXXHACKLINK@%$CXXHACKLINK%g
 s%@CXXHACKLDLIBS@%$CXXHACKLDLIBS%g
+s%@PTEX@%$PTEX%g
 s%@PETEX@%$PETEX%g
 s%@ETEX@%$ETEX%g
 s%@X_CFLAGS@%$X_CFLAGS%g

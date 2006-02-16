@@ -26,6 +26,7 @@ source code indentation by "indent -kr -nut"
 #include "ptexlib.h"
 #include <kpathsea/c-auto.h>
 #include <kpathsea/c-memstr.h>
+#include <string.h>
 
 static const char perforce_id[] =
     "$Id: mapfile.c,v 1.20 2005/10/16 17:41:51 hahe Exp hahe $";

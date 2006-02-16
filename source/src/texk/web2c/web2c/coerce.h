@@ -45,6 +45,6 @@ extern poolpointer makesrcspecial P2H(strnumber, int);
 extern void remembersourceinfo P2H(strnumber, int);
 #endif
 
-#ifdef pdfeTeX
-#include <pdfetexdir/pdfetex.h>
-#endif /* pdfeTeX */
+#ifdef pdfTeX
+#include <pdftexdir/pdftex.h>
+#endif /* pdfTeX */
