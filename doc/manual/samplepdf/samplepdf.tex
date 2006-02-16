@@ -187,8 +187,8 @@ Ligatures: ffont, fint, flint\par
 % course). \pdfliteral is intended to replace \special in pdf output mode.
 
 Changing color can be done by inserting `raw' PDF code, like
-\pdfliteral direct{0 1 1 0 k} % switch color to red; using \pdfliteral is
-this.                         % recommended
+\pdfliteral direct {0 1 1 0 k} % switch color to cmyk red
+this.
 
 \special{PDF:0 g}           % switch color back to black; \special can be
                             % used with prefix "pdf:" or "PDF:", optionally appended with
@@ -197,18 +197,29 @@ this.                         % recommended
                             % types into \pdfliteral is inserted literally indeed.
                             % Otherwise pdfTeX moves the space origin to the place after
                             % the last types item on the page, inserts the user code and
-                            % restores its internal position.
+                            % restores its internal position. It's recommended to use \pdfliteral
+                            % instead of \special
 
 A simple picture:
 \pdfliteral {q 1 j 0 1 0 rg 0 0 1 RG 0 0 10 10 re B Q}
 
-% Roughly speaking, pdfTeX typeset text having an origin in lower-left corner of
-% the page (native PDF space origin). \pdfliteral used without `direct' keyword
-% changes this position temporarily to the point user probably expect. Thanks to
-% that, the rectangle painted above appears in-line, not in the lower-left corner
-% of the page. If one say \pdfliteral{...}\pdfliteral{...}, pdfTeX makes the
-% offset only once; it moves to current point of the page before the first
-% literal content, and comes back after the last one.
+% pdfTeX keeps the origin point of coordinates in the lower-left corner of the
+% page (native PDF space origin). \pdfliteral used without `direct' keyword
+% moves this position temporarily to the point user probably expect; current
+% position on the page. That is why the rectangle above appears in-line.
+% Drawing anything relative to the page origin is a bit problematic. In most
+% cases, one can't simply say `\pdfliteral direct {q <paiting operators> Q}'.
+% That is because q..Q operators can't appear inside BT..ET blocks.
+%
+% Starting from pdfTeX 1.30.0, another \pdfliteral modifier can be used instead
+% of `direct'. If the keyword is `page', pdfTeX closes internal text block with `ET'
+% before putting the literal content; like with `direct', without translation.
+
+\feature 1.30.0 {\primitive\pdfliteral{ \tt page} keyword}
+...and now look at the lower-left corner of the page.\par
+\pdfliteral page {q 1 j 0 1 0 rg 0 0 1 RG 0 0 10 10 re B Q}
+\pdfliteral page {q -1 0 0 1 612 0 cm .5 g}\hfill Do you like that?\pdfliteral page {Q}
+\endfeature
 
 \bigskip
 
@@ -220,9 +231,15 @@ A simple picture:
 % \immediate. The object number of the last object created by \pdfobj is
 % accessible via \pdflastobj
 
-\pdfobj{Hello}              % the simplest case
+\pdfobj{(Hello)}            % the simplest case: a string "Hello"
 \pdfrefobj \pdflastobj      % mark the object to be written out; it can be
                             % understood as a reference to the object
+
+% Note, that the object you type must comply the syntax of one of PDF data
+% types (dictionary, array, string, stream, number, ...). The object created
+% with `\pdfobj{Hello}' is incorrect and may lead to parser crash. This issue
+% may not be noticed until one try to refer to the object anyhow or compress it
+% using non-zero \pdfobjectstreams.
 
 \immediate \pdfobj stream   % create the object as a stream a write it to
    {Hello}                  % the pdf output immediately
@@ -1091,6 +1108,9 @@ This is a page containing destination `num 1'
 \avoidboxdimen 2
 \pdfliteral{Q}
 \vskip\d
+
+% For better understaing \pdfliteral rules, play with the transformations above using
+% `direct' and `page' modifiers. Expect surprises, including corrupted output...
 
 % To have a smoothly readable PDF output one may use a newline character to
 % separate entries written directly do PDF code. No matter for the viewer.

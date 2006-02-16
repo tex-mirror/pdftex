@@ -3,7 +3,7 @@
 %% pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %% Used convention for syntax rules is borrowed from `TeXbook naruby'
 %% by Petr Olsak.
-%% $Id: pdftex-t.tex,v 1.622 2005/10/17 16:28:46 oneiros Exp $
+%% $Id: pdftex-t.tex,v 1.626.2.1 2006/02/16 00:08:28 oneiros Exp $
 
 %% integer registers:
 \pdfoutput                                              (integer)
@@ -107,7 +107,7 @@
 \pdftrailer <general text>
 \pdffontexpand <font> <expand spec>
 \vadjust [<pre spec>] <filler> { <vertical mode material> } (h, m)
-\pdfliteral [direct] <general text>                     (h, v, m)
+\pdfliteral [<pdfliteral spec>] <general text>          (h, v, m)
 \special <pdfspecial spec>
 \pdfresettimer
 \pdfsetrandomseed <number>
@@ -165,6 +165,8 @@
 <shrink> --> <number>
 <step> --> <number>
 <pre spec> --> pre
+<pdfliteral spec> --> direct | page }
+================= ERROR
 <pdfspecial spec> --> { [<pdfspecial id> [<pdfspecial modifier>]] <balanced text> }
 <pdfspecial id> --> pdf: | PDF:
 <pdfspecial modifier> --> direct:

@@ -12,6 +12,7 @@
 #pragma implementation
 #endif
 
+#include <limits.h>
 #include "gmem.h"
 #include "Error.h"
 #include "JArithmeticDecoder.h"
@@ -235,7 +236,7 @@ JPXStream::~JPXStream() {
 		for (pre = 0; pre < 1; ++pre) {
 		  precinct = &resLevel->precincts[pre];
 		  if (precinct->subbands) {
-		    for (sb = 0; sb < (r == 0 ? 1 : 3); ++sb) {
+		    for (sb = 0; sb < (Guint)(r == 0 ? 1 : 3); ++sb) {
 		      subband = &precinct->subbands[sb];
 		      gfree(subband->inclusion);
 		      gfree(subband->zeroBitPlane);
@@ -820,7 +821,8 @@ GBool JPXStream::readCodestream(Guint len) {
 	            / img.yTileSize;
       nTiles = img.nXTiles * img.nYTiles;
       // check for overflow before allocating memory
-      if (nTiles == 0 || nTiles / img.nXTiles != img.nYTiles) {
+      if (img.nXTiles <= 0 || img.nYTiles <= 0 ||
+	  img.nXTiles >= INT_MAX / img.nYTiles) {
 	error(getPos(), "Bad tile count in JPX SIZ marker segment");
 	return gFalse;
       }
@@ -1832,7 +1834,7 @@ GBool JPXStream::readTilePartData(Guint tileIdx,
     }
     if (!bits) {
       // packet is empty -- clear all code-block inclusion flags
-      for (sb = 0; sb < (tile->res == 0 ? 1 : 3); ++sb) {
+      for (sb = 0; sb < (Guint)(tile->res == 0 ? 1 : 3); ++sb) {
 	subband = &precinct->subbands[sb];
 	for (cbY = 0; cbY < subband->nYCBs; ++cbY) {
 	  for (cbX = 0; cbX < subband->nXCBs; ++cbX) {
@@ -1843,7 +1845,7 @@ GBool JPXStream::readTilePartData(Guint tileIdx,
       }
     } else {
 
-      for (sb = 0; sb < (tile->res == 0 ? 1 : 3); ++sb) {
+      for (sb = 0; sb < (Guint)(tile->res == 0 ? 1 : 3); ++sb) {
 	subband = &precinct->subbands[sb];
 	for (cbY = 0; cbY < subband->nYCBs; ++cbY) {
 	  for (cbX = 0; cbX < subband->nXCBs; ++cbX) {
@@ -1988,7 +1990,7 @@ GBool JPXStream::readTilePartData(Guint tileIdx,
 
     //----- packet data
 
-    for (sb = 0; sb < (tile->res == 0 ? 1 : 3); ++sb) {
+    for (sb = 0; sb < (Guint)(tile->res == 0 ? 1 : 3); ++sb) {
       subband = &precinct->subbands[sb];
       for (cbY = 0; cbY < subband->nYCBs; ++cbY) {
 	for (cbX = 0; cbX < subband->nXCBs; ++cbX) {

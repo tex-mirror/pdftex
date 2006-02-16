@@ -1,7 +1,7 @@
 % interface=english modes=letter,screen output=pdftex
 % vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.625 2005/12/04 13:45:30 oneiros Exp $
+% $Id: pdftex-t.tex,v 1.626.2.1 2006/02/16 00:08:28 oneiros Exp $
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
@@ -63,9 +63,9 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.625 2005/12/04 13:45:30 oneiros Exp $
+\rcsscan $Id: pdftex-t.tex,v 1.626.2.1 2006/02/16 00:08:28 oneiros Exp $
 
-\def\currentpdftex{1.30.5}
+\def\currentpdftex{1.30.6}
 
 %***********************************************************************
 
@@ -1790,7 +1790,7 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.625 2005/12/04 13:45:30 oneiros Exp $
+%%S $Id: pdftex-t.tex,v 1.626.2.1 2006/02/16 00:08:28 oneiros Exp $
 %%S NL
 %%S integer registers:
 
@@ -2221,7 +2221,7 @@ definitions and syntax rules follow after the list of primitives.
 }
 
 \Syntax {
-\Tex {\pdfliteral} \Optional{\Literal {direct}} \Something{general text} \Whatever{h, v, m}
+\Tex {\pdfliteral} \Optional{\Something {pdfliteral spec}} \Something{general text} \Whatever{h, v, m}
 }
 
 \Syntax {
@@ -2459,6 +2459,11 @@ definitions and syntax rules follow after the list of primitives.
 \Syntax {
 \Something{pre spec} \Means %
   \Literal{pre}
+}
+
+\Syntax {
+\Something{pdfliteral spec} \Means %
+  \Literal{direct} \Or \Literal{page} %
 }
 
 \Syntax {
@@ -3834,7 +3839,7 @@ an article thread.
 
 \subsection{Literals and specials}
 
-\pdftexprimitive {\Syntax {\Tex {\pdfliteral } \Optional{\Literal {direct}}
+\pdftexprimitive {\Syntax {\Tex {\pdfliteral} \Optional{\Something {pdfliteral spec}}
 \Something{general text}}}
 
 \bookmark{\type{\pdfliteral}}
@@ -3849,6 +3854,16 @@ command appends a~whatsit node to the list being built. \Something{general
 text} is expanded when the whatsit node is created and not when it is shipped
 out, as with \type{\special}.
 
+Starting from version 1.30.0, \PDFTEX\ allows to use \type{page} keyword
+instead of \type{direct}. Both modifies the default behaviour of
+\type{\pdfliteral}, avoiding translation of the coordinates space before
+inserting the literal code. The difference is that \type{page} keyword,
+instructs \PDFTEX\ to close \type{BT ET} block before inserting anything.
+It means that the literal code inserted  refers to the origin (lower-left
+corner of the page) and can be safely enclosed with \type{q Q}. Note, that
+in most cases, using \type{q Q} operators inside \type{\pdfliteral} with
+\type{direct} keyword, will produce corrupted PDF output.
+
 % HE: \unkern is a kludge here; wanted to have tight "{pdf:"
 \pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:} \Something{text} \Rbrace}}
 
@@ -3861,6 +3876,12 @@ This is equivalent to \Syntax{\Tex{\pdfliteral} \Lbrace \Something{text} \Rbrace
 \bookmark{\type{\special\ direct}}
 
 This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{direct} \Lbrace \Something{text} \Rbrace}.
+
+\pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:page:} \Something{text} \Rbrace}}
+
+\bookmark{\type{\special\ page}}
+
+This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{page} \Lbrace \Something{text} \Rbrace}.
 
 %***********************************************************************
 

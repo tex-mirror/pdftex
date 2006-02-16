@@ -1,10 +1,10 @@
 pdfTeX
 ======
 
-README for version 3.14159-1.30.5 of $Date: 2005/08/23 $
+README for version 3.14159-1.30.6 of $Date: 2005/08/23 $
 ========================================================
 
-This directory contains the version 1.30.5 of pdfTeX, an extended version of
+This directory contains the version 1.30.6 of pdfTeX, an extended version of
 TeX that can create PDF directly from TeX source files and enhance the
 result of TeX typesetting with the help of PDF. When PDF output is not
 selected, pdfTeX produces normal DVI output, otherwise it produces PDF
@@ -36,7 +36,7 @@ http://www.ntg.nl/mailman/listinfo/ntg-pdftex
 LEGAL ISSUES
 ============
 
-pdfTeX is copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
+pdfTeX is copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 pdfTeX is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
