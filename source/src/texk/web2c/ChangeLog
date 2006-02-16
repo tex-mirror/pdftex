@@ -1,16 +1,62 @@
-2005-07-12  Martin Schröder <martin@oneiros.de>
+2005-09-02  Olaf Weber  <olaf@infovore.xs4all.nl>
 
-        * depend.mk: Remove pdfxtex*
-        
-	* withenable.ac: Remove --without-pdfxtex.
-        
-	* texmfmp.h: Remove support for pdfxTeX.
+	* tex.ch [53.1370]: Since we generate a string in all cases, we
+	need to erase it in all cases.  Reported by Han The Thanh
+	<hanthethanh@gmail.com>, diagnosed by Akira Kakuto
+	<kakuto@fsci.fuk.kindai.ac.jp>.
 
-	* configure: Remove support for pdfxTeX.
+2005-08-22  Olaf Weber  <olaf@infovore.xs4all.nl>
 
-	* configure.in: Remove support for pdfxTeX.
+	* bibtex.ch: Make the buffer and related arrays grow dynamically.
+	Fixes a bug reported by Kevin Cahill <cahill@unm.edu>.
 
-	* Makefile.in: Remove support for pdfxTeX.
+2005-08-13  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* tex.ch: An \immediate\write18 on the '**' prompt would crash
+	TeX, because the log file isn't open yet.  Reported by Jerzy
+	B. Ludwichowski <Jerzy.Ludwichowski@uni.torun.pl>.  Since we
+	always log something for \write18, so lets also log the command
+	when \write18 is disabled, instead of merely showing that
+	something was attempted.
+
+2005-08-03  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Fix missing double-quote.
+
+	* texmfmp-help.h [Aleph,eTeX,pdfeTeX]: Document -etex switch.
+
+	* doc/web2c.texi: Correct missing entries in a table.
+
+2005-07-27  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* doc/web2c.texi: libkpathsea is entirely in LGPL.
+
+	* vftovp.ch: Remove misplaced semicolon.
+
+	* texmfmp.h: Disable IPC when compiling with __DJGPP__.  (Should
+	really be done in configure script.)
+
+	* texmfmp.h: Remove references to pdfxtex.  Add
+	get_seconds_and_micros prototype.
+
+2005-07-25  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* weave.ch: Increase max_bytes to 65530.  We're bumping to the
+	16-bit limits here.
+
+	* tex.ch: Significantly increase the ssup_trie_size.
+
+	* metapost.mk: Fix build rules/dependencies for mpware.
+
+	* Makefile.in: Fix build rules for mpware.
+
+	* vftovp.ch: Report the name of tfm files that we cannot find or
+	find to be unusable.  Reported by Patrick Gundlach.
+
+2005-06-29  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* withenable.ac: Remove one pair of brackets from
+	--with-editor-CMD help text.
 
 2005-06-26  Olaf Weber  <olaf@infovore.xs4all.nl>
 

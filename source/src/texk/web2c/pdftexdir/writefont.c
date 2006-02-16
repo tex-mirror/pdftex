@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#13 $
+$Id: writefont.c,v 1.1 2005/11/01 20:31:00 hahe Exp $
 */
 
 #include "ptexlib.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writefont.c#13 $";
+    "$Id: writefont.c,v 1.1 2005/11/01 20:31:00 hahe Exp $";
 
 key_entry font_keys[FONT_KEYS_NUM] = {
     {"Ascent",       "Ascender",     0, false},
@@ -115,18 +115,22 @@ static void get_char_widths(void)
     for (i = first_char; i <= last_char; i++)
         if (pdfcharmarked(tex_font, i))
             char_widths[i] = dividescaled(char_widths[i], 
-                                          pdffontsize[tex_font], 3);
+                                          pdffontsize[tex_font], 4);
         else
             char_widths[i] = 0;
 }
 
 static void write_char_widths(void)
 {
-    int i;
-    pdfbeginobj(char_widths_objnum); 
+    int i, j;
+    pdfbeginobj(char_widths_objnum, true); 
     pdf_puts("[");
-    for (i = first_char; i <= last_char; i++)
-        pdf_printf("%i ", char_widths[i]);
+    for (i = first_char; i <= last_char; i++) {
+        pdf_printf("%i", char_widths[i] / 10);
+        if ((j = char_widths[i] % 10) != 0)
+            pdf_printf(".%i", j);
+        pdf_printf(" ");
+    }
     pdf_puts("]\n");
     pdfendobj();
 }
@@ -151,7 +155,7 @@ static void write_fontname(boolean as_reference)
 
 static void write_fontobj(integer font_objnum)
 {
-    pdfbegindict(font_objnum);
+    pdfbegindict(font_objnum, true);
     pdf_puts("/Type /Font\n");
     pdf_printf("/Subtype /%s\n", is_truetype(fm_cur) ? "TrueType" : "Type1");
     if (encoding_objnum != 0)
@@ -192,7 +196,7 @@ static void write_fontfile(void)
     if (fm_cur->ff_objnum == 0)
         pdftex_fail("font file object number for `%s' not initialized",
                     fm_cur->tfm_name);
-    pdfbegindict(fm_cur->ff_objnum); /* font file stream */
+    pdfbegindict(fm_cur->ff_objnum, false); /* font file stream */
     if (is_truetype(fm_cur))
         pdf_printf("/Length1 %i\n", (int)ttf_length);
     else if (is_otf_font) 
@@ -208,7 +212,7 @@ static void write_fontfile(void)
 static void write_fontdescriptor(void)
 {
     int i;
-    pdfbegindict(fm_cur->fd_objnum); /* font descriptor */
+    pdfbegindict(fm_cur->fd_objnum, true); /* font descriptor */
     print_key(ASCENT_CODE, getcharheight(tex_font, 'h'));
     print_key(CAPHEIGHT_CODE, getcharheight(tex_font, 'H'));
     print_key(DESCENT_CODE, -getchardepth(tex_font, 'y'));
@@ -283,14 +287,11 @@ void dopdffont(integer font_objnum, internalfontnumber f)
             else
                 write_ttf_glyph_names = true;
         }
-        else if (is_fontfile(fm_cur) && !is_truetype(fm_cur)) {
-            encoding_objnum = pdfnewobjnum();
-        }
     }
     if (is_included(fm_cur))
         write_fontfile();
     if (fm_cur->fn_objnum != 0) {
-        pdfbeginobj(fm_cur->fn_objnum);
+        pdfbeginobj(fm_cur->fn_objnum, true);
         write_fontname(false);
         pdfendobj();
     }
@@ -303,14 +304,6 @@ void dopdffont(integer font_objnum, internalfontnumber f)
         write_char_widths();
     }
     if (cur_glyph_names == t1_builtin_glyph_names) {
-        if (!write_fontfile_only) {
-            for (i = 0; i <= MAX_CHAR_CODE; i++)
-                if (!pdfcharmarked(tex_font, i) && cur_glyph_names[i] != notdef) {
-                    xfree(cur_glyph_names[i]);
-                    cur_glyph_names[i] = (char*) notdef;
-                }
-            write_enc(cur_glyph_names, NULL, encoding_objnum);
-        }
         for (i = 0; i <= MAX_CHAR_CODE; i++)
             if (cur_glyph_names[i] != notdef)
                 xfree(cur_glyph_names[i]);

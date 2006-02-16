@@ -23,8 +23,8 @@ mailing list yourself, and how to receive announcements only.)
 
 For general documentation on the coding and usage standards this
 distribution follows, see the GNU standards document
-ftp://prep.ai.mit.edu/pub/gnu/standards/standards.text, especially the
-`Makefile Conventions', `Configuration', and `User Interfaces' sections.
+http://www.gnu.org/prep/standards, especially the `Makefile
+Conventions', `Configuration', and `User Interfaces' sections.
 
 The files in the etc/ directory are present for informational purposes.
 They are not used or installed by the programs.  For example, a copy of

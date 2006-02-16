@@ -1,0 +1,69 @@
+The pdfTeX team is happy to announce the release of a new alpha version:
+
+===========================================================================
+                       pdfTeX 1.40.0-alpha-20051205
+===========================================================================
+
+This is the announcement of pdfTeX 1.40.0-alpha-20051205, an extended
+version of TeX that can create PDF directly from TeX source files and
+enhance the result of TeX typesetting with the help of PDF.
+
+This is an alpha version, so please use at your own risk and expect things
+to break. But please tell us if things break. :-)
+
+===========================================================================
+  Main changes of pdfTeX 1.40.0-alpha-20051205
+===========================================================================
+- has these patches:
+  - 386	grow obj_tab and dest_names arrays dynamically
+  - 416	new primitive pdflastlink
+  - 427	Character positioning patch
+  - 432	Rules in a PDF qQ group
+  - 434	Remove queued map item handling
+  - 438	\pdfsavepos in DVI mode
+  - 443	512 zeros in Type1 fonts not copied anymore
+  - 447	Don't write /Encoding for non-reencoded fonts
+  - 453	Object Streams for PDF-1.5
+  - take PK resolution from "pk_dpi" parameter in texmfmp.c, if it has not
+    been set by the format file or by the user
+
+===========================================================================
+  Legal notice / license
+===========================================================================
+
+pdfTeX is copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
+
+pdfTeX is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+For a complete README (with a full discussion of the license)
+please look at http://www.pdftex.org/README
+
+===========================================================================
+  The files / installation
+===========================================================================
+
+See INSTALL.
+
+===========================================================================
+  Mailing lists / web pages:
+===========================================================================
+
+  Mailing list:
+    http://tug.org/mailman/listinfo/pdftex
+
+  Related web pages:
+    http://www.pdftex.org
+    http://sarovar.org/projects/pdftex/
+    http://www.tug.org/tex-live/
+    http://www.tug.org/tetex/
+    http://www.tex.ac.uk/cgi-bin/texfaq2html?introduction=yes
+    http://www.dante.de/
+    http://tug.org/
+    http://www.pragma-ade.com/
+
+Have fun!
+
+Martin Schröder (martin@pdftex.org) for the pdfTeX team, December 2005

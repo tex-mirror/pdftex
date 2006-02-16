@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#51 $
+$Id: pdftoepdf.cc,v 1.1 2005/11/28 23:44:56 hahe Exp $
 */
 
 #include <stdlib.h>
@@ -37,6 +37,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#51 $
 #include "Dict.h"
 #include "XRef.h"
 #include "Catalog.h"
+#include "Link.h"
 #include "Page.h"
 #include "GfxFont.h"
 #include "PDFDoc.h"
@@ -46,7 +47,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#51 $
 #include "epdf.h"
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftoepdf.cc#51 $";
+    "$Id: pdftoepdf.cc,v 1.1 2005/11/28 23:44:56 hahe Exp $";
 
 /* we avoid reading all necessary kpathsea headers, but we need xstrdup */
 #ifdef __cplusplus
@@ -629,8 +630,11 @@ static void writeRefs()
         if (!r->written) {
             Object obj1;
         r->written = 1;
-        zpdfbeginobj(r->num);
         xref->fetch(r->ref.num, r->ref.gen, &obj1);
+        if (obj1.isStream())
+            zpdfbeginobj(r->num, false);
+        else
+            zpdfbeginobj(r->num, true);
         if (r->type == objFont || r->type == objFontDesc)
             copyFontDict(&obj1, r);
         else

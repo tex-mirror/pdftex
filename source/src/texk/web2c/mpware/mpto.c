@@ -1,4 +1,4 @@
-/* $Id: mpto.c,v 1.19 2005/06/22 17:45:41 olaf Exp $
+/* $Id: mpto.c,v 1.21 2005/08/28 09:17:25 olaf Exp $
  * Public domain.
  *
  * Previous versions of mpto were copyright 1990 - 1995 by AT&T Bell
@@ -34,19 +34,22 @@
    use smaller values than that */
 #define bufsize  1000
 
-char*	tex_predoc =
-"\\long\\def\\mpxshipout#1{\\shipout\\hbox{%\n"
-"  \\setbox0=\\hbox{#1}%\n"
-"  \\dimen0=\\ht0 \\advance\\dimen0\\dp0\n"
-"  \\dimen1=\\ht0 \\dimen2=\\dp0"
-"  \\ht0=0pt \\dp0=0pt \\box0\n"
-"  \\ifnum\\dimen0>0 \\vrule width1sp height\\dimen1 depth\\dimen2 \n"
-"  \\else \\vrule width1sp height1sp depth0sp\\relax\n"
-"  \\fi}}\n";
+char*	tex_predoc = "";
 char*	tex_postdoc = "\\end{document}\n";
-char*	tex_pretex1 = "\\mpxshipout{%% line %d %s\n";
-char*	tex_pretex = "\\mpxshipout{%% line %d %s\n";
-char*	tex_posttex = "}\n";
+char*	tex_pretex1 = "\\gdef\\mpxshipout{\\shipout\\hbox\\bgroup%\n"
+  "  \\setbox0=\\hbox\\bgroup}%\n"
+  "\\gdef\\stopmpxshipout{\\egroup"
+  "  \\dimen0=\\ht0 \\advance\\dimen0\\dp0\n"
+  "  \\dimen1=\\ht0 \\dimen2=\\dp0\n"
+  "  \\setbox0=\\hbox\\bgroup\n"
+  "    \\box0\n"
+  "    \\ifnum\\dimen0>0 \\vrule width1sp height\\dimen1 depth\\dimen2 \n"
+  "    \\else \\vrule width1sp height1sp depth0sp\\relax\n"
+  "    \\fi\\egroup\n"
+  "  \\ht0=0pt \\dp0=0pt \\box0 \\egroup}\n"
+  "\\mpxshipout%% line %d %s\n";
+char*	tex_pretex = "\\mpxshipout%% line %d %s\n";
+char*	tex_posttex = "\\stopmpxshipout\n";
 char*	tex_preverb1 = "";			/* if very first instance */
 char*	tex_preverb = "%% line %d %s\n";	/* all other instances */
 char*	tex_postverb = "%\n";
@@ -277,7 +280,7 @@ main(int argc, char **argv)
         exit (0);
     } else if (argc > 1 && (strcmp (argv[1], "--version") == 0
                             || strcmp (argv[1], "-version") == 0)) {
-        printf ("mpto 0.9\n\
+        printf ("mpto 0.902\n\
 This program is in the public domain.\n\
 Primary author of mpto: John Hobby.\n");
         exit (0);

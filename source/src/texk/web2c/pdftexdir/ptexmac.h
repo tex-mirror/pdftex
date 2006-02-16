@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#14 $
+$Id: ptexmac.h,v 1.14 2005/11/29 22:05:23 hahe Exp $
 */
 
 #ifndef PDFTEXMAC
@@ -45,17 +45,22 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#14 $
 
 #define objinfo(n) objtab[n].int0
 
-#define pdfroom(n) do {                                 \
-    if (pdfbufsize < n)                                 \
-        pdftex_fail("PDF output buffer overflowed");    \
-    if (pdfptr + n > pdfbufsize)                        \
-        pdfflush();                                     \
+#define pdfroom(n) do {                                      \
+    if (n + pdfptr > pdfbufsize) {                           \
+        if (pdfosmode)                                       \
+            zpdfosgetosbuf(n);                               \
+        else {                                               \
+            if (n > pdfbufsize)                              \
+                pdftex_fail("PDF output buffer overflowed"); \
+            else                                             \
+                pdfflush();                                  \
+        }                                                    \
+    }                                                        \
 } while (0)
 
-#define pdfout(c)  do {             \
-    if (pdfptr > pdfbufsize)        \
-        pdfflush();                 \
-    pdfbuf[pdfptr++] = c;           \
+#define pdfout(c)  do {   \
+    pdfroom(1);           \
+    pdfbuf[pdfptr++] = c; \
 } while (0)
 
 #define pdfoffset()     (pdfgone + pdfptr)
@@ -72,7 +77,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#14 $
 
 #define check_buf(size, buf_size)                          \
     if ((size) > (buf_size))                               \
-        pdftex_fail("buffer overflow", (buf_size))
+        pdftex_fail("buffer overflow", (buf_size));
 
 #define append_char_to_buf(c, p, buf, buf_size) do {       \
     if (c == 9)                                            \
@@ -105,7 +110,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#14 $
 #define skip(p, c)   if (*p == c)  p++
 
 #define alloc_array(T, n, s) do {                           \
-    if (T##_array == NULL) {                                   \
+    if (T##_array == NULL) {                                \
         T##_limit = (s);                                    \
         if ((n) > T##_limit)                                \
             T##_limit = (n);                                \
@@ -117,7 +122,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexmac.h#14 $
         T##_limit *= 2;                                     \
         if (T##_ptr - T##_array + (n) > T##_limit)          \
             T##_limit = T##_ptr - T##_array + (n);          \
-        T##_array = xretalloc(T##_array, T##_limit, T##_entry); \
+        xretalloc(T##_array, T##_limit, T##_entry);         \
         T##_ptr = T##_array + last_ptr_index;               \
     }                                                       \
 } while (0)

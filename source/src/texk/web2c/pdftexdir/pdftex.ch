@@ -44,7 +44,7 @@
 % along with pdfTeX; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
-% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#163 $
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#169 $
 %
 % The TeX program is copyright (C) 1982 by D. E. Knuth.
 % TeX is a trademark of the American Mathematical Society.
@@ -67,9 +67,9 @@
 @x [2] - This change is made for TeX 3.141592
 @d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
 @y
-@d pdftex_version==130 { \.{\\pdftexversion} }
+@d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.30.0' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-alpha-20051205' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -667,6 +667,29 @@ begin
        get_tag_code := -1;
 end;
 procedure scan_font_ident;
+@z
+
+@x
+@ @<Initialize variables as |ship_out| begins@>=
+dvi_h:=0; dvi_v:=0; cur_h:=h_offset; dvi_f:=null_font;
+@y
+@ @<Calculate DVI page dimensions and margins@>=
+cur_h_offset := h_offset;
+cur_v_offset := v_offset;
+if pdf_page_width <> 0 then
+    cur_page_width := pdf_page_width
+else
+    cur_page_width := width(p) + 2*cur_h_offset + 2*4736286;
+    {4736286 = 1in, the funny DVI origin offset}
+if pdf_page_height <> 0 then
+    cur_page_height := pdf_page_height
+else
+    cur_page_height := height(p) + depth(p) + 2*cur_v_offset + 2*4736286
+    {4736286 = 1in, the funny DVI origin offset}
+
+@ @<Initialize variables as |ship_out| begins@>=
+dvi_h:=0; dvi_v:=0; cur_h:=h_offset; dvi_f:=null_font;
+@<Calculate DVI page dimensions and margins@>;
 @z
 
 % Shipping out to PDF
@@ -3988,7 +4011,7 @@ else begin
     @<Output the |obj_tab|@>;
     @<Output the trailer@>;
     pdf_flush;
-    print_nl("Output written on "); slow_print(output_file_name);
+    print_nl("Output written on "); print_file_name(0, output_file_name, 0);
   @.Output written on x@>
     print(" ("); print_int(total_pages); print(" page");
     if total_pages<>1 then print_char("s");
@@ -4825,11 +4848,11 @@ begin
     pdf_literal_data(tail) := def_ref;
 end
 
-@ The \.{\\pdfobj} primitive is to create a ``raw'' object in PDF
+@ The \.{\\pdfobj} primitive is used to create a ``raw'' object in the PDF
   output file. The object contents will be hold in memory and will be written
   out only when the object is referenced by \.{\\pdfrefobj}. When \.{\\pdfobj}
   is used with \.{\\immediate}, the object contents will be written out
-  immediately. Object referenced in current page are appended into
+  immediately. Objects referenced in the current page are appended into
   |pdf_obj_list|.
 
 @<Glob...@>=
@@ -4845,13 +4868,17 @@ begin
         pdf_last_obj := obj_ptr;
     end
     else begin
+        k := -1;
         if scan_keyword("useobjnum") then begin
             scan_int;
             k := cur_val;
-            if (k <= 0) or (k > obj_ptr) or (obj_data_ptr(k) <> 0) then 
-                pdf_error("ext1", "invalid object number");
-        end
-        else begin
+            if (k <= 0) or (k > obj_ptr) or (obj_data_ptr(k) <> 0) then begin
+                pdf_warning("\pdfobj", "invalid object number being ignored", true);
+                pdf_retval := -1; {signal the problem}
+                k := -1; {will be generated again}
+            end;
+        end;
+        if k < 0 then begin
             incr(pdf_obj_count);
             pdf_create_obj(obj_type_obj, pdf_obj_count);
             k := obj_ptr;
@@ -5617,7 +5644,6 @@ end
 
 @ @<Implement \.{\\pdfsavepos}@>=
 begin
-    check_pdfoutput("\pdfsavepos", true);
     new_whatsit(pdf_save_pos_node, small_node_size);
 end
 
@@ -6205,6 +6231,31 @@ begin
 end
 @z
 
+@x
+special_node:special_out(p);
+language_node:do_nothing;
+othercases confusion("ext4")
+@:this can't happen ext4}{\quad ext4@>
+endcases;
+end;
+@y
+special_node:special_out(p);
+language_node:do_nothing;
+pdf_save_pos_node:
+  @<Save current position in DVI mode@>;
+othercases confusion("ext4")
+@:this can't happen ext4}{\quad ext4@>
+endcases;
+end;
+
+@ @<Save current position in DVI mode@>=
+begin
+    {4736286 = 1in, the funny DVI origin offset}
+    pdf_last_x_pos := cur_h + 4736286;
+    pdf_last_y_pos := cur_page_height - cur_v - 4736286;
+end
+@z
+
 @x [1375]
 @<Implement \.{\\immediate}@>=
 begin get_x_token;
@@ -6240,6 +6291,7 @@ if cur_cmd=extension then begin
             do_extension; {scan image and set |pdf_last_ximage|}
             pdf_write_image(pdf_last_ximage);
         end;
+        othercases back_input
     endcases;
 end
 else

@@ -1,9 +1,13 @@
-2005-07-12  Martin Schröder <martin@oneiros.de>
+2005-08-03  Olaf Weber  <olaf@infovore.xs4all.nl>
 
-	* Makefile.in: Remove support for pdfxtex
+	* etex.man: Document -etex switch.
 
-        * pdfxtex.man: Removed
-        
+	* pdfetex.man: Document -etex switch.
+
+2005-07-27  Olaf Weber  <olaf@infovore.xs4all.nl>
+
+	* Makefile.in: Remove references to pdfxtex.
+
 2005-06-26  Olaf Weber  <olaf@infovore.xs4all.nl>
 
 	* Makefile.in: Replace ac_include with kpse_include.  From Peter

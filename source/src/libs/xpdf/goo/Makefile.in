@@ -9,6 +9,8 @@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
+srcdirparent = $(srcdir)/..
+
 kpathsea_include_dir = -I../../../texk -I$(srcdir)/../../../texk
 ALLCFLAGS = $(CFLAGS) @DEFS@ -I.. -I$(srcdir)/.. -I. -I$(srcdir) $(kpathsea_include_dir)
 ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ -I.. -I$(srcdir)/.. -I. -I$(srcdir) $(kpathsea_include_dir)
@@ -33,6 +35,7 @@ kpse_include ../../texk/make/library.mk
 #------------------------------------------------------------------------
 
 CXX_SRC = \
+	$(srcdir)/FixedPoint.cc \
 	$(srcdir)/GHash.cc \
 	$(srcdir)/GList.cc \
 	$(srcdir)/GString.cc \
@@ -45,7 +48,7 @@ C_SRC = \
 
 #------------------------------------------------------------------------
 
-GOO_CXX_OBJS = GHash.o GList.o GString.o gmempp.o gfile.o
+GOO_CXX_OBJS = FixedPoint.o GHash.o GList.o GString.o gmempp.o gfile.o
 GOO_C_OBJS = gmem.o parseargs.o
 GOO_OBJS = $(GOO_CXX_OBJS) $(GOO_C_OBJS)
 
@@ -66,8 +69,10 @@ distclean maintainer-clean extraclean: clean
 #------------------------------------------------------------------------
 
 depend:
-	($(CXX) $(ALLCXXFLAGS) -MM $(srcdir)/*.cc; \
-	 $(CC) $(ALLCFLAGS) -MM $(srcdir)/*.c) \
-	   | sed 's|$(srcdir)|$$(srcdir)|' > $(srcdir)/depend.mk
+	srcdirparent=`(cd $(srcdirparent) >/dev/null; pwd)`; \
+	  ($(CXX) $(ALLCXXFLAGS) -MM $(srcdir)/*.cc; \
+	   $(CC) $(ALLCFLAGS) -MM $(srcdir)/*.c) \
+	     | sed 's|$(srcdir)|$$(srcdir)|' \
+             | sed 's|'$$srcdirparent/'|$$(srcdirparent)/|g' > $(srcdir)/depend.mk
 
 kpse_include goo/depend.mk

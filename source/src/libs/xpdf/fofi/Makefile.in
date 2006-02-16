@@ -9,8 +9,11 @@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
+srcdirparent = $(srcdir)/..
+goodir = $(srcdirparent)/goo
+
 kpathsea_include_dir = -I../../../texk -I$(srcdir)/../../../texk
-ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ -I.. -I$(srcdir)/.. -I../goo -I$(srcdir)/../goo -I. -I$(srcdir) $(kpathsea_include_dir)
+ALLCXXFLAGS = $(CXXFLAGS) @DEFS@ -I.. -I$(srcdirparent) -I../goo -I$(goodir) -I. -I$(srcdir) $(kpathsea_include_dir)
 CXXFLAGS = @CXXFLAGS@
 CC = @CC@
 CXX = @CXX@
@@ -46,8 +49,11 @@ distclean maintainer-clean extraclean: clean
 #------------------------------------------------------------------------
 
 depend:
-	($(CXX) $(ALLCXXFLAGS) -MM $(srcdir)/*.cc; \
-	 $(CC) $(ALLCFLAGS) -MM $(srcdir)/*.c) \
-	   | sed 's|$(srcdir)|$$(srcdir)|' > $(srcdir)/depend.mk
+	srcdirparent=`(cd $(srcdirparent) >/dev/null; pwd)`; \
+	  $(CXX) $(ALLCXXFLAGS) -MM $(srcdir)/*.cc \
+	     | sed 's|$(srcdir)|$$(srcdir)|' \
+	     | sed 's|'$$srcdirparent/'|$$(srcdirparent)/|g' \
+	     | sed 's|$$(srcdirparent)/goo/|$$(goodir)/|g' \
+	     > $(srcdir)/depend.mk
 
 kpse_include fofi/depend.mk

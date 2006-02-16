@@ -1,13 +1,21 @@
-2005-07-12  Martin Schröder <martin@oneiros.de>
-        * splitup.c: Remove support for pdfxtex
-        
-        * convert: Remove support for pdfxtex
+2005-07-27  Olaf Weber  <olaf@infovore.xs4all.nl>
 
-        * convert.bat: Remove support for pdfxtex
-        
-	* common.defines: Remove PDFXTEXHELP.
-        
-	* coerce.h: Remove support for pdfxTeX.
+	* convert.bat: New file, .bat version of convert script.
+
+	* texmf.defines: Add secondsandmicros defn.  From Martin Schröder
+	<martin@oneiros.de>.
+
+	* coerce.h: Remove support for pdfxtex.  From Martin Schröder
+	<martin@oneiros.de>.
+
+	* common.defines: Remove support for pdfxtex.  From Martin
+	Schröder <martin@oneiros.de>.
+
+	* splitup.c: Remove support for pdfxtex.  From Martin Schröder
+	<martin@oneiros.de>.
+
+	* convert: Remove support for pdfxtex.  From Martin Schröder
+	<martin@oneiros.de>.
 
 2005-06-26  Olaf Weber  <olaf@infovore.xs4all.nl>
 

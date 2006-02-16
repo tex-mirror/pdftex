@@ -1,17 +1,17 @@
 pdfTeX
 ======
 
-INSTALL for pdfTeX 1.30.0
-=========================
+INSTALL for pdfTeX 1.40.0-alpha-20051205
+========================================
 
 This distribution is a stripped-down version of the TeXlive distribution.
-All source code is in the directory src; the script Build will generate and
+All source code is in the directory src; the script build.sh will generate and
 populate a directory build.
 
 The code of pdfTeX is in src/texk/web2c/pdftexdir and src/texk/web2c/pdfetexdir
 
-Try the script Build in this directory. If it succeeds, you should end up with
-the files pdftex, pdfetex, pdftex.pool and pdfetex.pool in build/texk/web2c
+Try the script build.sh in this directory. If it succeeds, you should end up
+with the files pdftex, pdfetex, pdftex.pool and pdfetex.pool in build/texk/web2c
 
 If you are using a TeX distribution older than 2005 (e.g. teTeX 2.x), please
 first update your complete TeX installation.

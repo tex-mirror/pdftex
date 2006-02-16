@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/epdf.h#15 $
+$Id: epdf.h,v 1.6 2005/11/28 23:29:32 hahe Exp $
 */
 
 extern "C" {
@@ -42,7 +42,7 @@ typedef const char *const_string; /* including kpathsea/types.h doesn't work on 
 
 #include <web2c/pdftexdir/ptexmac.h>
 
-#define pdfbufsize      pdfbufmax
+/* #-define pdfbufsize      pdfbufmax */
 
 extern float epdf_width;
 extern float epdf_height;
@@ -57,9 +57,11 @@ extern void *epdf_xref;
 
 extern integer pdfstreamlength;
 extern integer pdfptr;
+extern integer poolptr;
 typedef unsigned char eightbits  ;
-extern eightbits pdfbuf[];
-extern integer pdfbufmax;
+extern eightbits * pdfbuf;
+extern integer pdfbufsize;
+extern integer pdfosmode;
 
 extern char notdef[];
 
@@ -86,10 +88,11 @@ extern void pdftex_warn(const char *fmt,...);
 extern void tex_printf(const char *, ...);
 extern void write_enc(char **, struct enc_entry *, integer);
 extern void write_epdf(void);
-extern void zpdfbegindict(integer);
-extern void zpdfbeginobj(integer);
+extern void zpdfbegindict(integer, bool);
+extern void zpdfbeginobj(integer, bool);
 extern void zpdfcreateobj(integer, integer);
-extern void zpdfnewdict(integer, integer);
+extern void zpdfnewdict(integer, integer, bool);
+extern void zpdfosgetosbuf(integer);
 
 /* utils.c */
 extern char *convertStringToPDFString(char *in, int len);

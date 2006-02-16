@@ -52,7 +52,12 @@ pdfetex_ch_srcs = pdfetex.web \
   $(srcdir)/pdftexdir/tex.pch \
   $(srcdir)/pdftexdir/noligatures.ch \
   $(srcdir)/pdftexdir/pdfstrcmp.ch \
-  $(srcdir)/pdftexdir/randoms.ch
+  $(srcdir)/pdftexdir/randoms.ch \
+  $(srcdir)/pdftexdir/pdflastlink.ch \
+  $(srcdir)/pdftexdir/positioning.ch \
+  $(srcdir)/pdftexdir/rule.ch \
+  $(srcdir)/pdftexdir/objstream.ch \
+  $(srcdir)/pdftexdir/pkdpi.ch
 #   Rules:
 pdfetex.web: tie pdfetexdir/pdfetex.mk $(pdfetex_web_srcs)
 	$(TIE) -m pdfetex.web $(pdfetex_web_srcs)

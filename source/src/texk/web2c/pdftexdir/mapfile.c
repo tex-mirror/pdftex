@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: mapfile.c,v 1.78 2005/05/14 08:53:15 hahe Exp hahe $
+$Id: mapfile.c,v 1.20 2005/10/16 17:41:51 hahe Exp hahe $
 
 source code indentation by "indent -kr -nut"
 */
@@ -29,7 +29,7 @@ source code indentation by "indent -kr -nut"
 #include "avlstuff.h"
 
 static const char perforce_id[] =
-    "$Id: mapfile.c,v 1.78 2005/05/14 08:53:15 hahe Exp hahe $";
+    "$Id: mapfile.c,v 1.20 2005/10/16 17:41:51 hahe Exp hahe $";
 
 #define FM_BUF_SIZE     1024
 
@@ -50,9 +50,8 @@ typedef struct mitem {
     int type;                   /* map file or map line */
     char *line;                 /* pointer to map file name or map line */
     int lineno;                 /* line number in map file */
-    struct mitem *next;         /* pointer to next item, or NULL */
 } mapitem;
-mapitem *miptr, *mapitems = NULL;
+mapitem *mitem = NULL;
 
 fm_entry *fm_cur;
 static const char nontfm[] = "<nontfm>";
@@ -61,26 +60,28 @@ static fm_entry *avail_tfm_found;
 static fm_entry *non_tfm_found;
 static fm_entry *not_avail_tfm_found;
 
-#define read_field(r, q, buf) do {                     \
-    for (q = buf; *r != ' ' && *r != 10; *q++ = *r++); \
-    *q = 0;                                            \
-    skip (r, ' ');                                     \
+#define read_field(r, q, buf) do {  \
+    q = buf;                        \
+    while (*r != ' ' && *r != '\0') \
+        *q++ = *r++;                \
+    *q = '\0';                      \
+    skip (r, ' ');                  \
 } while (0)
 
-#define set_field(F) do {                              \
-    if (q > buf)                                       \
-        fm->F = xstrdup(buf);                          \
-    if (*r == 10)                                      \
-        goto done;                                     \
+#define set_field(F) do {           \
+    if (q > buf)                    \
+        fm->F = xstrdup(buf);       \
+    if (*r == '\0')                 \
+        goto done;                  \
 } while (0)
 
-static fm_entry *new_fm_entry(void)
+fm_entry *new_fm_entry(void)
 {
     fm_entry *fm;
     fm = xtalloc(1, fm_entry);
     fm->tfm_name = NULL;
     fm->ps_name = NULL;
-    fm->flags = 0;
+    fm->flags = 4;
     fm->ff_name = NULL;
     fm->subset_tag = NULL;
     fm->encoding = NULL;
@@ -98,7 +99,7 @@ static fm_entry *new_fm_entry(void)
     return fm;
 }
 
-static void delete_fm_entry(fm_entry * fm)
+void delete_fm_entry(fm_entry * fm)
 {
     xfree(fm->tfm_name);
     xfree(fm->ps_name);
@@ -140,7 +141,7 @@ char *mk_base_tfm(char *tfmname, int *i)
         return NULL;
     check_buf(q - p + 1, SMALL_BUF_SIZE);
     strncpy(buf, p, (unsigned) (q - p));
-    buf[q - p] = 0;
+    buf[q - p] = '\0';
     *i = atoi(q);
     return buf;
 }
@@ -224,7 +225,7 @@ to tfm_name and ps_name handling, e. g. a duplicate tfm_name gives a
 with the original version.
 */
 
-static int avl_do_entry(fm_entry * fp, int mode)
+int avl_do_entry(fm_entry * fp, int mode)
 {
     fm_entry *p, *p2;
     void *a;
@@ -411,36 +412,34 @@ boolean check_basefont(char *s)
 
 /**********************************************************************/
 
-static void fm_scan_line(mapitem * mitem)
+static void fm_scan_line()
 {
     int a, b, c, j, u = 0, v = 0;
     float d;
-    char fm_line[FM_BUF_SIZE], buf[FM_BUF_SIZE];
     fm_entry *fm;
+    char fm_line[FM_BUF_SIZE], buf[FM_BUF_SIZE];
     char *p, *q, *r, *s;
-    p = fm_line;
     switch (mitem->type) {
     case MAPFILE:
+        p = fm_line;
         do {
             c = fm_getchar();
             append_char_to_buf(c, p, fm_line, FM_BUF_SIZE);
         }
         while (c != 10);
+        *(--p) = '\0';
+        r = fm_line;
         break;
     case MAPLINE:
-        s = mitem->line;
-        while ((c = *s++) != 0)
-            append_char_to_buf(c, p, fm_line, FM_BUF_SIZE);
+        r = mitem->line;        /* work on string from makecstring() */
         break;
     default:
         assert(0);
     }
-    append_eol(p, fm_line, FM_BUF_SIZE);
-    if (is_cfg_comment(*fm_line))
+    if (*r == '\0' || is_cfg_comment(*r))
         return;
-    r = fm_line;
-    read_field(r, q, buf);
     fm = new_fm_entry();
+    read_field(r, q, buf);
     set_field(tfm_name);
     p = r;
     read_field(r, q, buf);
@@ -452,14 +451,13 @@ static void fm_scan_line(mapitem * mitem)
         fm->flags = atoi(r);
         while (isdigit(*r))
             r++;
-    } else
-        fm->flags = 4;          /* treat as Symbol font */
+    }
     while (1) {                 /* loop through "specials", encoding, font file */
         skip(r, ' ');
         switch (*r) {
-        case 10:
+        case '\0':
             goto done;
-        case '"':               /* opening quote */
+        case '"':              /* opening quote */
             r++;
             u = v = 0;
             do {
@@ -481,7 +479,7 @@ static void fm_scan_line(mapitem * mitem)
                             fm->extend = 0;
                         r = s + strlen("ExtendFont");
                     } else {    /* unknown name */
-                        for (r = s; *r != ' ' && *r != '"' && *r != 10; r++);   /* jump over name */
+                        for (r = s; *r != ' ' && *r != '"' && *r != '\0'; r++); /* jump over name */
                         c = *r; /* remember char for temporary end of string */
                         *r = '\0';
                         pdftex_warn
@@ -490,7 +488,7 @@ static void fm_scan_line(mapitem * mitem)
                         *r = c;
                     }
                 } else
-                    for (; *r != ' ' && *r != '"' && *r != 10; r++);
+                    for (; *r != ' ' && *r != '"' && *r != '\0'; r++);
             }
             while (*r == ' ');
             if (*r == '"')      /* closing quote */
@@ -502,7 +500,7 @@ static void fm_scan_line(mapitem * mitem)
                 goto bad_line;
             }
             break;
-        default:                /* encoding or font file specification */
+        default:               /* encoding or font file specification */
             a = b = 0;
             if (*r == '<') {
                 a = *r++;
@@ -558,40 +556,36 @@ static void fm_scan_line(mapitem * mitem)
 
 void fm_read_info()
 {
-    mapitem *tmp;
-    create_avl_trees();
-    while (mapitems != NULL) {
-        assert(mapitems->line != NULL);
-        mapitems->lineno = 1;
-        switch (mapitems->type) {
-        case MAPFILE:
-            set_cur_file_name(mapitems->line);
-            if (!fm_open()) {
-                pdftex_warn("cannot open font map file");
-            } else {
-                cur_file_name = (char *) nameoffile + 1;
-                tex_printf("{%s", cur_file_name);
-                while (!fm_eof()) {
-                    fm_scan_line(mapitems);
-                    mapitems->lineno++;
-                }
-                fm_close();
-                tex_printf("}");
-                fm_file = NULL;
+    if (tfm_tree == NULL)
+        create_avl_trees();
+    if (mitem->line == NULL)    /* nothing to do */
+        return;
+    mitem->lineno = 1;
+    switch (mitem->type) {
+    case MAPFILE:
+        set_cur_file_name(mitem->line);
+        if (!fm_open()) {
+            pdftex_warn("cannot open font map file");
+        } else {
+            cur_file_name = (char *) nameoffile + 1;
+            tex_printf("{%s", cur_file_name);
+            while (!fm_eof()) {
+                fm_scan_line();
+                mitem->lineno++;
             }
-            break;
-        case MAPLINE:
-            cur_file_name = NULL;       /* makes pdftex_warn() shorter */
-            fm_scan_line(mapitems);
-            break;
-        default:
-            assert(0);
+            fm_close();
+            tex_printf("}");
+            fm_file = NULL;
         }
-        tmp = mapitems;
-        mapitems = mapitems->next;
-        xfree(tmp->line);
-        xfree(tmp);
+        break;
+    case MAPLINE:
+        cur_file_name = NULL;   /* makes pdftex_warn() shorter */
+        fm_scan_line();
+        break;
+    default:
+        assert(0);
     }
+    mitem->line = NULL;         /* done with this line */
     cur_file_name = NULL;
     return;
 }
@@ -661,8 +655,8 @@ static fmentryptr fmlookup(internalfontnumber f)
     fm_entry *fm, *exfm;
     fm_entry tmp;
     int ai, e;
-    if (tfm_tree == NULL || mapitems != NULL)
-        fm_read_info();
+    if (tfm_tree == NULL)
+        fm_read_info();         /* only to read default map file */
     tfm = makecstring(fontname[f]);
     assert(strcmp(tfm, nontfm) != 0);
 
@@ -890,8 +884,8 @@ fm_entry *lookup_fontmap(char *bname)
     char *a, *b, *c, *d, *e, *s;
     strnumber str;
     int i, sl, ex, ai;
-    if (tfm_tree == NULL || mapitems != NULL)
-        fm_read_info();
+    if (tfm_tree == NULL)
+        fm_read_info();         /* only to read default map file */
     if (bname == NULL)
         return NULL;
     if (strlen(bname) >= SMALL_BUF_SIZE)
@@ -924,7 +918,7 @@ fm_entry *lookup_fontmap(char *bname)
         sl = (int) strtol(b, &e, 10);
         if ((e != b) && (e == strend(b))) {
             tmp.slant = sl;
-            *a = 0;             /* bname string ends before "-Slant_" */
+            *a = '\0';          /* bname string ends before "-Slant_" */
         } else {
             if (e != b) {       /* only if <slant> is valid number */
                 if ((c = strstr(e, "-Extend_")) != NULL) {
@@ -933,7 +927,7 @@ fm_entry *lookup_fontmap(char *bname)
                     if ((e != d) && (e == strend(d))) {
                         tmp.slant = sl;
                         tmp.extend = ex;
-                        *a = 0; /* bname string ends before "-Slant_" */
+                        *a = '\0';      /* bname string ends before "-Slant_" */
                     }
                 }
             }
@@ -944,7 +938,7 @@ fm_entry *lookup_fontmap(char *bname)
             ex = (int) strtol(b, &e, 10);
             if ((e != b) && (e == strend(b))) {
                 tmp.extend = ex;
-                *a = 0;         /* bname string ends before "-Extend_" */
+                *a = '\0';      /* bname string ends before "-Extend_" */
             }
         }
     }
@@ -1018,92 +1012,77 @@ fm_entry *lookup_fontmap(char *bname)
 
 /**********************************************************************/
 /*
-Add map file name or map line contents to the linked list "mapitems".
-Items not beginning with [+-=] flush list with pending items. Leading
-blanks and blanks immediately following [+-=] are ignored.
+Process map file given by its name or map line contents. Items not
+beginning with [+-=] flush default map file, if it has not yet been
+read. Leading blanks and blanks immediately following [+-=] are ignored.
 */
 
-char *add_map_item(char *s, int type)
+void process_map_item(char *s, int type)
 {
     char *p;
-    int l;                      /* length of map item (without [+-=]) */
-    mapitem *tmp;
     int mode;
-    for (; *s == ' '; s++);     /* ignore leading blanks */
+    if (*s == ' ')
+        s++;                    /* ignore leading blank */
     switch (*s) {
-    case '+':                   /* +mapfile.map, +mapline */
+    case '+':                  /* +mapfile.map, +mapline */
         mode = FM_DUPIGNORE;    /* insert entry, if it is not duplicate */
         s++;
         break;
-    case '=':                   /* =mapfile.map, =mapline */
+    case '=':                  /* =mapfile.map, =mapline */
         mode = FM_REPLACE;      /* try to replace earlier entry */
         s++;
         break;
-    case '-':                   /* -mapfile.map, -mapline */
+    case '-':                  /* -mapfile.map, -mapline */
         mode = FM_DELETE;       /* try to delete entry */
         s++;
         break;
     default:
-        mode = FM_DUPIGNORE;    /* also flush pending list */
-        while (mapitems != NULL) {
-            tmp = mapitems;
-            mapitems = mapitems->next;
-            xfree(tmp->line);
-            xfree(tmp);
-        }
+        mode = FM_DUPIGNORE;    /* like +, but also: */
+        mitem->line = NULL;     /* flush default map file name */
     }
-    for (; *s == ' '; s++);     /* ignore blanks after [+-=] */
+    if (*s == ' ')
+        s++;                    /* ignore blank after [+-=] */
     p = s;                      /* map item starts here */
-    switch (type) {             /* find end of map item */
-    case MAPFILE:
-        for (; *p != 0 && *p != ' ' && *p != 10; p++);
+    switch (type) {
+    case MAPFILE:              /* remove blank at end */
+        while (*p != '\0' && *p != ' ')
+            p++;
+        *p = '\0';
         break;
-    case MAPLINE:               /* blanks allowed */
-        for (; *p != 0 && *p != 10; p++);
+    case MAPLINE:              /* blank at end allowed */
         break;
     default:
         assert(0);
     }
-    l = p - s;
-    if (l > 0) {                /* only if real item to add */
-        tmp = xtalloc(1, mapitem);
-        if (mapitems == NULL)
-            mapitems = tmp;     /* start new list */
-        else
-            miptr->next = tmp;
-        miptr = tmp;
-        miptr->mode = mode;
-        miptr->type = type;
-        miptr->line = xtalloc(l + 1, char);
-        *(miptr->line) = 0;
-        strncat(miptr->line, s, l);
-        miptr->next = NULL;
+    if (mitem->line != NULL)    /* read default map file first */
+        fm_read_info();
+    if (*s != '\0') {           /* only if real item to process */
+        mitem->mode = mode;
+        mitem->type = type;
+        mitem->line = s;
+        fm_read_info();
     }
-    return p;
 }
 
 void pdfmapfile(integer t)
 {
-    add_map_item(makecstring(tokenstostring(t)), MAPFILE);
+    process_map_item(makecstring(tokenstostring(t)), MAPFILE);
     flushstr(lasttokensstring);
 }
 
 void pdfmapline(integer t)
 {
-    add_map_item(makecstring(tokenstostring(t)), MAPLINE);
+    process_map_item(makecstring(tokenstostring(t)), MAPLINE);
     flushstr(lasttokensstring);
 }
 
 void pdfinitmapfile(string map_name)
 {
-    if (mapitems == NULL) {
-        mapitems = xtalloc(1, mapitem);
-        miptr = mapitems;
-        miptr->mode = FM_DUPIGNORE;
-        miptr->type = MAPFILE;
-        miptr->line = xstrdup(map_name);
-        miptr->next = NULL;
-    }
+    assert(mitem == NULL);
+    mitem = xtalloc(1, mapitem);
+    mitem->mode = FM_DUPIGNORE;
+    mitem->type = MAPFILE;
+    mitem->line = xstrdup(map_name);
 }
 
 /**********************************************************************/
@@ -1118,7 +1097,6 @@ static void destroy_fm_entry_tfm(void *pa, void *pb)
     else
         unset_tfmlink(fm);
 }
-
 static void destroy_fm_entry_ps(void *pa, void *pb)
 {
     fm_entry *fm;
@@ -1128,15 +1106,12 @@ static void destroy_fm_entry_ps(void *pa, void *pb)
     else
         unset_pslink(fm);
 }
-
 static void destroy_ff_entry(void *pa, void *pb)
 {
     ff_entry *ff;
     ff = (ff_entry *) pa;
     delete_ff_entry(ff);
-}
-
-void fm_free(void)
+} void fm_free(void)
 {
     if (tfm_tree != NULL)
         avl_destroy(tfm_tree, destroy_fm_entry_tfm);

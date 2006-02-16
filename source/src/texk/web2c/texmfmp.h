@@ -152,7 +152,8 @@ extern boolean input_line P1H(FILE *);
 #define	dateandtime(i,j,k,l) get_date_and_time (&(i), &(j), &(k), &(l))
 extern void get_date_and_time P4H(integer *, integer *, integer *, integer *);
 
-#define	secondsandmicros(i,j) get_seconds_and_micros (&(i), &(j))
+/* Get high-res time info. */
+#define secondsandmicros(i,j) get_seconds_and_micros (&(i), &(j))
 extern void get_seconds_and_micros P2H(integer *, integer *);
 
 /* This routine has to return a scaled value. */

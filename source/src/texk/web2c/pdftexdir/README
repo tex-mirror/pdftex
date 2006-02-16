@@ -1,16 +1,19 @@
 pdfTeX
 ======
 
-README for version 3.14159-1.30.0 of $Date: 2005/02/04 $
-========================================================
+README for version 3.14159-1.40.0-alpha-20051205
+================================================
 
-This directory contains the version 1.30.0 of pdfTeX, an extended version of
-TeX that can create PDF directly from TeX source files and enhance the
-result of TeX typesetting with the help of PDF. When PDF output is not
-selected, pdfTeX produces normal DVI output, otherwise it produces PDF
-output that looks identical to the DVI output. An important aspect of this
-project is to investigate alternative justification algorithms, optionally
-making use of multiple master fonts. 
+This directory contains the version 1.40.0-alpha-20051205 of pdfTeX, an
+extended version of TeX that can create PDF directly from TeX source files
+and enhance the result of TeX typesetting with the help of PDF. When PDF
+output is not selected, pdfTeX produces normal DVI output, otherwise it
+produces PDF output that looks identical to the DVI output. An important
+aspect of this project is to investigate alternative justification
+algorithms, optionally making use of multiple master fonts. 
+
+This is an alpha version, so please use at your own risk and expect things
+to break. But please tell us if things break. :-)
 
 pdfeTeX is an even more extended version of TeX than pdfTeX because it is
 not based on TeX but on eTeX, an extended version of TeX. 
@@ -86,5 +89,5 @@ paragraph optimization is inspired by the work of Hermann Zapf.
 
 Please send bug reports, offers of help, etc. to martin@pdftex.org
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/README#26 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/README#30 $
 // vim: tw=75

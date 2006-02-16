@@ -26,11 +26,10 @@ libpng.a: $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
-mostlyclean clean:
-	rm -f *.o libpng.a pngtest pngout.png
+kpse_include ../texk/make/clean.mk
 
-distclean realclean extraclean maintainer-clean: clean
-	rm -f config.status config.log Makefile
+clean::
+	rm -f libpng.a pngtest pngout.png
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

@@ -240,7 +240,9 @@ distdir: doc $(library).dvi $(library).h
 # autoheader input file, not an includable C header. Bad name.
 $(library).h: always
 	rm -f $@
-	echo '#include <kpathsea/config.h>' >$@
+	echo '/* This is a generated file */' >$@
+	echo '/* collecting all kpathsea headers. */' >>$@
+	echo '#include <kpathsea/config.h>' >>$@
 	ls -1 *.h \
 	  | grep -v '\(acconfig\|config\|kpathsea\|win32lib\)\.h' \
 	  | sed -e 's,^,#include <kpathsea/,' -e s',$$,>,' >>$@

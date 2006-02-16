@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writepng.c#4 $
+$Id: writepng.c,v 1.3 2005/11/01 20:41:10 hahe Exp hahe $
 */
 
 #include "ptexlib.h"
@@ -26,7 +26,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writepng.c#4 $
 
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writepng.c#4 $";
+    "$Id: writepng.c,v 1.3 2005/11/01 20:41:10 hahe Exp hahe $";
 
 
 void read_png_info(integer img)
@@ -174,7 +174,7 @@ void write_png_palette (integer img)
     }
     pdfendstream();
     if (palette_objnum > 0) {
-        pdfbegindict(palette_objnum);
+        pdfbegindict(palette_objnum, false);
         pdfbeginstream();
         for (i = 0; i < png_info(img)->num_palette; i++) {
             pdfroom(3);
@@ -265,7 +265,7 @@ void write_png_gray_alpha (integer img)
     /* now write the Smask object */
     if (smask_objnum > 0) {
 	  bitdepth = (int)png_info(img)->bit_depth;
-      pdfbegindict(smask_objnum);
+      pdfbegindict(smask_objnum, false);
       pdf_puts("/Type /XObject\n/Subtype /Image\n");
       pdf_printf("/Width %i\n/Height %i\n/BitsPerComponent %i\n",
 		 (int)png_info(img)->width,
@@ -362,7 +362,7 @@ void write_png_rgb_alpha (integer img)
     /* now write the Smask object */
     if (smask_objnum > 0) {
 	  bitdepth = (int)png_info(img)->bit_depth;
-      pdfbegindict(smask_objnum);
+      pdfbegindict(smask_objnum, false);
       pdf_puts("/Type /XObject\n/Subtype /Image\n");
       pdf_printf("/Width %i\n/Height %i\n/BitsPerComponent %i\n",
 		 (int)png_info(img)->width,
@@ -530,7 +530,7 @@ void write_png (integer img)
 	  tex_printf(" (PNG copy)");
 	  copy_png(img);
 	  if (palette_objnum > 0) {
-		pdfbegindict(palette_objnum);
+		pdfbegindict(palette_objnum, false);
 		pdfbeginstream();
 		for (i = 0; i < png_info(img)->num_palette; i++) {
 		  pdfroom(3);

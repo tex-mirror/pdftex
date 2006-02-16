@@ -1,3 +1,49 @@
+----------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-alpha-20051205 was released on 2005-12-05
+----------------------------------------------------------------
+- has these patches:
+  - 386	grow obj_tab and dest_names arrays dynamically
+  - 416	new primitive pdflastlink
+  - 427	Character positioning patch
+  - 432	Rules in a PDF qQ group
+  - 434	Remove queued map item handling
+  - 438	\pdfsavepos in DVI mode
+  - 443	512 zeros in Type1 fonts not copied anymore
+  - 447	Don't write /Encoding for non-reencoded fonts
+  - 453	Object Streams for PDF-1.5
+  - take PK resolution from "pk_dpi" parameter in texmfmp.c, if it has not been
+    set by the format file or by the user
+
+-------------------------------------------------
+pdfTeX 3.141592-1.30.5 was released on 2005-12-04
+-------------------------------------------------
+- bugfix: \pdfximage prints the file name twice (bug 441)
+- bugfix: buffer overflow with \pdfmatch (bug 444)
+- bugfix: updated xpdf to 3.01pl1
+
+-------------------------------------------------
+pdfTeX 3.141592-1.30.4 was released on 2005-10-17
+-------------------------------------------------
+- bugfix: whitespaces in filenames didn't work on Unix anymore (bug 377)
+- bugfix: two \immediates cancel themselves (bug 437)
+- bugfix: wrong file name in error messages of image inclusion (bug 435)
+
+-------------------------------------------------
+pdfTeX 3.141592-1.30.3 was released on 2005-09-04
+-------------------------------------------------
+- bugfix: \write18
+
+-------------------------------------------------
+pdfTeX 3.141592-1.30.2 was released on 2005-08-25
+-------------------------------------------------
+- fixed some build problems and minor bugs introduced in 1.30.1
+
+-------------------------------------------------
+pdfTeX 3.141592-1.30.1 was released on 2005-08-21
+-------------------------------------------------
+- the eTeX extensions can now be enabled with the cmdline switch -etex
+- pdfTeX uses xpdf 3.01
+
 -------------------------------------------------
 pdfTeX 3.141592-1.30.0 was released on 2005-08-01
 -------------------------------------------------
@@ -124,8 +170,8 @@ pdfTeX 3.141592-1.21a was released on 2005-02-04
     This is a string -> (This is a string)
     <a1b245c1a2...> -> <a1b245c1a2...>
 - check for double newline char to get rid of empty lines in PDF output
-- Fixed a bug in the scanning of map lines introduced in the the fix of bug
-  #242 in 1.20b.
+- Fixed a bug in the scanning of map lines introduced in the fix of bug #242 in
+  1.20b.
 - Fixed three problems in xpdf; xpdf is now 3.00pl3
 - \ifeof18 is a simple method to test if \write18 is enabled.
 - a few extensions in pdfxtex:
@@ -373,5 +419,5 @@ pdfTeX 3.14159-1.00a-pretest-20010806 was released on 2001-08-06
 pdfTeX 3.14159-1.00a-pretest-20010804 was released on 2001-08-04
 ----------------------------------------------------------------
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#80 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/NEWS#86 $
 // vim: tw=79:ts=2:expandtab:autoindent

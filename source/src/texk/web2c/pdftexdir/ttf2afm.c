@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#15 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#21 $
 */
 
 /*
@@ -38,7 +38,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#15 $
 #include <pdftexdir/writettf.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#15 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ttf2afm.c#21 $";
 
 /* constants used for print_glyph */
 #define AS_NAME         0
@@ -665,15 +665,15 @@ void print_glyph_name(FILE *f, long glyph_index, int convention)
         else if (n == notdef && glyph_index == 0)
             fputs(notdef, f);
         else
-            fprintf(f, "%s%i", GLYPH_PREFIX_INDEX, glyph_index);
+            fprintf(f, "%s%li", GLYPH_PREFIX_INDEX, glyph_index);
         break;
     case AS_INDEX:
-        fprintf(f, "%s%i", GLYPH_PREFIX_INDEX, glyph_index);
+        fprintf(f, "%s%li", GLYPH_PREFIX_INDEX, glyph_index);
         break;
     case AS_UNICODE:
         u = mtx_tab[glyph_index].unicode_list;
         if (glyph_index == 0 || u == NULL)
-            fprintf(f, "%s%i", GLYPH_PREFIX_INDEX, glyph_index);
+            fprintf(f, "%s%li", GLYPH_PREFIX_INDEX, glyph_index);
         else {
             fprintf(f, "%s%.4X", GLYPH_PREFIX_UNICODE, u->code);
             if (u->next != NULL) {
@@ -682,7 +682,7 @@ void print_glyph_name(FILE *f, long glyph_index, int convention)
                     assert(strlen(buf) + strlen(GLYPH_PREFIX_UNICODE) + 4 < sizeof(buf));
                     sprintf(strend(buf), "%s%.4X ", GLYPH_PREFIX_UNICODE, u->code);
                 }
-                ttf_warn("glyph %i have multiple encodings: %s", 
+                ttf_warn("glyph %li have multiple encodings: %s", 
                          glyph_index, buf);
             }
         }
@@ -872,7 +872,7 @@ void print_encoding(char *fontname)
             break;
         case 4:
             for (i = 0; i < nglyphs; ++i) {
-                fprintf(file, "%% Glyph %i -> ", i);
+                fprintf(file, "%% Glyph %li -> ", i);
                 print_glyph_name(file, i, AS_UNICODE);
                 fputs("\n", file);
             }
@@ -923,7 +923,7 @@ void usage()
 
 int main(int argc, char **argv)
 {
-    char date[128], *s, *buf = NULL;
+    char date[128], *s;
     time_t t = time(&t);
     int c;
     kpse_set_progname(argv[0]);
@@ -974,8 +974,7 @@ int main(int argc, char **argv)
     *(char *)strchr(date, '\n') = 0;
     cur_file_name = argv[optind];
     if (print_cmap) {
-        buf = xstrdup(cur_file_name);
-        bname = xbasename(buf);
+        bname = strdup(xbasename(cur_file_name));
         if ((s = rindex(bname, '.')) != NULL)
             *s = 0;
     }
@@ -993,7 +992,6 @@ int main(int argc, char **argv)
     xfree(Notice);
     xfree(Version);
     xfree(Weight);
-    xfree(buf);
     free_tabs();
     xfclose(fontfile, cur_file_name);
     return 0;

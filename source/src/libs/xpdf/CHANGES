@@ -1420,3 +1420,209 @@ PSOutputDev and pdffonts check for NULL font objects (which can
 Swap the left and right mouse wheel button numbers.
 EPS output ("pdftops -eps") now uses the CropBox instead of the
   MediaBox as the EPS bounding box.
+
+3.01 (2005-aug-17)
+------------------
+Added the continuous view mode, including the '-cont' switch and the
+  'continuousView' config file option.
+At high zoom levels, don't rasterize the entire page - this avoids
+  problems running out of memory.
+Added "search backward" and "match case" options to the find dialog.
+Support explicitly masked images and soft masked images.
+Add support to DCTStream for 16-bit quant tables.
+Don't segfault if the user clicks on an outline entry with a broken
+  destination.
+Changed the makefiles and configure script to skip building pdftoppm
+  (in addition to xpdf) if X, Motif, or FreeType is not found; changed
+  the error message in the configure script to match.
+Move an inline function in JArithmeticDecoder.cc to avoid compiler
+  errors.
+Fixed a bug in the rasterizer that was sometimes causing infinite
+  loops with round line caps on vertical lines.
+Various rasterizer optimizations.
+Look for intermediate resize events - try to avoid lagging when the
+  user is doing an opaque resize.
+The FormType key in Form XObjects is optional.
+Handle external 16-bit TrueType fonts correctly, using the Unicode
+  cmap.
+Add class declarations to TextOutputDev.h to work with stricter C++
+  compilers.
+Support FreeType's weird include file stuff (ft2build.h, etc.).
+Fixed a bug handling empty paths.
+Fixed a text positioning problem in PostScript output.
+Handle TrueType collections in FoFiTrueType.cc.
+FoFiTrueType constructor was reporting a failure if the post table was
+  bad - this should be non-fatal.
+Type 1 font parser was missing a NULL test.
+Mask chars passed to isdigit in goo/parseargs.c to avoid problems with
+  signed chars.
+Added more error checking to the CCITTFax decoder.
+Fixed a bug (computing the MCU size) in the DCT decoder.
+Change a test in the Splash stroke code to avoid x86 floating point
+  weirdness.
+Reorganized the decryption code to allow security handler plugins;
+  removed the NO_DECRYPTION #ifdefs.
+Added a plugin interface, initially just for security handlers.
+Support color key masked images and explicitly masked images in PS
+  output (Level 2 only).
+When checking for aliases of the Base 14 fonts, ignore spaces in the
+  specified font name.
+Handle encrypted PDF files that are missing the file ID string.
+Handle tiling patterns more efficiently in the PostScript output.
+Rewrote the code that handles color spaces in PostScript output.
+Fixed a bug in the Type 1C font parser - zero-length indexes (and
+  zero-length names) weren't handled correctly.
+Handle shaded fills more efficiently in the PostScript output.
+Implement the remaining shading types (4-7).
+Rearranged the Splash color modes.
+Add the EarlyChange parameter to LZWStream when generating PostScript.
+Check for zero values in line dash arrays in PSOutputDev.
+Fixed an uninitialized variable in JArithmeticDecoder which was
+  causing crashes.
+Treat unknown CMap names as identity mappings (to match Adobe's
+  behavior).
+Fixed bugs in the XRef parser related to XRef streams in updated
+  files.
+Added a missing call to FT_Done_Glyph which was causing a memory leak.
+  [Thanks to Dave Formanek.]
+Fixed a bug in text copying that was causing the last word to be
+  dropped on some pages.
+Tweaked the image width/height computation in Splash::drawImage and
+  Splash::fillImageMask to make striped images work better.
+Ignore minus signs in the middle of numbers (to match Adobe's
+  behavior).
+Missing '%s' in format strings for dates in pdftotext '-htmlmeta'
+  mode.
+Change the TrueType code-to-GID mapping code so it looks at the
+  standard name-to-Unicode mapping before the ToUnicode mapping
+  defined in the font object.
+Added a matteColor setting (command line option and X resource).
+Tweaked the CMYK->RGB transform.
+Fix some problems in tracking the character position (to match up with
+  Adobe's highlight file format).
+Handle moveto/closepath/stroke correctly.
+Check for singular text matrices and font size of zero in PSOutputDev.
+Clip PS output to the size of the page (avoiding any gibberish that
+  lies outside the MediaBox, in the case where the MediaBox is smaller
+  than the paper).
+If the line dash element in an annotation's Border array is of an
+  invalid type (i.e., not an array), don't draw the link at all (this
+  matches Adobe's behavior).
+Don't remap small caps and oldstyle glyphs in the name-to-Unicode
+  table - it messes up TrueType font encodings.
+Pdftoppm wasn't setting the paper color correctly in mono and gray
+  modes (this only showed up on big-endian machines).
+Missing NULL check was causing crashes when attempting to read non-PDF
+  files that happened to contain the string '%PDF'.
+Fixed a problem in the text extractor that was breaking up words.
+Handle vertical text (CJK fonts) in PS output with TrueType fonts that
+  are missing the vertical metrics tables.
+Handle the case where a font object and the corresponding embedded
+  font are different types.
+Handle basic crypt filter functionality.
+Added more value checking in the XRef parser, to avoid potential
+  security problems.
+Updated the CJK language support packages: replaced the
+  displayCIDFontX references with displayCIDFontTT; added pointers to
+  free TrueType fonts.
+Added a missing error message when SplashOutputDev can't parse an
+  embedded TrueType font file.
+PDFCore and TextOutputDev now correctly handle searching for Unicode
+  strings, including real Unicode case-folding.
+Throw away tiling pattern fills that are completely outside the clip
+  region.
+The JPEG 2000 inverse reversible multiple component transform code was
+  wrong.
+Fixed some bugs in shading pattern fills: clipping was wrong, and
+  background color was not implemented.
+Added tool tips for the toolbar buttons.
+Decrease the max depth of recursive patch mesh filling if the pattern
+  has a large number of patches.
+Highlight the find text whenever the find dialog is mapped.
+Handle page boundary boxes with reversed coordinates.
+Fixed a bug in the text extractor code that handles duplicated text.
+Optimization work on SampledFunction::transform().
+Use the CropBox instead of the MediaBox as the display region.
+Dither for PseudoColor (8-bit) displays.
+Fix a bug in DCTStream that was causing an infinite loop with
+  corrupted DCT image data.
+Fix a bug in the ToUnicode CMap parser.
+Fix a bug in the text extractor - negative font sizes weren't being
+  handled correctly.
+Fix a bug in the text extractor - in certain cases, out-of-bounds text
+  could cause crashes (generally only in damaged PDF files).
+Fix a read-past-end-of-array bug in the JBIG2 decoder.
+Fix a case where pdftops was generating lines longer than 255 chars.
+Optimize redraws - don't regenerate the XImage every time redrawRect
+  is called.
+The ASCII85 decoder wasn't skipping whitespace properly.
+Optimize text extraction: skip (non-inline) image setup entirely.
+Added initial transparency support (stroke/fill alpha and blend mode).
+Added support for the overprint setting in PostScript output.
+Fixed various buffer overflow bugs.
+Handle negative font sizes and horizontal scaling correctly - this
+  affected PSOutputDev for all text operators, as well as the TJ
+  operator for all OutputDevs.
+Fixed a buffer overflow in the CCITTFax decoder.
+Fixed an out-of-order entry in the list of font name aliases.
+Fixed a backward loop in the PostScriptFunction code.
+Treat a zero-length base URI the same way as a nonexistent base URI.
+Add a divide-by-zero check in TextOutputDev (the problem was happening
+  in cases of mixed horizontal and vertical text).
+PSOutputDev wasn't rounding the page bounding box coordinates
+  correctly.
+Support the SOF1 marker in DCT (JPEG) image streams.
+Minor changes to GlobalParams.h and JPXStream.h because some compilers
+  don't like anonymous structs inside anonymous unions.
+Xpdf now complains about a negative page number.
+Changed GString::cmp and GString::cmpN to correctly handle '\0' chars
+  in the middle of strings.
+Corrected the handling of the 'extend' parameters in radial shadings.
+Added the gmallocn and greallocn functions.
+Fixed a bug in the TIFF image component predictor which shows up with
+  components that are not 1 or 8 bits wide.
+Optimized FlateStream::loadFixedCodes().
+For non-embedded Base-14 fonts, don't use the ascent/descent/bbox
+  values from the FontDescriptor - various PDF generators get them
+  wrong.
+Fixed a bug in the text extractor - words on the same line (especially
+  in tables) were being split vertically onto multiple lines.
+Automatically select the correct radio button ("print with command"
+  vs. "print to file") in the print dialog.
+Don't create the "open" and "save as" dialogs until needed - this
+  avoids stat-ing every file in the directory at startup.
+Changed the Big5 and Big5ascii encodings (in the traditional Chinese
+  language support package) to include characters from the Unicode
+  database (which aren't mentioned in the Adobe character collection
+  documentation).
+Added the '-pagecrop' switch to pdftops.
+Tweaked the RGB->gray and CMYK->gray conversion functions to match the
+  PDF spec.
+The JPEG 2000 decoder wasn't correctly handling codeblocks split
+  across multiple packets/layers.
+Fixed a typecast that caused compile errors on 64-bit systems.
+The CMap parser wasn't handling the 'cidchar' construct.
+Handle the case in PSOutputDev where two font objects refer to the
+  same embedded 16-bit TrueType font, but with different CIDToGIDMaps.
+Changed the configure script to report more accurate warnings when
+  it can't find X / Motif / FreeType.
+Encryption with revision=2 always uses a 40-bit key, regardless of the
+  specified Length value.
+Yet another minor change to the TrueType font encoding deciphering
+  algorithm.
+Don't completely invalidate the Catalog if one (or more) of the page
+  objects are bogus -- just skip over those pages.
+Removed the workaround in pdftops for too-small Length2 values in Type
+  1 fonts -- it was causing problems on various PostScript printers.
+Started adding error checking to the JBIG2 decoder (this is nowhere
+  near complete yet).
+Extended the "unicodeToUnicode" config option to also apply to CID
+  fonts.
+Added the narrow Latin characters to the Adobe-Korea1.cidToUnicode
+  file in the Korean language support package.
+Fixed the code that handles page rotation in PSOutputDev.
+When converting a Type 1C glyph to a Type 1 glyph, insert closepath
+  operators as appropriate.
+Check for a sane 'loca' table in TrueType fonts (FoFiTrueType::parse).
+Fix PSOutputDev to correctly handle the case of an empty name in a
+  font encoding.

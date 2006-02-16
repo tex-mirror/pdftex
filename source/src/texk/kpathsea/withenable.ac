@@ -42,13 +42,12 @@ dnl Check whether we can find a texmf tree.  Look at the most common spots.
 dnl Not a switch, but something that must be included everywhere, even at
 dnl at the top level, so putting it in common.ac is not enough.
 AC_MSG_CHECKING(where the main texmf tree is located)
+case $prefix in
+  */) prefix=`echo "$prefix" | sed 's@/*$@@'`;;
+esac
 texmfmain=
-if test -n "$TEXMFMAIN"; then
-  texmfmain="$TEXMFMAIN"
-  AC_MSG_RESULT([$texmfmain (from TEXMFMAIN)])
-
-elif test "x$datadir" != 'x${prefix}/share'; then
-  # datadir is explicitly defined, assume datadir/texmf.
+if test "x$datadir" != 'x${prefix}/share'; then
+  # First case, datadir is defined...
   eval p=\"$datadir\"
   # Unconditionally set the directory, but...
   texmfmain=`echo "$p/texmf" | sed 's,//*,/,g'`
@@ -57,17 +56,15 @@ elif test "x$datadir" != 'x${prefix}/share'; then
     AC_MSG_RESULT("$texmfmain")
   else
     AC_MSG_RESULT([not found])
-    AC_MSG_WARN([No texmf tree found at datadir/texmf ($texmfmain)])
-    AC_MSG_WARN([proceeding anyway.
+    AC_MSG_WARN([No texmf tree found at $texmfmain.
   *****************************************************************
-  * Warning: The main texmf tree was not found.                   *
-  * If you do not have the files, you should be able to find them *
-  * at the same place you got these sources, or from one of the   *
-  * CTAN hosts. Good luck.                                        *
+  * Error: The main texmf tree was not found.                     *
+  * If you do not have the files, you should be able to them from *
+  * the same place you got these sources from, or from one of the *
+  * CTAN hosts.                                                   *
   *****************************************************************
-])
+  Winging it.])
   fi
-
 else
   # Second case, datadir is default...
   if test "x$prefix" = "xNONE"; then
@@ -94,7 +91,7 @@ else
     AC_MSG_RESULT([not found])
     AC_MSG_WARN([The main texmf tree was not found at $texmfmain.
   *****************************************************************
-  * Warning: The main texmf tree was not found.                   *
+  * Error: The main texmf tree was not found.                     *
   * Use the --datadir option to specify its parent directory.     *
   * If you do not have the files, you should be able to them from *
   * the same place you got these sources from, or from one of the *

@@ -1,11 +1,11 @@
 Xpdf
 ====
 
-version 3.00
-2004-jan-22
+version 3.01
+2005-aug-17
 
 The Xpdf software and documentation are
-copyright 1996-2004 Glyph & Cog, LLC.
+copyright 1996-2005 Glyph & Cog, LLC.
 
 Email: derekn@foolabs.com
 WWW: http://www.foolabs.com/xpdf/
@@ -37,17 +37,19 @@ different systems.
     --with-t1-library=PATH
     --with-t1-includes=PATH
 
-* Install FreeType 2 (if desired).  WARNING: You must have version
-  2.0.5 or newer.  Some older versions of XFree86 ship with an older
-  version of FreeType, which means you'll need to explicitly set
+* Install FreeType 2 (this is required).  WARNING: You must have
+  version 2.0.5 or newer.  Some older versions of XFree86 ship with an
+  older version of FreeType, which means you'll need to explicitly set
   include and library paths to get the correct version:
 
     --with-freetype2-library=PATH
     --with-freetype2-includes=PATH
 
-  (With the default installation, the library path is
-  /usr/local/lib and the include path is
-  /usr/local/include/freetype2.)
+  (The include path is the directory which contains the freetype2
+  directory, i.e., do NOT include "freetype2" in the
+  --with-freetype2-includes path.  For example, with the default
+  installation, the library path is /usr/local/lib and the include
+  path is /usr/local/include/freetype2.)
 
 * If you have Motif (or Lesstif) installed in a non-standard place,
   you can use the following options to tell configure where to find
@@ -89,6 +91,11 @@ different systems.
         Use the specified app-defaults directory.  The default is
         /usr/lib/X11/app-defaults.
 
+  If you need to pass specific options to the C and/or C++ compiler,
+  you can set the CFLAGS and/or CXXFLAGS environment variables before
+  running the configure script.  Any options given that way will be
+  added to the CFLAGS/CXXFLAGS used by all of the Xpdf makefiles.
+
 * Type 'make'.  This should build the executables:
 
     xpdf/xpdf
@@ -103,7 +110,11 @@ different systems.
   pages.
 
 The old Makefile.config and Makefiles are no longer provided or
-supported.
+supported.  If you really want to manually configure Xpdf (which is
+not recommended), the files that need to be created are aconf.h,
+Makefile, goo/Makefile, fofi/Makefile, splash/Makefile, and
+xpdf/Makefile, all of which are generated from the corresponding '.in'
+files.
 
 If you want to run a quick test, there is a tiny PDF file included
 with xpdf, as misc/hello.pdf .

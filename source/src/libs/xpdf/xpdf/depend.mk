@@ -1,87 +1,416 @@
-$(srcdir)/Array.o: Array.cc ../goo/gmem.h Object.h ../goo/gtypes.h \
- ../goo/GString.h Array.h Dict.h Stream.h
-$(srcdir)/BuiltinFont.o: BuiltinFont.cc ../goo/gmem.h FontEncodingTables.h \
- BuiltinFont.h ../goo/gtypes.h
-$(srcdir)/BuiltinFontTables.o: BuiltinFontTables.cc FontEncodingTables.h \
- BuiltinFontTables.h BuiltinFont.h ../goo/gtypes.h
-$(srcdir)/CMap.o: CMap.cc ../goo/gmem.h ../goo/gfile.h ../goo/gtypes.h \
- ../goo/GString.h Error.h config.h GlobalParams.h CharTypes.h \
- PSTokenizer.h CMap.h
-$(srcdir)/Catalog.o: Catalog.cc ../goo/gmem.h Object.h ../goo/gtypes.h \
- ../goo/GString.h Array.h Dict.h Stream.h XRef.h Page.h Error.h \
- config.h Link.h Catalog.h
-$(srcdir)/CharCodeToUnicode.o: CharCodeToUnicode.cc ../goo/gmem.h ../goo/gfile.h \
- ../goo/gtypes.h ../goo/GString.h Error.h config.h GlobalParams.h \
- CharTypes.h PSTokenizer.h CharCodeToUnicode.h
-$(srcdir)/Decrypt.o: Decrypt.cc ../goo/gmem.h Decrypt.h ../goo/gtypes.h \
- ../goo/GString.h
-$(srcdir)/Dict.o: Dict.cc ../goo/gmem.h Object.h ../goo/gtypes.h \
- ../goo/GString.h Array.h Dict.h Stream.h XRef.h
-$(srcdir)/Error.o: Error.cc GlobalParams.h ../goo/gtypes.h CharTypes.h Error.h \
- config.h
-$(srcdir)/FontEncodingTables.o: FontEncodingTables.cc FontEncodingTables.h
-$(srcdir)/Function.o: Function.cc ../goo/gmem.h Object.h ../goo/gtypes.h \
- ../goo/GString.h Array.h Dict.h Stream.h Error.h config.h Function.h
-$(srcdir)/Gfx.o: Gfx.cc ../goo/gmem.h GlobalParams.h ../goo/gtypes.h CharTypes.h \
- Object.h ../goo/GString.h Array.h Dict.h Stream.h Lexer.h Parser.h \
- GfxFont.h GfxState.h Function.h OutputDev.h Page.h Error.h config.h \
- Gfx.h
-$(srcdir)/GfxFont.o: GfxFont.cc ../goo/gmem.h Error.h config.h Object.h \
- ../goo/gtypes.h ../goo/GString.h Array.h Dict.h Stream.h \
- GlobalParams.h CharTypes.h CMap.h CharCodeToUnicode.h \
- FontEncodingTables.h BuiltinFontTables.h BuiltinFont.h \
- ../fofi/FoFiType1.h ../fofi/FoFiBase.h ../fofi/FoFiType1C.h \
- ../fofi/FoFiTrueType.h GfxFont.h
-$(srcdir)/GfxState.o: GfxState.cc ../goo/gmem.h Error.h config.h Object.h \
- ../goo/gtypes.h ../goo/GString.h Array.h Dict.h Stream.h Page.h \
- GfxState.h Function.h
-$(srcdir)/GlobalParams.o: GlobalParams.cc ../goo/gmem.h ../goo/GString.h \
- ../goo/GList.h ../goo/gtypes.h ../goo/GHash.h ../goo/gfile.h Error.h \
- config.h NameToCharCode.h CharTypes.h CharCodeToUnicode.h \
- UnicodeMap.h CMap.h BuiltinFontTables.h BuiltinFont.h \
- FontEncodingTables.h GlobalParams.h NameToUnicodeTable.h \
- UnicodeMapTables.h UTF8.h
-$(srcdir)/JArithmeticDecoder.o: JArithmeticDecoder.cc Object.h ../goo/gtypes.h \
- ../goo/gmem.h ../goo/GString.h Array.h Dict.h Stream.h \
- JArithmeticDecoder.h
-$(srcdir)/JBIG2Stream.o: JBIG2Stream.cc ../goo/GList.h ../goo/gtypes.h Error.h \
- config.h JArithmeticDecoder.h JBIG2Stream.h Object.h ../goo/gmem.h \
- ../goo/GString.h Array.h Dict.h Stream.h Stream-CCITT.h
-$(srcdir)/JPXStream.o: JPXStream.cc ../goo/gmem.h Error.h config.h \
- JArithmeticDecoder.h ../goo/gtypes.h JPXStream.h Object.h \
- ../goo/GString.h Array.h Dict.h Stream.h
-$(srcdir)/Lexer.o: Lexer.cc Lexer.h Object.h ../goo/gtypes.h ../goo/gmem.h \
- ../goo/GString.h Array.h Dict.h Stream.h Error.h config.h
-$(srcdir)/Link.o: Link.cc ../goo/gmem.h ../goo/GString.h Error.h config.h \
- Object.h ../goo/gtypes.h Array.h Dict.h Stream.h Link.h
-$(srcdir)/NameToCharCode.o: NameToCharCode.cc ../goo/gmem.h NameToCharCode.h \
- CharTypes.h
-$(srcdir)/Object.o: Object.cc Object.h ../goo/gtypes.h ../goo/gmem.h \
- ../goo/GString.h Array.h Dict.h Stream.h Error.h config.h XRef.h
-$(srcdir)/Outline.o: Outline.cc ../goo/gmem.h ../goo/GString.h ../goo/GList.h \
- ../goo/gtypes.h Link.h Object.h Array.h Dict.h Stream.h \
- PDFDocEncoding.h CharTypes.h Outline.h
-$(srcdir)/OutputDev.o: OutputDev.cc Object.h ../goo/gtypes.h ../goo/gmem.h \
- ../goo/GString.h Array.h Dict.h Stream.h GfxState.h Function.h \
- OutputDev.h CharTypes.h
-$(srcdir)/PDFDoc.o: PDFDoc.cc ../goo/GString.h config.h GlobalParams.h \
- ../goo/gtypes.h CharTypes.h Page.h Object.h ../goo/gmem.h Array.h \
- Dict.h Stream.h Catalog.h XRef.h Link.h OutputDev.h Error.h \
- ErrorCodes.h Lexer.h Parser.h Outline.h PDFDoc.h
-$(srcdir)/PDFDocEncoding.o: PDFDocEncoding.cc PDFDocEncoding.h CharTypes.h
-$(srcdir)/PSTokenizer.o: PSTokenizer.cc PSTokenizer.h ../goo/gtypes.h
-$(srcdir)/Page.o: Page.cc GlobalParams.h ../goo/gtypes.h CharTypes.h Object.h \
- ../goo/gmem.h ../goo/GString.h Array.h Dict.h Stream.h XRef.h Link.h \
- OutputDev.h Error.h config.h Page.h
-$(srcdir)/Parser.o: Parser.cc Object.h ../goo/gtypes.h ../goo/gmem.h \
- ../goo/GString.h Array.h Dict.h Stream.h Parser.h Lexer.h XRef.h \
- Error.h config.h Decrypt.h
-$(srcdir)/Stream.o: Stream.cc ../goo/gmem.h ../goo/gfile.h ../goo/gtypes.h \
- config.h Error.h Object.h ../goo/GString.h Array.h Dict.h Stream.h \
- Decrypt.h JBIG2Stream.h JPXStream.h Stream-CCITT.h
-$(srcdir)/UnicodeMap.o: UnicodeMap.cc ../goo/gmem.h ../goo/gfile.h \
- ../goo/gtypes.h ../goo/GString.h ../goo/GList.h Error.h config.h \
- GlobalParams.h CharTypes.h UnicodeMap.h
-$(srcdir)/XRef.o: XRef.cc ../goo/gmem.h Object.h ../goo/gtypes.h \
- ../goo/GString.h Array.h Dict.h Stream.h Lexer.h Parser.h Decrypt.h \
- Error.h config.h ErrorCodes.h XRef.h
+Array.o: $(srcdir)/Array.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h
+BuiltinFont.o: $(srcdir)/BuiltinFont.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/FontEncodingTables.h \
+  $(srcdir)/BuiltinFont.h \
+  $(goodir)/gtypes.h
+BuiltinFontTables.o:  \
+ $(srcdir)/BuiltinFontTables.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(srcdir)/FontEncodingTables.h \
+  $(srcdir)/BuiltinFontTables.h \
+  $(srcdir)/BuiltinFont.h \
+  $(goodir)/gtypes.h
+Catalog.o: $(srcdir)/Catalog.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/XRef.h \
+  $(srcdir)/Page.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/Link.h \
+  $(srcdir)/Catalog.h
+CharCodeToUnicode.o:  \
+ $(srcdir)/CharCodeToUnicode.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(goodir)/gfile.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/GlobalParams.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/PSTokenizer.h \
+  $(srcdir)/CharCodeToUnicode.h
+CMap.o: $(srcdir)/CMap.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(goodir)/gfile.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/GlobalParams.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/PSTokenizer.h \
+  $(srcdir)/CMap.h
+Decrypt.o: $(srcdir)/Decrypt.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Decrypt.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h
+Dict.o: $(srcdir)/Dict.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/XRef.h
+Error.o: $(srcdir)/Error.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(srcdir)/GlobalParams.h \
+  $(goodir)/gtypes.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h
+FontEncodingTables.o:  \
+ $(srcdir)/FontEncodingTables.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(srcdir)/FontEncodingTables.h
+Function.o: $(srcdir)/Function.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/Function.h
+Gfx.o: $(srcdir)/Gfx.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/GlobalParams.h \
+  $(goodir)/gtypes.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/Object.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Lexer.h \
+  $(srcdir)/Parser.h \
+  $(srcdir)/GfxFont.h \
+  $(srcdir)/GfxState.h \
+  $(srcdir)/Function.h \
+  $(srcdir)/OutputDev.h \
+  $(srcdir)/Page.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/Gfx.h
+GfxFont.o: $(srcdir)/GfxFont.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/GlobalParams.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/CMap.h \
+  $(srcdir)/CharCodeToUnicode.h \
+  $(srcdir)/FontEncodingTables.h \
+  $(srcdir)/BuiltinFontTables.h \
+  $(srcdir)/BuiltinFont.h \
+  $(fofidir)/FoFiType1.h \
+  $(fofidir)/FoFiBase.h \
+  $(fofidir)/FoFiType1C.h \
+  $(fofidir)/FoFiTrueType.h \
+  $(srcdir)/GfxFont.h
+GfxState.o: $(srcdir)/GfxState.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Page.h \
+  $(srcdir)/GfxState.h \
+  $(srcdir)/Function.h
+GlobalParams.o: $(srcdir)/GlobalParams.cc \
+  ../aconf.h $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(goodir)/GString.h \
+  $(goodir)/GList.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GHash.h \
+  $(goodir)/gfile.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/NameToCharCode.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/CharCodeToUnicode.h \
+  $(srcdir)/UnicodeMap.h \
+  $(srcdir)/CMap.h \
+  $(srcdir)/BuiltinFontTables.h \
+  $(srcdir)/BuiltinFont.h \
+  $(srcdir)/FontEncodingTables.h \
+  $(srcdir)/GlobalParams.h \
+  $(srcdir)/NameToUnicodeTable.h \
+  $(srcdir)/UnicodeMapTables.h \
+  $(srcdir)/UTF8.h
+JArithmeticDecoder.o:  \
+ $(srcdir)/JArithmeticDecoder.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/gmem.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/JArithmeticDecoder.h
+JBIG2Stream.o: $(srcdir)/JBIG2Stream.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/GList.h \
+  $(goodir)/gtypes.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/JArithmeticDecoder.h \
+  $(srcdir)/JBIG2Stream.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gmem.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Stream-CCITT.h
+JPXStream.o: $(srcdir)/JPXStream.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/JArithmeticDecoder.h \
+  $(goodir)/gtypes.h \
+  $(srcdir)/JPXStream.h \
+  $(srcdir)/Object.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h
+Lexer.o: $(srcdir)/Lexer.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(srcdir)/Lexer.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/gmem.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h
+Link.o: $(srcdir)/Link.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Link.h
+NameToCharCode.o: $(srcdir)/NameToCharCode.cc \
+  ../aconf.h $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/NameToCharCode.h \
+  $(srcdir)/CharTypes.h
+Object.o: $(srcdir)/Object.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/gmem.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/XRef.h
+Outline.o: $(srcdir)/Outline.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(goodir)/GString.h \
+  $(goodir)/GList.h \
+  $(goodir)/gtypes.h \
+  $(srcdir)/Link.h \
+  $(srcdir)/Object.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/PDFDocEncoding.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/Outline.h
+OutputDev.o: $(srcdir)/OutputDev.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/gmem.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/GfxState.h \
+  $(srcdir)/Function.h \
+  $(srcdir)/OutputDev.h \
+  $(srcdir)/CharTypes.h
+Page.o: $(srcdir)/Page.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(srcdir)/GlobalParams.h \
+  $(goodir)/gtypes.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gmem.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/XRef.h \
+  $(srcdir)/Link.h \
+  $(srcdir)/OutputDev.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/Page.h
+Parser.o: $(srcdir)/Parser.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/gmem.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Parser.h \
+  $(srcdir)/Lexer.h \
+  $(srcdir)/XRef.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/Decrypt.h
+PDFDoc.o: $(srcdir)/PDFDoc.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/GString.h \
+  $(srcdir)/config.h \
+  $(srcdir)/GlobalParams.h \
+  $(goodir)/gtypes.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/Page.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Catalog.h \
+  $(srcdir)/XRef.h \
+  $(srcdir)/Link.h \
+  $(srcdir)/OutputDev.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/ErrorCodes.h \
+  $(srcdir)/Lexer.h \
+  $(srcdir)/Parser.h \
+  $(srcdir)/SecurityHandler.h \
+  $(srcdir)/Outline.h \
+  $(srcdir)/PDFDoc.h
+PDFDocEncoding.o: $(srcdir)/PDFDocEncoding.cc \
+  $(srcdir)/PDFDocEncoding.h \
+  $(srcdir)/CharTypes.h
+PSTokenizer.o: $(srcdir)/PSTokenizer.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(srcdir)/PSTokenizer.h \
+  $(goodir)/gtypes.h
+SecurityHandler.o: $(srcdir)/SecurityHandler.cc \
+  ../aconf.h $(srcdirparent)/aconf2.h \
+  $(goodir)/GString.h \
+  $(srcdir)/PDFDoc.h \
+  $(srcdir)/XRef.h \
+  $(goodir)/gtypes.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Catalog.h \
+  $(srcdir)/Page.h \
+  $(srcdir)/Decrypt.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/GlobalParams.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/SecurityHandler.h
+Stream.o: $(srcdir)/Stream.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(goodir)/gfile.h \
+  $(goodir)/gtypes.h \
+  $(srcdir)/config.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/Object.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Lexer.h \
+  $(srcdir)/Decrypt.h \
+  $(srcdir)/GfxState.h \
+  $(srcdir)/Function.h \
+  $(srcdir)/JBIG2Stream.h \
+  $(srcdir)/JPXStream.h \
+  $(srcdir)/Stream-CCITT.h
+UnicodeMap.o: $(srcdir)/UnicodeMap.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(goodir)/gfile.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h \
+  $(goodir)/GList.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/GlobalParams.h \
+  $(srcdir)/CharTypes.h \
+  $(srcdir)/UnicodeMap.h
+XRef.o: $(srcdir)/XRef.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
+  $(goodir)/gmem.h \
+  $(srcdir)/Object.h \
+  $(goodir)/gtypes.h \
+  $(goodir)/GString.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h \
+  $(srcdir)/Lexer.h \
+  $(srcdir)/Parser.h \
+  $(srcdir)/Error.h \
+  $(srcdir)/config.h \
+  $(srcdir)/ErrorCodes.h \
+  $(srcdir)/XRef.h

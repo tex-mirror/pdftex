@@ -59,7 +59,7 @@
 \entry {\code {-min-crossrefs=\var {n}}}{37}
 \entry {\code {-mixedcase}}{39}
 \entry {\code {-mktex=\var {filetype}}}{15, 24}
-\entry {\code {-mltex}}{15}
+\entry {\code {-mltex}}{16}
 \entry {\code {-mnemonics}}{49}
 \entry {\code {-no-file-line-error}}{7}
 \entry {\code {-no-mktex=\var {filetype}}}{15, 24}
@@ -423,7 +423,7 @@
 \entry {\code {install-formats \r {Make target}}}{4}
 \entry {\code {install-mems \r {Make target}}}{4}
 \entry {installation}{2}
-\entry {interaction between TCX files and \samp {-8bit}.}{20}
+\entry {interaction between TCX files and \samp {-8bit}.}{21}
 \entry {interaction mode}{8}
 \entry {international characters}{19}
 \entry {introduction}{1}
@@ -519,7 +519,7 @@
 \entry {\code {mktexmf\r {, disabling}}}{23}
 \entry {\code {mktextfM\r {, disabling}}}{14}
 \entry {\code {mltex}}{18}
-\entry {ML\TeX {}, enabling}{15}
+\entry {ML\TeX {}, enabling}{16}
 \entry {mode needed to run Metafont}{23}
 \entry {\code {mode_def}}{25}
 \entry {\code {mode_setup}}{25}
@@ -587,8 +587,8 @@
 \entry {\code {patgen}}{21}
 \entry {path searching}{9}
 \entry {path searching debugging}{8}
-\entry {PDF}{21}
-\entry {pdf\TeX {}}{21}
+\entry {PDF}{22}
+\entry {pdf\TeX {}}{22}
 \entry {permissions, legal}{55}
 \entry {PFA and PFB conversion}{54}
 \entry {\code {pfaedit}}{54}
@@ -638,7 +638,7 @@
 \entry {printer characteristics, for Metafont}{25}
 \entry {production use}{10}
 \entry {program name, determines memory dump}{11}
-\entry {program names, special}{8, 15}
+\entry {program names, special}{8, 16}
 \entry {\code {prologues}}{32}
 \entry {\code {prologues \r {and Troff in MetaPost}}}{33}
 \entry {\code {prologues\r {, and EPSF output}}}{31}

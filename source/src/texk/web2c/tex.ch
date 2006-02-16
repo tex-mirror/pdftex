@@ -203,7 +203,7 @@ versions of the program.
 @d ssup_max_strings == 262143
 {Larger values than 65536 cause the arrays consume much more memory.}
 @d ssup_trie_opcode == 65535
-@d ssup_trie_size == 4194303
+@d ssup_trie_size == @"3FFFFF
 
 @d ssup_hyph_size == 65535 {Changing this requires changing (un)dumping!}
 @d iinf_hyphen_size == 610 {Must be not less than |hyph_prime|!}
@@ -4914,9 +4914,7 @@ if (mubyte_out > 2) or (mubyte_out = -1) or (mubyte_out = -2) then
 @x [53.1370] l.24773 - system: (write_out) \write18{foo} => system(foo).
 if write_open[j] then selector:=j
 @y
-if shell_enabled_p and (j=18) then
-  begin selector := new_string;
-  end
+if j=18 then selector := new_string
 else if write_open[j] then selector:=j
 @z
 
@@ -4943,6 +4941,9 @@ if j=18 then
   begin if (tracing_online<=0) then
     selector:=log_only  {Show what we're doing in the log file.}
   else selector:=term_and_log;  {Show what we're doing.}
+  {If the log file isn't open yet, we can only send output to the terminal.
+   Calling |open_log_file| from here seems to result in bad data in the log.}
+  if not log_opened then selector:=term_only;
   print_nl("system(");
   for d:=0 to cur_length-1 do
     begin {|print| gives up if passed |str_ptr|, so do it by hand.}
@@ -4964,11 +4965,11 @@ if j=18 then
       system(stringcast(address_of(str_pool[str_start[str_ptr]])));
       print("executed");
       end;
-    pool_ptr:=str_start[str_ptr];  {erase the string}
     end
   else begin print("disabled");
   end;
   print_char("."); print_nl(""); print_ln;
+  pool_ptr:=str_start[str_ptr];  {erase the string}
 end;
 selector:=old_setting;
 @z

@@ -1,6 +1,7 @@
 /* The help messages for TeX & MF family of programs.
 
-Copyright (C) 1995, 96 Karl Berry, 2001 O.Weber.
+Copyright 2001-05 Olaf Weber.
+Copyright 1995, 96 Karl Berry.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -39,6 +40,7 @@ const_string ALEPHHELP[] = {
     "",
     "  If no arguments or options are specified, prompt for input.",
     "",
+    "-etex                   enable e-TeX extensions",
     "[-no]-file-line-error   disable/enable file:line:error style messages",
     "-fmt=FMTNAME            use FMTNAME instead of program name or a %& line",
     "-halt-on-error          stop processing at the first error",
@@ -93,6 +95,7 @@ const_string ETEXHELP[] = {
     "  If no arguments or options are specified, prompt for input.",
     "",
     "-enc                    enable encTeX extensions such as \\mubyte",
+    "-etex                   enable e-TeX extensions",
     "[-no]-file-line-error   disable/enable file:line:error style messages",
     "-fmt=FMTNAME            use FMTNAME instead of program name or a %& line",
     "-halt-on-error          stop processing at the first error",
@@ -408,6 +411,7 @@ const_string PDFETEXHELP[] = {
     "  If no arguments or options are specified, prompt for input.",
     "",
     "-enc                    enable encTeX extensions such as \\mubyte",
+    "-etex                   enable e-TeX extensions",
     "[-no]-file-line-error   disable/enable file:line:error style messages",
     "-fmt=FMTNAME            use FMTNAME instead of program name or a %& line",
     "-halt-on-error          stop processing at the first error",

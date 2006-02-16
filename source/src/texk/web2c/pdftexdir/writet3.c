@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet3.c#9 $
+$Id: writet3.c,v 1.7 2005/11/26 20:52:09 hahe Exp hahe $
 */
 
 #include "ptexlib.h"
@@ -27,7 +27,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet3.c#9 $
 #define T3_BUF_SIZE   1024
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet3.c#9 $";
+    "$Id: writet3.c,v 1.7 2005/11/26 20:52:09 hahe Exp hahe $";
 
 /* define t3_line_ptr, t3_line_array & t3_line_limit */
 typedef char t3_line_entry;
@@ -133,7 +133,7 @@ static void t3_write_glyph(internalfontnumber f)
     }
     update_bbox(llx, lly, urx, ury, t3_glyph_num == 0);
     t3_glyph_num++;
-    pdfnewdict(0, 0);
+    pdfnewdict(0, 0, false);
     t3_char_procs[glyph_index] = objptr;
     if (width == 0) 
         t3_char_widths[glyph_index] = 
@@ -229,7 +229,7 @@ static boolean writepk(internalfontnumber f)
         ury = cd.cheight + lly;
         update_bbox(llx, lly, urx, ury, t3_glyph_num == 0);
         t3_glyph_num++;
-        pdfnewdict(0, 0);
+        pdfnewdict(0, 0, false);
         t3_char_procs[cd.charcode] = objptr;
         pdfbeginstream();
         pdfprintreal(t3_char_widths[cd.charcode], 2);
@@ -269,6 +269,7 @@ void writet3(int objnum, internalfontnumber f)
 {
     static char t3_font_scale_str[] = "\\pdffontscale";
     int i, e;
+    integer wptr, eptr, cptr;
     int first_char, last_char;
     integer pk_font_scale;
     boolean is_notdef;
@@ -310,7 +311,7 @@ write_font_dict:
         if (pdfcharmarked(f, i))
             break;
     last_char = i;
-    pdfbegindict(objnum); /* Type 3 font dictionary */
+    pdfbegindict(objnum, true); /* Type 3 font dictionary */
     pdf_puts("/Type /Font\n/Subtype /Type3\n");
     pdf_printf("/Name /F%i\n", (int)f);
     if (pdffontattr[f] != getnullstr()) {
@@ -335,11 +336,13 @@ write_font_dict:
     pdf_printf("/Resources << /ProcSet [ /PDF %s] >>\n", 
                t3_image_used ? "/ImageB " : "");
     pdf_printf("/FirstChar %i\n/LastChar %i\n", first_char, last_char);
+    wptr = pdfnewobjnum();
+    eptr = pdfnewobjnum();
+    cptr = pdfnewobjnum();
     pdf_printf("/Widths %i 0 R\n/Encoding %i 0 R\n/CharProcs %i 0 R\n", 
-               (int)(objptr + 1), (int)(objptr + 2),
-               (int)(objptr + 3));
+               wptr, eptr, cptr);
     pdfenddict();
-    pdfnewobj(0, 0); /* chars width array */
+    pdfbeginobj(wptr, true); /* chars width array */
     pdf_puts("[");
     if (is_pk_font)
         for (i = first_char; i <= last_char; i++) {
@@ -351,7 +354,7 @@ write_font_dict:
             pdf_printf("%i ", (int)t3_char_widths[i]);
     pdf_puts("]\n");
     pdfendobj();
-    pdfnewdict(0, 0); /* encoding dictionary */
+    pdfbegindict(eptr, true); /* encoding dictionary */
     pdf_printf("/Type /Encoding\n/Differences [%i", first_char);
     if (t3_char_procs[first_char] == 0) {
         pdf_printf("/%s", notdef);
@@ -378,7 +381,7 @@ write_font_dict:
     }
     pdf_puts("]\n");
     pdfenddict();
-    pdfnewdict(0, 0); /* CharProcs dictionary */
+    pdfbegindict(cptr, true); /* CharProcs dictionary */
     for (i = first_char; i <= last_char; i++)
         if (t3_char_procs[i] != 0)
             pdf_printf("/a%i %i 0 R\n", (int)i, (int)t3_char_procs[i]);

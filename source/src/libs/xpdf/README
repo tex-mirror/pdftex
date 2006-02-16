@@ -1,17 +1,17 @@
 Xpdf
 ====
 
-version 3.00
-2004-jan-22
+version 3.01
+2005-aug-17
 
 The Xpdf software and documentation are
-copyright 1996-2004 Glyph & Cog, LLC.
+copyright 1996-2005 Glyph & Cog, LLC.
 
 Email: derekn@foolabs.com
 WWW: http://www.foolabs.com/xpdf/
 
 The PDF data structures, operators, and specification are
-copyright 1985-2003 Adobe Systems Inc.
+copyright 1985-2004 Adobe Systems Inc.
 
 
 What is Xpdf?
@@ -184,7 +184,8 @@ Thanks to:
   xpdf.
 * Pine Tree Systems A/S for funding the OPI and EPS support in
   pdftops.
-* Easy Software Products for funding the "sh" operator support.
+* Easy Software Products for funding several improvements to the
+  PostScript output code.
 * Tom Kacvinsky for help with FreeType and for being my interface to
   the FreeType team.
 * Theppitak Karoonboonyanan for help with Thai support.
@@ -204,9 +205,9 @@ References
 ----------
 
 Adobe Systems Inc., _PDF Reference: Adobe Portable Document Format
-Version 1.5_.
-http://partners.adobe.com/asn/tech/pdf/specifications.jsp
-[The manual for PDF version 1.5.]
+Version 1.6_.
+http://partners.adobe.com/public/developer/pdf/index_reference.html
+[The manual for PDF version 1.6.]
 
 Adobe Systems Inc., _PostScript Language Reference_, 3rd ed.
 Addison-Wesley, 1999, ISBN 0-201-37922-8.

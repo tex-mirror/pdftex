@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#21 $
+$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $
 */
 
 #include "sys/types.h"
@@ -32,7 +32,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#21 $
 #include <time.h>
 
 static const char perforce_id[] = 
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#21 $";
+    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $";
 
 char *cur_file_name = NULL;
 strnumber last_tex_string;
@@ -235,10 +235,25 @@ void pdftex_warn(const char *fmt,...)
 
 char *makecstring(integer s)
 {
-    static char cstrbuf[MAX_CSTRING_LEN];
-    char *p = cstrbuf;
-    int i, l = strstart[s + 1] - strstart[s];
+    static char *cstrbuf = NULL;
+    char *p;
+    static int allocsize;
+    int allocgrow, i, l = strstart[s + 1] - strstart[s];
     check_buf(l + 1, MAX_CSTRING_LEN);
+    if (cstrbuf == NULL) {
+        allocsize = l + 1;
+        cstrbuf = xmallocarray(char, allocsize);
+    } else if (l + 1 > allocsize) {
+        allocgrow = allocsize * 0.2;
+        if (l + 1 - allocgrow > allocsize)
+            allocsize = l + 1;
+        else if (allocsize < MAX_CSTRING_LEN - allocgrow)
+            allocsize += allocgrow;
+        else
+            allocsize = MAX_CSTRING_LEN;
+        cstrbuf = xreallocarray(cstrbuf, char, allocsize);
+    }
+    p = cstrbuf;
     for (i = 0; i < l; i++)
         *p++ = strpool[i + strstart[s]];
     *p = 0;
@@ -1111,32 +1126,20 @@ void getmatch(int i) {
 /* makecfilename
   input/ouput same as makecstring:
     input: string number
-    output: C string (buffer address that contains the string)
-  WIN32: quotes are removed.
+    output: C string with quotes removed.
+    That means, file names that are legal on some operation systems
+    cannot any more be used since pdfTeX version 1.30.4.
 */
 char *makecfilename(strnumber s) {
     char *name = makecstring(s);
-#ifdef WIN32
-    /* unquote file name */
-    if (*name == '"') {
-        char *p = name;
-        char *q = name;
-        while (p && *p) {
-            *q = (*p == '"' ? *(++p) : *p);
-            p++, q++;
-        }
-        *q = '\0';
+    char *p = name;
+    char *q = name;
+
+    while (*p) {
+        if (*p != '"')
+            *q++ = *p;
+        p++;
     }
-    fprintf(stderr, " %s\n", name);
-#endif
+    *q = '\0';
     return name;
-}
-
-
-boolean isquotebad() {
-#ifdef WIN32
-    return true;
-#else
-    return false;
-#endif
 }
