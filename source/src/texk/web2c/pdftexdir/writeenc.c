@@ -24,6 +24,7 @@ source code indentation by "indent -kr -nut"
 
 #include "ptexlib.h"
 
+/*@unused@*/
 static const char perforce_id[] =
     "$Id: writeenc.c,v 1.3 2005/12/26 14:20:13 hahe Exp hahe $";
 

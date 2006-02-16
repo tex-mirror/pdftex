@@ -396,7 +396,8 @@ boolean check_basefont(char *s)
         { -1, -1, -1, -1, -1, -1, 8, 0, -1, 4, 10, 9, -1, -1, 5, 2, 12, 6,
         -1, 3, -1, 7
     };
-    int n = strlen(s), k = -1;
+    const size_t n = strlen(s);
+    int k = -1;
     if (n > 21)
         return false;
     if (n == 12) {              /* three names have length 12 */

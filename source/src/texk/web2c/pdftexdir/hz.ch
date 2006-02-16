@@ -1,6 +1,6 @@
 % WEB change file containing HZ extensions for pdfTeX 
 %
-% Copyright (c) 1996-2002 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 1996-2006 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
 % This file is part of pdfTeX.
 %
@@ -333,7 +333,7 @@ end;
 function auto_expand_font(f: internal_font_number; e: integer): internal_font_number;
 {creates an expanded font from the base font; doesn't load expanded tfm at all}
 var k: internal_font_number;
-    nw, nk, ni, i, j: integer;
+    nw, nk, ni, i: integer;
 begin
     k := font_ptr + 1;
     incr(font_ptr);
@@ -385,7 +385,6 @@ begin
 end;
 
 procedure set_expand_param(k, f: internal_font_number; e: integer);
-var i, j: integer;
 begin
     if pdf_font_rp_base[f] = 0 then
         pdf_font_rp_base[f] := init_font_base(0);
@@ -532,7 +531,6 @@ end;
 function expand_font(f: internal_font_number; e: integer): internal_font_number;
 {looks up for font |f| expanded by |e| thousandths, |e| is an arbitrary value
 between max stretch and max shrink of |f|; if not found then creates it}
-var max_expand: integer;
 begin
     expand_font := f;
     if e = 0 then
@@ -738,8 +736,6 @@ label continue;
 var i: four_quarters;
     j: four_quarters;
     k: font_index;
-    p: pointer;
-    s: integer;
 begin
     get_kern := 0;
     i := char_info(f)(lc);
@@ -1239,7 +1235,7 @@ function total_pw(q, p: pointer): scaled;
 {returns the total width of character protrusion of a line;
 |cur_break(break_node(q))| and |p| is the leftmost resp. rightmost node in the
 horizontal list representing the actual line}
-var l, r, s: pointer;
+var l, r: pointer;
     n: integer;
 begin
     if break_node(q) = null then
@@ -1932,4 +1928,3 @@ begin
     prev_rightmost := p;
 end;
 @z
-

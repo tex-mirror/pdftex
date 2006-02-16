@@ -1,5 +1,5 @@
 %
-% Copyright (c) 2005 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 2005-2006 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
 % This file is part of pdfTeX.
 %
@@ -1385,11 +1385,11 @@ pdf_print_ln("%%EOF")
 
 @x 32439
     is_root: boolean; {|pdf_last_pages| is root of Pages tree?}
-    root, outlines, threads, names_tree, dests, fixed_dest: integer;
+    root, outlines, threads, names_tree, dests: integer;
 @y
     is_root: boolean; {|pdf_last_pages| is root of Pages tree?}
     is_names: boolean; {flag for name tree output: is it Names or Kids?}
-    root, outlines, threads, names_tree, dests, fixed_dest: integer;
+    root, outlines, threads, names_tree, dests: integer;
     xref_offset_width, names_head, names_tail: integer;
 @z
 

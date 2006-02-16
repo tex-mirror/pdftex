@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -68,7 +68,7 @@ $Id: ptexmac.h,v 1.14 2005/11/29 22:05:23 hahe Exp $
 
 #define MAX_CHAR_CODE       255
 #define PRINTF_BUF_SIZE     1024
-#define MAX_CSTRING_LEN     1024
+#define MAX_CSTRING_LEN     1024 * 1024
 #define MAX_PSTRING_LEN     1024
 #define SMALL_BUF_SIZE      256
 #define SMALL_ARRAY_SIZE    256
@@ -78,7 +78,7 @@ $Id: ptexmac.h,v 1.14 2005/11/29 22:05:23 hahe Exp $
 
 #define check_buf(size, buf_size)                          \
     if ((size) > (buf_size))                               \
-        pdftex_fail("buffer overflow at file %s, line %1", __FILE__,  __LINE__)
+        pdftex_fail("buffer overflow at file %s, line %d", __FILE__,  __LINE__ )
 
 #define append_char_to_buf(c, p, buf, buf_size) do {       \
     if (c == 9)                                            \

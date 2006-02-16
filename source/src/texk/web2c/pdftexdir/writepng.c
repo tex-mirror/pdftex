@@ -23,8 +23,7 @@ $Id: writepng.c,v 1.6 2005/12/26 14:25:24 hahe Exp hahe $
 #include "ptexlib.h"
 #include "image.h"
 
-
-
+/*@unused@*/
 static const char perforce_id[] = 
     "$Id: writepng.c,v 1.6 2005/12/26 14:25:24 hahe Exp hahe $";
 

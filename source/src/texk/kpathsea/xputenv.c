@@ -1,4 +1,4 @@
-/* xputenv.c: set an environment variable without return.
+/* xputenv.c: set an environment variable without return. */
 
 /*
  *  Copyright 2003-05 Olaf Weber.
@@ -98,7 +98,7 @@ xputenv(const char *var, const char *value)
         saved_env = XRETALLOC(saved_env, saved_count, const char *);
     } else {
         /* We owned the old string. */
-        free(saved_env[cur_loc]);
+        free((char **)saved_env[cur_loc]);
     }
     saved_env[cur_loc] = cur_item;
 

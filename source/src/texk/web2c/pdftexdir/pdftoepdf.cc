@@ -49,6 +49,10 @@ $Id: pdftoepdf.cc,v 1.3 2005/12/26 14:15:35 hahe Exp hahe $
 static const char perforce_id[] = 
     "$Id: pdftoepdf.cc,v 1.3 2005/12/26 14:15:35 hahe Exp hahe $";
 
+/* 
+ * this file is mostly C and not very much C++; it's just used to interface the
+ * functions of xpdf, which happens to be written in C++. 
+ */
 
 /*
  * Used flags below:
@@ -151,7 +155,7 @@ static PdfDocument *find_add_document(char *file_name)
         xref = p->xref;
         (p->occurences)++;
 #ifdef DEBUG
-        fprintf(stderr, "\nIncrementing %s (%d)\n", p->file_name, p->occurences);
+        fprintf(stderr, "\npdfTeX Debug: Incrementing %s (%d)\n", p->file_name, p->occurences);
 #endif
         return p;
     }
@@ -160,7 +164,7 @@ static PdfDocument *find_add_document(char *file_name)
     p->xref = xref = 0;
     p->occurences = 0;
 #ifdef DEBUG
-    fprintf(stderr, "\nCreating %s (%d)\n", p->file_name, p->occurences);
+    fprintf(stderr, "\npdfTeX Debug: Creating %s (%d)\n", p->file_name, p->occurences);
 #endif
     GString *docName = new GString(p->file_name);
     p->doc = new PDFDoc(docName);  // takes ownership of docName
@@ -781,7 +785,7 @@ write_epdf(void)
     PdfDocument *pdf_doc = (PdfDocument *) epdf_doc;
     (pdf_doc->occurences)--;
 #ifdef DEBUG
-    fprintf(stderr, "\nDecrementing %s (%d)\n", pdf_doc->file_name, pdf_doc->occurences);
+    fprintf(stderr, "\npdfTeX Debug: Decrementing %s (%d)\n", pdf_doc->file_name, pdf_doc->occurences);
 #endif
     xref = pdf_doc->xref;
     inObjList = pdf_doc->inObjList;
@@ -961,7 +965,7 @@ epdf_delete()
     xref = pdf_doc->xref;
     if (pdf_doc->occurences < 0) {
 #ifdef DEBUG
-        fprintf(stderr, "\nDeleting %s\n", pdf_doc->file_name);
+        fprintf(stderr, "\npdfTeX Debug: Deleting %s\n", pdf_doc->file_name);
 #endif
         delete_document(pdf_doc);
     }

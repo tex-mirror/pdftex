@@ -27,7 +27,7 @@
 % (pdftexdir/pdftex.ch). Consequently, changes in these files have to be
 % coordinated.
 %
-% Copyright (c) 1996-2005 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+% Copyright (c) 1996-2006 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
 %
 % This file is part of pdfTeX.
 %
@@ -70,7 +70,7 @@
 @y
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-alpha-20051226' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-alpha-20060106' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592',pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -1216,7 +1216,6 @@ function str_in_str(s, r: str_number; i: integer): boolean;
   {test equality of strings}
 label not_found; {loop exit}
 var j, k: pool_pointer; {running indices}
-@!result: boolean; {result of comparison}
 begin 
     str_in_str := false;
     if length(s) < i + length(r) then
@@ -2132,7 +2131,7 @@ end;
 procedure pdf_print_str(s: str_number); {print out |s| as string in PDF
 output}
 label done;
-var i, j, k: pool_pointer;
+var i, j: pool_pointer;
     is_hex_string: boolean;
 begin
     i := str_start[s];
@@ -2413,7 +2412,6 @@ var k: internal_font_number;
     s: str_number;
     ds, fs: scaled;
     cs: four_quarters;
-    c: integer;
 begin
     cs.b0 := vf_byte; cs.b1 := vf_byte; cs.b2 := vf_byte; cs.b3 := vf_byte;
     tmp_b0 := vf_byte; tmp_b1 := vf_byte; tmp_b2 := vf_byte; tmp_b3 := vf_byte;
@@ -2730,9 +2728,8 @@ end;
 procedure do_vf_packet(f: internal_font_number; c: eight_bits); {typeset the \.{DVI} commands in the
 character packet for character |c| in current font |f|}
 label do_char, continue;
-var save_packet_ptr, save_packet_length: pool_pointer;
-    save_vf, k, n: internal_font_number;
-    base_line, save_h, save_v: scaled;
+var save_vf, k, n: internal_font_number;
+    save_h, save_v: scaled;
     cmd: integer;
     char_move: boolean;
     w, x, y, z: scaled;
@@ -3247,7 +3244,6 @@ otherwise it will be a Page object.
 @p procedure pdf_ship_out(p: pointer; shipping_page: boolean); {output the box |p|}
 label done, done1;
 var i,j,k:integer; {general purpose accumulators}
-r: integer; {accumulator to copy node for pending link annotation}
 save_font_list: pointer; {to save |pdf_font_list| during flushing pending forms}
 save_obj_list: pointer; {to save |pdf_obj_list|}
 save_ximage_list: pointer; {to save |pdf_ximage_list|}
@@ -3255,8 +3251,6 @@ save_xform_list: pointer; {to save |pdf_xform_list|}
 save_image_procset: integer;  {to save |pdf_image_procset|}
 save_text_procset: integer;  {to save |pdf_text_procset|}
 pdf_last_resources: integer; {pointer to most recently generated Resources object}
-s:str_number;
-old_setting:0..max_selector; {saved |selector| setting}
 begin if tracing_output>0 then
   begin print_nl(""); print_ln;
   print("Completed box being shipped out");
@@ -3942,7 +3936,7 @@ end else
     kpse_init_prog('PDFTEX', fixed_pk_resolution, nil, nil);
 if not kpse_var_value('MKTEXPK') then
     kpse_set_program_enabled (kpse_pk_format, 1, kpse_src_cmdline);
-set_job_id(year, month, day, time, pdftex_version, pdftex_revision); 
+set_job_id(year, month, day, time); 
 if (pdf_unique_resname > 0) and (pdf_resname_prefix = 0) then
     pdf_resname_prefix := get_resname_prefix
 
@@ -3972,7 +3966,6 @@ end;
 procedure sort_dest_names(l, r: integer); {sorts |dest_names| by names}
 var i, j: integer;
     s: str_number;
-    x, y: integer;
     e: dest_name_entry;
 begin
     i := l;
@@ -4513,7 +4506,7 @@ procedure close_files_and_terminate;
 label done, done1;
 var a, b, c, i, j, k, l: integer; {all-purpose index}
     is_root: boolean; {|pdf_last_pages| is root of Pages tree?}
-    root, outlines, threads, names_tree, dests, fixed_dest: integer;
+    root, outlines, threads, names_tree, dests: integer;
 begin @<Finish the extensions@>;
 @!stat if tracing_stats>0 then @<Output statistics about this job@>;@;@+tats@/
 wake_up_terminal;
@@ -5103,8 +5096,7 @@ end;
 
 procedure scan_image;
 label reswitch;
-var p: pointer;
-    k: integer;
+var k: integer;
     named: str_number;
     s: str_number;
     page, pagebox, colorspace: integer;
@@ -5260,8 +5252,7 @@ end;
 
 @ @<Declare procedures needed in |do_ext...@>=
 function scan_action: pointer; {read an action specification}
-var p, t: integer;
-    s: str_number;
+var p: integer;
 begin
     p := get_node(pdf_action_size);
     scan_action := p;
@@ -5332,7 +5323,6 @@ end;
 
 procedure new_annot_whatsit(w, s: small_number); {create a new whatsit node for
 annotation}
-var p: pointer;
 begin
     new_whatsit(w, s);
     scan_alt_rule; {scans |<rule spec>| to |alt_rule|}
@@ -5836,7 +5826,7 @@ begin
 end;
 
 procedure out_thread(thread: integer);
-var a, b, c: pointer;
+var a, b: pointer;
     last_attr: integer;
 begin
     if obj_thread_first(thread) = 0 then begin
@@ -6554,7 +6544,7 @@ order to use |flush_node_list| to do the job.
 @<Declare procedures needed in |pdf_hlist_out|, |pdf_vlist_out|@>=
 procedure append_link(parent_box: pointer; x, y: scaled); {append a new
 |pdf_start_link_node| to |pdf_link_list| and update |last_link|}
-var p, r: integer;
+var r: integer;
 begin
     if type(parent_box) <> hlist_node then
         pdf_error("ext4", "link annotations can be inside hbox only");

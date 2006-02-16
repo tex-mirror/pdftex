@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -181,11 +181,25 @@ extern void pdf_printf(const char *,...);
 extern void pdf_puts(const char *);
 extern void pdftex_fail(const char *,...);
 extern void pdftex_warn(const char *,...);
-extern void setjobid(int, int, int, int, int, int);
+extern void setjobid(int, int, int, int);
 extern void tex_printf(const char *, ...);
 extern void writestreamlength(integer, integer);
-extern char *convertStringToPDFString(char *in, int len);
+extern char *convertStringToPDFString(const char *in, int len);
 extern void printID(strnumber);
+extern void printcreationdate();
+extern void escapename(poolpointer in);
+extern void escapestring(poolpointer in);
+extern void escapehex(poolpointer in);
+extern void unescapehex(poolpointer in);
+extern void getcreationdate();
+extern void getfilemoddate(strnumber s);
+extern void getfilesize(strnumber s);
+extern void getmd5sum(strnumber s, boolean file);
+extern void getfiledump(strnumber s, int offset, int length);
+extern void matchstrings(strnumber s, strnumber t, int subcount, boolean icase);
+extern void getmatch(int i);
+extern void makepdftexbanner(void);
+extern void initstarttime();
 
 /* vfpacket.c */
 extern eightbits packetbyte(void);
@@ -223,6 +237,7 @@ extern void deleteimage(integer);
 extern void img_free(void) ;
 extern void updateimageprocset(integer);
 extern void writeimage(integer);
+extern integer imagecolordepth(integer img);
 
 /* writet1.c */
 extern boolean t1_subset(char *, char *, unsigned char *);

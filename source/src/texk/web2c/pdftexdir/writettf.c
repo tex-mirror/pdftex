@@ -437,7 +437,7 @@ static void ttf_read_post(void)
     TTF_FIXED italic_angle;
     char *p;
     glyph_entry *glyph;
-    dirtab_entry *tab = ttf_seek_tab("post", 0);
+    const dirtab_entry *tab = ttf_seek_tab("post", 0);
     post_format = get_fixed();
     italic_angle = get_fixed();
     int_part = italic_angle >> 16;
@@ -801,7 +801,7 @@ static void ttf_write_cmap(void)
 
 static int prepend_subset_tags(int index, char *p)
 {
-    boolean is_unicode = (name_tab[index].platform_id == 3);
+    const boolean is_unicode = (name_tab[index].platform_id == 3);
     int i;
     assert(index > 0 && index < name_record_num && fm_cur->subset_tag != NULL);
     if (is_unicode) {
@@ -884,7 +884,7 @@ static void ttf_write_dirtab(void)
     dirtab_entry *tab;
     TTF_ULONG i, k;
     char *p;
-    integer save_offset = ttf_offset();
+    const integer save_offset = ttf_offset();
     ttf_seek_outbuf(TABDIR_OFF);
     if (is_subsetted(fm_cur)) {
         for (i = 0; i < DEFAULT_NTABS; i++) {
@@ -934,8 +934,8 @@ static void ttf_write_glyf(void)
     TTF_USHORT idx;
     TTF_USHORT flags;
     dirtab_entry *tab = ttf_name_lookup("glyf", true);
-    long glyf_offset = tab->offset;
-    long new_glyf_offset = ttf_offset();
+    const long glyf_offset = tab->offset;
+    const long new_glyf_offset = ttf_offset();
     ttf_reset_chksm(tab);
     for (id = glyph_index; id - glyph_index < new_glyphs_count; id++) {
         glyph_tab[*id].newoffset = ttf_offset() - new_glyf_offset;
@@ -1166,7 +1166,7 @@ static void ttf_write_OS2(void)
     ttf_reset_chksm(tab);
     version = get_ushort();
     if (version != 0x0000 && version != 0x0001 && version != 0x0002)
-        pdftex_fail("unknown verssion of OS/2 table (%.4X)", version);
+        pdftex_fail("unknown version of OS/2 table (%.4X)", version);
     put_ushort(0x0001); /* fix version to 1*/
     ttf_ncopy(2*TTF_USHORT_SIZE + 13*TTF_SHORT_SIZE + 10*TTF_BYTE_SIZE);
     ttf_skip(4*TTF_ULONG_SIZE); /* ulUnicodeRange 1--4 */

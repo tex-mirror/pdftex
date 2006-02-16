@@ -542,7 +542,6 @@ ipcpage P1C(int, is_eof)
 {
   static boolean begun = false;
   unsigned len = 0;
-  unsigned i;
   string p = "";
 
   if (!begun) {
@@ -560,6 +559,7 @@ ipcpage P1C(int, is_eof)
 #if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
     strncpy (name, &strpool[strstart[outputfilename]], len);
 #else
+    unsigned i;
     for (i=0; i<len; i++)
       name[i] =  strpool[i+strstartar[outputfilename - 65536L]];
 #endif
@@ -637,7 +637,7 @@ readtcxfile P1H(void)
     string line;
     unsigned line_count = 0;
     FILE *translate_file = xfopen (translate_filename, FOPEN_R_MODE);
-    while (line = read_line (translate_file)) {
+    while ((line = read_line (translate_file))) {
       int first;
       string start2;
       string comment_loc = strchr (line, '%');
@@ -1610,7 +1610,7 @@ setupboundvariable P3C(integer *, var,  const_string, var_name,  integer, dflt)
 }
 
 /* FIXME -- some (most?) of this can/should be moved to the Pascal/WEB side. */
-#if defined(TeX) || defined(MP) || defined(MF)
+#if !defined(pdfTeX) && !defined(pdfeTeX)
 static void
 checkpoolpointer (poolpointer poolptr, size_t len)
 {
@@ -1621,7 +1621,6 @@ checkpoolpointer (poolpointer poolptr, size_t len)
   }
 }
 
-#if !defined(pdfTeX) && !defined(pdfeTeX)
 static int
 maketexstring(const_string s)
 {
@@ -1635,6 +1634,7 @@ maketexstring(const_string s)
 }
 #endif
 
+#if defined(TeX) || defined(MP) || defined(MF)
 strnumber
 makefullnamestring()
 {
@@ -1674,7 +1674,7 @@ compare_paths P2C(const_string, p1, const_string, p2)
 string
 gettexstring P1C(strnumber, s)
 {
-  poolpointer i, len;
+  poolpointer len;
   string name;
 #if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
   len = strstart[s + 1] - strstart[s];
@@ -1685,6 +1685,7 @@ gettexstring P1C(strnumber, s)
 #if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
   strncpy (name, (string)&strpool[strstart[s]], len);
 #else
+  poolpointer i;
   /* Don't use strncpy.  The strpool is not made up of chars. */
   for (i=0; i<len; i++) name[i] =  strpool[i+strstartar[s - 65536L]];
 #endif
@@ -1717,7 +1718,6 @@ makesrcspecial P2C(strnumber, srcfilename,
   char *filename = gettexstring(srcfilename);
   /* FIXME: Magic number. */
   char buf[40];
-  size_t len = strlen(filename);
   char * s = buf;
 
   /* Always put a space after the number, which makes things easier

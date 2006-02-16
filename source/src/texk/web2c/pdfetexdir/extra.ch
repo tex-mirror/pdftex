@@ -1,3 +1,21 @@
+% Copyright (c) 2005-2006 Han Th\^e\llap{\raise 0.5ex\hbox{\'{}}} Th\`anh, <thanh@pdftex.org>
+%
+% This file is part of pdfTeX.
+%
+% pdfTeX is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% pdfTeX is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with pdfTeX; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+%
 % This is a change file implementing some (highly) exprimental features in pdftex.
 % To be applied to pdftex-1.30 as the last change file to pdfetex
 %
@@ -6,6 +24,8 @@
 % - \pdfinsertht
 % - kbs: kern before interword space and certain characters
 % - \ifincsname
+%
+% $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.ch#163 $
 
 @x [171] kbs
 @d tag_code == 5
@@ -765,7 +785,7 @@ end;
 procedure do_snapy_comp(p, b: pointer); {do snapping compensation in vertical
 direction; searchs for the next snap node and do the compensation if found}
 var q: pointer;
-    tmp_v, g, g2, g3: scaled;
+    tmp_v, g, g2: scaled;
 begin
     if not (not is_char_node(p) and 
             (type(p) = whatsit_node) and 

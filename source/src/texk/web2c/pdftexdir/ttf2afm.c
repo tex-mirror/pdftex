@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -45,7 +45,7 @@ static const char perforce_id[] =
 #define AS_INDEX        1
 #define AS_UNICODE      2
 
-#define VERSION         "1.01"
+#define VERSION         "1.02"
 
 /* FIXME */
 #define NOGLYPH_ASSIGNED_YET USHRT_MAX
@@ -305,11 +305,12 @@ void read_encoding(char *encname)
             if (++names_count > 256)
                 ttf_fail("encoding vector contains more than 256 names");
         }
-        if (*r != 10 && *r != '%')
+        if (*r != 10 && *r != '%') {
             if (strncmp(r, "] def", strlen("] def")) == 0)
                 goto done;
             else
                 ttf_fail("invalid encoding vector: a name or `] def' expected:\n%s", enc_line);
+        }
         enc_getline();
         r = enc_line;
     }
@@ -325,7 +326,7 @@ void append_unicode(long glyph_index, TTF_USHORT code)
     mtx_entry *m;
     unicode_entry *u, *v;
     assert(glyph_index >= 0 && glyph_index < nglyphs);
-    u = xtalloc(1, unicode_entry), *v;
+    u = xtalloc(1, unicode_entry);
     m = mtx_tab + glyph_index;
     u->next = NULL;
     u->code = code;
@@ -342,7 +343,7 @@ void read_cmap()
     cmap_entry *e;
     seg_entry *seg_tab, *s;
     TTF_USHORT *glyphId, format, segCount;
-    long int n, i, j, k, first_code, length, last_sep, index;
+    long int n, i, k, length, index;
     int unicode_map_count = 0;
     ttf_seek_tab("cmap", TTF_USHORT_SIZE); /* skip the table vesrion number (=0) */
     ncmapsubtabs = get_ushort();
@@ -707,14 +708,12 @@ void print_char_metric(FILE *f, int charcode, long glyph_index)
 
 void print_afm(char *date, char *fontname)
 {
-    int i, ncharmetrics;
+    int ncharmetrics;
     mtx_entry *pm;
     short mtx_index[256], *idx;
     unsigned int index;
     char **pe;
     kern_entry *pk, *qk;
-    unicode_entry *u;
-    char buf[20];
     fputs("StartFontMetrics 2.0\n", outfile);
     fprintf(outfile, "Comment Converted at %s by ttf2afm from font file `%s'\n", date, fontname);
     print_str(FontName);
@@ -794,7 +793,6 @@ void print_afm(char *date, char *fontname)
                 print_char_metric(outfile, -1, pm - mtx_tab);
         }
     }
-end_metrics:
     fputs("EndCharMetrics\n", outfile);
     if (nkernpairs == 0)
         goto end_kerns;
@@ -815,12 +813,11 @@ end_kerns:
 
 void print_encoding(char *fontname)
 {
-    long int i, k, first_code, length, last_sep;
+    long int i, k, first_code, length;
     FILE *file;
     TTF_USHORT format;
     char *enc_name, *end_enc_name;
     cmap_entry *e;
-    const char *n;
     printing_enc = 1;
     enc_name = xtalloc(strlen(bname) + 20, char);
     strcpy(enc_name, bname);

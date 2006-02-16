@@ -419,11 +419,8 @@ void load_enc(char *enc_name, char **glyph_names)
 
 static void t1_check_pfa(void)
 {
-    int c = t1_getchar();
-    if (c != 128)
-        t1_pfa = true;
-    else
-        t1_pfa = false;
+    const int c = t1_getchar();
+    t1_pfa = (c != 128) ? true : false;
     t1_ungetchar(c);
 }
 
@@ -479,21 +476,21 @@ static byte edecrypt(byte cipher)
 
 static byte cdecrypt(byte cipher, unsigned short *cr)
 {
-    byte plain = (cipher ^ (*cr >> 8));
+    const byte plain = (cipher ^ (*cr >> 8));
     *cr = (cipher + *cr) * t1_c1 + t1_c2;
     return plain;
 }
 
 static byte eencrypt(byte plain)
 {
-    byte cipher = (plain ^ (t1_er >> 8));
+    const byte cipher = (plain ^ (t1_er >> 8));
     t1_er = (cipher + t1_er) * t1_c1 + t1_c2;
     return cipher;
 }
 
 static byte cencrypt(byte plain, unsigned short *cr)
 {
-    byte cipher = (plain ^ (*cr >> 8));
+    const byte cipher = (plain ^ (*cr >> 8));
     *cr = (cipher + *cr) * t1_c1 + t1_c2;
     return cipher;
 }
@@ -612,6 +609,9 @@ static void t1_puts(const char *s)
     t1_putline();
 }
 
+#ifdef __GNUC__
+static void t1_printf(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
+#endif
 static void t1_printf(const char *fmt, ...)
 {
     va_list args;
@@ -1261,6 +1261,9 @@ static void cc_init(void)
 #define mark_subr(n)    cs_mark(0, n)
 #define mark_cs(s)      cs_mark(s, 0)
 
+#ifdef __GNUC__
+static void cs_warn(const char *cs_name, int subr, const char *fmt, ...) __attribute__ ((format (printf, 3, 4)));
+#endif
 static void cs_warn(const char *cs_name, int subr, const char *fmt, ...)
 {
     char buf[SMALL_BUF_SIZE];
