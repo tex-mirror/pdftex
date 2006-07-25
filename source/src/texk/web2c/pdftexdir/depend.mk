@@ -27,7 +27,7 @@ writezip.o: writezip.c ptexlib.h ../pdftexd.h ../texmfmp.h \
 writeenc.o: writeenc.c ptexlib.h ../pdftexd.h ../texmfmp.h \
  ../cpascal.h ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h \
  ptexmac.h
-writettf.o: writettf.c ptexlib.h ../pdftexd.h ../texmfmp.h \
+writettf.o: writettf.c ptexlib.h writettf.h ../pdftexd.h ../texmfmp.h \
  ../cpascal.h ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h \
  ptexmac.h macnames.c
 writejpg.o: writejpg.c ptexlib.h ../pdftexd.h ../texmfmp.h \
@@ -45,7 +45,7 @@ pdftoepdf.o: pdftoepdf.cc ../../../libs/xpdf/xpdf/Object.h \
  ../../../libs/xpdf/xpdf/XRef.h ../../../libs/xpdf/xpdf/Catalog.h \
  ../../../libs/xpdf/xpdf/Page.h ../../../libs/xpdf/xpdf/GfxFont.h \
  ../../../libs/xpdf/xpdf/Error.h epdf.h
-ttf2afm.o: ttf2afm.c macnames.c
+ttf2afm.o: ttf2afm.c writettf.h macnames.c
 pdftosrc.o: pdftosrc.cc ../../../libs/xpdf/xpdf/Object.h \
  ../../../libs/xpdf/xpdf/Array.h ../../../libs/xpdf/xpdf/Dict.h \
  ../../../libs/xpdf/xpdf/Stream.h ../../../libs/xpdf/xpdf/XRef.h \

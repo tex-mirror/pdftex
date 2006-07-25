@@ -54,9 +54,9 @@ pdftex.ch: $(TIE) $(pdftex_ch_srcs)
 
 # pdfetex: (it's just a copy of pdftex)
 pdfetex: pdftex
-	cp -a pdftex pdfetex
+	cp -p pdftex pdfetex
 pdfetex.pool: pdftex.pool
-	cp -a pdftex.pool pdfetex.pool
+	cp -p pdftex.pool pdfetex.pool
 
 # for developing only
 pdftex-org.web: $(TIE) $(pdftex_ch_srcs_org)
@@ -65,6 +65,7 @@ pdftex-all.web: $(TIE) $(srcdir)/$(pdftexdir)/pdftex.web pdftex.ch
 	$(TIE) -m $@ $(srcdir)/$(pdftexdir)/pdftex.web pdftex.ch
 pdftex-all.tex: pdftex-all.web
 	$(WEAVE) pdftex-all.web
+	echo -e '1s/ webmac/ pdfwebmac/\nw\nq' | ed $@ >/dev/null 2>&1
 pdftex-all.pdf: pdftex-all.tex
 	$(pdftex) pdftex-all.tex
 

@@ -102,43 +102,46 @@ static JPG_UINT16 read2bytes (FILE * f)
 
 void read_jpg_info (integer img)
 {
-    int i;
-    char jpg_id[] = "JFIF";
-    int units = 0;
+    int i, units = 0;
+    unsigned char jpg_id[] = "JFIF";
     img_xres (img) = img_yres (img) = 0;
     jpg_ptr (img)->file = xfopen (img_name (img), FOPEN_RBIN_MODE);
     xfseek (jpg_ptr (img)->file, 0, SEEK_END, cur_file_name);
     jpg_ptr (img)->length = xftell (jpg_ptr (img)->file, cur_file_name);
     xfseek (jpg_ptr (img)->file, 0, SEEK_SET, cur_file_name);
     if (read2bytes (jpg_ptr (img)->file) != 0xFFD8)
-        pdftex_fail ("reading JPEG image failed");
-
-    if (read2bytes (jpg_ptr (img)->file) == 0xFFE0) {   /* JFIF APP0 */
+        pdftex_fail ("reading JPEG image failed (no JPEG header found)");
+    /* currently only true JFIF files allow extracting img_xres and img_yres */
+    if (read2bytes (jpg_ptr (img)->file) == 0xFFE0) {   /* check for JFIF */
         (void) read2bytes (jpg_ptr (img)->file);
-        for (i = 0; i < 5; i++)
+        for (i = 0; i < 5; i++) {
             if (xgetc (jpg_ptr (img)->file) != jpg_id[i])
-                pdftex_fail ("reading JPEG image failed");
-        (void) read2bytes (jpg_ptr (img)->file);
-        units = xgetc (jpg_ptr (img)->file);
-        img_xres (img) = read2bytes (jpg_ptr (img)->file);
-        img_yres (img) = read2bytes (jpg_ptr (img)->file);
-        switch (units) {
-        case 1:
-            break;              /* pixels per inch */
-        case 2:
-            img_xres (img) *= 2.54;
-            img_yres (img) *= 2.54;
-            break;              /* pixels per cm */
-        default:
-            img_xres (img) = img_yres (img) = 0;
-            break;
+                break;
+        }
+        if (i == 5) {           /* it's JFIF */
+            read2bytes (jpg_ptr (img)->file);
+            units = xgetc (jpg_ptr (img)->file);
+            img_xres (img) = read2bytes (jpg_ptr (img)->file);
+            img_yres (img) = read2bytes (jpg_ptr (img)->file);
+            switch (units) {
+            case 1:
+                break;          /* pixels per inch */
+            case 2:
+                img_xres (img) *= 2.54;
+                img_yres (img) *= 2.54;
+                break;          /* pixels per cm */
+            default:
+                img_xres (img) = img_yres (img) = 0;
+                break;
+            }
         }
     }
-
     xfseek (jpg_ptr (img)->file, 0, SEEK_SET, cur_file_name);
     while (1) {
-        if (feof (jpg_ptr (img)->file) || fgetc (jpg_ptr (img)->file) != 0xFF)
-            pdftex_fail ("reading JPEG image failed");
+        if (feof (jpg_ptr (img)->file))
+            pdftex_fail ("reading JPEG image failed (premature file end)");
+        if (fgetc (jpg_ptr (img)->file) != 0xFF)
+            pdftex_fail ("reading JPEG image failed (no marker found)");
         switch (xgetc (jpg_ptr (img)->file)) {
         case M_SOF5:
         case M_SOF6:

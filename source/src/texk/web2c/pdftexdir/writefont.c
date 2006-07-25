@@ -48,8 +48,7 @@ char fontname_buf[FONTNAME_BUF_SIZE];
 static int first_char, last_char;
 static integer char_widths[256];
 static boolean write_fontfile_only;
-static int char_widths_objnum, encoding_objnum;
-static char **cur_glyph_names;
+static int char_widths_objnum, encoding_objnum, tounicode_objnum;
 
 static void print_key (integer code, integer v)
 {
@@ -157,6 +156,8 @@ static void write_fontobj (integer font_objnum)
     pdf_printf ("/Subtype /%s\n", is_truetype (fm_cur) ? "TrueType" : "Type1");
     if (encoding_objnum != 0)
         pdf_printf ("/Encoding %i 0 R\n", (int) encoding_objnum);
+    if (tounicode_objnum != 0)
+        pdf_printf ("/ToUnicode %i 0 R\n", (int) tounicode_objnum);
     if (pdffontattr[tex_font] != getnullstr ()) {
         pdfprint (pdffontattr[tex_font]);
         pdf_puts ("\n");
@@ -180,8 +181,6 @@ static void write_fontobj (integer font_objnum)
 static void write_fontfile (void)
 {
     int i;
-    for (i = 0; i < FONT_KEYS_NUM; i++)
-        font_keys[i].valid = false;
     fontfile_found = false;
     is_otf_font = false;
     if (is_truetype (fm_cur))
@@ -233,11 +232,10 @@ static void write_fontdescriptor (void)
         pdf_printf ("/Flags %i\n", (int) fm_cur->flags);
     if (is_included (fm_cur) && fontfile_found) {
         if (is_subsetted (fm_cur) && !is_truetype (fm_cur)) {
-            cur_glyph_names = t1_glyph_names;
             pdf_puts ("/CharSet (");
             for (i = 0; i < 256; i++)
-                if (pdfcharmarked (tex_font, i) && cur_glyph_names[i] != notdef)
-                    pdf_printf ("/%s", cur_glyph_names[i]);
+                if (pdfcharmarked (tex_font, i) && t1_glyph_names[i] != notdef)
+                    pdf_printf ("/%s", t1_glyph_names[i]);
             pdf_puts (")\n");
         }
         if (is_truetype (fm_cur))
@@ -253,11 +251,17 @@ static void write_fontdescriptor (void)
 void dopdffont (integer font_objnum, internalfontnumber f)
 {
     int i;
+    enc_entry *e;
+
     tex_font = f;
-    cur_glyph_names = NULL;
     encoding_objnum = 0;
+    tounicode_objnum = 0;
     write_ttf_glyph_names = false;
     write_fontfile_only = false;
+    t1_glyph_names = NULL;
+    for (i = 0; i < FONT_KEYS_NUM; i++)
+        font_keys[i].valid = false;
+
     if (pdffontmap[tex_font] == NULL)
         pdftex_fail ("pdffontmap not initialized for font %s",
                      makecstring (fontname[tex_font]));
@@ -274,18 +278,30 @@ void dopdffont (integer font_objnum, internalfontnumber f)
                                    used in embedded PDF only; if so then set
                                    write_fontfile_only to true */
 
-    if (!write_fontfile_only) { /* encoding vector needed */
-        if ((is_reencoded (fm_cur))) {
-            read_enc (fm_cur->encoding);
+    if (!write_fontfile_only) { /* handle Encoding + ToUnicode as well */
+        if (is_reencoded (fm_cur)) {
+            e = fm_cur->encoding;
+            read_enc (e);
             if (!is_truetype (fm_cur)) {
-                write_enc (NULL, fm_cur->encoding, 0);
-                encoding_objnum = (fm_cur->encoding)->objnum;
+                write_enc (NULL, e, 0);
+                encoding_objnum = e->objnum;
+                if (fixedgentounicode > 0) {
+                    if (e->tounicode == 0)
+                        e->tounicode =
+                            write_tounicode (e->glyph_names, e->name);
+                    tounicode_objnum = e->tounicode;
+                }
             } else
                 write_ttf_glyph_names = true;
         }
     }
     if (is_included (fm_cur))
         write_fontfile ();
+    if (!write_fontfile_only && !is_reencoded (fm_cur) &&
+        fixedgentounicode > 0 && t1_glyph_names == t1_builtin_glyph_names) {
+        /* write ToUnicode entry for built-in encoding of Type1 font */
+        tounicode_objnum = write_tounicode (t1_glyph_names, fm_cur->tfm_name);
+    }
     if (fm_cur->fn_objnum != 0) {
         pdfbeginobj (fm_cur->fn_objnum, 1);
         write_fontname (false);
@@ -299,9 +315,9 @@ void dopdffont (integer font_objnum, internalfontnumber f)
         write_fontdescriptor ();
         write_char_widths ();
     }
-    if (cur_glyph_names == t1_builtin_glyph_names) {
+    if (t1_glyph_names == t1_builtin_glyph_names) {
         for (i = 0; i < 256; i++)
-            if (cur_glyph_names[i] != notdef)
-                xfree (cur_glyph_names[i]);
+            if (t1_glyph_names[i] != notdef)
+                xfree (t1_glyph_names[i]);
     }
 }

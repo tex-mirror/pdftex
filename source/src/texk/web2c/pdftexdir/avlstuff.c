@@ -17,7 +17,6 @@ with this file; if not, write to the Free Software Foundation, Inc.,
 
 $Id: avlstuff.c,v 1.12 2005/07/11 20:27:39 hahe Exp hahe $
 
-source code indentation by "indent -kr -nut"
 */
 
 #include "ptexlib.h"

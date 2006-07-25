@@ -32,6 +32,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $
 #include <kpathsea/c-fopen.h>
 #include <string.h>
 #include <time.h>
+#include <float.h>              /* for DBL_EPSILON */
 
 /*@unused@*/
 static const char perforce_id[] =
@@ -449,6 +450,7 @@ void libpdffinish ()
     epdf_free ();
     ttf_free ();
     sfd_free ();
+    glyph_unicode_free ();
 }
 
 /* Converts any string given in in in an allowed PDF string which can be
@@ -520,9 +522,9 @@ void escapestring (poolpointer in)
         if ((ch < '!') || (ch > '~')) {
             /* convert control characters into oct */
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >=199901L
-            snprintf (&strpool[poolptr], 4,
+            snprintf ((char *) &strpool[poolptr], 4,
 #else
-            sprintf (&strpool[poolptr],
+            sprintf ((char *) &strpool[poolptr],
 #endif
                      "\\%.3o", (unsigned int) ch);
             poolptr += 4;
@@ -596,9 +598,9 @@ void escapename (poolpointer in)
         if ((ch >= 1 && ch <= 32) || ch >= 127) {
             /* escape */
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >=199901L
-            snprintf (&strpool[poolptr], 3,
+            snprintf ((char *) &strpool[poolptr], 3,
 #else
-            sprintf (&strpool[poolptr],
+            sprintf ((char *) &strpool[poolptr],
 #endif
                      "#%.2X", (unsigned int) ch);
             poolptr += 3;
@@ -621,9 +623,9 @@ void escapename (poolpointer in)
         case 125:
             /* escape */
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >=199901L
-            snprintf (&strpool[poolptr], 3,
+            snprintf ((char *) &strpool[poolptr], 3,
 #else
-            sprintf (&strpool[poolptr],
+            sprintf ((char *) &strpool[poolptr],
 #endif
                      "#%.2X", (unsigned int) ch);
             poolptr += 3;
@@ -657,9 +659,9 @@ void escapehex (poolpointer in)
         ch = (unsigned char) strpool[in++];
 
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >=199901L
-        snprintf (&strpool[poolptr], 3,
+        snprintf ((char *) &strpool[poolptr], 3,
 #else
-        sprintf (&strpool[poolptr],
+        sprintf ((char *) &strpool[poolptr],
 #endif
                  "%.2X", (unsigned int) ch);
         poolptr += 2;
@@ -726,7 +728,7 @@ static void convertStringToHexString (const char *in, char *out, int lin)
     j = 0;
     for (i = 0; i < lin; i++) {
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >=199901L
-        snprintf (buf, sizeof (buf);
+        snprintf (buf, sizeof (buf),
 #else
         sprintf (buf,
 #endif
@@ -1108,9 +1110,9 @@ void getfiledump (strnumber s, int offset, int length)
     data_end = data_ptr + read;
     for (; data_ptr < data_end; data_ptr++) {
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >=199901L
-        snprintf (&strpool[poolptr], 3,
+        snprintf ((char *) &strpool[poolptr], 3,
 #else
-        sprintf (&strpool[poolptr],
+        sprintf ((char *) &strpool[poolptr],
 #endif
                  "%.2X", (unsigned int) strpool[data_ptr]);
         poolptr += 2;
@@ -1189,9 +1191,9 @@ void getmatch (int i)
 
     if (found) {
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >=199901L
-        snprintf (&strpool[poolptr], 20,
+        snprintf ((char *) &strpool[poolptr], 20,
 #else
-        sprintf (&strpool[poolptr],
+        sprintf ((char *) &strpool[poolptr],
 #endif
                  "%d", pmatch[i].rm_so);
         poolptr += strlen (&strpool[poolptr]);

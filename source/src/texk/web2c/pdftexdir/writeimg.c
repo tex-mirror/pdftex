@@ -332,7 +332,7 @@ void deleteimage (integer img)
         epdf_delete ();
         break;
     case IMAGE_TYPE_PNG:
-        xfclose (png_ptr (img)->io_ptr, cur_file_name);
+        xfclose ((FILE *) png_ptr (img)->io_ptr, cur_file_name);
         png_destroy_read_struct (&(png_ptr (img)), &(png_info (img)), NULL);
         break;
     case IMAGE_TYPE_JPG:

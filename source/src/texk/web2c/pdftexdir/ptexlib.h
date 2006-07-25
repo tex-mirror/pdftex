@@ -26,7 +26,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#26 $
 /* WEB2C macros and prototypes */
 #  if !defined(PDFTEXCOERCE) && !defined(PDFETEXCOERCE)
 #    ifdef pdfTeX
-#      undef pdfTeX 		/* to avoid warning about redefining pdfTeX in pdftexd.h */
+#      undef pdfTeX             /* to avoid warning about redefining pdfTeX in pdftexd.h */
 #    endif                      /* pdfTeX */
 #    define EXTERN extern
 #    include "pdftexd.h"
@@ -52,6 +52,7 @@ typedef struct {
     char *name;                 /* encoding file name */
     integer objnum;             /* object number */
     char **glyph_names;
+    integer tounicode;          /* object number of associated ToUnicode entry */
 } enc_entry;
 
 struct _subfont_entry;
@@ -67,6 +68,13 @@ typedef struct {
     char *name;                 /* sfd name, eg "Unicode" */
     subfont_entry *subfont;     /* linked list of subfonts */
 } sfd_entry;
+
+typedef struct {
+    char *name;                 /* glyph name */
+    long code;                  /* -1 = undefined; -2 = multiple codes, stored
+                                   as string in unicode_seq; otherwise unicode value */
+    char *unicode_seq;          /* multiple unicode sequence */
+} glyph_unicode_entry;
 
 typedef struct {
     char *tfm_name;             /* TFM file name */
@@ -153,7 +161,12 @@ extern int readchar (boolean, chardesc *);
 
 /* subfont.c */
 extern void sfd_free (void);
-extern boolean handle_subfont_fm (fm_entry * fm, int mode);
+extern boolean handle_subfont_fm (fm_entry *, int);
+
+/* tounicode.c */
+extern void glyph_unicode_free (void);
+extern void deftounicode (strnumber, strnumber);
+extern integer write_tounicode (char **, char *);
 
 /* utils.c */
 extern boolean str_eq_cstr (strnumber, char *);

@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-beta-20060213' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-beta-20060725' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -5624,8 +5624,9 @@ that will be defined later.
 @d pdf_objcompresslevel_code = pdftex_first_integer_code + 21 {activate object streams}
 @d pdf_adjust_interword_glue_code    = pdftex_first_integer_code + 22 {adjust interword glue?}
 @d pdf_prepend_kern_code     = pdftex_first_integer_code + 23 {prepend kern before certain characters?}
-@d pdf_append_kern_code      = pdftex_first_integer_code + 24 {prepend kern before certain characters?}
-@d pdf_int_pars=pdftex_first_integer_code + 25 {total number of \pdfTeX's integer parameters}
+@d pdf_append_kern_code      = pdftex_first_integer_code + 24 {append kern before certain characters?}
+@d pdf_gen_tounicode_code    = pdftex_first_integer_code + 25 {generate ToUnicode for fonts?}
+@d pdf_int_pars=pdftex_first_integer_code + 26 {total number of \pdfTeX's integer parameters}
 @#
 @d etex_int_base=pdf_int_pars {base for \eTeX's integer parameters}
 @d tracing_assigns_code=etex_int_base {show assignments}
@@ -5710,6 +5711,7 @@ that will be defined later.
 @d pdf_adjust_interword_glue == int_par(pdf_adjust_interword_glue_code)
 @d pdf_prepend_kern == int_par(pdf_prepend_kern_code)
 @d pdf_append_kern == int_par(pdf_append_kern_code)
+@d pdf_gen_tounicode == int_par(pdf_gen_tounicode_code)
 @d pdf_output           == int_par(pdf_output_code)
 @d pdf_compress_level   == int_par(pdf_compress_level_code)
 @d pdf_objcompresslevel == int_par(pdf_objcompresslevel_code)
@@ -5829,6 +5831,7 @@ pdf_tracing_fonts_code:    print_esc("pdftracingfonts");
 pdf_adjust_interword_glue_code:    print_esc("pdfadjustinterwordglue");
 pdf_prepend_kern_code:    print_esc("pdfprependkern");
 pdf_append_kern_code:    print_esc("pdfappendkern");
+pdf_gen_tounicode_code:    print_esc("pdfgentounicode");
 @/@<Cases for |print_param|@>@/
 othercases print("[unknown integer parameter!]")
 endcases;
@@ -6002,6 +6005,8 @@ primitive("pdfprependkern",assign_int,int_base+pdf_prepend_kern_code);@/
 @!@:pdf_prepend_kern_}{\.{\\pdfprependkern} primitive@>
 primitive("pdfappendkern",assign_int,int_base+pdf_append_kern_code);@/
 @!@:pdf_append_kern_}{\.{\\pdfappendkern} primitive@>
+primitive("pdfgentounicode",assign_int,int_base+pdf_gen_tounicode_code);@/
+@!@:pdf_gen_tounicode_}{\.{\\pdfgentounicode} primitive@>
 
 @ @<Cases of |print_cmd_chr|...@>=
 assign_int: if chr_code<count_base then print_param(chr_code-int_base)
@@ -10529,8 +10534,8 @@ such that |job_name_code| remains last.
 @d pdf_file_dump_code       = pdftex_first_expand_code + 18 {command code for \.{\\pdffiledump}}
 @d pdf_match_code           = pdftex_first_expand_code + 19 {command code for \.{\\pdfmatch}}
 @d pdf_last_match_code      = pdftex_first_expand_code + 20 {command code for \.{\\pdflastmatch}}
-@d uniform_deviate_code     = pdftex_first_expand_code + 21 {end of \pdfTeX's command codes}
-@d normal_deviate_code      = pdftex_first_expand_code + 22 {end of \pdfTeX's command codes}
+@d uniform_deviate_code     = pdftex_first_expand_code + 21 {command code for \.{\\uniformdeviate}}
+@d normal_deviate_code      = pdftex_first_expand_code + 22 {command code for \.{\\normaldeviate}}
 @d pdf_insert_ht_code       = pdftex_first_expand_code + 23 {command code for \.{\\pdfinsertht}}
 @d pdf_ximage_bbox_code     = pdftex_first_expand_code + 24 {command code for \.{\\pdfximagebbox}}
 @d pdftex_convert_codes     = pdftex_first_expand_code + 25 {end of \pdfTeX's command codes}
@@ -15458,6 +15463,7 @@ PDF}
 @!min_font_val: scaled; {(TJ array system)}
 @!fixed_pk_resolution: integer;
 @!fixed_decimal_digits: integer;
+@!fixed_gen_tounicode: integer;
 @!pk_scale_factor: integer;
 @!pdf_output_option: integer;
 @!pdf_output_value: integer;
@@ -18816,6 +18822,7 @@ for k := font_base + 1 to font_ptr do
                 if pdf_char_marked(k, j) then
                     pdf_mark_char(i, j);
     end;
+fixed_gen_tounicode := pdf_gen_tounicode;
 k := head_tab[obj_type_font];
 while k <> 0 do begin
     f := obj_info(k);
@@ -19085,7 +19092,7 @@ begin
 end;
 
 @ @<Print the Producer key@>=
-pdf_print("/Producer (pdfeTeX-");
+pdf_print("/Producer (pdfTeX-");
 pdf_print_int(pdftex_version div 100);
 pdf_out(".");
 pdf_print_int(pdftex_version mod 100);
@@ -30886,6 +30893,7 @@ assign_font_int: begin n:=cur_chr; scan_font_ident; f:=cur_val;
     lp_code_base: set_lp_code(f, p, cur_val);
     rp_code_base: set_rp_code(f, p, cur_val);
     ef_code_base: set_ef_code(f, p, cur_val);
+    tag_code:     set_tag_code(f, p, cur_val);
     kn_bs_code_base: set_kn_bs_code(f, p, cur_val);
     st_bs_code_base: set_st_bs_code(f, p, cur_val);
     sh_bs_code_base: set_sh_bs_code(f, p, cur_val);
@@ -32269,37 +32277,38 @@ stays the same.
 @d immediate_code=4 {command modifier for \.{\\immediate}}
 @d set_language_code=5 {command modifier for \.{\\setlanguage}}
 @d pdftex_first_extension_code = 6
-@d pdf_annot_node              == pdftex_first_extension_code + 7
-@d pdf_catalog_code            == pdftex_first_extension_code + 17
-@d pdf_dest_node               == pdftex_first_extension_code + 11
-@d pdf_end_link_node           == pdftex_first_extension_code + 9
-@d pdf_end_thread_node         == pdftex_first_extension_code + 14
-@d pdf_font_attr_code          == pdftex_first_extension_code + 19
-@d pdf_font_expand_code        == pdftex_first_extension_code + 25
-@d pdf_include_chars_code      == pdftex_first_extension_code + 20
-@d pdf_info_code               == pdftex_first_extension_code + 16
 @d pdf_literal_node            == pdftex_first_extension_code + 0
+@d pdf_obj_code                == pdftex_first_extension_code + 1
+@d pdf_refobj_node             == pdftex_first_extension_code + 2
+@d pdf_xform_code              == pdftex_first_extension_code + 3
+@d pdf_refxform_node           == pdftex_first_extension_code + 4
+@d pdf_ximage_code             == pdftex_first_extension_code + 5
+@d pdf_refximage_node          == pdftex_first_extension_code + 6
+@d pdf_annot_node              == pdftex_first_extension_code + 7
+@d pdf_start_link_node         == pdftex_first_extension_code + 8
+@d pdf_end_link_node           == pdftex_first_extension_code + 9
+@d pdf_outline_code            == pdftex_first_extension_code + 10
+@d pdf_dest_node               == pdftex_first_extension_code + 11
+@d pdf_thread_node             == pdftex_first_extension_code + 12
+@d pdf_start_thread_node       == pdftex_first_extension_code + 13
+@d pdf_end_thread_node         == pdftex_first_extension_code + 14
+@d pdf_save_pos_node           == pdftex_first_extension_code + 15
+@d pdf_info_code               == pdftex_first_extension_code + 16
+@d pdf_catalog_code            == pdftex_first_extension_code + 17
+@d pdf_names_code              == pdftex_first_extension_code + 18
+@d pdf_font_attr_code          == pdftex_first_extension_code + 19
+@d pdf_include_chars_code      == pdftex_first_extension_code + 20
 @d pdf_map_file_code           == pdftex_first_extension_code + 21
 @d pdf_map_line_code           == pdftex_first_extension_code + 22
-@d pdf_names_code              == pdftex_first_extension_code + 18
-@d pdf_obj_code                == pdftex_first_extension_code + 1
-@d pdf_outline_code            == pdftex_first_extension_code + 10
-@d pdf_refobj_node             == pdftex_first_extension_code + 2
-@d pdf_refxform_node           == pdftex_first_extension_code + 4
-@d pdf_refximage_node          == pdftex_first_extension_code + 6
-@d pdf_save_pos_node           == pdftex_first_extension_code + 15
-@d pdf_snap_ref_point_node     == pdftex_first_extension_code + 27
-@d pdf_snapy_comp_node         == pdftex_first_extension_code + 29
-@d pdf_snapy_node              == pdftex_first_extension_code + 28
-@d pdf_start_link_node         == pdftex_first_extension_code + 8
-@d pdf_start_thread_node       == pdftex_first_extension_code + 13
-@d pdf_thread_node             == pdftex_first_extension_code + 12
 @d pdf_trailer_code            == pdftex_first_extension_code + 23
-@d pdf_xform_code              == pdftex_first_extension_code + 3
-@d pdf_ximage_code             == pdftex_first_extension_code + 5
 @d reset_timer_code            == pdftex_first_extension_code + 24
+@d pdf_font_expand_code        == pdftex_first_extension_code + 25
 @d set_random_seed_code        == pdftex_first_extension_code + 26
-@d pdftex_last_extension_code  == pdftex_first_extension_code + 29
+@d pdf_snap_ref_point_node     == pdftex_first_extension_code + 27
+@d pdf_snapy_node              == pdftex_first_extension_code + 28
+@d pdf_snapy_comp_node         == pdftex_first_extension_code + 29
+@d pdf_glyph_to_unicode_code   == pdftex_first_extension_code + 30
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 30
 
 @<Put each...@>=
 primitive("openout",extension,open_node);@/
@@ -32374,6 +32383,8 @@ primitive("pdfsetrandomseed",extension,set_random_seed_code);@/
 @!@:set_random_seed_code}{\.{\\pdfsetrandomseed} primitive@>
 primitive("pdffontexpand",extension,pdf_font_expand_code);@/
 @!@:pdf_font_expand_}{\.{\\pdffontexpand} primitive@>
+primitive("pdfglyphtounicode",extension,pdf_glyph_to_unicode_code);@/
+@!@:pdf_glyph_to_unicode_}{\.{\\pdfglyphtounicode} primitive@>
 
 @ The variable |write_loc| just introduced is used to provide an
 appropriate error message in case of ``runaway'' write texts.
@@ -32419,6 +32430,7 @@ extension: case chr_code of
   pdf_ximage_code: print_esc("pdfximage");
   reset_timer_code: print_esc("pdfresettimer");
   set_random_seed_code: print_esc("pdfsetrandomseed");
+  pdf_glyph_to_unicode_code: print_esc("pdfglyphtounicode");
   othercases print("[unknown extension!]")
   endcases;
 
@@ -32470,6 +32482,7 @@ begin case cur_chr of
   pdf_ximage_code: @<Implement \.{\\pdfximage}@>;
   reset_timer_code: @<Implement \.{\\pdfresettimer}@>;
   set_random_seed_code: @<Implement \.{\\pdfsetrandomseed}@>;
+  pdf_glyph_to_unicode_code: @<Implement \.{\\pdfglyphtounicode}@>;
 othercases confusion("ext1")
 @:this can't happen ext1}{\quad ext1@>
 endcases;
@@ -33605,6 +33618,19 @@ begin
     flush_str(s);
 end;
 
+procedure glyph_to_unicode;
+var s1, s2: str_number;
+begin
+    scan_pdf_ext_toks;
+    s1 := tokens_to_string(def_ref);
+    delete_token_ref(def_ref);
+    scan_pdf_ext_toks;
+    s2 := tokens_to_string(def_ref);
+    delete_token_ref(def_ref);
+    def_tounicode(s1, s2);
+    flush_str(s2);
+    flush_str(s1);
+end;
 
 @ @<Implement \.{\\pdfincludechars}@>=
 begin
@@ -33637,6 +33663,12 @@ begin
     scan_pdf_ext_toks;
     pdfmapline(def_ref);
     delete_token_ref(def_ref);
+end
+
+@ @<Implement \.{\\pdfglyphtounicode}@>=
+begin
+    check_pdfoutput("\pdfglyphtounicode", true);
+    glyph_to_unicode;
 end
 
 @ The following function are needed for outputing article thread.

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -71,16 +71,16 @@ typedef unsigned short TTF_F2DOT14;
 
 #define put_num(t,n)    ((t)ttf_putnum(t##_SIZE, n))
 
-#define put_char(n)     put_num(TTF_CHAR, n)
-#define put_byte(n)     put_num(TTF_BYTE, n)
+#define put_char(n)     (void)put_num(TTF_CHAR, n)
+#define put_byte(n)     (void)put_num(TTF_BYTE, n)
 #define put_short(n)    put_num(TTF_SHORT, n)
 #define put_ushort(n)   put_num(TTF_USHORT, n)
 #define put_long(n)     put_num(TTF_LONG, n)
-#define put_ulong(n)    put_num(TTF_ULONG, n)
-#define put_fixed(n)    put_num(TTF_FIXED, n)
+#define put_ulong(n)    (void)put_num(TTF_ULONG, n)
+#define put_fixed(n)    (void)put_num(TTF_FIXED, n)
 #define put_funit(n)    put_num(TTF_FUNIT, n)
 #define put_fword(n)    put_num(TTF_FWORD, n)
-#define put_ufword(n)   put_num(TTF_UFWORD, n)
+#define put_ufword(n)   (void)put_num(TTF_UFWORD, n)
 #define put_f2dot14(n)  put_num(TTF_F2DOT14, n)
 
 #define copy_byte()     put_byte(get_byte())

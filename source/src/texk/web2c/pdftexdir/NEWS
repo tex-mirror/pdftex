@@ -1,4 +1,14 @@
 ---------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-beta-20060725 was released on 2006-07-25
+---------------------------------------------------------------
+- added patches by Christian Schenk forwarded by Hartmut
+- added patch 421 (popen) from Taco
+- added lots of (void) to writettf* and ttf2afm to silence the compiler
+- removed some unused variables from tounicode.c
+- add new code by Thanh (patch 580)
+- added security patch for xpdf :-(
+
+---------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-beta-20060213 was released on 2006-02-13
 ---------------------------------------------------------------
 - pdftex.web has been improved a bit
@@ -92,6 +102,11 @@ pdfTeX 3.141592-1.40.0-alpha-20051205 was released on 2005-12-05
   - 453	Object Streams for PDF-1.5
   - take PK resolution from "pk_dpi" parameter in  texmf.cnf, if it has not
     been set by the format file or by the user
+
+-------------------------------------------------
+pdfTeX 3.141592-1.30.6 was released on 2006-02-16
+-------------------------------------------------
+- bugfix: updated xpdf to 3.01pl2
 
 -------------------------------------------------
 pdfTeX 3.141592-1.30.5 was released on 2005-12-04

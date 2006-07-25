@@ -372,15 +372,15 @@ void read_cmap ()
         continue;
       read_unicode_mapping:
         length = get_ushort (); /* length of subtable */
-        get_ushort ();          /* skip the version number */
+        (void) get_ushort ();   /* skip the version number */
         segCount = get_ushort () / 2;
-        get_ushort ();          /* skip searchRange */
-        get_ushort ();          /* skip entrySelector */
-        get_ushort ();          /* skip rangeShift */
+        (void) get_ushort ();   /* skip searchRange */
+        (void) get_ushort ();   /* skip entrySelector */
+        (void) get_ushort ();   /* skip rangeShift */
         seg_tab = xtalloc (segCount, seg_entry);
         for (s = seg_tab; s - seg_tab < segCount; s++)
             s->endCode = get_ushort ();
-        get_ushort ();          /* skip reversedPad */
+        (void) get_ushort ();   /* skip reversedPad */
         for (s = seg_tab; s - seg_tab < segCount; s++)
             s->startCode = get_ushort ();
         for (s = seg_tab; s - seg_tab < segCount; s++)
@@ -494,7 +494,7 @@ void read_font ()
     switch (post_format) {
     case 0x00010000:
         for (pm = mtx_tab; pm - mtx_tab < NMACGLYPHS; pm++)
-            pm->name = mac_glyph_names[pm - mtx_tab];
+            pm->name = (char *) mac_glyph_names[pm - mtx_tab];
         break;
     case 0x00020000:
         l = get_ushort ();      /* some fonts have this value different from nglyphs */
@@ -512,7 +512,7 @@ void read_font ()
         }
         for (pm = mtx_tab; pm - mtx_tab < l; pm++) {
             if (pm->index < NMACGLYPHS)
-                pm->name = mac_glyph_names[pm->index];
+                pm->name = (char *) mac_glyph_names[pm->index];
             else {
                 k = pm->index - NMACGLYPHS;
                 if (k < m) {
@@ -551,7 +551,7 @@ void read_font ()
 
     ttf_seek_tab ("name", 0);
     i = ftell (fontfile);
-    get_ushort ();              /* skip Format selector (=0) */
+    (void) get_ushort ();       /* skip Format selector (=0) */
     n = get_ushort ();          /* number of name records */
     j = get_ushort () + i;      /* start of string storage */
     i += 3 * TTF_USHORT_SIZE;   /* update the current offset */
@@ -559,7 +559,7 @@ void read_font ()
         ttf_seek_off ("name", i);
         platform_id = get_ushort ();
         encoding_id = get_ushort ();
-        get_ushort ();          /* skip language_id */
+        (void) get_ushort ();   /* skip language_id */
         k = get_ushort ();      /* name_id */
         l = get_ushort ();      /* string length */
         if ((platform_id == 1 && encoding_id == 0) &&
@@ -919,8 +919,8 @@ void print_encoding (char *fontname)
         fprintf (file, "/Encoding%i [\n", (int) (e - cmap_tab + 1));
         switch (format) {
         case 0:
-            get_ushort ();      /* skip length */
-            get_ushort ();      /* skip version number */
+            (void) get_ushort ();       /* skip length */
+            (void) get_ushort ();       /* skip version number */
             for (i = 0; i < 256; i++) {
                 fputs ("/", file);
                 print_glyph_name (file, get_byte (), print_glyph);
@@ -935,8 +935,8 @@ void print_encoding (char *fontname)
             }
             break;
         case 6:
-            get_ushort ();      /* skip table length */
-            get_ushort ();      /* skip version number */
+            (void) get_ushort ();       /* skip table length */
+            (void) get_ushort ();       /* skip version number */
             first_code = get_ushort (); /* first character code */
             for (i = 0; i < first_code; ++i)
                 fprintf (file, "/%s\n", notdef);

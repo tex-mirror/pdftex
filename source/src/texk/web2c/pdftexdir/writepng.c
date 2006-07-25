@@ -410,7 +410,7 @@ static int spng_getint (FILE * fp)
 
 void copy_png (integer img)
 {
-    FILE *fp = png_ptr (img)->io_ptr;
+    FILE *fp = (FILE *) png_ptr (img)->io_ptr;
     int i, len, type, streamlength = 0;
     boolean endflag = false;
     int idat = 0;               /* flag to check continuous IDAT chunks sequence */

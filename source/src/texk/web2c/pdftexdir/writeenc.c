@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 $Id: writeenc.c,v 1.3 2005/12/26 14:20:13 hahe Exp hahe $
 
-source code indentation by "indent -kr -nut"
 */
 
 #include "ptexlib.h"
@@ -110,6 +109,7 @@ enc_entry *add_enc (char *s)
     p->loaded = false;
     p->name = xstrdup (s);
     p->objnum = 0;
+    p->tounicode = 0;
     p->glyph_names = xtalloc (256, char *);
     for (i = 0; i < 256; i++)
         p->glyph_names[i] = (char *) notdef;

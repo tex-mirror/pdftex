@@ -42,8 +42,6 @@
 #include <etexdir/etexextra.h>
 #elif defined (pdfTeX)
 #include <pdftexdir/pdftexextra.h>
-#elif defined (pdfeTeX)
-#include <pdfetexdir/pdfetexextra.h>
 #elif defined (Omega)
 #include <omegadir/omegaextra.h>
 #elif defined (eOmega)
@@ -148,7 +146,7 @@ static string get_input_file_name P1H(void);
 static int eightbitp;
 #endif /* Omega || eOmega || Aleph */
 
-#if defined(pdfTeX) || defined(pdfeTeX)
+#if defined(pdfTeX)
 char *ptexbanner;
 #endif
 
@@ -180,7 +178,7 @@ maininit P2C(int, ac, string *, av)
   /* Must be initialized before options are parsed.  */
   interactionoption = 4;
 
-#if defined(pdfTeX) || defined(pdfeTeX)
+#if defined(pdfTeX)
   ptexbanner = BANNER;
 #endif
 
@@ -188,6 +186,7 @@ maininit P2C(int, ac, string *, av)
      since we want the --ini option, have to do it before getting into
      the web (which would read the base file, etc.).  */
   parse_options (ac, av);
+  if (!user_progname) user_progname = dump_name;
   
   /* Do this early so we can inspect program_invocation_name and
      kpse_program_name below, and because we have to do this before
@@ -264,7 +263,7 @@ maininit P2C(int, ac, string *, av)
       fprintf(stderr, "-enc only works with -ini\n");
     }
 #endif
-#if defined(eTeX) || defined(pdfeTeX) || defined(Aleph)
+#if defined(eTeX) || defined(pdfTeX) || defined(Aleph)
     if (etexp) {
       fprintf(stderr, "-etex only works with -ini\n");
     }
@@ -774,14 +773,14 @@ static struct option long_options[]
       { "mltex",                     0, &mltexp, 1 },
       { "enc",                       0, &enctexp, 1 },
 #endif /* !Omega && !eOmega && !Aleph */
-#if defined (eTeX) || defined(pdfeTeX) || defined(Aleph)
+#if defined (eTeX) || defined(pdfTeX) || defined(Aleph)
       { "etex",                      0, &etexp, 1 },
-#endif /* eTeX || pdfeTeX || Aleph */
+#endif /* eTeX || pdfTeX || Aleph */
       { "output-comment",            1, 0, 0 },
       { "output-directory",          1, 0, 0 },
-#if defined(pdfTeX) || defined(pdfeTeX)
+#if defined(pdfTeX)
       { "output-format",             1, 0, 0 },
-#endif /* pdfTeX or pdfeTeX */
+#endif /* pdfTeX */
       { "shell-escape",              0, &shellenabledp, 1 },
       { "no-shell-escape",           0, &shellenabledp, -1 },
       { "debug-format",              0, &debugformatfile, 1 },
@@ -842,14 +841,12 @@ parse_options P2C(int, argc,  string *, argv)
       
     } else if (ARGUMENT_IS (DUMP_OPTION)) {
       dump_name = optarg;
-      if (!user_progname) user_progname = optarg;
       dumpoption = true;
 
 #ifdef TeX
     /* FIXME: Obsolete -- for backward compatibility only. */
     } else if (ARGUMENT_IS ("efmt")) {
       dump_name = optarg;
-      if (!user_progname) user_progname = optarg;
       dumpoption = true;
 #endif
 
@@ -895,7 +892,7 @@ parse_options P2C(int, argc,  string *, argv)
           parse_src_specials_option(optarg);
        }
 #endif /* TeX */
-#if defined(pdfTeX) || defined(pdfeTeX)
+#if defined(pdfTeX)
     } else if (ARGUMENT_IS ("output-format")) {
        pdfoutputoption = 1;
        if (strcmp(optarg, "dvi") == 0) {
@@ -906,7 +903,7 @@ parse_options P2C(int, argc,  string *, argv)
          WARNING1 ("Ignoring unknown value `%s' for --output-format", optarg);
          pdfoutputoption = 0;
        }
-#endif /* pdfTeX || pdfeTeX */
+#endif /* pdfTeX */
 #if defined (TeX) || defined (MF) || defined (MP)
     } else if (ARGUMENT_IS ("translate-file")) {
       translate_filename = optarg;
@@ -1610,7 +1607,7 @@ setupboundvariable P3C(integer *, var,  const_string, var_name,  integer, dflt)
 }
 
 /* FIXME -- some (most?) of this can/should be moved to the Pascal/WEB side. */
-#if !defined(pdfTeX) && !defined(pdfeTeX)
+#if !defined(pdfTeX)
 static void
 checkpoolpointer (poolpointer poolptr, size_t len)
 {

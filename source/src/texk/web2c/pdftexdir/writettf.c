@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -580,15 +580,15 @@ static ttf_cmap_entry *ttf_read_cmap (char *ttf_name, int pid, int eid,
 
     /* read the subtable */
     length = get_ushort ();     /* length of subtable */
-    get_ushort ();              /* skip the version number */
+    (void) get_ushort ();       /* skip the version number */
     segCount = get_ushort () / 2;
-    get_ushort ();              /* skip searchRange */
-    get_ushort ();              /* skip entrySelector */
-    get_ushort ();              /* skip rangeShift */
+    (void) get_ushort ();       /* skip searchRange */
+    (void) get_ushort ();       /* skip entrySelector */
+    (void) get_ushort ();       /* skip rangeShift */
     seg_tab = xtalloc (segCount, seg_entry);
     for (s = seg_tab; s - seg_tab < segCount; s++)
         s->endCode = get_ushort ();
-    get_ushort ();              /* skip reversedPad */
+    (void) get_ushort ();       /* skip reversedPad */
     for (s = seg_tab; s - seg_tab < segCount; s++)
         s->startCode = get_ushort ();
     for (s = seg_tab; s - seg_tab < segCount; s++)
@@ -689,9 +689,9 @@ static void ttf_copytab (const char *name)
 static void ttf_byte_encoding (void)
 {
     ttfenc_entry *e;
-    put_ushort (0);             /* format number (0: byte encoding table) */
-    put_ushort (BYTE_ENCODING_LENGTH);  /* length of table */
-    put_ushort (0);             /* version number */
+    (void) put_ushort (0);      /* format number (0: byte encoding table) */
+    (void) put_ushort (BYTE_ENCODING_LENGTH);   /* length of table */
+    (void) put_ushort (0);      /* version number */
     for (e = ttfenc_tab; e - ttfenc_tab < 256; e++)
         if (e->newindex < 256) {
             put_byte (e->newindex);
@@ -709,13 +709,13 @@ static void ttf_byte_encoding (void)
 static void ttf_trimmed_table_map (void)
 {
     ttfenc_entry *e;
-    put_ushort (6);             /* format number (6): trimmed table mapping */
-    put_ushort (TRIMMED_TABLE_MAP_LENGTH);
-    put_ushort (0);             /* version number (0) */
-    put_ushort (0);             /* first character code */
-    put_ushort (256);           /* number of character code in table */
+    (void) put_ushort (6);      /* format number (6): trimmed table mapping */
+    (void) put_ushort (TRIMMED_TABLE_MAP_LENGTH);
+    (void) put_ushort (0);      /* version number (0) */
+    (void) put_ushort (0);      /* first character code */
+    (void) put_ushort (256);    /* number of character code in table */
     for (e = ttfenc_tab; e - ttfenc_tab < 256; e++)
-        put_ushort (e->newindex);
+        (void) put_ushort (e->newindex);
 }
 
 #define SEG_MAP_DELTA_LENGTH ((16 + (256))*TTF_USHORT_SIZE)
@@ -723,24 +723,24 @@ static void ttf_trimmed_table_map (void)
 static void ttf_seg_map_delta (void)
 {
     ttfenc_entry *e;
-    put_ushort (4);             /* format number (4: segment mapping to delta values) */
-    put_ushort (SEG_MAP_DELTA_LENGTH);
-    put_ushort (0);             /* version number */
-    put_ushort (4);             /* 2*segCount */
-    put_ushort (4);             /* searchRange */
-    put_ushort (1);             /* entrySelector */
-    put_ushort (0);             /* rangeShift */
-    put_ushort (0xF0FF);        /* endCount[0] */
-    put_ushort (0xFFFF);        /* endCount[1] */
-    put_ushort (0);             /* reversedPad */
-    put_ushort (0xF000);        /* startCount[0] */
-    put_ushort (0xFFFF);        /* startCount[1] */
-    put_ushort (0);             /* idDelta[0] */
-    put_ushort (1);             /* idDelta[1] */
-    put_ushort (2 * TTF_USHORT_SIZE);   /* idRangeOffset[0] */
-    put_ushort (0);             /* idRangeOffset[1] */
+    (void) put_ushort (4);      /* format number (4: segment mapping to delta values) */
+    (void) put_ushort (SEG_MAP_DELTA_LENGTH);
+    (void) put_ushort (0);      /* version number */
+    (void) put_ushort (4);      /* 2*segCount */
+    (void) put_ushort (4);      /* searchRange */
+    (void) put_ushort (1);      /* entrySelector */
+    (void) put_ushort (0);      /* rangeShift */
+    (void) put_ushort (0xF0FF); /* endCount[0] */
+    (void) put_ushort (0xFFFF); /* endCount[1] */
+    (void) put_ushort (0);      /* reversedPad */
+    (void) put_ushort (0xF000); /* startCount[0] */
+    (void) put_ushort (0xFFFF); /* startCount[1] */
+    (void) put_ushort (0);      /* idDelta[0] */
+    (void) put_ushort (1);      /* idDelta[1] */
+    (void) put_ushort (2 * TTF_USHORT_SIZE);    /* idRangeOffset[0] */
+    (void) put_ushort (0);      /* idRangeOffset[1] */
     for (e = ttfenc_tab; e - ttfenc_tab < 256; e++)
-        put_ushort (e->newindex);
+        (void) put_ushort (e->newindex);
 }
 
 #define CMAP_ENTRY_LENGTH (2*TTF_USHORT_SIZE + TTF_ULONG_SIZE)
@@ -764,8 +764,8 @@ static void ttf_write_cmap (void)
     dirtab_entry *tab = ttf_name_lookup ("cmap", true);
     ttf_select_cmap ();
     ttf_reset_chksm (tab);
-    put_ushort (0);             /* table version number (0) */
-    put_ushort (NEW_CMAP_SIZE); /* number of encoding tables */
+    (void) put_ushort (0);      /* table version number (0) */
+    (void) put_ushort (NEW_CMAP_SIZE);  /* number of encoding tables */
     offset = 2 * TTF_USHORT_SIZE + NEW_CMAP_SIZE * CMAP_ENTRY_LENGTH;
     for (ce = new_cmap_tab; ce - new_cmap_tab < NEW_CMAP_SIZE; ce++) {
         ce->offset = offset;
@@ -782,8 +782,8 @@ static void ttf_write_cmap (void)
         default:
             pdftex_fail ("invalid format (it should not have happened)");
         }
-        put_ushort (ce->platform_id);
-        put_ushort (ce->encoding_id);
+        (void) put_ushort (ce->platform_id);
+        (void) put_ushort (ce->encoding_id);
         put_ulong (ce->offset);
     }
     for (ce = new_cmap_tab; ce - new_cmap_tab < NEW_CMAP_SIZE; ce++) {
@@ -861,16 +861,17 @@ static void ttf_write_name (void)
         new_name_buf_size = name_buf_size;
     }
     ttf_reset_chksm (tab);
-    put_ushort (0);             /* Format selector */
-    put_ushort (name_record_num);
-    put_ushort (3 * TTF_USHORT_SIZE + name_record_num * 6 * TTF_USHORT_SIZE);
+    (void) put_ushort (0);      /* Format selector */
+    (void) put_ushort (name_record_num);
+    (void) put_ushort (3 * TTF_USHORT_SIZE +
+                       name_record_num * 6 * TTF_USHORT_SIZE);
     for (i = 0; i < name_record_num; i++) {
-        put_ushort (name_tab[i].platform_id);
-        put_ushort (name_tab[i].encoding_id);
-        put_ushort (name_tab[i].language_id);
-        put_ushort (name_tab[i].name_id);
-        put_ushort (name_tab[i].new_length);
-        put_ushort (name_tab[i].new_offset);
+        (void) put_ushort (name_tab[i].platform_id);
+        (void) put_ushort (name_tab[i].encoding_id);
+        (void) put_ushort (name_tab[i].language_id);
+        (void) put_ushort (name_tab[i].name_id);
+        (void) put_ushort (name_tab[i].new_length);
+        (void) put_ushort (name_tab[i].new_offset);
     }
     for (p = new_name_buf; p - new_name_buf < new_name_buf_size; p++)
         put_char (*p);
@@ -954,7 +955,7 @@ static void ttf_write_glyf (void)
                            which appears in the condition of the `for' loop
                          */
                     }
-                    put_ushort (glyph_tab[idx].newindex);
+                    (void) put_ushort (glyph_tab[idx].newindex);
                     if (flags & ARG_1_AND_2_ARE_WORDS)
                         ttf_ncopy (2 * TTF_SHORT_SIZE);
                     else
@@ -1091,8 +1092,8 @@ static void ttf_write_head ()
     ttf_ncopy (TTF_ULONG_SIZE + 2 * TTF_USHORT_SIZE + 16 +
                4 * TTF_FWORD_SIZE + 2 * TTF_USHORT_SIZE + TTF_SHORT_SIZE);
     if (is_subsetted (fm_cur)) {
-        put_short (loca_format);
-        put_short (0);
+        (void) put_short (loca_format);
+        (void) put_short (0);
     } else
         ttf_ncopy (2 * TTF_SHORT_SIZE);
     ttf_set_chksm (tab);
@@ -1105,7 +1106,7 @@ static void ttf_write_hhea (void)
     ttf_reset_chksm (tab);
     ttf_ncopy (TTF_FIXED_SIZE + 3 * TTF_FWORD_SIZE + TTF_UFWORD_SIZE +
                3 * TTF_FWORD_SIZE + 8 * TTF_SHORT_SIZE);
-    put_ushort (new_glyphs_count);
+    (void) put_ushort (new_glyphs_count);
     ttf_set_chksm (tab);
 }
 
@@ -1141,8 +1142,8 @@ static void ttf_write_loca (void)
         put_ulong (last_glyf_offset);
     } else {
         for (id = glyph_index; id - glyph_index < new_glyphs_count; id++)
-            put_ushort (glyph_tab[*id].newoffset / 2);
-        put_ushort (last_glyf_offset / 2);
+            (void) put_ushort (glyph_tab[*id].newoffset / 2);
+        (void) put_ushort (last_glyf_offset / 2);
     }
     ttf_set_chksm (tab);
 }
@@ -1152,7 +1153,7 @@ static void ttf_write_mapx (void)
     dirtab_entry *tab = ttf_seek_tab ("maxp", TTF_FIXED_SIZE + TTF_USHORT_SIZE);
     ttf_reset_chksm (tab);
     put_fixed (0x00010000);
-    put_ushort (new_glyphs_count);
+    (void) put_ushort (new_glyphs_count);
     ttf_ncopy (13 * TTF_USHORT_SIZE);
     ttf_set_chksm (tab);
 }
@@ -1165,7 +1166,7 @@ static void ttf_write_OS2 (void)
     version = get_ushort ();
     if (version != 0x0000 && version != 0x0001 && version != 0x0002)
         pdftex_fail ("unknown version of OS/2 table (%.4X)", version);
-    put_ushort (0x0001);        /* fix version to 1 */
+    (void) put_ushort (0x0001); /* fix version to 1 */
     ttf_ncopy (2 * TTF_USHORT_SIZE + 13 * TTF_SHORT_SIZE + 10 * TTF_BYTE_SIZE);
     ttf_skip (4 * TTF_ULONG_SIZE);      /* ulUnicodeRange 1--4 */
     put_ulong (0x00000003);     /* Basic Latin + Latin-1 Supplement (0x0000--0x00FF) */
@@ -1174,8 +1175,8 @@ static void ttf_write_OS2 (void)
     put_ulong (0x00000000);
     ttf_ncopy (4 * TTF_CHAR_SIZE + TTF_USHORT_SIZE);    /* achVendID + fsSelection */
     ttf_skip (2 * TTF_USHORT_SIZE);
-    put_ushort (0x0000);        /* usFirstCharIndex */
-    put_ushort (0xF0FF);        /* usLastCharIndex */
+    (void) put_ushort (0x0000); /* usFirstCharIndex */
+    (void) put_ushort (0xF0FF); /* usLastCharIndex */
     ttf_ncopy (5 * TTF_USHORT_SIZE);
     /* for version 0 the OS/2 table ends here, the rest is for version 1 */
     put_ulong (0x80000000);     /* Symbol Character Set---don't use any code page */
@@ -1206,13 +1207,13 @@ static void ttf_write_post (void)
     } else {
         put_fixed (0x00020000);
         ttf_ncopy (TTF_FIXED_SIZE + 2 * TTF_FWORD_SIZE + 5 * TTF_ULONG_SIZE);
-        put_ushort (new_glyphs_count);
+        (void) put_ushort (new_glyphs_count);
         k = 0;
         for (id = glyph_index; id - glyph_index < new_glyphs_count; id++) {
             glyph = glyph_tab + *id;
             if (glyph->name_index >= NMACGLYPHS || unsafe_name (glyph->name))
                 glyph->name_index = NMACGLYPHS + k++;
-            put_ushort (glyph->name_index);
+            (void) put_ushort (glyph->name_index);
         }
         for (id = glyph_index; id - glyph_index < new_glyphs_count; id++) {
             glyph = glyph_tab + *id;
@@ -1233,10 +1234,10 @@ static void ttf_init_font (int n)
     int i, k;
     for (i = 1, k = 0; i <= n; i <<= 1, k++);
     put_fixed (0x00010000);     /* font version */
-    put_ushort (n);             /* number of tables */
-    put_ushort (i << 3);        /* search range */
-    put_ushort (k - 1);         /* entry selector */
-    put_ushort ((n << 4) - (i << 3));   /* range shift */
+    (void) put_ushort (n);      /* number of tables */
+    (void) put_ushort (i << 3); /* search range */
+    (void) put_ushort (k - 1);  /* entry selector */
+    (void) put_ushort ((n << 4) - (i << 3));    /* range shift */
     ttf_seek_outbuf (TABDIR_OFF + n * 4 * TTF_ULONG_SIZE);
 }
 

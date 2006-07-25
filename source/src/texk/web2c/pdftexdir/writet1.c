@@ -19,13 +19,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#25 $
 
-source code indentation by "indent -kr -nut"
 */
 
 static const char perforce_id[] =
     "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#25 $";
 
-#ifdef pdfTeX                  /* writet1 used with pdfeTeX */
+#ifdef pdfTeX                   /* writet1 used with pdfeTeX */
 #  include "ptexlib.h"
 #  define t1_log(s)           tex_printf(s)
 #  define t1_open()           \
