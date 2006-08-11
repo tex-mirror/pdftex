@@ -38,6 +38,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/ptexlib.h#26 $
 /* avl */
 #  include "avlstuff.h"
 
+#  include "openbsd-compat.h"
 
 /* pdftexlib type declarations */
 typedef struct {
@@ -185,11 +186,15 @@ extern void fb_seek (integer);
 extern void libpdffinish (void);
 extern char *makecfilename (strnumber s);
 extern void make_subset_tag (fm_entry *, char **);
+__attribute__ ((format (printf, 1, 2))) 
 extern void pdf_printf (const char *, ...);
 extern void pdf_puts (const char *);
+__attribute__ ((noreturn, format (printf, 1, 2)))
 extern void pdftex_fail (const char *, ...);
+__attribute__ ((format (printf, 1, 2)))
 extern void pdftex_warn (const char *, ...);
 extern void setjobid (int, int, int, int);
+__attribute__ ((format (printf, 1, 2)))
 extern void tex_printf (const char *, ...);
 extern void writestreamlength (integer, integer);
 extern char *convertStringToPDFString (const char *in, int len);
@@ -210,6 +215,9 @@ extern void matchstrings (strnumber s, strnumber t, int subcount,
 extern void getmatch (int i);
 extern void makepdftexbanner (void);
 extern void initstarttime ();
+extern void removepdffile (void);
+extern void garbagewarning (void);
+extern void stripspaces (char *p);
 
 /* vfpacket.c */
 extern eightbits packetbyte (void);
@@ -249,6 +257,9 @@ extern void img_free (void);
 extern void updateimageprocset (integer);
 extern void writeimage (integer);
 extern integer imagecolordepth (integer img);
+
+/* writejbig2.c */
+extern void flushjbig2page0objects ();
 
 /* writet1.c */
 extern boolean t1_subset (char *, char *, unsigned char *);

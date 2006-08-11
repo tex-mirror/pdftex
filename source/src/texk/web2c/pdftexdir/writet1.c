@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -605,10 +605,7 @@ static void t1_puts (const char *s)
     t1_putline ();
 }
 
-#ifdef __GNUC__
-static void t1_printf (const char *fmt, ...)
-    __attribute__ ((format (printf, 1, 2)));
-#endif
+__attribute__ ((format (printf, 1, 2)))
 static void t1_printf (const char *fmt, ...)
 {
     va_list args;
@@ -750,7 +747,7 @@ static void t1_modify_fm (void)
             pdftex_fail ("FontMatrix: an array expected: `%s'", t1_line_array);
         }
     c = *p++;                   /* save the character '[' resp. '{' */
-    strncpy (t1_buf_array, t1_line_array, (unsigned) (p - t1_line_array));
+    strncpy (t1_buf_array, t1_line_array, (size_t) (p - t1_line_array));
     r = t1_buf_array + (p - t1_line_array);
     for (i = 0; i < 6; i++) {
         a[i] = t1_scan_num (p, &q);
@@ -789,7 +786,7 @@ static void t1_modify_italic (void)
     if (fm_slant (fm_cur) == 0)
         return;
     p = strchr (t1_line_array, ' ');
-    strncpy (t1_buf_array, t1_line_array, (unsigned) (p - t1_line_array + 1));
+    strncpy (t1_buf_array, t1_line_array, (size_t) (p - t1_line_array + 1));
     a = t1_scan_num (p + 1, &r);
     a -= atan (fm_slant (fm_cur) * 1E-3) * (180 / M_PI);
     sprintf (t1_buf_array + (p - t1_line_array + 1), "%g", a);
@@ -1177,7 +1174,7 @@ static boolean is_cc_init = false;
 
 #define stack_error(N) {                \
     pdftex_warn("CharString: invalid access (%i) to stack (%i entries)", \
-                 N, stack_ptr - cc_stack);                               \
+                 (int) N, (int)(stack_ptr - cc_stack));                  \
     goto cs_error;                    \
 }
 
@@ -1251,10 +1248,7 @@ static void cc_init (void)
 #define mark_subr(n)    cs_mark(0, n)
 #define mark_cs(s)      cs_mark(s, 0)
 
-#ifdef __GNUC__
-static void cs_warn (const char *cs_name, int subr, const char *fmt, ...)
-    __attribute__ ((format (printf, 3, 4)));
-#endif
+__attribute__ ((format (printf, 3, 4)))
 static void cs_warn (const char *cs_name, int subr, const char *fmt, ...)
 {
     char buf[SMALL_BUF_SIZE];
@@ -1599,7 +1593,7 @@ static void t1_flush_cs (boolean is_subr)
     for (ptr = tab; ptr < end_tab; ptr++) {
         if (ptr->used) {
             if (is_subr)
-                sprintf (t1_line_array, "dup %u %u", ptr - tab, ptr->cslen);
+                sprintf (t1_line_array, "dup %li %u", ptr - tab, ptr->cslen);
             else
                 sprintf (t1_line_array, "/%s %u", ptr->name, ptr->cslen);
             p = strend (t1_line_array);
@@ -1609,7 +1603,7 @@ static void t1_flush_cs (boolean is_subr)
         } else {
             /* replace unsused subr's by return_cs */
             if (is_subr) {
-                sprintf (t1_line_array, "dup %u %u%s ", ptr - tab, cs_len,
+                sprintf (t1_line_array, "dup %li %u%s ", ptr - tab, cs_len,
                          cs_token_pair[0]);
                 p = strend (t1_line_array);
                 memcpy (p, return_cs, cs_len);

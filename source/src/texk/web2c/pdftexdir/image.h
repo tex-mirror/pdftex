@@ -49,6 +49,11 @@ typedef struct {
 } pdf_image_struct;
 
 typedef struct {
+	    integer selected_page;
+	        FILE *file;
+} JBIG2_IMAGE_INFO;
+
+typedef struct {
     char *image_name;
     int image_type;
     int color_type;
@@ -62,6 +67,7 @@ typedef struct {
         pdf_image_struct *pdf;
         png_image_struct png;
         JPG_IMAGE_INFO *jpg;
+	JBIG2_IMAGE_INFO *jbig2;
     } image_struct;
 } image_entry;
 
@@ -73,6 +79,7 @@ extern integer image_max;
 #define IMAGE_TYPE_PNG  2
 #define IMAGE_TYPE_JPG  3
 #define IMAGE_TYPE_TIF  4
+#define IMAGE_TYPE_JBIG2 5
 
 #define IMAGE_COLOR_B   1
 #define IMAGE_COLOR_C   2
@@ -92,6 +99,7 @@ extern integer image_max;
 #define png_info(N)     (img_ptr(N)->image_struct.png.info_ptr)
 #define pdf_ptr(N)      (img_ptr(N)->image_struct.pdf)
 #define jpg_ptr(N)      (img_ptr(N)->image_struct.jpg)
+#define jbig2_ptr(N)    (img_ptr(N)->image_struct.jbig2)
 #define tif_ptr(N)      (img_ptr(N)->image_struct.tif)
 
 extern integer read_pdf_info (char *, char *, integer, integer, integer,
@@ -102,3 +110,5 @@ extern void read_png_info (integer);
 extern void write_png (integer);
 extern void read_jpg_info (integer);
 extern void write_jpg (integer);
+extern void read_jbig2_info(integer);
+extern void write_jbig2(integer);

@@ -542,13 +542,13 @@ void write_png (integer img)
                 (checked_gamma > 1.01 || checked_gamma < 0.99))
                 tex_printf ("gamma delta=%lf ", checked_gamma);
             if (png_ptr (img)->transformations != PNG_TRANSFORM_IDENTITY)
-                tex_printf ("transform=%d", png_ptr (img)->transformations);
+                tex_printf ("transform=%lu", (long)png_ptr (img)->transformations);
             if ((png_info (img)->color_type != PNG_COLOR_TYPE_GRAY) &&
                 (png_info (img)->color_type != PNG_COLOR_TYPE_RGB) &&
                 (png_info (img)->color_type != PNG_COLOR_TYPE_PALETTE))
                 tex_printf ("colortype ");
             if (fixedpdfminorversion <= 1)
-                tex_printf ("version=%d ", fixedpdfminorversion);
+                tex_printf ("version=%d ", (int)fixedpdfminorversion);
             if (png_info (img)->interlace_type != PNG_INTERLACE_NONE)
                 tex_printf ("interlaced ");
             if (png_info (img)->bit_depth > 8)

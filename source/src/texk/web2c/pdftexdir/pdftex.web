@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-beta-20060725' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-beta-20060811' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -5122,6 +5122,8 @@ locations for control sequences that are perpetually defined
   {permanent `\.{\\notexpanded:}'}
 @d frozen_null_font=frozen_control_sequence+10
   {permanent `\.{\\nullfont}'}
+@d frozen_primitive=frozen_control_sequence+11
+  {permanent `\.{\\pdfprimitive}'}
 @d font_id_base=frozen_null_font-font_base
   {begins table of 257 permanent font identifiers}
 @d undefined_control_sequence=frozen_null_font+257 {dummy location}
@@ -5617,16 +5619,15 @@ that will be defined later.
 @d pdf_image_gamma_code      = pdftex_first_integer_code + 14
 @d pdf_image_hicolor_code    = pdftex_first_integer_code + 15
 @d pdf_image_apply_gamma_code = pdftex_first_integer_code + 16
-@d pdf_px_dimen_code = pdftex_first_integer_code + 17 {the code for the pixel dimen value}
-@d pdf_adjust_spacing_code   = pdftex_first_integer_code + 18 {level of spacing adjusting}
-@d pdf_protrude_chars_code   = pdftex_first_integer_code + 19 {protrude chars at left/right edge of paragraphs}
-@d pdf_tracing_fonts_code    = pdftex_first_integer_code + 20 {level of font detail in log}
-@d pdf_objcompresslevel_code = pdftex_first_integer_code + 21 {activate object streams}
-@d pdf_adjust_interword_glue_code    = pdftex_first_integer_code + 22 {adjust interword glue?}
-@d pdf_prepend_kern_code     = pdftex_first_integer_code + 23 {prepend kern before certain characters?}
-@d pdf_append_kern_code      = pdftex_first_integer_code + 24 {append kern before certain characters?}
-@d pdf_gen_tounicode_code    = pdftex_first_integer_code + 25 {generate ToUnicode for fonts?}
-@d pdf_int_pars=pdftex_first_integer_code + 26 {total number of \pdfTeX's integer parameters}
+@d pdf_adjust_spacing_code   = pdftex_first_integer_code + 17 {level of spacing adjusting}
+@d pdf_protrude_chars_code   = pdftex_first_integer_code + 18 {protrude chars at left/right edge of paragraphs}
+@d pdf_tracing_fonts_code    = pdftex_first_integer_code + 19 {level of font detail in log}
+@d pdf_objcompresslevel_code = pdftex_first_integer_code + 20 {activate object streams}
+@d pdf_adjust_interword_glue_code    = pdftex_first_integer_code + 21 {adjust interword glue?}
+@d pdf_prepend_kern_code     = pdftex_first_integer_code + 22 {prepend kern before certain characters?}
+@d pdf_append_kern_code      = pdftex_first_integer_code + 23 {append kern before certain characters?}
+@d pdf_gen_tounicode_code    = pdftex_first_integer_code + 24 {generate ToUnicode for fonts?}
+@d pdf_int_pars=pdftex_first_integer_code + 25 {total number of \pdfTeX's integer parameters}
 @#
 @d etex_int_base=pdf_int_pars {base for \eTeX's integer parameters}
 @d tracing_assigns_code=etex_int_base {show assignments}
@@ -5730,7 +5731,6 @@ that will be defined later.
 @d pdf_image_gamma      == int_par(pdf_image_gamma_code)
 @d pdf_image_hicolor    == int_par(pdf_image_hicolor_code)
 @d pdf_image_apply_gamma == int_par(pdf_image_apply_gamma_code)
-@d pdf_px_dimen == int_par(pdf_px_dimen_code)
 @#
 @d tracing_assigns==int_par(tracing_assigns_code)
 @d tracing_groups==int_par(tracing_groups_code)
@@ -5824,7 +5824,6 @@ pdf_gamma_code:            print_esc("pdfgamma");
 pdf_image_gamma_code:      print_esc("pdfimagegamma");
 pdf_image_hicolor_code:    print_esc("pdfimagehicolor");
 pdf_image_apply_gamma_code: print_esc("pdfimageapplygamma");
-pdf_px_dimen_code: print_esc("pdfpxdimen");
 pdf_adjust_spacing_code:   print_esc("pdfadjustspacing");
 pdf_protrude_chars_code:   print_esc("pdfprotrudechars");
 pdf_tracing_fonts_code:    print_esc("pdftracingfonts");
@@ -5991,8 +5990,6 @@ primitive("pdfimagehicolor",assign_int,int_base+pdf_image_hicolor_code);@/
 @!@:pdf_image_hicolor_}{\.{\\pdfimagehicolor} primitive@>
 primitive("pdfimageapplygamma",assign_int,int_base+pdf_image_apply_gamma_code);@/
 @!@:pdf_image_apply_gamma_}{\.{\\pdfimageapplygamma} primitive@>
-primitive("pdfpxdimen",assign_int,int_base+pdf_px_dimen_code);@/
-@!@:pdf_px_dimen_}{\.{\\pdfpxdimen} primitive@>
 primitive("pdfadjustspacing",assign_int,int_base+pdf_adjust_spacing_code);@/
 @!@:pdf_adjust_spacing_}{\.{\\pdfadjustspacing} primitive@>
 primitive("pdfprotrudechars",assign_int,int_base+pdf_protrude_chars_code);@/
@@ -6020,7 +6017,6 @@ complete failure.
 
 @<Initialize table entries...@>=
 for k:=int_base to del_code_base-1 do eqtb[k].int:=0;
-pdf_px_dimen := unity;
 mag:=1000; tolerance:=10000; hang_after:=1; max_dead_cycles:=25;
 escape_char:="\"; end_line_char:=carriage_return;
 for k:=0 to 255 do del_code(k):=-1;
@@ -6115,7 +6111,8 @@ here, and the 256 \.{\\dimen} registers.
 @d pdf_last_line_depth_code   = pdftex_first_dimen_code + 8
 @d pdf_each_line_height_code  = pdftex_first_dimen_code + 9
 @d pdf_each_line_depth_code   = pdftex_first_dimen_code + 10
-@d pdftex_last_dimen_code  = pdftex_first_dimen_code + 10 {last number defined in this section}
+@d pdf_px_dimen_code       = pdftex_first_dimen_code + 11
+@d pdftex_last_dimen_code  = pdftex_first_dimen_code + 11 {last number defined in this section}
 @d dimen_pars = pdftex_last_dimen_code + 1 {total number of dimension parameters}
 @d scaled_base=dimen_base+dimen_pars
   {table of 256 user-defined \.{\\dimen} registers}
@@ -6155,6 +6152,7 @@ here, and the 256 \.{\\dimen} registers.
 @d pdf_last_line_depth   == dimen_par(pdf_last_line_depth_code)
 @d pdf_each_line_height  == dimen_par(pdf_each_line_height_code)
 @d pdf_each_line_depth   == dimen_par(pdf_each_line_depth_code)
+@d pdf_px_dimen      == dimen_par(pdf_px_dimen_code)
 
 @p procedure print_length_param(@!n:integer);
 begin case n of
@@ -6190,6 +6188,7 @@ pdf_first_line_height_code: print_esc("pdffirstlineheight");
 pdf_last_line_depth_code: print_esc("pdflastlinedepth");
 pdf_each_line_height_code: print_esc("pdfeachlineheight");
 pdf_each_line_depth_code: print_esc("pdfeachlinedepth");
+pdf_px_dimen_code:      print_esc("pdfpxdimen");
 othercases print("[unknown dimen parameter!]")
 endcases;
 end;
@@ -6261,6 +6260,8 @@ primitive("pdfeachlineheight",assign_dimen,dimen_base+pdf_each_line_height_code)
 @!@:pdf_each_line_height_}{\.{\\pdfeachlineheight} primitive@>
 primitive("pdfeachlinedepth",assign_dimen,dimen_base+pdf_each_line_depth_code);@/
 @!@:pdf_each_line_depth_}{\.{\\pdfeachlinedepth} primitive@>
+primitive("pdfpxdimen",assign_dimen,dimen_base+pdf_px_dimen_code);@/
+@!@:pdf_px_dimen_}{\.{\\pdfpxdimen} primitive@>
 
 @ @<Cases of |print_cmd_chr|...@>=
 assign_dimen: if chr_code<scaled_base then
@@ -6393,6 +6394,10 @@ eq_type(frozen_dont_expand):=dont_expand;
 text(frozen_dont_expand):="notexpanded:";
 @.notexpanded:@>
 
+eq_type(frozen_primitive):=ignore_spaces;
+equiv(frozen_primitive):=1;
+eq_level(frozen_primitive):=level_one;
+text(frozen_primitive):="primitive";
 @ Here is the subroutine that searches the hash table for an identifier
 that matches a given string of length |l>1| appearing in |buffer[j..
 (j+l-1)]|. If the identifier is found, the corresponding hash table address
@@ -6628,8 +6633,6 @@ primitive("hrule",hrule,0);@/
 @!@:hrule_}{\.{\\hrule} primitive@>
 primitive("ignorespaces",ignore_spaces,0);@/
 @!@:ignore_spaces_}{\.{\\ignorespaces} primitive@>
-primitive("primitive",ignore_spaces,1);@/
-@!@:primitive_}{\.{\\primitive} primitive@>
 primitive("insert",insert,0);@/
 @!@:insert_}{\.{\\insert} primitive@>
 primitive("mark",mark,0);@/
@@ -6648,6 +6651,8 @@ primitive("noboundary",no_boundary,0);@/
 @!@:no_boundary_}{\.{\\noboundary} primitive@>
 primitive("noexpand",no_expand,0);@/
 @!@:no_expand_}{\.{\\noexpand} primitive@>
+primitive("pdfprimitive",no_expand,1);@/
+@!@:pdfprimitive_}{\.{\\pdfprimitive} primitive@>
 primitive("nonscript",non_script,0);@/
 @!@:non_script_}{\.{\\nonscript} primitive@>
 primitive("omit",omit,0);@/
@@ -6718,7 +6723,8 @@ math_choice: print_esc("mathchoice");
 multiply: print_esc("multiply");
 no_align: print_esc("noalign");
 no_boundary:print_esc("noboundary");
-no_expand: print_esc("noexpand");
+no_expand: if chr_code=0 then print_esc("noexpand")
+   else print_esc("primitive");
 non_script: print_esc("nonscript");
 omit: print_esc("omit");
 radical: print_esc("radical");
@@ -8775,7 +8781,8 @@ case cur_cmd of
 top_bot_mark:@<Insert the \(a)appropriate mark text into the scanner@>;
 expand_after:if cur_chr=0 then @<Expand the token after the next token@>
   else @<Negate a boolean conditional and |goto reswitch|@>;
-no_expand:@<Suppress expansion of the next token@>;
+no_expand: if cur_chr=0 then @<Suppress expansion of the next token@> 
+  else @<Implement \.{\\pdfprimitive}@>;
 cs_name:@<Manufacture a control sequence name@>;
 convert:conv_toks; {this procedure is discussed in Part 27 below}
 the:ins_the_toks; {this procedure is discussed in Part 27 below}
@@ -8809,6 +8816,42 @@ back_input; {now |start| and |loc| point to the backed-up token |t|}
 if t>=cs_token_flag then
   begin p:=get_avail; info(p):=cs_token_flag+frozen_dont_expand;
   link(p):=loc; start:=p; loc:=p;
+  end;
+end
+
+@ The \.{\\pdfprimitive} handling. If the primitive meaning of the next 
+token is an expandable command, it suffices to replace the current
+token with the primitive one and restart |expand|/
+
+Otherwise, the token we just read has to be pushed back, as well
+as a token matching the internal form of \.{\\pdfprimitive}, that is
+sneaked in as an alternate form of |ignore_spaces|.
+@!@:pdfprimitive_}{\.{\\pdfprimitive} primitive (internalized)@>
+
+Simply pushing back a token that matches the correct internal command
+does not work, because approach would not survive roundtripping to a
+temporary file.
+
+@<Implement \.{\\pdfprimitive}@>=
+begin save_scanner_status := scanner_status; scanner_status:=normal;
+get_token; scanner_status:=save_scanner_status;
+if cur_cs < hash_base then
+  cur_cs := prim_lookup(cur_cs-257)
+else
+  cur_cs := prim_lookup(text(cur_cs));
+if cur_cs<>undefined_primitive then begin
+  if cur_cmd>max_command then begin
+    cur_cmd := prim_eq_type(cur_cs);
+    cur_chr := prim_equiv(cur_cs);
+    cur_tok := (cur_cmd*@'400)+cur_chr;
+    cur_cs  := 0;
+	goto reswitch;
+    end 
+  else begin
+    back_input; { now |loc| and |start| point to a one-item list }
+    p:=get_avail; info(p):=cs_token_flag+frozen_primitive;
+    link(p):=loc; loc:=p; start:=p; 
+    end;
   end;
 end
 
@@ -11295,7 +11338,7 @@ We consider now the way \TeX\ handles various kinds of \.{\\if} commands.
 @d if_true_code=14 { `\.{\\iftrue}' }
 @d if_false_code=15 { `\.{\\iffalse}' }
 @d if_case_code=16 { `\.{\\ifcase}' }
-@d if_primitive_code=21 { `\.{\\ifprimitive}' }
+@d if_pdfprimitive_code=21 { `\.{\\ifpdfprimitive}' }
 
 @<Put each...@>=
 primitive("if",if_test,if_char_code);
@@ -11332,8 +11375,8 @@ primitive("iffalse",if_test,if_false_code);
 @!@:if_false_}{\.{\\iffalse} primitive@>
 primitive("ifcase",if_test,if_case_code);
 @!@:if_case_}{\.{\\ifcase} primitive@>
-primitive("ifprimitive",if_test,if_primitive_code);
-@!@:if_primitive_}{\.{\\ifprimitive} primitive@>
+primitive("ifpdfprimitive",if_test,if_pdfprimitive_code);
+@!@:if_pdfprimitive_}{\.{\\ifpdfprimitive} primitive@>
 
 @ @<Cases of |print_cmd_chr|...@>=
 if_test: begin if chr_code>=unless_code then print_esc("unless");
@@ -11354,7 +11397,7 @@ case chr_code mod unless_code of
   if_true_code:print_esc("iftrue");
   if_false_code:print_esc("iffalse");
   if_case_code:print_esc("ifcase");
-  if_primitive_code:print_esc("ifprimitive");
+  if_pdfprimitive_code:print_esc("ifpdfprimitive");
   @/@<Cases of |if_test| for |print_cmd_chr|@>@/
   othercases print_esc("if")
   endcases;
@@ -11538,7 +11581,7 @@ if_false_code: b:=false;
 @/@<Cases for |conditional|@>@/
 if_case_code: @<Select the appropriate case
   and |return| or |goto common_ending|@>;
-if_primitive_code: begin
+if_pdfprimitive_code: begin
   save_scanner_status:=scanner_status;
   scanner_status:=normal;
   get_next;
@@ -14709,6 +14752,7 @@ pdf_gamma := 1000;
 pdf_image_gamma := 2200;
 pdf_image_hicolor := 1;
 pdf_image_apply_gamma := 0;
+pdf_px_dimen := one_bp;
 
 @ The subroutines define the corresponding macros so we can use them
 in C.
@@ -15020,6 +15064,7 @@ begin
             pdf_os_enable := false;
         end;
         ensure_pdf_open;
+        fix_pdfoutput;
         pdf_print("%PDF-1.");
         pdf_print_int_ln(fixed_pdf_minor_version);
         pdf_print("%");
@@ -18705,14 +18750,19 @@ end;
 are already written completely to PDF output file.
 
 @<Finish the PDF file@>=
-if total_pages=0 then print_nl("No pages of output.")
-@.No pages of output@>
+if total_pages=0 then begin
+    print_nl("No pages of output.");
+  @.No pages of output@>
+    if pdf_gone > 0 then
+        garbage_warning;
+end
 else begin
     pdf_flush; {to make sure that the output file name has been already
     created}
     if total_pages mod pages_tree_kids_max <> 0 then
         obj_info(pdf_last_pages) := total_pages mod pages_tree_kids_max;
     {last pages object may have less than |pages_tree_kids_max| children}
+    flush_jbig2_page0_objects; {flush page 0 objects from JBIG2 images, if any}
     @<Check for non-existing pages@>;
     @<Reverse the linked list of Page and Pages objects@>;
     @<Check for non-existing destinations@>;
@@ -24600,9 +24650,9 @@ if pdf_protrude_chars > 0 then begin
         p := q;
         ptmp := p;
     end else begin
-        p := prev_rightmost(temp_head, q); {get |link(p) = q|}
+        p := prev_rightmost(link(temp_head), q); {get |link(p) = q|}
         ptmp := p;
-        p := find_protchar_right(temp_head, p);
+        p := find_protchar_right(link(temp_head), p);
     end;
     @{
     short_display_n(p, 1);
@@ -31955,6 +32005,7 @@ var a, b, c, i, j, k, l: integer; {all-purpose index}
 begin @<Finish the extensions@>;
 @!stat if tracing_stats>0 then @<Output statistics about this job@>;@;@+tats@/
 wake_up_terminal;
+fix_pdfoutput;
 if fixed_pdfoutput > 0 then begin
     if history = fatal_error_stop then
         print_err(" ==> Fatal error occurred, the output PDF file is not finished!")
@@ -36634,8 +36685,8 @@ if j=1 then
 @d if_cs_code=18 { `\.{\\ifcsname}' }
 @d if_font_char_code=19 { `\.{\\iffontchar}' }
 @d if_in_csname_code=20 { `\.{\\ifincsname}' }
-@d if_abs_num_code=22 { `\.{\\ifabsnum}' } { 21 = |if_primitive|}
-@d if_abs_dim_code=23 { `\.{\\ifabsdim}' }
+@d if_pdfabs_num_code=22 { `\.{\\ifpdfabsnum}' } { 21 = |if_pdfprimitive|}
+@d if_pdfabs_dim_code=23 { `\.{\\ifpdfabsdim}' }
 
 @<Generate all \eTeX...@>=
 primitive("unless",expand_after,1);@/
@@ -36648,10 +36699,10 @@ primitive("iffontchar",if_test,if_font_char_code);
 @!@:if_font_char_}{\.{\\iffontchar} primitive@>
 primitive("ifincsname",if_test,if_in_csname_code);
 @!@:if_in_csname_}{\.{\\ifincsname} primitive@>
-primitive("ifabsnum",if_test,if_abs_num_code);
-@!@:if_abs_num_}{\.{\\ifabsnum} primitive@>
-primitive("ifabsdim",if_test,if_abs_dim_code);
-@!@:if_abs_dim_}{\.{\\ifabsdim} primitive@>
+primitive("ifpdfabsnum",if_test,if_pdfabs_num_code);
+@!@:if_pdfabs_num_}{\.{\\ifpdfabsnum} primitive@>
+primitive("ifpdfabsdim",if_test,if_pdfabs_dim_code);
+@!@:if_pdfabs_dim_}{\.{\\ifpdfabsdim} primitive@>
 
 @ @<Cases of |expandafter| for |print_cmd_chr|@>=
 else print_esc("unless")
@@ -36661,8 +36712,8 @@ if_def_code:print_esc("ifdefined");
 if_cs_code:print_esc("ifcsname");
 if_font_char_code:print_esc("iffontchar");
 if_in_csname_code:print_esc("ifincsname");
-if_abs_num_code:print_esc("ifabsnum");
-if_abs_dim_code:print_esc("ifabsdim");
+if_pdfabs_num_code:print_esc("ifpdfabsnum");
+if_pdfabs_dim_code:print_esc("ifpdfabsdim");
 
 @ The result of a boolean condition is reversed when the conditional is
 preceded by \.{\\unless}.
@@ -36729,8 +36780,8 @@ a font.
 
 @<Cases for |conditional|@>=
 if_in_csname_code: b := is_in_csname;
-if_abs_dim_code, if_abs_num_code: begin
-  if this_if=if_abs_num_code then scan_int@+else scan_normal_dimen;
+if_pdfabs_dim_code, if_pdfabs_num_code: begin
+  if this_if=if_pdfabs_num_code then scan_int@+else scan_normal_dimen;
   n:=cur_val;
   if n < 0 then negate(n);
   @<Get the next non-blank non-call...@>;
@@ -36742,7 +36793,7 @@ if_abs_dim_code, if_abs_num_code: begin
     help1("I was expecting to see `<', `=', or `>'. Didn't.");
     back_error; r:="=";
     end;
-  if this_if=if_abs_num_code then scan_int@+else scan_normal_dimen;
+  if this_if=if_pdfabs_num_code then scan_int@+else scan_normal_dimen;
   if cur_val < 0 then negate(cur_val);
   case r of
   "<": b:=(n<cur_val);

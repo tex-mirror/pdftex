@@ -1,4 +1,23 @@
 ---------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-beta-20060811 was released on 2006-08-11
+---------------------------------------------------------------
+- renamed primitives: 
+    \primitive -> \pdfprimitive
+    \ifprimitive -> \ifpdfprimitive
+    \ifabsdim -> \ifpdfabsdim
+    \ifabsnum -> \ifpdfabsnum
+- new version of \primitive/\ifprimitive (but see above)
+- new dimen: \pdfpxdimen
+- support for jbig2 files
+- new library: obsdcompat, which has improved string functions and allows the
+  use of __attribute__
+- update libpng to 1.2.12
+- added JFIF detection patch to writejpg.c (was bug 548)
+- bugfix: truetype OS/2 v3 fonts (594)
+- bugfix: file with only \immediate\pdfobj stream results in garbage (505)
+- bugfix: invalid pdf created if font name contains space (509)
+
+---------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-beta-20060725 was released on 2006-07-25
 ---------------------------------------------------------------
 - added patches by Christian Schenk forwarded by Hartmut
@@ -7,6 +26,7 @@ pdfTeX 3.141592-1.40.0-beta-20060725 was released on 2006-07-25
 - removed some unused variables from tounicode.c
 - add new code by Thanh (patch 580)
 - added security patch for xpdf :-(
+- added JFIF detection patch to writejpg.c (bug 548)
 
 ---------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-beta-20060213 was released on 2006-02-13

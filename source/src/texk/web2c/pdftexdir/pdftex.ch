@@ -62,6 +62,14 @@
 @d banner_k==pdfTeX_banner_k
 @z
 
+@x
+@d frozen_null_font=frozen_control_sequence+11
+  {permanent `\.{\\nullfont}'}
+@y
+@d frozen_null_font=frozen_control_sequence+12
+  {permanent `\.{\\nullfont}'}
+@z
+
 @x [17.236] l.4960 - first web2c, then e-TeX additional integer parameters
 @d int_pars=web2c_int_pars {total number of integer parameters}
 @#

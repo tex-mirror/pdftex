@@ -1,5 +1,5 @@
 /*
-Copyright 1996-2004 Han The Thanh, <thanh@pdftex.org>
+Copyright 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -376,7 +376,7 @@ static void copyFont(char *tag, Object *fontRef)
     for (p = inObjList; p; p = p->next) {
         if (p->ref.num == ref.num && p->ref.gen == ref.gen) {
             copyName(tag);
-            pdf_printf(" %d 0 R ", p->num);
+            pdf_printf(" %d 0 R ", (int)p->num);
             return;
         }
     }
@@ -664,7 +664,7 @@ static PDFRectangle *get_pagebox(Page *page, integer pagebox_spec)
         return page->getArtBox();
     else
         pdftex_fail("pdf inclusion: unknown value of pagebox spec (%i)", 
-                    pagebox_spec);
+                    (int)pagebox_spec);
         return page->getMediaBox(); // to make the compiler happy
 }
 
@@ -726,7 +726,7 @@ read_pdf_info(char *image_name, char *page_name, integer page_num, integer pageb
         // get page by number
         if (page_num <= 0 || page_num > epdf_num_pages)
             pdftex_fail("pdf inclusion: required page does not exist <%i>", 
-                        epdf_num_pages);
+                        (int)epdf_num_pages);
     }
     // get the required page
     page = pdf_doc->doc->getCatalog()->getPage(page_num);
@@ -806,7 +806,7 @@ write_epdf(void)
     pdf_printf("/%s.FileName (%s)\n", pdfkeyprefix, 
                convertStringToPDFString(pdf_doc->file_name,
                                         strlen(pdf_doc->file_name)));
-    pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, epdf_selected_page);
+    pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, (int)epdf_selected_page);
     pdf_doc->doc->getDocInfoNF(&info);
     if (info.isRef()) {
         // the info dict must be indirect (pdf ref p.61)

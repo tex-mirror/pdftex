@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -122,7 +122,7 @@ static void write_char_widths (void)
     pdfbeginobj (char_widths_objnum, 1);
     pdf_puts ("[");
     for (i = first_char; i <= last_char; i++) {
-        pdf_printf ("%i", char_widths[i] / 10);
+        pdf_printf ("%i", (int)char_widths[i] / 10);
         if ((j = char_widths[i] % 10) != 0)
             pdf_printf (".%i", j);
         pdf_printf (" ");
@@ -140,9 +140,10 @@ static void write_fontname (boolean as_reference)
     pdf_puts ("/");
     if (fm_cur->subset_tag != NULL)
         pdf_printf ("%s+", fm_cur->subset_tag);
-    if (font_keys[FONTNAME_CODE].valid)
+    if (font_keys[FONTNAME_CODE].valid) {
+        stripspaces (fontname_buf);
         pdf_printf ("%s", fontname_buf);
-    else if (fm_cur->ps_name != NULL)
+    } else if (fm_cur->ps_name != NULL)
         pdf_printf ("%s", fm_cur->ps_name);
     else
         pdf_printf ("%s", fm_cur->tfm_name);
@@ -174,13 +175,12 @@ static void write_fontobj (integer font_objnum)
     write_fontname (true);
     if (fm_cur->fd_objnum == 0)
         fm_cur->fd_objnum = pdfnewobjnum ();
-    pdf_printf ("/FontDescriptor %i 0 R\n", fm_cur->fd_objnum);
+    pdf_printf ("/FontDescriptor %i 0 R\n", (int)fm_cur->fd_objnum);
     pdfenddict ();
 }
 
 static void write_fontfile (void)
 {
-    int i;
     fontfile_found = false;
     is_otf_font = false;
     if (is_truetype (fm_cur))
@@ -209,6 +209,7 @@ static void write_fontdescriptor (void)
 {
     int i;
     pdfbegindict (fm_cur->fd_objnum, 1);        /* font descriptor */
+    pdf_puts ("/Type /FontDescriptor\n");
     print_key (ASCENT_CODE, getcharheight (tex_font, 'h'));
     print_key (CAPHEIGHT_CODE, getcharheight (tex_font, 'H'));
     print_key (DESCENT_CODE, -getchardepth (tex_font, 'y'));
@@ -239,11 +240,11 @@ static void write_fontdescriptor (void)
             pdf_puts (")\n");
         }
         if (is_truetype (fm_cur))
-            pdf_printf ("/FontFile2 %i 0 R\n", fm_cur->ff_objnum);
+            pdf_printf ("/FontFile2 %i 0 R\n", (int)fm_cur->ff_objnum);
         else if (is_otf_font)
-            pdf_printf ("/FontFile3 %i 0 R\n", fm_cur->ff_objnum);
+            pdf_printf ("/FontFile3 %i 0 R\n", (int)fm_cur->ff_objnum);
         else
-            pdf_printf ("/FontFile %i 0 R\n", fm_cur->ff_objnum);
+            pdf_printf ("/FontFile %i 0 R\n", (int)fm_cur->ff_objnum);
     }
     pdfenddict ();
 }

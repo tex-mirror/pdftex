@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -338,7 +338,7 @@ void writet3 (int objnum, internalfontnumber f)
     eptr = pdfnewobjnum ();
     cptr = pdfnewobjnum ();
     pdf_printf ("/Widths %i 0 R\n/Encoding %i 0 R\n/CharProcs %i 0 R\n",
-                wptr, eptr, cptr);
+                (int)wptr, (int)eptr, (int)cptr);
     pdfenddict ();
     pdfbeginobj (wptr, 1);      /* chars width array */
     pdf_puts ("[");

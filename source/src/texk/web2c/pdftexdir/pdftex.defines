@@ -69,6 +69,8 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#15
 @define procedure setjobid();
 @define procedure unescapehex();
 @define procedure writestreamlength();
+@define procedure removepdffile;
+@define procedure garbagewarning;
 
 
 { functions from vfpacket.c }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -44,6 +44,8 @@ extern "C" {
 
 #include <web2c/pdftexdir/ptexmac.h>
 
+#include "openbsd-compat.h"
+
 /* #-define pdfbufsize      pdfbufmax */
 
     extern float epdf_width;
@@ -86,14 +88,18 @@ extern "C" {
     extern void epdf_delete (void);
     extern void epdf_free (void);
     extern void mark_glyphs (struct fm_entry *, char *);
+    __attribute__ ((format (printf, 1, 2))) 
     extern void pdf_printf (const char *fmt, ...);
     extern void pdf_puts (const char *);
     extern void pdfbeginstream (void);
     extern void pdfendobj (void);
     extern void pdfendstream (void);
     extern void pdfflush (void);
+    __attribute__ ((noreturn, format (printf, 1, 2)))
     extern void pdftex_fail (const char *fmt, ...);
+    __attribute__ ((format (printf, 1, 2)))
     extern void pdftex_warn (const char *fmt, ...);
+    __attribute__ ((format (printf, 1, 2)))
     extern void tex_printf (const char *, ...);
     extern void write_enc (char **, struct enc_entry *, integer);
     extern void write_epdf (void);

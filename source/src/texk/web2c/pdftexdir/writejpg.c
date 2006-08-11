@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2002 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -206,8 +206,8 @@ void write_jpg (integer img)
     FILE *f;
     pdf_puts ("/Type /XObject\n/Subtype /Image\n");
     pdf_printf ("/Width %i\n/Height %i\n/BitsPerComponent %i\n/Length %i\n",
-                img_width (img),
-                img_height (img),
+                (int) img_width (img),
+                (int) img_height (img),
                 (int) jpg_ptr (img)->bits_per_component,
                 (int) jpg_ptr (img)->length);
     pdf_puts ("/ColorSpace ");

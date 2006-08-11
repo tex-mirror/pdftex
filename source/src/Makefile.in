@@ -37,6 +37,7 @@ LIBTYPE1DIR=$(LIBT1DIR)/../type1
 LIBXPDFDIR=libs/xpdf
 GDDIR=libs/gd
 FREETYPEDIR=libs/freetype
+LIBOBSDCOMPATDIR=libs/obsdcompat
 
 # Subdirectories that have makefiles
 ESUBDIRS = @ESUBDIRS@ texk
@@ -165,6 +166,8 @@ $(GDDIR)/libgd.a:
 	cd $(GDDIR); $(MAKE) libgd.a
 $(FREETYPEDIR)/lib/.libs/libttf.a:
 	cd $(FREETYPEDIR); $(MAKE)
+$(LIBOBSDCOMPATDIR)/libopenbsd-compat.a:
+	cd $(LIBOBSDCOMPATDIR); $(MAKE) libopenbsd-compat.a
 
 # Prevent GNU make v3 from overflowing arg limit on SysV.
 .NOEXPORT:

@@ -1,7 +1,7 @@
 % interface=english modes=letter,screen output=pdftex
 % vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.628 2006/02/10 23:32:08 hhenkel Exp $
+% $Id: pdftex-t.tex,v 1.640 2006/08/11 09:49:29 oneiros Exp $
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
@@ -51,8 +51,6 @@
 \setupcapitals
   [title=no]
 
-%***********************************************************************
-
 \def\rcsscan $#1 #2,v #3 #4/#5/#6 #7${
   \def\rcsrevision{#3}
   \def\rcsyear{#4}
@@ -63,7 +61,7 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.628 2006/02/10 23:32:08 hhenkel Exp $
+\rcsscan $Id: pdftex-t.tex,v 1.640 2006/08/11 09:49:29 oneiros Exp $
 
 \def\currentpdftex{1.40.0}
 
@@ -91,7 +89,9 @@
 \abbreviation [GHOSTSCRIPT] {Ghostscript} {\PS\ and \PDF\ language interpreter}
 \abbreviation [GNU]        {gnu}        {GNU's Not Unix}
 \abbreviation [HZ]         {hz}         {Hermann Zapf optimization}
-\abbreviation [JPEG]       {jpeg}       {Joint Photographic Expert Group}
+\abbreviation [JBIG]       {jbig}       {Joint Bi-level Image Experts Group}
+\abbreviation [JBIGTWO]    {jbig2}      {Joint Bi-level Image Experts Group}
+\abbreviation [JPEG]       {jpeg}       {Joint Photographic Experts Group}
 \abbreviation [LATEX]      {\LaTeX}     {general purpose macro package}
 \abbreviation [MAC]        {Macintosh}  {Macintosh hardware platform}
 \abbreviation [MACOSX]     {Mac\,OS\,X} {Macintosh operating system version 10}
@@ -112,6 +112,7 @@
 \abbreviation [PGC]        {pgc}        {\PDF\ Glyph Container}
 \abbreviation [PK]         {pk}         {Packed bitmap font}
 \abbreviation [PNG]        {png}        {Portable Network Graphics}
+\abbreviation [PROTEXT]    {pro\TeX t}  {\WIN\ \WEBC\ distribution based on \MIKTEX}
 \abbreviation [PS]         {ps}         {PostScript}
 \abbreviation [POSTSCRIPT] {PostScript} {PostScript}
 \abbreviation [PSTOPDF]    {PStoPDF}    {PostScript to \PDF\ converter (on top of GhostScript)}
@@ -132,6 +133,7 @@
 \abbreviation [WEBC]       {Web2c}      {official multi||platform \WEB\ environment}
 \abbreviation [WEB]        {web}        {literate programming environment}
 \abbreviation [WIN]        {Win32}      {Microsoft Windows platform}
+\abbreviation [XEMTEX]     {XEm\TeX}    {\WIN\ \WEBC\ distribution}
 \abbreviation [ZIP]        {zip}        {compressed file format}
 
 %D It makes sense to predefine the name of the author of \PDFTEX, doesn't it?
@@ -177,6 +179,12 @@
 %D The primitive definitions are specified a bit fuzzy using the next set of
 %D commands. Some day I'll write some proper macros to deal with this.
 
+% keep next 2 lines as temporary kludge for a while to make \type{} of
+% older ConTeXt versions handle these two new primitives; the original
+% problem with \type{} is already solved in ConTeXt as of 2006-02-14.
+\let\ifabsnum\relax
+\let\ifabsdim\relax
+
 \def\Sugar    #1{\unskip\unskip\unskip\kern.25em{#1}\kern.25em\ignorespaces}
 \def\Something#1{\Sugar{\mathematics{\langle\hbox{#1}\rangle}}}
 \def\Lbrace     {\Sugar{\tttf\leftargument}}
@@ -196,6 +204,9 @@
 
 % introduced
 \def\introduced#1{The primitive has been introduced in \PDFTEX\ #1.}
+
+% to get bookmarks for primitives like \ifpdfprimitive
+\appendtoks\def\tex#1{\string\\#1}\to\simplifiedcommands
 
 %D We typeset the \URL's in a monospaced font.
 
@@ -400,7 +411,8 @@
    page=yes,
    openaction=firstpage,
    title=the pdfTeX users manual,
-   author={H\`an Th\^e Th\`anh, Sebastian Rahtz, Hans Hagen, Hartmut Henkel, Pawe\l\ Jackowski}]
+   author={H\`an Th\^e Th\`anh, Sebastian Rahtz, Hans Hagen, Hartmut Henkel,
+   Pawe\l\ Jackowski, Martin Schröder}]
 
 \setupinteractionscreen % still needed?
 
@@ -592,6 +604,7 @@
     Hans Hagen\par
     Hartmut Henkel\par
     Pawe\l\ Jackowski\par
+    Martin Schr\"oder\par
 
     \vskip3ex
 
@@ -665,20 +678,21 @@ to keep new \PDFTEX\ versions backward compatible with earlier ones.
 
 For some years there has been a~\quote {moderate} successor to \TEX\
 available, called \ETEX. Because mainstream macro packages such as
-\LATEX\ have started supporting this welcome extension, \PDFTEX\ also
-is available as \PDFETEX.  Although in this document we will speak of
-\PDFTEX, we advise users to use \PDFETEX\ when available. That way they
-get the best of all worlds and are ready for the future. Starting with
-\TEXLIVE\ 2004, that future has arrived: \PDFETEX\ is now the primary
-\TEX\ engine.
+\LATEX\ have started supporting this welcome extension, the \ETEX\
+functionality has also been integrated into the \PDFTEX\ code. For a
+while (\TEXLIVE~2004 and~2005) \PDFTEX\ therefore came in two flavours:
+the \ETEX\ enabled \PDFETEX\ engine and the standard one, \PDFTEX. The
+ability to produce both \PDF\ and \DVI\ output made \PDFETEX\ the primary
+\TEX\ engine in these distributions. Since \PDFTEX\ version 1.40 now the
+\ETEX\ extensions are part already of the \PDFTEX\ engine, so there is
+no need anymore to ship \PDFETEX. The \ETEX\ functionality of \PDFTEX\
+can be disabled if not required. Other extensions are \MLTEX\ and \ENCTEX;
+these are also included in the current \PDFTEX\ code.
 
-Other extensions to \PDFTEX\ are \MLTEX\ and \ENCTEX; recent \PDFTEX\
-engines have these often included.
-
-\PDFTEX\ is maintained by \THANH, Martin Schr\"oder, Hans Hagen,
-Hartmut Henkel, and others. The \PDFTEX\ homepage is \from [ptex_org].
-Please send \PDFTEX\ comments and bug reports to the mailing list
-\from [ptex_bugs].
+\PDFTEX\ is maintained by \THANH, Martin Schr\"oder, Hans Hagen, Taco
+Hoekwater, Hartmut Henkel, and others. The \PDFTEX\ homepage is \from
+[ptex_org]. Please send \PDFTEX\ comments and bug reports to the mailing
+list \from [ptex_bugs].
 
 We thank all readers who send us corrections and suggestions. We also
 wish to express the hope that \PDFTEX\ will be of as much use to you
@@ -704,7 +718,7 @@ Please send questions or suggestions by email to \from[ptex_bugs].
 
 \subsection{Legal Notice}
 
-Copyright \copyright\ 1996||2005  \THANH.
+Copyright \copyright\ 1996||2006  \THANH.
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
 or any later version published by the Free Software Foundation;
@@ -743,25 +757,26 @@ inserts an object into the file, while \type{\pdflastobj} returns the
 number \PDFTEX\ assigned to this object. The sequence \type{5 0 R} is
 an object reference, a~pointer to another object (no.~5). The second
 number (here a~zero) is currently not used in \PDFTEX; it is the version
-number of the object. It is for instance used by \PDF\ editors, when they
-replace objects by new ones. The version numbers permit a~roll||back. (An
-example of a~graphic editor that uses \PDF\ as storage format is the
-Adobe Illustrator.)
+number of the object. It is for instance used by \PDF\ editors, when
+they replace objects by new ones. In general this rather direct way of
+pushing objects in the files by primitives like \type{\pdfobj} is not
+very useful, and only makes sense when implementing, say, fill||in field
+support or annotation content reuse. We will come to that later. Unless
+such direct objects are referenced by others, they will just end up as
+isolated entities, not doing any real harm but bloating the \PDF\ file.
 
-In general this rather direct way of pushing objects in the files is not very
-useful, and only makes sense when implementing, say, fill||in field
-support or annotation content reuse. We will come to that later. Unless such
-direct objects are part of something larger, they will end up as isolated
-entities, not doing any harm but not doing any good either.
-
-When a~viewer opens a~\PDF\ file, it first goes to the end of the file. There
-it finds the keyword \type{startxref}, the signal where to look for the so
-called \quote {object cross-reference table}. This table provides fast access
-to the objects that make up the file. The actual starting point of the file
-is defined after the \type{trailer}. The \type{/Root} entry points to the
-catalog. In this catalog the viewer can find the page list. In our example we
-have only one page. The trailer also holds an \type{/Info} entry, which tells
- a~bit more about the document. Just follow the thread:
+When a~viewer opens a~\PDF\ file, it goes right to the end of the
+file, looking for the keyword \type{startxref}. The number after
+\type{startxref} gives the absolute position (byte offset from the file
+start) of the so called \quote {object cross-reference table}. This
+table in turn tells the byte offsets of all objects that make up the
+\PDF\ file, providing fast random access to the individual objects. The
+actual starting point of the file's object structure is defined after
+the \type{trailer}: The \type{/Root} entry points to the \type{/Catalog}
+object. In this object the viewer can find the pointer \type{/Pages}
+to the page list. In our example we have only one page. The trailer also
+holds an \type{/Info} entry, which points to an object with a~bit more
+about the document. Just follow the thread:
 
 \startnarrower
 \type{/Root}     $\longrightarrow$ object~7 $\longrightarrow$
@@ -770,14 +785,15 @@ have only one page. The trailer also holds an \type{/Info} entry, which tells
 \type{/Contents} $\longrightarrow$ object~3
 \stopnarrower
 
-As soon as we add annotations, a~fancy word for hyperlinks and the like, some
-more entries are present in the catalog. We invite users to take a~look at
-the \PDF\ code of this file to get an impression of that.
+As soon as we add annotations, a~fancy word for hyperlinks and the like,
+some more entries will be present in the catalog. We invite users to
+take a~look at the \PDF\ code of this file to get an impression of that.
 
 The page content is a~stream of drawing operations. Such a~stream
 can be compressed, where the level of compression can be set with
-\type {\pdfcompresslevel}. Let's take a~closer look at this stream
-in object~3. Often there is a~transformation matrix, six numbers
+\type {\pdfcompresslevel} (compression is switched off for the title
+page). Let's take a~closer look at this stream in object~3. Often
+(but not in our example) there is a~transformation matrix, six numbers
 followed by \type{cm}. As in \POSTSCRIPT, the operator comes after
 the operands. Between \type{BT} and \type{ET} comes the text. A~font
 is selected by a~\type{Tf} operator, which is given a~resource name
@@ -786,20 +802,19 @@ bracket pairs so that it creates a~\POSTSCRIPT\ string. The numbers
 inbetween bracket pairs provide fine glyph positioning (kerning). When
 one analyzes a~file produced by a~less sophisticated typesetting engine,
 whole sequences of words can be recognized. In \PDF\ files generated by
-\PDFTEX\ however, the words comes out rather fragmented, mainly because
-a~lot of kerning takes place. \PDF\ viewers in search mode simply ignore the
-kerning information in these text streams. When a~document is searched,
-the search engine reconstructs the text from these (string) snippets.
+\PDFTEX\ however, many words come out rather fragmented, mainly because
+a~lot of kerning takes place; in our example the \type{80} moves the
+text \type{(elcome)} left towards the letter \type{(W)}. \PDF\ viewers
+in search mode simply ignore the kerning information in these text
+streams. When a~document is searched, the search engine reconstructs
+the text from these (string) snippets.
 
-This one page example uses an Adobe Times||Roman font. This is one of
+The title page example uses an Adobe Times||Roman font. This is one of
 the 14 so||called standard fonts that are always present in the viewer
 application, and therefore need not be embedded in the \PDF\ file.
-However, when we use for instance Computer Modern Roman, we have to
-make sure that this font is available, and the best way to do this is
-to embed it. Just let your eyes follow the object thread and see how
- a~font is described.  The only thing removed from this example is the
-(partially) embedded glyph description file, which for the 14 standard
-fonts is not needed.
+However, when we use for instance Computer Modern Roman, we have to make
+sure that this font is later available to the \PDF\ viewer, and the best
+way to do this is to embed it.
 
 In this simple file, we don't specify in what way the file should be opened,
 for instance full screen or clipped. A~closer look at the page object no.~2
@@ -821,24 +836,25 @@ come to that section, we will describe how to get started with \PDFTEX.
 \section{Getting started}
 
 This section describes the steps needed to get \PDFTEX\ running on
-a~system where \PDFTEX\ is not yet installed.  Nowadays virtually all \TEX\
+a~system where \PDFTEX\ is not yet installed. Nowadays virtually all \TEX\
 distributions have \PDFTEX\ as a~component, such as \TEXLIVE, \TETEX,
-\FPTEX, \MIKTEX, and \CMACTEX.  The ready to run \TEXLIVE\ distribution
-comes with \PDFTEX\ versions for many \UNIX, \WIN, and \MACOSX\ systems; more
-information can be found at \from[texlive]. \TETEX\ by Thomas Esser is
- a~source distribution with an automated compilation process for \UNIX\
-systems; see \from[tetex].  For \WIN\ systems there are also two separate
-distributions that contain \PDFTEX, both in \from[win32]: \FPTEX\ by
-Fabrice Popineau and \MIKTEX\ by Christian Schenk.  So when you use
+\XEMTEX, \MIKTEX, \PROTEXT, and \CMACTEX. The ready to run \TEXLIVE\
+distribution comes with \PDFTEX\ versions for many \UNIX, \WIN, and
+\MACOSX\ systems; more information can be found at \from[texlive]. \TETEX\
+by Thomas Esser is a~source distribution with an automated compilation
+process for \UNIX\ systems; see \from[tetex]. For \WIN\ systems there
+are also three separate distributions that contain \PDFTEX, all in
+\from[win32]: \XEMTEX\ by Fabrice Popineau, \MIKTEX\ by Christian Schenk,
+and \PROTEXT\ (based on \MIKTEX) by Thomas Feuerstack. So when you use
 any of these distributions, you don't need to bother with the \PDFTEX\
 installation procedure in the next sections.
 
-If there is no precompiled binary of \PDFTEX\ for your system, or the
-version coming with a~distribution is not the current one and you would
-like to try out a~fresh \PDFTEX\ immediately, you will need to build
-\PDFTEX\ from sources; read on.  You should already have a~working \TEX\
-system, \eg\ \TETEX, into which the freshly compiled \PDFTEX\ will
-be integrated.  Note that the installation description in this manual
+If there is no precompiled \PDFTEX\ binary for your system, or the version
+coming with a~distribution is not the current one and you would like to
+try out a~fresh \PDFTEX\ immediately, you will need to build \PDFTEX\
+from sources; read on. You should already have a~working \TEX\ system,
+\eg\ \TEXLIVE\ or \TETEX, into which the freshly compiled \PDFTEX\ will
+be integrated. Note that the installation description in this manual
 is \WEBC||specific.
 
 %***********************************************************************
@@ -874,25 +890,28 @@ cd pdftex-@currentpdftex
 ./build.sh
 \stopesctyping
 
-The binaries \filename{pdftex} and \filename{pdfetex} are then
-built in the subdirectory \filename{build/texk/web2c}. In the same
-directory also the corresponding pool files \filename{pdftex.pool}
-and \filename{pdfetex.pool} are generated, that are needed for creating
-formats.
+The binary \filename{pdftex} is then built in the subdirectory
+\filename{build/texk/web2c}. In the same directory also the corresponding
+pool file \filename{pdftex.pool} is generated; it's needed for creating
+the format files.
+
+The obsolescent binary \filename{pdfetex} is still generated for backward
+compatibility, but since version 1.40 it is a functionally identical copy
+of the file \filename{pdftex}; similarly the file \filename{pdfetex.pool}
+is just a copy from file \filename{pdftex.pool}.
 
 %***********************************************************************
 
 \subsection{Placing files}
 
-The next step is to put the freshly compiled binaries and pool
-files into their proper places within the \TDS\ structure
-of the \TEX\ system.  Put the files \filename{pdftex} and
-\filename{pdfetex} into the directory (\eg\ for a~typical \TETEX\ system)
-\filename{/usr/local/teTeX/bin/i686-pc-linux-gnu}, and the pool files
-into \filename{/usr/local/teTeX/share/texmf/web2c}.
+The next step is to put the freshly compiled binary and pool file
+into their proper places within the \TDS\ structure of the \TEX\ system.
+Put the file \filename{pdftex} into the directory (\eg\ for a~typical
+\TETEX\ system) \filename{/usr/local/teTeX/bin/i686-pc-linux-gnu},
+and the pool file into \filename{/usr/local/teTeX/share/texmf/web2c}.
 
 Don't forget to do a~\filename{texconfig-sys init} afterwards,
-so that all formats are regenerated system-wide with the fresh binaries.
+so that all formats are regenerated system-wide with the fresh binary.
 
 %***********************************************************************
 
@@ -943,7 +962,7 @@ where the various bits and pieces are going.
 in the current directory. If any output file cannot be opened there, it
 tries to open it in the directory specified in the environment variable
 \type{TEXMFOUTPUT}. There is no default value for that variable. For
-example, if you type \type{pdfetex paper} and the current directory is
+example, if you type \type{pdftex paper} and the current directory is
 not writable, if \type{TEXMFOUTPUT} has the value \type{/tmp}, \PDFTEX\
 attempts to create \type{/tmp/paper.log} (and \type{/tmp/paper.pdf},
 if any output is produced.)
@@ -980,7 +999,7 @@ files.  Like Type~1 fonts, TrueType fonts are also outlines.
 Unfortunately bitmap fonts are still displayed poorly by some \PDF\
 viewers, so when possible one should use outline fonts. When no outline
 is available, \PDFTEX\ tries to locate a~suitable \PK\ font (or invoke
- a~process that generates it).
+a~process that generates it).
 
 %***********************************************************************
 
@@ -1138,7 +1157,7 @@ memory layout (\eg\ pool and hash size), and other general parameters.
   {File \type{pdflatex.ini} for \LATEX\ format with \PDF\ output.}
   {\getbuffer}
 
-Both \PDFTEX\ and \PDFETEX\ engines allow building formats for \DVI\ and
+The \PDFTEX\ engine allow building formats for \DVI\ and
 \PDF\ output in the same way as the classical \TEX\ engine does for \DVI.
 Format generation is enabled by the \type{-ini} option. The default mode
 (\DVI\ or \PDF) can be chosen either on the command line by setting
@@ -1147,45 +1166,42 @@ setting the \type{\pdfoutput} parameter. The format file then inherits
 this setting, so that a~later call to \PDFTEX\ with this format starts
 in the preselected mode (which still can be overrun then). A~format
 file can be read in only by the engine that has generated it; a~format
-incompatible with an engine leads to a~fatal error. Often the \PDFTEX\
-program is a~mere link to the \PDFETEX\ engine; then also a~\PDFTEX\
-call generates an extended format.
+incompatible with an engine leads to a~fatal error.
 
 It is customary to package the configuration and macro file input
 into a~\type{.ini} file.  \Eg, the file \type{etex.ini} in
 \in{figure}[in:etexini] is for generating an \ETEX\ format with \DVI\
 output (it contains a~few comparisons to be safe also for \TEX\ engines).
- A~similar file \type{pdflatex.ini} can be used for generating a~\LATEX\
+A~similar file \type{pdflatex.ini} can be used for generating a~\LATEX\
 format with \PDF\ output; refer to \in{figure}[in:pdflatexini].
 One can see how the primitive \type{\pdfoutput} is used to override
 the output mode set by file \type{pdftexconfig.tex}. The corresponding
 \PDFTEX\ calls for format generation are:
 
 \starttyping
-pdfetex -ini *etex.ini
+pdftex -ini *etex.ini
 pdftex -ini pdflatex.ini
 \stoptyping
 
 These calls produce format files \filename{etex.fmt} and
 \filename{pdflatex.fmt}, as the default format file name is taken from
-the input file name.  You can overrule this with the \type{-jobname}
-option.  The asterisk \type{*} in the first example line tells the
-\PDFETEX\ engine to go into extended \type{-ini} mode; otherwise it
-stays in non||extended mode. The \PDFTEX\ engine can't be brought into
-extended mode at all; it interprets an asterisk \type{*} in front
-of a~file name as part of the file name.  So, if you want a~\PDFLATEX\
-format with \PDF\ output and \ETEX\ extensions available (format file
-\filename{pdfelatex.fmt}), you would need to type \eg:
+the input file name. You can overrule this with the \type{-jobname}
+option. The asterisk \type{*} in the first example line below tells the
+\PDFTEX\ engine to go into extended \type{-ini} mode (\ETEX\ enabled);
+otherwise it stays in non||extended \type{-ini} mode. The extended
+\type{-ini} mode can also be forced by the \type{-etex} command line
+option, as shown in the 2nd line below.
 
 \starttyping
-pdfetex -ini -jobname=pdfelatex *pdflatex.ini
+pdftex -ini -jobname=pdfelatex *pdflatex.ini
+pdftex -ini -jobname=pdfelatex -etex pdflatex.ini
 \stoptyping
 
 In \CONTEXT\ the generation depends on the interface used. A~format using the
 English user interface is generated with
 
 \starttyping
-pdfetex -ini cont-en
+pdftex -ini cont-en
 \stoptyping
 
 When properly set up, one can also use the \CONTEXT\ command line interface
@@ -1213,17 +1229,17 @@ needs. Whatever macro package used, the formats should be placed in the \type
 
 \subsection{Testing the installation}
 
-When everything is set up, you can test the installation. In the distribution
-there is a~plain \TEX\ test file \filename {example.tex}. Process this file
-by typing:
+When everything is set up, you can test the installation. In the
+distribution there is a~plain \TEX\ test file \filename{samplepdf.tex}
+in the \type{manual/samplepdf/} directory. Process this file by typing:
 
 \starttyping
-pdftex example
+pdftex samplepdf
 \stoptyping
 
-If the installation is ok, this run should produce a~file called \filename
-{example.pdf}. The file \filename {example.tex} is also a~good place to look
-for how to use \PDFTEX's primitives.
+If the installation is ok, this run should produce a~file called
+\filename{samplepdf.pdf}. The file \filename {samplepdf.tex} is also
+a~good place to look for how to use \PDFTEX's primitives.
 
 %***********************************************************************
 
@@ -1248,8 +1264,7 @@ getting started:
 
        \type{TEXMFCNF} is not set correctly and so \PDFTEX\ cannot find
        \type{texmf.cnf}, or \type{TEXPOOL} in \filename {texmf.cnf}
-       doesn't contain a~path to the pool file \filename {pdftex.pool} or
-       \type{pdfetex.pool} when you use \PDFETEX.
+       doesn't contain a~path to the pool file \filename {pdftex.pool}.
 
 \head  \type{You have to increase POOLSIZE.}
 
@@ -1285,12 +1300,12 @@ pool_size=500000
        {pdftex.pool} when installing a~new version of the \PDFTEX\
        binary. \Eg\ under \TETEX\ then run \type{texconfig-sys init}.
 
-\head  \type{! I can't find file `*pdftex.ini'.} \crlf
-       \type{<*> *pdftex.ini}
-
-       This typically appears when you try to generate an extended format
-       with the \PDFTEX\ engine (it does not know about the special asterisk
-       \type{*} notation). Use the \PDFETEX\ engine instead.
+%\head  \type{! I can't find file `*pdftex.ini'.} \crlf
+%       \type{<*> *pdftex.ini}
+%
+%       This typically appears when you try to generate an extended format
+%       with the \PDFTEX\ engine (it does not know about the special asterisk
+%       \type{*} notation). Use the \PDFETEX\ engine instead.
 
 \head  \PDFTEX\ cannot find one or more map files (\type{*.map}),
        encoding vectors (\type{*.enc}), virtual fonts, Type~1 fonts,
@@ -1307,21 +1322,14 @@ pool_size=500000
 
 \stopitemize
 
-%MS it would be nice if we could get the number of objects directly from TeX,
-%MS but currently even the line given at the end of the log "PDF objects out
-%MS of" is only a minimum as it doesn't include all the objects from the page
-%MS tree and document info...
-Normally the page content takes one object. This means that one seldom finds
-more than a~few hundred objects in a~simple file. This document for instance
-uses about 900 objects. In demanding applications this number can grow quite
-rapidly, especially when one uses a~lot of widget annotations, shared
-annotations or other shared things. In these situations in \filename
-{texmf.cnf} one can enlarge \PDFTEX 's internal object table by adding a~line
-in \filename {texmf.cnf}, for instance:
-
-\starttyping
-obj_tab_size=400000
-\stoptyping
+Normally the page content takes one object. This means that one seldomly
+finds more than a~few hundred objects in a~simple file. This \PDFTEX\
+manual for instance uses approx.~860 objects. In more complex applications
+this number can grow quite rapidly, especially when one uses a~lot of
+widget annotations, shared annotations or other shared things. In any
+case \PDFTEX's internal object table size will automatically grow to the
+required size (the parameter \type{obj_tab_size} for manual control of
+the object table size is now obsolete and ignored).
 
 %***********************************************************************
 
@@ -1410,7 +1418,7 @@ bitmap Type~3 fonts render very poorly in (older versions of) Adobe
 Reader. Given the
 free availability of Type~1 versions of all the Computer Modern fonts,
 and the ability to use standard \POSTSCRIPT\ fonts, there is rarely
- a~need to use bitmap fonts in \PDFTEX.
+a~need to use bitmap fonts in \PDFTEX.
 
 %***********************************************************************
 
@@ -1440,7 +1448,7 @@ the following fields (some are optional; explanations follow):
 \stopnarrower
 
 It is mandatory that {\em tfmname} is the first field. If
- a~{\em basename} is given, it must be the second field. Similarly if
+a~{\em basename} is given, it must be the second field. Similarly if
 {\em fontflags} is given it must be the third field (if {\em basename}
 is present) or the second field (if {\em basename} is left out). It is
 possible to mix the positions of {\em special}, {\em encodingfile},
@@ -1629,7 +1637,7 @@ on the \type{kpathsea} libraries.
 If a~used font is not present in the map files, first \PDFTEX\ will
 look for a~source with suffix \type{.pgc}, which is a~so||called \PGC\
 source (\PDF\ Glyph Container) \footnote {This is a~text file containing
- a~\PDF\ Type~3 font, created by \METAPOST\ using some utilities by Hans
+a~\PDF\ Type~3 font, created by \METAPOST\ using some utilities by Hans
 Hagen. In general \PGC\ files can contain whatever is allowed in a \PDF\ page
 description, which may be used to support fonts that are not available
 in \METAFONT. \PGC\ fonts are not widely useful, as vector Type~3 fonts
@@ -1791,7 +1799,7 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.628 2006/02/10 23:32:08 hhenkel Exp $
+%%S $Id: pdftex-t.tex,v 1.640 2006/08/11 09:49:29 oneiros Exp $
 %%S NL
 %%S integer registers:
 
@@ -1891,6 +1899,11 @@ definitions and syntax rules follow after the list of primitives.
 \Tex {\pdfimagegamma} \Whatever{integer}
 }
 
+% \pdfpxdimen was a count in pdfTeX 1.30.0
+% \Syntax {
+% \Tex {\pdfpxdimen} \Whatever{integer}
+% }
+
 \stoppacked
 
 %%S NL
@@ -1927,6 +1940,30 @@ definitions and syntax rules follow after the list of primitives.
 \Syntax {
 \Tex {\pdfthreadmargin} \Whatever{dimen}
 }
+
+% starting from pdfTeX 1.40.0, \pdfpxdimen is a dimen
+\Syntax {
+\Tex {\pdfpxdimen} \Whatever{dimen}
+}
+
+% todo:
+\iffalse
+\Syntax {
+\Tex {\pdffirstlineheight} \Whatever{dimen}
+}
+
+\Syntax {
+\Tex {\pdflastlinedepth} \Whatever{dimen}
+}
+
+\Syntax {
+\Tex {\pdfeachlineheight} \Whatever{dimen}
+}
+
+\Syntax {
+\Tex {\pdfeachlinedepth} \Whatever{dimen}
+}
+\fi
 
 \stoppacked
 
@@ -2022,12 +2059,23 @@ definitions and syntax rules follow after the list of primitives.
 \Tex {\pdfunescapehex} \Something{general text} \Whatever{expandable}
 }
 
-% Currently it's only experimental, so don't really document it
-\iffalse
 \Syntax {
-\Tex {\pdfstrcmp} \Something{general text} \Something{general text} \Whatever{expandable}
+\tex {ifpdfprimitive} \Something{control sequence} \Whatever{expandable}
 }
-\fi
+
+% Currently it's only experimental, so don't really document it
+% (also not in pdftex-syntax.txt)
+%\Syntax {
+%\Tex {\pdfstrcmp} \Something{general text} \Something{general text} \Whatever{expandable}
+%}
+
+\Syntax {
+\Tex {\ifabsnum} \Something{number} \Whatever{expandable}
+}
+
+\Syntax {
+\Tex {\ifabsdim} \Something{dimen} \Whatever{expandable}
+}
 
 \Syntax {
 \Tex {\pdfuniformdeviate} \Something{number} \Whatever{expandable}
@@ -2085,6 +2133,10 @@ definitions and syntax rules follow after the list of primitives.
 
 \Syntax {
 \Tex {\pdflastannot} \Whatever{read||only integer}
+}
+
+\Syntax {
+\Tex {\pdflastlink} \Whatever{read||only integer}
 }
 
 \Syntax {
@@ -2226,6 +2278,10 @@ definitions and syntax rules follow after the list of primitives.
 }
 
 \Syntax {
+\Tex {\quitvmode}
+}
+
+\Syntax {
 \Tex {\pdfliteral} \Optional{\Something {pdfliteral spec}} \Something{general text} \Whatever{h, v, m}
 }
 
@@ -2243,6 +2299,10 @@ definitions and syntax rules follow after the list of primitives.
 
 \Syntax {
 \Tex {\pdfnoligatures} \Something{font}
+}
+
+\Syntax {
+\Tex {\pdfprimitive} \Something{control sequence}
 }
 
 \stoppacked
@@ -2622,7 +2682,7 @@ are compressed, including the \text{/Info} dictionary (this means that
 the \text{/Info} can't be read as clear text any more). If object streams
 are to be used, currently \type{\pdfobjcompresslevel=2} is recommended,
 
-\description{Caveats:} The \type{\pdfcompresslevel} feature is new and
+\description{Caveat:} The \type{\pdfcompresslevel} feature is new and
 still somewhat experimental (feedback welcome). \PDF\ files generated
 with object streams enabled can't be viewed with (old) \PDF\ readers that
 don't understand \PDF-1.5 files. For widest distribution and unknown
@@ -2719,8 +2779,8 @@ and the values, being strings, are given between parentheses. All keys
 are optional. Possible keys are \type{/Author}, \type{/CreationDate}
 (defaults to current date including time zone info), \type{/ModDate},
 \type{/Creator} (defaults to \type {TeX}), \type{/Producer} (defaults
-to \esctype{pdfTeX-@currentpdftex} or \esctype{pdfeTeX-@currentpdftex}),
-\type{/Title}, \type{/Subject}, and \type{/Keywords}.
+to \esctype{pdfTeX-@currentpdftex}), \type{/Title}, \type{/Subject},
+and \type{/Keywords}.
 
 \type{/CreationDate} and \type{/ModDate} are expressed in the form
 \type{D:YYYYMMDDhhmmssTZ..}, where \type{YYYY} is the year, \type{MM} is
@@ -2741,10 +2801,10 @@ An example of the use of \type{\pdfinfo} is:
 \pdfinfo
   { /Title        (example.pdf)
     /Creator      (TeX)
-    /Producer     (pdfeTeX @currentpdftex)
+    /Producer     (pdfTeX @currentpdftex)
     /Author       (Tom and Jerry)
-    /CreationDate (D:20050428154343+01'00')
-    /ModDate      (D:20050428155343+01'00')
+    /CreationDate (D:20060216154343+01'00')
+    /ModDate      (D:20060216155343+01'00')
     /Subject      (Example)
     /Keywords     (mouse, cat) }
 \stopesctyping
@@ -2792,7 +2852,7 @@ open action directly into the catalog.
 
 This primitive inserts the \Something{general text} to the \type
 {/Names} array. The text must
-conform to the specifications as laid down in the \PDF\ Reference Manual,
+conform to the specifications as laid down in the \PDF\ Reference,
 otherwise the document can be invalid.
 
 \pdftexprimitive {\Syntax {\Tex {\pdftrailer} \Something{general text}}}
@@ -2952,7 +3012,7 @@ the primitives \type{\rpcode} and \type{\lpcode}. Character protrusion
 is disabled when \type{\pdfprotrudechars=0} (or negative).
 
 If you want to protrude some item other than a~character (\eg\
- a~\type{\hbox}), you can do so by padding the item with an invisible
+a~\type{\hbox}), you can do so by padding the item with an invisible
 zero||width character, for which protrusion is activated.
 
 \pdftexprimitive {\Syntax {\Tex {\rpcode} \Something{font} \Whatever{integer}}}
@@ -3039,7 +3099,7 @@ for more details.
 
 This primitive inserts the \Something{general text} to the \type {/Font}
 dictionary. The text must conform to the specifications as laid down in the
-\PDF\ Reference Manual, otherwise the document can be invalid.
+\PDF\ Reference, otherwise the document can be invalid.
 
 \pdftexprimitive {\Syntax {\Tex {\pdffontname} \Something{font} \Whatever
 {expandable}}}
@@ -3109,8 +3169,9 @@ read in by \PDFTEX.
 
 Normally there is no need for the \PDFTEX\ user to bother about the
 \type{\pdfmapfile} primitive, as the main \TEX\ distributions provide
-nice helper tools that automatically assemble the default font map file.
-One prominent tool example is the script \type{updmap} coming with \TETEX.
+nice helper tools that automatically assemble the default font map
+file. Prominent tool examples are the scripts \type{updmap} and
+\type{updmap-sys} coming with \TETEX\ and \TEXLIVE.
 
 The operation mode of the \type{\pdfmapfile} primitive is selected by
 a~flag letter (\type{+}, \type{=}, \type{-}, or omitted). This flag defines
@@ -3475,30 +3536,35 @@ the image as determined by \PDFTEX. When dimensions are specified before the
 the \eg\ \type{\input} primitive, the filename is supplied between
 braces.
 
-The image type is specified by the extension of the given file name: \type
-{.png} stands for \PNG\ image, \type{.jpg} for \JPEG, and \type{.pdf} for \PDF\
-file. But once \PDFTEX\ has opened the file, it checks the file type first by
-looking to the magic number at the file start, which gets precedence over the
-file name extension.  This gives a~certain degree of fault tolerance, if the
-file name extension is stated wrongly.
+The image type is specified by the extension of the given file name:
+\type {.png} stands for \PNG\ image, \type{.jpg} (or \type{.jpeg}) for
+\JPEG, \type{.jbig2} (preferred, but \type{.jb2} works also) for \JBIGTWO,
+and \type{.pdf} for \PDF\ file. But once \PDFTEX\ has opened the file,
+it checks the file type first by looking to the magic number at the
+file start, which gets precedence over the file name extension. This
+gives a~certain degree of fault tolerance, if the file name extension
+is stated wrongly.
 
-Similarly to \type{\pdfxform}, the optional text given by \Something{attr spec}
-will be written as additional attributes of the image before other keys of the
-image dictionary. One should be aware, that slightly different type of PDF
-object is created while including \PNG\ or \JPEG\ bitmaps and \PDF\ images.
+Similarly to \type{\pdfxform}, the optional text given by \Something{attr
+spec} will be written as additional attributes of the image before
+other keys of the image dictionary. One should be aware, that slightly
+different type of PDF object is created while including \PNG, \JPEG,
+or \JBIG2\ bitmaps and \PDF\ images.
 
-While working with \PDF\ image, \Something{page spec} allows to decide which
-page of the document is to be included. Starting from \PDFTEX\ 1.11 one may
-also decide which \PDF\ page box of the image is to be treated as a~final
-bounding box. If \Something{pdf box spec} is present, overrides default
-behaviour specified by \type{\pdfforcepagebox} parameter. Both options are
-irrelevant for non||\PDF\ inclusions.
+While working with \PDF\ or \JBIG2\ images, \Something{page spec}
+allows to decide which page of the document is to be included;
+the \Something{page spec} is irrelevant for the other two image
+formats. Starting from \PDFTEX\ 1.11 one may also decide in the \PDF\
+image case, which page box of the image is to be treated as a~final
+bounding box. If \Something{pdf box spec} is present, it overrides the
+default behaviour specified by the \type{\pdfforcepagebox} parameter. This
+option is irrelevant for non||\PDF\ inclusions.
 
 Starting from \PDFTEX\ 1.21, \type{\pdfximage} command supports
 \type{colorspace} keyword followed by an object number (user||defined
-colorspace for the image being included). This feature works for \JPEG\ images
-only. \PNG s are \RGB\ palettes and \PDF\ images have always self||contained
-color space information.
+colorspace for the image being included). This feature works for \JPEG\
+images only. \PNG s are \RGB\ palettes, \JBIG2 s are bitonal, and \PDF\
+images have always self||contained color space information.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfrefximage} \Something{integer}}}
 
@@ -3529,15 +3595,15 @@ integer}}}
 This read||only register returns the highest page number from a~file
 previously accessed via the \type{\pdfximage} command.
 This is useful only for \PDF\ files; it always returns \type{1}
-for \PNG\ or \JPEG\ files.
+for \PNG, \JPEG, or \JBIGTWO\ files.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfimageresolution} \Whatever{integer}}}
 
 \bookmark{\type{\pdfimageresolution}}
 
 The integer \type{\pdfimageresolution} parameter (unit: dots per
-inch, dpi) is a~last resort value, used only for bitmap (\JPEG,
-\PNG) images, but not for \PDF{}s. The priorities are as follows:
+inch, dpi) is a~last resort value, used only for bitmap (\JPEG, \PNG,
+\JBIGTWO) images, but not for \PDF{}s. The priorities are as follows:
 Often one image dimension (\type{width} or \type{height}) is stated
 explicitely in the \TEX\ file. Then the image is properly scaled so
 that the aspect ratio is kept. If both image dimensions are given,
@@ -3659,6 +3725,35 @@ value, like~1000.
 If specified, the parameter must appear before any data is written to the
 \PDF\ output.
 \introduced{1.30.0}
+
+% \pdftexprimitive {\Syntax {\Tex {\pdfpxdimen} \Whatever{integer}}} % 1.30.0
+\pdftexprimitive {\Syntax {\Tex {\pdfpxdimen} \Whatever{dimen}}}
+
+\bookmark{\type{\pdfpxdimen}}
+
+While working with bitmap graphics or typesetting electronic documents,
+it might be convenient to base dimensions on pixels rather than \TeX's
+standard units like \type{pt} or \type{em}. For this purpose, \PDFTEX\
+provides an~extra unit called \type{px} that takes the dimension given to
+the \type{\pdfpxdimen} primitive. In example, to make the unit \type{px}
+corresponding to 96\,dpi pixel density (then 1\,px~=~72/96\,bp), one
+can do the following calculation:
+
+\starttyping
+\pdfpxdimen=1in % 1 dpi
+\divide\pdfpxdimen by 96 % 96 dpi
+\hsize=1200px
+\stoptyping
+
+Then \type{\hsize} amounts to 1200~pixels in 96\,dpi, which is
+exactly 903.375\,pt (but \TeX\ rounds it to 903.36914\,pt). The
+default value of \type{\pdfpxdimen} is 1\,bp, corresponding to a pixel
+density of 72\,dpi. This primitive is completely independent from the
+\type{\pdfimageresolution} and \type{\pdfpkresolution} parameters.
+\introduced{1.30.0} It used to be an integer register that gave
+the dimension 1\,px as number of scaled points, defaulting to 65536
+(1\,px equal to 65536\,sp~$=$~1\,pt). Starting from \PDFTEX\ 1.40.0,
+\type{\pdfpxdimen} is now a real dimension parameter.
 
 %***********************************************************************
 
@@ -3810,6 +3905,15 @@ between \type{\pdfstartlink} and \type{\pdfendlink} will be treated as part
 of this link. \PDFTEX\ may break the result across lines (or pages), in which
 case it will make several links with the same content.
 
+\pdftexprimitive {\Syntax {\Tex {\pdflastlink} \Whatever{read||only
+integer}}}
+
+\bookmark{\type{\pdflastlink}}
+
+This primitive returns the object number of the last link created by
+\type{\pdfstartlink} (analogous to \type{\pdflastannot}).
+\introduced{1.40.0}
+
 \pdftexprimitive {\Syntax {\Tex {\pdflinkmargin} \Whatever{dimension}}}
 
 \bookmark{\type{\pdflinkmargin}}
@@ -3947,7 +4051,7 @@ a~general text into \PDF\ string. Many characters that may be needed inside
 such a~text (especially parenthesis), have a~special meaning inside a~\PDF\
 string object and thus, can't be used literally. The primitive replaces each
 special \PDF\ character by its literal representation by inserting a~backslash
-before that character. Some characters (\eg space) are also converted into
+before that character. Some characters (\eg\ space) are also converted into
 3||digit octal number. In example, \type{\pdfescapestring{Text (1)}} will be
 expanded to \type{Text\040\(1\)}. This ensures a~literal interpretation of the
 text by the \PDF\ viewer.
@@ -4004,31 +4108,23 @@ hexadecimal format (same as \type{\pdfescapehex}).
 
 %***********************************************************************
 
-\subsection{Timekeeping}
+\subsection{Numbers}
 
-\pdftexprimitive {\Syntax {\Tex {\pdfelapsedtime}} \Whatever{read||only
-integer}}
+\pdftexprimitive{\Syntax {\Tex {\ifabsnum}} \Something{number}}
 
-\bookmark{\type{\pdfelapsedtime}}
+\bookmark{\type{\ifabsnum}}
 
-The command expands to a~number that represents the time elapsed from the
-moment of run start. The elapsed time is returned in `scaled seconds', that
-means seconds divided by 65536, \eg\ \PDFTEX\ has run for \the\pdfelapsedtime\
-`scaled seconds' when this paragraph was typeset. Obviously, the command will
-never return a value greater than the highest number available in \TeX: if
-the time exceeds 32767 seconds, the constant value $2^{31}-1$ will be returned.
-\introduced{1.30.0}
+The primitive works as normal \type{\ifnum} condition check, except that it compares
+absolute values of numbers. Although it seems to be a~trivial shortcut for a~couple of
+\type{\ifnum x<0} tests, as a primitive it is more friendly in usage and works a~bit faster.
+\introduced{1.40.0}
 
-\pdftexprimitive{\type{\pdfresettimer}}
+\pdftexprimitive{\Syntax {\Tex {\ifabsdim}} \Something{dimen}}
 
-\bookmark{\type{\pdfresettimer}}
+\bookmark{\type{\ifabsdim}}
 
-The command resets the internal timer so that \type{\pdfelapsedtime}
-starts returning micro||time from~0 again. \introduced{1.30.0}
-
-%***********************************************************************
-
-\subsection{Random numbers}
+Like \type{\ifabsnum}, the primitive works as normal \type{\ifdim} condition check, except
+that it compares absolute values of dimensions. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfuniformdeviate} \Something{number} \Whatever{expandable}}}
 
@@ -4066,6 +4162,30 @@ commands like \type{\count}). \introduced{1.30.0}
 This sets the random seed (\type{\pdfrandomseed}) to a specific value,
 allowing you to re-play sequences of semi-randoms at a later moment.
 \introduced{1.30.0}
+
+%***********************************************************************
+
+\subsection{Timekeeping}
+
+\pdftexprimitive {\Syntax {\Tex {\pdfelapsedtime}} \Whatever{read||only
+integer}}
+
+\bookmark{\type{\pdfelapsedtime}}
+
+The command expands to a~number that represents the time elapsed from the
+moment of run start. The elapsed time is returned in `scaled seconds', that
+means seconds divided by 65536, \eg\ \PDFTEX\ has run for \the\pdfelapsedtime\
+`scaled seconds' when this paragraph was typeset. Obviously, the command will
+never return a value greater than the highest number available in \TeX: if
+the time exceeds 32767 seconds, the constant value $2^{31}-1$ will be returned.
+\introduced{1.30.0}
+
+\pdftexprimitive{\type{\pdfresettimer}}
+
+\bookmark{\type{\pdfresettimer}}
+
+The command resets the internal timer so that \type{\pdfelapsedtime}
+starts returning micro||time from~0 again. \introduced{1.30.0}
 
 %***********************************************************************
 
@@ -4132,6 +4252,17 @@ the line in which \type{\vadjust} appears. However with the qualifier
 \type{pre}, the adjustment item is put {\em before} the line in which
 \type{\vadjust pre} appears.
 
+\pdftexprimitive {\Syntax {\Tex {\quitvmode}}}
+
+\bookmark{\type{\quitvmode}}
+
+The primitive instructs \PDFTEX\ to quit the vertical mode and start typesetting
+a~paragraph. \type{\quitvmode} has the same effect as \type{\leavevmode} definition 
+from \type{plain} macro package. Note however, that \type{\leavevmode} may conflict 
+with \type{\everypar} tokens list. No such risk while using \type{\quitvmode} instead.
+\introduced{1.21a}
+
+
 \pdftexprimitive {\Syntax {\Tex {\pdfsavepos}}}
 
 \bookmark{\type{\pdfsavepos}}
@@ -4143,7 +4274,9 @@ position coordinates can then be retrieved by the \type{\pdflastxpos}
 and \type{\pdflastypos} primitives, and \eg\ written out to some
 auxiliary file. The coordinates can be used only after the current
 \type{\shipout} has been finalized, therefore normally two \PDFTEX\
-runs are required to utilize these primitives.
+runs are required to utilize these primitives. Starting with
+\PDFTEX\ 1.40.0, this mechanism can be used also while running
+in \DVI\ mode.
 
 \pdftexprimitive {\Syntax {\Tex {\pdflastxpos}} \Whatever{read||only
 integer}}
@@ -4203,15 +4336,36 @@ This primitive is~1 if \type{\write18} is enabled, 0 otherwise.
 manual was typeset.
 \introduced{1.30.0}
 
+\pdftexprimitive {\Syntax {\tex {ifpdfprimitive} \Something{control sequence} \Whatever{expandable}}}
+
+\bookmark{\tex{ifpdfprimitive}}
+
+This condition checks if the following control sequence has its primitive
+meaning. If it has, \type{\ifpdfprimitive} returns true. In any other case
+(redefined, made \type{\undefined}, has never been primitive) false is returned.
+\introduced{1.40.0}
+
+
+\pdftexprimitive {\Syntax {\tex {pdfprimitive} \Something{control sequence}}}
+
+\bookmark{\type{\pdfprimitive}}
+
+This command executes the primitive meaning of the following control sequence,
+if it has been redefined or made undefined. If the following control sequence is 
+undefined and never was a~primitive, nothing happens and no error is raised. 
+If the control sequence was initially expandable, \type{\pdfprimitive} 
+expands either. Otherwise \type{\pdfprimitive} doesn't expand. \introduced{1.40.0}
+
+
 %***********************************************************************
 
 \section{Graphics and color}
 
-\PDFTEX\ supports inclusion of pictures in \PNG, \JPEG, and \PDF\ format;
- a~few differences between these are discussed below. The most common
-technique with \TEX\ |<|the inclusion of \EPS\ figures|>| is replaced by
-\PDF\ inclusion. \EPS\ files can be converted to \PDF\ by \GHOSTSCRIPT,
-Adobe Distiller or other \POSTSCRIPT||to||\PDF\ converters.
+\PDFTEX\ supports inclusion of pictures in \PNG, \JPEG, \JBIGTWO, and
+\PDF\ format; a~few differences between these are discussed below. The
+most common technique with \TEX\ |<|the inclusion of \EPS\ figures|>|
+is replaced by \PDF\ inclusion. \EPS\ files can be converted to \PDF\ by
+\GHOSTSCRIPT, Adobe Distiller or other \POSTSCRIPT||to||\PDF\ converters.
 
 The \PDF\ format is currently the most versatile source format for
 graphics embedding. \PDFTEX\ allows to insert arbitrary pages from
@@ -4248,7 +4402,7 @@ the pixel array and to re||compress it to the \PDF\ requirements; this
 process often takes a~noticeable amount of time. Since \PDFTEX\ 1.30.0
 there is now a~fast \PNG\ embedding mode that goes without uncompressing;
 the image data are directly copied into the \PDF\ stream, resulting in
- a~much higher embedding speed. However this mode is only activated, if
+a~much higher embedding speed. However this mode is only activated, if
 the image array structure of the \PNG\ file is compatible with the \PDF\
 image structure (\eg\ an interlaced \PNG\ image requires uncompressing to
 re||arrange the image lines). Luckily it seems that the most common \PNG\
@@ -4260,6 +4414,18 @@ which then shows the string `(PNG copy)' after the \PNG\ file name.
 The \JPEG\ format is normally used in lossy mode; then it's ideal for
 embedding photos; it's not recommended for crisp images from synthetic
 sources with a~limited amount of colors.
+
+The \JBIGTWO\ format works only for bitonal (black and white) pixel
+images like scanned line and text documents, but for these it has
+typically a much higher compression ratio than the other two pixel
+image formats. The \JBIGTWO\ format is part of the \PDF\ standard since
+version 1.5; native \JBIGTWO\ image inclusion is available in \PDFTEX\
+since version 1.40.0. A \JBIGTWO\ file might contain many images, which
+gives an even better compression ratio than with a single image per file,
+as \JBIGTWO\ encoders can exploit similarities between bit patterns over
+several images. Encoders for \JBIGTWO\ can operate in lossy as well as
+lossless modes. Only recently a free \JBIGTWO\ encoder has been written
+and made available, see http:/\!/www.imperialviolet.org/jbig2.html.
 
 Other options for graphics in \PDFTEX\ are:
 
@@ -4437,7 +4603,7 @@ reference. The following key ends up in the document catalog.
 produced the file as displayed by \typ {pdftex --version}, \eg\
 {\tt\pdftexbanner}.  This is necessary because the string in the
 \type {Producer} key in the info dictionary is rather short,
-\eg\ {\tt pdfeTeX-\currentpdftex}. \NC \NR
+\eg\ {\tt pdfTeX-\currentpdftex}. \NC \NR
 \HL
 \stoptabulate
 
@@ -4662,9 +4828,9 @@ pages.
 If you publish or distribute Opaque copies of the Document numbering
 more than 100, you must either include a~machine-readable Transparent
 copy along with each Opaque copy, or state in or with each Opaque copy
- a~computer-network location from which the general network-using
+a~computer-network location from which the general network-using
 public has access to download using public-standard network protocols
- a~complete Transparent copy of the Document, free of added material.
+a~complete Transparent copy of the Document, free of added material.
 If you use the latter option, you must take reasonably prudent steps,
 when you begin distribution of Opaque copies in quantity, to ensure
 that this Transparent copy will remain thus accessible at the stated
@@ -4884,7 +5050,7 @@ The Free Software Foundation may publish new, revised versions
 of the GNU Free Documentation License from time to time.  Such new
 versions will be similar in spirit to the present version, but may
 differ in detail to address new problems or concerns.  See
-http://www.gnu.org/copyleft/.
+http:/\!/www.gnu.org/copyleft/.
 
 Each version of the License is given a~distinguishing version number.
 If the Document specifies that a~particular numbered version of this

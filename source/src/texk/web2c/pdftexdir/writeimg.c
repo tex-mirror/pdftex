@@ -128,6 +128,8 @@ integer imagecolordepth (integer img)
         return png_info (img)->bit_depth;
     case IMAGE_TYPE_JPG:
         return jpg_ptr (img)->bits_per_component;
+    case IMAGE_TYPE_JBIG2:
+        return 0;
     case IMAGE_TYPE_PDF:
         return 0;
     default:
@@ -175,6 +177,19 @@ integer imagecolordepth (integer img)
   Function "checktypebyheader" only looks at the first two bytes:
     "\xFF\xD8"
 
+  * ISO/IEC JTC 1/SC 29/WG 1
+    (ITU-T SG8)
+    Coding of Still Pictures
+    Title: 14492 FCD
+    Source: JBIG Committee
+    Project: JTC 1.29.10
+    Status: Final Committee Draft
+
+  | D.4.1, ID string
+  |
+  | This is an 8-byte sequence containing 0x97 0x4A 0x42 0x32 0x0D 0x0A
+  | 0x1A 0x0A.
+
   * "PDF Reference", third edition:
     * The first line should contain "%PDF-1.0" until "%PDF-1.4"
       (section 3.4.1 "File Header").
@@ -200,6 +215,7 @@ integer imagecolordepth (integer img)
 
 #define HEADER_JPG "\xFF\xD8"
 #define HEADER_PNG "\x89PNG\r\n\x1A\n"
+#define HEADER_JBIG2 "\x97\x4A\x42\x32\x0D\x0A\x1A\x0A"
 #define HEADER_PDF "%PDF-1."
 #define MAX_HEADER (sizeof(HEADER_PNG)-1)
 static void checktypebyheader (integer img)
@@ -225,6 +241,8 @@ static void checktypebyheader (integer img)
         img_type (img) = IMAGE_TYPE_JPG;
     else if (strncmp (header, HEADER_PNG, sizeof (HEADER_PNG) - 1) == 0)
         img_type (img) = IMAGE_TYPE_PNG;
+    else if (strncmp (header, HEADER_JBIG2, sizeof (HEADER_JBIG2) - 1) == 0)
+        img_type (img) = IMAGE_TYPE_JBIG2;
     else if (strncmp (header, HEADER_PDF, sizeof (HEADER_PDF) - 1) == 0)
         img_type (img) = IMAGE_TYPE_PDF;
 }
@@ -238,13 +256,16 @@ static void checktypebyextension (integer img)
     /* tests */
     if ((image_suffix = strrchr (cur_file_name, '.')) == 0)
         img_type (img) = IMAGE_TYPE_NONE;
-    else if (strcasecmp (image_suffix, ".pdf") == 0)
-        img_type (img) = IMAGE_TYPE_PDF;
     else if (strcasecmp (image_suffix, ".png") == 0)
         img_type (img) = IMAGE_TYPE_PNG;
     else if (strcasecmp (image_suffix, ".jpg") == 0 ||
              strcasecmp (image_suffix, ".jpeg") == 0)
         img_type (img) = IMAGE_TYPE_JPG;
+    else if (strcasecmp (image_suffix, ".jbig2") == 0 ||
+             strcasecmp (image_suffix, ".jb2") == 0)
+        img_type (img) = IMAGE_TYPE_JBIG2;
+    else if (strcasecmp (image_suffix, ".pdf") == 0)
+        img_type (img) = IMAGE_TYPE_PDF;
 }
 
 integer readimage (strnumber s, integer page_num, strnumber page_name,
@@ -292,6 +313,12 @@ integer readimage (strnumber s, integer page_num, strnumber page_name,
         img_pages (img) = 1;
         read_jpg_info (img);
         break;
+    case IMAGE_TYPE_JBIG2:
+        jbig2_ptr (img) = xtalloc (1, JBIG2_IMAGE_INFO);
+        img_type (img) = IMAGE_TYPE_JBIG2;
+        jbig2_ptr (img)->selected_page = page_num;
+        read_jbig2_info (img);
+        break;
     default:
         pdftex_fail ("unknown type of image");
     }
@@ -310,6 +337,9 @@ void writeimage (integer img)
         break;
     case IMAGE_TYPE_JPG:
         write_jpg (img);
+        break;
+    case IMAGE_TYPE_JBIG2:
+        write_jbig2 (img);
         break;
     case IMAGE_TYPE_PDF:
         epdf_doc = pdf_ptr (img)->doc;
@@ -337,6 +367,8 @@ void deleteimage (integer img)
         break;
     case IMAGE_TYPE_JPG:
         xfclose (jpg_ptr (img)->file, cur_file_name);
+        break;
+    case IMAGE_TYPE_JBIG2:
         break;
     default:
         pdftex_fail ("unknown type of image");

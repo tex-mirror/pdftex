@@ -559,7 +559,7 @@ static ttf_cmap_entry *ttf_read_cmap (char *ttf_name, int pid, int eid,
                 goto read_cmap_format_4;
             else {
                 if (warn)
-                    pdftex_warn ("cmap format %i unsupported");
+                    pdftex_warn ("cmap format %i unsupported", format);
                 return NULL;
             }
         }
@@ -616,12 +616,12 @@ static ttf_cmap_entry *ttf_read_cmap (char *ttf_name, int pid, int eid,
                         index = (index + s->idDelta) & 0xFFFF;
                 }
                 if (index >= glyphs_count)
-                    pdftex_fail ("cmap: glyph index %i out of range [0..%i)",
+                    pdftex_fail ("cmap: glyph index %li out of range [0..%i)",
                                  index, glyphs_count);
                 if (p->table[i] != -1)
                     pdftex_warn
-                        ("cmap: multiple glyphs are mapped to unicode %.4X, "
-                         "only %i will be used (glyph %i being ignored)", i,
+                        ("cmap: multiple glyphs are mapped to unicode %.4lX, "
+                         "only %i will be used (glyph %li being ignored)", i,
                          p->table[i], index);
                 else
                     p->table[i] = index;
@@ -1164,7 +1164,7 @@ static void ttf_write_OS2 (void)
     TTF_USHORT version;
     ttf_reset_chksm (tab);
     version = get_ushort ();
-    if (version != 0x0000 && version != 0x0001 && version != 0x0002)
+    if (version > 3)
         pdftex_fail ("unknown version of OS/2 table (%.4X)", version);
     (void) put_ushort (0x0001); /* fix version to 1 */
     ttf_ncopy (2 * TTF_USHORT_SIZE + 13 * TTF_SHORT_SIZE + 10 * TTF_BYTE_SIZE);

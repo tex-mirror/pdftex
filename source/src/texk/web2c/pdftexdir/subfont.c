@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2005 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 2005-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -173,7 +173,7 @@ static sfd_entry *read_sfd (char *sfd_name)
 
 boolean handle_subfont_fm (fm_entry * fm, int mode)
 {
-    int l;
+    size_t l;
     char *p, *q, *r;
     sfd_entry *sfd;
     subfont_entry *sf;

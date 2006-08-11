@@ -6,6 +6,10 @@
 pdftex = @PETEX@ pdftex
 pdftexdir = pdftexdir
 
+LIBOBSDCOMPATDIR=../../libs/obsdcompat
+LIBOBSDCOMPATFSRCDIR=$(srcdir)/$(LIBOBSDCOMPATDIR)
+XCPPFLAGS=-I$(LIBOBSDCOMPATDIR) -I$(LIBOBSDCOMPATDIR)/.. -I$(LIBOBSDCOMPATFSRCDIR) -I$(LIBOBSDCOMPATFSRCDIR)/..
+
 Makefile: $(srcdir)/$(pdftexdir)/pdftex.mk
 
 # pdftex_bin = pdftex ttf2afm pdftosrc

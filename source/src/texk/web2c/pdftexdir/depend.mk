@@ -8,7 +8,8 @@ papersiz.o: papersiz.c ptexlib.h ../pdftexd.h ../texmfmp.h \
 utils.o: utils.c ptexlib.h ../pdftexd.h ../texmfmp.h ../cpascal.h \
  ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h ptexmac.h \
  ../../../libs/zlib/zlib.h ../../../libs/zlib/zconf.h \
- ../../../libs/md5/md5.h pdftexextra.h
+ ../../../libs/md5/md5.h pdftexextra.h \
+ ../../../libs/obsdcompat/openbsd-compat.h
 vfpacket.o: vfpacket.c ptexlib.h ../pdftexd.h ../texmfmp.h \
  ../cpascal.h ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h \
  ptexmac.h

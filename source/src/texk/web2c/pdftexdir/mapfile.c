@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2005 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -148,7 +148,7 @@ char *mk_base_tfm (char *tfmname, int *i)
     if (!(q > p) || q == r || (*q != '+' && *q != '-'))
         return NULL;
     check_buf (q - p + 1, SMALL_BUF_SIZE);
-    strncpy (buf, p, (unsigned) (q - p));
+    strncpy (buf, p, (size_t) (q - p));
     buf[q - p] = '\0';
     *i = atoi (q);
     return buf;
@@ -608,21 +608,6 @@ void fm_read_info ()
 }
 
 /**********************************************************************/
-
-/*
-char *mk_exname(char *basename, int e)
-{
-    static char buf[SMALL_BUF_SIZE];
-    char *p = basename, *r;
-    if ((r = strrchr(p, '.')) == NULL)
-        r = strend(p);
-    check_buf(r - p + strlen(r) + 10, SMALL_BUF_SIZE);
-    strncpy(buf, p, (unsigned) (r - p));
-    sprintf(buf + (r - p), "%+i", e);
-    strcat(buf, r);
-    return buf;
-}
-*/
 
 internalfontnumber tfmoffm (fmentryptr fm_pt)
 {

@@ -37,6 +37,8 @@ DIFFFLAGS =
 kpse_include ../make/common.mk
 kpse_include ../make/programs.mk
 
+XCPPFLAGS = $(PDFXCPPFLAGS)
+
 CXX = @CXX@
 CXXLD = $(CXX)
 cxx_link_command = $(CXXLD) -o $@ $(LDFLAGS)
