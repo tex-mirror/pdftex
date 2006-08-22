@@ -1030,7 +1030,7 @@ int main (int argc, char **argv)
     *(char *) strchr (date, '\n') = 0;
     cur_file_name = argv[optind];
     if (print_cmap) {
-        bname = strdup (xbasename (cur_file_name));
+        bname = xstrdup (xbasename (cur_file_name));
         if ((s = rindex (bname, '.')) != NULL)
             *s = 0;
     }

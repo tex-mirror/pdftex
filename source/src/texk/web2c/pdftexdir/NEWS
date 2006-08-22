@@ -1,4 +1,19 @@
 ---------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-beta-20060822 was released on 2006-08-22
+---------------------------------------------------------------
+- new feature: with \pdfdraftmode=1 (or -draftmode) pdfTeX doesn't write an
+  output pdf file and doesn't read the content of any image file, thus speeding
+  up the run. This is usefull when you know you need another run of pdfTeX e.g.
+  just to get all the references right, but don't care for the output of this
+  run
+- changed the format of pdfTeX warnings and unified the four(!) functions
+  pdfTeX uses for writing out errors and warnings
+- expanded the output of -version to include information about the libraries
+  used
+- fixed a bug where -20060811 would loop forever
+- fixed some compilation problems with obsdcompat
+
+---------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-beta-20060811 was released on 2006-08-11
 ---------------------------------------------------------------
 - renamed primitives: 

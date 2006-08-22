@@ -283,8 +283,6 @@ AC_CHECK_HEADERS( \
 	sys/stropts.h \
 	sys/strtio.h \
 	sys/sysmacros.h \
-	time.h \
-	unistd.h \
 	util.h \
 )
 
@@ -299,7 +297,6 @@ AC_CHECK_FUNCS( \
 	strerror \
 	strlcat \
 	strlcpy \
-	strmode \
 	strtonum \
 	strtoll \
 	strtoul \

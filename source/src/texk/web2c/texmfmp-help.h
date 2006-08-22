@@ -374,6 +374,7 @@ const_string PDFTEXHELP[] = {
     "                          (no effect for PDF)",
     "-output-directory=DIR   use DIR as the directory to write files to",
     "-output-format=FORMAT   use FORMAT for job output; FORMAT is `dvi' or `pdf'",
+    "-draftmode              switch on draft mode (generates no output PDF)",
     "[-no]-parse-first-line  disable/enable parsing of the first line of the",
     "                          input file",
     "-progname=STRING        set program (and fmt) name to STRING",

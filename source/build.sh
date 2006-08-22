@@ -1,7 +1,6 @@
-#! /usr/bin/env bash
-# $Id$
+#! /bin/sh
 # builds new pdftex binaries
-MAKE=make
+MAKE=gmake
 STRIP=strip
 # this deletes all previous builds. 
 # comment out the rm and mkdir if you want to keep them (and uncomment and

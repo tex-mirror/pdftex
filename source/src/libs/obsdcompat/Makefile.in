@@ -4,11 +4,11 @@ VPATH=@srcdir@
 CC=@CC@
 LD=@LD@
 CFLAGS=@CFLAGS@
-CPPFLAGS=-I. -I.. -I$(srcdir) -I$(srcdir)/.. @CPPFLAGS@ @DEFS@
+CPPFLAGS=-I. -I.. -I@srcdir@ -I@srcdir@/.. @CPPFLAGS@ @DEFS@
 AR=@AR@
 RANLIB=@RANLIB@
 
-OPENBSD=strlcat.o strlcpy.o strmode.o strsep.o strtonum.o strtoll.o strtoul.o
+OPENBSD=strlcat.o strlcpy.o strsep.o strtonum.o strtoll.o strtoul.o
 
 COMPAT=bsd-asprintf.o bsd-snprintf.o 
 

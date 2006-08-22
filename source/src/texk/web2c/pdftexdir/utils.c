@@ -20,19 +20,24 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $
 */
 
-#include "sys/types.h"
-#include "sysexits.h"
-#include "regex.h"
-#include "md5.h"
+#include "openbsd-compat.h"
+#ifdef HAVE_ASPRINTF            /* asprintf is not defined in openbsd-compat.h, but in stdio.h */
+#  include <stdio.h>
+#endif
+#include <sys/types.h>
+#include <sysexits.h>
+#include <regex.h>
 #include <kpathsea/c-proto.h>
 #include <kpathsea/c-stat.h>
 #include <kpathsea/c-fopen.h>
 #include <string.h>
 #include <time.h>
 #include <float.h>              /* for DBL_EPSILON */
+#include "md5.h"
 #include "zlib.h"
 #include "ptexlib.h"
-#include "openbsd-compat.h"
+#include "png.h"
+#include "xpdf/config.h"
 
 /*@unused@*/
 static const char perforce_id[] =
@@ -155,7 +160,7 @@ void pdf_puts (const char *s)
         pdfbuf[pdfptr++] = *s++;
 }
 
-__attribute__ ((format (printf, 1, 2))) 
+__attribute__ ((format (printf, 1, 2)))
 void pdf_printf (const char *fmt, ...)
 {
     va_list args;
@@ -179,7 +184,7 @@ strnumber maketexstring (const char *s)
 }
 
 __attribute__ ((format (printf, 1, 2)))
-void tex_printf (const char *fmt, ...) 
+void tex_printf (const char *fmt, ...)
 {
     va_list args;
     va_start (args, fmt);
@@ -200,7 +205,7 @@ static void safe_print (const char *str)
 
 void removepdffile (void)
 {
-    if (!kpathsea_debug && outputfilename) {
+    if (!kpathsea_debug && outputfilename && !fixedpdfdraftmode) {
         xfclose (pdffile, makecstring (outputfilename));
         remove (makecstring (outputfilename));
     }
@@ -209,14 +214,17 @@ void removepdffile (void)
 /* pdftex_fail may be called when a buffer overflow has happened/is
    happening, therefore may not call mktexstring.  However, with the
    current implementation it appears that error messages are misleading,
-   possibly because pool overflows are detected too late. */
+   possibly because pool overflows are detected too late. 
+   
+   The output format of this fuction must be the same as pdf_error in
+   pdftex.web! */
 __attribute__ ((noreturn, format (printf, 1, 2)))
 void pdftex_fail (const char *fmt, ...)
 {
     va_list args;
     va_start (args, fmt);
     println ();
-    safe_print ("Error: ");
+    safe_print ("!pdfTeX error: ");
     safe_print (program_invocation_name);
     if (cur_file_name) {
         safe_print (" (file ");
@@ -228,7 +236,7 @@ void pdftex_fail (const char *fmt, ...)
     safe_print (print_buf);
     va_end (args);
     println ();
-    removepdffile();
+    removepdffile ();
     safe_print (" ==> Fatal error occurred, no output PDF file produced!");
     println ();
     if (kpathsea_debug) {
@@ -238,13 +246,16 @@ void pdftex_fail (const char *fmt, ...)
     }
 }
 
+/* The output format of this fuction must be the same as pdf_warn in
+   pdftex.web! */
 __attribute__ ((format (printf, 1, 2)))
-void pdftex_warn (const char *fmt, ...) 
+void pdftex_warn (const char *fmt, ...)
 {
     va_list args;
     va_start (args, fmt);
     println ();
-    tex_printf ("Warning: %s", program_invocation_name);
+    println ();
+    tex_printf ("pdfTeX warning: %s", program_invocation_name);
     if (cur_file_name)
         tex_printf (" (file %s)", cur_file_name);
     tex_printf (": ");
@@ -306,10 +317,10 @@ void setjobid (int year, int month, int day, int time)
     s = xtalloc (slen, char);
     /* The Web2c version string starts with a space.  */
     snprintf (s, slen,
-             "%.4d/%.2d/%.2d %.2d:%.2d %s %s %s%s %s",
-             year, month, day, time / 60, time % 60,
-             name_string, format_string, ptexbanner,
-             versionstring, kpathsea_version_string);
+              "%.4d/%.2d/%.2d %.2d:%.2d %s %s %s%s %s",
+              year, month, day, time / 60, time % 60,
+              name_string, format_string, ptexbanner,
+              versionstring, kpathsea_version_string);
     job_id_string = xstrdup (s);
     xfree (s);
     xfree (name_string);
@@ -331,7 +342,7 @@ void makepdftexbanner (void)
     s = xtalloc (slen, char);
     /* The Web2c version string starts with a space.  */
     snprintf (s, slen,
-             "%s%s %s", ptexbanner, versionstring, kpathsea_version_string);
+              "%s%s %s", ptexbanner, versionstring, kpathsea_version_string);
     pdftexbanner = maketexstring (s);
     xfree (s);
     pdftexbanner_init = true;
@@ -346,7 +357,7 @@ strnumber getresnameprefix (void)
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     char prefix[7];             /* make a tag of 6 chars long */
     unsigned long crc;
-    int i;
+    short i;
     size_t base = strlen (name_str);
     crc = crc32 (0L, Z_NULL, 0);
     crc = crc32 (crc, (Bytef *) job_id_string, strlen (job_id_string));
@@ -390,13 +401,13 @@ int xputc (int c, FILE * stream)
 
 void writestreamlength (integer length, integer offset)
 {
-    integer save_offset;
     if (jobname_cstr == NULL)
         jobname_cstr = xstrdup (makecstring (jobname));
-    save_offset = xftell (pdffile, jobname_cstr);
-    xfseek (pdffile, offset, SEEK_SET, jobname_cstr);
-    fprintf (pdffile, "%li", (long int) length);
-    xfseek (pdffile, pdfoffset (), SEEK_SET, jobname_cstr);
+    if (fixedpdfdraftmode == 0) {
+        xfseek (pdffile, offset, SEEK_SET, jobname_cstr);
+        fprintf (pdffile, "%li", (long int) length);
+        xfseek (pdffile, pdfoffset (), SEEK_SET, jobname_cstr);
+    }
 }
 
 scaled extxnoverd (scaled x, scaled n, scaled d)
@@ -437,15 +448,14 @@ char *convertStringToPDFString (const char *in, int len)
 {
     static char pstrbuf[MAX_PSTRING_LEN];
     char *out = pstrbuf;
-    int i, j;
+    int i, j = 0;
     char buf[5];
-    j = 0;
     for (i = 0; i < len; i++) {
         check_buf (j + sizeof (buf), MAX_PSTRING_LEN);
         if (((unsigned char) in[i] < '!') || ((unsigned char) in[i] > '~')) {
             /* convert control characters into oct */
             snprintf (buf, sizeof (buf),
-                     "\\%03o", (unsigned int) (unsigned char) in[i]);
+                      "\\%03o", (unsigned int) (unsigned char) in[i]);
             out[j++] = buf[0];
             out[j++] = buf[1];
             out[j++] = buf[2];
@@ -492,7 +502,7 @@ void escapestring (poolpointer in)
         if ((ch < '!') || (ch > '~')) {
             /* convert control characters into oct */
             snprintf ((char *) &strpool[poolptr], 4,
-                     "\\%.3o", (unsigned int) ch);
+                      "\\%.3o", (unsigned int) ch);
             poolptr += 4;
             continue;
         }
@@ -564,7 +574,7 @@ void escapename (poolpointer in)
         if ((ch >= 1 && ch <= 32) || ch >= 127) {
             /* escape */
             snprintf ((char *) &strpool[poolptr], 3,
-                     "#%.2X", (unsigned int) ch);
+                      "#%.2X", (unsigned int) ch);
             poolptr += 3;
             continue;
         }
@@ -585,7 +595,7 @@ void escapename (poolpointer in)
         case 125:
             /* escape */
             snprintf ((char *) &strpool[poolptr], 3,
-                     "#%.2X", (unsigned int) ch);
+                      "#%.2X", (unsigned int) ch);
             poolptr += 3;
             break;
         default:
@@ -616,8 +626,7 @@ void escapehex (poolpointer in)
 
         ch = (unsigned char) strpool[in++];
 
-        snprintf ((char *) &strpool[poolptr], 3,
-                 "%.2X", (unsigned int) ch);
+        snprintf ((char *) &strpool[poolptr], 3, "%.2X", (unsigned int) ch);
         poolptr += 2;
     }
 }
@@ -682,7 +691,7 @@ static void convertStringToHexString (const char *in, char *out, int lin)
     j = 0;
     for (i = 0; i < lin; i++) {
         snprintf (buf, sizeof (buf),
-                 "%02X", (unsigned int) (unsigned char) in[i]);
+                  "%02X", (unsigned int) (unsigned char) in[i]);
         out[j++] = buf[0];
         out[j++] = buf[1];
     }
@@ -850,8 +859,7 @@ static void makepdftime (time_t t, char *time_str)
     } else {
         off_hours = off / 60;
         off_mins = abs (off - off_hours * 60);
-        snprintf (&time_str[size], 9,
-                 "%+03d'%02d'", off_hours, off_mins);
+        snprintf (&time_str[size], 9, "%+03d'%02d'", off_hours, off_mins);
     }
 }
 
@@ -936,7 +944,7 @@ void getfilesize (strnumber s)
 
         /* st_size has type off_t */
         snprintf (buf, sizeof (buf),
-                 "%lu", (long unsigned int) file_data.st_size);
+                  "%lu", (long unsigned int) file_data.st_size);
         len = strlen (buf);
         if (poolptr + len >= poolsize) {
             poolptr = poolsize;
@@ -1051,7 +1059,7 @@ void getfiledump (strnumber s, int offset, int length)
     data_end = data_ptr + read;
     for (; data_ptr < data_end; data_ptr++) {
         snprintf ((char *) &strpool[poolptr], 3,
-                 "%.2X", (unsigned int) strpool[data_ptr]);
+                  "%.2X", (unsigned int) strpool[data_ptr]);
         poolptr += 2;
     }
     xfree (file_name);
@@ -1127,8 +1135,7 @@ void getmatch (int i)
     }
 
     if (found) {
-        snprintf ((char *) &strpool[poolptr], 20,
-                 "%d", (int)pmatch[i].rm_so);
+        snprintf ((char *) &strpool[poolptr], 20, "%d", (int) pmatch[i].rm_so);
         poolptr += strlen ((char *) &strpool[poolptr]);
         strpool[poolptr++] = '-';
         strpool[poolptr++] = '>';
@@ -1243,4 +1250,14 @@ void stripspaces (char *p)
             *q++ = *p;
     }
     *q = '\0';
+}
+
+void initversionstring (char **versions)
+{
+    (void) asprintf (versions,
+                     "Compiled with libpng %s; using libpng %s\n"
+                     "Compiled with zlib %s; using zlib %s\n"
+                     "Compiled with xpdf version %s\n",
+                     PNG_LIBPNG_VER_STRING, png_libpng_ver,
+                     ZLIB_VERSION, zlib_version, xpdfVersion);
 }

@@ -42,6 +42,7 @@
 #include <etexdir/etexextra.h>
 #elif defined (pdfTeX)
 #include <pdftexdir/pdftexextra.h>
+#include <pdftexdir/ptexlib.h>
 #elif defined (Omega)
 #include <omegadir/omegaextra.h>
 #elif defined (eOmega)
@@ -556,7 +557,7 @@ ipcpage P1C(int, is_eof)
 #endif
     name = (string)xmalloc (len + 1);
 #if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
-    strncpy (name, &strpool[strstart[outputfilename]], len);
+    strncpy (name, (string)&strpool[strstart[outputfilename]], len);
 #else
     unsigned i;
     for (i=0; i<len; i++)
@@ -779,6 +780,7 @@ static struct option long_options[]
       { "output-comment",            1, 0, 0 },
       { "output-directory",          1, 0, 0 },
 #if defined(pdfTeX)
+      { "draftmode",                 0, 0, 0 },
       { "output-format",             1, 0, 0 },
 #endif /* pdfTeX */
       { "shell-escape",              0, &shellenabledp, 1 },
@@ -903,6 +905,9 @@ parse_options P2C(int, argc,  string *, argv)
          WARNING1 ("Ignoring unknown value `%s' for --output-format", optarg);
          pdfoutputoption = 0;
        }
+    } else if (ARGUMENT_IS ("draftmode")) {
+       pdfdraftmodeoption = 1;
+       pdfdraftmodevalue = 1;
 #endif /* pdfTeX */
 #if defined (TeX) || defined (MF) || defined (MP)
     } else if (ARGUMENT_IS ("translate-file")) {
@@ -944,7 +949,13 @@ parse_options P2C(int, argc,  string *, argv)
         usagehelp (PROGRAM_HELP, BUG_ADDRESS);
 
     } else if (ARGUMENT_IS ("version")) {
-      printversionandexit (BANNER, COPYRIGHT_HOLDER, AUTHOR);
+      char *versions;
+#if defined (pdfTeX)
+      initversionstring(&versions); 
+#elif
+      versions = NULL;
+#endif
+      printversionandexit (BANNER, COPYRIGHT_HOLDER, AUTHOR, versions);
 
     } /* Else it was a flag; getopt has already done the assignment.  */
   }
@@ -1412,7 +1423,7 @@ calledit P4C(packedASCIIcode *, filename,
 	    case 'd':
 	      if (ddone)
                 FATAL ("call_edit: `%%d' appears twice in editor command");
-              sprintf (temp, "%ld", linenumber);
+              sprintf (temp, "%ld", (long int)linenumber);
               while (*temp != '\0')
                 temp++;
               ddone = 1;

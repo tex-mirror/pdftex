@@ -218,6 +218,7 @@ extern void initstarttime ();
 extern void removepdffile (void);
 extern void garbagewarning (void);
 extern void stripspaces (char *p);
+extern void initversionstring (char **versions);
 
 /* vfpacket.c */
 extern eightbits packetbyte (void);

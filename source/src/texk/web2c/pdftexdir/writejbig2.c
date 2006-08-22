@@ -687,7 +687,7 @@ void read_jbig2_info (integer img)
     fip = (FILEINFO *) avl_find (file_tree, &tmp);
     if (fip == NULL) {
         fip = new_fileinfo ();
-        fip->filename = strdup (img_name (img));
+        fip->filename = xstrdup (img_name (img));
         aa = avl_probe (file_tree, fip);
         assert (aa != NULL);
     }

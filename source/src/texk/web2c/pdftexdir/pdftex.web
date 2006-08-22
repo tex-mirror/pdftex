@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-beta-20060811' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-beta-20060822' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -1861,6 +1861,10 @@ amounts of user interaction:
 @d error_stop_mode=3 {stops at every opportunity to interact}
 @d print_err(#)==begin if interaction=error_stop_mode then wake_up_terminal;
   print_nl("! "); print(#);
+  end
+@d print_warn(#)==begin if interaction=error_stop_mode then wake_up_terminal;
+  if prepend_nl then begin print_nl(""); print_ln end;
+  print_nl(#);
   end
 
 @<Glob...@>=
@@ -5627,7 +5631,8 @@ that will be defined later.
 @d pdf_prepend_kern_code     = pdftex_first_integer_code + 22 {prepend kern before certain characters?}
 @d pdf_append_kern_code      = pdftex_first_integer_code + 23 {append kern before certain characters?}
 @d pdf_gen_tounicode_code    = pdftex_first_integer_code + 24 {generate ToUnicode for fonts?}
-@d pdf_int_pars=pdftex_first_integer_code + 25 {total number of \pdfTeX's integer parameters}
+@d pdf_draftmode_code        = pdftex_first_integer_code + 25 {switch on draftmode if positive}
+@d pdf_int_pars=pdftex_first_integer_code + 26 {total number of \pdfTeX's integer parameters}
 @#
 @d etex_int_base=pdf_int_pars {base for \eTeX's integer parameters}
 @d tracing_assigns_code=etex_int_base {show assignments}
@@ -5731,6 +5736,7 @@ that will be defined later.
 @d pdf_image_gamma      == int_par(pdf_image_gamma_code)
 @d pdf_image_hicolor    == int_par(pdf_image_hicolor_code)
 @d pdf_image_apply_gamma == int_par(pdf_image_apply_gamma_code)
+@d pdf_draftmode        == int_par(pdf_draftmode_code)
 @#
 @d tracing_assigns==int_par(tracing_assigns_code)
 @d tracing_groups==int_par(tracing_groups_code)
@@ -5831,6 +5837,7 @@ pdf_adjust_interword_glue_code:    print_esc("pdfadjustinterwordglue");
 pdf_prepend_kern_code:    print_esc("pdfprependkern");
 pdf_append_kern_code:    print_esc("pdfappendkern");
 pdf_gen_tounicode_code:    print_esc("pdfgentounicode");
+pdf_draftmode_code:        print_esc("pdfdraftmode");
 @/@<Cases for |print_param|@>@/
 othercases print("[unknown integer parameter!]")
 endcases;
@@ -6004,6 +6011,8 @@ primitive("pdfappendkern",assign_int,int_base+pdf_append_kern_code);@/
 @!@:pdf_append_kern_}{\.{\\pdfappendkern} primitive@>
 primitive("pdfgentounicode",assign_int,int_base+pdf_gen_tounicode_code);@/
 @!@:pdf_gen_tounicode_}{\.{\\pdfgentounicode} primitive@>
+primitive("pdfdraftmode",assign_int,int_base+pdf_draftmode_code);@/
+@!@:pdf_draftmode_}{\.{\\pdfdraftmode} primitive@>
 
 @ @<Cases of |print_cmd_chr|...@>=
 assign_int: if chr_code<count_base then print_param(chr_code-int_base)
@@ -6397,7 +6406,7 @@ text(frozen_dont_expand):="notexpanded:";
 eq_type(frozen_primitive):=ignore_spaces;
 equiv(frozen_primitive):=1;
 eq_level(frozen_primitive):=level_one;
-text(frozen_primitive):="primitive";
+text(frozen_primitive):="pdfprimitive";
 @ Here is the subroutine that searches the hash table for an identifier
 that matches a given string of length |l>1| appearing in |buffer[j..
 (j+l-1)]|. If the identifier is found, the corresponding hash table address
@@ -6711,7 +6720,7 @@ expand_after: if chr_code=0 then print_esc("expandafter")
   @<Cases of |expandafter| for |print_cmd_chr|@>;
 halign: print_esc("halign");
 hrule: print_esc("hrule");
-ignore_spaces: if chr_code=0 then print_esc("ignorespaces") else print_esc("primitive");
+ignore_spaces: if chr_code=0 then print_esc("ignorespaces") else print_esc("pdfprimitive");
 insert: print_esc("insert");
 ital_corr: print_esc("/");
 mark: begin print_esc("mark");
@@ -6724,7 +6733,7 @@ multiply: print_esc("multiply");
 no_align: print_esc("noalign");
 no_boundary:print_esc("noboundary");
 no_expand: if chr_code=0 then print_esc("noexpand")
-   else print_esc("primitive");
+   else print_esc("pdfprimitive");
 non_script: print_esc("nonscript");
 omit: print_esc("omit");
 radical: print_esc("radical");
@@ -14753,6 +14762,7 @@ pdf_image_gamma := 2200;
 pdf_image_hicolor := 1;
 pdf_image_apply_gamma := 0;
 pdf_px_dimen := one_bp;
+pdf_draftmode := 0;
 
 @ The subroutines define the corresponding macros so we can use them
 in C.
@@ -15004,6 +15014,8 @@ end
 @!fixed_image_apply_gamma: integer;
 @!epochseconds: integer;
 @!microseconds: integer;
+@!fixed_pdf_draftmode: integer; {fixed \\pdfdraftmode}
+@!fixed_pdf_draftmode_set: boolean; {|fixed_pdf_draftmode| has been set?}
 
 @ @<Set init...@>=
 pdf_gone := 0;
@@ -15020,6 +15032,7 @@ pdf_seek_write_length := false;
 zip_write_state := no_zip;
 pdf_minor_version_written := false;
 fixed_pdfoutput_set := false;
+fixed_pdf_draftmode_set := false;
 
 @ @p
 function fix_int(val, min, max: integer): integer;
@@ -15054,11 +15067,12 @@ begin
         fixed_image_hicolor     := fix_int(pdf_image_hicolor, 0, 1);
         fixed_image_apply_gamma := fix_int(pdf_image_apply_gamma, 0, 1);
         fixed_pdf_objcompresslevel := fix_int(pdf_objcompresslevel, 0, 3);
+        fixed_pdf_draftmode     := fix_int(pdf_draftmode, 0, 1);
         if (fixed_pdf_minor_version >= 5) and (fixed_pdf_objcompresslevel > 0) then
             pdf_os_enable := true
         else begin
             if fixed_pdf_objcompresslevel > 0 then begin
-                pdf_warning("Object streams", "\pdfobjcompresslevel > 0 requires \pdfminorversion > 4. Object streams disabled now.", true);
+                pdf_warning("Object streams", "\pdfobjcompresslevel > 0 requires \pdfminorversion > 4. Object streams disabled now.", true, true);
                 fixed_pdf_objcompresslevel := 0;
             end;
             pdf_os_enable := false;
@@ -15090,8 +15104,9 @@ begin
     if job_name = 0 then
         open_log_file;
     pack_job_name(".pdf");
-    while not b_open_out(pdf_file) do
-        prompt_file_name("file name for output",".pdf");
+    if fixed_pdf_draftmode = 0 then
+        while not b_open_out(pdf_file) do
+            prompt_file_name("file name for output",".pdf");
     output_file_name := b_make_name_string(pdf_file);
 end;
 
@@ -15105,7 +15120,7 @@ begin
     if not pdf_os_mode then begin
         case zip_write_state of
             no_zip: if pdf_ptr > 0 then begin
-                write_pdf(0, pdf_ptr - 1);
+                if fixed_pdf_draftmode = 0 then write_pdf(0, pdf_ptr - 1);
                 pdf_gone := pdf_gone + pdf_ptr;
                 pdf_last_byte := pdf_buf[pdf_ptr - 1];
             end;
@@ -15193,9 +15208,9 @@ begin
     succumb;
 end;
 
-procedure pdf_warning(t, p: str_number; append_nl: boolean);
+procedure pdf_warning(t, p: str_number; prepend_nl, append_nl: boolean);
 begin
-    print_err("pdfTeX warning");
+    print_warn("pdfTeX warning");
     if t <> 0 then begin
         print(" (");
         print(t);
@@ -15203,6 +15218,7 @@ begin
     end;
     print(": "); print(p);
     if append_nl then
+        print_ln;
         print_ln;
 end;
 
@@ -15512,6 +15528,8 @@ PDF}
 @!pk_scale_factor: integer;
 @!pdf_output_option: integer;
 @!pdf_output_value: integer;
+@!pdf_draftmode_option: integer;
+@!pdf_draftmode_value: integer;
 
 @ Following procedures implement low-level subroutines to convert \TeX{}
 internal structures to PDF page description.
@@ -16594,7 +16612,7 @@ var kn, st, sh: scaled;
     f: internal_font_number;
 begin
     if not (not is_char_node(g) and type(g) = glue_node) then begin
-        pdf_warning("adjust_interword_glue", "g is not a glue", false);
+        pdf_warning("adjust_interword_glue", "g is not a glue", false, false);
         return;
     end;
     if (not is_char_node(p)) and (type(p) <> ligature_node) then
@@ -16992,7 +17010,7 @@ begin
     font_used[f] := true;
     pdf_font_num[f] := fontnum;
     if pdf_move_chars > 0 then begin
-        pdf_warning(0,"Primitive \pdfmovechars is obsolete.",true);
+        pdf_warning(0,"Primitive \pdfmovechars is obsolete.",true, true);
         pdf_move_chars := 0; {warn only once}
     end;
 end;
@@ -17988,6 +18006,11 @@ begin
     else if fixed_pdfoutput <> pdf_output then
         pdf_error("setup",
             "\pdfoutput can only be changed before anything is written to the output");
+    if (fixed_pdfoutput > 0) and (fixed_pdf_draftmode > 0) and (not fixed_pdf_draftmode_set) then begin
+        fixed_pdf_draftmode_set := true;
+        pdf_compress_level := 0;
+        fixed_pdf_objcompresslevel := 0;
+    end
 end;
 
 
@@ -18413,7 +18436,7 @@ begin
         pdf_print_toks_ln(obj_ximage_attr(n));
         delete_toks(obj_ximage_attr(n));
     end;
-    write_image(obj_ximage_data(n));
+    if fixed_pdf_draftmode = 0 then write_image(obj_ximage_data(n));
     delete_image(obj_ximage_data(n));
 end;
 
@@ -18757,41 +18780,44 @@ if total_pages=0 then begin
         garbage_warning;
 end
 else begin
-    pdf_flush; {to make sure that the output file name has been already
-    created}
-    if total_pages mod pages_tree_kids_max <> 0 then
-        obj_info(pdf_last_pages) := total_pages mod pages_tree_kids_max;
-    {last pages object may have less than |pages_tree_kids_max| children}
-    flush_jbig2_page0_objects; {flush page 0 objects from JBIG2 images, if any}
-    @<Check for non-existing pages@>;
-    @<Reverse the linked list of Page and Pages objects@>;
-    @<Check for non-existing destinations@>;
-    @<Output fonts definition@>;
-    @<Output pages tree@>;
-    @<Output outlines@>;
-    @<Output name tree@>;
-    @<Output article threads@>;
-    @<Output the catalog object@>;
-    pdf_print_info; {last candidate for object stream}
-    if pdf_os_enable then begin
-        pdf_os_switch(true);
-        pdf_os_write_objstream;
+    if fixed_pdf_draftmode = 0 then begin
+        pdf_flush; {to make sure that the output file name has been already
+        created}
+        if total_pages mod pages_tree_kids_max <> 0 then
+            obj_info(pdf_last_pages) := total_pages mod pages_tree_kids_max;
+        {last pages object may have less than |pages_tree_kids_max| children}
+        flush_jbig2_page0_objects; {flush page 0 objects from JBIG2 images, if any}
+        @<Check for non-existing pages@>;
+        @<Reverse the linked list of Page and Pages objects@>;
+        @<Check for non-existing destinations@>;
+        @<Output fonts definition@>;
+        @<Output pages tree@>;
+        @<Output outlines@>;
+        @<Output name tree@>;
+        @<Output article threads@>;
+        @<Output the catalog object@>;
+        pdf_print_info; {last candidate for object stream}
+        if pdf_os_enable then begin
+            pdf_os_switch(true);
+            pdf_os_write_objstream;
+            pdf_flush;
+            pdf_os_switch(false);
+            @<Output the cross-reference stream dictionary@>;
+            pdf_flush;
+        end else begin
+            @<Output the |obj_tab|@>;
+        end;
+        @<Output the trailer@>;
         pdf_flush;
-        pdf_os_switch(false);
-        @<Output the cross-reference stream dictionary@>;
-        pdf_flush;
-    end else begin
-        @<Output the |obj_tab|@>;
+        print_nl("Output written on "); print_file_name(0, output_file_name, 0);
+      @.Output written on x@>
+        print(" ("); print_int(total_pages); print(" page");
+        if total_pages<>1 then print_char("s");
+        print(", "); print_int(pdf_offset); print(" bytes).");
     end;
-    @<Output the trailer@>;
-    pdf_flush;
-    print_nl("Output written on "); print_file_name(0, output_file_name, 0);
-  @.Output written on x@>
-    print(" ("); print_int(total_pages); print(" page");
-    if total_pages<>1 then print_char("s");
-    print(", "); print_int(pdf_offset); print(" bytes).");
     libpdffinish;
-    b_close(pdf_file);
+    if fixed_pdf_draftmode = 0 then b_close(pdf_file)
+    else pdf_warning(0, "\pdfdraftmode enabled, not changing output pdf", true, true)
 end
 
 @ Destinations that have been referenced but don't exists have
@@ -18802,7 +18828,7 @@ PDF browsers, so we need to fix them.
 begin
     if obj_dest_ptr(k) <> null then
         return;
-    pdf_warning("dest", "", false);
+    pdf_warning("dest", "", false, false);
     if obj_info(k) < 0 then begin
         print("name{");
         print(-obj_info(k));
@@ -18831,7 +18857,7 @@ end
 @ @<Check for non-existing pages@>=
 k := head_tab[obj_type_page];
 while obj_aux(k) = 0 do begin
-    pdf_warning("dest", "Page ", false);
+    pdf_warning("dest", "Page ", false, false);
     print_int(obj_info(k));
     print(" has been referenced but does not exist!");
     print_ln; print_ln;
@@ -32005,10 +32031,13 @@ var a, b, c, i, j, k, l: integer; {all-purpose index}
 begin @<Finish the extensions@>;
 @!stat if tracing_stats>0 then @<Output statistics about this job@>;@;@+tats@/
 wake_up_terminal;
-fix_pdfoutput;
+if not fixed_pdfoutput_set then
+    fix_pdfoutput;
 if fixed_pdfoutput > 0 then begin
-    if history = fatal_error_stop then
-        print_err(" ==> Fatal error occurred, the output PDF file is not finished!")
+    if history = fatal_error_stop then begin
+        remove_pdffile;
+        print_err(" ==> Fatal error occurred, no output PDF file produced!")
+        end
     else begin
         @<Finish the PDF file@>;
         wlog_cr;
@@ -32158,6 +32187,7 @@ if (format_ident=0)or(buffer[loc]="&") then
   while (loc<limit)and(buffer[loc]=" ") do incr(loc);
   end;
 if (pdf_output_option <> 0) then pdf_output := pdf_output_value;
+if (pdf_draftmode_option <> 0) then pdf_draftmode := pdf_draftmode_value;
 pdf_init_map_file('pdftex.map');
 if eTeX_ex then wterm_ln('entering extended mode');
 if end_line_char_inactive then decr(limit)
@@ -32629,7 +32659,7 @@ begin
         if is_error then
             pdf_error(s, "not allowed in DVI mode (\pdfoutput <= 0)")
         else
-            pdf_warning(s, "not allowed in DVI mode (\pdfoutput <= 0); ignoring it", true);
+            pdf_warning(s, "not allowed in DVI mode (\pdfoutput <= 0); ignoring it", true, true);
 end;
 
 procedure scan_pdf_ext_toks;
@@ -32715,7 +32745,7 @@ begin
             scan_int;
             k := cur_val;
             if (k <= 0) or (k > obj_ptr) or (obj_data_ptr(k) <> 0) then begin
-                pdf_warning("\pdfobj", "invalid object number being ignored", true);
+                pdf_warning("\pdfobj", "invalid object number being ignored", true, true);
                 pdf_retval := -1; {signal the problem}
                 k := -1; {will be generated again}
             end;
@@ -32863,7 +32893,7 @@ begin
     if (xr > 65535) or (yr > 65535) then begin
         xr := 0;
         yr := 0;
-        pdf_warning("ext1", "too large image resolution ignored", true);
+        pdf_warning("ext1", "too large image resolution ignored", true, true);
     end;
     if (x <= 0) or (y <= 0) or (xr < 0) or (yr < 0) then
         pdf_error("ext1", "invalid image dimensions");
@@ -33024,19 +33054,19 @@ begin
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
     if pdf_option_always_use_pdfpagebox <> 0 then begin
-        pdf_warning("PDF inclusion", "Primitive \pdfoptionalwaysusepdfpagebox is obsolete; use \pdfpagebox instead.", true);
+        pdf_warning("PDF inclusion", "Primitive \pdfoptionalwaysusepdfpagebox is obsolete; use \pdfpagebox instead.", true, true);
         pdf_force_pagebox := pdf_option_always_use_pdfpagebox;
         pdf_option_always_use_pdfpagebox := 0; {warn once}
         warn_pdfpagebox := false;
     end;
     if pdf_option_pdf_inclusion_errorlevel <> 0 then begin
-        pdf_warning("PDF inclusion", "Primitive \pdfoptionpdfinclusionerrorlevel is obsolete; use \pdfinclusionerrorlevel instead.", true);
+        pdf_warning("PDF inclusion", "Primitive \pdfoptionpdfinclusionerrorlevel is obsolete; use \pdfinclusionerrorlevel instead.", true, true);
         pdf_inclusion_errorlevel := pdf_option_pdf_inclusion_errorlevel;
         pdf_option_pdf_inclusion_errorlevel := 0; {warn once}
     end;
     if pdf_force_pagebox > 0 then begin
         if warn_pdfpagebox then begin
-            pdf_warning("PDF inclusion", "Primitive \pdfforcepagebox is obsolete; use \pdfpagebox instead.", true);
+            pdf_warning("PDF inclusion", "Primitive \pdfforcepagebox is obsolete; use \pdfpagebox instead.", true, true);
             warn_pdfpagebox := false;
         end;
         pagebox := pdf_force_pagebox;
@@ -33374,7 +33404,7 @@ with the same identifier already exists and give a warning if needed.
 @<Declare procedures needed in |pdf_hlist_out|, |pdf_vlist_out|@>=
 procedure warn_dest_dup(id: integer; byname: small_number; s1, s2: str_number);
 begin
-    pdf_warning(s1, "destination with the same identifier (", false);
+    pdf_warning(s1, "destination with the same identifier (", false, false);
     if byname > 0 then begin
         print("name");
         print_mark(id);
@@ -33738,7 +33768,7 @@ end;
 procedure pdf_fix_thread(thread: integer);
 var a: pointer;
 begin
-    pdf_warning("thread", "destination ", false);
+    pdf_warning("thread", "destination ", false, false);
     if obj_info(thread) < 0 then begin
         print("name{");
         print(-obj_info(thread));

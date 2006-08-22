@@ -38,8 +38,6 @@ static /**/const char *const rcsid[] = { (const char *)rcsid, "\100(#)" msg }
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <pwd.h>
-#include <time.h>
 #include <stddef.h>
 
 #ifdef HAVE_LIMITS_H
@@ -48,7 +46,6 @@ static /**/const char *const rcsid[] = { (const char *)rcsid, "\100(#)" msg }
 #ifdef HAVE_ENDIAN_H
 # include <endian.h>
 #endif
-#include <unistd.h> /* For STDIN_FILENO, etc */
 
 /*
  *-*-nto-qnx needs these headers for strcasecmp and LASTLOG_FILE respectively
