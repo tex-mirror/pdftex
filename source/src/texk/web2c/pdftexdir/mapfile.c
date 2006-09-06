@@ -185,12 +185,12 @@ static int comp_fm_entry_ps (const void *pa, const void *pb, void *p)
     const fm_entry *p1 = (const fm_entry *) pa, *p2 = (const fm_entry *) pb;
     int i;
     assert (p1->ps_name != NULL && p2->ps_name != NULL);
-    if ((i = strcmp (p1->ps_name, p2->ps_name)) != 0)
+    if ((i = strcmp (p1->ps_name, p2->ps_name)))
         return i;
     cmp_return (p1->slant, p2->slant);
     cmp_return (p1->extend, p2->extend);
     if (p1->tfm_name != NULL && p2->tfm_name != NULL &&
-        (i = strcmp (p1->tfm_name, p2->tfm_name)) != 0)
+        (i = strcmp (p1->tfm_name, p2->tfm_name)))
         return i;
     return 0;
 }
@@ -234,7 +234,7 @@ int avl_do_entry (fm_entry * fp, int mode)
 
     /* handle tfm_name link */
 
-    if (strcmp (fp->tfm_name, nontfm) != 0) {
+    if (strcmp (fp->tfm_name, nontfm)) {
         p = (fm_entry *) avl_find (tfm_tree, fp);
         if (p != NULL) {
             if (mode == FM_DUPIGNORE) {
@@ -415,7 +415,7 @@ boolean check_basefont (char *s)
         }
     } else
         k = index[n];
-    if (k > -1 && strcmp (basefont_names[k], s) == 0)
+    if (k > -1 && !strcmp (basefont_names[k], s))
         return true;
     return false;
 };
@@ -635,7 +635,7 @@ static fm_entry *mk_ex_fm (internalfontnumber f, fm_entry * basefm, int ex)
     fm->ff_objnum = pdfnewobjnum ();
     fm->tfm_num = f;
     fm->tfm_avail = TFM_FOUND;
-    assert (strcmp (fm->tfm_name, nontfm) != 0);
+    assert (strcmp (fm->tfm_name, nontfm));
     return fm;
 }
 
@@ -660,7 +660,7 @@ static fmentryptr fmlookup (internalfontnumber f)
     if (tfm_tree == NULL)
         fm_read_info ();        /* only to read default map file */
     tfm = makecstring (fontname[f]);
-    assert (strcmp (tfm, nontfm) != 0);
+    assert (strcmp (tfm, nontfm));
 
     /* Look up for full <tfmname>[+-]<expand> */
     tmp.tfm_name = tfm;
@@ -750,7 +750,7 @@ static boolean used_tfm (fm_entry * p)
 
     /* check whether we didn't find a loaded font yet,
      * and this font has been loaded */
-    if (loaded_tfm_found == NULL && strcmp (p->tfm_name, nontfm) != 0) {
+    if (loaded_tfm_found == NULL && strcmp (p->tfm_name, nontfm)) {
         s = maketexstring (p->tfm_name);
         if ((f = tfmlookup (s, 0)) != getnullfont ()) {
             loaded_tfm_found = p;
@@ -767,7 +767,7 @@ static boolean used_tfm (fm_entry * p)
     /* check whether we didn't find either a loaded or a loadable font yet,
      * and this font is loadable */
     if (avail_tfm_found == NULL && loaded_tfm_found == NULL &&
-        strcmp (p->tfm_name, nontfm) != 0) {
+        strcmp (p->tfm_name, nontfm)) {
         if (p->tfm_avail == TFM_UNCHECKED) {
             if (kpse_find_file (p->tfm_name, kpse_tfm_format, 0) != NULL) {
                 avail_tfm_found = p;
@@ -781,7 +781,7 @@ static boolean used_tfm (fm_entry * p)
     }
 
     /* check whether the current entry is a <nontfm> entry */
-    if (non_tfm_found == NULL && strcmp (p->tfm_name, nontfm) == 0)
+    if (non_tfm_found == NULL && !strcmp (p->tfm_name, nontfm))
         non_tfm_found = p;
 
     return false;

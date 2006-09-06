@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-beta-20060822' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-beta-20060906' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -15125,9 +15125,9 @@ begin
                 pdf_last_byte := pdf_buf[pdf_ptr - 1];
             end;
             zip_writing:
-                write_zip(false);
+                if fixed_pdf_draftmode = 0 then write_zip(false);
             zip_finish: begin
-                write_zip(true);
+                if fixed_pdf_draftmode = 0 then write_zip(true);
                 zip_write_state := no_zip;
             end;
         end;
@@ -18006,13 +18006,26 @@ begin
     else if fixed_pdfoutput <> pdf_output then
         pdf_error("setup",
             "\pdfoutput can only be changed before anything is written to the output");
-    if (fixed_pdfoutput > 0) and (fixed_pdf_draftmode > 0) and (not fixed_pdf_draftmode_set) then begin
+    if fixed_pdfoutput_set then fix_pdf_draftmode;
+end;
+
+@ |fix_pdf_draftmode| freezes |pdfdraftmode| when something has been written to
+the output and also switches somes things off when draftmode is on.
+@p procedure fix_pdf_draftmode;
+begin
+    if not fixed_pdf_draftmode_set then begin
+        fixed_pdf_draftmode := pdf_draftmode;
+        fixed_pdf_draftmode_set := true;
+    end
+    else if fixed_pdf_draftmode <> pdf_draftmode then
+        pdf_error("setup",
+            "\pdfdraftmode can only be changed before anything is written to the output");
+    if fixed_pdf_draftmode_set and fixed_pdf_draftmode > 0 then begin
         fixed_pdf_draftmode_set := true;
         pdf_compress_level := 0;
         fixed_pdf_objcompresslevel := 0;
-    end
+    end;
 end;
-
 
 @ |pdf_ship_out| is used instead of |ship_out| to shipout a box to PDF
 output. If |shipping_page| is not set then the output will be a Form object,

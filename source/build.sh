@@ -1,6 +1,20 @@
 #! /bin/sh
 # builds new pdftex binaries
-MAKE=gmake
+# try to find gnu make; we need it
+if make -v 2>&1| grep -q "GNU Make" 
+then 
+  MAKE=make;
+  echo "Your make is a GNU-make; I will use that"
+elif gmake -v >/dev/null 2>&1
+then
+  MAKE=gmake;
+  echo "You have a GNU-make installed as gmake; I will use that"
+else
+  MAKE=make
+  echo "I can't find a GNU-make; I'll try to use make and hope that works." 
+  echo "If it doesn't, please install GNU-make."
+fi
+#
 STRIP=strip
 # this deletes all previous builds. 
 # comment out the rm and mkdir if you want to keep them (and uncomment and
@@ -55,3 +69,4 @@ $STRIP texk/web2c/{pdf*tex,pdftosrc,ttf2afm}
 cd ..
 # show the results
 ls -l build/texk/web2c/{pdf*tex,pdf*tex.pool,pdftosrc,ttf2afm}
+# vim: set syntax=sh ts=2:

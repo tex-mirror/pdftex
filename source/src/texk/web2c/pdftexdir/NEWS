@@ -1,4 +1,10 @@
 ---------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-beta-20060906 was released on 2006-09-06
+---------------------------------------------------------------
+- bugfix: \pdfdraftmode could be tricked (600)
+- bugfix: Type1C (CFF) fonts of embedded pdfs didn't get replaced
+
+---------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-beta-20060822 was released on 2006-08-22
 ---------------------------------------------------------------
 - new feature: with \pdfdraftmode=1 (or -draftmode) pdfTeX doesn't write an
