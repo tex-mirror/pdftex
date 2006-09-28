@@ -1,4 +1,12 @@
 ---------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-beta-20060928 was released on 2006-09-28
+---------------------------------------------------------------
+- added patch 603 (ColorStack)
+- added patch 462 (HZ font expansion by text matrix manipulation)
+- updated obsdcompat from openssh 4.4pl1
+- bugfix: \pdfescapestring + \pdfescapename had been broken (605)
+
+---------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-beta-20060906 was released on 2006-09-06
 ---------------------------------------------------------------
 - bugfix: \pdfdraftmode could be tricked (600)

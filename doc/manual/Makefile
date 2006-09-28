@@ -1,8 +1,8 @@
-# $Id: Makefile,v 1.84 2006/02/10 21:43:21 hhenkel Exp $
+# $Id: Makefile,v 1.85 2006/09/28 16:54:17 oneiros Exp $
 #
 # Makefile for pdfTeX documentation
 
-pdftexversion=1.30.4
+pdftexversion=1.40.0
 mandir=manual
 distdate=`date +%y%m%d`
 distrev=`awk '/Id:/{print $$4; exit}' $(mandir)/pdftex-t.tex`
@@ -89,3 +89,5 @@ allclean:
 	- rm -f pdftex-syntax.txt
 	- rm -f pdftex-w.pdf pdftex-t.txt
 	make clean
+
+clobber: allclean

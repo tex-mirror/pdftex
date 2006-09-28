@@ -1,7 +1,7 @@
 % interface=english modes=letter,screen output=pdftex
 % vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.640 2006/08/11 09:49:29 oneiros Exp $
+% $Id: pdftex-t.tex,v 1.643 2006/09/28 16:59:40 oneiros Exp $
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
@@ -61,7 +61,7 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.640 2006/08/11 09:49:29 oneiros Exp $
+\rcsscan $Id: pdftex-t.tex,v 1.643 2006/09/28 16:59:40 oneiros Exp $
 
 \def\currentpdftex{1.40.0}
 
@@ -182,8 +182,8 @@
 % keep next 2 lines as temporary kludge for a while to make \type{} of
 % older ConTeXt versions handle these two new primitives; the original
 % problem with \type{} is already solved in ConTeXt as of 2006-02-14.
-\let\ifabsnum\relax
-\let\ifabsdim\relax
+\let\ifpdfabsnum\relax
+\let\ifpdfabsdim\relax
 
 \def\Sugar    #1{\unskip\unskip\unskip\kern.25em{#1}\kern.25em\ignorespaces}
 \def\Something#1{\Sugar{\mathematics{\langle\hbox{#1}\rangle}}}
@@ -1465,13 +1465,20 @@ be given.
 
 \startdescription {basename}
 
-sets the base (\POSTSCRIPT) font name.  The {\em basename} field is
-checked against the BaseName entry of fonts coming with embedded \PDF\
-files.  If there is a~match, the font will be removed from the embedded
-file, and a~local font is opened, which will contain the glyphs from the
-embedded file. This collecting mechanism helps keeping the resulting \PDF\
-file size small, if many files with similar fonts are to be embedded.
-Therefore it is recommended always to set the {\em basename} field.
+sets the (\POSTSCRIPT) base font name, which is used for only one purpose
+described as follows: When a \PDF\ file is embedded by \type{\pdfximage},
+the \type{/BaseFont} names in the font dictionaries of Type~1 and Type~1C
+(CFF) fonts from the embedded \PDF\ file are checked against this {\em
+basename} field. If names match, the glyphs of that font will not be
+copied from the embedded \PDF\ file, but instead a~local font is opened,
+and all needed glyphs will be taken from the Type~1 font file that is
+mentioned in the map line (see {\em fontfile} below). By this collecting
+mechanism Type~1 glyphs can be shared between several embedded \PDF\
+files and with text that is typeset by \pdfTeX, which helps keeping the
+resulting \PDF\ file size small, if many files with similar Type~1(C)
+fonts are embedded. A limitation is that the replacement does not work
+for TrueType fonts. Still it is recommended always to set the {\em
+basename} field.
 
 If a~{\em basename} field is given, also a~{\em fontfile} field must
 be there, unless the {\em basename} matches one of the 14 standard font
@@ -1736,7 +1743,7 @@ Do not embed the font --- only extract the font parameters:
 pgsr8a GillSans pgsr8a.pfb
 \stoptyping
 
- A~TrueType font can be used in the same way as a~Type~1 font:
+A~TrueType font can be used in the same way as a~Type~1 font:
 
 \starttyping
 verdana8r Verdana <8r.enc <verdana.ttf
@@ -1799,7 +1806,7 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.640 2006/08/11 09:49:29 oneiros Exp $
+%%S $Id: pdftex-t.tex,v 1.643 2006/09/28 16:59:40 oneiros Exp $
 %%S NL
 %%S integer registers:
 
@@ -2070,11 +2077,11 @@ definitions and syntax rules follow after the list of primitives.
 %}
 
 \Syntax {
-\Tex {\ifabsnum} \Something{number} \Whatever{expandable}
+\Tex {\ifpdfabsnum} \Something{number} \Whatever{expandable}
 }
 
 \Syntax {
-\Tex {\ifabsdim} \Something{dimen} \Whatever{expandable}
+\Tex {\ifpdfabsdim} \Something{dimen} \Whatever{expandable}
 }
 
 \Syntax {
@@ -2528,7 +2535,7 @@ definitions and syntax rules follow after the list of primitives.
 
 \Syntax {
 \Something{pdfliteral spec} \Means %
-  \Literal{direct} \Or \Literal{page} %
+  \Literal{direct} \Or \Literal{page}
 }
 
 \Syntax {
@@ -4110,20 +4117,20 @@ hexadecimal format (same as \type{\pdfescapehex}).
 
 \subsection{Numbers}
 
-\pdftexprimitive{\Syntax {\Tex {\ifabsnum}} \Something{number}}
+\pdftexprimitive{\Syntax {\Tex {\ifpdfabsnum}} \Something{number}}
 
-\bookmark{\type{\ifabsnum}}
+\bookmark{\type{\ifpdfabsnum}}
 
 The primitive works as normal \type{\ifnum} condition check, except that it compares
 absolute values of numbers. Although it seems to be a~trivial shortcut for a~couple of
 \type{\ifnum x<0} tests, as a primitive it is more friendly in usage and works a~bit faster.
 \introduced{1.40.0}
 
-\pdftexprimitive{\Syntax {\Tex {\ifabsdim}} \Something{dimen}}
+\pdftexprimitive{\Syntax {\Tex {\ifpdfabsdim}} \Something{dimen}}
 
-\bookmark{\type{\ifabsdim}}
+\bookmark{\type{\ifpdfabsdim}}
 
-Like \type{\ifabsnum}, the primitive works as normal \type{\ifdim} condition check, except
+Like \type{\ifpdfabsnum}, the primitive works as normal \type{\ifdim} condition check, except
 that it compares absolute values of dimensions. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfuniformdeviate} \Something{number} \Whatever{expandable}}}

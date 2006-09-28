@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-beta-20060906' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-beta-20060928' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -10577,20 +10577,21 @@ such that |job_name_code| remains last.
 @d left_margin_kern_code    = pdftex_first_expand_code + 9 {command code for \.{\\leftmarginkern}}
 @d right_margin_kern_code   = pdftex_first_expand_code + 10 {command code for \.{\\rightmarginkern}}
 @d pdf_strcmp_code          = pdftex_first_expand_code + 11 {command code for \.{\\pdfstrcmp}}
-@d pdf_escape_hex_code      = pdftex_first_expand_code + 12 {command code for \.{\\pdfescapehex}}
-@d pdf_unescape_hex_code    = pdftex_first_expand_code + 13 {command code for \.{\\pdfunescapehex}}
-@d pdf_creation_date_code   = pdftex_first_expand_code + 14 {command code for \.{\\pdfcreationdate}}
-@d pdf_file_mod_date_code   = pdftex_first_expand_code + 15 {command code for \.{\\pdffilemoddate}}
-@d pdf_file_size_code       = pdftex_first_expand_code + 16 {command code for \.{\\pdffilesize}}
-@d pdf_mdfive_sum_code      = pdftex_first_expand_code + 17 {command code for \.{\\pdfmdfivesum}}
-@d pdf_file_dump_code       = pdftex_first_expand_code + 18 {command code for \.{\\pdffiledump}}
-@d pdf_match_code           = pdftex_first_expand_code + 19 {command code for \.{\\pdfmatch}}
-@d pdf_last_match_code      = pdftex_first_expand_code + 20 {command code for \.{\\pdflastmatch}}
-@d uniform_deviate_code     = pdftex_first_expand_code + 21 {command code for \.{\\uniformdeviate}}
-@d normal_deviate_code      = pdftex_first_expand_code + 22 {command code for \.{\\normaldeviate}}
-@d pdf_insert_ht_code       = pdftex_first_expand_code + 23 {command code for \.{\\pdfinsertht}}
-@d pdf_ximage_bbox_code     = pdftex_first_expand_code + 24 {command code for \.{\\pdfximagebbox}}
-@d pdftex_convert_codes     = pdftex_first_expand_code + 25 {end of \pdfTeX's command codes}
+@d pdf_colorstack_init_code = pdftex_first_expand_code + 12 {command code for \.{\\pdfcolorstackinit}}
+@d pdf_escape_hex_code      = pdftex_first_expand_code + 13 {command code for \.{\\pdfescapehex}}
+@d pdf_unescape_hex_code    = pdftex_first_expand_code + 14 {command code for \.{\\pdfunescapehex}}
+@d pdf_creation_date_code   = pdftex_first_expand_code + 15 {command code for \.{\\pdfcreationdate}}
+@d pdf_file_mod_date_code   = pdftex_first_expand_code + 16 {command code for \.{\\pdffilemoddate}}
+@d pdf_file_size_code       = pdftex_first_expand_code + 17 {command code for \.{\\pdffilesize}}
+@d pdf_mdfive_sum_code      = pdftex_first_expand_code + 18 {command code for \.{\\pdfmdfivesum}}
+@d pdf_file_dump_code       = pdftex_first_expand_code + 19 {command code for \.{\\pdffiledump}}
+@d pdf_match_code           = pdftex_first_expand_code + 20 {command code for \.{\\pdfmatch}}
+@d pdf_last_match_code      = pdftex_first_expand_code + 21 {command code for \.{\\pdflastmatch}}
+@d uniform_deviate_code     = pdftex_first_expand_code + 22 {end of \pdfTeX's command codes}
+@d normal_deviate_code      = pdftex_first_expand_code + 23 {end of \pdfTeX's command codes}
+@d pdf_insert_ht_code       = pdftex_first_expand_code + 24 {command code for \.{\\pdfinsertht}}
+@d pdf_ximage_bbox_code     = pdftex_first_expand_code + 25 {command code for \.{\\pdfximagebbox}}
+@d pdftex_convert_codes     = pdftex_first_expand_code + 26 {end of \pdfTeX's command codes}
 @d job_name_code=pdftex_convert_codes {command code for \.{\\jobname}}
 
 @<Put each...@>=
@@ -10647,6 +10648,8 @@ primitive("pdflastmatch",convert,pdf_last_match_code);@/
 @!@:pdf_last_match_}{\.{\\pdflastmatch} primitive@>
 primitive("pdfstrcmp",convert,pdf_strcmp_code);@/
 @!@:pdf_strcmp_}{\.{\\pdfstrcmp} primitive@>
+primitive("pdfcolorstackinit",convert,pdf_colorstack_init_code);@/
+@!@:pdf_colorstack_init_}{\.{\\pdfcolorstackinit} primitive@>
 primitive("pdfuniformdeviate",convert,uniform_deviate_code);@/
 @!@:uniform_deviate_}{\.{\\pdfuniformdeviate} primitive@>
 primitive("pdfnormaldeviate",convert,normal_deviate_code);@/
@@ -10688,6 +10691,7 @@ convert: case chr_code of
   pdf_match_code:         print_esc("pdfmatch");
   pdf_last_match_code:    print_esc("pdflastmatch");
   pdf_strcmp_code:        print_esc("pdfstrcmp");
+  pdf_colorstack_init_code: print_esc("pdfcolorstackinit");
   uniform_deviate_code:   print_esc("pdfuniformdeviate");
   normal_deviate_code:    print_esc("pdfnormaldeviate");
   pdf_insert_ht_code: print_esc("pdfinsertht");
@@ -10992,6 +10996,37 @@ pdf_strcmp_code:
     warning_index := save_warning_index;
     scanner_status := save_scanner_status;
   end;
+pdf_colorstack_init_code:
+  begin
+    bool := scan_keyword("page");
+    if scan_keyword("direct") then
+        cur_val := direct_always
+    else
+        if scan_keyword("page") then
+            cur_val := direct_page
+        else
+            cur_val := set_origin;
+    save_scanner_status := scanner_status;
+    save_warning_index := warning_index;
+    save_def_ref := def_ref;
+    scan_pdf_ext_toks;
+    s := tokens_to_string(def_ref);
+    delete_token_ref(def_ref);
+    def_ref := save_def_ref;
+    warning_index := save_warning_index;
+    scanner_status := save_scanner_status;
+    cur_val := newcolorstack(s, cur_val, bool);
+    flush_str(s);
+    cur_val_level := int_val;
+    if cur_val < 0 then begin
+        print_err("Too many color stacks");
+@.Too many color stacks@>
+        help2("The number of color stacks is limited to 32768.")@/
+        ("I'll use the default color stack 0 here.");
+        error;
+        cur_val := 0;
+    end;
+  end;
 job_name_code: if job_name=0 then open_log_file;
 uniform_deviate_code:     scan_int;
 normal_deviate_code:      do_nothing;
@@ -11065,6 +11100,7 @@ right_margin_kern_code: begin
 end;
 pdf_xform_name_code: print_int(obj_info(cur_val));
 pdf_strcmp_code: print_int(cur_val);
+pdf_colorstack_init_code: print_int(cur_val);
 uniform_deviate_code:     print_int(unif_rand(cur_val));
 normal_deviate_code:      print_int(norm_rand);
 pdf_insert_ht_code: begin
@@ -15272,7 +15308,10 @@ procedure pdf_print_char(f: internal_font_number; c: integer);
   form in the following cases: chars <= 32, backslash (92), left parenthesis
   (40) and  right parenthesis (41) }
 begin
-    pdf_mark_char(f, c);
+    if pdf_font_blink[f] <> null_font then
+        pdf_mark_char(pdf_font_blink[f], c)
+    else
+        pdf_mark_char(f, c);
     if (c <= 32) or (c = 92) or (c = 40) or (c = 41) or (c > 127) then begin
         pdf_out(92);           {output a backslash}
         pdf_print_octal(c);
@@ -15458,13 +15497,15 @@ procedure adv_char_width(f: internal_font_number; c: eight_bits); {update |pdf_h
 by character width |w| from font |f|}
 var w: scaled;
 begin
-    w := char_width(f)(char_info(f)(c));
+    if pdf_font_blink[f] <> null_font then
+        w := char_width(pdf_font_blink[f])(char_info(pdf_font_blink[f])(c))
+    else
+        w := char_width(f)(char_info(f)(c));
     if hasfmentry(f) then begin
         call_func(divide_scaled(w, pdf_font_size[f], 4));
-        pdf_h := pdf_h + scaled_out;
-    end
-    else
-        pdf_h := pdf_h + get_pk_char_width(f, w);
+        pdf_delta_h := pdf_delta_h + scaled_out;
+    end else
+        pdf_delta_h := pdf_delta_h + get_pk_char_width(f, w);
 end;
 
 procedure pdf_print_real(m, d: integer); {print $m/10^d$ as real}
@@ -15508,18 +15549,22 @@ end;
 PDF}
 @d pdf_y(#) == (pdf_origin_v - (#)) {convert $y$-coordinate from \.{DVI} to
 PDF}
+@d dvi_x(#) == ((#) + pdf_origin_h) {convert $x$-coordinate from \.{PDF} to
+DVI}
+@d dvi_y(#) == (pdf_origin_v - (#)) {convert $y$-coordinate from \.{PDF} to
+DVI}
 
 @<Glob...@>=
 @!pdf_f: internal_font_number; {the current font in PDF output page}
 @!pdf_h: scaled; {current horizontal coordinate in PDF output page}
 @!pdf_v: scaled; {current vertical coordinate in PDF output page}
-@!pdf_last_h: scaled; {last horizontal coordinate in PDF output page}
-@!pdf_last_v: scaled; {last vertical coordinate in PDF output page}
+@!pdf_tj_start_h: scaled; {horizontal coordinate in PDF output page just before \.{TJ} array start}
+@!cur_delta_h: scaled; {horizontal |cur_h| offset from |pdf_tj_start_h|}
+@!pdf_delta_h: scaled; {horizontal offset from |pdf_tj_start_h|}
 @!pdf_origin_h: scaled; {current horizontal origin in PDF output page}
 @!pdf_origin_v: scaled; {current vertical origin in PDF output page}
 @!pdf_doing_string: boolean; {we are writing string to PDF file?}
 @!pdf_doing_text: boolean; {we are writing text section to PDF file?}
-@!pdf_font_changed: boolean; {current font has been changed?}
 @!min_bp_val: scaled;
 @!min_font_val: scaled; {(TJ array system)}
 @!fixed_pk_resolution: integer;
@@ -15547,9 +15592,8 @@ begin
         pdf_print_ln(" cm");
     end;
     pdf_h := pdf_origin_h;
-    pdf_last_h := pdf_origin_h;
+    pdf_tj_start_h := pdf_h;
     pdf_v := pdf_origin_v;
-    pdf_last_v := pdf_origin_v;
 end;
 
 procedure pdf_set_origin_temp(h, v: scaled); {set the origin to |h|, |v| inside group}
@@ -15580,17 +15624,29 @@ begin
     end;
 end;
 
-procedure pdf_moveto(v, v_out: scaled); {set the next starting point to |cur_h|, |cur_v|}
+procedure pdf_set_textmatrix(v, v_out: scaled; f: internal_font_number);
+{set the next starting point to |cur_h|, |cur_v|}
 begin
     pdf_out(" ");
-    pdf_print_bp(cur_h - pdf_last_h);
-    pdf_h := pdf_last_h + scaled_out;
-    pdf_out(" ");
-    pdf_print_real(v, fixed_decimal_digits);
-    pdf_print(" Td");
-    pdf_v := pdf_last_v - v_out;
-    pdf_last_h := pdf_h;
-    pdf_last_v := pdf_v;
+    if (pdf_font_expand_ratio[f] <> 0) or (pdf_font_expand_ratio[pdf_f] <> 0) then begin
+        pdf_print_real(1000 + pdf_font_expand_ratio[f], 3);
+        pdf_print(" 0 0 1 ");
+        pdf_print_bp(cur_h + pdf_origin_h);
+        pdf_h := scaled_out;
+        pdf_out(" ");
+        pdf_print_bp(pdf_origin_v - cur_v);
+        pdf_v := pdf_origin_v - scaled_out;
+        pdf_print(" Tm");
+    end else begin
+        pdf_print_bp(cur_h - pdf_tj_start_h); {works only for unexpanded fonts}
+        pdf_h := pdf_tj_start_h + scaled_out;
+        pdf_out(" ");
+        pdf_print_real(v, fixed_decimal_digits); {use |v| and |v_out| to avoid duplicate calculation}
+        pdf_v := pdf_v - v_out;
+        pdf_print(" Td");
+    end;
+    pdf_tj_start_h := pdf_h;
+    pdf_delta_h := 0;
 end;
 
 procedure pdf_print_font_tag(f: internal_font_number);
@@ -15603,13 +15659,25 @@ begin
 end;
 
 procedure pdf_set_font(f: internal_font_number);
-label found;
+label found, found1;
 var p: pointer;
-    k: internal_font_number;
+    k, b, c: internal_font_number;
 begin
     if not font_used[f] then
         pdf_init_font(f);
-    set_ff(f);
+    if pdf_font_blink[f] <> null_font then {is the new font an expanded one?}
+        b := pdf_font_blink[f]
+    else
+        b := f;
+    if not font_used[b] then
+        pdf_init_font(b);
+    if pdf_font_blink[pdf_f] <> null_font then {was the previous font an expanded one?}
+        c := pdf_font_blink[pdf_f]
+    else
+        c := pdf_f;
+    if b = c then
+        return;
+    set_ff(b);
     k := ff;
     p := pdf_font_list;
     while p <> null do begin
@@ -15618,17 +15686,15 @@ begin
             goto found;
         p := link(p);
     end;
-    pdf_append_list(f)(pdf_font_list); {|f| not found in |pdf_font_list|}
+    pdf_append_list(b)(pdf_font_list); {|b| not found in |pdf_font_list|}
 found:
     pdf_print("/F");
     pdf_print_int(k);
-    pdf_print_font_tag(f);
+    pdf_print_font_tag(b);
     pdf_print_resname_prefix;
     pdf_out(" ");
-    pdf_print_real(divide_scaled(font_size[f], one_hundred_bp, 6), 4);
+    pdf_print_real(divide_scaled(font_size[b], one_hundred_bp, 6), 4);
     pdf_print(" Tf");
-    pdf_f := f;
-    pdf_font_changed := true;
 end;
 
 procedure pdf_begin_text; {begin a text section}
@@ -15644,7 +15710,7 @@ end;
 for each font change.
 Division by $2000$ there sets |min_font_val| just at the
 trigger level of the |divide_scaled| operation below.
-Therefore the comparison |abs(cur_h - pdf_h)| does not
+Therefore the comparison |abs(cur_delta_h - pdf_delta_h)| does not
 cost precision, it just makes the |divide_scaled|
 operation happen less often.
 
@@ -15657,16 +15723,17 @@ begin
     if f <> pdf_f then begin
         pdf_end_string;
         pdf_set_font(f);
-        min_font_val :=
-            divide_scaled(pdf_font_size[f], 2000, 0);
+        min_font_val := divide_scaled(pdf_font_size[f], 2000, 0);
     end;
-    if abs(cur_h - pdf_h) >= min_font_val then begin
-        s := divide_scaled(cur_h - pdf_h, pdf_font_size[f], 3);
+    cur_delta_h := round_xn_over_d(cur_h - pdf_tj_start_h, 1000,
+                                   1000 + pdf_font_expand_ratio[f]);
+    if abs(cur_delta_h - pdf_delta_h) >= min_font_val then begin
+        s := divide_scaled(cur_delta_h - pdf_delta_h, pdf_font_size[f], 3);
         s_out := scaled_out;
     end else
         s := 0;
     if abs(cur_v - pdf_v) >= min_bp_val then begin
-        v := divide_scaled(pdf_last_v - cur_v, one_hundred_bp,
+        v := divide_scaled(pdf_v - cur_v, one_hundred_bp,
                            fixed_decimal_digits + 2);
         v_out := scaled_out;
     end
@@ -15674,14 +15741,14 @@ begin
         v := 0;
         v_out := 0;
     end;
-    if pdf_font_changed or (v <> 0) or (abs(s) >= @'100000) then begin
+    if (f <> pdf_f) or (v <> 0) or (abs(s) >= @'100000) then begin
         pdf_end_string;
-        pdf_moveto(v, v_out);
-        pdf_font_changed := false;
+        pdf_set_textmatrix(v, v_out, f);
+        pdf_f := f;
         s := 0;
     end;
     if not pdf_doing_string then begin
-        pdf_out("[");
+        pdf_print(" [");
         if s = 0 then
             pdf_out("(");
     end;
@@ -15690,7 +15757,7 @@ begin
             pdf_out(")");
         pdf_print_int(-s);
         pdf_out("(");
-        pdf_h := pdf_h + s_out;
+        pdf_delta_h := pdf_delta_h + s_out;
     end;
     pdf_doing_string := true;
 end;
@@ -15864,6 +15931,31 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d direct_page             == 1 {end text (ET) if needed, but don't change the CTM}
 @d direct_always           == 2 {don't end text, don't change the CTM}
 @d scan_special            == 3 {look into special text}
+
+@# {data structure for \.{\\pdfcolorstack}}
+@d pdf_colorstack_node_size == 3
+@d pdf_colorstack_setter_node_size == 3
+@d pdf_colorstack_getter_node_size == 2
+@d pdf_colorstack_stack(#)  == link(#+1) {stack number}
+@d pdf_colorstack_cmd(#)    == info(#+1) {command: set, push, pop, current}
+@d pdf_colorstack_data(#)   == link(#+2) {data}
+
+@# {color stack commands}
+@d colorstack_set          == 0
+@d colorstack_push         == 1
+@d colorstack_data         == 1 { last value where data field is set }
+@d colorstack_pop          == 2
+@d colorstack_current      == 3
+
+@# {data structure for \.{\\pdfsetmatrix}}
+@d pdf_setmatrix_node_size == 2
+@d pdf_setmatrix_data(#)   == link(#+1) {data}
+
+@# {data structure for \.{\\pdsave}}
+@d pdf_save_node_size      == 2
+
+@# {data structure for \.{\\pdfrestore}}
+@d pdf_restore_node_size   == 2
 
 @# {data structure for \.{\\pdfobj} and \.{\\pdfrefobj}}
 @d pdf_refobj_node_size    == 2 {size of whatsit node representing the raw object}
@@ -17028,7 +17120,8 @@ begin
                 return;
             end;
         end;
-        pdf_create_obj(obj_type_font, f);
+        if pdf_font_blink[f] = null_font then
+            pdf_create_obj(obj_type_font, f);
         pdf_use_font(f, obj_ptr);
     end;
 end;
@@ -17659,6 +17752,107 @@ begin
     flush_str(s);
 end;
 
+procedure pdf_out_colorstack(p:pointer);
+var old_setting: 0..max_selector; {holds print |selector|}
+    s: str_number;
+    cmd: integer;
+    stack_no: integer;
+    literal_mode: integer;
+begin
+    cmd := pdf_colorstack_cmd(p);
+    stack_no := pdf_colorstack_stack(p);
+    if stack_no >= colorstackused then begin
+        print_nl("");
+        print("Color stack ");
+        print_int(stack_no);
+        print(" is not initialized for use!");
+        print_nl("");
+        return;
+    end;
+    case cmd of
+    colorstack_set, colorstack_push: begin
+        old_setting:=selector; selector:=new_string;
+        show_token_list(link(pdf_colorstack_data(p)),null,pool_size-pool_ptr);
+        selector:=old_setting;
+        s := make_string;
+        if cmd = colorstack_set then
+            literal_mode := colorstackset(stack_no, s)
+        else
+            literal_mode := colorstackpush(stack_no, s);
+        if length(s) > 0 then
+            literal(s, literal_mode, false);
+        flush_str(s);
+        return;
+    end;
+    colorstack_pop: literal_mode := colorstackpop(stack_no);
+    colorstack_current: literal_mode := colorstackcurrent(stack_no);
+    othercases do_nothing
+    endcases;
+    if cur_length > 0 then begin
+        s := make_string;
+        literal(s, literal_mode, false);
+        flush_str(s);
+    end
+end;
+
+procedure pdf_out_colorstack_startpage;
+var i: integer;
+    max: integer;
+    start_status: integer;
+    literal_mode: integer;
+    s: str_number;
+begin
+    i := 0;
+    max := colorstackused;
+    while i < max do begin
+        start_status := colorstackskippagestart(i);
+        if start_status = 0 then begin
+            literal_mode := colorstackcurrent(i);
+            if cur_length > 0 then begin
+                s := make_string;
+                literal(s, literal_mode, false);
+                flush_str(s);
+            end;
+        end;
+        incr(i);
+    end;
+end;
+
+procedure pdf_out_setmatrix(p:pointer);
+var old_setting:0..max_selector; {holds print |selector|}
+    s: str_number;
+begin
+    old_setting:=selector; selector:=new_string;
+    show_token_list(link(pdf_setmatrix_data(p)),null,pool_size-pool_ptr);
+    selector:=old_setting;
+    str_room(7);
+    str_pool[pool_ptr] := 0; { make C string for pdfsetmatrix }
+    pdfsetmatrix(str_start[str_ptr], cur_h, cur_page_height - cur_v);
+    str_room(7);
+    append_char(" ");
+    append_char("0");
+    append_char(" ");
+    append_char("0");
+    append_char(" ");
+    append_char("c");
+    append_char("m");
+    s := make_string;
+    literal(s, set_origin, false);
+    flush_str(s);
+end;
+
+procedure pdf_out_save(p:pointer);
+begin
+    checkpdfsave(cur_h, cur_v);
+    literal("q", set_origin, false);
+end;
+
+procedure pdf_out_restore(p:pointer);
+begin
+    checkpdfrestore(cur_h, cur_v);
+    literal("Q", set_origin, false);
+end;
+
 procedure pdf_special(p: pointer);
 var old_setting:0..max_selector; {holds print |selector|}
     s: str_number;
@@ -18168,7 +18362,10 @@ pdf_indirect_ln("Resources", pdf_last_resources)
 pdf_begin_stream;
 if shipping_page then begin
     @<Adjust transformation matrix for the magnification ratio@>;
-end
+end;
+pdfshipoutbegin(shipping_page);
+if shipping_page then
+    pdf_out_colorstack_startpage;
 
 @ @<Adjust transformation matrix for the magnification ratio@>=
 prepare_mag;
@@ -18198,6 +18395,7 @@ end
 
 @ @<Finish stream of page/form contents@>=
 pdf_end_text;
+pdfshipoutend(shipping_page);
 pdf_end_stream
 
 @ @<Write out resources dictionary@>=
@@ -18915,7 +19113,8 @@ fixed_gen_tounicode := pdf_gen_tounicode;
 k := head_tab[obj_type_font];
 while k <> 0 do begin
     f := obj_info(k);
-    do_pdf_font(k, f);
+    if pdf_font_blink[f] = null_font then
+        do_pdf_font(k, f);
     k := obj_link(k);
 end
 
@@ -32402,7 +32601,11 @@ stays the same.
 @d pdf_snapy_node              == pdftex_first_extension_code + 28
 @d pdf_snapy_comp_node         == pdftex_first_extension_code + 29
 @d pdf_glyph_to_unicode_code   == pdftex_first_extension_code + 30
-@d pdftex_last_extension_code  == pdftex_first_extension_code + 30
+@d pdf_colorstack_node         == pdftex_first_extension_code + 31
+@d pdf_setmatrix_node          == pdftex_first_extension_code + 32
+@d pdf_save_node               == pdftex_first_extension_code + 33
+@d pdf_restore_node            == pdftex_first_extension_code + 34
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 34
 
 @<Put each...@>=
 primitive("openout",extension,open_node);@/
@@ -32419,6 +32622,14 @@ primitive("setlanguage",extension,set_language_code);@/
 @!@:set_language_}{\.{\\setlanguage} primitive@>
 primitive("pdfliteral",extension,pdf_literal_node);@/
 @!@:pdf_literal_}{\.{\\pdfliteral} primitive@>
+primitive("pdfcolorstack",extension,pdf_colorstack_node);@/
+@!@:pdf_colorstack_}{\.{\\pdfcolorstack} primitive@>
+primitive("pdfsetmatrix",extension,pdf_setmatrix_node);@/
+@!@:pdf_setmatrix_}{\.{\\pdfsetmatrix} primitive@>
+primitive("pdfsave",extension,pdf_save_node);@/
+@!@:pdf_save_}{\.{\\pdfsave} primitive@>
+primitive("pdfrestore",extension,pdf_restore_node);@/
+@!@:pdf_restore_}{\.{\\pdfrestore} primitive@>
 primitive("pdfobj",extension,pdf_obj_code);@/
 @!@:pdf_obj_}{\.{\\pdfobj} primitive@>
 primitive("pdfrefobj",extension,pdf_refobj_node);@/
@@ -32504,6 +32715,10 @@ extension: case chr_code of
   pdf_include_chars_code: print_esc("pdfincludechars");
   pdf_info_code: print_esc("pdfinfo");
   pdf_literal_node: print_esc("pdfliteral");
+  pdf_colorstack_node: print_esc("pdfcolorstack");
+  pdf_setmatrix_node: print_esc("pdfsetmatrix");
+  pdf_save_node: print_esc("pdfsave");
+  pdf_restore_node: print_esc("pdfrestore");
   pdf_map_file_code: print_esc("pdfmapfile");
   pdf_map_line_code: print_esc("pdfmapline");
   pdf_names_code: print_esc("pdfnames");
@@ -32556,6 +32771,10 @@ begin case cur_chr of
   pdf_include_chars_code: @<Implement \.{\\pdfincludechars}@>;
   pdf_info_code: @<Implement \.{\\pdfinfo}@>;
   pdf_literal_node: @<Implement \.{\\pdfliteral}@>;
+  pdf_colorstack_node: @<Implement \.{\\pdfcolorstack}@>;
+  pdf_setmatrix_node: @<Implement \.{\\pdfsetmatrix}@>;
+  pdf_save_node: @<Implement \.{\\pdfsave}@>;
+  pdf_restore_node: @<Implement \.{\\pdfrestore}@>;
   pdf_map_file_code: @<Implement \.{\\pdfmapfile}@>;
   pdf_map_line_code: @<Implement \.{\\pdfmapline}@>;
   pdf_names_code: @<Implement \.{\\pdfnames}@>;
@@ -32731,6 +32950,88 @@ begin
         pdf_literal_mode(tail) := set_origin;
     scan_pdf_ext_toks;
     pdf_literal_data(tail) := def_ref;
+end
+
+@ @<Implement \.{\\pdfcolorstack}@>=
+begin
+    check_pdfoutput("\pdfcolorstack", true);
+    {Scan and check the stack number and store in cur_val}
+    scan_int;
+    if cur_val >= colorstackused then begin
+        print_err("Unknown color stack number ");
+        print_int(cur_val);
+@.Unknown color stack@>
+        help3("Allocate and initialize a color stack with \\pdfcolorstackinit.")@/
+        ("I'll use default color stack 0 here.")@/
+        ("Proceed, with fingers crossed.");
+        error;
+        cur_val := 0;
+    end;
+    if cur_val < 0 then begin
+        print_err("Invalid negative color stack number");
+@.Invalid negative color stack number@>
+        help2("I'll use default color stack 0 here.")@/
+        ("Proceed, with fingers corssed.");
+        error;
+        cur_val := 0;
+    end;
+    {Scan the command and store in i, j holds the node size}
+    if scan_keyword("set") then begin
+        i := colorstack_set;
+        j := pdf_colorstack_setter_node_size;
+    end
+    else if scan_keyword("push") then begin
+        i := colorstack_push;
+        j := pdf_colorstack_setter_node_size;
+    end
+    else if scan_keyword("pop") then begin
+        i := colorstack_pop;
+        j := pdf_colorstack_getter_node_size;
+    end
+    else if scan_keyword("current") then begin
+        i := colorstack_current;
+        j := pdf_colorstack_getter_node_size;
+    end
+    else begin
+        i := -1; {error}
+    end;
+    if i >= 0 then begin
+        new_whatsit(pdf_colorstack_node, j);
+        pdf_colorstack_stack(tail) := cur_val;
+        pdf_colorstack_cmd(tail)   := i;
+        if i <= colorstack_data then begin
+            scan_pdf_ext_toks;
+            pdf_colorstack_data(tail) := def_ref;
+        end;
+    end
+    else begin
+        print_err("Color stack action is missing");
+@.Color stack action is missing@>
+        help3("The expected actions for \pdfcolorstack:")@/
+        ("    set, push, pop, current")@/
+        ("I'll ignore the color stack command.");
+        error;
+    end 
+end
+
+@ @<Implement \.{\\pdfsetmatrix}@>=
+begin
+    check_pdfoutput("\pdfsetmatrix", true);
+    new_whatsit(pdf_setmatrix_node, pdf_setmatrix_node_size);
+    scan_pdf_ext_toks;
+    pdf_setmatrix_data(tail) := def_ref;
+end
+
+@ @<Implement \.{\\pdfsave}@>=
+begin
+    check_pdfoutput("\pdfsave", true);
+    new_whatsit(pdf_save_node, pdf_save_node_size);
+end
+
+@ @<Implement \.{\\pdfrestore}@>=
+begin
+    check_pdfoutput("\pdfrestore", true);
+    new_whatsit(pdf_restore_node, pdf_restore_node_size);
 end
 
 @ The \.{\\pdfobj} primitive is used to create a ``raw'' object in the PDF
@@ -33903,6 +34204,33 @@ pdf_literal_node: begin
     endcases;
     print_mark(pdf_literal_data(p));
 end;
+pdf_colorstack_node: begin
+    print_esc("pdfcolorstack ");
+    print_int(pdf_colorstack_stack(p));
+    case  pdf_colorstack_cmd(p) of
+    colorstack_set:
+        print(" set ");
+    colorstack_push:
+        print(" push ");
+    colorstack_pop:
+        print(" pop");
+    colorstack_current:
+        print(" current");
+    othercases confusion("pdfcolorstack")
+    endcases;
+    if pdf_colorstack_cmd(p) <= colorstack_data then
+        print_mark(pdf_colorstack_data(p));
+end;
+pdf_setmatrix_node: begin
+    print_esc("pdfsetmatrix");
+    print_mark(pdf_setmatrix_data(p));
+end;
+pdf_save_node: begin
+    print_esc("pdfsave");
+end;
+pdf_restore_node: begin
+    print_esc("pdfrestore");
+end;
 pdf_refobj_node: begin
     print_esc("pdfrefobj");
     if obj_obj_is_stream(pdf_obj_objnum(p)) > 0 then begin
@@ -34073,6 +34401,30 @@ pdf_literal_node: begin
     add_token_ref(pdf_literal_data(p));
     words := write_node_size;
 end;
+pdf_colorstack_node: begin
+    if pdf_colorstack_cmd(p) <= colorstack_data then begin
+        r := get_node(pdf_colorstack_setter_node_size);
+        add_token_ref(pdf_colorstack_data(p));
+        words := pdf_colorstack_setter_node_size;
+    end
+    else begin
+        r := get_node(pdf_colorstack_getter_node_size);
+        words := pdf_colorstack_getter_node_size;
+    end;
+end;
+pdf_setmatrix_node: begin
+    r := get_node(pdf_setmatrix_node_size);
+    add_token_ref(pdf_setmatrix_data(p));
+    words := pdf_setmatrix_node_size;
+end;
+pdf_save_node: begin
+    r := get_node(pdf_save_node_size);
+    words := pdf_save_node_size;
+end;
+pdf_restore_node: begin
+    r := get_node(pdf_restore_node_size);
+    words := pdf_restore_node_size;
+end;
 pdf_refobj_node: begin
     r := get_node(pdf_refobj_node_size);
     words := pdf_refobj_node_size;
@@ -34146,6 +34498,24 @@ close_node,language_node: free_node(p,small_node_size);
 pdf_literal_node: begin
     delete_token_ref(pdf_literal_data(p));
     free_node(p, write_node_size);
+end;
+pdf_colorstack_node: begin
+    if pdf_colorstack_cmd(p) <= colorstack_data then begin
+        delete_token_ref(pdf_colorstack_data(p));
+        free_node(p, pdf_colorstack_setter_node_size);
+    end
+    else
+        free_node(p, pdf_colorstack_getter_node_size);
+end;
+pdf_setmatrix_node: begin
+    delete_token_ref(pdf_setmatrix_data(p));
+    free_node(p, pdf_setmatrix_node_size);
+end;
+pdf_save_node: begin
+    free_node(p, pdf_save_node_size);
+end;
+pdf_restore_node: begin
+    free_node(p, pdf_restore_node_size);
 end;
 pdf_refobj_node:
     free_node(p, pdf_refobj_node_size);
@@ -34624,6 +34994,14 @@ begin
         pdf_bottom(p) := y  + depth(parent_box)
     else
         pdf_bottom(p) := cur_v + d;
+    if is_shipping_page and matrixused then begin
+        matrixtransformrect(pdf_left(p), cur_page_height - pdf_bottom(p),
+                            pdf_right(p), cur_page_height - pdf_top(p));
+        pdf_left(p)   := getllx;
+        pdf_bottom(p) := cur_page_height - getlly;
+        pdf_right(p)  := geturx;
+        pdf_top(p)    := cur_page_height - getury;
+    end;
     pdf_left(p)   := pdf_left(p)   - margin;
     pdf_top(p)    := pdf_top(p)    - margin;
     pdf_right(p)  := pdf_right(p)  + margin;
@@ -34707,7 +35085,15 @@ begin
     if pdf_link_level <> cur_s then
         pdf_error("ext4", "\pdfendlink ended up in different nesting level than \pdfstartlink");
     if is_running(pdf_link_wd) and (last_link <> null) then
-        pdf_right(last_link) := cur_h + pdf_link_margin;
+        if is_shipping_page and matrixused then begin
+            matrixrecalculate(cur_h + pdf_link_margin);
+            pdf_left(last_link)   := getllx - pdf_link_margin;
+            pdf_top(last_link)    := cur_page_height - getury - pdf_link_margin;
+            pdf_right(last_link)  := geturx + pdf_link_margin;
+            pdf_bottom(last_link) := cur_page_height - getlly + pdf_link_margin;
+         end
+         else
+            pdf_right(last_link) := cur_h + pdf_link_margin;
     restore_link_level;
     last_link := null;
 end;
@@ -34867,16 +35253,31 @@ begin
     obj_dest_ptr(k) := p;
     pdf_append_list(k)(pdf_dest_list);
     case pdf_dest_type(p) of
-    pdf_dest_xyz: begin
-        pdf_left(p) := cur_h;
-        pdf_top(p) := cur_v;
-    end;
+    pdf_dest_xyz:
+        if matrixused then
+            set_rect_dimens(p, parent_box, x, y,
+                            pdf_width(p), pdf_height(p), pdf_depth(p),
+                            pdf_dest_margin)
+        else begin
+            pdf_left(p) := cur_h;
+            pdf_top(p) := cur_v;
+        end;
     pdf_dest_fith,
     pdf_dest_fitbh:
-        pdf_top(p) := cur_v;
+        if matrixused then
+            set_rect_dimens(p, parent_box, x, y,
+                            pdf_width(p), pdf_height(p), pdf_depth(p),
+                            pdf_dest_margin)
+        else
+            pdf_top(p) := cur_v;
     pdf_dest_fitv,
     pdf_dest_fitbv:
-        pdf_left(p) := cur_h;
+        if matrixused then
+            set_rect_dimens(p, parent_box, x, y,
+                            pdf_width(p), pdf_height(p), pdf_depth(p),
+                            pdf_dest_margin)
+        else
+            pdf_left(p) := cur_h;
     pdf_dest_fit,
     pdf_dest_fitb:
         do_nothing;
@@ -35114,6 +35515,14 @@ end
 case subtype(p) of
 pdf_literal_node:
     pdf_out_literal(p);
+pdf_colorstack_node:
+    pdf_out_colorstack(p);
+pdf_setmatrix_node:
+    pdf_out_setmatrix(p);
+pdf_save_node:
+    pdf_out_save(p);
+pdf_restore_node:
+    pdf_out_restore(p);
 pdf_refobj_node:
     pdf_append_list(pdf_obj_objnum(p))(pdf_obj_list);
 pdf_refxform_node:
@@ -35182,6 +35591,14 @@ begin cur_v:=cur_v+pdf_height(p); save_v:=cur_v;
 case subtype(p) of
 pdf_literal_node:
     pdf_out_literal(p);
+pdf_colorstack_node:
+    pdf_out_colorstack(p);
+pdf_setmatrix_node:
+    pdf_out_setmatrix(p);
+pdf_save_node:
+    pdf_out_save(p);
+pdf_restore_node:
+    pdf_out_restore(p);
 pdf_refobj_node:
     pdf_append_list(pdf_obj_objnum(p))(pdf_obj_list);
 pdf_refxform_node:

@@ -39,6 +39,10 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $
 #include "png.h"
 #include "xpdf/config.h"
 
+#define check_nprintf(size_get, size_want) \
+    if (size_get >= size_want) \
+        pdftex_fail ("snprintf failed: file %s, line %d", __FILE__, __LINE__);
+
 /*@unused@*/
 static const char perforce_id[] =
     "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $";
@@ -303,6 +307,7 @@ void setjobid (int year, int month, int day, int time)
 {
     char *name_string, *format_string, *s;
     size_t slen;
+    int i;
 
     if (job_id_string != NULL)
         return;
@@ -316,11 +321,12 @@ void setjobid (int year, int month, int day, int time)
         strlen (versionstring) + strlen (kpathsea_version_string);
     s = xtalloc (slen, char);
     /* The Web2c version string starts with a space.  */
-    snprintf (s, slen,
-              "%.4d/%.2d/%.2d %.2d:%.2d %s %s %s%s %s",
-              year, month, day, time / 60, time % 60,
-              name_string, format_string, ptexbanner,
-              versionstring, kpathsea_version_string);
+    i = snprintf (s, slen,
+                  "%.4d/%.2d/%.2d %.2d:%.2d %s %s %s%s %s",
+                  year, month, day, time / 60, time % 60,
+                  name_string, format_string, ptexbanner,
+                  versionstring, kpathsea_version_string);
+    check_nprintf (i, slen);
     job_id_string = xstrdup (s);
     xfree (s);
     xfree (name_string);
@@ -332,6 +338,7 @@ void makepdftexbanner (void)
     static boolean pdftexbanner_init = false;
     char *s;
     size_t slen;
+    int i;
 
     if (pdftexbanner_init)
         return;
@@ -341,8 +348,10 @@ void makepdftexbanner (void)
         strlen (versionstring) + strlen (kpathsea_version_string);
     s = xtalloc (slen, char);
     /* The Web2c version string starts with a space.  */
-    snprintf (s, slen,
-              "%s%s %s", ptexbanner, versionstring, kpathsea_version_string);
+    i = snprintf (s, slen,
+                  "%s%s %s", ptexbanner, versionstring,
+                  kpathsea_version_string);
+    check_nprintf (i, slen);
     pdftexbanner = maketexstring (s);
     xfree (s);
     pdftexbanner_init = true;
@@ -448,14 +457,15 @@ char *convertStringToPDFString (const char *in, int len)
 {
     static char pstrbuf[MAX_PSTRING_LEN];
     char *out = pstrbuf;
-    int i, j = 0;
+    int i, j = 0, k;
     char buf[5];
     for (i = 0; i < len; i++) {
         check_buf (j + sizeof (buf), MAX_PSTRING_LEN);
         if (((unsigned char) in[i] < '!') || ((unsigned char) in[i] > '~')) {
             /* convert control characters into oct */
-            snprintf (buf, sizeof (buf),
-                      "\\%03o", (unsigned int) (unsigned char) in[i]);
+            k = snprintf (buf, sizeof (buf),
+                          "\\%03o", (unsigned int) (unsigned char) in[i]);
+            check_nprintf (k, sizeof (buf));
             out[j++] = buf[0];
             out[j++] = buf[1];
             out[j++] = buf[2];
@@ -501,9 +511,10 @@ void escapestring (poolpointer in)
 
         if ((ch < '!') || (ch > '~')) {
             /* convert control characters into oct */
-            snprintf ((char *) &strpool[poolptr], 4,
-                      "\\%.3o", (unsigned int) ch);
-            poolptr += 4;
+            int i = snprintf ((char *) &strpool[poolptr], 5,
+                              "\\%.3o", (unsigned int) ch);
+            check_nprintf (i, 5);
+            poolptr += i;
             continue;
         }
         if ((ch == '(') || (ch == ')') || (ch == '\\')) {
@@ -514,7 +525,6 @@ void escapestring (poolpointer in)
         strpool[poolptr++] = ch;
     }
 }
-
 
 /* Convert any given string in a PDF name using escaping mechanism
    of PDF 1.2. The result does not include the leading slash.
@@ -561,6 +571,7 @@ void escapename (poolpointer in)
 {
     const poolpointer out = poolptr;
     unsigned char ch;
+    int i;
 
     while (in < out) {
         if (poolptr + 3 >= poolsize) {
@@ -573,9 +584,10 @@ void escapename (poolpointer in)
 
         if ((ch >= 1 && ch <= 32) || ch >= 127) {
             /* escape */
-            snprintf ((char *) &strpool[poolptr], 3,
-                      "#%.2X", (unsigned int) ch);
-            poolptr += 3;
+            i = snprintf ((char *) &strpool[poolptr], 4,
+                          "#%.2X", (unsigned int) ch);
+            check_nprintf (i, 4);
+            poolptr += i;
             continue;
         }
         switch (ch) {
@@ -594,9 +606,10 @@ void escapename (poolpointer in)
         case 123:
         case 125:
             /* escape */
-            snprintf ((char *) &strpool[poolptr], 3,
-                      "#%.2X", (unsigned int) ch);
-            poolptr += 3;
+            i = snprintf ((char *) &strpool[poolptr], 4,
+                          "#%.2X", (unsigned int) ch);
+            check_nprintf (i, 4);
+            poolptr += i;
             break;
         default:
             /* copy */
@@ -616,6 +629,7 @@ void escapehex (poolpointer in)
 {
     const poolpointer out = poolptr;
     unsigned char ch;
+    int i;
 
     while (in < out) {
         if (poolptr + 2 >= poolsize) {
@@ -626,7 +640,8 @@ void escapehex (poolpointer in)
 
         ch = (unsigned char) strpool[in++];
 
-        snprintf ((char *) &strpool[poolptr], 3, "%.2X", (unsigned int) ch);
+        i = snprintf ((char *) &strpool[poolptr], 3, "%.2X", (unsigned int) ch);
+        check_nprintf (i, 3);
         poolptr += 2;
     }
 }
@@ -686,12 +701,13 @@ void unescapehex (poolpointer in)
  */
 static void convertStringToHexString (const char *in, char *out, int lin)
 {
-    int i, j;
+    int i, j, k;
     char buf[3];
     j = 0;
     for (i = 0; i < lin; i++) {
-        snprintf (buf, sizeof (buf),
-                  "%02X", (unsigned int) (unsigned char) in[i]);
+        k = snprintf (buf, sizeof (buf),
+                      "%02X", (unsigned int) (unsigned char) in[i]);
+        check_nprintf (k, sizeof (buf));
         out[j++] = buf[0];
         out[j++] = buf[1];
     }
@@ -821,7 +837,7 @@ static void makepdftime (time_t t, char *time_str)
 
     struct tm lt, gmt;
     size_t size;
-    int off, off_hours, off_mins;
+    int i, off, off_hours, off_mins;
 
     /* get the time */
     lt = *localtime (&t);
@@ -859,7 +875,8 @@ static void makepdftime (time_t t, char *time_str)
     } else {
         off_hours = off / 60;
         off_mins = abs (off - off_hours * 60);
-        snprintf (&time_str[size], 9, "%+03d'%02d'", off_hours, off_mins);
+        i = snprintf (&time_str[size], 9, "%+03d'%02d'", off_hours, off_mins);
+        check_nprintf (i, 9);
     }
 }
 
@@ -931,6 +948,7 @@ void getfilemoddate (strnumber s)
 void getfilesize (strnumber s)
 {
     struct stat file_data;
+    int i;
 
     char *file_name = kpse_find_tex (makecfilename (s));
     if (file_name == NULL) {
@@ -943,8 +961,9 @@ void getfilesize (strnumber s)
         char buf[20];
 
         /* st_size has type off_t */
-        snprintf (buf, sizeof (buf),
-                  "%lu", (long unsigned int) file_data.st_size);
+        i = snprintf (buf, sizeof (buf),
+                      "%lu", (long unsigned int) file_data.st_size);
+        check_nprintf (i, sizeof (buf));
         len = strlen (buf);
         if (poolptr + len >= poolsize) {
             poolptr = poolsize;
@@ -1015,7 +1034,7 @@ void getmd5sum (strnumber s, boolean file)
 void getfiledump (strnumber s, int offset, int length)
 {
     FILE *f;
-    int read;
+    int read, i;
     poolpointer data_ptr;
     poolpointer data_end;
     char *file_name;
@@ -1058,9 +1077,10 @@ void getfiledump (strnumber s, int offset, int length)
     /* convert to hex */
     data_end = data_ptr + read;
     for (; data_ptr < data_end; data_ptr++) {
-        snprintf ((char *) &strpool[poolptr], 3,
-                  "%.2X", (unsigned int) strpool[data_ptr]);
-        poolptr += 2;
+        i = snprintf ((char *) &strpool[poolptr], 3,
+                      "%.2X", (unsigned int) strpool[data_ptr]);
+        check_nprintf (i, 3);
+        poolptr += i;
     }
     xfree (file_name);
 }
@@ -1115,8 +1135,7 @@ void matchstrings (strnumber s, strnumber t, int subcount, boolean icase)
 
 void getmatch (int i)
 {
-    int size = 0;
-    int len = 0;
+    int size, len;
 
     boolean found = i < sub_match_count
         && match_string != NULL && pmatch[i].rm_so >= 0 && i >= 0;
@@ -1135,8 +1154,10 @@ void getmatch (int i)
     }
 
     if (found) {
-        snprintf ((char *) &strpool[poolptr], 20, "%d", (int) pmatch[i].rm_so);
-        poolptr += strlen ((char *) &strpool[poolptr]);
+        int j = snprintf ((char *) &strpool[poolptr], 20, "%d",
+                          (int) pmatch[i].rm_so);
+        check_nprintf (j, 20);
+        poolptr += j;
         strpool[poolptr++] = '-';
         strpool[poolptr++] = '>';
         memcpy (&strpool[poolptr], &match_string[pmatch[i].rm_so], len);
@@ -1260,4 +1281,541 @@ void initversionstring (char **versions)
                      "Compiled with xpdf version %s\n",
                      PNG_LIBPNG_VER_STRING, png_libpng_ver,
                      ZLIB_VERSION, zlib_version, xpdfVersion);
+}
+
+
+/*************************************************/
+/* Color Stack and Matrix Transformation Support */
+/*************************************************/
+
+/*
+    In the following array and especially stack data structures are used.
+    They have the following properties:
+    - They automatically grow dynamically.
+    - The size never decreases.
+    - The variable with name ending in "size" contains the number how many
+      entries the data structure can hold.
+    - The variable with name ending in "used" contains the number of
+      actually used entries.
+    - Memory of strings in stack entries must be allocated and
+      freed if the stack is cleared.
+*/
+
+/* Color Stack */
+
+#define STACK_INCREMENT 8
+#define MAX_COLORSTACKS 32768
+/* The colorstack number is stored in two bytes (info field of the node) */
+/* Condition (newcolorstack): MAX_COLORSTACKS mod STACK_INCREMENT = 0 */
+
+#define COLOR_DEFAULT "0 g 0 G"
+/* literal_modes, see pdftex.web */
+#define SET_ORIGIN 0
+#define DIRECT_PAGE 1
+#define DIRECT_ALWAYS 2
+
+/* remember shipout mode: page/form */
+static boolean page_mode;
+
+typedef struct {
+    char **page_stack;
+    char **form_stack;
+    char *page_current;
+    char *form_current;
+    char *form_init;
+    int page_size;
+    int form_size;
+    int page_used;
+    int form_used;
+    int literal_mode;
+    boolean page_start;
+} colstack_type;
+
+static colstack_type *colstacks = NULL;
+static int colstacks_size = 0;
+static int colstacks_used = 0;
+
+/*
+    Initialization is done, if the color stacks are used,
+    init_colorstacks() is defined as macro to avoid unnecessary
+    procedure calls.
+*/
+#define init_colorstacks() if (colstacks_size == 0) colstacks_first_init();
+void colstacks_first_init ()
+{
+    colstacks_size = STACK_INCREMENT;
+    colstacks = xtalloc (colstacks_size, colstack_type);
+    colstacks_used = 1;
+    colstacks[0].page_stack = NULL;
+    colstacks[0].form_stack = NULL;
+    colstacks[0].page_size = 0;
+    colstacks[0].form_size = 0;
+    colstacks[0].page_used = 0;
+    colstacks[0].form_used = 0;
+    colstacks[0].page_current = xstrdup (COLOR_DEFAULT);
+    colstacks[0].form_current = xstrdup (COLOR_DEFAULT);
+    colstacks[0].form_init = xstrdup (COLOR_DEFAULT);
+    colstacks[0].literal_mode = DIRECT_ALWAYS;
+    colstacks[0].page_start = true;
+}
+
+int colorstackused ()
+{
+    init_colorstacks ();
+    return colstacks_used;
+}
+
+/*
+    newcolorstack()
+    A new color stack is setup with the given parameters.
+    The stack number is returned or -1 in case of error (no room).
+*/
+int newcolorstack (integer s, integer literal_mode, boolean page_start)
+{
+    colstack_type *colstack;
+    int colstack_num;
+    char *str;
+
+    init_colorstacks ();
+
+    /* make room */
+    if (colstacks_used == MAX_COLORSTACKS) {
+        return -1;
+    }
+    if (colstacks_used == colstacks_size) {
+        colstacks_size += STACK_INCREMENT;
+        /* If (MAX_COLORSTACKS mod STACK_INCREMENT = 0) then we don't
+           need to check the case that size overruns MAX_COLORSTACKS. */
+        colstacks = xretalloc (colstacks, colstacks_size, colstack_type);
+    }
+    /* claim new color stack */
+    colstack_num = colstacks_used++;
+    colstack = &colstacks[colstack_num];
+    /* configure the new color stack */
+    colstack->literal_mode = literal_mode;
+    colstack->page_start = page_start;
+    str = makecstring (s);
+    if (*str == 0) {
+        colstack->page_current = NULL;
+        colstack->form_current = NULL;
+        colstack->form_init = NULL;
+    } else {
+        colstack->page_current = xstrdup (str);
+        colstack->form_current = xstrdup (str);
+        colstack->form_init = xstrdup (str);
+    }
+    return colstack_num;
+}
+
+#define get_colstack(n) (&colstacks[n])
+
+/*
+    Puts a string on top of the string pool and updates poolptr.
+*/
+void put_cstring_on_strpool (poolpointer start, char *str)
+{
+    size_t len;
+
+    if (str == NULL || *str == 0) {
+        return;
+    }
+
+    len = strlen (str);
+    poolptr = start + len;
+    if (poolptr >= poolsize) {
+        poolptr = poolsize;
+        /* error by str_toks that calls str_room(1) */
+        return;
+    }
+    memcpy (&strpool[start], str, len);
+}
+
+integer colorstackset (int colstack_no, integer s)
+{
+    colstack_type *colstack = get_colstack (colstack_no);
+
+    if (page_mode) {
+        xfree (colstack->page_current);
+        colstack->page_current = xstrdup (makecstring (s));
+    } else {
+        xfree (colstack->form_current);
+        colstack->form_current = xstrdup (makecstring (s));
+    }
+    return colstack->literal_mode;
+}
+
+integer colorstackcurrent (int colstack_no)
+{
+    colstack_type *colstack = get_colstack (colstack_no);
+
+    if (page_mode) {
+        put_cstring_on_strpool (poolptr, colstack->page_current);
+    } else {
+        put_cstring_on_strpool (poolptr, colstack->form_current);
+    }
+    return colstack->literal_mode;
+}
+
+integer colorstackpush (int colstack_no, integer s)
+{
+    colstack_type *colstack = get_colstack (colstack_no);
+    char *str;
+
+    if (page_mode) {
+        if (colstack->page_used == colstack->page_size) {
+            colstack->page_size += STACK_INCREMENT;
+            colstack->page_stack = xretalloc (colstack->page_stack,
+                                              colstack->page_size, char *);
+        }
+        colstack->page_stack[colstack->page_used++] = colstack->page_current;
+        str = makecstring (s);
+        if (*str == 0) {
+            colstack->page_current = NULL;
+        } else {
+            colstack->page_current = xstrdup (str);
+        }
+    } else {
+        if (colstack->form_used == colstack->form_size) {
+            colstack->form_size += STACK_INCREMENT;
+            colstack->form_stack = xretalloc (colstack->form_stack,
+                                              colstack->form_size, char *);
+        }
+        colstack->form_stack[colstack->form_used++] = colstack->form_current;
+        str = makecstring (s);
+        if (*str == 0) {
+            colstack->form_current = NULL;
+        } else {
+            colstack->form_current = xstrdup (str);
+        }
+    }
+    return colstack->literal_mode;
+}
+
+integer colorstackpop (int colstack_no)
+{
+    colstack_type *colstack = get_colstack (colstack_no);
+
+    if (page_mode) {
+        if (colstack->page_used == 0) {
+            pdftex_warn ("pop empty color page stack %u",
+                         (unsigned int) colstack_no);
+            return colstack->literal_mode;
+        }
+        xfree (colstack->page_current);
+        colstack->page_current = colstack->page_stack[--colstack->page_used];
+        put_cstring_on_strpool (poolptr, colstack->page_current);
+    } else {
+        if (colstack->form_used == 0) {
+            pdftex_warn ("pop empty color form stack %u",
+                         (unsigned int) colstack_no);
+            return colstack->literal_mode;
+        }
+        xfree (colstack->form_current);
+        colstack->form_current = colstack->form_stack[--colstack->form_used];
+        put_cstring_on_strpool (poolptr, colstack->form_current);
+    }
+    return colstack->literal_mode;
+}
+
+void colorstackpagestart ()
+{
+    int i, j;
+    colstack_type *colstack;
+
+    if (page_mode) {
+        /* see procedure pdf_out_colorstack_startpage */
+        return;
+    }
+
+    for (i = 0; i < colstacks_used; i++) {
+        colstack = &colstacks[i];
+        for (j = 0; j < colstack->form_used; j++) {
+            xfree (colstack->form_stack[j]);
+        }
+        colstack->form_used = 0;
+        xfree (colstack->form_current);
+        if (colstack->form_init == NULL) {
+            colstack->form_current = NULL;
+        } else {
+            colstack->form_current = xstrdup (colstack->form_init);
+        }
+    }
+}
+
+integer colorstackskippagestart (int colstack_no)
+{
+    colstack_type *colstack = get_colstack (colstack_no);
+
+    if (!colstack->page_start) {
+        return 1;
+    }
+    if (strcmp (COLOR_DEFAULT, colstack->page_current) == 0) {
+        return 2;
+    }
+    return 0;
+}
+
+
+/* stack for \pdfsetmatrix */
+
+typedef struct {
+    double a;
+    double b;
+    double c;
+    double d;
+    double e;
+    double f;
+} matrix_entry;
+static matrix_entry *matrix_stack = 0;
+static int matrix_stack_size = 0;
+static int matrix_stack_used = 0;
+
+boolean matrixused ()
+{
+    return matrix_stack_used > 0;
+}
+
+/* stack for positions of \pdfsave */
+typedef struct {
+    int pos_h;
+    int pos_v;
+    int matrix_stack;
+} pos_entry;
+static pos_entry *pos_stack = 0;        /* the stack */
+static int pos_stack_size = 0;  /* initially empty */
+static int pos_stack_used = 0;  /* used entries */
+
+void matrix_stack_room ()
+{
+    matrix_entry *new_stack;
+
+    if (matrix_stack_used >= matrix_stack_size) {
+        matrix_stack_size += STACK_INCREMENT;
+        new_stack = xtalloc (matrix_stack_size, matrix_entry);
+        memcpy ((void *) new_stack, (void *) matrix_stack,
+                matrix_stack_used * sizeof (matrix_entry));
+        xfree (matrix_stack);
+        matrix_stack = new_stack;
+    }
+}
+
+void checkpdfsave (int cur_h, int cur_v)
+{
+    pos_entry *new_stack;
+
+    if (pos_stack_used >= pos_stack_size) {
+        pos_stack_size += STACK_INCREMENT;
+        new_stack = xtalloc (pos_stack_size, pos_entry);
+        memcpy ((void *) new_stack, (void *) pos_stack,
+                pos_stack_used * sizeof (pos_entry));
+        xfree (pos_stack);
+        pos_stack = new_stack;
+    }
+    pos_stack[pos_stack_used].pos_h = cur_h;
+    pos_stack[pos_stack_used].pos_v = cur_v;
+    if (page_mode) {
+        pos_stack[pos_stack_used].matrix_stack = matrix_stack_used;
+    }
+    pos_stack_used++;
+}
+
+void checkpdfrestore (int cur_h, int cur_v)
+{
+    int diff_h, diff_v;
+    if (pos_stack_used == 0) {
+        pdftex_warn ("%s", "\\pdfrestore: missing \\pdfsave");
+        return;
+    }
+    pos_stack_used--;
+    diff_h = cur_h - pos_stack[pos_stack_used].pos_h;
+    diff_v = cur_v - pos_stack[pos_stack_used].pos_v;
+    if (diff_h != 0 || diff_v != 0) {
+        pdftex_warn ("Misplaced \\pdfrestore by (%usp, %usp)", diff_h, diff_v);
+    }
+    if (page_mode) {
+        matrix_stack_used = pos_stack[pos_stack_used].matrix_stack;
+    }
+}
+
+void pdfshipoutbegin (boolean shipping_page)
+{
+    pos_stack_used = 0;         /* start with empty stack */
+
+    page_mode = shipping_page;
+    if (shipping_page) {
+        colorstackpagestart ();
+    }
+}
+
+void pdfshipoutend (boolean shipping_page)
+{
+    if (pos_stack_used > 0) {
+        pdftex_warn ("%u unmatched \\pdfsave after %s shipout",
+                     (unsigned int) pos_stack_used,
+                     ((shipping_page) ? "page" : "form"));
+    }
+}
+
+/*
+    \pdfsetmatrix{a b c d}
+    e := cur_h
+    f := cur_v
+    M_top: current active matrix at the top of
+           the matrix stack
+    
+    The origin of \pdfsetmatrix is the current point.
+    The annotation coordinate system is the original
+    page coordinate system. When pdfTeX calculates
+    annotation rectangles it does not take into
+    account this transformations, it uses the original
+    coordinate system. To get the corrected values,
+    first we go back to the origin, perform the
+    transformation and go back:
+
+    (  1   0  0 )   ( a b 0 )   ( 1 0 0 )
+    (  0   1  0 ) x ( c d 0 ) x ( 0 1 0 ) x M_top
+    ( -e  -f  1 )   ( 0 0 1 )   ( e f 1 )
+    
+    ( 1  0  0 )   (  a  b 0 )
+  = ( 0  1  0 ) x (  c  d 0 ) x M_top
+    ( e  f  1 )   ( -e -f 1 )
+    
+    ( a         b         0 )
+  = ( c         d         0 ) x M_top
+    ( e(1-a)-fc f(1-d)-eb 1 )
+    
+*/
+
+void pdfsetmatrix (poolpointer in, scaled cur_h, scaled cur_v)
+{
+    /* Argument of \pdfsetmatrix starts with strpool[in] and ends
+       before strpool[poolptr]. */
+
+    matrix_entry x, *y, *z;
+
+    if (page_mode) {
+        if (sscanf ((const char *) &strpool[in], " %lf %lf %lf %lf ",
+                    &x.a, &x.b, &x.c, &x.d) != 4) {
+            pdftex_warn ("Unrecognized format of \\pdfsetmatrix{%s}",
+                         &strpool[poolptr]);
+            return;
+        }
+        /* calculate this transformation matrix */
+        x.e = (double) cur_h *(1.0 - x.a) - (double) cur_v *x.c;
+        x.f = (double) cur_v *(1.0 - x.d) - (double) cur_h *x.b;
+        matrix_stack_room ();
+        z = &matrix_stack[matrix_stack_used];
+        if (matrix_stack_used > 0) {
+            y = &matrix_stack[matrix_stack_used - 1];
+            z->a = x.a * y->a + x.b * y->c;
+            z->b = x.a * y->b + x.b * y->d;
+            z->c = x.c * y->a + x.d * y->c;
+            z->d = x.c * y->b + x.d * y->d;
+            z->e = x.e * y->a + x.f * y->c + y->e;
+            z->f = x.e * y->b + x.f * y->d + y->f;
+        } else {
+            z->a = x.a;
+            z->b = x.b;
+            z->c = x.c;
+            z->d = x.d;
+            z->e = x.e;
+            z->f = x.f;
+        }
+        matrix_stack_used++;
+    }
+}
+
+/* Apply matrix to point (x,y)
+
+               ( a b 0 )
+   ( x y 1 ) x ( c d 0 ) = ( xa+yc+e xb+yd+f 1 )
+               ( e f 1 )
+
+   If \pdfsetmatrix wasn't used, then return the value unchanged.
+*/
+
+/* Return valeus for matrix tranform functions */
+static scaled ret_llx;
+static scaled ret_lly;
+static scaled ret_urx;
+static scaled ret_ury;
+
+scaled getllx ()
+{
+    return ret_llx;
+}
+
+scaled getlly ()
+{
+    return ret_lly;
+}
+
+scaled geturx ()
+{
+    return ret_urx;
+}
+
+scaled getury ()
+{
+    return ret_ury;
+}
+
+static int last_llx;
+static int last_lly;
+static int last_urx;
+static int last_ury;
+
+#define DO_ROUND(x)  ((x > 0) ? (x + .5) : (x - .5))
+#define DO_MIN(a, b) ((a < b) ? a : b)
+#define DO_MAX(a, b) ((a > b) ? a : b)
+
+void do_matrixtransform (scaled x, scaled y, scaled * retx, scaled * rety)
+{
+    matrix_entry *m = &matrix_stack[matrix_stack_used - 1];
+    double x_old = x;
+    double y_old = y;
+    double x_new = x_old * m->a + y_old * m->c + m->e;
+    double y_new = x_old * m->b + y_old * m->d + m->f;
+    *retx = (scaled) DO_ROUND (x_new);
+    *rety = (scaled) DO_ROUND (y_new);
+}
+
+void matrixtransformrect (scaled llx, scaled lly, scaled urx, scaled ury)
+{
+    scaled x1, x2, x3, x4, y1, y2, y3, y4;
+
+    if (page_mode && matrix_stack_used > 0) {
+        last_llx = llx;
+        last_lly = lly;
+        last_urx = urx;
+        last_ury = ury;
+        do_matrixtransform (llx, lly, &x1, &y1);
+        do_matrixtransform (llx, ury, &x2, &y2);
+        do_matrixtransform (urx, lly, &x3, &y3);
+        do_matrixtransform (urx, ury, &x4, &y4);
+        ret_llx = DO_MIN (DO_MIN (x1, x2), DO_MIN (x3, x4));
+        ret_lly = DO_MIN (DO_MIN (y1, y2), DO_MIN (y3, y4));
+        ret_urx = DO_MAX (DO_MAX (x1, x2), DO_MAX (x3, x4));
+        ret_ury = DO_MAX (DO_MAX (y1, y2), DO_MAX (y3, y4));
+    } else {
+        ret_llx = llx;
+        ret_lly = lly;
+        ret_urx = urx;
+        ret_ury = ury;
+    }
+}
+
+void matrixtransformpoint (scaled x, scaled y)
+{
+    if (page_mode && matrix_stack_used > 0) {
+        do_matrixtransform (x, y, &ret_llx, &ret_lly);
+    } else {
+        ret_llx = x;
+        ret_lly = y;
+    }
+}
+
+void matrixrecalculate (scaled urx)
+{
+    matrixtransformrect (last_llx, last_lly, urx, last_ury);
 }

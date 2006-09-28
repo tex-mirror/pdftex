@@ -676,6 +676,8 @@ static fmentryptr fmlookup (internalfontnumber f)
     tmp.tfm_name = tfm;
     fm = (fm_entry *) avl_find (tfm_tree, &tmp);
     if (fm != NULL) {           /* found an entry with the base tfm name, e.g. cmr10 */
+        return (fmentryptr) fm; /* font expansion uses the base font */
+        /* the following code would be obsolete, as would be mk_ex_fm() */
         if (!is_t1fontfile (fm) || !is_included (fm)) {
             pdftex_warn
                 ("font %s cannot be expanded (not an included Type1 font)",

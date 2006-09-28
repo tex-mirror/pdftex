@@ -71,7 +71,26 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#15
 @define procedure writestreamlength();
 @define procedure removepdffile;
 @define procedure garbagewarning;
-
+@define function newcolorstack();
+@define function colorstackset();
+@define function colorstackpush();
+@define function colorstackpop();
+@define function colorstackcurrent();
+@define function colorstackused;
+@define function colorstackskippagestart();
+@define procedure checkpdfsave();
+@define procedure checkpdfrestore();
+@define procedure pdfshipoutbegin();
+@define procedure pdfshipoutend();
+@define procedure pdfsetmatrix();
+@define procedure matrixtransformpoint();
+@define procedure matrixtransformrect();
+@define function matrixused;
+@define procedure matrixrecalculate();
+@define function getllx;
+@define function getlly;
+@define function geturx;
+@define function getury;
 
 { functions from vfpacket.c }
 @define function newvfpacket();

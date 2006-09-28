@@ -186,7 +186,7 @@ extern void fb_seek (integer);
 extern void libpdffinish (void);
 extern char *makecfilename (strnumber s);
 extern void make_subset_tag (fm_entry *, char **);
-__attribute__ ((format (printf, 1, 2))) 
+__attribute__ ((format (printf, 1, 2)))
 extern void pdf_printf (const char *, ...);
 extern void pdf_puts (const char *);
 __attribute__ ((noreturn, format (printf, 1, 2)))
@@ -219,6 +219,27 @@ extern void removepdffile (void);
 extern void garbagewarning (void);
 extern void stripspaces (char *p);
 extern void initversionstring (char **versions);
+extern int newcolorstack (integer s, integer literal_mode, boolean pagestart);
+extern int colorstackused ();
+extern integer colorstackset (int colstack_no, integer s);
+extern integer colorstackpush (int colstack_no, integer s);
+extern integer colorstackpop (int colstack_no);
+extern integer colorstackcurrent (int colstack_no);
+extern integer colorstackskippagestart (int colstack_no);
+extern void checkpdfsave (int cur_h, int cur_v);
+extern void checkpdfrestore (int cur_h, int cur_v);
+extern void pdfshipoutbegin (boolean shipping_page);
+extern void pdfshipoutend (boolean shipping_page);
+extern void pdfsetmatrix (poolpointer in, scaled cur_h, scaled cur_v);
+extern void matrixtransformpoint (scaled x, scaled y);
+extern void matrixtransformrect (scaled llx, scaled lly, scaled urx,
+                                 scaled ury);
+extern boolean matrixused ();
+extern void matrixrecalculate (scaled urx);
+extern scaled getllx ();
+extern scaled getlly ();
+extern scaled geturx ();
+extern scaled getury ();
 
 /* vfpacket.c */
 extern eightbits packetbyte (void);
