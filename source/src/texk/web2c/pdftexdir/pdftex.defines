@@ -36,6 +36,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#15
 @define function vfbopenin ();
 @define procedure pdfmarkchar();
 @define procedure writepdf();
+@define procedure pdfassert();
 
 { functions from mapfile.c }
 @define function hasfmentry();

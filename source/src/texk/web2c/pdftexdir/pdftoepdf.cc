@@ -324,8 +324,8 @@ static void copyFontDict (Object * obj, InObj * r)
         for (i = 0, l = obj->dictGetLength (); i < l; ++i) {
             key = obj->dictGetKey (i);
             if (!strcmp ("FontName", key)
-                || !strncmp ("FontFile", key, strlen ("FontFile"))
-                || !strncmp ("FontFile3", key, strlen ("FontFile3")))
+                || !strcmp ("FontFile", key)
+                || !strcmp ("FontFile3", key))
                 continue;       // ignore original FontName/FontFile/FontFile3
             if (strcmp ("CharSet", key) == 0)
                 continue;       // ignore CharSet

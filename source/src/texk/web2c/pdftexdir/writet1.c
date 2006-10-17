@@ -281,7 +281,6 @@ static int last_hexbyte;
 static FILE *t1_file;
 static FILE *enc_file;
 
-#define str_prefix(s1, s2)  (strncmp(s1, s2, strlen(s2)) == 0)
 #define t1_prefix(s)        str_prefix(t1_line_array, s)
 #define t1_buf_prefix(s)    str_prefix(t1_buf_array, s)
 #define t1_suffix(s)        str_suffix(t1_line_array, t1_line_ptr, s)
@@ -396,7 +395,7 @@ void load_enc (char *enc_name, char **glyph_names)
             names_count++;
         }
         if (*r != 10 && *r != '%') {
-            if (strncmp (r, "] def", strlen ("] def")) == 0)
+            if (str_prefix (r, "] def"))
                 goto done;
             else {
                 remove_eol (r, enc_line);
@@ -819,7 +818,7 @@ static void t1_scan_keys (void)
         return;
     }
     for (key = font_keys; key - font_keys < MAX_KEY_CODE; key++)
-        if (strncmp (t1_line_array + 1, key->t1name, strlen (key->t1name)) == 0)
+        if (str_prefix (t1_line_array + 1, key->t1name))
             break;
     if (key - font_keys == MAX_KEY_CODE)
         return;
@@ -1549,7 +1548,7 @@ static void t1_flush_cs (boolean is_subr)
     cs_entry *tab, *end_tab, *ptr;
     char *start_line, *line_end;
     int count, size_pos;
-    unsigned short cr, cs_len;
+    unsigned short cr, cs_len = 0;      /* to avoid warning about uninitialized use of cs_len */
     if (is_subr) {
         start_line = subr_array_start;
         line_end = subr_array_end;
@@ -1593,7 +1592,8 @@ static void t1_flush_cs (boolean is_subr)
     for (ptr = tab; ptr < end_tab; ptr++) {
         if (ptr->used) {
             if (is_subr)
-                sprintf (t1_line_array, "dup %li %u", ptr - tab, ptr->cslen);
+                sprintf (t1_line_array, "dup %i %u", (int) (ptr - tab),
+                         ptr->cslen);
             else
                 sprintf (t1_line_array, "/%s %u", ptr->name, ptr->cslen);
             p = strend (t1_line_array);
@@ -1603,8 +1603,8 @@ static void t1_flush_cs (boolean is_subr)
         } else {
             /* replace unsused subr's by return_cs */
             if (is_subr) {
-                sprintf (t1_line_array, "dup %li %u%s ", ptr - tab, cs_len,
-                         cs_token_pair[0]);
+                sprintf (t1_line_array, "dup %i %u%s ", (int) (ptr - tab),
+                         cs_len, cs_token_pair[0]);
                 p = strend (t1_line_array);
                 memcpy (p, return_cs, cs_len);
                 t1_line_ptr = p + cs_len;

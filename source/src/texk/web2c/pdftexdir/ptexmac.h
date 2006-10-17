@@ -49,11 +49,11 @@ $Id: ptexmac.h,v 1.14 2005/11/29 22:05:23 hahe Exp $
 #  define objinfo(n) objtab[n].int0
 
 #  define pdfroom(n) do {                                      \
-    if (n + pdfptr > pdfbufsize) {                           \
+    if ((unsigned)(n + pdfptr) > (unsigned)pdfbufsize) {     \
         if (pdfosmode)                                       \
             zpdfosgetosbuf(n);                               \
         else {                                               \
-            if (n > pdfbufsize)                              \
+            if ((unsigned)(n) > (unsigned)pdfbufsize)        \
                 pdftex_fail("PDF output buffer overflowed"); \
             else                                             \
                 pdfflush();                                  \
@@ -81,7 +81,7 @@ $Id: ptexmac.h,v 1.14 2005/11/29 22:05:23 hahe Exp $
 #  define pdftex_debug    tex_printf
 
 #  define check_buf(size, buf_size)                          \
-    if ((size) > (buf_size))                               \
+    if ((unsigned)(size) > (unsigned)(buf_size))                               \
         pdftex_fail("buffer overflow at file %s, line %d", __FILE__,  __LINE__ )
 
 #  define append_char_to_buf(c, p, buf, buf_size) do {       \
@@ -117,15 +117,15 @@ $Id: ptexmac.h,v 1.14 2005/11/29 22:05:23 hahe Exp $
 #  define alloc_array(T, n, s) do {                           \
     if (T##_array == NULL) {                                \
         T##_limit = (s);                                    \
-        if ((n) > T##_limit)                                \
+        if ((unsigned)(n) > T##_limit)                      \
             T##_limit = (n);                                \
         T##_array = xtalloc(T##_limit, T##_entry);          \
         T##_ptr = T##_array;                                \
     }                                                       \
-    else if (T##_ptr - T##_array + (n) > T##_limit) {       \
+    else if ((unsigned)(T##_ptr - T##_array + (n)) > T##_limit) {       \
         last_ptr_index = T##_ptr - T##_array;               \
         T##_limit *= 2;                                     \
-        if (T##_ptr - T##_array + (n) > T##_limit)          \
+        if ((unsigned)(T##_ptr - T##_array + (n)) > T##_limit)          \
             T##_limit = T##_ptr - T##_array + (n);          \
         xretalloc(T##_array, T##_limit, T##_entry);         \
         T##_ptr = T##_array + last_ptr_index;               \
@@ -212,5 +212,7 @@ size_t          T##_limit
         return 1;        \
     if (a < b)           \
         return -1
+
+#  define str_prefix(s1, s2)  (strncmp((s1), (s2), strlen(s2)) == 0)
 
 #endif                          /* PDFTEXMAC */

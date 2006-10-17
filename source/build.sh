@@ -1,5 +1,6 @@
 #! /bin/sh
 # builds new pdftex binaries
+# ----------
 # try to find gnu make; we need it
 if make -v 2>&1| grep -q "GNU Make" 
 then 
@@ -14,50 +15,76 @@ else
   echo "I can't find a GNU-make; I'll try to use make and hope that works." 
   echo "If it doesn't, please install GNU-make."
 fi
+# ----------
+# Options:
+#       --make      : only make, no make distclean; configure
+#       --parallel  : make -j2
+ONLY_MAKE=FALSE
+JOBS=1
+while [ "$1" != "" ] ; do
+  if [ "$1" = "--make" ] ;
+  then ONLY_MAKE=TRUE ;
+  elif [ "$1" = "--parallel" ] ;
+  then MAKE=$MAKE --jobs 2 --max-load=3.0 ;
+  fi ;
+  shift ;
+done
 #
 STRIP=strip
-# this deletes all previous builds. 
-# comment out the rm and mkdir if you want to keep them (and uncomment and
-# change the $MAKE distclean below)
-rm -rf build
-mkdir build
+# ----------
+# clean up, if needed
+if [ -e Makefile -a $ONLY_MAKE = "FALSE" ]
+then
+  rm -rf build
+elif [ ! -e Makefile ]
+then
+    ONLY_MAKE=FALSE
+fi
+if [ ! -a build ]
+then
+  mkdir build
+fi
+#
 cd build
 # clean up (uncomment the next line if you have commented out the rm and
 # mkdir above)
 # $MAKE distclean;
-# do a configure without all the things we don't need
-echo "ignore warnings and errors about the main texmf tree"
-../src/configure \
-            --without-bibtex8   \
-            --without-cjkutils  \
-            --without-detex     \
-            --without-dialog    \
-            --without-dtl       \
-            --without-dvi2tty   \
-            --without-dvidvi    \
-            --without-dviljk    \
-            --without-dvipdfm   \
-            --without-dvipsk    \
-            --without-eomega    \
-            --without-etex      \
-            --without-gsftopk   \
-            --without-lacheck   \
-            --without-makeindexk\
-            --without-musixflx  \
-            --without-odvipsk   \
-            --without-omega     \
-            --without-oxdvik    \
-            --without-ps2pkm    \
-            --without-seetexk   \
-            --without-t1utils   \
-            --without-tetex     \
-            --without-tex4htk   \
-            --without-texinfo   \
-            --without-texlive   \
-            --without-ttf2pk    \
-            --without-tth       \
-            --without-xdvik     \
-            || exit 1 
+if [ "$ONLY_MAKE" = "FALSE" ]
+then
+  # do a configure without all the things we don't need
+  echo "ignore warnings and errors about the main texmf tree"
+  ../src/configure \
+              --without-bibtex8   \
+              --without-cjkutils  \
+              --without-detex     \
+              --without-dialog    \
+              --without-dtl       \
+              --without-dvi2tty   \
+              --without-dvidvi    \
+              --without-dviljk    \
+              --without-dvipdfm   \
+              --without-dvipsk    \
+              --without-eomega    \
+              --without-etex      \
+              --without-gsftopk   \
+              --without-lacheck   \
+              --without-makeindexk\
+              --without-musixflx  \
+              --without-odvipsk   \
+              --without-omega     \
+              --without-oxdvik    \
+              --without-ps2pkm    \
+              --without-seetexk   \
+              --without-t1utils   \
+              --without-tetex     \
+              --without-tex4htk   \
+              --without-texinfo   \
+              --without-texlive   \
+              --without-ttf2pk    \
+              --without-tth       \
+              --without-xdvik     \
+              || exit 1 
+fi
 # make the binaries
 (cd texk/web2c/web2c; $MAKE) || exit 1
 (cd texk/web2c; $MAKE ../kpathsea/libkpathsea.la) || exit 1

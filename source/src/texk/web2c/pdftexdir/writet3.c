@@ -49,7 +49,7 @@ static boolean is_pk_font;
 #define t3_close()      xfclose(t3_file, cur_file_name)
 #define t3_getchar()    xgetc(t3_file)
 #define t3_eof()        feof(t3_file)
-#define t3_prefix(s)    (!strncmp(t3_line_array, s, strlen(s)))
+#define t3_prefix(s)    str_prefix(t3_line_array, s)
 #define t3_putchar(c)   pdfout(c)
 
 #define t3_check_eof()                                     \
@@ -338,7 +338,7 @@ void writet3 (int objnum, internalfontnumber f)
     eptr = pdfnewobjnum ();
     cptr = pdfnewobjnum ();
     pdf_printf ("/Widths %i 0 R\n/Encoding %i 0 R\n/CharProcs %i 0 R\n",
-                (int)wptr, (int)eptr, (int)cptr);
+                (int) wptr, (int) eptr, (int) cptr);
     pdfenddict ();
     pdfbeginobj (wptr, 1);      /* chars width array */
     pdf_puts ("[");

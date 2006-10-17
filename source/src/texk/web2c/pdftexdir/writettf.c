@@ -88,7 +88,7 @@ static TTF_USHORT nhmtxs;
 static TTF_USHORT new_ntabs;
 
 static glyph_entry *glyph_tab;
-static short *glyph_index;
+static long *glyph_index;
 static cmap_entry *cmap_tab, new_cmap_tab[NEW_CMAP_SIZE];
 static name_record *name_tab;
 static int name_record_num;
@@ -260,10 +260,15 @@ static void ttf_copy_encoding (void)
     static char *charcode_names[256], buf[2048];
 
     ttfenc_entry *e = ttfenc_tab;
-    pdfmarkchar (tex_font, 'a');        /* workaround for a bug of AcroReader 4.0 */
 
     if (is_reencoded (fm_cur)) {
         glyph_names = (fm_cur->encoding)->glyph_names;
+
+        /* a workaround for a bug of AcroReader 4.0 */
+        if (glyph_names != NULL && strcmp (glyph_names[97], "a") == 0)
+            pdfmarkchar (tex_font, 'a');
+        /* end of workaround */
+
         for (i = 0; i < 256; i++, e++) {
             if (pdfcharmarked (tex_font, i))
                 e->name = glyph_names[i];
@@ -285,8 +290,8 @@ static void ttf_copy_encoding (void)
                 e->code = -1;
             if (e->code != -1) {
                 assert (e->code < 0x10000);
-                // FIXME: e->code is long. Do we want multibyte instead of a char?
-                sprintf (p, "/hc%4.4X", (short) e->code);
+                // we need a long (not multibyte). Please refer to subfont.txt for details -- thanh
+                sprintf (p, "/c%4.4X", (int) e->code);
                 charcode_names[i] = p;
                 p = strend (p) + 1;
             } else
@@ -362,7 +367,7 @@ static void ttf_read_mapx (void)
         glyph->name_index = 0;
         glyph->name = (char *) notdef;
     }
-    glyph_index = xtalloc (glyphs_count, short);
+    glyph_index = xtalloc (glyphs_count, long);
     glyph_index[0] = 0;         /* index of ".notdef" glyph */
     glyph_index[1] = 1;         /* index of ".null" glyph */
 }
@@ -910,7 +915,7 @@ static void ttf_write_dirtab (void)
     /* adjust checkSumAdjustment */
     tmp_ulong = 0;
     checksum = 0;
-    for (p = fb_array, i = 0; i < save_offset;) {
+    for (p = fb_array, i = 0; i < (unsigned) save_offset;) {
         tmp_ulong = (tmp_ulong << 8) + *p++;
         i++;
         if (i % 4 == 0) {
@@ -930,7 +935,7 @@ static void ttf_write_dirtab (void)
 
 static void ttf_write_glyf (void)
 {
-    short *id, k;
+    long *id, k;
     TTF_USHORT idx;
     TTF_USHORT flags;
     dirtab_entry *tab = ttf_name_lookup ("glyf", true);
@@ -1011,7 +1016,13 @@ static void ttf_reindex_glyphs (void)
                 continue;
             t = cmap->table;
             assert (t != NULL && e->code < 0x10000);
-            assert (t[e->code] < glyphs_count); /* t has been read from ttf */
+            if (t[e->code] < 0) {
+                pdftex_warn
+                    ("subfont %s: wrong mapping: character %li --> 0x%4.4X --> .notdef",
+                     fm_cur->tfm_name, e - ttfenc_tab, (int) e->code);
+                continue;
+            }
+            assert (t[e->code] >= 0 && t[e->code] < glyphs_count);      /* t has been read from ttf */
             glyph = glyph_tab + t[e->code];
             goto append_new_glyph;
         }
@@ -1070,9 +1081,9 @@ static void ttf_reindex_glyphs (void)
             continue;
         }
       append_new_glyph:
-        assert (glyph - glyph_tab < glyphs_count);
+        assert (glyph > glyph_tab && glyph - glyph_tab < glyphs_count);
         if (glyph->newindex < 0) {
-            glyph_index[new_glyphs_count] = glyph - glyph_tab;
+            glyph_index[new_glyphs_count] = (short) (glyph - glyph_tab);
             glyph->newindex = new_glyphs_count;
             new_glyphs_count++;
         }
@@ -1112,7 +1123,7 @@ static void ttf_write_hhea (void)
 
 static void ttf_write_htmx (void)
 {
-    short *id;
+    long *id;
     dirtab_entry *tab = ttf_seek_tab ("hmtx", 0);
     ttf_reset_chksm (tab);
     for (id = glyph_index; id - glyph_index < new_glyphs_count; id++) {
@@ -1124,7 +1135,7 @@ static void ttf_write_htmx (void)
 
 static void ttf_write_loca (void)
 {
-    short *id;
+    long *id;
     dirtab_entry *tab = ttf_seek_tab ("loca", 0);
     ttf_reset_chksm (tab);
     loca_format = 0;
@@ -1198,7 +1209,7 @@ static void ttf_write_post (void)
     dirtab_entry *tab = ttf_seek_tab ("post", TTF_FIXED_SIZE);
     glyph_entry *glyph;
     char *s;
-    short *id;
+    long *id;
     int l;
     ttf_reset_chksm (tab);
     if (!write_ttf_glyph_names || post_format == 0x00030000) {

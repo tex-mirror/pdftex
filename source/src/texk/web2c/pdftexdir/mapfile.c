@@ -476,12 +476,11 @@ static void fm_scan_line ()
                     s = r + j;  /* jump behind number, eat also blanks, if any */
                     if (*(s - 1) == 'E' || *(s - 1) == 'e')
                         s--;    /* e. g. 0.5ExtendFont: %f = 0.5E */
-                    if (strncmp (s, "SlantFont", strlen ("SlantFont")) == 0) {
+                    if (str_prefix (s, "SlantFont")) {
                         d *= 1000.0;    /* correct rounding also for neg. numbers */
                         fm->slant = (integer) (d > 0 ? d + 0.5 : d - 0.5);
                         r = s + strlen ("SlantFont");
-                    } else if (strncmp (s, "ExtendFont", strlen ("ExtendFont"))
-                               == 0) {
+                    } else if (str_prefix (s, "ExtendFont")) {
                         d *= 1000.0;
                         fm->extend = (integer) (d > 0 ? d + 0.5 : d - 0.5);
                         if (fm->extend == 1000)

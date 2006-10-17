@@ -40,7 +40,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $
 #include "xpdf/config.h"
 
 #define check_nprintf(size_get, size_want) \
-    if (size_get >= size_want) \
+    if ((unsigned)(size_get) >= (unsigned)(size_want)) \
         pdftex_fail ("snprintf failed: file %s, line %d", __FILE__, __LINE__);
 
 /*@unused@*/
@@ -658,7 +658,8 @@ void escapehex (poolpointer in)
 void unescapehex (poolpointer in)
 {
     const poolpointer out = poolptr;
-    unsigned char ch, a;
+    unsigned char ch;
+    unsigned char a = 0;        /* to avoid warning about uninitialized use of a */
     boolean first = true;
 
     while (in < out) {
@@ -907,7 +908,7 @@ void getcreationdate ()
 
     initstarttime ();
 
-    if (poolptr + len >= poolsize) {
+    if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
         poolptr = poolsize;
         /* error by str_toks that calls str_room(1) */
         return;
@@ -932,7 +933,7 @@ void getfilemoddate (strnumber s)
 
         makepdftime (file_data.st_mtime, time_str);
         len = strlen (time_str);
-        if (poolptr + len >= poolsize) {
+        if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
             poolptr = poolsize;
             /* error by str_toks that calls str_room(1) */
         } else {
@@ -965,7 +966,7 @@ void getfilesize (strnumber s)
                       "%lu", (long unsigned int) file_data.st_size);
         check_nprintf (i, sizeof (buf));
         len = strlen (buf);
-        if (poolptr + len >= poolsize) {
+        if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
             poolptr = poolsize;
             /* error by str_toks that calls str_room(1) */
         } else {
@@ -1135,7 +1136,7 @@ void matchstrings (strnumber s, strnumber t, int subcount, boolean icase)
 
 void getmatch (int i)
 {
-    int size, len;
+    int size, len = 0;          /* to avoid warning about uninitialized use of len */
 
     boolean found = i < sub_match_count
         && match_string != NULL && pmatch[i].rm_so >= 0 && i >= 0;

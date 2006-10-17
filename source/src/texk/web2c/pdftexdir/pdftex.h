@@ -62,4 +62,6 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.h#4 $
 #define vfbopenin(f) \
     open_input (&(f), kpse_vf_format, FOPEN_RBIN_MODE)
 
+#define pdfassert   assert
+
 #include <pdftexdir/ptexlib.h>

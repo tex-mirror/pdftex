@@ -169,7 +169,7 @@ void write_png_palette (integer img)
             pdftex_warn
                 ("large interlaced PNG might cause out of memory (use non-interlaced PNG to fix this)");
         rows = xtalloc (png_info (img)->height, png_bytep);
-        for (i = 0; i < png_info (img)->height; i++)
+        for (i = 0; (unsigned) i < png_info (img)->height; i++)
             rows[i] = xtalloc (png_info (img)->rowbytes, png_byte);
         png_read_image (png_ptr (img), rows);
         write_interlaced (write_simple_pixel (row));
@@ -179,7 +179,7 @@ void write_png_palette (integer img)
     if (palette_objnum > 0) {
         pdfbegindict (palette_objnum, 0);
         pdfbeginstream ();
-        for (i = 0; i < png_info (img)->num_palette; i++) {
+        for (i = 0; (unsigned) i < png_info (img)->num_palette; i++) {
             pdfroom (3);
             pdfbuf[pdfptr++] = png_info (img)->palette[i].red;
             pdfbuf[pdfptr++] = png_info (img)->palette[i].green;
@@ -208,7 +208,7 @@ void write_png_gray (integer img)
             pdftex_warn
                 ("large interlaced PNG might cause out of memory (use non-interlaced PNG to fix this)");
         rows = xtalloc (png_info (img)->height, png_bytep);
-        for (i = 0; i < png_info (img)->height; i++)
+        for (i = 0; (unsigned) i < png_info (img)->height; i++)
             rows[i] = xtalloc (png_info (img)->rowbytes, png_byte);
         png_read_image (png_ptr (img), rows);
         write_interlaced (write_simple_pixel (row));
@@ -252,7 +252,7 @@ void write_png_gray_alpha (integer img)
             pdftex_warn
                 ("large interlaced PNG might cause out of memory (use non-interlaced PNG to fix this)");
         rows = xtalloc (png_info (img)->height, png_bytep);
-        for (i = 0; i < png_info (img)->height; i++)
+        for (i = 0; (unsigned) i < png_info (img)->height; i++)
             rows[i] = xtalloc (png_info (img)->rowbytes, png_byte);
         png_read_image (png_ptr (img), rows);
         if ((png_info (img)->bit_depth == 16) && fixedimagehicolor) {
@@ -306,7 +306,7 @@ void write_png_rgb (integer img)
             pdftex_warn
                 ("large interlaced PNG might cause out of memory (use non-interlaced PNG to fix this)");
         rows = xtalloc (png_info (img)->height, png_bytep);
-        for (i = 0; i < png_info (img)->height; i++)
+        for (i = 0; (unsigned) i < png_info (img)->height; i++)
             rows[i] = xtalloc (png_info (img)->rowbytes, png_byte);
         png_read_image (png_ptr (img), rows);
         write_interlaced (write_simple_pixel (row));
@@ -348,7 +348,7 @@ void write_png_rgb_alpha (integer img)
             pdftex_warn
                 ("large interlaced PNG might cause out of memory (use non-interlaced PNG to fix this)");
         rows = xtalloc (png_info (img)->height, png_bytep);
-        for (i = 0; i < png_info (img)->height; i++)
+        for (i = 0; (unsigned) i < png_info (img)->height; i++)
             rows[i] = xtalloc (png_info (img)->rowbytes, png_byte);
         png_read_image (png_ptr (img), rows);
         if ((png_info (img)->bit_depth == 16) && fixedimagehicolor) {
@@ -542,13 +542,14 @@ void write_png (integer img)
                 (checked_gamma > 1.01 || checked_gamma < 0.99))
                 tex_printf ("gamma delta=%lf ", checked_gamma);
             if (png_ptr (img)->transformations != PNG_TRANSFORM_IDENTITY)
-                tex_printf ("transform=%lu", (long)png_ptr (img)->transformations);
-            if ((png_info (img)->color_type != PNG_COLOR_TYPE_GRAY) &&
-                (png_info (img)->color_type != PNG_COLOR_TYPE_RGB) &&
-                (png_info (img)->color_type != PNG_COLOR_TYPE_PALETTE))
+                tex_printf ("transform=%lu",
+                            (long) png_ptr (img)->transformations);
+            if ((png_info (img)->color_type != PNG_COLOR_TYPE_GRAY)
+                && (png_info (img)->color_type != PNG_COLOR_TYPE_RGB)
+                && (png_info (img)->color_type != PNG_COLOR_TYPE_PALETTE))
                 tex_printf ("colortype ");
             if (fixedpdfminorversion <= 1)
-                tex_printf ("version=%d ", (int)fixedpdfminorversion);
+                tex_printf ("version=%d ", (int) fixedpdfminorversion);
             if (png_info (img)->interlace_type != PNG_INTERLACE_NONE)
                 tex_printf ("interlaced ");
             if (png_info (img)->bit_depth > 8)

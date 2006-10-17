@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-beta-20060928' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-beta-20061017' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -10703,6 +10703,13 @@ convert: case chr_code of
 for |convert| functions into the scanner; `\.{\\outer}' control sequences
 are allowed to follow `\.{\\string}' and `\.{\\meaning}'.
 
+The extra temp string |u| is needed because |pdf_scan_ext_toks| incorporates 
+any pending string in its output. In order to save such a pending string,
+we have to create a temporary string that is destroyed immediately after.
+
+@d save_cur_string==if str_start[str_ptr]<pool_ptr then u:=make_string
+@d restore_cur_string==if u<>0 then begin decr(str_ptr); u:=0; end
+ 
 @p procedure conv_toks;
 label exit;
 var old_setting:0..max_selector; {holds |selector| setting}
@@ -10717,7 +10724,11 @@ p, q: pointer;
 @!b:pool_pointer; {base of temporary string}
 @!s: str_number; {first temp string}
 @!t: str_number; {second temp string}
-begin c:=cur_chr; @<Scan the argument for command |c|@>;
+@!u: str_number; {saved current string string}
+begin 
+c:=cur_chr; 
+u:=0; { will become non-nil if a string is already being built}
+@<Scan the argument for command |c|@>;
 old_setting:=selector; selector:=new_string; b:=pool_ptr;
 @<Print the result of command |c|@>;
 selector:=old_setting; link(garbage):=str_toks(b); ins_list(link(temp_head));
@@ -10762,6 +10773,7 @@ pdf_escape_string_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
@@ -10773,6 +10785,7 @@ pdf_escape_string_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
+	restore_cur_string;
     return;
   end;
 pdf_escape_name_code:
@@ -10780,6 +10793,7 @@ pdf_escape_name_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
@@ -10791,6 +10805,7 @@ pdf_escape_name_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
+	restore_cur_string; 
     return;
   end;
 pdf_escape_hex_code:
@@ -10798,6 +10813,7 @@ pdf_escape_hex_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
@@ -10809,6 +10825,7 @@ pdf_escape_hex_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
+	restore_cur_string; 
     return;
   end;
 pdf_unescape_hex_code:
@@ -10816,6 +10833,7 @@ pdf_unescape_hex_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
@@ -10827,6 +10845,7 @@ pdf_unescape_hex_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
+	restore_cur_string; 
     return;
   end;
 pdf_creation_date_code:
@@ -10842,6 +10861,7 @@ pdf_file_mod_date_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
@@ -10853,6 +10873,7 @@ pdf_file_mod_date_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
+	restore_cur_string; 
     return;
   end;
 pdf_file_size_code:
@@ -10860,6 +10881,7 @@ pdf_file_size_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
@@ -10871,6 +10893,7 @@ pdf_file_size_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
+	restore_cur_string; 
     return;
   end;
 pdf_mdfive_sum_code:
@@ -10878,6 +10901,7 @@ pdf_mdfive_sum_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     bool := scan_keyword("file");
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
@@ -10890,6 +10914,7 @@ pdf_mdfive_sum_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
+	restore_cur_string; 
     return;
   end;
 pdf_file_dump_code:
@@ -10897,6 +10922,7 @@ pdf_file_dump_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     {scan offset}
     cur_val := 0;
     if (scan_keyword("offset")) then begin
@@ -10937,6 +10963,7 @@ pdf_file_dump_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
+	restore_cur_string; 
     return;
   end;
 pdf_match_code:
@@ -10944,6 +10971,7 @@ pdf_match_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     {scan for icase}
     bool := scan_keyword("icase");
     {scan for subcount}
@@ -10967,6 +10995,7 @@ pdf_match_code:
     flush_str(t);
     flush_str(s);
     ins_list(link(temp_head));
+	restore_cur_string; 
     return;
   end;
 pdf_last_match_code:
@@ -10991,10 +11020,12 @@ pdf_strcmp_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     compare_strings;
     def_ref := save_def_ref;
     warning_index := save_warning_index;
     scanner_status := save_scanner_status;
+	restore_cur_string; 
   end;
 pdf_colorstack_init_code:
   begin
@@ -11009,6 +11040,7 @@ pdf_colorstack_init_code:
     save_scanner_status := scanner_status;
     save_warning_index := warning_index;
     save_def_ref := def_ref;
+    save_cur_string;
     scan_pdf_ext_toks;
     s := tokens_to_string(def_ref);
     delete_token_ref(def_ref);
@@ -11025,6 +11057,7 @@ pdf_colorstack_init_code:
         ("I'll use the default color stack 0 here.");
         error;
         cur_val := 0;
+	restore_cur_string; 
     end;
   end;
 job_name_code: if job_name=0 then open_log_file;
@@ -17907,10 +17940,10 @@ var base_line: scaled; {the baseline coordinate for this box}
 @!outer_doing_leaders:boolean; {were we doing leaders?}
 @!edge:scaled; {right edge of sub-box or leader space}
 @!prev_p:pointer; {one step behind |p|}
-@!running_link: pointer; {pointer to `running' link if exists}
 @!glue_temp:real; {glue value before rounding}
 @!cur_glue:real; {glue seen so far}
 @!cur_g:scaled; {rounded equivalent of |cur_glue| times the glue ratio}
+@!i: small_number; {index to scan |pdf_link_stack|}
 begin cur_g:=0; cur_glue:=float_constant(0);
 this_box:=temp_ptr; g_order:=glue_order(this_box);
 g_sign:=glue_sign(this_box); p:=list_ptr(this_box);
@@ -17919,8 +17952,7 @@ base_line:=cur_v;
 prev_p:=this_box+list_offset;
 @<Initialize |hlist_out| for mixed...@>;
 left_edge:=cur_h;
-running_link := null;
-@<Create link annotation for the current hbox if needed@>;
+@<Create link annotations for the current hbox if needed@>;
 while p<>null do
     @<Output node |p| for |pdf_hlist_out| and move to the next node,
     maintaining the condition |cur_v=base_line|@>;
@@ -17928,15 +17960,12 @@ while p<>null do
 decr(cur_s);
 end;
 
-@ @<Create link annotation for the current hbox if needed@>=
-if running_link = null then begin
-    if is_running(pdf_link_wd) and (pdf_link_level = cur_s) then begin
-        append_link(this_box, left_edge, base_line);
-        running_link := last_link;
-    end;
+@ @<Create link annotations for the current hbox if needed@>=
+for i := 1 to pdf_link_stack_ptr do begin
+    pdfassert(is_running(pdf_width(pdf_link_stack[i].link_node)));
+    if (pdf_link_stack[i].nesting_level = cur_s) then
+        append_link(this_box, left_edge, base_line, i);
 end
-else
-    last_link := running_link
 
 @ @<Output node |p| for |pdf_hlist_out|...@>=
 reswitch: if is_char_node(p) then
@@ -18284,7 +18313,7 @@ fix_pdfoutput;
 temp_ptr:=p;
 prepare_mag;
 pdf_last_resources := pdf_new_objnum;
-@<Reset resources lists@>;
+@<Reset resource lists@>;
 if not shipping_page then begin
     pdf_xform_width := width(p);
     pdf_xform_height := height(p);
@@ -18313,7 +18342,7 @@ if not shipping_page then begin
 end;
 @<Start stream of page/form contents@>
 
-@ @<Reset resources lists@>=
+@ @<Reset resource lists@>=
 pdf_font_list := null;
 pdf_obj_list := null;
 pdf_xform_list := null;
@@ -18326,7 +18355,6 @@ pdf_annot_list := null;
 pdf_link_list := null;
 pdf_dest_list := null;
 pdf_bead_list := null;
-last_link := null;
 last_thread := null
 
 @ @<Calculate page dimensions and margins@>=
@@ -18381,14 +18409,12 @@ end
 if shipping_page then begin
     @<Write out page object@>;
 end;
-@<Flush out pending raw objects@>;
-@<Flush out pending forms@>;
-@<Flush out pending images@>;
+@<Write out resource lists@>;
 if shipping_page then begin
-    @<Flush out pending PDF marks@>;
+    @<Write out pending PDF marks@>;
 end;
 @<Write out resources dictionary@>;
-@<Flush resources lists@>;
+@<Flush resource lists@>;
 if shipping_page then begin
     @<Flush PDF mark lists@>;
 end
@@ -18397,6 +18423,11 @@ end
 pdf_end_text;
 pdfshipoutend(shipping_page);
 pdf_end_stream
+
+@ @<Write out resource lists@>=
+@<Write out pending raw objects@>;
+@<Write out pending forms@>;
+@<Write out pending images@>
 
 @ @<Write out resources dictionary@>=
 pdf_begin_dict(pdf_last_resources, 1);
@@ -18423,7 +18454,7 @@ have been created during the page shipping.
 
 @d delete_toks(#) == begin delete_token_ref(#); # := null; end
 
-@<Flush resources lists@>=
+@<Flush resource lists@>=
 flush_list(pdf_font_list);
 flush_list(pdf_obj_list);
 flush_list(pdf_xform_list);
@@ -18594,7 +18625,7 @@ begin
     flush_node_list(p);
 end;
 
-@ @<Flush out pending raw objects@>=
+@ @<Write out pending raw objects@>=
 if pdf_obj_list <> null then begin
     k := pdf_obj_list;
     while k <> null do begin
@@ -18604,26 +18635,26 @@ if pdf_obj_list <> null then begin
     end;
 end
 
-@ When flushing pending forms we need to save and restore resources lists
+@ When flushing pending forms we need to save and restore resource lists
   (|pdf_font_list|, |pdf_obj_list|, |pdf_xform_list| and |pdf_ximage_list|),
   which are also used by page shipping.
 
-@<Flush out pending forms@>=
+@<Write out pending forms@>=
 if pdf_xform_list <> null then begin
     k := pdf_xform_list;
     while k <> null do begin
         if not is_obj_written(info(k)) then begin
             pdf_cur_form := info(k);
-            @<Save resources lists@>;
-            @<Reset resources lists@>;
+            @<Save resource lists@>;
+            @<Reset resource lists@>;
             pdf_ship_out(obj_xform_box(pdf_cur_form), false);
-            @<Restore resources lists@>;
+            @<Restore resource lists@>;
         end;
         k := link(k);
     end;
 end
 
-@ @<Save resources lists@>=
+@ @<Save resource lists@>=
 save_font_list := pdf_font_list;
 save_obj_list := pdf_obj_list;
 save_xform_list := pdf_xform_list;
@@ -18631,7 +18662,7 @@ save_ximage_list := pdf_ximage_list;
 save_text_procset := pdf_text_procset;
 save_image_procset := pdf_image_procset
 
-@ @<Restore resources lists@>=
+@ @<Restore resource lists@>=
 pdf_font_list := save_font_list;
 pdf_obj_list := save_obj_list;
 pdf_xform_list := save_xform_list;
@@ -18651,7 +18682,7 @@ begin
     delete_image(obj_ximage_data(n));
 end;
 
-@ @<Flush out pending images@>=
+@ @<Write out pending images@>=
 if pdf_ximage_list <> null then begin
     k := pdf_ximage_list;
     while k <> null do begin
@@ -18661,15 +18692,15 @@ if pdf_ximage_list <> null then begin
     end;
 end
 
-@ @<Flush out pending PDF marks@>=
+@ @<Write out pending PDF marks@>=
 pdf_origin_h := 0;
 pdf_origin_v := cur_page_height;
-@<Flush out PDF annotations@>;
-@<Flush out PDF link annotations@>;
-@<Flush out PDF mark destinations@>;
-@<Flush out PDF bead rectangle specifications@>
+@<Write out PDF annotations@>;
+@<Write out PDF link annotations@>;
+@<Write out PDF mark destinations@>;
+@<Write out PDF bead rectangle specifications@>
 
-@ @<Flush out PDF annotations@>=
+@ @<Write out PDF annotations@>=
 if pdf_annot_list <> null then begin
     k := pdf_annot_list;
     while k <> null do begin
@@ -18683,43 +18714,40 @@ if pdf_annot_list <> null then begin
     end;
 end
 
-@ @<Flush out PDF link annotations@>=
-if pdf_link_list <> null then begin
-    @<Write out PDF link annotations@>;
-    @<Free PDF link annotations@>;
-end
-
 @ @<Write out PDF link annotations@>=
-k := pdf_link_list;
-while k <> null do begin
-    i := obj_annot_ptr(info(k));
-    pdf_begin_dict(info(k), 1);
-    pdf_print_ln("/Type /Annot");
-    if pdf_link_attr(i) <> null then
-        pdf_print_toks_ln(pdf_link_attr(i));
-    pdf_rectangle(pdf_left(i), pdf_top(i), pdf_right(i), pdf_bottom(i));
-    if pdf_action_type(pdf_link_action(i)) <> pdf_action_user
-    then begin
-        pdf_print_ln("/Subtype /Link");
-        pdf_print("/A ");
+if pdf_link_list <> null then begin
+    k := pdf_link_list;
+    while k <> null do begin
+        i := obj_annot_ptr(info(k));
+        pdf_begin_dict(info(k), 1);
+        pdf_print_ln("/Type /Annot");
+        if pdf_link_attr(i) <> null then
+            pdf_print_toks_ln(pdf_link_attr(i));
+        pdf_rectangle(pdf_left(i), pdf_top(i), pdf_right(i), pdf_bottom(i));
+        if pdf_action_type(pdf_link_action(i)) <> pdf_action_user
+        then begin
+            pdf_print_ln("/Subtype /Link");
+            pdf_print("/A ");
+        end;
+        write_action(pdf_link_action(i));
+        pdf_end_dict;
+        k := link(k);
     end;
-    write_action(pdf_link_action(i));
-    pdf_end_dict;
-    k := link(k);
+    @<Flush |pdf_start_link_node|'s created by |append_link|@>;
 end
 
-@ @<Free PDF link annotations@>=
+@ @<Flush |pdf_start_link_node|'s created by |append_link|@>=
 k := pdf_link_list;
 while k <> null do begin
     i := obj_annot_ptr(info(k));
-    {nodes with |info = null| were created by |append_link| and
+    {nodes with |info = max_halfword| were created by |append_link| and
      must be flushed here, as they are not linked in any list}
     if info(i) = max_halfword then
         flush_whatsit_node(i, pdf_start_link_node);
     k := link(k);
 end
 
-@ @<Flush out PDF mark destinations@>=
+@ @<Write out PDF mark destinations@>=
 if pdf_dest_list <> null then begin
     k := pdf_dest_list;
     while k <> null do begin
@@ -18796,7 +18824,7 @@ begin
     pdf_print_mag_bp(pdf_y(pdf_top(r)));
 end;
 
-@ @<Flush out PDF bead rectangle specifications@>=
+@ @<Write out PDF bead rectangle specifications@>=
 if pdf_bead_list <> null then begin
     k := pdf_bead_list;
     while k <> null do begin
@@ -32888,10 +32916,12 @@ end
 procedure check_pdfoutput(s: str_number; is_error : boolean);
 begin
     if pdf_output <= 0 then
+        begin
         if is_error then
             pdf_error(s, "not allowed in DVI mode (\pdfoutput <= 0)")
         else
             pdf_warning(s, "not allowed in DVI mode (\pdfoutput <= 0); ignoring it", true, true);
+        end
 end;
 
 procedure scan_pdf_ext_toks;
@@ -32955,7 +32985,7 @@ end
 @ @<Implement \.{\\pdfcolorstack}@>=
 begin
     check_pdfoutput("\pdfcolorstack", true);
-    {Scan and check the stack number and store in cur_val}
+    {Scan and check the stack number and store in |cur_val|}
     scan_int;
     if cur_val >= colorstackused then begin
         print_err("Unknown color stack number ");
@@ -33615,6 +33645,9 @@ begin
     pdf_link_action(tail) := scan_action;
     pdf_link_objnum(tail) := k;
     pdf_last_link := k;
+    {N.B.: although it is possible to set |obj_annot_ptr(k) := tail| here, it
+     is not safe if nodes are later copied/destroyed/moved; a better place
+     to do this is inside |do_link|, when the whatsit node is written out}
 end
 
 @ @<Implement \.{\\pdfendlink}@>=
@@ -33935,7 +33968,7 @@ begin
     scan_pdf_ext_toks;
     if pdf_output > 0 then
         pdf_catalog_toks := concat_tokens(pdf_catalog_toks, def_ref);
-    if scan_keyword("openaction") then
+    if scan_keyword("openaction") then begin
         if pdf_catalog_openaction <> 0 then
             pdf_error("ext1", "duplicate of openaction")
         else begin
@@ -33947,6 +33980,7 @@ begin
             pdf_end_obj;
             delete_action_ref(p);
         end;
+    end
 end
 
 @ @<Implement \.{\\pdfnames}@>=
@@ -34846,10 +34880,6 @@ end;
 @!pdf_obj_list: pointer; {list of objects in the current page}
 @!pdf_xform_list: pointer; {list of forms in the current page}
 @!pdf_ximage_list: pointer; {list of images in the current page}
-@!pdf_link_level: integer; {depth of nesting of box containing link annotation}
-@!last_link: pointer; {pointer to the last link annotation}
-@!pdf_link_ht, pdf_link_dp, pdf_link_wd: scaled; {dimensions of the last link
-annotation}
 @!last_thread: pointer; {pointer to the last thread}
 @!pdf_thread_ht, pdf_thread_dp, pdf_thread_wd: scaled; {dimensions of the last
 thread}
@@ -34877,12 +34907,9 @@ thread}
 @!dest_names: ^dest_name_entry;
 @!pk_dpi: integer; {PK pixel density value from \.{texmf.cnf}}
 @!image_orig_x, image_orig_y: integer; {origin of cropped PDF images}
-@!link_level_stack: pointer; {stack to save |pdf_link_level|}
 @!pdf_trailer_toks: pointer; {additional keys of Trailer dictionary}
 
 @ @<Set init...@>=
-pdf_link_level := -1;
-link_level_stack := null;
 pdf_first_outline:= 0;
 pdf_last_outline:= 0;
 pdf_parent_outline:= 0;
@@ -35020,105 +35047,111 @@ begin
     pdf_append_list(pdf_annot_objnum(p))(pdf_annot_list);
 end;
 
-@ To implement nesting link annotations, we need a stack to save box testing
-level of each link that has been broken. Each stack entry holds the
-box nesting level and pointer the whatsit node created for
-corresponding \.{\\pdfstartlink}.
+@ To implement nesting link annotations, we need a stack to hold copy of
+|pdf_start_link_node|'s that are being written out, together with their box
+nesting level.
 
-@d link_level(#) == info(#)
-@d link_ptr(#) == info(# + 1)
+@d pdf_link_stack_top == pdf_link_stack[pdf_link_stack_ptr]
 
-@<Declare procedures needed in |pdf_hlist_out|, |pdf_vlist_out|@>=
-procedure save_link_level(l: pointer);
-var p, r: pointer;
+@<Constants...@>=
+@!pdf_max_link_level = 10; {maximum depth of link nesting}
+
+@ @<Types...@>=
+@!pdf_link_stack_record = record
+    nesting_level: small_number;
+    link_node: pointer; {holds a copy of the corresponding |pdf_start_link_node|}
+    ref_link_node: pointer; {points to original |pdf_start_link_node|, or a
+                             copy of |link_node| created by |append_link| in
+                             case of multi-line link}
+end;
+
+@ @<Glob...@>=
+@!pdf_link_stack: array[1..pdf_max_link_level] of pdf_link_stack_record;
+@!pdf_link_stack_ptr: small_number;
+
+@ @<Set init...@>=
+pdf_link_stack_ptr := 0;
+
+@ @<Declare procedures needed in |pdf_hlist_out|, |pdf_vlist_out|@>=
+procedure push_link_level(p: pointer);
 begin
-    pdf_link_level := cur_s;
-    r := copy_node_list(l);
-    pdf_link_wd := pdf_width(r);
-    pdf_link_ht := pdf_height(r);
-    pdf_link_dp := pdf_depth(r);
-    p := get_node(small_node_size);
-    link_level(p) := pdf_link_level;
-    link_ptr(p) := r;
-    link(p) := link_level_stack;
-    link_level_stack := p;
+    if pdf_link_stack_ptr >= pdf_max_link_level then
+        overflow("pdf link stack size", pdf_max_link_level);
+    pdfassert((type(p) = whatsit_node) and (subtype(p) = pdf_start_link_node));
+    incr(pdf_link_stack_ptr);
+    pdf_link_stack_top.nesting_level := cur_s;
+    pdf_link_stack_top.link_node := copy_node_list(p);
+    pdf_link_stack_top.ref_link_node := p;
+end;
+
+procedure pop_link_level;
+begin
+    pdfassert(pdf_link_stack_ptr > 0);
+    flush_node_list(pdf_link_stack_top.link_node);
+    decr(pdf_link_stack_ptr);
 end;
 
 procedure do_link(p, parent_box: pointer; x, y: scaled);
 begin
     if not is_shipping_page then
         pdf_error("ext4", "link annotations cannot be inside an XForm");
-    if type(parent_box) <> hlist_node then
-        pdf_error("ext4", "link annotations can be inside hbox only");
-    save_link_level(p);
+    pdfassert(type(parent_box) = hlist_node);
+    push_link_level(p);
     set_rect_dimens(p, parent_box, x, y,
-                    pdf_link_wd, pdf_link_ht, pdf_link_dp, pdf_link_margin);
-    last_link := p;
-    obj_annot_ptr(pdf_link_objnum(p)) := p;
+                    pdf_width(p), pdf_height(p), pdf_depth(p),
+                    pdf_link_margin);
+    obj_annot_ptr(pdf_link_objnum(p)) := p; {the reference for the pdf annot object
+                                             must be set here}
     pdf_append_list(pdf_link_objnum(p))(pdf_link_list);
 end;
 
-procedure restore_link_level;
-var p, r: pointer;
-begin
-    if link_level_stack = null then
-        pdf_error("ext4", "invalid stack of link nesting level");
-    p := link_level_stack;
-    link_level_stack := link(p);
-    r := link_ptr(p);
-    flush_node_list(r);
-    free_node(p, small_node_size);
-    p := link_level_stack;
-    if p = null then
-        pdf_link_level := -1
-    else begin
-        pdf_link_level := link_level(p);
-        r := link_ptr(p);
-        pdf_link_wd := pdf_width(r);
-        pdf_link_ht := pdf_height(r);
-        pdf_link_dp := pdf_depth(r);
-    end;
-end;
-
 procedure end_link;
+var p: pointer;
 begin
-    if pdf_link_level <> cur_s then
+    if pdf_link_stack_ptr < 1 then
+        pdf_error("ext4", "pdf_link_stack empty, \pdfendlink used without \pdfstartlink?");
+    if pdf_link_stack_top.nesting_level <> cur_s then
         pdf_error("ext4", "\pdfendlink ended up in different nesting level than \pdfstartlink");
-    if is_running(pdf_link_wd) and (last_link <> null) then
+
+    {N.B.: test for running link must be done on |link_node| and not |ref_link_node|, 
+    as |ref_link_node| can be set by |do_link| or |append_link| already}
+
+    if is_running(pdf_width(pdf_link_stack_top.link_node)) then begin
+        p := pdf_link_stack_top.ref_link_node;
         if is_shipping_page and matrixused then begin
             matrixrecalculate(cur_h + pdf_link_margin);
-            pdf_left(last_link)   := getllx - pdf_link_margin;
-            pdf_top(last_link)    := cur_page_height - getury - pdf_link_margin;
-            pdf_right(last_link)  := geturx + pdf_link_margin;
-            pdf_bottom(last_link) := cur_page_height - getlly + pdf_link_margin;
+            pdf_left(p)   := getllx - pdf_link_margin;
+            pdf_top(p)    := cur_page_height - getury - pdf_link_margin;
+            pdf_right(p)  := geturx + pdf_link_margin;
+            pdf_bottom(p) := cur_page_height - getlly + pdf_link_margin;
          end
          else
-            pdf_right(last_link) := cur_h + pdf_link_margin;
-    restore_link_level;
-    last_link := null;
+            pdf_right(p) := cur_h + pdf_link_margin;
+    end;
+    pop_link_level;
 end;
 
 @ For ``running'' annotations we must append a new node when the end of
 annotation is in other box than its start. The new created node is identical to
 corresponding whatsit node representing the start of annotation,  but its
-|info| field is |null|. We set |info| field just before destroying the node, in
-order to use |flush_node_list| to do the job.
+|info| field is |max_halfword|. We set |info| field just before destroying the
+node, in order to use |flush_node_list| to do the job.
 
 @<Declare procedures needed in |pdf_hlist_out|, |pdf_vlist_out|@>=
-procedure append_link(parent_box: pointer; x, y: scaled); {append a new
-|pdf_start_link_node| to |pdf_link_list| and update |last_link|}
-var r: integer;
+procedure append_link(parent_box: pointer; x, y: scaled; i: small_number); {append a new
+pdf annot to |pdf_link_list|}
+var p: pointer;
 begin
-    if type(parent_box) <> hlist_node then
-        pdf_error("ext4", "link annotations can be inside hbox only");
-    r := copy_node_list(link_ptr(link_level_stack)); {copy link node to |r|}
-    info(r) := max_halfword; {mark that this node is not a whatsit node}
-    link(r) := null; {this node will be destroyed separately}
-    set_rect_dimens(r, parent_box, x, y,
-                    pdf_link_wd, pdf_link_ht, pdf_link_dp, pdf_link_margin);
+    pdfassert(type(parent_box) = hlist_node);
+    p := copy_node_list(pdf_link_stack[i].link_node);
+    pdf_link_stack[i].ref_link_node := p;
+    info(p) := max_halfword; {mark that this node is not a whatsit node}
+    link(p) := null; {this node is not linked in any list}
+    set_rect_dimens(p, parent_box, x, y,
+                    pdf_width(p), pdf_height(p), pdf_depth(p),
+                    pdf_link_margin);
     pdf_create_obj(obj_type_others, 0);
-    obj_annot_ptr(obj_ptr) := r;
-    last_link := r;
+    obj_annot_ptr(obj_ptr) := p;
     pdf_append_list(obj_ptr)(pdf_link_list);
 end;
 
@@ -35609,10 +35642,8 @@ pdf_annot_node:
     do_annot(p, this_box, left_edge, base_line);
 pdf_start_link_node:
     do_link(p, this_box, left_edge, base_line);
-pdf_end_link_node: begin
+pdf_end_link_node:
     end_link;
-    @<Create link annotation for the current hbox if needed@>;
-end;
 pdf_dest_node:
     do_dest(p, this_box, left_edge, base_line);
 pdf_thread_node:
@@ -36841,7 +36872,9 @@ while q<>null do
     until not is_char_node(q)
   else  begin p:=q; q:=link(p);
     if type(p)=math_node then
+      begin
       @<Adjust \(t)the LR stack for the |just_reverse| routine@>;
+      end;
     link(p):=l; l:=p;
     end;
 goto done;

@@ -229,7 +229,7 @@ static void checktypebyheader (integer img)
 
     /* read the header */
     file = xfopen (img_name (img), FOPEN_RBIN_MODE);
-    for (i = 0; i < MAX_HEADER; i++) {
+    for (i = 0; (unsigned) i < MAX_HEADER; i++) {
         header[i] = xgetc (file);
         if (feof (file))
             pdftex_fail ("reading image file failed");

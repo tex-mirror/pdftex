@@ -309,7 +309,7 @@ void read_encoding (char *encname)
                 ttf_fail ("encoding vector contains more than 256 names");
         }
         if (*r != 10 && *r != '%') {
-            if (strncmp (r, "] def", strlen ("] def")) == 0)
+            if (str_prefix (r, "] def"))
                 goto done;
             else
                 ttf_fail
@@ -795,7 +795,7 @@ void print_afm (char *date, char *fontname)
             if (*pe == notdef)
                 continue;
             /* scan form `uniABCD' */
-            if (sscanf (*pe, GLYPH_PREFIX_UNICODE "%X", &index) == 1) {
+            if (sscanf (*pe, GLYPH_PREFIX_UNICODE "%9X", &index) == 1) {
                 if (unicode_map[index] != NOGLYPH_ASSIGNED_YET) {
                     pm = mtx_tab + unicode_map[index];
                     pm->found = 1;
