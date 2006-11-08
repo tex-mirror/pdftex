@@ -1,3 +1,59 @@
+-----------------------------------------------------
+pdfTeX 3.141592-1.40.0-rc1 was released on 2006-11-??
+-----------------------------------------------------
+- pdfetex (as a separate binary/program) is gone; all extensions are now in
+  pdftex. The make files still know about the target pdfetex, but it's just a
+  copy of pdftex
+- The sources of TeX, eTeX and pdfTeX have been merged into one file pdftex.web
+  and one change file pdftex.ch. The sources of TeX and eTeX distributed are
+  just there for reference
+- New features:
+  - pdfTeX can now generate PDF 1.5 object streams, which leads to smaller
+    PDFs. This is controlled by setting \pdfobjcompresslevel to a value >0 (3
+    compress everything, 2 don't compress /Info, 1 also don't compress embedded
+    PDFs) and works only with PDF >=1.5 (patch 453)
+  - pdfTeX can now handle Colorstacks.
+
+  - support for jbig2 files
+  - 466 \pdfprimitive and \ifpdfprimitive
+  - 473 \ifpdfabsnum and \ifpdfabsdim
+  - added patch 421 (popen) from Taco
+  - 416	new primitive pdflastlink
+  - \pdfdraftmode
+  - new dimen: \pdfpxdimen
+
+  - 386	grow obj_tab and dest_names arrays dynamically
+  - 427	Character positioning patch
+  - 432	Rules in a PDF qQ group
+  - 438	\pdfsavepos in DVI mode
+  - added patch 462 (HZ font expansion by text matrix manipulation)
+  - take PK resolution from "pk_dpi" parameter in  texmf.cnf, if it has not
+    been set by the format file or by the user
+  - write out PDF statistics later to make them correct
+  - remove generated pdf in case of fatal error
+  - pdfTeX now sets /ModDate and /Trapped by default (the values can be
+    overridden with /pdfinfo)
+  - changed the format of pdfTeX warnings and unified the four(!) functions
+    pdfTeX uses for writing out errors and warnings
+  - expanded the output of -version to include information about the libraries
+    used
+  - add new code by Thanh (patch 580)
+- Bugfixes:
+  - added JFIF detection patch to writejpg.c (bug 548)
+  - bugfix: invalid pdf created if font name contains space (509)
+  - bugfix: truetype OS/2 v3 fonts (594)
+  - bugfix: Type1C (CFF) fonts of embedded pdfs didn't get replaced
+- update libpng to 1.2.12
+
+---------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-beta-20061108 was released on 2006-11-08
+---------------------------------------------------------------
+- bugfix: extra kerning+expansion+ligatures (481)
+- bugfix: extra kerning does not work with ligatures (482)
+- bugfix: extra kerning inhibits extra spacing (483)
+- bugfix: extra kerning inhibits hyphenation (484)
+- bugfix: ttf2afm fails to include characters specified with uniXXXX (565)
+
 ---------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-beta-20061017 was released on 2006-10-17
 ---------------------------------------------------------------

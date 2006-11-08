@@ -1083,7 +1083,7 @@ static void ttf_reindex_glyphs (void)
       append_new_glyph:
         assert (glyph > glyph_tab && glyph - glyph_tab < glyphs_count);
         if (glyph->newindex < 0) {
-            glyph_index[new_glyphs_count] = (short) (glyph - glyph_tab);
+            glyph_index[new_glyphs_count] =  glyph - glyph_tab;
             glyph->newindex = new_glyphs_count;
             new_glyphs_count++;
         }

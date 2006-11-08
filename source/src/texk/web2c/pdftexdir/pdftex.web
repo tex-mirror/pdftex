@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-beta-20061017' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-beta-20061108' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -3755,7 +3755,11 @@ inserted from \.{\\mkern} specifications in math formulas).
 @d kn_bc_code_base == 10
 @d kn_ac_code_base == 11
 
-@d auto_kern == explicit {please don't drop this}
+@d auto_kern == normal
+{
+@d auto_kern == explicit
+}
+
 @d no_lig_code == 6
 
 @d max_hlist_stack = 512 {maximum fill level for |hlist_stack|}
@@ -4926,6 +4930,8 @@ be pushed onto |nest| if necessary.
 @!max_nest_stack:0..nest_size; {maximum of |nest_ptr| when pushing}
 @!cur_list:list_state_record; {the ``top'' semantic state}
 @!shown_mode:-mmode..mmode; {most recent mode shown by \.{\\tracingcommands}}
+@!save_tail: pointer; {save |tail| so we can examine whether we have an auto
+                       kern before a glue}
 
 @ Here is a common way to make the current list grow:
 
@@ -6770,7 +6776,10 @@ to do before the hash table was defined:
 
 @<Print the font identifier for |font(p)|@>=
 begin
-    print_esc(font_id_text(font(p)));
+    if pdf_font_blink[font(p)] = null_font then
+        print_esc(font_id_text(font(p)))
+    else
+        print_esc(font_id_text(pdf_font_blink[font(p)]));
     if pdf_tracing_fonts > 0 then begin
         print(" (");
         print(font_name[font(p)]);
@@ -16630,7 +16639,18 @@ procedure scan_pdf_ext_toks; forward;
 @!pdf_font_type: ^eight_bits; {the type of font}
 @!pdf_font_attr: ^str_number; {pointer to additional attributes}
 @!tmp_f: internal_font_number; {for use with |pdf_init_font|}
+
 @ Here come some subroutines to deal with expanded fonts for HZ-algorithm.
+
+@d set_char_and_font(#) ==
+if is_char_node(#) then begin
+    c := character(#);
+    f := font(#);
+end
+else if type(#) = ligature_node then begin
+    c := character(lig_char(#));
+    f := font(lig_char(#));
+end
 
 @p
 procedure set_tag_code(f: internal_font_number; c: eight_bits; i: integer);
@@ -16732,24 +16752,31 @@ end;
 procedure adjust_interword_glue(p, g: pointer); {adjust the interword
 glue |g| after a character |p|}
 var kn, st, sh: scaled;
-    q: pointer;
-    c: eight_bits;
+    q, r: pointer;
+    c: halfword;
     f: internal_font_number;
+    b: boolean;
 begin
     if not (not is_char_node(g) and type(g) = glue_node) then begin
         pdf_warning("adjust_interword_glue", "g is not a glue", false, false);
         return;
     end;
-    if (not is_char_node(p)) and (type(p) <> ligature_node) then
-        return;
-    if is_char_node(p) then begin
-        c := character(p);
-        f := font(p);
-    end
-    else begin
-        c := character(lig_char(p));
-        f := font(lig_char(p));
+
+    c := non_char; {no char before interword glue yet}
+    set_char_and_font(p) {set |f| and |c| if |p| is a char or ligature}
+    else if (type(p) = kern_node) and 
+            (subtype(p) = auto_kern) and 
+            (save_tail <> null) then
+    begin
+        r := save_tail;
+        while (link(r) <> null) and (link(r) <> p) do
+            r := link(r);
+        if (link(r) = p) then
+            set_char_and_font(r); {set |f| and |c| if |r| is a char or ligature}
     end;
+    if (c = non_char) then
+        return; 
+
     kn := get_kn_bs_code(f, c);
     st := get_st_bs_code(f, c);
     sh := get_sh_bs_code(f, c);
@@ -16763,55 +16790,33 @@ begin
     end;
 end;
 
-procedure auto_prepend_kern(p: pointer); {prepend a kern before |p| if
-|p| is a charnode with non-zero |knbccode|}
-var k: integer;
-    q: pointer;
-    c: eight_bits;
-    f: internal_font_number;
+function get_auto_kern(f: internal_font_number; l, r: halfword): pointer;
+{return a pointer to an auto kern node, or |null|}
+var tmp_w: scaled;
+    p: pointer;
 begin
-    if (not is_char_node(p)) and (type(p) <> ligature_node) then
+    pdfassert((l >= 0) and (r >= 0));
+    get_auto_kern := null;
+    if (pdf_append_kern <= 0) and (pdf_prepend_kern <= 0) then
         return;
-    if is_char_node(p) then begin
-        c := character(p);
-        f := font(p);
-    end
-    else begin
-        c := character(lig_char(p));
-        f := font(lig_char(p));
+    tmp_w := 0;
+    if (pdf_append_kern > 0) and (l < non_char) then begin
+        k := get_kn_ac_code(f, l);
+        if k <> 0 then
+            tmp_w := round_xn_over_d(quad(f), k, 1000);
     end;
-    k := get_kn_bc_code(f, c);
-    if k = 0 then
-        return;
-    q := new_kern(round_xn_over_d(quad(f), k, 1000));
-    subtype(q) := auto_kern;
-    tail_append(q);
+    if (pdf_prepend_kern > 0) and (r < non_char) then begin
+        k := get_kn_bc_code(f, r);
+        if k <> 0 then
+            tmp_w := tmp_w + round_xn_over_d(quad(f), k, 1000);
+    end;
+    if tmp_w <> 0 then begin
+        p := new_kern(tmp_w);
+        subtype(p) := auto_kern;
+        get_auto_kern := p;
+    end;
 end;
 
-procedure auto_append_kern(p: pointer); {append a kern after |p| if
-|p| is a charnode with non-zero |knaccode|}
-var k: integer;
-    q: pointer;
-    c: eight_bits;
-    f: internal_font_number;
-begin
-    if (not is_char_node(p)) and (type(p) <> ligature_node) then
-        return;
-    if is_char_node(p) then begin
-        c := character(p);
-        f := font(p);
-    end
-    else begin
-        c := character(lig_char(p));
-        f := font(lig_char(p));
-    end;
-    k := get_kn_ac_code(f, c);
-    if k = 0 then
-        return;
-    q := new_kern(round_xn_over_d(quad(f), k, 1000));
-    subtype(q) := auto_kern;
-    tail_append(q);
-end;
 
 function expand_font_name(f: internal_font_number; e: integer): str_number;
 var old_setting:0..max_selector; {holds |selector| setting}
@@ -25426,6 +25431,7 @@ var @!p:pointer; {temporary register for list manipulation}
 @!test_char:halfword; {hyphen or other character for ligature testing}
 @!w:scaled; {amount of kerning}
 @!k:font_index; {position of current lig/kern instruction}
+tmp_k1, tmp_k2: pointer; {for testing whether an auto kern should be inserted}
 begin hyphen_passed:=0; t:=hold_head; w:=0; link(hold_head):=null;
  {at this point |ligature_present=lft_hit=rt_hit=false|}
 @<Set up data structures with the cursor following position |j|@>;
@@ -25488,7 +25494,9 @@ if cur_l=non_char then
   begin k:=bchar_label[hf];
   if k=non_address then goto done@+else q:=font_info[k].qqqq;
   end
-else begin q:=char_info(hf)(cur_l);
+else begin
+  @<Check if an auto kern is present@>;
+  q:=char_info(hf)(cur_l);
   if char_tag(q)<>lig_tag then goto done;
   k:=lig_kern_start(hf)(q); q:=font_info[k].qqqq;
   if skip_byte(q)>stop_flag then
@@ -25518,6 +25526,11 @@ loop@+begin if next_char(q)=test_char then if skip_byte(q)<=stop_flag then
   end;
 done:
 
+@ @<Check if an auto kern is present@>=
+tmp_k1 := get_auto_kern(hf, cur_l, cur_r);
+if tmp_k1 <> null then
+    goto done
+
 @ @d wrap_lig(#)==if ligature_present then
     begin p:=new_ligature(hf,cur_l,link(cur_q));
     if lft_hit then
@@ -25526,7 +25539,19 @@ done:
     if # then if lig_stack=null then
       begin incr(subtype(p)); rt_hit:=false;
       end;
-    link(cur_q):=p; t:=p; ligature_present:=false;
+    if pdf_prepend_kern > 0 then
+        tmp_k2 := get_auto_kern(hf, non_char, cur_l)
+    else
+        tmp_k2 := null;
+    if tmp_k2 = null then begin
+        link(cur_q):=p; t:=p; ligature_present:=false;
+    end
+    else begin
+        link(cur_q) := tmp_k2;
+        link(tmp_k2) := p;
+        t := p;
+        ligature_present := false;
+    end
     end
 @d pop_lig_stack==begin if lig_ptr(lig_stack)>null then
     begin link(t):=lig_ptr(lig_stack); {this is a charnode for |hu[j+1]|}
@@ -25538,6 +25563,7 @@ done:
 
 @<Append a ligature and/or kern to the translation...@>=
 wrap_lig(rt_hit);
+@<Append auto kern saved in |tmp_k1| if present@>;
 if w<>0 then
   begin link(t):=new_kern(w); t:=link(t); w:=0;
   end;
@@ -25545,6 +25571,13 @@ if lig_stack>null then
   begin cur_q:=t; cur_l:=character(lig_stack); ligature_present:=true;
   pop_lig_stack; goto continue;
   end
+
+@ @<Append auto kern saved in |tmp_k1| if present@>=
+if tmp_k1 <> null then begin
+    pdfassert(w = 0);
+    link(t) := tmp_k1;
+    t := link(t);
+end
 
 @ @<Carry out a ligature replacement, updating the cursor structure...@>=
 begin if cur_l=non_char then lft_hit:=true;
@@ -27736,6 +27769,7 @@ label big_switch,reswitch,main_loop,main_loop_wrapup,
   main_lig_loop,main_lig_loop+1,main_lig_loop+2,
   append_normal_space,exit;
 var@!t:integer; {general-purpose temporary variable}
+tmp_k1, tmp_k2: pointer; {for testing whether an auto kern should be inserted}
 begin if every_job<>null then begin_token_list(every_job,every_job_text);
 big_switch: get_x_token;@/
 reswitch: @<Give diagnostic information, if requested@>;
@@ -27830,6 +27864,7 @@ are inside the individual sections.
 
 @<Append character |cur_chr|...@>=
 adjust_space_factor;@/
+save_tail := null;
 main_f:=cur_font;
 bchar:=font_bchar[main_f]; false_bchar:=font_false_bchar[main_f];
 if mode>0 then if language<>clang then fix_language;
@@ -27874,7 +27909,19 @@ nodes inside of other discretionaries.
   if # then if lig_stack=null then
     begin incr(subtype(main_p)); rt_hit:=false;
     end;
-  link(cur_q):=main_p; tail:=main_p; ligature_present:=false;
+  if pdf_prepend_kern > 0 then
+      tmp_k2 := get_auto_kern(main_f, non_char, cur_l)
+  else
+      tmp_k2 := null;
+  if tmp_k2 = null then begin
+      link(cur_q):=main_p; tail:=main_p; ligature_present:=false;
+  end
+  else begin
+      link(cur_q) := tmp_k2;
+      link(tmp_k2) := main_p;
+      tail := main_p;
+      ligature_present := false;
+  end
   end
 
 @d wrapup(#)==if cur_l<non_char then
@@ -27901,11 +27948,7 @@ main_i:=char_info(main_f)(cur_l);
 if not char_exists(main_i) then
   begin char_warning(main_f,cur_chr); free_avail(lig_stack); goto big_switch;
   end;
-if pdf_prepend_kern > 0 then
-    auto_prepend_kern(lig_stack);
-tail_append(lig_stack);
-if pdf_append_kern > 0 then
-    auto_append_kern(lig_stack)
+tail_append(lig_stack) {|main_loop_lookahead| is next}
 
 @ Here we are at |main_loop_move_lig|.
 When we begin this code we have |cur_q=tail| and |cur_l=character(lig_stack)|.
@@ -27955,6 +27998,7 @@ lig/kern commands were investigated for every such character.
 At the beginning of this code we have |main_i=char_info(main_f)(cur_l)|.
 
 @<If there's a ligature/kern command...@>=
+@<Insert auto kern for |main_control| if desired@>;
 if char_tag(main_i)<>lig_tag then goto main_loop_wrapup;
 main_k:=lig_kern_start(main_f)(main_i); main_j:=font_info[main_k].qqqq;
 if skip_byte(main_j)<=stop_flag then goto main_lig_loop+2;
@@ -27969,6 +28013,15 @@ else begin if skip_byte(main_j)>=stop_flag then goto main_loop_wrapup;
   main_k:=main_k+qo(skip_byte(main_j))+1;
   end;
 goto main_lig_loop+1
+
+@ @<Insert auto kern for |main_control| if desired@>=
+tmp_k1 := get_auto_kern(main_f, cur_l, cur_r);
+if tmp_k1 <> null then begin
+    wrapup(rt_hit);
+    save_tail := tail;
+    tail_append(tmp_k1);
+    goto main_loop_move;
+end
 
 @ When a ligature or kern instruction matches a character, we know from
 |read_font_info| that the character exists in the font, even though we

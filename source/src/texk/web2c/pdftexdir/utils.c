@@ -37,7 +37,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $
 #include "zlib.h"
 #include "ptexlib.h"
 #include "png.h"
-#include "xpdf/config.h"
+#include "xpdf/config.h"        /* just to get the xpdf version */
 
 #define check_nprintf(size_get, size_want) \
     if ((unsigned)(size_get) >= (unsigned)(size_want)) \

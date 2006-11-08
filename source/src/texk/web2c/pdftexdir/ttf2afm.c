@@ -795,9 +795,10 @@ void print_afm (char *date, char *fontname)
             if (*pe == notdef)
                 continue;
             /* scan form `uniABCD' */
-            if (sscanf (*pe, GLYPH_PREFIX_UNICODE "%9X", &index) == 1) {
+            if (sscanf (*pe, GLYPH_PREFIX_UNICODE "%4X", &index) == 1) {
                 if (unicode_map[index] != NOGLYPH_ASSIGNED_YET) {
                     pm = mtx_tab + unicode_map[index];
+		    mtx_index[pe - enc_names] = pm - mtx_tab;
                     pm->found = 1;
                 } else
                     ttf_warn ("`unicode %s%.4X' is not mapped to any glyph",
@@ -809,6 +810,7 @@ void print_afm (char *date, char *fontname)
                 if (index >= nglyphs)
                     ttf_fail ("`%s' out of valid range [0..%i)", *pe, nglyphs);
                 pm = mtx_tab + index;
+                mtx_index[pe - enc_names] = pm - mtx_tab;
                 pm->found = 1;
                 continue;
             }
