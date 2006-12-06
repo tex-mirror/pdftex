@@ -5,6 +5,7 @@
 --procnames-start-lines
 --space-after-procedure-calls
 --dont-break-procedure-type
+--no-space-after-casts
 /* this does not work in indent 2.2.6 :-( */
 --no-tabs
 /* this is new in indent 2.2.9 */

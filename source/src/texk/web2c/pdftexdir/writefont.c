@@ -24,301 +24,569 @@ $Id: writefont.c,v 1.3 2005/12/27 19:04:42 hahe Exp $
 
 static const char perforce_id[] =
     "$Id: writefont.c,v 1.3 2005/12/27 19:04:42 hahe Exp $";
+/**********************************************************************/
 
-key_entry font_keys[FONT_KEYS_NUM] = {
-    {"Ascent", "Ascender", 0, false},
-    {"CapHeight", "CapHeight", 0, false},
-    {"Descent", "Descender", 0, false},
-    {"FontName", "FontName", 0, false},
-    {"ItalicAngle", "ItalicAngle", 0, false},
-    {"StemV", "StdVW", 0, false},
-    {"XHeight", "XHeight", 0, false},
-    {"FontBBox", "FontBBox", 0, false},
-    {"", "", 0, false},
-    {"", "", 0, false},
-    {"", "", 0, false}
-};
+struct avl_table *fo_tree = NULL;       /* tree of font dictionaries */
+struct avl_table *fd_tree = NULL;       /* tree of font descriptor objects */
 
-internalfontnumber tex_font;
-boolean fontfile_found;
-boolean is_otf_font;
-boolean write_ttf_glyph_names;
-char fontname_buf[FONTNAME_BUF_SIZE];
-
-static int first_char, last_char;
-static integer char_widths[256];
-static boolean write_fontfile_only;
-static int char_widths_objnum, encoding_objnum, tounicode_objnum;
-
-static void print_key (integer code, integer v)
+static int comp_fo_entry (const void *pa, const void *pb, void *p)
 {
-    pdf_printf ("/%s ", font_keys[code].pdfname);
-    if (font_keys[code].valid)
-        pdf_printf ("%i", (int) font_keys[code].value);
-    else
-        pdf_printf ("%i", (int) dividescaled (v, pdffontsize[tex_font], 3));
-    pdf_puts ("\n");
+    return strcmp (((const fo_entry *) pa)->fm->tfm_name,
+                   ((const fo_entry *) pb)->fm->tfm_name);
 }
 
-static void print_italic_angle ()
-{
-    pdf_printf ("/%s ", font_keys[ITALIC_ANGLE_CODE].pdfname);
-    if (font_keys[ITALIC_ANGLE_CODE].valid)
-        pdf_printf ("%g", font_keys[ITALIC_ANGLE_CODE].value);
-    else
-        pdf_printf ("%g", -atan (getslant (tex_font) / 65536.0) * (180 / M_PI));
-    pdf_puts ("\n");
-}
-
-static integer getstemv (void)
-{
-    return getcharwidth (tex_font, '.') / 3;
-}
-
-static void getbbox (void)
-{
-    font_keys[FONTBBOX1_CODE].value = 0;
-    font_keys[FONTBBOX2_CODE].value =
-        dividescaled (-getchardepth (tex_font, 'y'), pdffontsize[tex_font], 3);
-    font_keys[FONTBBOX3_CODE].value =
-        dividescaled (getquad (tex_font), pdffontsize[tex_font], 3);
-    font_keys[FONTBBOX4_CODE].value =
-        dividescaled (getcharheight (tex_font, 'H'), pdffontsize[tex_font], 3);
-}
-
-static void get_char_widths (void)
+static int comp_fd_entry (const void *pa, const void *pb, void *p)
 {
     int i;
-    for (i = 0; i < 256; i++) {
-        if (i < fontbc[tex_font] || i > fontec[tex_font])
-            char_widths[i] = 0;
-        else
-            char_widths[i] = getcharwidth (tex_font, i);
-    }
-    for (i = fontbc[tex_font]; i < 256; i++)
-        if (pdfcharmarked (tex_font, i))
-            break;
-    first_char = i;
-    for (i = 255; i > first_char; i--)
-        if (pdfcharmarked (tex_font, i))
-            break;
-    last_char = i;
-    if ((first_char > last_char) ||
-        (first_char == last_char && !pdfcharmarked (tex_font, first_char))) {
-        write_fontfile_only = true;     /* the font is used in PDF images only */
-        return;
-    }
-    for (i = first_char; i <= last_char; i++)
-        if (pdfcharmarked (tex_font, i))
-            char_widths[i] = dividescaled (char_widths[i],
-                                           pdffontsize[tex_font], 4);
-        else
-            char_widths[i] = 0;
+    const fd_entry *p1 = (const fd_entry *) pa, *p2 = (const fd_entry *) pb;
+    assert (p1->fm != NULL && p1->fm->ff_name != NULL &&
+            p2->fm != NULL && p2->fm->ff_name != NULL);
+    if ((i = strcmp (p1->fm->ff_name, p2->fm->ff_name)) != 0)
+        return i;
+    cmp_return (p1->fm->slant, p2->fm->slant);
+    cmp_return (p1->fm->extend, p2->fm->extend);
+    return 0;
 }
 
-static void write_char_widths (void)
+/**********************************************************************/
+/* initialize data structure for /Type /Font */
+
+fo_entry *new_fo_entry (void)
+{
+    fo_entry *fo;
+    fo = xtalloc (1, fo_entry);
+    fo->fo_objnum = 0;
+    fo->tex_font = 0;
+    fo->fm = NULL;
+    fo->fd = NULL;
+    fo->fe = NULL;
+    fo->cw = NULL;
+    fo->first_char = 1;
+    fo->last_char = 0;
+    return fo;
+}
+
+/* initialize data structure for /Type /FontDescriptor */
+
+fd_entry *new_fd_entry (void)
+{
+    fd_entry *fd;
+    int i;
+    fd = xtalloc (1, fd_entry);
+    fd->fd_objnum = 0;
+    fd->fontname = NULL;
+    fd->subset_tag = NULL;
+    fd->ff_found = false;
+    fd->ff_objnum = 0;
+    fd->fn_objnum = 0;
+    fd->all_glyphs = false;
+    fd->write_ttf_glyph_names = false;
+    for (i = 0; i < INT_KEYS_NUM; i++) {
+        fd->font_dim[i].val = 0;
+        fd->font_dim[i].set = false;
+    }
+    fd->fe = NULL;
+    fd->fm = NULL;
+    fd->tx_tree = NULL;
+    fd->gl_tree = NULL;
+    return fd;
+}
+
+/* initialize data structure for /Widths array object */
+
+cw_entry *new_cw_entry (void)
+{
+    cw_entry *cw;
+    cw = xtalloc (1, cw_entry);
+    cw->cw_objnum = 0;
+    cw->width = NULL;
+    return cw;
+}
+
+/**********************************************************************/
+/*
+ * Only fallback values of font metrics are taken from the TFM info
+ * of f by preset_fontmetrics(). During reading of the font file,
+ * these values are replaced by metrics from the font, if available.
+ */
+
+static void preset_fontmetrics (fd_entry * fd, internalfontnumber f)
+{
+    int i;
+    fd->font_dim[ITALIC_ANGLE_CODE].val =
+        dividescaled (-atan (getslant (f) / 65536.0) * (180 / M_PI),
+                      pdffontsize[f], 3);
+    fd->font_dim[ASCENT_CODE].val =
+        dividescaled (getcharheight (f, 'h'), pdffontsize[f], 3);
+    fd->font_dim[CAPHEIGHT_CODE].val =
+        dividescaled (getcharheight (f, 'H'), pdffontsize[f], 3);
+    fd->font_dim[DESCENT_CODE].val =
+        dividescaled (getcharheight (f, 'y'), pdffontsize[f], 3);
+    fd->font_dim[STEMV_CODE].val =
+        dividescaled (getcharwidth (f, '.') / 3, pdffontsize[f], 3);
+    fd->font_dim[XHEIGHT_CODE].val =
+        dividescaled (getxheight (f), pdffontsize[f], 3);
+    fd->font_dim[FONTBBOX1_CODE].val = 0;
+    fd->font_dim[FONTBBOX2_CODE].val =
+        dividescaled (-getchardepth (f, 'y'), pdffontsize[f], 3);
+    fd->font_dim[FONTBBOX3_CODE].val =
+        dividescaled (getquad (f), pdffontsize[f], 3);
+    fd->font_dim[FONTBBOX4_CODE].val =
+        dividescaled (getcharheight (f, 'H'), pdffontsize[f], 3);
+    for (i = 0; i < INT_KEYS_NUM; i++)
+        fd->font_dim[i].set = true;
+}
+
+static void write_fontmetrics (fd_entry * fd)
+{
+    int i;
+    if (fd->font_dim[FONTBBOX1_CODE].set && fd->font_dim[FONTBBOX2_CODE].set
+        && fd->font_dim[FONTBBOX3_CODE].set && fd->font_dim[FONTBBOX4_CODE].set)
+        pdf_printf ("/%s [%i %i %i %i]\n", font_key[FONTBBOX1_CODE].pdfname,
+                    (int) fd->font_dim[FONTBBOX1_CODE].val,
+                    (int) fd->font_dim[FONTBBOX2_CODE].val,
+                    (int) fd->font_dim[FONTBBOX3_CODE].val,
+                    (int) fd->font_dim[FONTBBOX4_CODE].val);
+    for (i = 0; i < GEN_KEY_NUM; i++)
+        if (fd->font_dim[i].set)
+            pdf_printf ("/%s %i\n", font_key[i].pdfname, fd->font_dim[i].val);
+}
+
+/**********************************************************************/
+
+static void preset_fontname (fo_entry * fo)
+{
+    if (fo->fm->ps_name != NULL)
+        fo->fd->fontname = xstrdup(fo->fm->ps_name);     /* just fallback */
+    else
+        fo->fd->fontname = xstrdup(fo->fm->tfm_name);
+}
+
+static void write_fontname (fd_entry * fd, char *key)
+{
+    assert (fd->fontname != NULL);
+    pdf_puts ("/");
+    if (key != NULL)
+        pdf_printf ("%s /", key);
+    if (fd->subset_tag != NULL)
+        pdf_printf ("%s+", fd->subset_tag);
+    pdf_printf ("%s\n", fd->fontname);
+}
+
+static void write_fontname_object (fd_entry * fd)
+{
+    assert (fd->fn_objnum != 0);
+    pdfbeginobj (fd->fn_objnum, 1);
+    write_fontname (fd, NULL);
+    pdfendobj ();
+}
+
+/**********************************************************************/
+
+fd_entry *lookup_fd_entry (char *s, integer slant, integer extend)
+{
+    fd_entry fd;
+    fm_entry fm;
+    assert (s != NULL);
+    fm.ff_name = s;
+    fm.slant = slant;
+    fm.extend = extend;
+    fd.fm = &fm;
+    if (fd_tree == NULL) {
+        fd_tree = avl_create (comp_fd_entry, NULL, &avl_xallocator);
+        assert (fd_tree != NULL);
+    }
+    return (fd_entry *) avl_find (fd_tree, &fd);
+}
+
+fd_entry *lookup_fontdescriptor (fo_entry * fo)
+{
+    assert (fo != NULL);
+    assert (fo->fm != NULL);
+    assert (fo->fm->ff_name != NULL);
+    return lookup_fd_entry (fo->fm->ff_name, fo->fm->slant, fo->fm->extend);
+}
+
+void register_fd_entry (fd_entry * fd)
+{
+    void **aa;
+    if (fd_tree == NULL) {
+        fd_tree = avl_create (comp_fd_entry, NULL, &avl_xallocator);
+        assert (fd_tree != NULL);
+    }
+    assert (fd != NULL && fd->fm != NULL && fd->fm->ff_name != NULL);
+    assert (lookup_fd_entry (fd->fm->ff_name, fd->fm->slant, fd->fm->extend) == NULL);      /* font descriptor not yet registered */
+    aa = avl_probe (fd_tree, fd);
+    assert (aa != NULL);
+}
+
+void create_fontdescriptor (fo_entry * fo, internalfontnumber f)
+{
+    assert (fo != NULL);
+    assert (fo->fm != NULL);
+    assert (fo->fm->ff_name != NULL);
+    assert (fo->fd == NULL);
+    fo->fd = new_fd_entry ();
+    preset_fontname (fo);
+    preset_fontmetrics (fo->fd, f);
+    fo->fd->fe = fo->fe;        /* encoding needed by TrueType writing */
+    fo->fd->fm = fo->fm;        /* map entry needed by TrueType writing */
+    fo->fd->gl_tree = avl_create (comp_string_entry, NULL, &avl_xallocator);
+    assert (fo->fd->gl_tree != NULL);
+}
+
+/**********************************************************************/
+/*
+ * For all used characters of TeX font f, get corresponding glyph names
+ * from external reencoding (.enc) file and collect these in the glyph
+ * tree gl_tree of font descriptor fd referenced by font dictionary fo.
+ */
+
+void mark_reenc_glyphs (fo_entry * fo, internalfontnumber f)
+{
+    int i;
+    char **g;
+    void **aa;
+    assert (fo->fe != NULL);
+    if (is_included (fo->fm) && is_subsetted (fo->fm)) {
+        /* mark glyphs from TeX (externally reencoded characters) */
+        g = fo->fe->glyph_names;
+        for (i = fo->first_char; i <= fo->last_char; i++) {
+            if (pdfcharmarked (f, i) && g[i] != notdef
+                && (char *) avl_find (fo->fd->gl_tree, g[i]) == NULL) {
+                aa = avl_probe (fo->fd->gl_tree, xstrdup (g[i]));
+                assert (aa != NULL);
+            }
+        }
+    }
+}
+
+/*
+ * Function mark_chars() has 2 uses:
+ * 1. Mark characters as chars on TeX level.
+ * 2. Mark encoding pairs used by TeX to optimize encoding vector.
+ */
+
+struct avl_table *mark_chars (fo_entry * fo, struct avl_table *tx_tree,
+                              internalfontnumber f)
+{
+    int i, *j;
+    void **aa;
+    if (tx_tree == NULL) {
+        tx_tree = avl_create (comp_int_entry, NULL, &avl_xallocator);
+        assert (tx_tree != NULL);
+    }
+    for (i = fo->first_char; i <= fo->last_char; i++) {
+        if (pdfcharmarked (f, i) && (int *) avl_find (tx_tree, &i) == NULL) {
+            j = xtalloc (1, int);
+            *j = i;
+            aa = avl_probe (tx_tree, j);
+            assert (aa != NULL);
+        }
+    }
+    return tx_tree;
+}
+
+/**********************************************************************/
+
+void get_char_range (fo_entry * fo, internalfontnumber f)
+{
+    int i;
+    assert (fo != NULL);
+    for (i = fontbc[f]; i <= fontec[f]; i++)    /* search for first_char and last_char */
+        if (pdfcharmarked (f, i))
+            break;
+    fo->first_char = i;
+    for (i = fontec[f]; i >= fontbc[f]; i--)
+        if (pdfcharmarked (f, i))
+            break;
+    fo->last_char = i;
+    if ((fo->first_char > fo->last_char)
+        || !pdfcharmarked (f, fo->first_char)) {        /* no character used from this font */
+        fo->last_char = 0;
+        fo->first_char = fo->last_char + 1;
+    }
+}
+
+void create_charwidth_array (fo_entry * fo, internalfontnumber f)
+{
+    int i;
+    assert (fo != NULL);
+    assert (fo->cw == NULL);
+    fo->cw = new_cw_entry ();
+    fo->cw->width = xtalloc (256, integer);
+    for (i = 0; i < fo->first_char; i++)
+        fo->cw->width[i] = 0;
+    for (i = fo->first_char; i <= fo->last_char; i++)
+        fo->cw->width[i] =
+            dividescaled (getcharwidth (f, i), pdffontsize[f], 4);
+    for (i = fo->last_char + 1; i < 256; i++)
+        fo->cw->width[i] = 0;
+}
+
+static void write_charwidth_array (fo_entry * fo)
 {
     int i, j;
-    pdfbeginobj (char_widths_objnum, 1);
+    assert (fo->cw != NULL);
+    assert (fo->cw->cw_objnum == 0);
+    fo->cw->cw_objnum = pdfnewobjnum ();
+    pdfbeginobj (fo->cw->cw_objnum, 1);
     pdf_puts ("[");
-    for (i = first_char; i <= last_char; i++) {
-        pdf_printf ("%i", (int)char_widths[i] / 10);
-        if ((j = char_widths[i] % 10) != 0)
+    for (i = fo->first_char; i <= fo->last_char; i++) {
+        pdf_printf ("%i", (int) fo->cw->width[i] / 10);       /* see adv_char_width() in pdftex.web */
+        if ((j = fo->cw->width[i] % 10) != 0)
             pdf_printf (".%i", j);
-        pdf_printf (" ");
+        if (i != fo->last_char)
+            pdf_puts (" ");
     }
     pdf_puts ("]\n");
     pdfendobj ();
 }
 
-static void write_fontname (boolean as_reference)
+/**********************************************************************/
+/*
+ * Remark: Font objects from embedded PDF files are never registered
+ * into fo_tree; they are individually written out.
+ */
+
+fo_entry *lookup_fo_entry (char *s)
 {
-    if (as_reference && fm_cur->fn_objnum != 0) {
-        pdf_printf ("%i 0 R\n", (int) fm_cur->fn_objnum);
-        return;
+    fo_entry fo;
+    fm_entry fm;
+    assert (s != NULL);
+    fm.tfm_name = s;
+    fo.fm = &fm;
+    if (fo_tree == NULL) {
+        fo_tree = avl_create (comp_fo_entry, NULL, &avl_xallocator);
+        assert (fo_tree != NULL);
     }
-    pdf_puts ("/");
-    if (fm_cur->subset_tag != NULL)
-        pdf_printf ("%s+", fm_cur->subset_tag);
-    if (font_keys[FONTNAME_CODE].valid) {
-        stripspaces (fontname_buf);
-        pdf_printf ("%s", fontname_buf);
-    } else if (fm_cur->ps_name != NULL)
-        pdf_printf ("%s", fm_cur->ps_name);
-    else
-        pdf_printf ("%s", fm_cur->tfm_name);
-    pdf_puts ("\n");
+    return (fo_entry *) avl_find (fo_tree, &fo);
 }
 
-static void write_fontobj (integer font_objnum)
+void register_fo_entry (fo_entry * fo)
 {
-    pdfbegindict (font_objnum, 1);
-    pdf_puts ("/Type /Font\n");
-    pdf_printf ("/Subtype /%s\n", is_truetype (fm_cur) ? "TrueType" : "Type1");
-    if (encoding_objnum != 0)
-        pdf_printf ("/Encoding %i 0 R\n", (int) encoding_objnum);
-    if (tounicode_objnum != 0)
-        pdf_printf ("/ToUnicode %i 0 R\n", (int) tounicode_objnum);
-    if (pdffontattr[tex_font] != getnullstr ()) {
-        pdfprint (pdffontattr[tex_font]);
-        pdf_puts ("\n");
+    void **aa;
+    if (fo_tree == NULL) {
+        fo_tree = avl_create (comp_fo_entry, NULL, &avl_xallocator);
+        assert (fo_tree != NULL);
     }
-    if (no_font_desc (fm_cur)) {
-        pdf_printf ("/BaseFont /%s\n", fm_cur->ps_name);
-        pdfenddict ();
-        return;
-    }
-    char_widths_objnum = pdfnewobjnum ();
-    pdf_printf ("/FirstChar %i\n/LastChar %i\n/Widths %i 0 R\n",
-                first_char, last_char, char_widths_objnum);
-    pdf_printf ("/BaseFont ");
-    write_fontname (true);
-    if (fm_cur->fd_objnum == 0)
-        fm_cur->fd_objnum = pdfnewobjnum ();
-    pdf_printf ("/FontDescriptor %i 0 R\n", (int)fm_cur->fd_objnum);
-    pdfenddict ();
+    assert (fo != NULL);
+    assert (fo->fm != NULL);
+    assert (fo->fm->tfm_name != NULL);
+    assert (lookup_fo_entry (fo->fm->tfm_name) == NULL);
+    aa = avl_probe (fo_tree, fo);
+    assert (aa != NULL);
 }
 
-static void write_fontfile (void)
+/**********************************************************************/
+
+static void write_fontfile (fd_entry * fd)
 {
-    fontfile_found = false;
-    is_otf_font = false;
-    if (is_truetype (fm_cur))
-        writettf ();
+    if (is_type1 (fd->fm))
+        writet1 (fd);
+    else if (is_truetype (fd->fm))
+        writettf (fd);
+    else if (is_opentype (fd->fm))
+        writeotf (fd);
     else
-        writet1 ();
-    if (!fontfile_found || !is_included (fm_cur))
+        assert (0);
+    if (!fd->ff_found || !is_included (fd->fm))
         return;
-    if (fm_cur->ff_objnum == 0)
-        pdftex_fail ("font file object number for `%s' not initialized",
-                     fm_cur->tfm_name);
-    pdfbegindict (fm_cur->ff_objnum, 0);        /* font file stream */
-    if (is_truetype (fm_cur))
-        pdf_printf ("/Length1 %i\n", (int) ttf_length);
-    else if (is_otf_font)
-        pdf_printf ("/Subtype /Type1C\n");
-    else
+    assert (fd->ff_objnum == 0);
+    fd->ff_objnum = pdfnewobjnum ();
+    pdfbegindict (fd->ff_objnum, 0);    /* font file stream */
+    if (is_type1 (fd->fm))
         pdf_printf ("/Length1 %i\n/Length2 %i\n/Length3 %i\n",
                     (int) t1_length1, (int) t1_length2, (int) t1_length3);
+    else if (is_truetype (fd->fm))
+        pdf_printf ("/Length1 %i\n", (int) ttf_length);
+    else if (is_opentype (fd->fm))
+        pdf_puts ("/Subtype /Type1C\n");
+    else
+        assert (0);
     pdfbeginstream ();
     fb_flush ();
     pdfendstream ();
 }
 
-static void write_fontdescriptor (void)
+/**********************************************************************/
+
+static void write_fontdescriptor (fd_entry * fd)
 {
-    int i;
-    pdfbegindict (fm_cur->fd_objnum, 1);        /* font descriptor */
+    char *glyph;
+    struct avl_traverser t;
+    assert (fd != NULL && fd->fm != NULL);
+    if (is_included (fd->fm))
+        write_fontfile (fd);
+    if (fd->fn_objnum != 0)
+        write_fontname_object (fd);
+    if (fd->fd_objnum == 0)
+        fd->fd_objnum = pdfnewobjnum ();
+    pdfbegindict (fd->fd_objnum, 1);
     pdf_puts ("/Type /FontDescriptor\n");
-    print_key (ASCENT_CODE, getcharheight (tex_font, 'h'));
-    print_key (CAPHEIGHT_CODE, getcharheight (tex_font, 'H'));
-    print_key (DESCENT_CODE, -getchardepth (tex_font, 'y'));
-    pdf_printf ("/FontName ");
-    write_fontname (true);
-    print_italic_angle ();
-    print_key (STEMV_CODE, getstemv ());
-    print_key (XHEIGHT_CODE, getxheight (tex_font));
-    if (!font_keys[FONTBBOX1_CODE].valid) {
-        getbbox ();
-    }
-    pdf_printf ("/%s [%i %i %i %i]\n",
-                font_keys[FONTBBOX1_CODE].pdfname,
-                (int) font_keys[FONTBBOX1_CODE].value,
-                (int) font_keys[FONTBBOX2_CODE].value,
-                (int) font_keys[FONTBBOX3_CODE].value,
-                (int) font_keys[FONTBBOX4_CODE].value);
-    if (!fontfile_found && fm_cur->flags == 4)
+    write_fontname (fd, "FontName");
+    if (!fd->ff_found && fd->fm->fd_flags == 4)
         pdf_puts ("/Flags 34\n");       /* assumes a roman sans serif font */
     else
-        pdf_printf ("/Flags %i\n", (int) fm_cur->flags);
-    if (is_included (fm_cur) && fontfile_found) {
-        if (is_subsetted (fm_cur) && !is_truetype (fm_cur)) {
+        pdf_printf ("/Flags %i\n", (int) fd->fm->fd_flags);
+    write_fontmetrics (fd);
+    if (is_included (fd->fm) && fd->ff_found) {
+        if (is_subsetted (fd->fm) && is_type1 (fd->fm)) {
+            /* /CharSet is optional; names may appear in any order */
+            assert (fd->gl_tree != NULL);
+            avl_t_init (&t, fd->gl_tree);
             pdf_puts ("/CharSet (");
-            for (i = 0; i < 256; i++)
-                if (pdfcharmarked (tex_font, i) && t1_glyph_names[i] != notdef)
-                    pdf_printf ("/%s", t1_glyph_names[i]);
+            for (glyph = (char *) avl_t_first (&t, fd->gl_tree); glyph != NULL;
+                 glyph = (char *) avl_t_next (&t))
+                pdf_printf ("/%s", glyph);
             pdf_puts (")\n");
         }
-        if (is_truetype (fm_cur))
-            pdf_printf ("/FontFile2 %i 0 R\n", (int)fm_cur->ff_objnum);
-        else if (is_otf_font)
-            pdf_printf ("/FontFile3 %i 0 R\n", (int)fm_cur->ff_objnum);
+        if (is_type1 (fd->fm))
+            pdf_printf ("/FontFile %i 0 R\n", (int) fd->ff_objnum);
+        else if (is_truetype (fd->fm))
+            pdf_printf ("/FontFile2 %i 0 R\n", (int) fd->ff_objnum);
+        else if (is_opentype (fd->fm))
+            pdf_printf ("/FontFile3 %i 0 R\n", (int) fd->ff_objnum);
         else
-            pdf_printf ("/FontFile %i 0 R\n", (int)fm_cur->ff_objnum);
+            assert (0);
     }
     pdfenddict ();
 }
 
-void dopdffont (integer font_objnum, internalfontnumber f)
+void write_fontdescriptors ()
 {
-    int i;
-    enc_entry *e;
-
-    tex_font = f;
-    encoding_objnum = 0;
-    tounicode_objnum = 0;
-    write_ttf_glyph_names = false;
-    write_fontfile_only = false;
-    t1_glyph_names = NULL;
-    for (i = 0; i < FONT_KEYS_NUM; i++)
-        font_keys[i].valid = false;
-
-    if (pdffontmap[tex_font] == NULL)
-        pdftex_fail ("pdffontmap not initialized for font %s",
-                     makecstring (fontname[tex_font]));
-    if (hasfmentry (tex_font))
-        fm_cur = (fm_entry *) pdffontmap[tex_font];
-    else
-        fm_cur = NULL;
-    if (fm_cur == NULL || (fm_cur->ps_name == NULL && fm_cur->ff_name == NULL)) {
-        writet3 (font_objnum, tex_font);
+    fd_entry *fd;
+    struct avl_traverser t;
+    if (fd_tree == NULL)
         return;
+    avl_t_init (&t, fd_tree);
+    for (fd = (fd_entry *) avl_t_first (&t, fd_tree); fd != NULL;
+         fd = (fd_entry *) avl_t_next (&t))
+        write_fontdescriptor (fd);
+}
+
+/**********************************************************************/
+
+void write_fontdictionary (fo_entry * fo)
+{
+    assert (fo != NULL);
+    assert (fo->fo_objnum != 0);        /* reserved as pdf_font_num[f] in pdftex.web */
+    pdfbegindict (fo->fo_objnum, 1);
+    pdf_puts ("/Type /Font\n");
+    pdf_puts ("/Subtype /");
+    if (is_type1 (fo->fm))
+        pdf_printf ("%s\n", "Type1");
+    else if (is_truetype (fo->fm))
+        pdf_printf ("%s\n", "TrueType");
+    else
+        assert (0);
+    if (fo->fd == NULL) {       /* no /FontDescriptor object */
+        if (fo->fm->ps_name != NULL)
+            pdf_printf ("/BaseFont /%s\n", fo->fm->ps_name);
+        else
+            pdf_printf ("/BaseFont /%s\n", fo->fm->tfm_name);
+    } else {
+        write_fontname (fo->fd, "BaseFont");
+        assert (fo->cw != NULL);
+        pdf_printf ("/FirstChar %i\n/LastChar %i\n/Widths %i 0 R\n",
+                    (int) fo->first_char, (int) fo->last_char, (int) fo->cw->cw_objnum);
+        assert (fo->fd->fd_objnum != 0);
+        pdf_printf ("/FontDescriptor %i 0 R\n", (int) fo->fd->fd_objnum);
     }
+    if (fo->fe != NULL && fo->fe->fe_objnum != 0)
+        pdf_printf ("/Encoding %i 0 R\n", (int) fo->fe->fe_objnum);
+    if (pdffontattr[fo->tex_font] != getnullstr ()) {
+        pdfprint (pdffontattr[fo->tex_font]);
+        pdf_puts ("\n");
+    }
+    pdfenddict ();
+}
 
-    get_char_widths ();         /* update char widths; also check whether this font is
-                                   used in embedded PDF only; if so then set
-                                   write_fontfile_only to true */
+void write_fontdictionaries ()
+{
+    fo_entry *fo;
+    struct avl_traverser t;
+    if (fo_tree == NULL)
+        return;
+    avl_t_init (&t, fo_tree);
+    for (fo = (fo_entry *) avl_t_first (&t, fo_tree); fo != NULL;
+         fo = (fo_entry *) avl_t_next (&t))
+        write_fontdictionary (fo);
+}
 
-    if (!write_fontfile_only) { /* handle Encoding + ToUnicode as well */
-        if (is_reencoded (fm_cur)) {
-            e = fm_cur->encoding;
-            read_enc (e);
-            if (!is_truetype (fm_cur)) {
-                write_enc (NULL, e, 0);
-                encoding_objnum = e->objnum;
-                if (fixedgentounicode > 0) {
-                    if (e->tounicode == 0)
-                        e->tounicode =
-                            write_tounicode (e->glyph_names, e->name);
-                    tounicode_objnum = e->tounicode;
-                }
-            } else
-                write_ttf_glyph_names = true;
+/**********************************************************************/
+/*
+ * Final flush of all font related stuff by call from
+ * @<Output fonts definition@>= in pdftex.web.
+ */
+
+void writefontstuff ()
+{
+    write_fontdescriptors ();
+    write_fontencodings ();     /* see writeenc.c */
+    write_fontdictionaries ();
+}
+
+/**********************************************************************/
+
+void create_fontdictionary (fm_entry * fm, integer font_objnum,
+                            internalfontnumber f)
+{
+    fo_entry *fo = new_fo_entry ();
+    get_char_range (fo, f);     /* set fo->first_char and fo->last_char from f */
+    assert (fo->last_char >= fo->first_char);
+    fo->fm = fm;
+    fo->fo_objnum = font_objnum;
+    if (is_reencoded (fo->fm)) {
+        fo->fe = get_fe_entry (fo->fm->encname);
+        if (is_type1 (fo->fm)) {
+            if (fo->fe->fe_objnum == 0)
+                fo->fe->fe_objnum = pdfnewobjnum ();    /* then it will be written out */
+            /* mark encoding pairs used by TeX to optimize encoding vector */
+            fo->fe->tx_tree = mark_chars (fo, fo->fe->tx_tree, f);
         }
     }
-    if (is_included (fm_cur))
-        write_fontfile ();
-    if (!write_fontfile_only && !is_reencoded (fm_cur) &&
-        fixedgentounicode > 0 && t1_glyph_names == t1_builtin_glyph_names) {
-        /* write ToUnicode entry for built-in encoding of Type1 font */
-        tounicode_objnum = write_tounicode (t1_glyph_names, fm_cur->tfm_name);
+    if (has_fontdesc (fo->fm)) {
+        if (is_type1 (fo->fm)) {
+            if ((fo->fd = lookup_fontdescriptor (fo)) == NULL) {
+                create_fontdescriptor (fo, f);
+                register_fd_entry (fo->fd);
+            }
+        } else
+            create_fontdescriptor (fo, f);
+        create_charwidth_array (fo, f);
+        write_charwidth_array (fo);
+        if (is_reencoded (fo->fm)) {
+            mark_reenc_glyphs (fo, f);
+            if (!is_type1 (fo->fm)) {
+                /* mark reencoded characters as chars on TeX level */
+                assert (fo->fd->tx_tree == NULL);
+                fo->fd->tx_tree = mark_chars (fo, fo->fd->tx_tree, f);
+                if (is_truetype (fo->fm))
+                    fo->fd->write_ttf_glyph_names = true;
+            }
+        } else
+            /* mark non-reencoded characters as chars on TeX level */
+            fo->fd->tx_tree = mark_chars (fo, fo->fd->tx_tree, f);
+        if (!is_type1 (fo->fm))
+            write_fontdescriptor (fo->fd);
     }
-    if (fm_cur->fn_objnum != 0) {
-        pdfbeginobj (fm_cur->fn_objnum, 1);
-        write_fontname (false);
-        pdfendobj ();
-    }
-    if (!write_fontfile_only)
-        write_fontobj (font_objnum);
-    if (no_font_desc (fm_cur))
-        return;
-    if (!write_fontfile_only) {
-        write_fontdescriptor ();
-        write_char_widths ();
-    }
-    if (t1_glyph_names == t1_builtin_glyph_names) {
-        for (i = 0; i < 256; i++)
-            if (t1_glyph_names[i] != notdef)
-                xfree (t1_glyph_names[i]);
-    }
+    if (is_type1 (fo->fm))
+        register_fo_entry (fo);
+    else
+        write_fontdictionary (fo);
 }
+
+/**********************************************************************/
+
+void dopdffont (integer font_objnum, internalfontnumber f)
+{
+    fm_entry *fm;
+    fm = hasfmentry (f) ? (fm_entry *) pdffontmap[f] : NULL;
+    if (fm == NULL || (fm->ps_name == NULL && fm->ff_name == NULL))
+        writet3 (font_objnum, f);
+    else
+        create_fontdictionary (fm, font_objnum, f);
+}
+
+/**********************************************************************/

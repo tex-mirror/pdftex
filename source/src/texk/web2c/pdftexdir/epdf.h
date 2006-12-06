@@ -76,19 +76,17 @@ extern "C" {
     extern char notdef[];
 
     extern int is_subsetable (struct fm_entry *);
-    extern int is_type1 (struct fm_entry *);
     extern struct fm_entry *lookup_fontmap (char *);
     extern integer get_fontfile (struct fm_entry *);
     extern integer get_fontname (struct fm_entry *);
     extern integer pdfnewobjnum (void);
     extern integer read_pdf_info (char *, char *, integer, integer, integer,
                                   integer);
-    extern void embed_whole_font (struct fm_entry *);
+    extern void embed_whole_font (struct fd_entry *);
     extern void epdf_check_mem (void);
     extern void epdf_delete (void);
     extern void epdf_free (void);
-    extern void mark_glyphs (struct fm_entry *, char *);
-    __attribute__ ((format (printf, 1, 2))) 
+    __attribute__ ((format (printf, 1, 2)))
     extern void pdf_printf (const char *fmt, ...);
     extern void pdf_puts (const char *);
     extern void pdfbeginstream (void);
@@ -101,13 +99,21 @@ extern "C" {
     extern void pdftex_warn (const char *fmt, ...);
     __attribute__ ((format (printf, 1, 2)))
     extern void tex_printf (const char *, ...);
-    extern void write_enc (char **, struct enc_entry *, integer);
     extern void write_epdf (void);
     extern void zpdfbegindict (integer, bool);
     extern void zpdfbeginobj (integer, bool);
     extern void zpdfcreateobj (integer, integer);
     extern void zpdfnewdict (integer, integer, bool);
     extern void zpdfosgetosbuf (integer);
+
+/* epdf.c */
+    extern void epdf_mark_glyphs (struct fd_entry *, char *);
+    extern struct fd_entry *epdf_create_fontdescriptor (struct fm_entry *);
+    extern int get_fd_objnum (struct fd_entry *);
+    extern int get_fn_objnum (struct fd_entry *);
+
+/* write_enc.c */
+    extern void epdf_write_enc (char **, integer);
 
 /* utils.c */
     extern char *convertStringToPDFString (char *in, int len);

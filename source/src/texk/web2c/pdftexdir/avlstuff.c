@@ -27,13 +27,11 @@ $Id: avlstuff.c,v 1.12 2005/07/11 20:27:39 hahe Exp hahe $
 static const char perforce_id[] =
     "$Id: avlstuff.c,v 1.12 2005/07/11 20:27:39 hahe Exp hahe $";
 
-/* One AVL tree for each obj_type 0...pdfobjtypemax */
-
 static struct avl_table *PdfObjTree[pdfobjtypemax + 1] =
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
-
-/* memory management functions for avl */
+/**********************************************************************/
+/* memory management functions for AVL */
 
 void *avl_xmalloc (struct libavl_allocator *allocator, size_t size)
 {
@@ -51,6 +49,24 @@ struct libavl_allocator avl_xallocator = {
     avl_xmalloc,
     avl_xfree
 };
+
+/**********************************************************************/
+/* general AVL comparison functions */
+
+int comp_int_entry (const void *pa, const void *pb, void *p)
+{
+    cmp_return (*(const int *) pa, *(const int *) pb);
+    return 0;
+}
+
+int comp_string_entry (const void *pa, const void *pb, void *p)
+{
+    return strcmp ((const char *) pa, (const char *) pb);
+}
+
+/**********************************************************************/
+/* One AVL tree for each obj_type 0...pdfobjtypemax */
+
 
 typedef struct oentry_ {
     integer int0;
@@ -130,6 +146,20 @@ integer avlfindobj (integer t, integer i, integer byname)
     return p->objptr;
 }
 
+/**********************************************************************/
+
+struct avl_table *mf_tree = NULL;
+
+typedef struct {
+    char *tfm_name;
+    internalfontnumber fontnum;
+} mf_entry;
+
+static int comp_mf_entry (const void *pa, const void *pb, void *p)
+{
+    return strcmp (((const mf_entry *) pa)->tfm_name,
+                   ((const mf_entry *) pb)->tfm_name);
+}
 /**********************************************************************/
 /* cleaning up... */
 

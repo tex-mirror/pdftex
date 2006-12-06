@@ -67,7 +67,6 @@ $Id: ptexmac.h,v 1.14 2005/11/29 22:05:23 hahe Exp $
 } while (0)
 
 #  define pdfoffset()     (pdfgone + pdfptr)
-#  define pdfinitfont(f)  {tmpf = f; pdfcreatefontobj();}
 
 #  define MAX_CHAR_CODE       255
 #  define PRINTF_BUF_SIZE     1024
@@ -147,51 +146,64 @@ size_t          T##_limit
 #  define ASCENT_CODE         0
 #  define CAPHEIGHT_CODE      1
 #  define DESCENT_CODE        2
-#  define FONTNAME_CODE       3
-#  define ITALIC_ANGLE_CODE   4
-#  define STEMV_CODE          5
-#  define XHEIGHT_CODE        6
-#  define FONTBBOX1_CODE      7
-#  define FONTBBOX2_CODE      8
-#  define FONTBBOX3_CODE      9
-#  define FONTBBOX4_CODE      10
+#  define ITALIC_ANGLE_CODE   3
+#  define STEMV_CODE          4
+#  define XHEIGHT_CODE        5
+#  define FONTBBOX1_CODE      6
+#  define FONTBBOX2_CODE      7
+#  define FONTBBOX3_CODE      8
+#  define FONTBBOX4_CODE      9
+#  define FONTNAME_CODE       10
+#  define GEN_KEY_NUM         (XHEIGHT_CODE + 1)
 #  define MAX_KEY_CODE        (FONTBBOX1_CODE + 1)
-#  define FONT_KEYS_NUM       (FONTBBOX4_CODE + 1)
+#  define INT_KEYS_NUM        (FONTBBOX4_CODE + 1)
+#  define FONT_KEYS_NUM       (FONTNAME_CODE + 1)
 
 #  define F_INCLUDED          0x01
 #  define F_SUBSETTED         0x02
-#  define F_TRUETYPE          0x04
-#  define F_BASEFONT          0x08
-#  define F_SUBFONT           0x10
+#  define F_STDT1FONT         0x04
+#  define F_SUBFONT           0x08
+#  define F_TYPE1             0x10
+#  define F_TRUETYPE          0x20
+#  define F_OTF               0x40
 
 #  define set_included(fm)    ((fm)->type |= F_INCLUDED)
 #  define set_subsetted(fm)   ((fm)->type |= F_SUBSETTED)
+#  define set_std_t1font(fm)  ((fm)->type |= F_STDT1FONT)
+#  define set_subfont(fm)     ((fm)->type |= F_SUBFONT)
+#  define set_type1(fm)       ((fm)->type |= F_TYPE1)
 #  define set_truetype(fm)    ((fm)->type |= F_TRUETYPE)
-#  define set_basefont(fm)    ((fm)->type |= F_BASEFONT)
+#  define set_opentype(fm)    ((fm)->type |= F_OTF)
 #  define set_subfont(fm)     ((fm)->type |= F_SUBFONT)
 
 #  define unset_included(fm)  ((fm)->type &= ~F_INCLUDED)
 #  define unset_subsetted(fm) ((fm)->type &= ~F_SUBSETTED)
+#  define unset_std_t1font(fm)((fm)->type &= ~F_STDT1FONT)
+#  define unset_subfont(fm)   ((fm)->type &= ~F_SUBFONT)
+#  define unset_type1(fm)     ((fm)->type &= ~F_TYPE1)
 #  define unset_truetype(fm)  ((fm)->type &= ~F_TRUETYPE)
-#  define unset_basefont(fm)  ((fm)->type &= ~F_BASEFONT)
+#  define unset_opentype(fm)  ((fm)->type &= ~F_OTF)
 #  define unset_subfont(fm)   ((fm)->type &= ~F_SUBFONT)
 
-#  define unset_fontfile(fm)  xfree((fm)->ff_name)
+#  define is_included(fm)     (((fm)->type & F_INCLUDED) != 0)
+#  define is_subsetted(fm)    (((fm)->type & F_SUBSETTED) != 0)
+#  define is_std_t1font(fm)   (((fm)->type & F_STDT1FONT) != 0)
+#  define is_subfont(fm)      (((fm)->type & F_SUBFONT) != 0)
+#  define is_type1(fm)        (((fm)->type & F_TYPE1) != 0)
+#  define is_truetype(fm)     (((fm)->type & F_TRUETYPE) != 0)
+#  define is_opentype(fm)     (((fm)->type & F_OTF) != 0)
+#  define is_subfont(fm)      (((fm)->type & F_SUBFONT) != 0)
 
-#  define is_included(fm)     ((fm)->type & F_INCLUDED)
-#  define is_subsetted(fm)    ((fm)->type & F_SUBSETTED)
-#  define is_truetype(fm)     ((fm)->type & F_TRUETYPE)
-#  define is_basefont(fm)     ((fm)->type & F_BASEFONT)
-#  define is_subfont(fm)      ((fm)->type & F_SUBFONT)
-#  define no_font_desc(fm)    (is_basefont(fm) && !is_included(fm))
+#  define unset_fontfile(fm)  xfree((fm)->ff_name)
+#  define has_fontdesc(fm)    (!is_std_t1font(fm) || is_included(fm))
 
 #  define fm_slant(fm)        (fm)->slant
 #  define fm_extend(fm)       (fm)->extend
 #  define fm_fontfile(fm)     (fm)->ff_name
 
-#  define is_reencoded(fm)    ((fm)->encoding != NULL)
+#  define is_reencoded(fm)    ((fm)->encname != NULL)
 #  define is_fontfile(fm)     (fm_fontfile(fm) != NULL)
-#  define is_t1fontfile(fm)   (is_fontfile(fm) && !is_truetype(fm))
+#  define is_t1fontfile(fm)   (is_fontfile(fm) && is_type1(fm))
 
 #  define LINK_TFM            0x01
 #  define LINK_PS             0x02
@@ -208,9 +220,9 @@ size_t          T##_limit
     packfilename(maketexstring(cur_file_name), getnullstr(), getnullstr())
 
 #  define cmp_return(a, b) \
-    if (a > b)           \
+    if ((a) > (b))         \
         return 1;        \
-    if (a < b)           \
+    if ((a) < (b))         \
         return -1
 
 #  define str_prefix(s1, s2)  (strncmp((s1), (s2), strlen(s2)) == 0)

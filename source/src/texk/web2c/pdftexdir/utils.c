@@ -66,6 +66,14 @@ define_array (fb);
 typedef char char_entry;
 define_array (char);
 
+/* define vf_e_fnts_ptr, vf_e_fnts_array & vf_e_fnts_limit */
+typedef integer vf_e_fnts_entry;
+define_array (vf_e_fnts);
+
+/* define vf_i_fnts_ptr, vf_i_fnts_array & vf_i_fnts_limit */
+typedef internalfontnumber vf_i_fnts_entry;
+define_array (vf_i_fnts);
+
 integer fb_offset (void)
 {
     return fb_ptr - fb_array;
@@ -99,62 +107,52 @@ void fb_flush (void)
     fb_ptr = fb_array;
 }
 
-static void fnstr_append (const char *s)
-{
-    size_t l = strlen (s) + 1;
-    alloc_array (char, l, SMALL_ARRAY_SIZE);
-    strcat (char_ptr, s);
-    char_ptr = strend (char_ptr);
-}
+#define SUBSET_TAG_LENGTH 6
 
-void make_subset_tag (fm_entry * fm_cur, char **glyph_names)
+void make_subset_tag (fd_entry * fd)
 {
-    char tag[7];
-    unsigned long crc;
-    int i;
-    size_t l = strlen (job_id_string) + 1;
-    alloc_array (char, l, SMALL_ARRAY_SIZE);
-    strcpy (char_array, job_id_string);
-    char_ptr = strend (char_array);
-    if (fm_cur->tfm_name != NULL) {
-        fnstr_append (" TFM name: ");
-        fnstr_append (fm_cur->tfm_name);
-    }
-    fnstr_append (" PS name: ");
-    if (font_keys[FONTNAME_CODE].valid)
-        fnstr_append (fontname_buf);
-    else if (fm_cur->ps_name != NULL)
-        fnstr_append (fm_cur->ps_name);
-    fnstr_append (" Encoding: ");
-    if (fm_cur->encoding != NULL && (fm_cur->encoding)->name != NULL)
-        fnstr_append ((fm_cur->encoding)->name);
-    else
-        fnstr_append ("built-in");
-    fnstr_append (" CharSet: ");
-    assert (glyph_names != NULL);
-    for (i = 0; i < 256; i++)
-        if (pdfcharmarked (tex_font, i) && glyph_names[i] != notdef) {
-            fnstr_append ("/");
-            fnstr_append (glyph_names[i]);
+    int i, j = 0, a[SUBSET_TAG_LENGTH];
+    md5_state_t pms;
+    char *glyph;
+    struct avl_traverser t;
+    md5_byte_t digest[16];
+    void **aa;
+    static struct avl_table *st_tree = NULL;
+    if (st_tree == NULL)
+        st_tree = avl_create (comp_string_entry, NULL, &avl_xallocator);
+    assert (fd != NULL);
+    assert (fd->gl_tree != NULL);
+    assert (fd->fontname != NULL);
+    assert (fd->subset_tag == NULL);
+    fd->subset_tag = xtalloc (SUBSET_TAG_LENGTH + 1, char);
+    do {
+        md5_init (&pms);
+        avl_t_init (&t, fd->gl_tree);
+        for (glyph = (char *) avl_t_first (&t, fd->gl_tree); glyph != NULL;
+             glyph = (char *) avl_t_next (&t)) {
+            md5_append (&pms, (md5_byte_t *)glyph, strlen (glyph));
+            md5_append (&pms, (md5_byte_t *)" ", 1);
         }
-    if (fm_cur->charset != NULL) {
-        fnstr_append (" Extra CharSet: ");
-        fnstr_append (fm_cur->charset);
+        md5_append (&pms, (md5_byte_t *)fd->fontname, strlen (fd->fontname));
+        md5_append (&pms, (md5_byte_t *) & j, sizeof (int));    /* to resolve collision */
+        md5_finish (&pms, digest);
+        for (a[0] = 0, i = 0; i < 13; i++)
+            a[0] += digest[i];
+        for (i = 1; i < SUBSET_TAG_LENGTH; i++)
+            a[i] = a[i - 1] - digest[i - 1] + digest[(i + 12) % 16];
+        for (i = 0; i < SUBSET_TAG_LENGTH; i++)
+            fd->subset_tag[i] = a[i] % 26 + 'A';
+        fd->subset_tag[SUBSET_TAG_LENGTH] = '\0';
+        j++;
+        assert (j < 100);
     }
-    crc = crc32 (0L, Z_NULL, 0);
-    crc = crc32 (crc, (Bytef *) char_array, strlen (char_array));
-    /* we need to fit a 32-bit number into a string of 6 uppercase chars long;
-     * there are 26 uppercase chars ==> each char represents a number in range
-     * 0..25. The maximal number that can be represented by the tag is
-     * 26^6 - 1, which is a number between 2^28 and 2^29. Thus the bits 29..31
-     * of the CRC must be dropped out.
-     */
-    for (i = 0; i < 6; i++) {
-        tag[i] = 'A' + crc % 26;
-        crc /= 26;
-    }
-    tag[6] = 0;
-    fm_cur->subset_tag = xstrdup (tag);
+    while ((char *) avl_find (st_tree, fd->subset_tag) != NULL);
+    aa = avl_probe (st_tree, fd->subset_tag);
+    assert (aa != NULL);
+    if (j > 1)
+        pdftex_warn
+            ("\nmake_subset_tag(): subset-tag collision, resolved in round %d.\n",
+             j);
 }
 
 void pdf_puts (const char *s)
@@ -366,7 +364,7 @@ strnumber getresnameprefix (void)
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     char prefix[7];             /* make a tag of 6 chars long */
     unsigned long crc;
-    short i;
+    int i;
     size_t base = strlen (name_str);
     crc = crc32 (0L, Z_NULL, 0);
     crc = crc32 (crc, (Bytef *) job_id_string, strlen (job_id_string));
@@ -1819,4 +1817,24 @@ void matrixtransformpoint (scaled x, scaled y)
 void matrixrecalculate (scaled urx)
 {
     matrixtransformrect (last_llx, last_lly, urx, last_ury);
+}
+
+void allocvffnts(void)
+{
+    if (vf_e_fnts_array == NULL) {
+        vf_e_fnts_array = vfefnts;
+        vf_e_fnts_limit = fontmax;
+        vf_e_fnts_ptr   = vf_e_fnts_array;
+        vf_i_fnts_array = vfifnts;
+        vf_i_fnts_limit = fontmax;
+        vf_i_fnts_ptr   = vf_i_fnts_array;
+    }
+    alloc_array(vf_e_fnts, 1, fontmax);
+    vf_e_fnts_ptr++;
+    alloc_array(vf_i_fnts, 1, fontmax);
+    vf_i_fnts_ptr++;
+    if (vf_e_fnts_array != vfefnts) {
+        vfefnts = vf_e_fnts_array;
+        vfifnts = vf_i_fnts_array;
+    }
 }

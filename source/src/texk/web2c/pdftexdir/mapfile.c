@@ -40,24 +40,18 @@ static FILE *fm_file;
 #define fm_getchar()    xgetc(fm_file)
 #define fm_eof()        feof(fm_file)
 
-enum _mode { FM_DUPIGNORE, FM_REPLACE, FM_DELETE };
-enum _ltype { MAPFILE, MAPLINE };
-enum _tfmavail { TFM_UNCHECKED, TFM_FOUND, TFM_NOTFOUND };
+typedef enum { FM_DUPIGNORE, FM_REPLACE, FM_DELETE } updatemode;
+typedef enum { MAPFILE, MAPLINE } maptype;
 
 typedef struct mitem {
-    int mode;                   /* FM_DUPIGNORE or FM_REPLACE or FM_DELETE */
-    int type;                   /* map file or map line */
+    updatemode mode;            /* FM_DUPIGNORE or FM_REPLACE or FM_DELETE */
+    maptype type;               /* map file or map line */
     char *line;                 /* pointer to map file name or map line */
     int lineno;                 /* line number in map file */
 } mapitem;
 mapitem *mitem = NULL;
 
-fm_entry *fm_cur;
 static const char nontfm[] = "<nontfm>";
-static fm_entry *loaded_tfm_found;
-static fm_entry *avail_tfm_found;
-static fm_entry *non_tfm_found;
-static fm_entry *not_avail_tfm_found;
 
 #define read_field(r, q, buf) do {  \
     q = buf;                        \
@@ -74,46 +68,33 @@ static fm_entry *not_avail_tfm_found;
         goto done;                  \
 } while (0)
 
-#define cmp_return(a, b) \
-    if (a > b)           \
-        return 1;        \
-    if (a < b)           \
-        return -1
-
 fm_entry *new_fm_entry (void)
 {
     fm_entry *fm;
     fm = xtalloc (1, fm_entry);
     fm->tfm_name = NULL;
+    fm->sfd_name = NULL;
     fm->ps_name = NULL;
-    fm->flags = 4;
+    fm->fd_flags = 4;
     fm->ff_name = NULL;
-    fm->subset_tag = NULL;
-    fm->encoding = NULL;
-    fm->tfm_num = getnullfont ();
-    fm->tfm_avail = TFM_UNCHECKED;
+    fm->encname = NULL;
     fm->type = 0;
     fm->slant = 0;
     fm->extend = 0;
-    fm->ff_objnum = 0;
-    fm->fn_objnum = 0;
-    fm->fd_objnum = 0;
-    fm->charset = NULL;
-    fm->all_glyphs = false;
     fm->links = 0;
     fm->pid = -1;
     fm->eid = -1;
     fm->subfont = NULL;
+    fm->in_use = false;
     return fm;
 }
 
 void delete_fm_entry (fm_entry * fm)
 {
     xfree (fm->tfm_name);
+    xfree (fm->sfd_name);
     xfree (fm->ps_name);
     xfree (fm->ff_name);
-    xfree (fm->subset_tag);
-    xfree (fm->charset);
     xfree (fm);
 }
 
@@ -139,36 +120,13 @@ static fm_entry *dummy_fm_entry ()
     return (fm_entry *) & const_fm_entry;
 }
 
-char *mk_base_tfm (char *tfmname, int *i)
-{
-    static char buf[SMALL_BUF_SIZE];
-    char *p = tfmname, *r = strend (p) - 1, *q = r;
-    while (q > p && isdigit (*q))
-        --q;
-    if (!(q > p) || q == r || (*q != '+' && *q != '-'))
-        return NULL;
-    check_buf (q - p + 1, SMALL_BUF_SIZE);
-    strncpy (buf, p, (size_t) (q - p));
-    buf[q - p] = '\0';
-    *i = atoi (q);
-    return buf;
-}
-
-static fmentryptr fmlookup (internalfontnumber);
-
-boolean hasfmentry (internalfontnumber f)
-{
-    if (pdffontmap[f] == NULL)
-        pdffontmap[f] = fmlookup (f);
-    assert (pdffontmap[f] != NULL);
-    return pdffontmap[f] != (fmentryptr) dummy_fm_entry ();
-}
 
 /**********************************************************************/
 
 struct avl_table *tfm_tree = NULL;
 struct avl_table *ps_tree = NULL;
 struct avl_table *ff_tree = NULL;
+struct avl_table *encname_tree = NULL;
 
 /* AVL sort fm_entry into tfm_tree by tfm_name */
 
@@ -182,16 +140,13 @@ static int comp_fm_entry_tfm (const void *pa, const void *pb, void *p)
 
 static int comp_fm_entry_ps (const void *pa, const void *pb, void *p)
 {
-    const fm_entry *p1 = (const fm_entry *) pa, *p2 = (const fm_entry *) pb;
     int i;
+    const fm_entry *p1 = (const fm_entry *) pa, *p2 = (const fm_entry *) pb;
     assert (p1->ps_name != NULL && p2->ps_name != NULL);
-    if ((i = strcmp (p1->ps_name, p2->ps_name)))
+    if ((i = strcmp (p1->ps_name, p2->ps_name)) != 0)
         return i;
     cmp_return (p1->slant, p2->slant);
     cmp_return (p1->extend, p2->extend);
-    if (p1->tfm_name != NULL && p2->tfm_name != NULL &&
-        (i = strcmp (p1->tfm_name, p2->tfm_name)))
-        return i;
     return 0;
 }
 
@@ -205,20 +160,21 @@ static int comp_ff_entry (const void *pa, const void *pb, void *p)
 
 static void create_avl_trees ()
 {
-    if (tfm_tree == NULL) {
-        tfm_tree = avl_create (comp_fm_entry_tfm, NULL, &avl_xallocator);
-        assert (tfm_tree != NULL);
-    }
-    if (ps_tree == NULL) {
-        ps_tree = avl_create (comp_fm_entry_ps, NULL, &avl_xallocator);
-        assert (ps_tree != NULL);
-    }
-    if (ff_tree == NULL) {
-        ff_tree = avl_create (comp_ff_entry, NULL, &avl_xallocator);
-        assert (ff_tree != NULL);
-    }
+    assert (tfm_tree == NULL);
+    tfm_tree = avl_create (comp_fm_entry_tfm, NULL, &avl_xallocator);
+    assert (tfm_tree != NULL);
+    assert (ps_tree == NULL);
+    ps_tree = avl_create (comp_fm_entry_ps, NULL, &avl_xallocator);
+    assert (ps_tree != NULL);
+    assert (ff_tree == NULL);
+    ff_tree = avl_create (comp_ff_entry, NULL, &avl_xallocator);
+    assert (ff_tree != NULL);
+    assert (encname_tree == NULL);
+    encname_tree = avl_create (comp_string_entry, NULL, &avl_xallocator);
+    assert (encname_tree != NULL);
 }
 
+/**********************************************************************/
 /*
 The function avl_do_entry() is not completely symmetrical with regards
 to tfm_name and ps_name handling, e. g. a duplicate tfm_name gives a
@@ -226,7 +182,7 @@ to tfm_name and ps_name handling, e. g. a duplicate tfm_name gives a
 with the original version.
 */
 
-int avl_do_entry (fm_entry * fp, int mode)
+int avl_do_entry (fm_entry * fm, int mode)
 {
     fm_entry *p;
     void *a;
@@ -234,19 +190,22 @@ int avl_do_entry (fm_entry * fp, int mode)
 
     /* handle tfm_name link */
 
-    if (strcmp (fp->tfm_name, nontfm)) {
-        p = (fm_entry *) avl_find (tfm_tree, fp);
+    if (strcmp (fm->tfm_name, nontfm) != 0) {
+        p = (fm_entry *) avl_find (tfm_tree, fm);
         if (p != NULL) {
-            if (mode == FM_DUPIGNORE) {
+            switch (mode) {
+            case FM_DUPIGNORE:
                 pdftex_warn
                     ("fontmap entry for `%s' already exists, duplicates ignored",
-                     fp->tfm_name);
+                     fm->tfm_name);
                 goto exit;
-            } else {            /* mode == FM_REPLACE / FM_DELETE */
-                if (fontused[p->tfm_num]) {
+                break;
+            case FM_REPLACE:
+            case FM_DELETE:
+                if (fm->in_use) {
                     pdftex_warn
                         ("fontmap entry for `%s' has been used, replace/delete not allowed",
-                         fp->tfm_name);
+                         fm->tfm_name);
                     goto exit;
                 }
                 a = avl_delete (tfm_tree, p);
@@ -254,52 +213,68 @@ int avl_do_entry (fm_entry * fp, int mode)
                 unset_tfmlink (p);
                 if (!has_pslink (p))
                     delete_fm_entry (p);
+                break;
+            default:
+                assert (0);
             }
         }
         if (mode != FM_DELETE) {
-            aa = avl_probe (tfm_tree, fp);
+            aa = avl_probe (tfm_tree, fm);
             assert (aa != NULL);
-            set_tfmlink (fp);
+            set_tfmlink (fm);
         }
     }
 
     /* handle ps_name link */
 
-    if (fp->ps_name != NULL) {
-        assert (fp->tfm_name != NULL);
-        p = (fm_entry *) avl_find (ps_tree, fp);
+    if (fm->ps_name != NULL) {
+        p = (fm_entry *) avl_find (ps_tree, fm);
         if (p != NULL) {
-            if (mode == FM_DUPIGNORE) {
-                pdftex_warn
-                    ("ps_name entry for `%s' already exists, duplicates ignored",
-                     fp->ps_name);
+            switch (mode) {
+            case FM_DUPIGNORE:
                 goto exit;
-            } else {            /* mode == FM_REPLACE / FM_DELETE */
-                if (fontused[p->tfm_num]) {
-                    /* REPLACE/DELETE not allowed */
-                    pdftex_warn
-                        ("fontmap entry for `%s' has been used, replace/delete not allowed",
-                         p->tfm_name);
+                break;
+            case FM_REPLACE:
+            case FM_DELETE:
+                if (fm->in_use)
                     goto exit;
-                }
                 a = avl_delete (ps_tree, p);
                 assert (a != NULL);
                 unset_pslink (p);
                 if (!has_tfmlink (p))
                     delete_fm_entry (p);
+                break;
+            default:
+                assert (0);
             }
         }
         if (mode != FM_DELETE) {
-            aa = avl_probe (ps_tree, fp);
+            aa = avl_probe (ps_tree, fm);
             assert (aa != NULL);
-            set_pslink (fp);
+            set_pslink (fm);
         }
     }
   exit:
-    if (!has_tfmlink (fp) && !has_pslink (fp))  /* e. g. after FM_DELETE */
+    if (!has_tfmlink (fm) && !has_pslink (fm))  /* e. g. after FM_DELETE */
         return 1;               /* deallocation of fm_entry structure required */
     else
         return 0;
+}
+
+/* add the encoding name to an AVL tree. this has nothing to do with writeenc.c */
+
+char *add_encname (char *s)
+{
+    char *p;
+    void **aa;
+    assert (s != NULL);
+    assert (encname_tree != NULL);
+    if ((p = (char *) avl_find (encname_tree, s)) == NULL) {    /* encoding name not yet registered */
+        p = xstrdup (s);
+        aa = avl_probe (encname_tree, p);
+        assert (aa != NULL);
+    }
+    return p;
 }
 
 /**********************************************************************/
@@ -309,24 +284,22 @@ int check_fm_entry (fm_entry * fm, boolean warn)
 {
     int a = 0;
     assert (fm != NULL);
-    if (fm->ps_name != NULL) {
-        if (is_basefont (fm)) {
-            if (is_fontfile (fm) && !is_included (fm)) {
-                if (warn)
-                    pdftex_warn
-                        ("invalid entry for `%s': font file must be included or omitted for base fonts",
-                         fm->tfm_name);
-                a += 1;
-            }
-        } else {                /* not a base font */
-            /* if no font file given, drop this entry */
-            if (!is_fontfile (fm)) {
-                if (warn)
-                    pdftex_warn
-                        ("invalid entry for `%s': font file missing",
-                         fm->tfm_name);
-                a += 2;
-            }
+    if (is_std_t1font (fm)) {
+        if (is_fontfile (fm) && !is_included (fm)) {
+            if (warn)
+                pdftex_warn
+                    ("invalid entry for `%s': font file must be included or omitted for base fonts",
+                     fm->tfm_name);
+            a += 1;
+        }
+    } else {    /* not a base font */
+        /* if no font file given, drop this entry */
+        if (!is_fontfile (fm)) {
+            if (warn)
+                pdftex_warn
+                    ("invalid entry for `%s': font file missing",
+                     fm->tfm_name);
+            a += 2;
         }
     }
     if (is_truetype (fm) && is_reencoded (fm) && !is_subsetted (fm)) {
@@ -373,9 +346,9 @@ int check_fm_entry (fm_entry * fm, boolean warn)
 /**********************************************************************/
 /* returns true if s is one of the 14 std. font names; speed-trimmed. */
 
-boolean check_basefont (char *s)
+boolean check_std_t1font (char *s)
 {
-    static const char *basefont_names[] = {
+    static const char *std_t1font_names[] = {
         "Courier",              /* 0:7 */
         "Courier-Bold",         /* 1:12 */
         "Courier-Oblique",      /* 2:15 */
@@ -392,8 +365,8 @@ boolean check_basefont (char *s)
         "ZapfDingbats"          /* 13:12 */
     };
     static const int index[] =
-        { -1, -1, -1, -1, -1, -1, 8, 0, -1, 4, 10, 9, -1, -1, 5, 2, 12, 6,
-        -1, 3, -1, 7
+        { -1, -1, -1, -1, -1, -1, 8, 0, -1, 4, 10, 9, -1, -1, 5, 2, 12, 6, -1,
+        3, -1, 7
     };
     const size_t n = strlen (s);
     int k = -1;
@@ -415,10 +388,11 @@ boolean check_basefont (char *s)
         }
     } else
         k = index[n];
-    if (k > -1 && !strcmp (basefont_names[k], s))
+    if (k > -1 && strcmp (std_t1font_names[k], s) == 0)
         return true;
     return false;
 };
+
 
 /**********************************************************************/
 
@@ -457,8 +431,8 @@ static void fm_scan_line ()
         set_field (ps_name);
     else
         r = p;                  /* unget the field */
-    if (isdigit (*r)) {         /* font flags given */
-        fm->flags = atoi (r);
+    if (isdigit (*r)) {         /* font descriptor /Flags given */
+        fm->fd_flags = atoi (r);
         while (isdigit (*r))
             r++;
     }
@@ -525,7 +499,7 @@ static void fm_scan_line ()
             read_field (r, q, buf);
             /* encoding, formats: '8r.enc' or '<8r.enc' or '<[8r.enc' */
             if (strlen (buf) > 4 && strcasecmp (strend (buf) - 4, ".enc") == 0) {
-                fm->encoding = add_enc (buf);
+                fm->encname = add_encname (buf);
                 u = v = 0;      /* u, v used if intervening blank: "<< foo" */
             } else if (strlen (buf) > 0) {      /* file name given */
                 /* font file, formats:
@@ -548,11 +522,17 @@ static void fm_scan_line ()
         }
     }
   done:
-    if (fm->ps_name != NULL && check_basefont (fm->ps_name))
-        set_basefont (fm);
-    if (is_fontfile (fm)
-        && strcasecmp (strend (fm_fontfile (fm)) - 4, ".ttf") == 0)
-        set_truetype (fm);
+    if (fm->ps_name != NULL && check_std_t1font (fm->ps_name))
+        set_std_t1font (fm);
+    if (is_fontfile (fm)) {
+        if (strcasecmp (strend (fm_fontfile (fm)) - 4, ".ttf") == 0)
+            set_truetype (fm);
+        else if (strcasecmp (strend (fm_fontfile (fm)) - 4, ".otf") == 0)
+            set_opentype (fm);
+        else
+            set_type1 (fm);
+    } else if (is_std_t1font (fm))
+        set_type1 (fm);
     if (check_fm_entry (fm, true) != 0)
         goto bad_line;
     /*
@@ -608,304 +588,66 @@ void fm_read_info ()
 
 /**********************************************************************/
 
-internalfontnumber tfmoffm (fmentryptr fm_pt)
-{
-    return ((fm_entry *) fm_pt)->tfm_num;
-}
-
-static fm_entry *mk_ex_fm (internalfontnumber f, fm_entry * basefm, int ex)
-{
-    fm_entry *fm;
-    integer e = basefm->extend;
-    if (e == 0)
-        e = 1000;
-    fm = new_fm_entry ();
-    fm->flags = basefm->flags;
-    fm->encoding = basefm->encoding;
-    fm->type = basefm->type;
-    fm->slant = basefm->slant;
-    fm->extend = roundxnoverd (e, 1000 + ex, 1000);     /* modify ExtentFont to simulate expansion */
-    if (fm->extend == 1000)
-        fm->extend = 0;
-    fm->tfm_name = xstrdup (makecstring (fontname[f]));
-    if (basefm->ps_name != NULL)
-        fm->ps_name = xstrdup (basefm->ps_name);
-    fm->ff_name = xstrdup (basefm->ff_name);
-    fm->ff_objnum = pdfnewobjnum ();
-    fm->tfm_num = f;
-    fm->tfm_avail = TFM_FOUND;
-    assert (strcmp (fm->tfm_name, nontfm));
-    return fm;
-}
-
-static void init_fm (fm_entry * fm, internalfontnumber f)
-{
-    if (fm->fd_objnum == 0 && !no_font_desc (fm))
-        fm->fd_objnum = pdfnewobjnum ();
-    if (fm->ff_objnum == 0 && is_included (fm))
-        fm->ff_objnum = pdfnewobjnum ();
-    if (fm->tfm_num == getnullfont ()) {
-        fm->tfm_num = f;
-        fm->tfm_avail = TFM_FOUND;
-    }
-}
-
 static fmentryptr fmlookup (internalfontnumber f)
 {
     char *tfm;
-    fm_entry *fm, *exfm;
+    fm_entry *fm;
     fm_entry tmp;
-    int ai, e;
     if (tfm_tree == NULL)
         fm_read_info ();        /* only to read default map file */
     tfm = makecstring (fontname[f]);
-    assert (strcmp (tfm, nontfm));
+    assert (strcmp (tfm, nontfm) != 0);
 
     /* Look up for full <tfmname>[+-]<expand> */
     tmp.tfm_name = tfm;
     fm = (fm_entry *) avl_find (tfm_tree, &tmp);
     if (fm != NULL) {
-        init_fm (fm, f);
+        fm->in_use = true;
         return (fmentryptr) fm;
-    }
-    tfm = mk_base_tfm (makecstring (fontname[f]), &e);
-    if (tfm == NULL)            /* not an expanded font, nothing to do */
-        return (fmentryptr) dummy_fm_entry ();
-
-    tmp.tfm_name = tfm;
-    fm = (fm_entry *) avl_find (tfm_tree, &tmp);
-    if (fm != NULL) {           /* found an entry with the base tfm name, e.g. cmr10 */
-        return (fmentryptr) fm; /* font expansion uses the base font */
-        /* the following code would be obsolete, as would be mk_ex_fm() */
-        if (!is_t1fontfile (fm) || !is_included (fm)) {
-            pdftex_warn
-                ("font %s cannot be expanded (not an included Type1 font)",
-                 tfm);
-            return (fmentryptr) dummy_fm_entry ();
-        }
-        exfm = mk_ex_fm (f, fm, e);     /* copies all fields from fm except tfm name */
-        init_fm (exfm, f);
-        ai = avl_do_entry (exfm, FM_DUPIGNORE);
-        assert (ai == 0);
-        return (fmentryptr) exfm;
     }
     return (fmentryptr) dummy_fm_entry ();
 }
 
-/*
-   Early check whether a font file exists. Used e. g. for replacing fonts
-   of embedded PDF files: Without font file, the font within the embedded
-   PDF-file is used. Search tree ff_tree is used in 1st instance, as it
-   may be faster than the kpse_find_file(), and kpse_find_file() is called
-   only once per font file name + expansion parameter. This might help
-   keeping speed, if many PDF pages with same fonts are to be embedded.
-
-   The ff_tree contains only font files, which are actually needed,
-   so this tree typically is much smaller than the tfm_tree or ps_tree.
-*/
-
-ff_entry *check_ff_exist (fm_entry * fm)
+boolean hasfmentry (internalfontnumber f)
 {
-    ff_entry *ff;
-    ff_entry tmp;
-    void **aa;
-
-    assert (fm->ff_name != NULL);
-    tmp.ff_name = fm->ff_name;
-    ff = (ff_entry *) avl_find (ff_tree, &tmp);
-    if (ff == NULL) {           /* not yet in database */
-        ff = new_ff_entry ();
-        ff->ff_name = xstrdup (fm->ff_name);
-        if (is_truetype (fm))
-            ff->ff_path = kpse_find_file (fm->ff_name, kpse_truetype_format, 0);
-        else
-            ff->ff_path = kpse_find_file (fm->ff_name, kpse_type1_format, 0);
-        aa = avl_probe (ff_tree, ff);
-        assert (aa != NULL);
-    }
-    return ff;
+    if (pdffontmap[f] == NULL)
+            pdffontmap[f] = fmlookup (f);
+    assert (pdffontmap[f] != NULL);
+    return pdffontmap[f] != (fmentryptr) dummy_fm_entry ();
 }
 
 /**********************************************************************/
-
-static boolean used_tfm (fm_entry * p)
-{
-    internalfontnumber f;
-    strnumber s;
-    ff_entry *ff;
-
-    /* check if the font file is not a TrueType font */
-    /* font replacement makes sense only for included Type1 files */
-    if (is_truetype (p) || !is_included (p))
-        return false;
-
-    /* check if the font file is available */
-    ff = check_ff_exist (p);
-    if (ff->ff_path == NULL)
-        return false;
-
-    /* check whether this font has been used */
-    if (fontused[p->tfm_num])
-        return true;
-    assert (p->tfm_name != NULL);
-
-    /* check whether we didn't find a loaded font yet,
-     * and this font has been loaded */
-    if (loaded_tfm_found == NULL && strcmp (p->tfm_name, nontfm)) {
-        s = maketexstring (p->tfm_name);
-        if ((f = tfmlookup (s, 0)) != getnullfont ()) {
-            loaded_tfm_found = p;
-            if (pdffontmap[f] == NULL)
-                pdffontmap[f] = (fmentryptr) p;
-            if (p->tfm_num == getnullfont ())
-                p->tfm_num = f;
-            assert (p->tfm_num == f);
-            /* don't call flushstr() here as it has been called by tfmlookup() */
-        } else
-            flushstr (s);
-    }
-
-    /* check whether we didn't find either a loaded or a loadable font yet,
-     * and this font is loadable */
-    if (avail_tfm_found == NULL && loaded_tfm_found == NULL &&
-        strcmp (p->tfm_name, nontfm)) {
-        if (p->tfm_avail == TFM_UNCHECKED) {
-            if (kpse_find_file (p->tfm_name, kpse_tfm_format, 0) != NULL) {
-                avail_tfm_found = p;
-                p->tfm_avail = TFM_FOUND;
-            } else {
-                p->tfm_avail = TFM_NOTFOUND;
-                if (not_avail_tfm_found == NULL)
-                    not_avail_tfm_found = p;
-            }
-        }
-    }
-
-    /* check whether the current entry is a <nontfm> entry */
-    if (non_tfm_found == NULL && !strcmp (p->tfm_name, nontfm))
-        non_tfm_found = p;
-
-    return false;
-}
-
-/* lookup_ps_name looks for an entry with a given ps name + slant + extend;
- * return NULL if not found.
- *
- * As there may exist several such entries, we need to select the `right'
- * one. We do so by checking all such entries and return the first one that
- * fulfils the following criteria (in descending priority):
- *
- * - the tfm has been used (some char from this font has been typeset)
- * - the tfm has been loaded (but not used yet)
- * - the tfm can be loaded (but not loaded yet)
- * - the tfm is present in map files, but cannot be loaded. In this case a
- *   dummy tfm can be loaded instead, and a warning should be written out
+/*
+ * lookup fontmap by ps_name;
+ * used for Type1 font replacement when embedding of PDF files
  */
 
-static fm_entry *lookup_ps_name (fm_entry * fm)
+fm_entry *lookup_fontmap (char *ps_name)
 {
-    fm_entry *p, *p2;
-    struct avl_traverser t, t2;
-    int a;
-
-    loaded_tfm_found = NULL;
-    avail_tfm_found = NULL;
-    non_tfm_found = NULL;
-    not_avail_tfm_found = NULL;
-
-    assert (fm->tfm_name == NULL);
-    p = (fm_entry *) avl_t_find (&t, ps_tree, fm);
-    if (p == NULL)
-        return NULL;
-    t2 = t;
-    p2 = (fm_entry *) avl_t_prev (&t2);
-
-    /* search forward */
-    do {
-        if (used_tfm (p))
-            return p;
-        p = (fm_entry *) avl_t_next (&t);
-    }
-    while (p != NULL && comp_fm_entry_ps (fm, p, NULL) == 0);
-
-    /* search backward */
-    while (p2 != NULL && comp_fm_entry_ps (fm, p2, NULL) == 0) {
-        if (used_tfm (p2))
-            return p2;
-        p2 = (fm_entry *) avl_t_prev (&t2);
-    }
-
-    if (loaded_tfm_found != NULL)
-        p = loaded_tfm_found;
-    else if (avail_tfm_found != NULL) {
-        p = avail_tfm_found;
-        p->tfm_num = readfontinfo (getnullcs (), maketexstring (p->tfm_name),
-                                   getnullstr (), -1000);
-        p->tfm_avail = TFM_FOUND;
-    } else if (non_tfm_found != NULL) {
-        p = non_tfm_found;
-        p->tfm_num = newdummyfont ();
-        p->tfm_avail = TFM_FOUND;
-    } else if (not_avail_tfm_found != NULL) {
-        p = not_avail_tfm_found;
-        pdftex_warn ("`%s' not loadable, use a dummy tfm instead", p->tfm_name);
-        p2 = new_fm_entry ();
-        p2->flags = p->flags;
-        p2->encoding = p->encoding;
-        p2->type = p->type;
-        p2->slant = p->slant;
-        p2->extend = p->extend;
-        p2->tfm_name = xstrdup (nontfm);
-        p2->ps_name = xstrdup (p->ps_name);
-        if (p->ff_name != NULL)
-            p2->ff_name = xstrdup (p->ff_name);
-        p2->tfm_num = newdummyfont ();
-        p2->tfm_avail = TFM_FOUND;
-        a = avl_do_entry (p2, FM_DUPIGNORE);
-        assert (a == 0);
-        p = p2;
-    } else
-        return NULL;
-    assert (p->tfm_num != getnullfont ());
-    return p;
-}
-
-/* Lookup fontmap for /BaseFont entries of embedded PDF-files;
- * return dummy_fm_entry() if not found */
-
-fm_entry *lookup_fontmap (char *bname)
-{
-    fm_entry *fm, *fmx;
-    fm_entry tmp, tmpx;
-    ff_entry *ff;
-    char buf[SMALL_BUF_SIZE];
+    fm_entry *fm, tmp;
     char *a, *b, *c, *d, *e, *s;
-    int i, sl, ex, ai;
+    int i, sl, ex;
     if (tfm_tree == NULL)
         fm_read_info ();        /* only to read default map file */
-    if (bname == NULL)
-        return NULL;
-    if (strlen (bname) >= SMALL_BUF_SIZE)
-        pdftex_fail ("Font name too long: `%s'", bname);
-    strcpy (buf, bname);        /* keep bname untouched for later */
-    s = buf;
-    if (strlen (buf) > 7) {     /* check for subsetted name tag */
+    assert (ps_name != NULL);
+    s = ps_name;
+    if (strlen (ps_name) > 7) { /* check for subsetted name tag */
         for (i = 0; i < 6; i++, s++)
             if (*s < 'A' || *s > 'Z')
                 break;
         if (i == 6 && *s == '+')
             s++;                /* if name tag found, skip behind it */
         else
-            s = buf;
+            s = ps_name;
     }
 
     /*
-       Scan -Slant_<slant> and -Extend_<extend> font name extensions;
-       three valid formats:
-       <fontname>-Slant_<slant>
-       <fontname>-Slant_<slant>-Extend_<extend>
-       <fontname>-Extend_<extend>
-       Slant entry must come _before_ Extend entry
+     * Scan -Slant_<slant> and -Extend_<extend> font name extensions;
+     * three valid formats:
+     * <fontname>-Slant_<slant>
+     * <fontname>-Slant_<slant>-Extend_<extend>
+     * <fontname>-Extend_<extend>
+     * Slant entry must come _before_ Extend entry
      */
 
     tmp.slant = 0;
@@ -915,7 +657,7 @@ fm_entry *lookup_fontmap (char *bname)
         sl = (int) strtol (b, &e, 10);
         if ((e != b) && (e == strend (b))) {
             tmp.slant = sl;
-            *a = '\0';          /* bname string ends before "-Slant_" */
+            *a = '\0';          /* ps_name string ends before "-Slant_" */
         } else {
             if (e != b) {       /* only if <slant> is valid number */
                 if ((c = strstr (e, "-Extend_")) != NULL) {
@@ -924,7 +666,7 @@ fm_entry *lookup_fontmap (char *bname)
                     if ((e != d) && (e == strend (d))) {
                         tmp.slant = sl;
                         tmp.extend = ex;
-                        *a = '\0';      /* bname string ends before "-Slant_" */
+                        *a = '\0';      /* ps_name string ends before "-Slant_" */
                     }
                 }
             }
@@ -935,84 +677,22 @@ fm_entry *lookup_fontmap (char *bname)
             ex = (int) strtol (b, &e, 10);
             if ((e != b) && (e == strend (b))) {
                 tmp.extend = ex;
-                *a = '\0';      /* bname string ends before "-Extend_" */
+                *a = '\0';      /* ps_name string ends before "-Extend_" */
             }
         }
     }
     tmp.ps_name = s;
-    tmp.tfm_name = NULL;
-    fm = lookup_ps_name (&tmp);
-    if (fm != NULL) {
-        if (!(is_type1 (fm) && is_included (fm))) {
-            pdftex_warn
-                ("PS name '%s' is found but ignored (not an included Type1 font)",
-                 tmp.ps_name);
-            return NULL;
-        }
-        i = fm->tfm_num;
-        assert (i != getnullfont ());
-        if (pdffontmap[i] == NULL)
-            pdffontmap[i] = (fmentryptr) fm;
-        if (fm->ff_objnum == 0 && is_included (fm))
-            fm->ff_objnum = pdfnewobjnum ();
-        if (!fontused[i])
-            pdfinitfont (i);
-        return fm;
-    }
-/*
-   The following code snipplet handles fonts with "Slant" and "Extend"
-   name extensions in embedded PDF files, which don't yet have an
-   fm_entry. If such a font is found (e. g. CMR10-Extend_1020), and no
-   fm_entry for this is found in the ps_tree (e. g. ps_name = "CMR10",
-   extend = 1020), and if an unextended base font (e. g. CMR10) is found,
-   a new <nontfm> fm_entry is created and put into the ps_tree. Then
-   the lookup_fontmap() function is (recursively) called again, which
-   then should find the new fm_entry. The same can be done manually by
-   a map entry e. g.:
-
-   \pdfmapline{+<nontfm> CMR10 "1.02 ExtendFont" <cmr10.pfb}
-
-   This would also match the embedded font CMR10-Extend_1020, and replace
-   it by an extended copy of cmr10.pfb. -- But not by an expanded version;
-   no MM files (e.g. cmr10+20.pfb) would be used.
-*/
-
-    tmpx.ps_name = s;
-    tmpx.tfm_name = NULL;
-    tmpx.slant = 0;
-    tmpx.extend = 0;
-/*     fm = (fm_entry *) avl_find(ps_tree, &tmpx); */
-    fm = lookup_ps_name (&tmpx);
-    if (fm != NULL) {
-        if (is_truetype (fm) || !is_included (fm))
-            return NULL;
-        ff = check_ff_exist (fm);
-        if (ff->ff_path == NULL)
-            return NULL;
-        fmx = new_fm_entry ();
-        fmx->flags = fm->flags;
-        fmx->encoding = fm->encoding;
-        fmx->type = fm->type;
-        fmx->slant = tmp.slant;
-        fmx->extend = tmp.extend;
-        fmx->tfm_name = xstrdup (nontfm);
-        fmx->ps_name = xstrdup (s);
-        fmx->ff_name = xstrdup (fm->ff_name);
-        ai = avl_do_entry (fmx, FM_DUPIGNORE);
-        assert (ai == 0);
-        fm = lookup_fontmap (bname);    /* new try */
-        assert (fm != NULL);
-        return fm;
-    }
-    return NULL;
+    fm = (fm_entry *) avl_find (ps_tree, &tmp);
+    return fm;
 }
 
 /**********************************************************************/
 /*
-Process map file given by its name or map line contents. Items not
-beginning with [+-=] flush default map file, if it has not yet been
-read. Leading blanks and blanks immediately following [+-=] are ignored.
-*/
+ * Process map file given by its name or map line contents. Items not
+ * beginning with [+-=] flush default map file, if it has not yet been
+ * read. Leading blanks and blanks immediately following [+-=] are
+ * ignored.
+ */
 
 void process_map_item (char *s, int type)
 {
@@ -1083,6 +763,40 @@ void pdfinitmapfile (string map_name)
 }
 
 /**********************************************************************/
+/*
+ * Early check whether a font file exists. Search tree ff_tree is used
+ * in 1st instance, as it may be faster than the kpse_find_file(), and
+ * kpse_find_file() is called only once per font file name + expansion
+ * parameter. This might help keeping speed, if many PDF pages with
+ * same fonts are to be embedded.
+ *
+ * The ff_tree contains only font files, which are actually needed,
+ * so this tree typically is much smaller than the tfm_tree or ps_tree.
+ */
+
+ff_entry *check_ff_exist (char *ff_name, boolean is_tt)
+{
+    ff_entry *ff;
+    ff_entry tmp;
+    void **aa;
+
+    assert (ff_name != NULL);
+    tmp.ff_name = ff_name;
+    ff = (ff_entry *) avl_find (ff_tree, &tmp);
+    if (ff == NULL) {           /* not yet in database */
+        ff = new_ff_entry ();
+        ff->ff_name = xstrdup (ff_name);
+        if (is_tt)
+            ff->ff_path = kpse_find_file (ff_name, kpse_truetype_format, 0);
+        else
+            ff->ff_path = kpse_find_file (ff_name, kpse_type1_format, 0);
+        aa = avl_probe (ff_tree, ff);
+        assert (aa != NULL);
+    }
+    return ff;
+}
+
+/**********************************************************************/
 /* cleaning up... */
 
 static void destroy_fm_entry_tfm (void *pa, void *pb)
@@ -1094,6 +808,7 @@ static void destroy_fm_entry_tfm (void *pa, void *pb)
     else
         unset_tfmlink (fm);
 }
+
 static void destroy_fm_entry_ps (void *pa, void *pb)
 {
     fm_entry *fm;
@@ -1103,19 +818,28 @@ static void destroy_fm_entry_ps (void *pa, void *pb)
     else
         unset_pslink (fm);
 }
+
 static void destroy_ff_entry (void *pa, void *pb)
 {
     ff_entry *ff;
     ff = (ff_entry *) pa;
     delete_ff_entry (ff);
-} void fm_free (void)
+}
+
+void fm_free (void)
 {
-    if (tfm_tree != NULL)
+    if (tfm_tree != NULL) {
         avl_destroy (tfm_tree, destroy_fm_entry_tfm);
-    if (ps_tree != NULL)
+        tfm_tree = NULL;
+    }
+    if (ps_tree != NULL) {
         avl_destroy (ps_tree, destroy_fm_entry_ps);
-    if (ff_tree != NULL)
+        ps_tree = NULL;
+    }
+    if (ff_tree != NULL) {
         avl_destroy (ff_tree, destroy_ff_entry);
+        ff_tree = NULL;
+    }
 }
 
 /**********************************************************************/

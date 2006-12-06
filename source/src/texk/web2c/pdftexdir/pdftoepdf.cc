@@ -31,6 +31,7 @@ $Id: pdftoepdf.cc,v 1.9 2006/09/01 18:06:52 hahe Exp hahe $
 #include <gmem.h>
 #include <gfile.h>
 #include <config.h>
+#include <assert.h>
 #include "Object.h"
 #include "Stream.h"
 #include "Array.h"
@@ -110,7 +111,7 @@ struct InObj {
     InObjType type;             // object type
     InObj *next;                // next entry in list of indirect objects
     integer num;                // new object number in output PDF
-    fm_entry *fontmap;          // pointer to font map entry
+    fd_entry *fd;               // pointer to /FontDescriptor object structure
     integer enc_objnum;         // Encoding for objFont
     int written;                // has it been written to output PDF?
 };
@@ -150,7 +151,7 @@ static XRef *xref = 0;
 static PdfDocument *find_add_document (char *file_name)
 {
     PdfDocument *p = pdfDocuments;
-    while (p && strcmp (p->file_name, file_name))
+    while (p && strcmp (p->file_name, file_name) != 0)
         p = p->next;
     if (p) {
         xref = p->xref;
@@ -229,16 +230,20 @@ static int addEncoding (GfxFont * gfont)
     return n->enc_objnum;
 }
 
-#define addFont(ref, fontmap, enc_objnum) \
-        addInObj(objFont, ref, fontmap, enc_objnum)
+#define addFont(ref, fd, enc_objnum) \
+        addInObj(objFont, ref, fd, enc_objnum, 0)
 
-#define addFontDesc(ref, fontmap) \
-        addInObj(objFontDesc, ref, fontmap, 0)
+// addFontDesc is only used to avoid writing the original FontDescriptor
+// from the PDF file.
+
+#define addFontDesc(ref) \
+        addInObj(objFontDesc, ref, NULL, 0, 0)
 
 #define addOther(ref) \
-        addInObj(objOther, ref, 0, 0)
+        addInObj(objOther, ref, 0, 0, 0)
 
-static int addInObj (InObjType type, Ref ref, fm_entry * f, integer e)
+static int addInObj (InObjType type, Ref ref, fd_entry * fd, integer e,
+                     integer newobjnum)
 {
     InObj *p, *q, *n = new InObj;
     if (ref.num == 0)
@@ -246,7 +251,7 @@ static int addInObj (InObjType type, Ref ref, fm_entry * f, integer e)
     n->ref = ref;
     n->type = type;
     n->next = 0;
-    n->fontmap = f;
+    n->fd = fd;
     n->enc_objnum = e;
     n->written = 0;
     if (inObjList == 0)
@@ -264,7 +269,7 @@ static int addInObj (InObjType type, Ref ref, fm_entry * f, integer e)
         // written out.
         q->next = n;
     }
-    n->num = pdfnewobjnum ();
+    n->num = (newobjnum == 0) ? pdfnewobjnum () : newobjnum;
     return n->num;
 }
 
@@ -310,31 +315,19 @@ static void copyFontDict (Object * obj, InObj * r)
         pdftex_fail ("PDF inclusion: invalid dict type <%s>",
                      obj->getTypeName ());
     pdf_puts ("<<\n");
-    if (r->type == objFont) {   // Font dict
-        for (i = 0, l = obj->dictGetLength (); i < l; ++i) {
-            key = obj->dictGetKey (i);
-            if (!strcmp ("BaseFont", key) || !strcmp ("Encoding", key))
-                continue;       // skip original values
-            copyDictEntry (obj, i);
-        }
-        // write new BaseFont and Encoding
-        pdf_printf ("/BaseFont %i 0 R\n", (int) get_fontname (r->fontmap));
-        pdf_printf ("/Encoding %i 0 R\n", (int) r->enc_objnum);
-    } else {                    // FontDescriptor dict
-        for (i = 0, l = obj->dictGetLength (); i < l; ++i) {
-            key = obj->dictGetKey (i);
-            if (!strcmp ("FontName", key)
-                || !strcmp ("FontFile", key)
-                || !strcmp ("FontFile3", key))
-                continue;       // ignore original FontName/FontFile/FontFile3
-            if (strcmp ("CharSet", key) == 0)
-                continue;       // ignore CharSet
-            copyDictEntry (obj, i);
-        }
-        // write new FontName and FontFile
-        pdf_printf ("/FontName %i 0 R\n", (int) get_fontname (r->fontmap));
-        pdf_printf ("/FontFile %i 0 R\n", (int) get_fontfile (r->fontmap));
+    assert (r->type == objFont);        // FontDescriptor is in fd_tree
+    for (i = 0, l = obj->dictGetLength (); i < l; ++i) {
+        key = obj->dictGetKey (i);
+        if (strncmp ("FontDescriptor", key, strlen ("FontDescriptor")) == 0
+            || strncmp ("BaseFont", key, strlen ("BaseFont")) == 0
+            || strncmp ("Encoding", key, strlen ("Encoding")) == 0)
+            continue;           // skip original values
+        copyDictEntry (obj, i);
     }
+    // write new FontDescriptor, BaseFont, and Encoding
+    pdf_printf ("/FontDescriptor %d 0 R\n", (int) get_fd_objnum (r->fd));
+    pdf_printf ("/BaseFont %d 0 R\n", (int) get_fn_objnum (r->fd));
+    pdf_printf ("/Encoding %d 0 R\n", (int) r->enc_objnum);
     pdf_puts (">>");
 }
 
@@ -373,6 +366,7 @@ static void copyFont (char *tag, Object * fontRef)
     PdfObject fontdict, subtype, basefont, fontdescRef, fontdesc, charset,
         fontfile, ffsubtype;
     GfxFont *gfont;
+    fd_entry *fd;
     fm_entry *fontmap;
     // Check whether the font has already been embedded before analysing it.
     InObj *p;
@@ -399,22 +393,23 @@ static void copyFont (char *tag, Object * fontRef)
                                                        &ffsubtype)->isName ()
                 && !strcmp (ffsubtype->getName (), "Type1C")))
         && (fontmap = lookup_fontmap (basefont->getName ())) != NULL) {
-        if (fontdesc->dictLookup ("CharSet", &charset)->isString ()
-            && is_subsetable (fontmap))
-            mark_glyphs (fontmap, charset->getString ()->getCString ());
+        fd = epdf_create_fontdescriptor (fontmap);
+        if (fontdesc->dictLookup ("CharSet", &charset) &&
+            charset->isString () && is_subsetable (fontmap))
+            epdf_mark_glyphs (fd, charset->getString ()->getCString ());
         else
-            embed_whole_font (fontmap);
-        addFontDesc (fontdescRef->getRef (), fontmap);
+            embed_whole_font (fd);
+        addFontDesc (fontdescRef->getRef ());
         copyName (tag);
         gfont = GfxFont::makeFont (xref, tag, fontRef->getRef (),
                                    fontdict->getDict ());
-        pdf_printf (" %d 0 R ", addFont (fontRef->getRef (), fontmap,
+        pdf_printf (" %d 0 R ", addFont (fontRef->getRef (), fd,
                                          addEncoding (gfont)));
-        return;
-    }
+    } else {
     copyName (tag);
     pdf_puts (" ");
     copyObject (fontRef);
+    }
 }
 
 static void copyFontResources (Object * obj)
@@ -598,16 +593,21 @@ static void writeRefs ()
             Object obj1;
             r->written = 1;
             xref->fetch (r->ref.num, r->ref.gen, &obj1);
-            if (obj1.isStream ())
-                zpdfbeginobj (r->num, 0);
-            else
+            if (r->type == objFont) {
+                assert (!obj1.isStream ());
                 zpdfbeginobj (r->num, 2);       // \pdfobjcompresslevel = 2 is for this
-            if (r->type == objFont || r->type == objFontDesc)
                 copyFontDict (&obj1, r);
-            else
+                pdf_puts ("\n");
+                pdfendobj ();
+            } else if (r->type != objFontDesc) {        // /FontDescriptor is written via write_fontdescriptor()
+                if (obj1.isStream ())
+                    zpdfbeginobj (r->num, 0);
+                else
+                    zpdfbeginobj (r->num, 2);   // \pdfobjcompresslevel = 2 is for this
                 copyObject (&obj1);
-            pdf_puts ("\n");
-            pdfendobj ();
+                pdf_puts ("\n");
+                pdfendobj ();
+            }
             obj1.free ();
         }
     }
@@ -629,7 +629,7 @@ static void writeEncodings ()
             else
                 glyphNames[i] = notdef;
         }
-        write_enc (glyphNames, NULL, r->enc_objnum);
+        epdf_write_enc (glyphNames, r->enc_objnum);
     }
     for (r = encodingList; r != 0; r = n) {
         n = r->next;
@@ -639,7 +639,6 @@ static void writeEncodings ()
 }
 
 // get the pagebox according to the pagebox_spec
-
 static PDFRectangle *get_pagebox (Page * page, integer pagebox_spec)
 {
     if (pagebox_spec == pdfboxspecmedia)
@@ -780,9 +779,7 @@ void write_epdf (void)
     char s[256];
     int i, l;
     int rotate;
-    double scale[6] = {
-        0, 0, 0, 0, 0, 0
-    };
+    double scale[6] = { 0, 0, 0, 0, 0, 0 };
     bool writematrix = false;
     PdfDocument *pdf_doc = (PdfDocument *) epdf_doc;
     (pdf_doc->occurences)--;
@@ -927,9 +924,9 @@ void write_epdf (void)
         for (i = 0, l = obj1->dictGetLength (); i < l; ++i) {
             obj1->dictGetVal (i, &obj2);
             key = obj1->dictGetKey (i);
-            if (!strcmp ("Font", key))
+            if (strcmp ("Font", key) == 0)
                 copyFontResources (&obj2);
-            else if (!strcmp ("ProcSet", key))
+            else if (strcmp ("ProcSet", key) == 0)
                 copyProcSet (&obj2);
             else
                 copyOtherResources (&obj2, key);

@@ -37,7 +37,7 @@ static subfont_entry *new_subfont_entry (void)
     subfont_entry *subfont;
     subfont = xtalloc (1, subfont_entry);
     subfont->infix = NULL;
-    for (i = 0; i < 255; ++i)
+    for (i = 0; i < 256; i++)
         subfont->charcodes[i] = -1;     /* unassigned */
     subfont->next = NULL;
     return subfont;
@@ -180,6 +180,7 @@ boolean handle_subfont_fm (fm_entry * fm, int mode)
     fm_entry *fm2;
     char buf[SMALL_BUF_SIZE];
     assert (fm->tfm_name != NULL);
+
     p = fm->tfm_name;
     q = strchr (p, '@');        /* search for the first '@' */
     if (q == NULL)
@@ -193,10 +194,12 @@ boolean handle_subfont_fm (fm_entry * fm, int mode)
     l = r - (q + 1);            /* length of sfd name */
     strncpy (buf, q + 1, l);
     buf[l] = 0;
+    check_buf(strlen(buf) + 4, SMALL_BUF_SIZE);
     strcat (buf, ".sfd");
     sfd = read_sfd (buf);
     if (sfd == NULL)
         return false;
+
     /* at this point we know fm is a subfont */
     set_subfont (fm);
     xfree (fm->ps_name);

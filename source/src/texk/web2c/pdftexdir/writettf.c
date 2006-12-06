@@ -103,6 +103,10 @@ static TTF_ULONG checkSumAdjustment_offset;
 static FILE *ttf_file;
 static ttfenc_entry ttfenc_tab[256];
 
+//static fm_entry *fm_cur;        /* WRONG!!! XXXXX */
+static fd_entry *fd_cur;        /* WRONG!!! XXXXX */
+//static integer tex_font;        /* WRONG!!! XXXXX */
+
 static struct avl_table *ttf_cmap_tree = NULL;
 
 integer ttf_length;
@@ -254,50 +258,64 @@ static void ttf_seek_off (TTF_LONG offset)
 
 static void ttf_copy_encoding (void)
 {
-    int i;
-    char **glyph_names, *p;
+    int i, *q;
+    void **aa;
+    char **glyph_names;
     long *charcodes;
-    static char *charcode_names[256], buf[2048];
-
+    static char buf[SMALL_BUF_SIZE];
+    struct avl_traverser t;
     ttfenc_entry *e = ttfenc_tab;
 
-    if (is_reencoded (fm_cur)) {
-        glyph_names = (fm_cur->encoding)->glyph_names;
+    assert(fd_cur->tx_tree != NULL); /* this must be set in create_fontdictionary */
+
+    if (fd_cur->fe != NULL) {
+        glyph_names = fd_cur->fe->glyph_names;
+        assert (glyph_names != NULL);
+
+        for (i = 0; i < 256; i++)
+            ttfenc_tab[i].name = (char *) notdef;
 
         /* a workaround for a bug of AcroReader 4.0 */
-        if (glyph_names != NULL && strcmp (glyph_names[97], "a") == 0)
-            pdfmarkchar (tex_font, 'a');
+        if (strcmp (glyph_names[97], "a") == 0) {
+            q = xtalloc (1, int);
+            *q = 'a';
+            aa = avl_probe (fd_cur->tx_tree, q);
+            assert (aa != NULL);
+        }
         /* end of workaround */
 
-        for (i = 0; i < 256; i++, e++) {
-            if (pdfcharmarked (tex_font, i))
-                e->name = glyph_names[i];
-            else
-                e->name = (char *) notdef;
+        /* take over collected characters from TeX, reencode them */
+        avl_t_init (&t, fd_cur->tx_tree);
+        for (q = (int *) avl_t_first (&t, fd_cur->tx_tree); q != NULL;
+             q = (int *) avl_t_next (&t)) {
+            assert(*q >=0 && *q < 256);
+            ttfenc_tab[*q].name = glyph_names[*q];
         }
-        make_subset_tag (fm_cur, glyph_names);
-    } else if (is_subfont (fm_cur)) {
-        charcodes = fm_cur->subfont->charcodes;
+        make_subset_tag (fd_cur);
+    } else if (is_subfont (fd_cur->fm)) {
+        charcodes = fd_cur->fm->subfont->charcodes;
         assert (charcodes != NULL);
-        p = buf;
-        for (i = 0; i < 256; i++, e++) {
-            if (pdfcharmarked (tex_font, i)) {
-                e->code = charcodes[i];
-                if (e->code == -1)
-                    pdftex_warn ("character %i is not mapped to any charcode",
-                                 i);
-            } else
-                e->code = -1;
-            if (e->code != -1) {
+
+        for (i = 0; i < 256; i++)
+            ttfenc_tab[i].code = -1;
+
+        /* take over collected characters from TeX */
+        avl_t_init (&t, fd_cur->tx_tree);
+        for (q = (int *) avl_t_first (&t, fd_cur->tx_tree); q != NULL;
+             q = (int *) avl_t_next (&t)) {
+            assert(*q >= 0 && *q < 256);
+            e = ttfenc_tab + *q;
+            e->code = charcodes[*q];
+            if (e->code == -1)
+                pdftex_warn ("character %i is not mapped to any charcode", *q);
+            else {
                 assert (e->code < 0x10000);
-                // we need a long (not multibyte). Please refer to subfont.txt for details -- thanh
-                sprintf (p, "/c%4.4X", (int) e->code);
-                charcode_names[i] = p;
-                p = strend (p) + 1;
-            } else
-                charcode_names[i] = (char *) notdef;
+                sprintf (buf, "/c%4.4X", (int) e->code);
+                aa = avl_probe (fd_cur->gl_tree, xstrdup(buf));
+                assert (aa != NULL);
+            }
         }
-        make_subset_tag (fm_cur, charcode_names);
+        make_subset_tag (fd_cur);
     } else
         assert (0);
 }
@@ -334,22 +352,25 @@ static void ttf_read_name (void)
     for (i = 0; i < name_record_num; i++) {
         if (name_tab[i].platform_id == 1 &&
             name_tab[i].encoding_id == 0 && name_tab[i].name_id == 6) {
-            strncpy (fontname_buf, name_buf + name_tab[i].offset,
+            xfree(fd_cur->fontname);
+            fd_cur->fontname = xtalloc(name_tab[i].length + 1, char);
+            strncpy (fd_cur->fontname, name_buf + name_tab[i].offset,
                      name_tab[i].length);
-            fontname_buf[name_tab[i].length] = 0;
-            font_keys[FONTNAME_CODE].valid = true;
+            fd_cur->fontname[name_tab[i].length] = 0;
+            fd_cur->font_dim[FONTNAME_CODE].set = true;
             break;
         }
     }
-    if (!font_keys[FONTNAME_CODE].valid) {
+    if (!fd_cur->font_dim[FONTNAME_CODE].set) {
         for (i = 0; i < name_record_num; i++) {
             if (name_tab[i].platform_id == 3 &&
                 (name_tab[i].encoding_id == 0 ||
                  name_tab[i].encoding_id == 1) && name_tab[i].name_id == 6) {
-                for (j = 0, p = fontname_buf; j < name_tab[i].length; j += 2)
+                for (j = 0, p = fd_cur->fontname; j < name_tab[i].length;
+                     j += 2)
                     *p++ = name_buf[name_tab[i].offset + j + 1];
                 *p = 0;
-                font_keys[FONTNAME_CODE].valid = true;
+                fd_cur->font_dim[FONTNAME_CODE].set = true;
                 break;
             }
         }
@@ -378,14 +399,14 @@ static void ttf_read_head (void)
                   2 * TTF_FIXED_SIZE + 2 * TTF_ULONG_SIZE + TTF_USHORT_SIZE);
     upem = get_ushort ();
     ttf_skip (16);
-    font_keys[FONTBBOX1_CODE].value = ttf_funit (get_fword ());
-    font_keys[FONTBBOX2_CODE].value = ttf_funit (get_fword ());
-    font_keys[FONTBBOX3_CODE].value = ttf_funit (get_fword ());
-    font_keys[FONTBBOX4_CODE].value = ttf_funit (get_fword ());
-    font_keys[FONTBBOX1_CODE].valid = true;
-    font_keys[FONTBBOX2_CODE].valid = true;
-    font_keys[FONTBBOX3_CODE].valid = true;
-    font_keys[FONTBBOX4_CODE].valid = true;
+    fd_cur->font_dim[FONTBBOX1_CODE].val = ttf_funit (get_fword ());
+    fd_cur->font_dim[FONTBBOX2_CODE].val = ttf_funit (get_fword ());
+    fd_cur->font_dim[FONTBBOX3_CODE].val = ttf_funit (get_fword ());
+    fd_cur->font_dim[FONTBBOX4_CODE].val = ttf_funit (get_fword ());
+    fd_cur->font_dim[FONTBBOX1_CODE].set = true;
+    fd_cur->font_dim[FONTBBOX2_CODE].set = true;
+    fd_cur->font_dim[FONTBBOX3_CODE].set = true;
+    fd_cur->font_dim[FONTBBOX4_CODE].set = true;
     ttf_skip (2 * TTF_USHORT_SIZE + TTF_SHORT_SIZE);
     loca_format = get_short ();
 }
@@ -393,10 +414,10 @@ static void ttf_read_head (void)
 static void ttf_read_hhea (void)
 {
     ttf_seek_tab ("hhea", TTF_FIXED_SIZE);
-    font_keys[ASCENT_CODE].value = ttf_funit (get_fword ());
-    font_keys[DESCENT_CODE].value = ttf_funit (get_fword ());
-    font_keys[ASCENT_CODE].valid = true;
-    font_keys[DESCENT_CODE].valid = true;
+    fd_cur->font_dim[ASCENT_CODE].val = ttf_funit (get_fword ());
+    fd_cur->font_dim[DESCENT_CODE].val = ttf_funit (get_fword ());
+    fd_cur->font_dim[ASCENT_CODE].set = true;
+    fd_cur->font_dim[DESCENT_CODE].set = true;
     ttf_skip (TTF_FWORD_SIZE + TTF_UFWORD_SIZE + 3 * TTF_FWORD_SIZE +
               8 * TTF_SHORT_SIZE);
     nhmtxs = get_ushort ();
@@ -407,11 +428,11 @@ static void ttf_read_pclt (void)
     if (ttf_name_lookup ("PCLT", false) == NULL)
         return;
     ttf_seek_tab ("PCLT", TTF_FIXED_SIZE + TTF_ULONG_SIZE + TTF_USHORT_SIZE);
-    font_keys[XHEIGHT_CODE].value = ttf_funit (get_ushort ());
+    fd_cur->font_dim[XHEIGHT_CODE].val = ttf_funit (get_ushort ());
     ttf_skip (2 * TTF_USHORT_SIZE);
-    font_keys[CAPHEIGHT_CODE].value = ttf_funit (get_ushort ());
-    font_keys[XHEIGHT_CODE].valid = true;
-    font_keys[CAPHEIGHT_CODE].valid = true;
+    fd_cur->font_dim[CAPHEIGHT_CODE].val = ttf_funit (get_ushort ());
+    fd_cur->font_dim[XHEIGHT_CODE].set = true;
+    fd_cur->font_dim[CAPHEIGHT_CODE].set = true;
 }
 
 static void ttf_read_hmtx (void)
@@ -450,9 +471,9 @@ static void ttf_read_post (void)
         sign = -1;
     }
     frac_part = italic_angle % 0x10000;
-    font_keys[ITALIC_ANGLE_CODE].value =
+    fd_cur->font_dim[ITALIC_ANGLE_CODE].val =
         sign * (int_part + frac_part * 1.0 / 0x10000);
-    font_keys[ITALIC_ANGLE_CODE].valid = true;
+    fd_cur->font_dim[ITALIC_ANGLE_CODE].set = true;
     if (glyph_tab == NULL)
         return;                 /* being called from writeotf() */
     ttf_skip (2 * TTF_FWORD_SIZE + 5 * TTF_ULONG_SIZE);
@@ -811,17 +832,17 @@ static int prepend_subset_tags (int index, char *p)
 {
     const boolean is_unicode = (name_tab[index].platform_id == 3);
     int i;
-    assert (index > 0 && index < name_record_num && fm_cur->subset_tag != NULL);
+    assert (index > 0 && index < name_record_num && fd_cur->subset_tag != NULL);
     if (is_unicode) {
         for (i = 0; i < 6; ++i) {
             *p++ = 0;
-            *p++ = fm_cur->subset_tag[i];
+            *p++ = fd_cur->subset_tag[i];
         }
         *p++ = 0;
         *p++ = '+';
         return 14;
     } else {
-        strncpy (p, fm_cur->subset_tag, 6);
+        strncpy (p, fd_cur->subset_tag, 6);
         p += 6;
         *p++ = '+';
         return 7;
@@ -837,7 +858,7 @@ static void ttf_write_name (void)
     char *new_name_buf;
     name_record *n;
     dirtab_entry *tab = ttf_name_lookup ("name", true);
-    if (is_subsetted (fm_cur)) {
+    if (is_subsetted (fd_cur->fm)) {
         l = 0;
         for (i = 0; i < name_record_num; i++)
             l += name_tab[i].length + 14;       /* maximum lengh of new stogare area */
@@ -892,7 +913,7 @@ static void ttf_write_dirtab (void)
     char *p;
     const integer save_offset = ttf_offset ();
     ttf_seek_outbuf (TABDIR_OFF);
-    if (is_subsetted (fm_cur)) {
+    if (is_subsetted (fd_cur->fm)) {
         for (i = 0; i < DEFAULT_NTABS; i++) {
             tab = ttf_name_lookup (newtabnames[i], false);
             if (tab == NULL)
@@ -1002,12 +1023,12 @@ static void ttf_reindex_glyphs (void)
         e->newindex = 0;        /* index of ".notdef" glyph */
 
         /* handle case of subfonts first */
-        if (is_subfont (fm_cur)) {
+        if (is_subfont (fd_cur->fm)) {
             if (e->code == -1)
                 continue;
-            assert (fm_cur->pid != -1 && fm_cur->eid != -1);
+            assert (fd_cur->fm->pid != -1 && fd_cur->fm->eid != -1);
             if (cmap == NULL && !cmap_not_found) {
-                cmap = ttf_read_cmap (fm_cur->ff_name, fm_cur->pid, fm_cur->eid,
+                cmap = ttf_read_cmap (fd_cur->fm->ff_name, fd_cur->fm->pid, fd_cur->fm->eid,
                                       true);
                 if (cmap == NULL)
                     cmap_not_found = true;
@@ -1018,8 +1039,8 @@ static void ttf_reindex_glyphs (void)
             assert (t != NULL && e->code < 0x10000);
             if (t[e->code] < 0) {
                 pdftex_warn
-                    ("subfont %s: wrong mapping: character %li --> 0x%4.4X --> .notdef",
-                     fm_cur->tfm_name, e - ttfenc_tab, (int) e->code);
+                    ("subfont %s: wrong mapping: character %li --> 0x%4.4lX --> .notdef",
+                     fd_cur->fm->tfm_name, (long) (e - ttfenc_tab), e->code);
                 continue;
             }
             assert (t[e->code] >= 0 && t[e->code] < glyphs_count);      /* t has been read from ttf */
@@ -1044,9 +1065,9 @@ static void ttf_reindex_glyphs (void)
         if (sscanf (e->name, GLYPH_PREFIX_UNICODE "%X", &index) == 1) {
             if (cmap == NULL && !cmap_not_found) {
                 /* need to read the unicode mapping, ie (pid,eid) = (3,1) or (0,3) */
-                cmap = ttf_read_cmap (fm_cur->ff_name, 3, 1, false);
+                cmap = ttf_read_cmap (fd_cur->fm->ff_name, 3, 1, false);
                 if (cmap == NULL)
-                    cmap = ttf_read_cmap (fm_cur->ff_name, 0, 3, false);
+                    cmap = ttf_read_cmap (fd_cur->fm->ff_name, 0, 3, false);
                 if (cmap == NULL) {
                     pdftex_warn
                         ("no unicode mapping found, all `uniXXXX' names will be ignored");
@@ -1102,7 +1123,7 @@ static void ttf_write_head ()
     ttf_skip (TTF_ULONG_SIZE);  /* skip checkSumAdjustment */
     ttf_ncopy (TTF_ULONG_SIZE + 2 * TTF_USHORT_SIZE + 16 +
                4 * TTF_FWORD_SIZE + 2 * TTF_USHORT_SIZE + TTF_SHORT_SIZE);
-    if (is_subsetted (fm_cur)) {
+    if (is_subsetted (fd_cur->fm)) {
         (void) put_short (loca_format);
         (void) put_short (0);
     } else
@@ -1212,7 +1233,7 @@ static void ttf_write_post (void)
     long *id;
     int l;
     ttf_reset_chksm (tab);
-    if (!write_ttf_glyph_names || post_format == 0x00030000) {
+    if (!fd_cur->write_ttf_glyph_names || post_format == 0x00030000) {
         put_fixed (0x00030000);
         ttf_ncopy (TTF_FIXED_SIZE + 2 * TTF_FWORD_SIZE + 5 * TTF_ULONG_SIZE);
     } else {
@@ -1290,10 +1311,13 @@ static void ttf_copy_font (void)
     ttf_write_dirtab ();
 }
 
-void writettf ()
+void writettf (fd_entry * fd)
 {
-    set_cur_file_name (fm_cur->ff_name);
-    if (is_subsetted (fm_cur) && !is_reencoded (fm_cur) && !is_subfont (fm_cur)) {
+    fd_cur = fd;                /* fd_cur is global inside writettf.c */
+    assert(fd_cur->fm != NULL);
+    assert (is_truetype (fd_cur->fm));
+    set_cur_file_name (fd_cur->fm->ff_name);
+    if (is_subsetted (fd_cur->fm) && (fd_cur->fe == NULL) && !is_subfont (fd_cur->fm)) {
         pdftex_warn ("Subset TrueType must be a reencoded or a subfont");
         cur_file_name = NULL;
         return;
@@ -1302,13 +1326,13 @@ void writettf ()
         pdftex_fail ("cannot open TrueType font file for reading");
     }
     cur_file_name = (char *) nameoffile + 1;
-    if (!is_included (fm_cur))
+    if (!is_included (fd_cur->fm))
         tex_printf ("{%s", cur_file_name);
-    else if (is_subsetted (fm_cur))
+    else if (is_subsetted (fd_cur->fm))
         tex_printf ("<%s", cur_file_name);
     else
         tex_printf ("<<%s", cur_file_name);
-    fontfile_found = true;
+    fd_cur->ff_found = true;
     new_glyphs_count = 2;
     new_ntabs = DEFAULT_NTABS;
     dir_tab = NULL;
@@ -1318,10 +1342,10 @@ void writettf ()
     name_tab = NULL;
     name_buf = NULL;
     ttf_read_font ();
-    if (is_included (fm_cur)) {
+    if (is_included (fd_cur->fm)) {
         pdfsaveoffset = pdfoffset ();
         pdfflush ();
-        if (is_subsetted (fm_cur)) {
+        if (is_subsetted (fd_cur->fm)) {
             ttf_copy_encoding ();
             ttf_subset_font ();
         } else
@@ -1335,26 +1359,32 @@ void writettf ()
     xfree (name_tab);
     xfree (name_buf);
     ttf_close ();
-    if (!is_included (fm_cur))
+    if (!is_included (fd_cur->fm))
         tex_printf ("}");
-    else if (is_subsetted (fm_cur))
+    else if (is_subsetted (fd_cur->fm))
         tex_printf (">");
     else
         tex_printf (">>");
     cur_file_name = NULL;
 }
 
-void writeotf ()
+void writeotf (fd_entry * fd)
 {
     dirtab_entry *tab;
     long i;
-    set_cur_file_name (fm_cur->ff_name);
+
+    fd_cur = fd;                /* fd_cur is global inside writettf.c */
+    assert(fd_cur->fm != NULL);
+    assert (is_opentype (fd_cur->fm));
+    set_cur_file_name (fd_cur->fm->ff_name);
+    if (!is_included (fd_cur->fm) || is_subsetted (fd_cur->fm))
+        pdftex_fail ("OTF fonts must be included entirely");
     if (!open_input (&ttf_file, kpse_type1_format, FOPEN_RBIN_MODE)) {
         pdftex_fail ("cannot open OpenType font file for reading");
     }
     cur_file_name = (char *) nameoffile + 1;
     tex_printf ("<<%s", cur_file_name);
-    fontfile_found = true;
+    fd_cur->ff_found = true;
     dir_tab = NULL;
     glyph_tab = NULL;
     ttf_read_tabdir ();

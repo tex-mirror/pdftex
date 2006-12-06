@@ -329,7 +329,7 @@ void writet3 (int objnum, internalfontnumber f)
         pdf_printf ("/FontMatrix [%g 0 0 %g 0 0]\n",
                     (double) t3_font_scale, (double) t3_font_scale);
     pdf_printf ("/%s [ %i %i %i %i ]\n",
-                font_keys[FONTBBOX1_CODE].pdfname,
+                font_key[FONTBBOX1_CODE].pdfname,
                 (int) t3_b0, (int) t3_b1, (int) t3_b2, (int) t3_b3);
     pdf_printf ("/Resources << /ProcSet [ /PDF %s] >>\n",
                 t3_image_used ? "/ImageB " : "");

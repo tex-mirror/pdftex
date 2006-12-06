@@ -11,39 +11,70 @@ pdfTeX 3.141592-1.40.0-rc1 was released on 2006-11-??
   - pdfTeX can now generate PDF 1.5 object streams, which leads to smaller
     PDFs. This is controlled by setting \pdfobjcompresslevel to a value >0 (3
     compress everything, 2 don't compress /Info, 1 also don't compress embedded
-    PDFs) and works only with PDF >=1.5 (patch 453)
-  - pdfTeX can now handle Colorstacks.
-
-  - support for jbig2 files
-  - 466 \pdfprimitive and \ifpdfprimitive
-  - 473 \ifpdfabsnum and \ifpdfabsdim
-  - added patch 421 (popen) from Taco
-  - 416	new primitive pdflastlink
-  - \pdfdraftmode
-  - new dimen: \pdfpxdimen
-
-  - 386	grow obj_tab and dest_names arrays dynamically
-  - 427	Character positioning patch
-  - 432	Rules in a PDF qQ group
-  - 438	\pdfsavepos in DVI mode
+    PDFs) and works only with PDF >=1.5
+  - pdfTeX now supports another image file format: JBIG2 files (.jbig2)
+  - the memory allocated for objects and destination names now grows
+    dynamically
+  - pdfTeX now generates smaller PDFs since for char positioning the width of
+    chars (/Widths) is stored with more precision and so the chars must rarely
+    be positioned seperatedly
+  - the PK resolution is now taken from the "pk_dpi" parameter in texmf.cnf if
+    it has not been set in the format file or by the user
+  - pdfTeX now removes the generated pdf in case of a fatal error
+  - pdfTeX now sets /ModDate and /Trapped in the InfoDict by default (the
+    values can be overridden with /pdfinfo)
+  - the format of warnings and errors issued by pdfTeX has been changed and
+    unified
+  - the output of -version has been extended and now includes information about
+    the libraries actually used, which can be handy when using shared libraries
+  - rules and their positioning on the page are now inside a qQ group
+- New primitives:
+  - TODO: pdfTeX can now handle Colorstacks 
+  - \pdfprimitive\TeX-primitive executes the original \TeX-primitive even if
+    the command has been redefined since. E.g.
+      \let\relax\undefined\pdfprimitive\relax 
+    expands to \relax.
+    \ifpdfprimitive\TeX-primitive is true if \TeX-primitive has its original
+    meaning
+  - \ifpdfabsnum and \ifpdfabsdim are like \ifnum and \ifdim, but don't care
+    about negative numbers
+  - shell escape: if the first character of a filename for \openin, \openout
+    \input is a pipe symbol (|), the filename is assumed to be a request for a
+    pipe to a command line that is given in the rest of the filename
+  - draftmode: With \pdfdraftmode=1 or the commandline switch -draftmode pdfTeX
+    doesn't write the output pdf and doesn't actually read any images, thus
+    speeding up compilations when you know you need an extra run but don't care
+    about the output, e.g. just to get the BibTeX references right
+  - \pdfpxdimen (introduced in 1.30) is now a real dimension paramter. It
+    allows one base dimensions on pixels. 1px defaults to 1bp (or 72dpi), but
+    can be changed with the \pdfpxdimen primitive:
+      \pdfpxdimen=1in % 1 dpi
+      \divide\pdfpxdimen by 96 % 96 dpi
+      \hsize=1200px
+    Now \hsize is (1in/96)*1200
+  - \pdflastlink returns the object number of the last \pdfstartlink
+  - \pdfsavepos now works in DVI mode
+- Fonts:
+  - support for subfonts: This creates all needed map entries for subfonts
+    automatically and handles Unicode mappings
+  - ToUnicode entries for Type1 fonts (patch 580)
+- HZ:
   - added patch 462 (HZ font expansion by text matrix manipulation)
-  - take PK resolution from "pk_dpi" parameter in  texmf.cnf, if it has not
-    been set by the format file or by the user
-  - write out PDF statistics later to make them correct
-  - remove generated pdf in case of fatal error
-  - pdfTeX now sets /ModDate and /Trapped by default (the values can be
-    overridden with /pdfinfo)
-  - changed the format of pdfTeX warnings and unified the four(!) functions
-    pdfTeX uses for writing out errors and warnings
-  - expanded the output of -version to include information about the libraries
-    used
-  - add new code by Thanh (patch 580)
 - Bugfixes:
+  - the PDF statistics in the log are now correct
   - added JFIF detection patch to writejpg.c (bug 548)
   - bugfix: invalid pdf created if font name contains space (509)
   - bugfix: truetype OS/2 v3 fonts (594)
   - bugfix: Type1C (CFF) fonts of embedded pdfs didn't get replaced
-- update libpng to 1.2.12
+- pdfTeX uses libpng 1.2.14
+
+---------------------------------------------------------------
+pdfTeX 3.141592-1.40.0-beta-20061206 was released on 2006-12-06
+---------------------------------------------------------------
+- bugfix: crash with autokern (663)
+- memory for virtual fonts can now grow dynamically (patch 705)
+- rework the font mechanism (patches 597 and 709)
+- updated libpng to 1.2.14
 
 ---------------------------------------------------------------
 pdfTeX 3.141592-1.40.0-beta-20061108 was released on 2006-11-08
