@@ -1,10 +1,10 @@
 pdfTeX
 ======
 
-INSTALL for pdfTeX 1.40.0-beta
-==============================
+INSTALL for pdfTeX 1.40.0-rc1
+=============================
 
-This distribution is a stripped-down version of the TeXlive distribution.
+This distribution is a stripped-down version of the teTeX distribution.
 All source code is in the directory src; the script build.sh will generate and
 populate a directory build.
 

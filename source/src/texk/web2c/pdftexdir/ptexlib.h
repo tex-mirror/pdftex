@@ -113,6 +113,7 @@ typedef struct fd_entry_ {
     boolean write_ttf_glyph_names;
     intparm font_dim[FONT_KEYS_NUM];
     fe_entry *fe;               /* pointer to encoding structure */
+    char **builtin_glyph_names; /* builtin encoding as read from the Type1 font file */
     fm_entry *fm;               /* pointer to font map structure */
     struct avl_table *tx_tree;  /* tree of non-reencoded TeX characters marked as used */
     struct avl_table *gl_tree;  /* tree of all marked glyphs */
@@ -132,6 +133,7 @@ typedef struct fo_entry_ {
     cw_entry *cw;               /* pointer to character /Widths array object structure */
     integer first_char;         /* first character used in this font */
     integer last_char;          /* last character used in this font */
+    integer tounicode_objnum;   /* object number of ToUnicode */
 } fo_entry;
 
 /**********************************************************************/
@@ -160,177 +162,176 @@ extern size_t last_ptr_index;
 /* pdftexlib function prototypes */
 
 /* epdf.c */
-extern integer get_fontfile_num (int);
-extern integer get_fontname_num (int);
-extern void epdf_free (void);
+extern integer get_fontfile_num(int);
+extern integer get_fontname_num(int);
+extern void epdf_free(void);
 
 /* mapfile.c */
-extern fm_entry *lookup_fontmap (char *);
-extern boolean hasfmentry (internalfontnumber);
-extern void fm_free (void);
-extern void fm_read_info (void);
-extern ff_entry *check_ff_exist (char *, boolean);
-extern void pdfmapfile (integer);
-extern void pdfmapline (integer);
-extern void pdfinitmapfile (string map_name);
-extern fm_entry *new_fm_entry (void);
-extern void delete_fm_entry (fm_entry *);
-extern int avl_do_entry (fm_entry *, int);
+extern fm_entry *lookup_fontmap(char *);
+extern boolean hasfmentry(internalfontnumber);
+extern void fm_free(void);
+extern void fm_read_info(void);
+extern ff_entry *check_ff_exist(char *, boolean);
+extern void pdfmapfile(integer);
+extern void pdfmapline(integer);
+extern void pdfinitmapfile(string map_name);
+extern fm_entry *new_fm_entry(void);
+extern void delete_fm_entry(fm_entry *);
+extern int avl_do_entry(fm_entry *, int);
 
 /* papersiz.c */
-extern integer myatodim (char **);
-extern integer myatol (char **);
+extern integer myatodim(char **);
+extern integer myatol(char **);
 
 /* pkin.c */
-extern int readchar (boolean, chardesc *);
+extern int readchar(boolean, chardesc *);
 
 /* subfont.c */
-extern void sfd_free (void);
-extern boolean handle_subfont_fm (fm_entry *, int);
+extern void sfd_free(void);
+extern boolean handle_subfont_fm(fm_entry *, int);
 
 /* tounicode.c */
-extern void glyph_unicode_free (void);
-extern void deftounicode (strnumber, strnumber);
-extern integer write_tounicode (char **, char *);
+extern void glyph_unicode_free(void);
+extern void deftounicode(strnumber, strnumber);
+extern integer write_tounicode(char **, char *);
 
 /* utils.c */
-extern boolean str_eq_cstr (strnumber, char *);
-extern char *makecstring (integer);
-extern int xfflush (FILE *);
-extern int xgetc (FILE *);
-extern int xputc (int, FILE *);
-extern scaled extxnoverd (scaled, scaled, scaled);
-extern size_t xfwrite (void *, size_t size, size_t nmemb, FILE *);
-extern strnumber getresnameprefix (void);
-extern strnumber maketexstring (const char *);
-extern integer fb_offset (void);
-extern void fb_flush (void);
-extern void fb_putchar (eightbits b);
-extern void fb_seek (integer);
-extern void libpdffinish (void);
-extern char *makecfilename (strnumber s);
-extern void make_subset_tag (fd_entry *);
-__attribute__ ((format (printf, 1, 2)))
-extern void pdf_printf (const char *, ...);
-extern void pdf_puts (const char *);
-__attribute__ ((noreturn, format (printf, 1, 2)))
-extern void pdftex_fail (const char *, ...);
-__attribute__ ((format (printf, 1, 2)))
-extern void pdftex_warn (const char *, ...);
-extern void setjobid (int, int, int, int);
-__attribute__ ((format (printf, 1, 2)))
-extern void tex_printf (const char *, ...);
-extern void writestreamlength (integer, integer);
-extern char *convertStringToPDFString (const char *in, int len);
-extern void printID (strnumber);
-extern void printcreationdate ();
-extern void printmoddate ();
-extern void escapename (poolpointer in);
-extern void escapestring (poolpointer in);
-extern void escapehex (poolpointer in);
-extern void unescapehex (poolpointer in);
-extern void getcreationdate ();
-extern void getfilemoddate (strnumber s);
-extern void getfilesize (strnumber s);
-extern void getmd5sum (strnumber s, boolean file);
-extern void getfiledump (strnumber s, int offset, int length);
-extern void matchstrings (strnumber s, strnumber t, int subcount,
-                          boolean icase);
-extern void getmatch (int i);
-extern void makepdftexbanner (void);
-extern void initstarttime ();
-extern void removepdffile (void);
-extern void garbagewarning (void);
-extern void stripspaces (char *p);
-extern void initversionstring (char **versions);
-extern int newcolorstack (integer s, integer literal_mode, boolean pagestart);
-extern int colorstackused ();
-extern integer colorstackset (int colstack_no, integer s);
-extern integer colorstackpush (int colstack_no, integer s);
-extern integer colorstackpop (int colstack_no);
-extern integer colorstackcurrent (int colstack_no);
-extern integer colorstackskippagestart (int colstack_no);
-extern void checkpdfsave (int cur_h, int cur_v);
-extern void checkpdfrestore (int cur_h, int cur_v);
-extern void pdfshipoutbegin (boolean shipping_page);
-extern void pdfshipoutend (boolean shipping_page);
-extern void pdfsetmatrix (poolpointer in, scaled cur_h, scaled cur_v);
-extern void matrixtransformpoint (scaled x, scaled y);
-extern void matrixtransformrect (scaled llx, scaled lly, scaled urx,
-                                 scaled ury);
-extern boolean matrixused ();
-extern void matrixrecalculate (scaled urx);
-extern scaled getllx ();
-extern scaled getlly ();
-extern scaled geturx ();
-extern scaled getury ();
-extern void allocvffnts ();
+extern boolean str_eq_cstr(strnumber, char *);
+extern char *makecstring(integer);
+extern int xfflush(FILE *);
+extern int xgetc(FILE *);
+extern int xputc(int, FILE *);
+extern scaled extxnoverd(scaled, scaled, scaled);
+extern size_t xfwrite(void *, size_t size, size_t nmemb, FILE *);
+extern strnumber getresnameprefix(void);
+extern strnumber maketexstring(const char *);
+extern integer fb_offset(void);
+extern void fb_flush(void);
+extern void fb_putchar(eightbits b);
+extern void fb_seek(integer);
+extern void libpdffinish(void);
+extern char *makecfilename(strnumber s);
+extern void make_subset_tag(fd_entry *);
+__attribute__ ((format(printf, 1, 2)))
+extern void pdf_printf(const char *, ...);
+extern void pdf_puts(const char *);
+__attribute__ ((noreturn, format(printf, 1, 2)))
+extern void pdftex_fail(const char *, ...);
+__attribute__ ((format(printf, 1, 2)))
+extern void pdftex_warn(const char *, ...);
+extern void setjobid(int, int, int, int);
+__attribute__ ((format(printf, 1, 2)))
+extern void tex_printf(const char *, ...);
+extern void writestreamlength(integer, integer);
+extern char *convertStringToPDFString(const char *in, int len);
+extern void printID(strnumber);
+extern void printcreationdate();
+extern void printmoddate();
+extern void escapename(poolpointer in);
+extern void escapestring(poolpointer in);
+extern void escapehex(poolpointer in);
+extern void unescapehex(poolpointer in);
+extern void getcreationdate();
+extern void getfilemoddate(strnumber s);
+extern void getfilesize(strnumber s);
+extern void getmd5sum(strnumber s, boolean file);
+extern void getfiledump(strnumber s, int offset, int length);
+extern void matchstrings(strnumber s, strnumber t, int subcount, boolean icase);
+extern void getmatch(int i);
+extern void makepdftexbanner(void);
+extern void initstarttime();
+extern void removepdffile(void);
+extern void garbagewarning(void);
+extern void stripspaces(char *p);
+extern void initversionstring(char **versions);
+extern int newcolorstack(integer s, integer literal_mode, boolean pagestart);
+extern int colorstackused();
+extern integer colorstackset(int colstack_no, integer s);
+extern integer colorstackpush(int colstack_no, integer s);
+extern integer colorstackpop(int colstack_no);
+extern integer colorstackcurrent(int colstack_no);
+extern integer colorstackskippagestart(int colstack_no);
+extern void checkpdfsave(int cur_h, int cur_v);
+extern void checkpdfrestore(int cur_h, int cur_v);
+extern void pdfshipoutbegin(boolean shipping_page);
+extern void pdfshipoutend(boolean shipping_page);
+extern void pdfsetmatrix(poolpointer in, scaled cur_h, scaled cur_v);
+extern void matrixtransformpoint(scaled x, scaled y);
+extern void matrixtransformrect(scaled llx, scaled lly, scaled urx, scaled ury);
+extern boolean matrixused();
+extern void matrixrecalculate(scaled urx);
+extern scaled getllx();
+extern scaled getlly();
+extern scaled geturx();
+extern scaled getury();
+extern void allocvffnts();
 
 /* vfpacket.c */
-extern eightbits packetbyte (void);
-extern integer newvfpacket (internalfontnumber);
-extern void poppacketstate (void);
-extern void pushpacketstate (void);
-extern void startpacket (internalfontnumber, integer);
-extern void storepacket (integer, integer, integer);
-extern void vf_free (void);
+extern eightbits packetbyte(void);
+extern integer newvfpacket(internalfontnumber);
+extern void poppacketstate(void);
+extern void pushpacketstate(void);
+extern void startpacket(internalfontnumber, integer);
+extern void storepacket(integer, integer, integer);
+extern void vf_free(void);
 
 /* writeenc.c */
-extern fe_entry *get_fe_entry (char *);
-extern void enc_free (void);
-extern void write_fontencodings (void);
+extern fe_entry *get_fe_entry(char *);
+extern void enc_free(void);
+extern void write_fontencodings(void);
 
 /* writefont.c */
-extern void dopdffont (integer, internalfontnumber);
-extern fd_entry *lookup_fd_entry (char *, integer, integer);
-extern fd_entry *new_fd_entry (void);
+extern void dopdffont(integer, internalfontnumber);
+extern fd_entry *lookup_fd_entry(char *, integer, integer);
+extern fd_entry *new_fd_entry(void);
+extern void writefontstuff();
 
 /* writeimg.c */
-extern boolean checkimageb (integer);
-extern boolean checkimagec (integer);
-extern boolean checkimagei (integer);
-extern boolean ispdfimage (integer);
-extern integer epdforigx (integer);
-extern integer epdforigy (integer);
-extern integer imageheight (integer);
-extern integer imagepages (integer);
-extern integer imagewidth (integer);
-extern integer imagexres (integer);
-extern integer imageyres (integer);
-extern integer readimage (strnumber, integer, strnumber, integer, integer,
-                          integer, integer);
-extern void deleteimage (integer);
-extern void img_free (void);
-extern void updateimageprocset (integer);
-extern void writeimage (integer);
-extern integer imagecolordepth (integer img);
+extern boolean checkimageb(integer);
+extern boolean checkimagec(integer);
+extern boolean checkimagei(integer);
+extern boolean ispdfimage(integer);
+extern integer epdforigx(integer);
+extern integer epdforigy(integer);
+extern integer imageheight(integer);
+extern integer imagepages(integer);
+extern integer imagewidth(integer);
+extern integer imagexres(integer);
+extern integer imageyres(integer);
+extern integer readimage(strnumber, integer, strnumber, integer, integer,
+                         integer, integer);
+extern void deleteimage(integer);
+extern void img_free(void);
+extern void updateimageprocset(integer);
+extern void writeimage(integer);
+extern integer imagecolordepth(integer img);
 
 /* writejbig2.c */
-extern void flushjbig2page0objects ();
+extern void flushjbig2page0objects();
 
 /* writet1.c */
-extern boolean t1_subset (char *, char *, unsigned char *);
-extern char **load_enc_file (char *);
-extern void writet1 (fd_entry *);
-extern void t1_free (void);
+extern boolean t1_subset(char *, char *, unsigned char *);
+extern char **load_enc_file(char *);
+extern void writet1(fd_entry *);
+extern void t1_free(void);
 
 /* writet3.c */
-extern void writet3 (int, internalfontnumber);
-extern scaled getpkcharwidth (internalfontnumber, scaled);
+extern void writet3(int, internalfontnumber);
+extern scaled getpkcharwidth(internalfontnumber, scaled);
 
 /* writettf.c */
-extern void writettf (fd_entry *);
-extern void writeotf (fd_entry *);
-extern void ttf_free (void);
+extern void writettf(fd_entry *);
+extern void writeotf(fd_entry *);
+extern void ttf_free(void);
 
 /* writezip.c */
-extern void writezip (boolean);
+extern void writezip(boolean);
 
 /* avlstuff.c */
-extern int comp_int_entry (const void *, const void *, void *);
-extern int comp_string_entry (const void *, const void *, void *);
-extern void avlputobj (integer, integer);
-extern integer avlfindobj (integer, integer, integer);
+extern int comp_int_entry(const void *, const void *, void *);
+extern int comp_string_entry(const void *, const void *, void *);
+extern void avlputobj(integer, integer);
+extern integer avlfindobj(integer, integer, integer);
 
 /**********************************************************************/
 static const key_entry font_key[FONT_KEYS_NUM] = {
@@ -346,5 +347,6 @@ static const key_entry font_key[FONT_KEYS_NUM] = {
     , {"", "", 0}
     , {"FontName", "FontName"}
 };
+
 /**********************************************************************/
 #endif                          /* PDFTEXLIB */

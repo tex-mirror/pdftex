@@ -130,10 +130,9 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#15
 { functions from avlstuff.c }
 @define procedure avlputobj();
 @define function avlfindobj();
-@define function getmasterfont();
-@define procedure registermasterfont();
 
 { functions from tounicode.c }
 @define procedure deftounicode();
 
 { end of pdftex.defines }
+{ vim: set syntax=web : }
