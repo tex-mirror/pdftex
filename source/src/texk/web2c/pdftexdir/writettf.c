@@ -325,6 +325,24 @@ do {\
     *q++ = B;\
 } while (0)
 
+static char *strip_spaces_and_delims(char *s, int l)
+{
+    static char buf[SMALL_BUF_SIZE];
+    assert(l >= 0 && l < (int) sizeof(buf));
+    char *p = buf;
+    int i;
+
+    for (i = 0; i < l ; s++, i++) {
+        if (*s == '(' || *s == ')' || *s == '<' || *s == '>' ||
+            *s == '[' || *s == ']' || *s == '{' || *s == '}' ||
+            *s == '/' || *s == '%' || isspace(*s))
+            continue;
+        *p++ = *s;
+    }
+    *p = 0;
+    return buf;
+}
+
 static void ttf_read_name(void)
 {
     int i, j;
@@ -351,10 +369,9 @@ static void ttf_read_name(void)
         if (name_tab[i].platform_id == 1 &&
             name_tab[i].encoding_id == 0 && name_tab[i].name_id == 6) {
             xfree(fd_cur->fontname);
-            fd_cur->fontname = xtalloc(name_tab[i].length + 1, char);
-            strncpy(fd_cur->fontname, name_buf + name_tab[i].offset,
-                    name_tab[i].length);
-            fd_cur->fontname[name_tab[i].length] = 0;
+            fd_cur->fontname =
+                xstrdup(strip_spaces_and_delims(name_buf + name_tab[i].offset,
+                                                name_tab[i].length));
             fd_cur->font_dim[FONTNAME_CODE].set = true;
             break;
         }
@@ -974,7 +991,7 @@ static void ttf_write_glyf(void)
                     if (glyph_tab[idx].newindex < 0) {
                         glyph_tab[idx].newindex = new_glyphs_count;
                         glyph_index[new_glyphs_count++] = idx;
-                        /* 
+                        /*
                            N.B.: Here we change `new_glyphs_count',
                            which appears in the condition of the `for' loop
                          */
@@ -1011,7 +1028,7 @@ static void ttf_reindex_glyphs(void)
     ttf_cmap_entry *cmap = NULL;
     boolean cmap_not_found = false;
 
-    /* 
+    /*
      * reindexing glyphs: we append index of used glyphs to `glyph_index'
      * while going through `ttfenc_tab'. After appending a new entry to
      * `glyph_index' we set field `newindex' of corresponding entries in both

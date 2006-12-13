@@ -17,33 +17,101 @@ You should have received a copy of the GNU General Public License
 along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#25 $
-
+$Id: writet1.c,v 1.6 2006/12/12 20:38:11 hahe Exp hahe $
 */
 
-static const char perforce_id[] =
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writet1.c#25 $";
+#include "ptexlib.h"
+#include <kpathsea/c-vararg.h>
+#include <kpathsea/c-proto.h>
+#include <string.h>
 
-#ifdef pdfTeX                   /* writet1 used with pdfeTeX */
-#  include "ptexlib.h"
-#  define t1_log(s)           tex_printf(s)
-#  define t1_open()           \
-    open_input(&t1_file, kpse_type1_format, FOPEN_RBIN_MODE)
-#  define enc_open()          \
-    open_input(&enc_file, kpse_enc_format, FOPEN_RBIN_MODE)
-#  define full_file_name()    (char*)nameoffile + 1
-#  define get_length1()       t1_length1 = t1_offset() - t1_save_offset
-#  define get_length2()       t1_length2 = t1_offset() - t1_save_offset
-#  define get_length3()       t1_length3 = fixedcontent? t1_offset() - t1_save_offset : 0
-#  define t1_putchar          fb_putchar
-#  define t1_offset           fb_offset
-#  define out_eexec_char      t1_putchar
-#  define save_offset()       t1_save_offset = t1_offset()
-#  define end_last_eexec_line() \
-    t1_eexec_encrypt = false
-#  define t1_char(c)          c
-#  define embed_all_glyphs    fd_cur->all_glyphs
-#  define fixedcontent        false
+#define t1_log(s)        tex_printf(s)
+#define get_length1()    t1_length1 = t1_offset() - t1_save_offset
+#define get_length2()    t1_length2 = t1_offset() - t1_save_offset
+#define get_length3()    t1_length3 = fixedcontent? t1_offset() - t1_save_offset : 0
+#define save_offset()    t1_save_offset = t1_offset()
+
+#define t1_open()        open_input(&t1_file, kpse_type1_format, FOPEN_RBIN_MODE)
+#define t1_close()       xfclose(t1_file, cur_file_name)
+#define t1_getchar()     getc(t1_file)
+#define t1_putchar       fb_putchar
+#define t1_offset        fb_offset
+#define t1_ungetchar(c)  ungetc(c, t1_file)
+#define t1_eof()         feof(t1_file)
+
+#define t1_prefix(s)     str_prefix(t1_line_array, s)
+#define t1_buf_prefix(s) str_prefix(t1_buf_array, s)
+#define t1_suffix(s)     str_suffix(t1_line_array, t1_line_ptr, s)
+#define t1_buf_suffix(s) str_suffix(t1_buf_array, t1_buf_ptr, s)
+#define t1_charstrings() strstr(t1_line_array, charstringname)
+#define t1_subrs()       t1_prefix("/Subrs")
+#define t1_end_eexec()   t1_suffix("mark currentfile closefile")
+#define t1_cleartomark() t1_prefix("cleartomark")
+
+#define enc_open()       open_input(&enc_file, kpse_enc_format, FOPEN_RBIN_MODE)
+#define enc_close()      xfclose(enc_file, cur_file_name)
+#define enc_getchar()    getc(enc_file)
+#define enc_eof()        feof(enc_file)
+
+#define valid_code(c)    (c >= 0 && c < 256)
+#define fixedcontent     false
+
+static const char *standard_glyph_names[256] = {
+    /* 0x00 */
+    notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
+    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
+    /* 0x10 */
+    notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
+    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
+    /* 0x20 */
+    "space", "exclam", "quotedbl", "numbersign", "dollar", "percent",
+    "ampersand", "quoteright", "parenleft", "parenright", "asterisk",
+    "plus", "comma", "hyphen", "period", "slash",
+    /* 0x30 */
+    "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+    "nine", "colon", "semicolon", "less", "equal", "greater", "question",
+    /* 0x40 */
+    "at", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+    "O",
+    /* 0x50 */
+    "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "bracketleft",
+    "backslash", "bracketright", "asciicircum", "underscore",
+    /* 0x60 */
+    "quoteleft", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
+    "m", "n", "o",
+    /* 0x70 */
+    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "braceleft", "bar",
+    "braceright", "asciitilde", notdef,
+    /* 0x80 */
+    notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
+    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
+    /* 0x90 */
+    notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
+    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
+    /* 0xa0 */
+    notdef, "exclamdown", "cent", "sterling", "fraction", "yen", "florin",
+    "section", "currency", "quotesingle", "quotedblleft", "guillemotleft",
+    "guilsinglleft", "guilsinglright", "fi", "fl",
+    /* 0xb0 */
+    notdef, "endash", "dagger", "daggerdbl", "periodcentered", notdef,
+    "paragraph", "bullet", "quotesinglbase", "quotedblbase",
+    "quotedblright", "guillemotright", "ellipsis", "perthousand", notdef,
+    "questiondown",
+    /* 0xc0 */
+    notdef, "grave", "acute", "circumflex", "tilde", "macron", "breve",
+    "dotaccent", "dieresis", notdef,
+    "ring", "cedilla", notdef, "hungarumlaut", "ogonek", "caron",
+    /* 0xd0 */
+    "emdash", notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
+    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
+    /* 0xe0 */
+    notdef, "AE", notdef, "ordfeminine", notdef, notdef, notdef, notdef,
+    "Lslash", "Oslash", "OE", "ordmasculine", notdef, notdef, notdef,
+    notdef,
+    /* 0xf0 */
+    notdef, "ae", notdef, notdef, notdef, "dotlessi", notdef, notdef, "lslash",
+    "oslash", "oe", "germandbls", notdef, notdef, notdef, notdef
+};
 
 integer t1_length1, t1_length2, t1_length3;
 static integer t1_save_offset;
@@ -51,164 +119,43 @@ static integer t1_fontname_offset;
 extern char *fb_array;
 static fd_entry *fd_cur;
 
-#else                           /* writet1 used with dvips */
-#  include "sysexits.h"
-#  include "dvips.h"
-#  include "ptexmac.h"
-#  undef  fm_extend
-#  define fm_extend(f)        0
-#  undef  fm_slant
-#  define fm_slant(f)         0
-#  undef  is_reencoded
-#  define is_reencoded(f)     (cur_enc_name != NULL)
-#  undef  is_subsetted
-#  define is_subsetted(f)     true
-#  undef  is_included
-#  define is_included(f)      true
-#  undef  set_cur_file_name
-#  define set_cur_file_name(s)    cur_file_name = s
-#  define t1_open()           \
-    ((t1_file = search(headerpath, cur_file_name, FOPEN_RBIN_MODE)) != NULL)
-#  define enc_open()          \
-    ((enc_file = search(encpath, cur_file_name, FOPEN_RBIN_MODE)) != NULL)
-#  define full_file_name()    cur_file_name
-#  define get_length1()
-#  define get_length2()
-#  define get_length3()
-#  define is_used_char(c)     (grid[c] == 1)
-#  define out_eexec_char      t1_outhex
-#  define save_offset()
-#  define end_last_eexec_line()       \
-    hexline_length = HEXLINE_WIDTH; \
-    end_hexline();                  \
-    t1_eexec_encrypt = false
-#  define t1_log(s)
-#  define t1_scan_only()
-#  define t1_include()
-#  define t1_putchar(c)       fputc(c, bitfile)
-#  define t1_scan_keys()
-#  define embed_all_glyphs    false
-#  undef pdfmovechars
-#  ifdef SHIFTLOWCHARS
-extern char errbuf[];
-extern Boolean shiftlowchars;
-#    define pdfmovechars shiftlowchars
-#    define t1_char(c)          T1Char(c)
-#  else                         /* SHIFTLOWCHARS */
-#    define t1_char(c)          c
-#    define pdfmovechars 0
-#  endif                        /* SHIFTLOWCHARS */
-#  define make_subset_tag(a, b)
-#  define fixedcontent        true
-
-extern FILE *bitfile;
-extern FILE *search();
-static char *cur_file_name;
-static char *cur_enc_name;
-static unsigned char *grid;
-static char *ext_glyph_names[256];
-static char print_buf[PRINTF_BUF_SIZE];
-static int hexline_length;
-static const char notdef[] = ".notdef";
-static size_t last_ptr_index;
-#endif                          /* pdfTeX */
-
-#include <kpathsea/c-vararg.h>
-#include <kpathsea/c-proto.h>
-#include <string.h>
-
-#define t1_getchar()    getc(t1_file)
-#define t1_ungetchar(c) ungetc(c, t1_file)
-#define t1_eof()        feof(t1_file)
-#define t1_close()      xfclose(t1_file, cur_file_name)
-
-#define enc_getchar()   getc(enc_file)
-#define enc_eof()       feof(enc_file)
-#define enc_close()     xfclose(enc_file, cur_file_name)
-
-#define valid_code(c)   (c >= 0 && c < 256)
-
-static const char *standard_glyph_names[256] =
-    { notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    "space", "exclam", "quotedbl", "numbersign",
-    "dollar", "percent", "ampersand", "quoteright", "parenleft",
-    "parenright", "asterisk", "plus", "comma", "hyphen", "period",
-    "slash", "zero", "one", "two", "three", "four", "five", "six", "seven",
-    "eight", "nine", "colon", "semicolon", "less",
-    "equal", "greater", "question", "at", "A", "B", "C", "D", "E", "F",
-    "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
-    "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "bracketleft",
-    "backslash", "bracketright", "asciicircum", "underscore",
-    "quoteleft", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
-    "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
-    "w", "x", "y", "z", "braceleft", "bar", "braceright", "asciitilde",
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, "exclamdown", "cent",
-    "sterling", "fraction", "yen", "florin", "section", "currency",
-    "quotesingle", "quotedblleft", "guillemotleft",
-    "guilsinglleft", "guilsinglright", "fi", "fl", notdef, "endash",
-    "dagger", "daggerdbl", "periodcentered", notdef,
-    "paragraph", "bullet", "quotesinglbase", "quotedblbase",
-    "quotedblright", "guillemotright", "ellipsis", "perthousand",
-    notdef, "questiondown", notdef, "grave", "acute", "circumflex",
-    "tilde", "macron", "breve", "dotaccent", "dieresis", notdef,
-    "ring", "cedilla", notdef, "hungarumlaut", "ogonek", "caron", "emdash",
-    notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, "AE", notdef, "ordfeminine", notdef, notdef,
-    notdef, notdef, "Lslash", "Oslash", "OE", "ordmasculine", notdef,
-    notdef, notdef, notdef, notdef, "ae", notdef, notdef,
-    notdef, "dotlessi", notdef, notdef, "lslash", "oslash", "oe",
-    "germandbls", notdef, notdef, notdef, notdef
-};
-
 static char charstringname[] = "/CharStrings";
 
-char charsetstr[0x4000];
-static int t1_encoding;
+enum { ENC_STANDARD, ENC_BUILTIN } t1_encoding;
 
-#define ENC_STANDARD    0
-#define ENC_BUILTIN     1
+#define T1_BUF_SIZE      0x10
+#define ENC_BUF_SIZE     0x1000
 
-#define T1_BUF_SIZE   0x10
-#define ENC_BUF_SIZE  0x1000
+#define CS_HSTEM         1
+#define CS_VSTEM         3
+#define CS_VMOVETO       4
+#define CS_RLINETO       5
+#define CS_HLINETO       6
+#define CS_VLINETO       7
+#define CS_RRCURVETO     8
+#define CS_CLOSEPATH     9
+#define CS_CALLSUBR      10
+#define CS_RETURN        11
+#define CS_ESCAPE        12
+#define CS_HSBW          13
+#define CS_ENDCHAR       14
+#define CS_RMOVETO       21
+#define CS_HMOVETO       22
+#define CS_VHCURVETO     30
+#define CS_HVCURVETO     31
+#define CS_1BYTE_MAX     (CS_HVCURVETO + 1)
 
-#define CS_HSTEM            1
-#define CS_VSTEM            3
-#define CS_VMOVETO          4
-#define CS_RLINETO          5
-#define CS_HLINETO          6
-#define CS_VLINETO          7
-#define CS_RRCURVETO        8
-#define CS_CLOSEPATH        9
-#define CS_CALLSUBR         10
-#define CS_RETURN           11
-#define CS_ESCAPE           12
-#define CS_HSBW             13
-#define CS_ENDCHAR          14
-#define CS_RMOVETO          21
-#define CS_HMOVETO          22
-#define CS_VHCURVETO        30
-#define CS_HVCURVETO        31
-#define CS_1BYTE_MAX        (CS_HVCURVETO + 1)
-
-#define CS_DOTSECTION       CS_1BYTE_MAX + 0
-#define CS_VSTEM3           CS_1BYTE_MAX + 1
-#define CS_HSTEM3           CS_1BYTE_MAX + 2
-#define CS_SEAC             CS_1BYTE_MAX + 6
-#define CS_SBW              CS_1BYTE_MAX + 7
-#define CS_DIV              CS_1BYTE_MAX + 12
-#define CS_CALLOTHERSUBR    CS_1BYTE_MAX + 16
-#define CS_POP              CS_1BYTE_MAX + 17
-#define CS_SETCURRENTPOINT  CS_1BYTE_MAX + 33
-#define CS_2BYTE_MAX        (CS_SETCURRENTPOINT + 1)
-#define CS_MAX              CS_2BYTE_MAX
+#define CS_DOTSECTION    CS_1BYTE_MAX + 0
+#define CS_VSTEM3        CS_1BYTE_MAX + 1
+#define CS_HSTEM3        CS_1BYTE_MAX + 2
+#define CS_SEAC          CS_1BYTE_MAX + 6
+#define CS_SBW           CS_1BYTE_MAX + 7
+#define CS_DIV           CS_1BYTE_MAX + 12
+#define CS_CALLOTHERSUBR CS_1BYTE_MAX + 16
+#define CS_POP           CS_1BYTE_MAX + 17
+#define CS_SETCURRENTPOINT CS_1BYTE_MAX + 33
+#define CS_2BYTE_MAX     (CS_SETCURRENTPOINT + 1)
+#define CS_MAX           CS_2BYTE_MAX
 
 typedef unsigned char byte;
 
@@ -253,7 +200,8 @@ static char *subr_array_start, *subr_array_end;
 static int subr_max, subr_size, subr_size_pos;
 
 /* This list contains the begin/end tokens commonly used in the */
-/* /Subrs array of a Type 1 font.                                */
+/* /Subrs array of a Type 1 font.                               */
+
 static const char *cs_token_pairs_list[][2] = {
     {" RD", "NP"},
     {" -|", "|"},
@@ -269,67 +217,6 @@ static long t1_block_length;
 static int last_hexbyte;
 static FILE *t1_file;
 static FILE *enc_file;
-
-#define t1_prefix(s)        str_prefix(t1_line_array, s)
-#define t1_buf_prefix(s)    str_prefix(t1_buf_array, s)
-#define t1_suffix(s)        str_suffix(t1_line_array, t1_line_ptr, s)
-#define t1_buf_suffix(s)    str_suffix(t1_buf_array, t1_buf_ptr, s)
-#define t1_charstrings()    strstr(t1_line_array, charstringname)
-#define t1_subrs()          t1_prefix("/Subrs")
-#define t1_end_eexec()      t1_suffix("mark currentfile closefile")
-#define t1_cleartomark()    t1_prefix("cleartomark")
-
-#ifndef pdfTeX
-static void pdftex_fail(char *fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-    fputs("\nError: module writet1", stderr);
-    if (cur_file_name)
-        fprintf(stderr, " (file %s)", cur_file_name);
-    fputs(": ", stderr);
-    vsprintf(print_buf, fmt, args);
-    fputs(print_buf, stderr);
-    fputs
-        ("\n ==> Fatal error occurred, the output PS file is not finished!\n",
-         stderr);
-    va_end(args);
-    exit(EX_SOFTWARE);
-}
-
-static void pdftex_warn(char *fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-    fputs("\nWarning: module writet1 of dvips", stderr);
-    if (cur_file_name)
-        fprintf(stderr, " (file %s)", cur_file_name);
-    fputs(": ", stderr);
-    vsprintf(print_buf, fmt, args);
-    fputs(print_buf, stderr);
-    fputs("\n", stderr);
-    va_end(args);
-}
-
-#  define HEXLINE_WIDTH 64
-
-static void end_hexline()
-{
-    if (hexline_length == HEXLINE_WIDTH) {
-        fputs("\n", bitfile);
-        hexline_length = 0;
-    }
-}
-
-static void t1_outhex(byte b)
-{
-    static char *hexdigits = "0123456789ABCDEF";
-    t1_putchar(hexdigits[b / 16]);
-    t1_putchar(hexdigits[b % 16]);
-    hexline_length += 2;
-    end_hexline();
-}
-#endif                          /* pdfTeX */
 
 static void enc_getline(void)
 {
@@ -366,7 +253,7 @@ char **load_enc_file(char *enc_name)
     for (i = 0; i < 256; i++)
         glyph_names[i] = (char *) notdef;
     t1_log("{");
-    t1_log(cur_file_name = full_file_name());
+    t1_log(cur_file_name = (char *) nameoffile + 1);
     enc_getline();
     if (*enc_line != '/' || (r = strchr(enc_line, '[')) == NULL) {
         remove_eol(r, enc_line);
@@ -595,7 +482,7 @@ static void t1_putline(void)
         return;
     if (t1_eexec_encrypt) {
         while (p < t1_line_ptr)
-            out_eexec_char(eencrypt(*p++));
+            t1_putchar(eencrypt(*p++));
     } else
         while (p < t1_line_ptr)
             t1_putchar(*p++);
@@ -683,7 +570,7 @@ static void t1_stop_eexec(void)
         get_length2();
         save_offset();
     }
-    end_last_eexec_line();
+    t1_eexec_encrypt = false;
     if (!t1_pfa)
         t1_check_block_len(true);
     else {
@@ -699,17 +586,17 @@ static void t1_stop_eexec(void)
     t1_in_eexec = 2;
 }
 
-#ifdef pdfTeX
 /* macros for various transforms; currently only slant and extend are used */
-#  define do_xshift(x,a) {x[4]+=a;}
-#  define do_yshift(x,a) {x[5]+=a;}
-#  define do_xscale(x,a) {x[0]*=a; x[2]*=a; x[4]*=a;}
-#  define do_yscale(x,a) {x[1]*=a; x[3]*=a; x[5]*=a;}
-#  define do_extend(x,a) {do_xscale(x,a);}
-#  define do_scale(x,a)  {do_xscale(x,a); do_yscale(x,a);}
-#  define do_slant(x,a)  {x[0]+=x[1]*(a); x[2]+=x[3]*(a); x[4]+=x[5]*(a);}
-#  define do_shear(x,a)  {x[1]+=x[0]*(a); x[3]+=x[2]*(a); x[5]+=x[4]*(a);}
-#  define do_rotate(x,a)          \
+
+#define do_xshift(x,a) {x[4]+=a;}
+#define do_yshift(x,a) {x[5]+=a;}
+#define do_xscale(x,a) {x[0]*=a; x[2]*=a; x[4]*=a;}
+#define do_yscale(x,a) {x[1]*=a; x[3]*=a; x[5]*=a;}
+#define do_extend(x,a) {do_xscale(x,a);}
+#define do_scale(x,a)  {do_xscale(x,a); do_yscale(x,a);}
+#define do_slant(x,a)  {x[0]+=x[1]*(a); x[2]+=x[3]*(a); x[4]+=x[5]*(a);}
+#define do_shear(x,a)  {x[1]+=x[0]*(a); x[3]+=x[2]*(a); x[5]+=x[4]*(a);}
+#define do_rotate(x,a)          \
   {float t, u=cos(a), v=sin(a); \
   t    =x[0]*u+x[1]*-v;         \
   x[1] =x[0]*v+x[1]* u; x[0]=t; \
@@ -874,8 +761,6 @@ static void t1_scan_keys(void)
     fd_cur->font_dim[k].set = true;
 }
 
-#endif                          /* pdfTeX */
-
 static void t1_scan_param(void)
 {
     static const char *lenIV = "/lenIV";
@@ -900,6 +785,7 @@ static void copy_glyph_names(char **glyph_names, int a, int b)
 }
 
 /* read encoding from Type1 font file, return glyph_names array, or pdffail() */
+
 char **t1_builtin_enc(void)
 {
     int i, a, b, c, counter = 0;
@@ -1034,7 +920,6 @@ static void t1_check_end(void)
         t1_putline();
 }
 
-#ifdef pdfTeX
 static boolean t1_open_fontfile(const char *open_name_prefix)
 {
     ff_entry *ff;
@@ -1098,18 +983,6 @@ static void t1_include(void)
     get_length3();
 }
 
-#else                           /* not pdfTeX */
-static boolean t1_open_fontfile(char *open_name_prefix)
-{
-    if (!t1_open()) {
-        (void) sprintf(errbuf, "! Couldn't find font file %s", cur_file_name);
-        error(errbuf);
-    }
-    t1_init_params(open_name_prefix);
-    return true;
-}
-#endif                          /* pdfTeX */
-
 #define check_subr(subr) \
     if (subr >= subr_size || subr < 0) \
         pdftex_fail("Subrs array: entry index out of range (%i)",  subr);
@@ -1161,25 +1034,24 @@ static void cs_store(boolean is_subr)
     ptr->valid = true;
 }
 
-#define store_subr()    cs_store(true)
-#define store_cs()      cs_store(false)
+#define store_subr()     cs_store(true)
+#define store_cs()       cs_store(false)
 
-#define CC_STACK_SIZE       24
+#define CC_STACK_SIZE    24
 
 static integer cc_stack[CC_STACK_SIZE], *stack_ptr = cc_stack;
 static cc_entry cc_tab[CS_MAX];
 static boolean is_cc_init = false;
 
-
-#define cc_pop(N)                       \
-    if (stack_ptr - cc_stack < (N))     \
-        stack_error(N);                 \
+#define cc_pop(N)                   \
+    if (stack_ptr - cc_stack < (N)) \
+        stack_error(N);             \
     stack_ptr -= N
 
-#define stack_error(N) {                \
+#define stack_error(N) {            \
     pdftex_warn("CharString: invalid access (%i) to stack (%i entries)", \
                  (int) N, (int)(stack_ptr - cc_stack));                  \
-    goto cs_error;                    \
+    goto cs_error;                  \
 }
 
 /*
@@ -1199,10 +1071,8 @@ static integer cc_get(integer index)
 */
 
 #define cc_get(N)   ((N) < 0 ? *(stack_ptr + (N)) : *(cc_stack + (N)))
-
 #define cc_push(V)  *stack_ptr++ = V
 #define cc_clear()  stack_ptr = cc_stack
-
 #define set_cc(N, B, A, C) \
     cc_tab[N].nargs = A;   \
     cc_tab[N].bottom = B;  \
@@ -1247,10 +1117,10 @@ static void cc_init(void)
     is_cc_init = true;
 }
 
-#define cs_getchar()    cdecrypt(*data++, &cr)
+#define cs_getchar()     cdecrypt(*data++, &cr)
 
-#define mark_subr(n)    cs_mark(0, n)
-#define mark_cs(s)      cs_mark(s, 0)
+#define mark_subr(n)     cs_mark(0, n)
+#define mark_cs(s)       cs_mark(s, 0)
 
 __attribute__ ((format(printf, 3, 4)))
 static void cs_warn(const char *cs_name, int subr, const char *fmt, ...)
@@ -1481,9 +1351,7 @@ static void t1_subset_ascii_part(void)
         for (glyph = (char *) avl_t_first(&t, fd_cur->gl_tree); glyph != NULL;
              glyph = (char *) avl_t_next(&t)) {
             if ((gg = (char **) avl_find(gl_tree, &glyph)) != NULL) {
-                /* this is actually optional: */
-                t1_printf("dup %i /%s put\n",
-                          (int) t1_char((int) (gg - glyph_names)), *gg);
+                t1_printf("dup %i /%s put\n", (int) (gg - glyph_names), *gg);
                 j++;
             }
         }
@@ -1503,11 +1371,6 @@ static void t1_subset_ascii_part(void)
     }
     while (t1_in_eexec == 0);
 }
-
-#define t1_subr_flush()  t1_flush_cs(true)
-#define t1_cs_flush()    t1_flush_cs(false)
-
-static void t1_flush_cs(boolean);
 
 static void cs_init(void)
 {
@@ -1572,7 +1435,9 @@ static void t1_read_subrs()
        we will treat the font as synthetic and ignore everything until next
        Subrs is found
      */
-#define POST_SUBRS_SCAN     5
+
+#define POST_SUBRS_SCAN  5
+
     s = 0;
     *t1_buf_array = 0;
     for (i = 0; i < POST_SUBRS_SCAN; i++) {
@@ -1600,6 +1465,9 @@ static void t1_read_subrs()
         goto found;
     }
 }
+
+#define t1_subr_flush()  t1_flush_cs(true)
+#define t1_cs_flush()    t1_flush_cs(false)
 
 static void t1_flush_cs(boolean is_subr)
 {
@@ -1693,7 +1561,7 @@ static void t1_mark_glyphs(void)
     char *glyph;
     struct avl_traverser t;
     cs_entry *ptr;
-    if (t1_synthetic || embed_all_glyphs) {     /* mark everything */
+    if (t1_synthetic || fd_cur->all_glyphs) {   /* mark everything */
         if (cs_tab != NULL)
             for (ptr = cs_tab; ptr < cs_ptr; ptr++)
                 if (ptr->valid)
@@ -1815,32 +1683,3 @@ void t1_free()
     xfree(t1_line_array);
     xfree(t1_buf_array);
 }
-
-#ifndef pdfTeX
-boolean t1_subset(char *fontfile, char *encfile, unsigned char *g)
-{
-    int i;
-    cur_enc_name = encfile;
-    if (cur_enc_name != NULL)
-        load_enc_file(cur_enc_name, ext_glyph_names);
-    grid = g;
-    cur_file_name = fontfile;
-    hexline_length = 0;
-    writet1();
-    free_glyph_names(ext_glyph_names);
-    return 1;                   /* note:  there *is* no unsuccessful return */
-}
-
-boolean t1_subset_2(char *fontfile, unsigned char *g, char *extraGlyphs)
-{
-    int i;
-    for (i = 0; i < 256; i++)
-        ext_glyph_names[i] = (char *) notdef;
-    grid = g;
-    cur_file_name = fontfile;
-    hexline_length = 0;
-    writet1();
-    free_glyph_names(ext_glyph_names);
-    return 1;                   /* note:  there *is* no unsuccessful return */
-}
-#endif                          /* not pdfTeX */

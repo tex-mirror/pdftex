@@ -58,7 +58,8 @@ int main(int argc, char *argv[])
     int c;
     fprintf(stderr, "pdftosrc version %s\n", xpdfVersion);
     if (argc < 2) {
-        fprintf(stderr, "Usage: pdftosrc <PDF-file> [<stream-object-number>]\n");
+        fprintf(stderr,
+                "Usage: pdftosrc <PDF-file> [<stream-object-number>]\n");
         exit(1);
     }
     fileName = new GString(argv[1]);
@@ -96,8 +97,7 @@ int main(int argc, char *argv[])
         outname = srcName.getString()->getCString();
         // We cannot free srcName, as objname shares its string.
         // srcName.free();
-    }
-    else if (objnum > 0) {
+    } else if (objnum > 0) {
         xref->fetch(objnum, objgen, &srcStream);
         if (!srcStream.isStream()) {
             fprintf(stderr, "Not a Stream object\n");
@@ -111,8 +111,7 @@ int main(int argc, char *argv[])
         else
             sprintf(p, ".%i+%i", objnum, objgen);
         outname = buf;
-    }
-    else { // objnum < 0 means we are extracting the XRef table
+    } else {                    // objnum < 0 means we are extracting the XRef table
         extract_xref_table = true;
         sprintf(buf, "%s", fileName->getCString());
         if ((p = strrchr(buf, '.')) == 0)
@@ -136,30 +135,30 @@ int main(int argc, char *argv[])
         fprintf(outfile, "0 %i\n", size);
         for (i = 0; i < size; i++) {
             XRefEntry *e = xref->getEntry(i);
-            if (e->type != xrefEntryCompressed) 
-                fprintf(outfile, "%.10lu %.5i %s\n", 
+            if (e->type != xrefEntryCompressed)
+                fprintf(outfile, "%.10lu %.5i %s\n",
                         (long unsigned) e->offset, e->gen,
                         (e->type == xrefEntryFree ? "f" : "n"));
-            else {  // e->offset is the object number of the object stream
-                    // e->gen is the local index inside that object stream
+            else {              // e->offset is the object number of the object stream
+                // e->gen is the local index inside that object stream
                 //int objStrOffset = xref->getEntry(e->offset)->offset;
                 Object tmpObj;
 
-                xref->fetch(i, e->gen, &tmpObj);   // to ensure xref->objStr is set
+                xref->fetch(i, e->gen, &tmpObj);        // to ensure xref->objStr is set
                 ObjectStream *objStr = xref->getObjStr();
                 assert(objStr != NULL);
                 int *localOffsets = objStr->getOffsets();
                 assert(localOffsets != NULL);
-//                 fprintf(outfile, "%0.10lu %i n\n", 
+//                 fprintf(outfile, "%0.10lu %i n\n",
 //                         (long unsigned) (objStrOffset), e->gen);
-                fprintf(outfile, "%.10lu 00000 n\n", 
-                        (long unsigned) (objStr->getFirstOffset() + localOffsets[e->gen]));
+                fprintf(outfile, "%.10lu 00000 n\n",
+                        (long unsigned) (objStr->getFirstOffset() +
+                                         localOffsets[e->gen]));
 //                         (long unsigned) (objStrOffset + objStr->getStart() + localOffsets[e->gen]));
                 tmpObj.free();
             }
         }
-    }
-    else {
+    } else {
         s = srcStream.getStream();
         s->reset();
         while ((c = s->getChar()) != EOF)

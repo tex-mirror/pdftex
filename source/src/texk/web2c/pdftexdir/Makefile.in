@@ -15,7 +15,7 @@ CXX = @CXX@
 .cc.o:
 	$(CXX) $(ALL_CXXFLAGS) -c $<
 
-# XCFLAGS=-Wstrict-prototypes -Wmissing-prototypes 
+# XCFLAGS=-Wstrict-prototypes -Wmissing-prototypes
 
 LIBPNGDIR=../../../libs/libpng
 LIBPNGSRCDIR=$(srcdir)/$(LIBPNGDIR)

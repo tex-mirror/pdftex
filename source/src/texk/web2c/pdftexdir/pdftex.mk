@@ -22,9 +22,9 @@ $(pdftexdir)/pdftex.version: $(srcdir)/$(pdftexdir)/pdftex.web
 	grep '^@d pdftex_version_string==' $(srcdir)/$(pdftexdir)/pdftex.web \
 	  | sed "s/^.*'-//;s/'.*$$//" \
 	  >$(pdftexdir)/pdftex.version
-          
+
 # The C sources.
-pdftex_c = pdftexini.c pdftex0.c pdftex1.c pdftex2.c pdftex3.c 
+pdftex_c = pdftexini.c pdftex0.c pdftex1.c pdftex2.c pdftex3.c
 pdftex_o = pdftexini.o pdftex0.o pdftex1.o pdftex2.o pdftex3.o pdftexextra.o
 
 # Making pdftex
@@ -51,7 +51,7 @@ pdftex.p pdftex.pool: tangle $(srcdir)/$(pdftexdir)/pdftex.web pdftex.ch
 pdftex_ch_srcs = $(srcdir)/$(pdftexdir)/pdftex.web \
   $(srcdir)/$(pdftexdir)/tex.ch0 \
   $(srcdir)/tex.ch \
-  $(srcdir)/$(pdftexdir)/pdftex.ch 
+  $(srcdir)/$(pdftexdir)/pdftex.ch
 #   Rules:
 pdftex.ch: $(TIE) $(pdftex_ch_srcs)
 	$(TIE) -c pdftex.ch $(pdftex_ch_srcs)

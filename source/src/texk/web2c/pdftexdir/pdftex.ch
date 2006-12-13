@@ -86,10 +86,10 @@
 @z
 
 @x (MLTeX) l. 14640
-@d is_valid_char(#)==((font_bc[f] <= #) and (# <= font_ec[f]) and 
+@d is_valid_char(#)==((font_bc[f] <= #) and (# <= font_ec[f]) and
                       char_exists(char_info(f)(#)))
 @y
-@d is_valid_char(#)==((font_bc[f] <= #) and (# <= font_ec[f]) and 
+@d is_valid_char(#)==((font_bc[f] <= #) and (# <= font_ec[f]) and
                       char_exists(orig_char_info(f)(#)))
 @z
 
@@ -151,7 +151,7 @@ label reswitch, move_past, fin_rule, next_p, found, continue;
 @z
 
 @x (MLTeX) l. 17462
-  if is_valid_char(c) then 
+  if is_valid_char(c) then
       output_one_char(c)
   else
       char_warning(f, c);
@@ -214,7 +214,7 @@ found: @<Print character substition tracing log@>;
 @ The |pdf_vlist_out| routine is similar to |pdf_hlist_out|, but a bit simpler.
 @z
 
-@x [49.1259] 
+@x [49.1259]
     begin if s>0 then
       begin if s=font_size[f] then goto common_ending;
       end

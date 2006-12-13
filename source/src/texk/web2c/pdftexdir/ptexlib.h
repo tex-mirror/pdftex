@@ -242,7 +242,6 @@ extern void makepdftexbanner(void);
 extern void initstarttime();
 extern void removepdffile(void);
 extern void garbagewarning(void);
-extern void stripspaces(char *p);
 extern void initversionstring(char **versions);
 extern int newcolorstack(integer s, integer literal_mode, boolean pagestart);
 extern int colorstackused();

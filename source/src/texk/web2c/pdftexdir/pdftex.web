@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-rc1' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-rc2' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -1861,10 +1861,6 @@ amounts of user interaction:
 @d error_stop_mode=3 {stops at every opportunity to interact}
 @d print_err(#)==begin if interaction=error_stop_mode then wake_up_terminal;
   print_nl("! "); print(#);
-  end
-@d print_warn(#)==begin if interaction=error_stop_mode then wake_up_terminal;
-  if prepend_nl then begin print_nl(""); print_ln end;
-  print_nl(#);
   end
 
 @<Glob...@>=
@@ -8800,7 +8796,7 @@ case cur_cmd of
 top_bot_mark:@<Insert the \(a)appropriate mark text into the scanner@>;
 expand_after:if cur_chr=0 then @<Expand the token after the next token@>
   else @<Negate a boolean conditional and |goto reswitch|@>;
-no_expand: if cur_chr=0 then @<Suppress expansion of the next token@> 
+no_expand: if cur_chr=0 then @<Suppress expansion of the next token@>
   else @<Implement \.{\\pdfprimitive}@>;
 cs_name:@<Manufacture a control sequence name@>;
 convert:conv_toks; {this procedure is discussed in Part 27 below}
@@ -8838,7 +8834,7 @@ if t>=cs_token_flag then
   end;
 end
 
-@ The \.{\\pdfprimitive} handling. If the primitive meaning of the next 
+@ The \.{\\pdfprimitive} handling. If the primitive meaning of the next
 token is an expandable command, it suffices to replace the current
 token with the primitive one and restart |expand|/
 
@@ -8865,11 +8861,11 @@ if cur_cs<>undefined_primitive then begin
     cur_tok := (cur_cmd*@'400)+cur_chr;
     cur_cs  := 0;
     goto reswitch;
-    end 
+    end
   else begin
     back_input; { now |loc| and |start| point to a one-item list }
     p:=get_avail; info(p):=cs_token_flag+frozen_primitive;
-    link(p):=loc; loc:=p; start:=p; 
+    link(p):=loc; loc:=p; start:=p;
     end;
   end;
 end
@@ -10713,13 +10709,13 @@ convert: case chr_code of
 for |convert| functions into the scanner; `\.{\\outer}' control sequences
 are allowed to follow `\.{\\string}' and `\.{\\meaning}'.
 
-The extra temp string |u| is needed because |pdf_scan_ext_toks| incorporates 
+The extra temp string |u| is needed because |pdf_scan_ext_toks| incorporates
 any pending string in its output. In order to save such a pending string,
 we have to create a temporary string that is destroyed immediately after.
 
 @d save_cur_string==if str_start[str_ptr]<pool_ptr then u:=make_string
 @d restore_cur_string==if u<>0 then begin decr(str_ptr); u:=0; end
- 
+
 @p procedure conv_toks;
 label exit;
 var old_setting:0..max_selector; {holds |selector| setting}
@@ -10735,8 +10731,8 @@ p, q: pointer;
 @!s: str_number; {first temp string}
 @!t: str_number; {second temp string}
 @!u: str_number; {saved current string string}
-begin 
-c:=cur_chr; 
+begin
+c:=cur_chr;
 u:=0; { will become non-nil if a string is already being built}
 @<Scan the argument for command |c|@>;
 old_setting:=selector; selector:=new_string; b:=pool_ptr;
@@ -10815,7 +10811,7 @@ pdf_escape_name_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
-    restore_cur_string; 
+    restore_cur_string;
     return;
   end;
 pdf_escape_hex_code:
@@ -10835,7 +10831,7 @@ pdf_escape_hex_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
-    restore_cur_string; 
+    restore_cur_string;
     return;
   end;
 pdf_unescape_hex_code:
@@ -10855,7 +10851,7 @@ pdf_unescape_hex_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
-    restore_cur_string; 
+    restore_cur_string;
     return;
   end;
 pdf_creation_date_code:
@@ -10883,7 +10879,7 @@ pdf_file_mod_date_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
-    restore_cur_string; 
+    restore_cur_string;
     return;
   end;
 pdf_file_size_code:
@@ -10903,7 +10899,7 @@ pdf_file_size_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
-    restore_cur_string; 
+    restore_cur_string;
     return;
   end;
 pdf_mdfive_sum_code:
@@ -10924,7 +10920,7 @@ pdf_mdfive_sum_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
-    restore_cur_string; 
+    restore_cur_string;
     return;
   end;
 pdf_file_dump_code:
@@ -10973,7 +10969,7 @@ pdf_file_dump_code:
     link(garbage) := str_toks(b);
     flush_str(s);
     ins_list(link(temp_head));
-    restore_cur_string; 
+    restore_cur_string;
     return;
   end;
 pdf_match_code:
@@ -11005,7 +11001,7 @@ pdf_match_code:
     flush_str(t);
     flush_str(s);
     ins_list(link(temp_head));
-    restore_cur_string; 
+    restore_cur_string;
     return;
   end;
 pdf_last_match_code:
@@ -11035,7 +11031,7 @@ pdf_strcmp_code:
     def_ref := save_def_ref;
     warning_index := save_warning_index;
     scanner_status := save_scanner_status;
-    restore_cur_string; 
+    restore_cur_string;
   end;
 pdf_colorstack_init_code:
   begin
@@ -11067,7 +11063,7 @@ pdf_colorstack_init_code:
         ("I'll use the default color stack 0 here.");
         error;
         cur_val := 0;
-    restore_cur_string; 
+    restore_cur_string;
     end;
   end;
 job_name_code: if job_name=0 then open_log_file;
@@ -15294,7 +15290,11 @@ end;
 
 procedure pdf_warning(t, p: str_number; prepend_nl, append_nl: boolean);
 begin
-    print_warn("pdfTeX warning");
+    if interaction = error_stop_mode then
+        wake_up_terminal;
+    if prepend_nl then
+        print_ln;
+    print("pdfTeX warning");
     if t <> 0 then begin
         print(" (");
         print(t);
@@ -15302,7 +15302,6 @@ begin
     end;
     print(": "); print(p);
     if append_nl then
-        print_ln;
         print_ln;
 end;
 
@@ -15551,7 +15550,7 @@ begin
         end
         else begin
             s := divide_scaled(round_xn_over_d(w, 1000, 1000 + pdf_cur_Tm_a),
-                               pdf_font_size[f], 
+                               pdf_font_size[f],
                                4);
             s_out := round_xn_over_d(round_xn_over_d(pdf_font_size[f], abs(s), 10000),
                                      1000 + pdf_cur_Tm_a, 1000);
@@ -15695,7 +15694,7 @@ begin
         pdf_new_Tm_a := 0
     else
         pdf_new_Tm_a := pdf_font_expand_ratio[f];
-    if (pdf_new_Tm_a <> 0) or 
+    if (pdf_new_Tm_a <> 0) or
         ((pdf_new_Tm_a = 0) and (pdf_cur_Tm_a <> 0)) then begin
         pdf_print_real(1000 + pdf_new_Tm_a, 3);
         pdf_print(" 0 0 1 ");
@@ -15768,10 +15767,10 @@ begin
         i := head_tab[obj_type_font];
         while i <> 0 do begin
             k := obj_info(i);
-            if hasfmentry(k) and 
+            if hasfmentry(k) and
                (pdf_font_map[k] = pdf_font_map[f]) and
-               (str_eq_str(font_name[k], font_name[f]) or 
-                (pdf_font_auto_expand[f] and 
+               (str_eq_str(font_name[k], font_name[f]) or
+                (pdf_font_auto_expand[f] and
                  (pdf_font_blink[f] <> null_font) and
                  str_eq_str(font_name[k], font_name[pdf_font_blink[f]]))) then
             begin
@@ -15857,16 +15856,16 @@ begin
         s_out := scaled_out;
     end
     else begin
-        s := divide_scaled(round_xn_over_d(cur_h - (pdf_tj_start_h + pdf_delta_h), 1000, 
+        s := divide_scaled(round_xn_over_d(cur_h - (pdf_tj_start_h + pdf_delta_h), 1000,
                                            1000 + pdf_cur_Tm_a),
-                           pdf_font_size[f], 
+                           pdf_font_size[f],
                            3);
         if abs(s) < @'100000 then begin
             s_out := round_xn_over_d(round_xn_over_d(pdf_font_size[f], abs(s), 1000),
                                      1000 + pdf_cur_Tm_a, 1000);
             if s < 0 then
                 s_out := -s_out;
-        end; 
+        end;
         {no need to calculate |s_out| when |abs(s) >= @'100000|, since the text
          matrix will be reset below}
     end;
@@ -16858,8 +16857,8 @@ begin
 
     c := non_char; {no char before interword glue yet}
     set_char_and_font(p) {set |f| and |c| if |p| is a char or ligature}
-    else if (type(p) = kern_node) and 
-            (subtype(p) = auto_kern) and 
+    else if (type(p) = kern_node) and
+            (subtype(p) = auto_kern) and
             (save_tail <> null) then
     begin
         r := save_tail;
@@ -16869,7 +16868,7 @@ begin
             set_char_and_font(r); {set |f| and |c| if |r| is a char or ligature}
     end;
     if (c = non_char) then
-        return; 
+        return;
 
     kn := get_kn_bs_code(f, c);
     st := get_st_bs_code(f, c);
@@ -16925,7 +16924,62 @@ begin
     expand_font_name := make_string;
 end;
 
-function auto_expand_font(f: internal_font_number; e: integer; copy_lig_kern: boolean): internal_font_number;
+function auto_expand_font(f: internal_font_number; e: integer): internal_font_number;
+{creates an expanded font from the base font; doesn't load expanded tfm at all}
+var k: internal_font_number;
+    nw, nk, ni, i: integer;
+begin
+    k := font_ptr + 1;
+    incr(font_ptr);
+    if (font_ptr >= font_max) then
+        overflow("maximum internal font number (font_max)", font_max);
+    font_name[k] := expand_font_name(f, e);
+    font_area[k] := font_area[f];
+    font_id_text(k) := font_id_text(f);
+    hyphen_char[k] := hyphen_char[f];
+    skew_char[k] := skew_char[f];
+    font_bchar[k] := font_bchar[f];
+    font_false_bchar[k] := font_false_bchar[f];
+    font_bc[k] := font_bc[f];
+    font_ec[k] := font_ec[f];
+    font_size[k] := font_size[f];
+    font_dsize[k] := font_dsize[f];
+    font_params[k] := font_params[f];
+    font_glue[k] := font_glue[f];
+    bchar_label[k] := bchar_label[f];
+
+    char_base[k] := char_base[f];
+    height_base[k] := height_base[f];
+    depth_base[k] := depth_base[f];
+    lig_kern_base[k] := lig_kern_base[f];
+    exten_base[k] := exten_base[f];
+    param_base[k] := param_base[f];
+
+    nw := height_base[f] - width_base[f];
+    ni := lig_kern_base[f] - italic_base[f];
+    nk := exten_base[f] - (kern_base[f] + kern_base_offset);
+    if (fmem_ptr + nw + ni + nk >= font_mem_size) then
+        overflow("number of words of font memory (font_mem_size)", font_mem_size);
+    width_base[k] := fmem_ptr;
+    italic_base[k] := width_base[k] + nw;
+    kern_base[k] := italic_base[k] + ni - kern_base_offset;
+    fmem_ptr := fmem_ptr + nw + ni + nk;
+
+    for i := 0 to nw - 1 do
+        font_info[width_base[k] + i].sc :=
+           round_xn_over_d(font_info[width_base[f] + i].sc, 1000 + e, 1000);
+    for i := 0 to ni - 1 do
+        font_info[italic_base[k] + i].sc :=
+           round_xn_over_d(font_info[italic_base[f] + i].sc, 1000 + e, 1000);
+    for i := 0 to nk - 1 do
+        font_info[kern_base[k] + kern_base_offset + i].sc :=
+           round_xn_over_d(font_info[kern_base[f] + kern_base_offset + i].sc, 1000 + e, 1000);
+
+    auto_expand_font := k;
+end;
+
+
+function auto_expand_font2(f: internal_font_number; e: integer; for_letter_spacing: boolean): internal_font_number;
 {creates an expanded font from the base font; doesn't load expanded tfm at all}
 var k: internal_font_number;
     nw, nk, ni, nl, i: integer;
@@ -16955,37 +17009,51 @@ begin
     exten_base[k] := exten_base[f];
     param_base[k] := param_base[f];
 
-    nw := height_base[f] - width_base[f];
-    ni := lig_kern_base[f] - italic_base[f];
-    nk := exten_base[f] - (kern_base[f] + kern_base_offset);
-    if (fmem_ptr + nw + ni + nk >= font_mem_size) then
-        overflow("number of words of font memory (font_mem_size)", font_mem_size);
-    width_base[k] := fmem_ptr;
-    italic_base[k] := width_base[k] + nw;
-    kern_base[k] := italic_base[k] + ni - kern_base_offset;
-    fmem_ptr := fmem_ptr + nw + ni + nk;
 
-    for i := 0 to nw - 1 do
-        font_info[width_base[k] + i].sc :=
-           round_xn_over_d(font_info[width_base[f] + i].sc, 1000 + e, 1000);
-    for i := 0 to ni - 1 do
-        font_info[italic_base[k] + i].sc :=
-           round_xn_over_d(font_info[italic_base[f] + i].sc, 1000 + e, 1000);
-    for i := 0 to nk - 1 do
-        font_info[kern_base[k] + kern_base_offset + i].sc :=
-           round_xn_over_d(font_info[kern_base[f] + kern_base_offset + i].sc, 1000 + e, 1000);
+    if for_letter_spacing then begin
+        {copy |lig_kern_base| so that |set_no_ligatures(k)| won't affect the base font;
+         expand |width_base|; share |italic_base| and |kern_base|}
 
-    if copy_lig_kern then begin
+        italic_base[k] := italic_base[f];
+        kern_base[k] := kern_base[f];
+
+        nw := height_base[f] - width_base[f];
         nl := kern_base[f] + kern_base_offset - lig_kern_base[f];
-        if (fmem_ptr + nl >= font_mem_size) then
+        if (fmem_ptr + nw + nl >= font_mem_size) then
             overflow("number of words of font memory (font_mem_size)", font_mem_size);
-        fmem_ptr := fmem_ptr + nl;
-        lig_kern_base[k] := fmem_ptr;
+        width_base[k] := fmem_ptr;
+        lig_kern_base[k] := width_base[k] + nw;
+        fmem_ptr := fmem_ptr + nw + nl;
+        for i := 0 to nw - 1 do
+            font_info[width_base[k] + i].sc :=
+                font_info[width_base[f] + i].sc + round_xn_over_d(quad(f), e, 1000);
         for i := 0 to nl - 1 do
             font_info[lig_kern_base[k] + i] := font_info[lig_kern_base[f] + i];
     end
-    else
+    else begin
+        {expand |width_base|, |italic_base| and |kern_base|; share |lig_kern_base|}
+
         lig_kern_base[k] := lig_kern_base[f];
+
+        nw := height_base[f] - width_base[f];
+        ni := lig_kern_base[f] - italic_base[f];
+        nk := exten_base[f] - (kern_base[f] + kern_base_offset);
+        if (fmem_ptr + nw + ni + nk >= font_mem_size) then
+            overflow("number of words of font memory (font_mem_size)", font_mem_size);
+        width_base[k] := fmem_ptr;
+        italic_base[k] := width_base[k] + nw;
+        kern_base[k] := italic_base[k] + ni - kern_base_offset;
+        fmem_ptr := fmem_ptr + nw + ni + nk;
+        for i := 0 to nw - 1 do
+            font_info[width_base[k] + i].sc :=
+               round_xn_over_d(font_info[width_base[f] + i].sc, 1000 + e, 1000);
+        for i := 0 to ni - 1 do
+            font_info[italic_base[k] + i].sc :=
+               round_xn_over_d(font_info[italic_base[f] + i].sc, 1000 + e, 1000);
+        for i := 0 to nk - 1 do
+            font_info[kern_base[k] + kern_base_offset + i].sc :=
+               round_xn_over_d(font_info[kern_base[f] + kern_base_offset + i].sc, 1000 + e, 1000);
+    end;
 
     auto_expand_font := k;
 end;
@@ -17059,7 +17127,7 @@ begin
     k := tfm_lookup(s, font_size[f]);
     if k = null_font then begin
         if pdf_font_auto_expand[f] then
-            k := auto_expand_font(f, e, false)
+            k := auto_expand_font(f, e)
         else
             k := read_font_info(null_cs, s, "", font_size[f]);
     end;
@@ -17092,9 +17160,9 @@ begin
         lf := vf_default_font[bf] + k;
         allocvffnts;
         {copy vf local font numbers:}
-        vf_e_fnts[vf_nf] := vf_e_fnts[lf]; 
+        vf_e_fnts[vf_nf] := vf_e_fnts[lf];
         {definition of local vf fonts are expanded from base fonts:}
-        vf_i_fnts[vf_nf] := auto_expand_font(vf_i_fnts[lf], e, false); 
+        vf_i_fnts[vf_nf] := auto_expand_font(vf_i_fnts[lf], e);
         copy_expand_params(vf_i_fnts[vf_nf], vf_i_fnts[lf], e);
         incr(vf_nf);
     end;
@@ -17192,7 +17260,7 @@ begin
     for k := 0 to vf_local_font_num[f] - 1 do begin
         lf := vf_i_fnts[vf_default_font[f] + k];
         set_expand_params(lf, pdf_font_auto_expand[f],
-                          pdf_font_expand_ratio[pdf_font_stretch[f]], 
+                          pdf_font_expand_ratio[pdf_font_stretch[f]],
                           pdf_font_expand_ratio[pdf_font_shrink[f]],
                           pdf_font_step[f], pdf_font_expand_ratio[f]);
         if pdf_font_type[lf] = virtual_font_type then
@@ -17210,6 +17278,8 @@ begin
     f := cur_val;
     if f = null_font then
         pdf_error("font expansion", "invalid font identifier");
+    if pdf_font_blink[f] <> null_font then
+        pdf_error("font expansion", "\pdffontexpand cannot be used this way (the base font has been expanded or letter-spaced)");
     scan_optional_equals;
     scan_int;
     font_stretch := fix_int(cur_val, 0, 1000);
@@ -17260,24 +17330,35 @@ begin
     end;
 end;
 
-function letter_space_font(f: internal_font_number; e: integer): internal_font_number;
+function letter_space_font(u: pointer; f: internal_font_number; e: integer): internal_font_number;
 var k: internal_font_number;
     w, r, fs: scaled;
-    s, extra_kern_cmd: str_number;
-    negative: boolean;
-    i: integer;
+    s: str_number;
+    i, nw: integer;
+    old_setting:0..max_selector;
 begin
-    k := auto_expand_font(f, e, true);
-    set_no_ligatures(k);
+    {read a new font and expand the character widths}
+    k := read_font_info(u, font_name[f], "", font_size[f]);
+    set_no_ligatures(k); {disable ligatures for letter-spaced fonts}
+    nw := height_base[k] - width_base[k];
+    for i := 0 to nw - 1 do
+        font_info[width_base[k] + i].sc :=
+            font_info[width_base[k] + i].sc + round_xn_over_d(quad(k), e, 1000);
 
-    {append 'ls' to |font_name[k]| so this font doesn't get interfered with font expansion}
-    str_room(length(font_name[k]) + 2);
-    for i := 0 to length(font_name[k]) - 1 do
-        append_char(str_pool[str_start[font_name[k]] + i]);
-    append_char('l');
-    append_char('s');
+    {append eg '+100ls' to font name}
+    flush_str(font_name[k]);
+    str_room(length(font_name[k]) + 7); {|abs(e) <= 1000|}
+    old_setting := selector;
+    selector := new_string;
+    print(font_name[k]);
+    if e > 0 then
+        print("+"); {minus sign will be printed by |print_int|}
+    print_int(e);
+    print("ls");
+    selector := old_setting;
     font_name[k] := make_string;
 
+    {create the corresponding virtual font}
     allocvffnts;
     vf_e_fnts[vf_nf] := 0;
     vf_i_fnts[vf_nf] := f;
@@ -17289,13 +17370,10 @@ begin
     fs := font_size[f];
     vf_z := fs;
     vf_replace_z;
-    w := round_xn_over_d(quad(f), e, 1000);
-    if w > 0 then begin
-        negative := false;
-        tmp_b0 := 0;
-    end
+    w := round_xn_over_d(quad(f), e, 2000);
+    if w > 0 then
+        tmp_b0 := 0
     else begin
-        negative := true;
         tmp_b0 := 255;
         w := vf_alpha + w;
     end;
@@ -17315,27 +17393,25 @@ begin
         r := r * 256;
         tmp_b3 := r div vf_z;
     end;
-    str_room(5);
-    append_char(right1 + 3);
-    append_char(tmp_b0);
-    append_char(tmp_b1);
-    append_char(tmp_b2);
-    append_char(tmp_b3);
-    extra_kern_cmd := make_string;
     vf_packet_base[k] := new_vf_packet(k);
-
     for c := font_bc[k] to font_ec[k] do begin
         str_room(12);
-        for i := 0 to length(extra_kern_cmd) - 1 do
-            append_char(str_pool[str_start[extra_kern_cmd] + i]);
+        append_char(right1 + 3);
+        append_char(tmp_b0);
+        append_char(tmp_b1);
+        append_char(tmp_b2);
+        append_char(tmp_b3);
         if c < set1 then
             append_char(c)
         else begin
             append_char(set1);
             append_char(c);
         end;
-        for i := 0 to length(extra_kern_cmd) - 1 do
-            append_char(str_pool[str_start[extra_kern_cmd] + i]);
+        append_char(right1 + 3);
+        append_char(tmp_b0);
+        append_char(tmp_b1);
+        append_char(tmp_b2);
+        append_char(tmp_b3);
         s := make_string;
         storepacket(k, c, s);
         flush_str(s);
@@ -17349,7 +17425,6 @@ var u:pointer; {user's font identifier}
 @!t:str_number; {name for the frozen font identifier}
 @!old_setting:0..max_selector; {holds |selector| setting}
 @!f, k:internal_font_number;
-@!e: integer;
 begin
     get_r_token; u:=cur_cs;
     if u>=hash_base then t:=text(u)
@@ -17361,15 +17436,9 @@ begin
       str_room(1); t:=make_string;
       end;
     define(u,set_font,null_font); scan_optional_equals; scan_font_ident;
-
     k := cur_val;
     scan_int;
-    e := fix_int(cur_val, -1000, 1000);
-    if e = 0 then
-        f := k
-    else
-        f := letter_space_font(k, e);
-
+    f := letter_space_font(u, k, fix_int(cur_val, -1000, 1000));
     equiv(u):=f; eqtb[font_id_base+f]:=eqtb[u]; font_id_text(f):=t;
 end;
 
@@ -17537,7 +17606,7 @@ begin
     end;
     if (pdf_font_step[f] <> 0) then
         set_expand_params(k, pdf_font_auto_expand[f],
-                          pdf_font_expand_ratio[pdf_font_stretch[f]], 
+                          pdf_font_expand_ratio[pdf_font_stretch[f]],
                           pdf_font_expand_ratio[pdf_font_shrink[f]],
                           pdf_font_step[f], pdf_font_expand_ratio[f]);
     vf_def_font := k;
@@ -33288,7 +33357,7 @@ begin
         ("    set, push, pop, current")@/
         ("I'll ignore the color stack command.");
         error;
-    end 
+    end
 end
 
 @ @<Implement \.{\\pdfsetmatrix}@>=
@@ -35360,8 +35429,8 @@ begin
     if pdf_link_stack_top.nesting_level <> cur_s then
         pdf_error("ext4", "\pdfendlink ended up in different nesting level than \pdfstartlink");
 
-    {N.B.: test for running link must be done on |link_node| and not |ref_link_node|, 
-    as |ref_link_node| can be set by |do_link| or |append_link| already}
+    {N.B.: test for running link must be done on |link_node| and not |ref_link_node|,
+     as |ref_link_node| can be set by |do_link| or |append_link| already}
 
     if is_running(pdf_width(pdf_link_stack_top.link_node)) then begin
         p := pdf_link_stack_top.ref_link_node;

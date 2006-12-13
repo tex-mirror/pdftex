@@ -1,6 +1,6 @@
 How change files are applied for pdftex/pdfetex?
 
-============================= pdftex ============================= 
+============================= pdftex =============================
 
 2) pdftex.ch is generated from
     ./tie -c pdftex.ch pdftex.web \
@@ -10,7 +10,7 @@ How change files are applied for pdftex/pdfetex?
     $(srcdir)/pdftexdir/tex.pch
 
 Input:
-    pdftex.web: 
+    pdftex.web:
         pdftex without system-dependent changes
 
     pdftexdir/tex.ch0:
@@ -20,7 +20,7 @@ Input:
 
         change the pdftex banner to tex banner, so tex.ch can be applied
 
-    tex.ch: 
+    tex.ch:
         the main web2c-specific (or other system-dependent) change file
 
     pdftexdir/pdftex.ch:
