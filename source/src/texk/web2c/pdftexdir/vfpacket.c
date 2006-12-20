@@ -29,7 +29,7 @@ typedef struct {
 } packet_entry;
 
 /* define packet_ptr, packet_array & packet_limit */
-define_array (packet);
+define_array(packet);
 
 typedef struct {
     char **data;
@@ -38,16 +38,16 @@ typedef struct {
 } vf_entry;
 
 /* define vf_ptr, vf_array & vf_limit */
-define_array (vf);
+define_array(vf);
 
 static char *packet_data_ptr;
 
-integer newvfpacket (internalfontnumber f)
+integer newvfpacket(internalfontnumber f)
 {
     int i, n = fontec[f] - fontbc[f] + 1;
-    alloc_array (vf, 1, SMALL_ARRAY_SIZE);
-    vf_ptr->len = xtalloc (n, int);
-    vf_ptr->data = xtalloc (n, char *);
+    alloc_array(vf, 1, SMALL_ARRAY_SIZE);
+    vf_ptr->len = xtalloc(n, int);
+    vf_ptr->data = xtalloc(n, char *);
     for (i = 0; i < n; i++) {
         vf_ptr->data[i] = NULL;
         vf_ptr->len[i] = 0;
@@ -56,60 +56,60 @@ integer newvfpacket (internalfontnumber f)
     return vf_ptr++ - vf_array;
 }
 
-void storepacket (integer f, integer c, integer s)
+void storepacket(integer f, integer c, integer s)
 {
     int l = strstart[s + 1] - strstart[s];
     vf_array[vfpacketbase[f]].len[c - fontbc[f]] = l;
-    vf_array[vfpacketbase[f]].data[c - fontbc[f]] = xtalloc (l, char);
-    memcpy ((void *) vf_array[vfpacketbase[f]].data[c - fontbc[f]],
-            (void *) (strpool + strstart[s]), (unsigned) l);
+    vf_array[vfpacketbase[f]].data[c - fontbc[f]] = xtalloc(l, char);
+    memcpy((void *) vf_array[vfpacketbase[f]].data[c - fontbc[f]],
+           (void *) (strpool + strstart[s]), (unsigned) l);
 }
 
-void pushpacketstate ()
+void pushpacketstate()
 {
-    alloc_array (packet, 1, SMALL_ARRAY_SIZE);
+    alloc_array(packet, 1, SMALL_ARRAY_SIZE);
     packet_ptr->font = f;
     packet_ptr->dataptr = packet_data_ptr;
     packet_ptr->len = vfpacketlength;
     packet_ptr++;
 }
 
-void poppacketstate ()
+void poppacketstate()
 {
     if (packet_ptr == packet_array)
-        pdftex_fail ("packet stack empty, impossible to pop");
+        pdftex_fail("packet stack empty, impossible to pop");
     packet_ptr--;
     f = packet_ptr->font;
     packet_data_ptr = packet_ptr->dataptr;
     vfpacketlength = packet_ptr->len;
 }
 
-void startpacket (internalfontnumber f, integer c)
+void startpacket(internalfontnumber f, integer c)
 {
     packet_data_ptr = vf_array[vfpacketbase[f]].data[c - fontbc[f]];
     vfpacketlength = vf_array[vfpacketbase[f]].len[c - fontbc[f]];
 }
 
-eightbits packetbyte ()
+eightbits packetbyte()
 {
     vfpacketlength--;
     return *packet_data_ptr++;
 }
 
-void vf_free (void)
+void vf_free(void)
 {
     vf_entry *v;
     int n;
     char **p;
     if (vf_array != NULL) {
         for (v = vf_array; v < vf_ptr; v++) {
-            xfree (v->len);
-            n = fontec[v->font] - fontec[v->font] + 1;
+            xfree(v->len);
+            n = fontec[v->font] - fontbc[v->font] + 1;
             for (p = v->data; p - v->data < n; p++)
-                xfree (*p);
-            xfree (v->data);
+                xfree(*p);
+            xfree(v->data);
         }
-        xfree (vf_array);
+        xfree(vf_array);
     }
-    xfree (packet_array);
+    xfree(packet_array);
 }

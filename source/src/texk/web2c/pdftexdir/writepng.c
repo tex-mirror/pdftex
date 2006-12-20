@@ -23,10 +23,6 @@ $Id: writepng.c,v 1.2 2006/01/06 22:35:43 hahe Exp hahe $
 #include "ptexlib.h"
 #include "image.h"
 
-/*@unused@*/
-static const char perforce_id[] =
-    "$Id: writepng.c,v 1.2 2006/01/06 22:35:43 hahe Exp hahe $";
-
 void read_png_info(integer img)
 {
     double gamma;

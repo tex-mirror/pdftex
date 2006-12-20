@@ -1,12 +1,12 @@
 % interface=english modes=letter,screen output=pdftex
 % vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.643 2006/09/28 16:59:40 oneiros Exp $
+% $Id: pdftex-t.tex,v 1.646 2006/12/20 15:06:50 oneiros Exp $
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
 
-\setvariables[pdftex][titlepagelines=65]
+\setvariables[pdftex][titlepagelines=56]
 
 %D We use a multi purpose style (using modes) that enable us
 %D to generate an A4, letter and screen version.
@@ -61,7 +61,7 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.643 2006/09/28 16:59:40 oneiros Exp $
+\rcsscan $Id: pdftex-t.tex,v 1.646 2006/12/20 15:06:50 oneiros Exp $
 
 \def\currentpdftex{1.40.0}
 
@@ -557,7 +557,7 @@
 \start
 
     \chardef\fontdigits=2
-    \switchtobodyfont[10pt,tt]
+    \switchtobodyfont[12pt,tt]
     \setupinterlinespace[line=\dimexpr((\paperheight-1cm)/\getvariable{pdftex}{titlepagelines})]
     \setuptyping[margin=,color=]
     \setuplayout[titlepage]
@@ -741,10 +741,10 @@ A~\PDF\ file consist of objects. These objects can be recognized by their
 number and keywords:
 
 \starttyping
-7 0 obj << /Type /Catalog /Pages 5 0 R >> endobj
+9 0 obj << /Type /Catalog /Pages 5 0 R >> endobj
 \stoptyping
 
-Here \typ{7 0 obj ... endobj} is the object capsule. The first number is
+Here \typ{9 0 obj ... endobj} is the object capsule. The first number is
 the object number. Later we will see that \PDFTEX\ gives access to this
 number. One can for instance create an object by using \type{\pdfobj} after
 which \type{\pdflastobj} returns the number. So
@@ -779,7 +779,7 @@ holds an \type{/Info} entry, which points to an object with a~bit more
 about the document. Just follow the thread:
 
 \startnarrower
-\type{/Root}     $\longrightarrow$ object~7 $\longrightarrow$
+\type{/Root}     $\longrightarrow$ object~9 $\longrightarrow$
 \type{/Pages}    $\longrightarrow$ object~5 $\longrightarrow$
 \type{/Kids}     $\longrightarrow$ object~2 $\longrightarrow$
 \type{/Contents} $\longrightarrow$ object~3
@@ -1806,7 +1806,7 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.643 2006/09/28 16:59:40 oneiros Exp $
+%%S $Id: pdftex-t.tex,v 1.646 2006/12/20 15:06:50 oneiros Exp $
 %%S NL
 %%S integer registers:
 
@@ -4663,16 +4663,16 @@ purposes (given that \PDFTEX\ and the fonts are set up properly).
 \section{GNU Free Documentation License}
 
 \startnotmode[screen]
-    \switchtobodyfont[7pt]
+    \switchtobodyfont[4.35pt] % squeeze everything on one page :-}
     \setuplayout[grid=yes]
-    \setupcolumns[n=3]
+    \setupcolumns[n=7]
 \stopnotmode
 
 \startmode[screen]
     \setupcolumns[n=2]
 \stopmode
 
-\startcolumns[tolerance=verytolerant,distance=12pt] \widowpenalty10000 \clubpenalty10000
+\startcolumns[tolerance=verytolerant,distance=10pt] \widowpenalty10000 \clubpenalty10000
 
 \startlines
 Version 1.2, November 2002

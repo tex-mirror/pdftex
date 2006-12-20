@@ -24,9 +24,6 @@ $Id: writezip.c,v 1.2 2006/01/14 20:35:43 hahe Exp $
 #include "zlib.h"
 #include <assert.h>
 
-static const char perforce_id[] =
-    "$Id: writezip.c,v 1.2 2006/01/14 20:35:43 hahe Exp $";
-
 #define ZIP_BUF_SIZE  32768
 
 #define check_err(f, fn)                                   \
@@ -36,17 +33,16 @@ static const char perforce_id[] =
 static char zipbuf[ZIP_BUF_SIZE];
 static z_stream c_stream;       /* compression stream */
 
-void writezip (boolean finish)
+void writezip(boolean finish)
 {
     int err;
-    assert (getpdfcompresslevel () > 0);
+    assert(getpdfcompresslevel() > 0);
     cur_file_name = NULL;
     if (pdfstreamlength == 0) {
         c_stream.zalloc = (alloc_func) 0;
         c_stream.zfree = (free_func) 0;
         c_stream.opaque = (voidpf) 0;
-        check_err (deflateInit (&c_stream, getpdfcompresslevel ()),
-                   "deflateInit");
+        check_err(deflateInit(&c_stream, getpdfcompresslevel()), "deflateInit");
         c_stream.next_out = (Bytef *) zipbuf;
         c_stream.avail_out = ZIP_BUF_SIZE;
     }
@@ -54,26 +50,26 @@ void writezip (boolean finish)
     c_stream.avail_in = pdfptr;
     for (;;) {
         if (c_stream.avail_out == 0) {
-            pdfgone += xfwrite (zipbuf, 1, ZIP_BUF_SIZE, pdffile);
+            pdfgone += xfwrite(zipbuf, 1, ZIP_BUF_SIZE, pdffile);
             pdflastbyte = zipbuf[ZIP_BUF_SIZE - 1];     /* not needed */
             c_stream.next_out = (Bytef *) zipbuf;
             c_stream.avail_out = ZIP_BUF_SIZE;
         }
-        err = deflate (&c_stream, finish ? Z_FINISH : Z_NO_FLUSH);
+        err = deflate(&c_stream, finish ? Z_FINISH : Z_NO_FLUSH);
         if (finish && err == Z_STREAM_END)
             break;
-        check_err (err, "deflate");
+        check_err(err, "deflate");
         if (!finish && c_stream.avail_in == 0)
             break;
     }
     if (finish) {
         if (c_stream.avail_out < ZIP_BUF_SIZE) {        /* at least one byte has been output */
             pdfgone +=
-                xfwrite (zipbuf, 1, ZIP_BUF_SIZE - c_stream.avail_out, pdffile);
+                xfwrite(zipbuf, 1, ZIP_BUF_SIZE - c_stream.avail_out, pdffile);
             pdflastbyte = zipbuf[ZIP_BUF_SIZE - c_stream.avail_out - 1];
         }
-        check_err (deflateEnd (&c_stream), "deflateEnd");
-        xfflush (pdffile);
+        check_err(deflateEnd(&c_stream), "deflateEnd");
+        xfflush(pdffile);
     }
     pdfstreamlength = c_stream.total_out;
 }

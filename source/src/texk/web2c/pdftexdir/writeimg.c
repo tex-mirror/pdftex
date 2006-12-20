@@ -25,9 +25,6 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#17 $
 #include <kpathsea/c-auto.h>
 #include <kpathsea/c-memstr.h>
 
-static const char perforce_id[] =
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writeimg.c#17 $";
-
 #define bp2int(p)    round(p*(onehundredbp/100.0))
 
 /* define image_ptr, image_array & image_limit */

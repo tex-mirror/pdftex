@@ -24,9 +24,6 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#16 $
 #include "writettf.h"
 #include <string.h>
 
-static const char perforce_id[] =
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/writettf.c#16 $";
-
 #define DEFAULT_NTABS       14
 #define NEW_CMAP_SIZE       2
 
@@ -1332,6 +1329,8 @@ void writettf(fd_entry * fd)
     fd_cur = fd;                /* fd_cur is global inside writettf.c */
     assert(fd_cur->fm != NULL);
     assert(is_truetype(fd_cur->fm));
+    assert(is_included(fd_cur->fm));
+
     set_cur_file_name(fd_cur->fm->ff_name);
     if (is_subsetted(fd_cur->fm) && (fd_cur->fe == NULL)
         && !is_subfont(fd_cur->fm)) {
@@ -1343,9 +1342,7 @@ void writettf(fd_entry * fd)
         pdftex_fail("cannot open TrueType font file for reading");
     }
     cur_file_name = (char *) nameoffile + 1;
-    if (!is_included(fd_cur->fm))
-        tex_printf("{%s", cur_file_name);
-    else if (is_subsetted(fd_cur->fm))
+    if (is_subsetted(fd_cur->fm))
         tex_printf("<%s", cur_file_name);
     else
         tex_printf("<<%s", cur_file_name);
@@ -1359,16 +1356,16 @@ void writettf(fd_entry * fd)
     name_tab = NULL;
     name_buf = NULL;
     ttf_read_font();
-    if (is_included(fd_cur->fm)) {
-        pdfsaveoffset = pdfoffset();
-        pdfflush();
-        if (is_subsetted(fd_cur->fm)) {
-            ttf_copy_encoding();
-            ttf_subset_font();
-        } else
-            ttf_copy_font();
-        ttf_length = ttf_offset();
-    }
+
+    pdfsaveoffset = pdfoffset();
+    pdfflush();
+    if (is_subsetted(fd_cur->fm)) {
+        ttf_copy_encoding();
+        ttf_subset_font();
+    } else
+        ttf_copy_font();
+    ttf_length = ttf_offset();
+
     xfree(dir_tab);
     xfree(glyph_tab);
     xfree(glyph_index);
@@ -1376,9 +1373,7 @@ void writettf(fd_entry * fd)
     xfree(name_tab);
     xfree(name_buf);
     ttf_close();
-    if (!is_included(fd_cur->fm))
-        tex_printf("}");
-    else if (is_subsetted(fd_cur->fm))
+    if (is_subsetted(fd_cur->fm))
         tex_printf(">");
     else
         tex_printf(">>");
@@ -1393,8 +1388,10 @@ void writeotf(fd_entry * fd)
     fd_cur = fd;                /* fd_cur is global inside writettf.c */
     assert(fd_cur->fm != NULL);
     assert(is_opentype(fd_cur->fm));
+    assert(is_included(fd_cur->fm));
+
     set_cur_file_name(fd_cur->fm->ff_name);
-    if (!is_included(fd_cur->fm) || is_subsetted(fd_cur->fm))
+    if (is_subsetted(fd_cur->fm))
         pdftex_fail("OTF fonts must be included entirely");
     if (!open_input(&ttf_file, kpse_type1_format, FOPEN_RBIN_MODE)) {
         pdftex_fail("cannot open OpenType font file for reading");

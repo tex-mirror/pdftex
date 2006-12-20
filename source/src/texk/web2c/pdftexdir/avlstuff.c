@@ -24,25 +24,22 @@ $Id: avlstuff.c,v 1.12 2005/07/11 20:27:39 hahe Exp hahe $
 #include <kpathsea/c-proto.h>
 #include "avl.h"
 
-static const char perforce_id[] =
-    "$Id: avlstuff.c,v 1.12 2005/07/11 20:27:39 hahe Exp hahe $";
-
 static struct avl_table *PdfObjTree[pdfobjtypemax + 1] =
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 /**********************************************************************/
 /* memory management functions for AVL */
 
-void *avl_xmalloc (struct libavl_allocator *allocator, size_t size)
+void *avl_xmalloc(struct libavl_allocator *allocator, size_t size)
 {
-    assert (allocator != NULL && size > 0);
-    return xmalloc (size);
+    assert(allocator != NULL && size > 0);
+    return xmalloc(size);
 }
 
-void avl_xfree (struct libavl_allocator *allocator, void *block)
+void avl_xfree(struct libavl_allocator *allocator, void *block)
 {
-    assert (allocator != NULL && block != NULL);
-    xfree (block);
+    assert(allocator != NULL && block != NULL);
+    xfree(block);
 }
 
 struct libavl_allocator avl_xallocator = {
@@ -53,15 +50,15 @@ struct libavl_allocator avl_xallocator = {
 /**********************************************************************/
 /* general AVL comparison functions */
 
-int comp_int_entry (const void *pa, const void *pb, void *p)
+int comp_int_entry(const void *pa, const void *pb, void *p)
 {
-    cmp_return (*(const int *) pa, *(const int *) pb);
+    cmp_return(*(const int *) pa, *(const int *) pb);
     return 0;
 }
 
-int comp_string_entry (const void *pa, const void *pb, void *p)
+int comp_string_entry(const void *pa, const void *pb, void *p)
 {
-    return strcmp ((const char *) pa, (const char *) pb);
+    return strcmp((const char *) pa, (const char *) pb);
 }
 
 /**********************************************************************/
@@ -75,7 +72,7 @@ typedef struct oentry_ {
 
 /* AVL sort oentry into avl_table[] */
 
-int compare_info (const void *pa, const void *pb, void *param)
+int compare_info(const void *pa, const void *pb, void *param)
 {
     integer a, b;
     int as, ae, bs, be, al, bl;
@@ -108,28 +105,28 @@ int compare_info (const void *pa, const void *pb, void *param)
     return 0;
 }
 
-void avlputobj (integer objptr, integer t)
+void avlputobj(integer objptr, integer t)
 {
     static void **pp;
     static oentry *oe;
 
     if (PdfObjTree[t] == NULL) {
-        PdfObjTree[t] = avl_create (compare_info, NULL, &avl_xallocator);
+        PdfObjTree[t] = avl_create(compare_info, NULL, &avl_xallocator);
         if (PdfObjTree[t] == NULL)
-            pdftex_fail ("avlstuff.c: avl_create() PdfObjTree failed");
+            pdftex_fail("avlstuff.c: avl_create() PdfObjTree failed");
     }
-    oe = xtalloc (1, oentry);
+    oe = xtalloc(1, oentry);
     oe->int0 = objtab[objptr].int0;
     oe->objptr = objptr;        /* allows to relocate objtab */
-    pp = avl_probe (PdfObjTree[t], oe);
+    pp = avl_probe(PdfObjTree[t], oe);
     if (pp == NULL)
-        pdftex_fail ("avlstuff.c: avl_probe() out of memory in insertion");
+        pdftex_fail("avlstuff.c: avl_probe() out of memory in insertion");
 }
 
 
 /* replacement for linear search pascal function "find_obj()" */
 
-integer avlfindobj (integer t, integer i, integer byname)
+integer avlfindobj(integer t, integer i, integer byname)
 {
     static oentry *p;
     static oentry tmp;
@@ -140,7 +137,7 @@ integer avlfindobj (integer t, integer i, integer byname)
         tmp.int0 = i;
     if (PdfObjTree[t] == NULL)
         return 0;
-    p = (oentry *) avl_find (PdfObjTree[t], &tmp);
+    p = (oentry *) avl_find(PdfObjTree[t], &tmp);
     if (p == NULL)
         return 0;
     return p->objptr;
@@ -155,27 +152,22 @@ typedef struct {
     internalfontnumber fontnum;
 } mf_entry;
 
-static int comp_mf_entry (const void *pa, const void *pb, void *p)
-{
-    return strcmp (((const mf_entry *) pa)->tfm_name,
-                   ((const mf_entry *) pb)->tfm_name);
-}
 /**********************************************************************/
 /* cleaning up... */
 
-static void destroy_oentry (void *pa, void *pb)
+static void destroy_oentry(void *pa, void *pb)
 {
     oentry *p = (oentry *) pa;
-    xfree (p);
+    xfree(p);
 }
 
-void PdfObjTree_free ()
+void PdfObjTree_free()
 {
     int i;
 
     for (i = 0; i <= pdfobjtypemax; i++) {
         if (PdfObjTree[i] != NULL)
-            avl_destroy (PdfObjTree[i], destroy_oentry);
+            avl_destroy(PdfObjTree[i], destroy_oentry);
     }
 }
 

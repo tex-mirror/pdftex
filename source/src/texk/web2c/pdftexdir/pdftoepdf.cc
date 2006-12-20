@@ -230,19 +230,18 @@ static int addEncoding(GfxFont * gfont)
 }
 
 #define addFont(ref, fd, enc_objnum) \
-        addInObj(objFont, ref, fd, enc_objnum, 0)
+        addInObj(objFont, ref, fd, enc_objnum)
 
 // addFontDesc is only used to avoid writing the original FontDescriptor
 // from the PDF file.
 
-#define addFontDesc(ref) \
-        addInObj(objFontDesc, ref, NULL, 0, 0)
+#define addFontDesc(ref, fd) \
+        addInObj(objFontDesc, ref, fd, 0)
 
 #define addOther(ref) \
-        addInObj(objOther, ref, 0, 0, 0)
+        addInObj(objOther, ref, 0, 0)
 
-static int addInObj(InObjType type, Ref ref, fd_entry * fd, integer e,
-                    integer newobjnum)
+static int addInObj(InObjType type, Ref ref, fd_entry * fd, integer e)
 {
     InObj *p, *q, *n = new InObj;
     if (ref.num == 0)
@@ -268,7 +267,10 @@ static int addInObj(InObjType type, Ref ref, fd_entry * fd, integer e,
         // written out.
         q->next = n;
     }
-    n->num = (newobjnum == 0) ? pdfnewobjnum() : newobjnum;
+    if (type == objFontDesc)
+        n->num = get_fd_objnum(fd);
+    else
+        n->num = pdfnewobjnum();
     return n->num;
 }
 
@@ -398,7 +400,7 @@ static void copyFont(char *tag, Object * fontRef)
             epdf_mark_glyphs(fd, charset->getString()->getCString());
         else
             embed_whole_font(fd);
-        addFontDesc(fontdescRef->getRef());
+        addFontDesc(fontdescRef->getRef(), fd);
         copyName(tag);
         gfont = GfxFont::makeFont(xref, tag, fontRef->getRef(),
                                   fontdict->getDict());

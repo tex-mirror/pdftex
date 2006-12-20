@@ -548,10 +548,9 @@ static void t1_check_block_len(boolean decrypt)
 static void t1_start_eexec(void)
 {
     int i;
-    if (is_included(fd_cur->fm)) {
-        get_length1();
-        save_offset();
-    }
+    assert(is_included(fd_cur->fm));
+    get_length1();
+    save_offset();
     if (!t1_pfa)
         t1_check_block_len(false);
     for (t1_line_ptr = t1_line_array, i = 0; i < 4; i++) {
@@ -559,17 +558,15 @@ static void t1_start_eexec(void)
         *t1_line_ptr++ = 0;
     }
     t1_eexec_encrypt = true;
-    if (is_included(fd_cur->fm))
-        t1_putline();           /* to put the first four bytes */
+    t1_putline();           /* to put the first four bytes */
 }
 
 static void t1_stop_eexec(void)
 {
     int c;
-    if (is_included(fd_cur->fm)) {
-        get_length2();
-        save_offset();
-    }
+    assert(is_included(fd_cur->fm));
+    get_length2();
+    save_offset();
     t1_eexec_encrypt = false;
     if (!t1_pfa)
         t1_check_block_len(true);
@@ -738,7 +735,8 @@ static void t1_scan_keys(void)
         /* at this moment we cannot call make_subset_tag() yet, as the encoding
          * is not read; thus we mark the offset of the subset tag and write it
          * later */
-        if (is_included(fd_cur->fm) && is_subsetted(fd_cur->fm)) {
+        if (is_subsetted(fd_cur->fm)) {
+            assert(is_included(fd_cur->fm));
             t1_fontname_offset = t1_offset() + (r - t1_line_array);
             strcpy(t1_buf_array, p);
             sprintf(r, "ABCDEF+%s%s", fd_cur->fontname, t1_buf_array);
@@ -933,21 +931,6 @@ static boolean t1_open_fontfile(const char *open_name_prefix)
     }
     t1_init_params(open_name_prefix);
     return true;                /* font file found */
-}
-
-static void t1_scan_only(void)
-{
-    do {
-        t1_getline();
-        t1_scan_param();
-    }
-    while (t1_in_eexec == 0);
-    t1_start_eexec();
-    do {
-        t1_getline();
-        t1_scan_param();
-    }
-    while (!(t1_charstrings() || t1_subrs()));
 }
 
 static void t1_include(void)
@@ -1322,7 +1305,8 @@ static void t1_subset_ascii_part(void)
     }
     glyph_names = t1_builtin_enc();
     fd_cur->builtin_glyph_names = glyph_names;
-    if (is_included(fd_cur->fm) && is_subsetted(fd_cur->fm)) {
+    if (is_subsetted(fd_cur->fm)) {
+        assert(is_included(fd_cur->fm));
         if (fd_cur->tx_tree != NULL) {
             /* take over collected non-reencoded characters from TeX */
             avl_t_init(&t, fd_cur->tx_tree);
@@ -1650,14 +1634,9 @@ void writet1(fd_entry * fd)
     fd_cur = fd;                /* fd_cur is global inside writet1.c */
     assert(fd_cur->fm != NULL);
     assert(is_type1(fd->fm));
+    assert(is_included(fd->fm));
+
     t1_save_offset = 0;
-    if (!is_included(fd_cur->fm)) {     /* scan parameters from font file */
-        if (!(fd->ff_found = t1_open_fontfile("{")))
-            return;
-        t1_scan_only();
-        t1_close_font_file("}");
-        return;
-    }
     if (!is_subsetted(fd_cur->fm)) {    /* include entire font */
         if (!(fd->ff_found = t1_open_fontfile("<<")))
             return;

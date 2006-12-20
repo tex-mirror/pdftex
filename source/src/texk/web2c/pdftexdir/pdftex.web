@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.0-rc2' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.0-rc3' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -16974,86 +16974,6 @@ begin
     for i := 0 to nk - 1 do
         font_info[kern_base[k] + kern_base_offset + i].sc :=
            round_xn_over_d(font_info[kern_base[f] + kern_base_offset + i].sc, 1000 + e, 1000);
-
-    auto_expand_font := k;
-end;
-
-
-function auto_expand_font2(f: internal_font_number; e: integer; for_letter_spacing: boolean): internal_font_number;
-{creates an expanded font from the base font; doesn't load expanded tfm at all}
-var k: internal_font_number;
-    nw, nk, ni, nl, i: integer;
-begin
-    k := font_ptr + 1;
-    incr(font_ptr);
-    if (font_ptr >= font_max) then
-        overflow("maximum internal font number (font_max)", font_max);
-    font_name[k] := expand_font_name(f, e);
-    font_area[k] := font_area[f];
-    font_id_text(k) := font_id_text(f);
-    hyphen_char[k] := hyphen_char[f];
-    skew_char[k] := skew_char[f];
-    font_bchar[k] := font_bchar[f];
-    font_false_bchar[k] := font_false_bchar[f];
-    font_bc[k] := font_bc[f];
-    font_ec[k] := font_ec[f];
-    font_size[k] := font_size[f];
-    font_dsize[k] := font_dsize[f];
-    font_params[k] := font_params[f];
-    font_glue[k] := font_glue[f];
-    bchar_label[k] := bchar_label[f];
-
-    char_base[k] := char_base[f];
-    height_base[k] := height_base[f];
-    depth_base[k] := depth_base[f];
-    exten_base[k] := exten_base[f];
-    param_base[k] := param_base[f];
-
-
-    if for_letter_spacing then begin
-        {copy |lig_kern_base| so that |set_no_ligatures(k)| won't affect the base font;
-         expand |width_base|; share |italic_base| and |kern_base|}
-
-        italic_base[k] := italic_base[f];
-        kern_base[k] := kern_base[f];
-
-        nw := height_base[f] - width_base[f];
-        nl := kern_base[f] + kern_base_offset - lig_kern_base[f];
-        if (fmem_ptr + nw + nl >= font_mem_size) then
-            overflow("number of words of font memory (font_mem_size)", font_mem_size);
-        width_base[k] := fmem_ptr;
-        lig_kern_base[k] := width_base[k] + nw;
-        fmem_ptr := fmem_ptr + nw + nl;
-        for i := 0 to nw - 1 do
-            font_info[width_base[k] + i].sc :=
-                font_info[width_base[f] + i].sc + round_xn_over_d(quad(f), e, 1000);
-        for i := 0 to nl - 1 do
-            font_info[lig_kern_base[k] + i] := font_info[lig_kern_base[f] + i];
-    end
-    else begin
-        {expand |width_base|, |italic_base| and |kern_base|; share |lig_kern_base|}
-
-        lig_kern_base[k] := lig_kern_base[f];
-
-        nw := height_base[f] - width_base[f];
-        ni := lig_kern_base[f] - italic_base[f];
-        nk := exten_base[f] - (kern_base[f] + kern_base_offset);
-        if (fmem_ptr + nw + ni + nk >= font_mem_size) then
-            overflow("number of words of font memory (font_mem_size)", font_mem_size);
-        width_base[k] := fmem_ptr;
-        italic_base[k] := width_base[k] + nw;
-        kern_base[k] := italic_base[k] + ni - kern_base_offset;
-        fmem_ptr := fmem_ptr + nw + ni + nk;
-        for i := 0 to nw - 1 do
-            font_info[width_base[k] + i].sc :=
-               round_xn_over_d(font_info[width_base[f] + i].sc, 1000 + e, 1000);
-        for i := 0 to ni - 1 do
-            font_info[italic_base[k] + i].sc :=
-               round_xn_over_d(font_info[italic_base[f] + i].sc, 1000 + e, 1000);
-        for i := 0 to nk - 1 do
-            font_info[kern_base[k] + kern_base_offset + i].sc :=
-               round_xn_over_d(font_info[kern_base[f] + kern_base_offset + i].sc, 1000 + e, 1000);
-    end;
 
     auto_expand_font := k;
 end;

@@ -194,9 +194,6 @@ size_t          T##_limit
 #  define is_opentype(fm)     (((fm)->type & F_OTF) != 0)
 #  define is_subfont(fm)      (((fm)->type & F_SUBFONT) != 0)
 
-#  define unset_fontfile(fm)  xfree((fm)->ff_name)
-#  define has_fontdesc(fm)    (!is_std_t1font(fm) || is_included(fm))
-
 #  define fm_slant(fm)        (fm)->slant
 #  define fm_extend(fm)       (fm)->extend
 #  define fm_fontfile(fm)     (fm)->ff_name
@@ -204,6 +201,7 @@ size_t          T##_limit
 #  define is_reencoded(fm)    ((fm)->encname != NULL)
 #  define is_fontfile(fm)     (fm_fontfile(fm) != NULL)
 #  define is_t1fontfile(fm)   (is_fontfile(fm) && is_type1(fm))
+#  define is_builtin(fm)      (!is_fontfile(fm))
 
 #  define LINK_TFM            0x01
 #  define LINK_PS             0x02

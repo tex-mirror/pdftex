@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.85 2006/09/28 16:54:17 oneiros Exp $
+# $Id: Makefile,v 1.87 2006/12/18 21:32:21 hhenkel Exp $
 #
 # Makefile for pdfTeX documentation
 
@@ -48,14 +48,14 @@ pdftex-t.txt:	pdftex-w.pdf Makefile
 	cat $< \
 	| expand \
 	| sed -e '/\/Differences/s/\// \//g' \
-	| fmt -s -w43 \
+	| fmt -s -w36 \
 	| sed -e '/Differences/,/endobj/s/ //g' \
 	| grep . \
 	| expand \
 	| cat > $@
 
 pdftex-w.pdf:	pdftex-w.tex
-	pdfetex $<
+	pdftex $<
 
 pdftex-syntax.txt:	pdftex-t.tex syntaxform.awk
 	gawk -f syntaxform.awk $< > $@

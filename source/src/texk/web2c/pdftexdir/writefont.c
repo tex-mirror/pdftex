@@ -22,8 +22,6 @@ $Id: writefont.c,v 1.3 2005/12/27 19:04:42 hahe Exp $
 
 #include "ptexlib.h"
 
-static const char perforce_id[] =
-    "$Id: writefont.c,v 1.3 2005/12/27 19:04:42 hahe Exp $";
 /**********************************************************************/
 
 struct avl_table *fo_tree = NULL;       /* tree of font dictionaries */
@@ -39,8 +37,8 @@ static int comp_fd_entry(const void *pa, const void *pb, void *p)
 {
     int i;
     const fd_entry *p1 = (const fd_entry *) pa, *p2 = (const fd_entry *) pb;
-    assert(p1->fm != NULL && p1->fm->ff_name != NULL &&
-           p2->fm != NULL && p2->fm->ff_name != NULL);
+    assert(p1->fm != NULL && is_fontfile(p1->fm) &&
+           p2->fm != NULL && is_fontfile(p2->fm));
     if ((i = strcmp(p1->fm->ff_name, p2->fm->ff_name)) != 0)
         return i;
     cmp_return(p1->fm->slant, p2->fm->slant);
@@ -205,7 +203,7 @@ fd_entry *lookup_fontdescriptor(fo_entry * fo)
 {
     assert(fo != NULL);
     assert(fo->fm != NULL);
-    assert(fo->fm->ff_name != NULL);
+    assert(is_fontfile(fo->fm));
     return lookup_fd_entry(fo->fm->ff_name, fo->fm->slant, fo->fm->extend);
 }
 
@@ -216,7 +214,7 @@ void register_fd_entry(fd_entry * fd)
         fd_tree = avl_create(comp_fd_entry, NULL, &avl_xallocator);
         assert(fd_tree != NULL);
     }
-    assert(fd != NULL && fd->fm != NULL && fd->fm->ff_name != NULL);
+    assert(fd != NULL && fd->fm != NULL && is_fontfile(fd->fm));
     assert(lookup_fd_entry(fd->fm->ff_name, fd->fm->slant, fd->fm->extend) == NULL);    /* font descriptor not yet registered */
     aa = avl_probe(fd_tree, fd);
     assert(aa != NULL);
@@ -226,7 +224,6 @@ void create_fontdescriptor(fo_entry * fo, internalfontnumber f)
 {
     assert(fo != NULL);
     assert(fo->fm != NULL);
-    assert(fo->fm->ff_name != NULL);
     assert(fo->fd == NULL);
     fo->fd = new_fd_entry();
     preset_fontname(fo);
@@ -250,7 +247,8 @@ void mark_reenc_glyphs(fo_entry * fo, internalfontnumber f)
     char **g;
     void **aa;
     assert(fo->fe != NULL);
-    if (is_included(fo->fm) && is_subsetted(fo->fm)) {
+    if (is_subsetted(fo->fm)) {
+        assert(is_included(fo->fm));
         /* mark glyphs from TeX (externally reencoded characters) */
         g = fo->fe->glyph_names;
         for (i = fo->first_char; i <= fo->last_char; i++) {
@@ -383,6 +381,7 @@ void register_fo_entry(fo_entry * fo)
 
 static void write_fontfile(fd_entry * fd)
 {
+    assert(is_included(fd->fm));
     if (is_type1(fd->fm))
         writet1(fd);
     else if (is_truetype(fd->fm))
@@ -391,7 +390,7 @@ static void write_fontfile(fd_entry * fd)
         writeotf(fd);
     else
         assert(0);
-    if (!fd->ff_found || !is_included(fd->fm))
+    if (!fd->ff_found)
         return;
     assert(fd->ff_objnum == 0);
     fd->ff_objnum = pdfnewobjnum();
@@ -417,8 +416,9 @@ static void write_fontdescriptor(fd_entry * fd)
     char *glyph;
     struct avl_traverser t;
     assert(fd != NULL && fd->fm != NULL);
-    if (is_included(fd->fm))
-        write_fontfile(fd);
+
+    if (is_fontfile(fd->fm))
+        write_fontfile(fd); /* this will set fd->ff_found if font file is found */
     if (fd->fn_objnum != 0)
         write_fontname_object(fd);
     if (fd->fd_objnum == 0)
@@ -431,7 +431,7 @@ static void write_fontdescriptor(fd_entry * fd)
     else
         pdf_printf("/Flags %i\n", (int) fd->fm->fd_flags);
     write_fontmetrics(fd);
-    if (is_included(fd->fm) && fd->ff_found) {
+    if (fd->ff_found) {
         if (is_subsetted(fd->fm) && is_type1(fd->fm)) {
             /* /CharSet is optional; names may appear in any order */
             assert(fd->gl_tree != NULL);
@@ -494,22 +494,17 @@ void write_fontdictionary(fo_entry * fo)
         pdf_printf("%s\n", "Type1");
     else if (is_truetype(fo->fm))
         pdf_printf("%s\n", "TrueType");
+    else if (is_opentype(fo->fm))
+        pdf_printf("%s\n", "Type1");
     else
         assert(0);
-    if (fo->fd == NULL) {       /* no /FontDescriptor object */
-        if (fo->fm->ps_name != NULL)
-            pdf_printf("/BaseFont /%s\n", fo->fm->ps_name);
-        else
-            pdf_printf("/BaseFont /%s\n", fo->fm->tfm_name);
-    } else {
-        write_fontname(fo->fd, "BaseFont");
-        assert(fo->cw != NULL);
-        pdf_printf("/FirstChar %i\n/LastChar %i\n/Widths %i 0 R\n",
-                   (int) fo->first_char, (int) fo->last_char,
-                   (int) fo->cw->cw_objnum);
-        assert(fo->fd->fd_objnum != 0);
-        pdf_printf("/FontDescriptor %i 0 R\n", (int) fo->fd->fd_objnum);
-    }
+    assert(fo->fd != NULL && fo->fd->fd_objnum != 0);
+    write_fontname(fo->fd, "BaseFont");
+    pdf_printf("/FontDescriptor %i 0 R\n", (int) fo->fd->fd_objnum);
+    assert(fo->cw != NULL);
+    pdf_printf("/FirstChar %i\n/LastChar %i\n/Widths %i 0 R\n",
+               (int) fo->first_char, (int) fo->last_char,
+               (int) fo->cw->cw_objnum);
     if (fo->fe != NULL && fo->fe->fe_objnum != 0)
         pdf_printf("/Encoding %i 0 R\n", (int) fo->fe->fe_objnum);
     if (fo->tounicode_objnum != 0)
@@ -559,14 +554,14 @@ void create_fontdictionary(fm_entry * fm, integer font_objnum,
     fo->tex_font = f;
     if (is_reencoded(fo->fm)) {
         fo->fe = get_fe_entry(fo->fm->encname);
-        if (is_type1(fo->fm)) {
+        if (is_type1(fo->fm) || is_opentype(fo->fm)) {
             if (fo->fe->fe_objnum == 0)
                 fo->fe->fe_objnum = pdfnewobjnum();     /* then it will be written out */
             /* mark encoding pairs used by TeX to optimize encoding vector */
             fo->fe->tx_tree = mark_chars(fo, fo->fe->tx_tree, f);
         }
     }
-    if (has_fontdesc(fo->fm)) {
+    if (!is_builtin(fo->fm)) {
         if (is_type1(fo->fm)) {
             if ((fo->fd = lookup_fontdescriptor(fo)) == NULL) {
                 create_fontdescriptor(fo, f);
@@ -590,6 +585,19 @@ void create_fontdictionary(fm_entry * fm, integer font_objnum,
             fo->fd->tx_tree = mark_chars(fo, fo->fd->tx_tree, f);
         if (!is_type1(fo->fm))
             write_fontdescriptor(fo->fd);
+    }
+    else {
+        /* builtin fonts still need the /Widths array and /FontDescriptor
+         * (to avoid error 'font FOO contains bad /BBox')
+         */
+        create_charwidth_array(fo, f);
+        write_charwidth_array(fo);
+        create_fontdescriptor(fo, f);   
+        write_fontdescriptor(fo->fd);
+        if (!is_std_t1font(fo->fm))
+            pdftex_warn("font `%s' is not a standard font; "
+                        "I suppose it is available to your PDF viewer then",
+                        fo->fm->ps_name);
     }
     if (is_type1(fo->fm))
         register_fo_entry(fo);

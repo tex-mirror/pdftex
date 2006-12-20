@@ -43,10 +43,6 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $
     if ((unsigned)(size_get) >= (unsigned)(size_want)) \
         pdftex_fail ("snprintf failed: file %s, line %d", __FILE__, __LINE__);
 
-/*@unused@*/
-static const char perforce_id[] =
-    "$Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $";
-
 char *cur_file_name = NULL;
 strnumber last_tex_string;
 static char print_buf[PRINTF_BUF_SIZE];
