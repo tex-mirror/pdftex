@@ -1,12 +1,12 @@
 % interface=english modes=letter,screen output=pdftex
 % vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.646 2006/12/20 15:06:50 oneiros Exp $
+% $Id: pdftex-t.tex,v 1.652 2006/12/21 22:38:08 hhenkel Exp $
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
 
-\setvariables[pdftex][titlepagelines=56]
+\setvariables[pdftex][titlepagelines=55]
 
 %D We use a multi purpose style (using modes) that enable us
 %D to generate an A4, letter and screen version.
@@ -61,7 +61,7 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.646 2006/12/20 15:06:50 oneiros Exp $
+\rcsscan $Id: pdftex-t.tex,v 1.652 2006/12/21 22:38:08 hhenkel Exp $
 
 \def\currentpdftex{1.40.0}
 
@@ -809,12 +809,13 @@ in search mode simply ignore the kerning information in these text
 streams. When a~document is searched, the search engine reconstructs
 the text from these (string) snippets.
 
-The title page example uses an Adobe Times||Roman font. This is one of
-the 14 so||called standard fonts that are always present in the viewer
-application, and therefore need not be embedded in the \PDF\ file.
-However, when we use for instance Computer Modern Roman, we have to make
-sure that this font is later available to the \PDF\ viewer, and the best
-way to do this is to embed it.
+The title page example uses an Adobe Times||Roman font. This is one of the
+14 so||called standard fonts that should always be present in any \PDF\
+viewer application, and therefore need not be embedded in the \PDF\ file.
+However, when we use for instance a~Computer Modern Roman font, we have
+to make sure that this font is later available to the \PDF\ viewer, and
+the best way to do this is to embed the font (it's highly recommended
+to embed even the standard fonts).
 
 In this simple file, we don't specify in what way the file should be opened,
 for instance full screen or clipped. A~closer look at the page object no.~2
@@ -896,22 +897,27 @@ pool file \filename{pdftex.pool} is generated; it's needed for creating
 the format files.
 
 The obsolescent binary \filename{pdfetex} is still generated for backward
-compatibility, but since version 1.40 it is a functionally identical copy
-of the file \filename{pdftex}; similarly the file \filename{pdfetex.pool}
-is just a copy from file \filename{pdftex.pool}.
+compatibility, but since version 1.40 it is just a~file copy
+of the file \filename{pdftex}.
+
+Together with the \filename{pdftex} binary also the \filename{pdftosrc}
+and \filename{ttf2afm} binaries are generated.
 
 %***********************************************************************
 
 \subsection{Placing files}
 
-The next step is to put the freshly compiled binary and pool file
-into their proper places within the \TDS\ structure of the \TEX\ system.
-Put the file \filename{pdftex} into the directory (\eg\ for a~typical
-\TETEX\ system) \filename{/usr/local/teTeX/bin/i686-pc-linux-gnu},
-and the pool file into \filename{/usr/local/teTeX/share/texmf/web2c}.
+The next step is to put the freshly compiled \filename{pdftex},
+\filename{pdftosrc}, and \filename{ttf2afm} binaries and the
+pool file \filename{pdftex.pool} into their proper places within
+the \TDS\ structure of the \TEX\ system. Put the binary files
+into the binary directory (\eg\ for a~typical \TETEX\ system)
+\filename{/usr/local/teTeX/bin/i686-pc-linux-gnu}, and the pool file
+into \filename{/usr/local/teTeX/share/texmf/web2c}.
 
-Don't forget to do a~\filename{texconfig-sys init} afterwards,
-so that all formats are regenerated system-wide with the fresh binary.
+Don't forget to do a~\filename{texconfig-sys init} afterwards, so that
+all formats are regenerated system-wide with the fresh \filename{pdftex}
+binary.
 
 %***********************************************************************
 
@@ -937,19 +943,20 @@ where the various bits and pieces are going.
 \startbuffer
 \starttabulate[|l|l|]
 \HL
-\NC \bf used for        \NC \bf texmf.cnf       \NC\NR
+\NC \bf used for        \NC \bf texmf.cnf        \NC\NR
 \HL
-\NC output files        \NC \type{TEXMFOUTPUT}  \NC\NR
-\NC input files, images \NC \type{TEXINPUTS}    \NC\NR
-\NC format files        \NC \type{TEXFORMATS}   \NC\NR
-\NC text pool files     \NC \type{TEXPOOL}      \NC\NR
-\NC encoding files      \NC \type{ENCFONTS}     \NC\NR
-\NC font map files      \NC \type{TEXFONTMAPS}  \NC\NR
-\NC \TFM\ files         \NC \type{TFMFONTS}     \NC\NR
-\NC virtual fonts       \NC \type{VFFONTS}      \NC\NR
-\NC type1 fonts         \NC \type{T1FONTS}      \NC\NR
-\NC TrueType fonts      \NC \type{TTFONTS}      \NC\NR
-\NC pixel fonts         \NC \type{PKFONTS}      \NC\NR
+\NC output files        \NC \type{TEXMFOUTPUT}   \NC\NR
+\NC input files, images \NC \type{TEXINPUTS}     \NC\NR
+\NC format files        \NC \type{TEXFORMATS}    \NC\NR
+\NC text pool files     \NC \type{TEXPOOL}       \NC\NR
+\NC encoding files      \NC \type{ENCFONTS}      \NC\NR
+\NC font map files      \NC \type{TEXFONTMAPS}   \NC\NR
+\NC \TFM\ files         \NC \type{TFMFONTS}      \NC\NR
+\NC virtual fonts       \NC \type{VFFONTS}       \NC\NR
+\NC type1 fonts         \NC \type{T1FONTS}       \NC\NR
+\NC TrueType fonts      \NC \type{TTFONTS}       \NC\NR
+\NC OpenType fonts      \NC \type{OPENTYPEFONTS} \NC\NR
+\NC pixel fonts         \NC \type{PKFONTS}       \NC\NR
 \HL
 \stoptabulate
 \stopbuffer
@@ -991,8 +998,9 @@ and \type{.pfb}).  These outline (vector) fonts are to be preferred over
 bitmap \PK\ fonts. In most cases Type~1 fonts are used and this variable
 tells \PDFTEX\ where to find them.
 
-\PathDescription {TTFFONTS} Search path for TrueType font (\type{.ttf})
-files.  Like Type~1 fonts, TrueType fonts are also outlines.
+\PathDescription {TTFFONTS, OPENTYPEFONTS} Search paths for TrueType
+(\type{.ttf}) and OpenType (\type{.otf}) font files.  Like Type~1 fonts,
+TrueType and OpenType fonts are also outlines.
 
 \PathDescription {PKFONTS} Search path for packed (bitmap) font
 (\type{.pk}) files.
@@ -1309,7 +1317,7 @@ pool_size=500000
 
 \head  \PDFTEX\ cannot find one or more map files (\type{*.map}),
        encoding vectors (\type{*.enc}), virtual fonts, Type~1 fonts,
-       TrueType fonts or some image file.
+       TrueType or OpenType fonts, or some image file.
 
        Make sure that the required file exists and the corresponding variable
        in \filename {texmf.cnf} contains a~path to the file. See above which
@@ -1324,7 +1332,7 @@ pool_size=500000
 
 Normally the page content takes one object. This means that one seldomly
 finds more than a~few hundred objects in a~simple file. This \PDFTEX\
-manual for instance uses approx.~860 objects. In more complex applications
+manual for instance uses approx.~750 objects. In more complex applications
 this number can grow quite rapidly, especially when one uses a~lot of
 widget annotations, shared annotations or other shared things. In any
 case \PDFTEX's internal object table size will automatically grow to the
@@ -1410,7 +1418,7 @@ Some nice samples of \PDFTEX\ output can be found at
 
 \PDFTEX\ can work with Type~1 and TrueType fonts, but a~source must be
 available for all fonts used in the document, except for the 14 standard
-fonts supplied by the \PDF\ reader (Times, Helvetica, Courier, Symbol
+fonts supplied by the \PDF\ viewer (Times, Helvetica, Courier, Symbol
 and Dingbats).  It is possible to use \METAFONT||generated fonts in
 \PDFTEX\ --- but it is strongly recommended not to use these fonts if an
 equivalent is available in Type~1 or TrueType format, if only because
@@ -1465,9 +1473,10 @@ be given.
 
 \startdescription {basename}
 
-sets the (\POSTSCRIPT) base font name, which is used for only one purpose
-described as follows: When a \PDF\ file is embedded by \type{\pdfximage},
-the \type{/BaseFont} names in the font dictionaries of Type~1 and Type~1C
+sets the (\POSTSCRIPT) base font name, which has two uses:
+
+First, when a~\PDF\ file is embedded by \type{\pdfximage}, the
+\type{/BaseFont} names in the font dictionaries of Type~1 and Type~1C
 (CFF) fonts from the embedded \PDF\ file are checked against this {\em
 basename} field. If names match, the glyphs of that font will not be
 copied from the embedded \PDF\ file, but instead a~local font is opened,
@@ -1476,17 +1485,18 @@ mentioned in the map line (see {\em fontfile} below). By this collecting
 mechanism Type~1 glyphs can be shared between several embedded \PDF\
 files and with text that is typeset by \pdfTeX, which helps keeping the
 resulting \PDF\ file size small, if many files with similar Type~1(C)
-fonts are embedded. A limitation is that the replacement does not work
-for TrueType fonts. Still it is recommended always to set the {\em
-basename} field.
+fonts are embedded. Replacing Type1 fonts from embedded \PDF\ files
+requires that also a~Type1 font file name is in the {\em fontfile} field
+(see below).
 
-If a~{\em basename} field is given, also a~{\em fontfile} field must
-be there, unless the {\em basename} matches one of the 14 standard font
-names; then the {\em fontfile} field is optional. If the {\em fontfile}
-name is given, this font will be embedded (depending on flags, see below).
-If the {\em fontfile} name for a~standard font is missing, the font will
-be quietly left out, which is fine, as \PDF\ viewers will later render
-the text with their own versions of the font.
+Second, if a~font file is not to be embedded into the \PDF\ output
+({\em fontfile} field missing), then the {\em basename} field will be
+copied to the \type{/BaseFont} and \type{/FontName} dictionary entries
+in the \PDF\ file, so that the \POSTSCRIPT\ font name will be known to
+the consumer application (\eg\ viewer).
+
+It is highly recommended to always use the {\em basename} field (but
+strictly speaking it's optional).
 
 \stopdescription
 
@@ -1595,41 +1605,60 @@ preferred and is {\em required} when subsetting a~TrueType font.
 
 \startdescription {fontfile}
 
-sets the name of the font source file. This must be a~Type~1 or TrueType font
-file. The font file name can be preceded by one or two special characters,
-which says how the font file should be handled.
+sets the name of the font file to be embedded into the \PDF\ output for a
+given \TeX\ font (the {\em tfmname}~$\longleftrightarrow$~{\em fontfile}
+mapping is the most prominent use of the \filename{pdftex.map} file).
+The font file name must belong to a~Type~1 or TrueType font file. If the
+{\em fontfile} name is missing, no font embedding can take place; in case
+the {\em basename} field does not contain one of the 14 standard font
+names also a~warning will be given. Not embedding a~font into a~\PDF\
+file might be troublesome, as it requires that the font or some similar
+looking replacement font is available within the \PDF\ viewer, so that
+it can render the glyphs with its own font version.
+
+The font file name should be preceded by one or two special characters,
+which tells how to handle the font file:
 
 \startitemize
 
-\item  If the font file name is preceded by a~\type{<} the font file
-       will be partially downloaded, meaning that only used glyphs
-       (characters) are
-       embedded to the font. This is the most common use and is
-       {\em strongly recommended} for any font, as it ensures the
-       portability and reduces the size of the \PDF\ output. Partial fonts
-       are included in such a~way that name and cache clashes are minimized.
+\item  If the font file name is preceded by a~\type{<} character, the
+       font file will be partially downloaded (``subsetted''), meaning
+       that only used glyphs are going into the \PDF\ file. This is the
+       most common use and is {\em strongly recommended} for any font,
+       as it ensures the portability and reduces the size of the \PDF\
+       output. Subsetted fonts are included in such a~way that name and
+       cache clashes are minimized.
 
 \item  If the font file name is preceded by a~double \type{<<}, the font
-       file will be included entirely --- all glyphs of the font are
-       embedded, including the ones that are not used in the document. Apart
-       from causing large size \PDF\ output, this option may cause troubles
-       with TrueType fonts, so it is not recommended. It might be useful
-       in case the font is atypical and can not be subsetted well by
-       \PDFTEX. {\em Beware: some font vendors forbid full font inclusion.}
+       file will be included entirely --- all glyphs of the font
+       are embedded, including even the ones that are not used in the
+       document. Apart from causing large size \PDF\ output, this option
+       may cause troubles with TrueType fonts, so it is normally not
+       recommended for Type1 or TrueType fonts. But this is currently
+       the only mode that allows the use of OpenType fonts. This mode
+       might also be useful in case the font is atypical and can not be
+       subsetted well by \PDFTEX. {\em Beware: some font vendors forbid
+       full font inclusion.}
 
-\item  If nothing precedes the font file name, the font file is read but
-       nothing is embedded, only the font parameters are extracted to
-       generate the so||called font descriptor, which is used by the \PDF\
-       reader to simulate the font if needed. This option is useful only when
-       you do not want to embed the font (i.\,e.~to reduce the output size),
-       but wish to use the font metrics and let the \PDF\ reader generate
-       instances that look close to the used font in case the font resource
-       is not installed on the system where the \PDF\ output will be viewed
-       or printed. To use this feature the font flags {\em must} be
-       specified, and it must have the bit~6 set on, which means that only
-       fonts with the Adobe Standard Roman Character Set can be simulated.
-       The only exception is the case of a~Symbolic font, which is not very
-       useful.
+\item  The case that no special character precedes the font file name
+       is deprecated since \PDFTEX\ version 1.40.0. These font files are
+       now completely ignored, and a~corresponding warning is given. You
+       achieve exactly the same \PDF\ result if you just remove the
+       font file name from the map entry. Then the glyph widths that go
+       into the \PDF~file are extracted from the \TFM~file, and a~font
+       descriptor object is created that contains approximations of the
+       font metrics for the selected font.
+
+       This option is useful only as fallback when you do not want to
+       embed the font (\eg\ due to font license restrictions), but wish to
+       use the font metrics and let the \PDF\ viewer generate instances
+       that look close to the used font in case the font resource is not
+       installed on the system where the \PDF\ output will be viewed
+       or printed. To use this feature, the font flags {\em must} be
+       specified, and it must have the bit~6 set on, which means that
+       only fonts with the Adobe Standard Roman Character Set can be
+       simulated. The only exception is the case of a~Symbolic font,
+       which is not very useful.
 
 \stopitemize
 
@@ -1645,7 +1674,7 @@ If a~used font is not present in the map files, first \PDFTEX\ will
 look for a~source with suffix \type{.pgc}, which is a~so||called \PGC\
 source (\PDF\ Glyph Container) \footnote {This is a~text file containing
 a~\PDF\ Type~3 font, created by \METAPOST\ using some utilities by Hans
-Hagen. In general \PGC\ files can contain whatever is allowed in a \PDF\ page
+Hagen. In general \PGC\ files can contain whatever is allowed in a~\PDF\ page
 description, which may be used to support fonts that are not available
 in \METAFONT. \PGC\ fonts are not widely useful, as vector Type~3 fonts
 are not displayed very well in older versions of Acrobat Reader, but may
@@ -1675,72 +1704,56 @@ is not scalable or not available, \PDFTEX\ will use \PK\ fonts instead; the
 \PDF\ output is still valid but some fonts may look ugly because of the
 scaled bitmap.
 
-To summarize this rather confusing story, we include a~some example lines.
-First we use two fonts from the 14 standard fonts with font||specific
-encoding, i.\,e.~no external encoding is given.  In the first line, the
-fontfile is missing, so viewers will use their own font.  The ZapfDingbats
-font is taken from the given font file.
+To summarize this rather confusing story, we include some example lines.
+The most common way is to embed only a~glyph subset from a~font like this,
+with re||encoding:
 
 \starttyping
-psyr Symbol
-pzdr ZapfDingbats <pzdr.pfb
-\stoptyping
-
-Similarly, two standard fonts with an external encoding. The \type{<}
-preceding the encoding file name may be left out.
-
-\starttyping
-ptmr8r  Times-Roman  <8r.enc
 ptmri8r Times-Italic <8r.enc <ptmri8a.pfb
 \stoptyping
 
- A~SlantFont is specified similarly as for \type{dvips}. The \type
-{SlantFont} or \type{ExtendFont} entries work only with embedded
-font files.
+The \type{<} preceding the encoding file name may be left out.
+Without re||encoding it looks like this:
+
+\starttyping
+cmr10 CMR10 <cmr10.pfb
+\stoptyping
+
+The fontfile is missing, so viewers will use their own font (with and
+without re||encoding):
+
+\starttyping
+ptmr8r  Times-Roman  <8r.enc
+psyr Symbol
+\stoptyping
+
+Not embedding fonts like this is rather risky and should normally
+be avoided. You might use this trick to typeset with the 14~standard
+fonts (\eg\ Times, Helvetica, Symbol), if you want very small \PDF\
+files. Remember that if a~font is not embedded and it's none of the
+14 standard \PDF\ fonts, the result on the viewer side depends on the
+availability of the right font there. If in doubt, always embed all fonts,
+even the 14 standard ones.
+
+A~SlantFont is specified similarly as for \type{dvips}. The \type
+{SlantFont} or \type{ExtendFont} entries work only with embedded Type1
+fonts:
 
 \starttyping
 psyro           ".167 SlantFont"         <usyr.pfb
 pcrr8rn Courier ".85 ExtendFont" <8r.enc <pcrr8a.pfb
 \stoptyping
 
-Partially download a~font without re||encoding:
-
-\starttyping
-pgsr8a GillSans <pgsr8a.pfb
-\stoptyping
-
-Download a~font entirely without re||encoding:
+Entirely download a~font without re||encoding:
 
 \starttyping
 pgsr8a GillSans <<pgsr8a.pfb
-\stoptyping
-
-Partially download a~font with re||encoding:
-
-\starttyping
-pgsr8r GillSans <8r.enc <pgsr8a.pfb
 \stoptyping
 
 Entirely download a~font with re||encoding:
 
 \starttyping
 pgsr8r GillSans <8r.enc <<pgsr8a.pfb
-\stoptyping
-
-Sometimes we do not want to include a~font, but need to extract parameters
-from the font file and re||encode the font as well. This only works for
-fonts with Adobe Standard Encoding. The font flags specify how such
-a~font looks like, so \eg\ the Adobe Reader can generate a~similar instance
-if the font resource is not available on the target system.
-
-\starttyping
-pgsr8r GillSans 32 <8r.enc pgsr8a.pfb
-\stoptyping
-
-Do not embed the font --- only extract the font parameters:
-
-\starttyping
-pgsr8a GillSans pgsr8a.pfb
 \stoptyping
 
 A~TrueType font can be used in the same way as a~Type~1 font:
@@ -1806,13 +1819,24 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.646 2006/12/20 15:06:50 oneiros Exp $
+%%S $Id: pdftex-t.tex,v 1.652 2006/12/21 22:38:08 hhenkel Exp $
 %%S NL
 %%S integer registers:
 
 \subsubject{Integer registers}
 
 \startpacked
+
+Sometimes we do not want to include a~font, but need to re||encode it.
+This only works for fonts with Adobe Standard Encoding. The font
+flags specify how such a~font looks like, so \eg\ the Adobe Reader can
+generate a~similar instance if the font resource is not available on
+the target system.
+
+\starttyping
+pgsr8r GillSans 32 <8r.enc
+\stoptyping
+
 
 \Syntax {
 \Tex {\pdfoutput} \Whatever{integer}
@@ -2669,10 +2693,10 @@ and links are used.
 \introduced{1.40.0}
 
 The writing of compressed objects is enabled by setting
-\type{\pdfobjcompresslevel} to a value between 1 and~3; it's
+\type{\pdfobjcompresslevel} to a~value between 1 and~3; it's
 disabled by value~0 (default). Enabling requires that also
 \type{\pdfminorversion}~$>$~4. If \type{\pdfobjcompresslevel}~$>$~0,
-but \type{\pdfminorversion}~$<$~5, a warning is given and object stream
+but \type{\pdfminorversion}~$<$~5, a~warning is given and object stream
 writing is disabled. The \type{\pdfobjcompresslevel} value is clipped
 to the range 0..3. Using values outside this range is not recommended
 (for future extension).
@@ -2691,12 +2715,12 @@ are to be used, currently \type{\pdfobjcompresslevel=2} is recommended,
 
 \description{Caveat:} The \type{\pdfcompresslevel} feature is new and
 still somewhat experimental (feedback welcome). \PDF\ files generated
-with object streams enabled can't be viewed with (old) \PDF\ readers that
+with object streams enabled can't be read with (old) \PDF\ viewers that
 don't understand \PDF-1.5 files. For widest distribution and unknown
 audience, don't activate object stream writing. The \PDF-1.5 standard
-describes also a hybrid object compression mode that gives some backward
+describes also a~hybrid object compression mode that gives some backward
 compatibility, but this is currently not implemented, as \PDF-1.5 seems
-to be rather quickly adopted by modern readers. Also not implemented is
+to be rather quickly adopted by modern \PDF\ viewers. Also not implemented is
 the optional \type{/Extends} key.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfdecimaldigits} \Whatever{integer}}}
@@ -2897,45 +2921,52 @@ called {\em font expansion}. We describe this by an example:
 \pdfadjustspacing=2
 \stoptyping
 
-The \type{30 20 10} means this: \quotation {hey \TEX, when line
-breaking is going badly, you may stretch the glyphs in this font as
-much as 3\,\% or shrink them by 2\,\%}. Because \PDFTEX\ uses internal
-data structures with fixed widths, each additional width also means an
-additional font. For practical reasons \PDFTEX\ uses discrete steps,
-in this example, 1\,\%. This means that for font \type{sometfm} up to~6
-differently scaled alternatives may be used. When no step is specified,
-0.5\,\% steps are used.
+The \type{30 20 10} means this: \quotation {hey \TEX, when line breaking
+is going badly, you may stretch the glyphs from this font as much as
+3\,\% or shrink them as much as 2\,\%}. For practical reasons \PDFTEX\
+uses discrete expansion steps, in this example, 1\,\%. Roughly spoken, the
+trick is as follows. Consider a~text typeset in triple column mode. When
+\TEX\ cannot break a~line in the appropriate way, the unbreakable parts
+of the word will stick into the margin. When \PDFTEX\ notes this, it
+will try to scale (shrink) the glyphs in that line using fixed steps,
+until the line fits. When lines are too spacy, the opposite happens:
+\PDFTEX\ starts scaling (stretching) the glyphs until the white space
+gaps is acceptable. This glyph stretching and shrinking is called
+{\em font expansion}. To enable font expansion, don't forget to set
+\type{\pdfadjustspacing} to a~value greater than zero.
 
-Roughly spoken, the trick is as follows. Consider a~text typeset in
-triple column mode. When \TEX\ cannot break a~line in the appropriate
-way, the unbreakable parts of the word will stick into the margin. When
-\PDFTEX\ notes this, it will try to scale (shrink) the glyphs in that
-line using fixed steps, until the line fits. When lines are too spacy,
-the opposite happens: \PDFTEX\ starts scaling (stretching) the glyphs
-until the white space gaps is acceptable. This glyph stretching and
-shrinking is called {\em font expansion}.
+There are two different modes for font expansion:
 
-The additional expanded fonts get artificial names by adding the font
-expansion value to the tfmname of the base font, \eg\ \type{sometfm+10}
-for 1\,\% stretch or \type {sometfm-15} for 1.5\,\% shrink. If the
-\type{autoexpand} option is not given, \TFM\ files with these names and
-appropriate dimensions must be available. So, each expanded variant
-of a~font must have its own \TFM\ file! Expanded \TFM\ names like
-\type{sometfm+10} must not be mentioned in the map file (but the \TFM\
-name of the base font without expansion must be there). When no \TFM\
-file can be found, \PDFTEX\ will try to generate it by executing the
-script \type{mktextfm}, where available and supported.
+First, if the \type{autoexpand} option is there --- which is the
+recommended mode --- only a single map entry is needed for all expanded
+font versions, using the name of the unexpanded \TFM\ file ({\em
+tfmname}). No expanded {\em tfmname} versions need to mentioned (they are
+ignored), as \PDFTEX\ generates expanded copies of the unexpanded \TFM\
+data structures and keeps them in its memory. Since \PDFTEX~1.40.0 the
+\type{autoexpand} mode happens within the page stream by modification of
+the text matrix (\PDF\ operator ``\type{Tm}''), and not anymore on font
+file level, giving the advantage that it now works not only with Type1
+but also with TrueType and OpenType fonts (and even without embedding
+a~font file; but that's not recommended). In this mode \PDFTEX\ requires
+only unexpanded font files.
 
-The font expansion is greatly simplified, if the \type{autoexpand}
-option is there.  Then no expanded \TFM\ file versions are needed;
-instead, \PDFTEX\ generates expanded copies of the unexpanded \TFM\
-data structures and keeps them in its memory.
-
-\PDFTEX\ requires only unexpanded Type~1 font files for font expansion,
-from which all expanded font versions are internally generated and
-included (subsetted) into the \PDF\ output file.  To enable font
-expansion, don't forget to set \type{\pdfadjustspacing} to a~value
-greater than zero.
+Second, if the \type{autoexpand} option is missing, setting up font
+expansion gets more tedious, as there must be map entries for \TFM\ files
+in all required expansion values. The expanded {\em tfmname} variants
+are constructed by adding the font expansion value to the {\em tfmname}
+of the base font, \eg\ there must be a~map entry with {\em tfmname}
+\type{sometfm+10} for 1\,\% stretch or \type {sometfm-15} for 1.5\,\%
+shrink. This also means, that for each expanded font variant a \TFM\
+file with properly expanded metrics must exist. Having several map
+entries for the various expansion values of a font requires to provide
+for each expansion value an individually crafted font file with expanded
+glyphs. Depending on how these glyphs are generated, this might give
+slightly better glyph forms than the rather simple glyph stretching
+used in \type{autoexpand mode}. The drawback is that several font
+files will be embedded in the \PDF\ output for each expanded font,
+leading to significantly larger \PDF\ files than in \type{autoexpand}
+mode. For moderate expansion values going without \type{autoexpand}
+mode is not worth the trouble.
 
 The font expansion mechanism is inspired by an optimization first
 introduced by Prof.~Hermann Zapf, which in itself goes back to
@@ -3415,7 +3446,7 @@ a~page. The contents are added to the attributes of the current page.
 
 This primitive expands to the number of the page object that contains the
 dictionary for page \Something{page number}. If the page \Something{page
-number} does not exist, a~warning will be issued, a fresh unused \PDF\
+number} does not exist, a~warning will be issued, a~fresh unused \PDF\
 object will be generated, and \type{\pdfpageref} will expand to that
 object number.
 
@@ -3754,13 +3785,13 @@ can do the following calculation:
 
 Then \type{\hsize} amounts to 1200~pixels in 96\,dpi, which is
 exactly 903.375\,pt (but \TeX\ rounds it to 903.36914\,pt). The
-default value of \type{\pdfpxdimen} is 1\,bp, corresponding to a pixel
+default value of \type{\pdfpxdimen} is 1\,bp, corresponding to a~pixel
 density of 72\,dpi. This primitive is completely independent from the
 \type{\pdfimageresolution} and \type{\pdfpkresolution} parameters.
 \introduced{1.30.0} It used to be an integer register that gave
 the dimension 1\,px as number of scaled points, defaulting to 65536
 (1\,px equal to 65536\,sp~$=$~1\,pt). Starting from \PDFTEX\ 1.40.0,
-\type{\pdfpxdimen} is now a real dimension parameter.
+\type{\pdfpxdimen} is now a~real dimension parameter.
 
 %***********************************************************************
 
@@ -4123,7 +4154,7 @@ hexadecimal format (same as \type{\pdfescapehex}).
 
 The primitive works as normal \type{\ifnum} condition check, except that it compares
 absolute values of numbers. Although it seems to be a~trivial shortcut for a~couple of
-\type{\ifnum x<0} tests, as a primitive it is more friendly in usage and works a~bit faster.
+\type{\ifnum x<0} tests, as a~primitive it is more friendly in usage and works a~bit faster.
 \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\ifpdfabsdim}} \Something{dimen}}
@@ -4137,7 +4168,7 @@ that it compares absolute values of dimensions. \introduced{1.40.0}
 
 \bookmark{\type{\pdfuniformdeviate}}
 
-The commands generates a uniformly distributed random integer value between
+The commands generates a~uniformly distributed random integer value between
 0 (inclusive) and \Something{number} (exclusive). This primitive expands to
 a list of tokens. \introduced{1.30.0}
 
@@ -4147,8 +4178,8 @@ a list of tokens. \introduced{1.30.0}
 
 %MS Hopefully the random number doesn't influce the length of this paragraph;
 %MS otherwise texexec could loop :-)
-The commands generates a random integer value with a mean of 0 and a unit
-of 65\,536, \eg\ $\pdfnormaldeviate$. This primitive expands to a list of
+The commands generates a~random integer value with a~mean of 0 and a~unit
+of 65\,536, \eg\ $\pdfnormaldeviate$. This primitive expands to a~list of
 tokens. \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfrandomseed}} \Whatever{read||only
@@ -4166,8 +4197,8 @@ commands like \type{\count}). \introduced{1.30.0}
 
 \bookmark{\type{\pdfsetrandomseed}}
 
-This sets the random seed (\type{\pdfrandomseed}) to a specific value,
-allowing you to re-play sequences of semi-randoms at a later moment.
+This sets the random seed (\type{\pdfrandomseed}) to a~specific value,
+allowing you to re-play sequences of semi-randoms at a~later moment.
 \introduced{1.30.0}
 
 %***********************************************************************
@@ -4183,7 +4214,7 @@ The command expands to a~number that represents the time elapsed from the
 moment of run start. The elapsed time is returned in `scaled seconds', that
 means seconds divided by 65536, \eg\ \PDFTEX\ has run for \the\pdfelapsedtime\
 `scaled seconds' when this paragraph was typeset. Obviously, the command will
-never return a value greater than the highest number available in \TeX: if
+never return a~value greater than the highest number available in \TeX: if
 the time exceeds 32767 seconds, the constant value $2^{31}-1$ will be returned.
 \introduced{1.30.0}
 
@@ -4264,8 +4295,8 @@ the line in which \type{\vadjust} appears. However with the qualifier
 \bookmark{\type{\quitvmode}}
 
 The primitive instructs \PDFTEX\ to quit the vertical mode and start typesetting
-a~paragraph. \type{\quitvmode} has the same effect as \type{\leavevmode} definition 
-from \type{plain} macro package. Note however, that \type{\leavevmode} may conflict 
+a~paragraph. \type{\quitvmode} has the same effect as \type{\leavevmode} definition
+from \type{plain} macro package. Note however, that \type{\leavevmode} may conflict
 with \type{\everypar} tokens list. No such risk while using \type{\quitvmode} instead.
 \introduced{1.21a}
 
@@ -4358,9 +4389,9 @@ meaning. If it has, \type{\ifpdfprimitive} returns true. In any other case
 \bookmark{\type{\pdfprimitive}}
 
 This command executes the primitive meaning of the following control sequence,
-if it has been redefined or made undefined. If the following control sequence is 
-undefined and never was a~primitive, nothing happens and no error is raised. 
-If the control sequence was initially expandable, \type{\pdfprimitive} 
+if it has been redefined or made undefined. If the following control sequence is
+undefined and never was a~primitive, nothing happens and no error is raised.
+If the control sequence was initially expandable, \type{\pdfprimitive}
 expands either. Otherwise \type{\pdfprimitive} doesn't expand. \introduced{1.40.0}
 
 
@@ -4424,14 +4455,14 @@ sources with a~limited amount of colors.
 
 The \JBIGTWO\ format works only for bitonal (black and white) pixel
 images like scanned line and text documents, but for these it has
-typically a much higher compression ratio than the other two pixel
+typically a~much higher compression ratio than the other two pixel
 image formats. The \JBIGTWO\ format is part of the \PDF\ standard since
 version 1.5; native \JBIGTWO\ image inclusion is available in \PDFTEX\
-since version 1.40.0. A \JBIGTWO\ file might contain many images, which
-gives an even better compression ratio than with a single image per file,
+since version 1.40.0. A~\JBIGTWO\ file might contain many images, which
+gives an even better compression ratio than with a~single image per file,
 as \JBIGTWO\ encoders can exploit similarities between bit patterns over
 several images. Encoders for \JBIGTWO\ can operate in lossy as well as
-lossless modes. Only recently a free \JBIGTWO\ encoder has been written
+lossless modes. Only recently a~free \JBIGTWO\ encoder has been written
 and made available, see http:/\!/www.imperialviolet.org/jbig2.html.
 
 Other options for graphics in \PDFTEX\ are:
@@ -4757,7 +4788,7 @@ drawing editor, and that is suitable for input to text formatters or
 for automatic translation to a~variety of formats suitable for input
 to text formatters. A~copy made in an otherwise Transparent file
 format whose markup, or absence of markup, has been arranged to thwart
-or discourage subsequent modification by readers is not Transparent.
+or discourage subsequent modification by \PDF\ viewers is not Transparent.
 An image format is not Transparent if used for any substantial amount
 of text. A~copy that is not ``Transparent'' is called {\bf ``Opaque''}.
 

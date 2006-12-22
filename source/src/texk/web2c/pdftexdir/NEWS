@@ -1,5 +1,5 @@
 -----------------------------------------------------
-pdfTeX 3.141592-1.40.0-rc3 was released on 2006-12-20
+pdfTeX 3.141592-1.40.0-rc4 was released on 2006-12-22
 -----------------------------------------------------
 - pdfetex (as a separate binary/program) is gone; all extensions are now in
   pdftex. The make files still know about the target pdfetex, but it's just a
@@ -71,6 +71,12 @@ pdfTeX 3.141592-1.40.0-rc3 was released on 2006-12-20
   - bugfix: truetype OS/2 v3 fonts (594)
   - bugfix: Type1C (CFF) fonts of embedded pdfs didn't get replaced
 - pdfTeX uses libpng 1.2.14
+- changes from rc3:
+ various small fixes
+
+-----------------------------------------------------
+pdfTeX 3.141592-1.40.0-rc3 was released on 2006-12-20
+-----------------------------------------------------
 - changes from rc2:
   - map file handling:
    - in usual cases the behaviour is the same like in previous version. So if a

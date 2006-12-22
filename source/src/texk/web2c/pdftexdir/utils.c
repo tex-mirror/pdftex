@@ -145,7 +145,7 @@ void make_subset_tag(fd_entry * fd)
     while ((char *) avl_find(st_tree, fd->subset_tag) != NULL);
     aa = avl_probe(st_tree, fd->subset_tag);
     assert(aa != NULL);
-    if (j > 1)
+    if (j > 2)
         pdftex_warn
             ("\nmake_subset_tag(): subset-tag collision, resolved in round %d.\n",
              j);

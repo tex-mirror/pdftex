@@ -329,7 +329,7 @@ static char *strip_spaces_and_delims(char *s, int l)
     char *p = buf;
     int i;
 
-    for (i = 0; i < l ; s++, i++) {
+    for (i = 0; i < l; s++, i++) {
         if (*s == '(' || *s == ')' || *s == '<' || *s == '>' ||
             *s == '[' || *s == ']' || *s == '{' || *s == '}' ||
             *s == '/' || *s == '%' || isspace(*s))
@@ -1393,7 +1393,7 @@ void writeotf(fd_entry * fd)
     set_cur_file_name(fd_cur->fm->ff_name);
     if (is_subsetted(fd_cur->fm))
         pdftex_fail("OTF fonts must be included entirely");
-    if (!open_input(&ttf_file, kpse_type1_format, FOPEN_RBIN_MODE)) {
+    if (!open_input(&ttf_file, kpse_opentype_format, FOPEN_RBIN_MODE)) {
         pdftex_fail("cannot open OpenType font file for reading");
     }
     cur_file_name = (char *) nameoffile + 1;

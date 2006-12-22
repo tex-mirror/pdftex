@@ -120,19 +120,19 @@ static void preset_fontmetrics(fd_entry * fd, internalfontnumber f)
         dividescaled(getcharheight(f, 'h'), pdffontsize[f], 3);
     fd->font_dim[CAPHEIGHT_CODE].val =
         dividescaled(getcharheight(f, 'H'), pdffontsize[f], 3);
-    fd->font_dim[DESCENT_CODE].val =
-        dividescaled(getcharheight(f, 'y'), pdffontsize[f], 3);
+    i = -dividescaled(getchardepth(f, 'y'), pdffontsize[f], 3);
+    fd->font_dim[DESCENT_CODE].val = i < 0 ? i : 0;
     fd->font_dim[STEMV_CODE].val =
         dividescaled(getcharwidth(f, '.') / 3, pdffontsize[f], 3);
     fd->font_dim[XHEIGHT_CODE].val =
         dividescaled(getxheight(f), pdffontsize[f], 3);
     fd->font_dim[FONTBBOX1_CODE].val = 0;
-    fd->font_dim[FONTBBOX2_CODE].val =
-        dividescaled(-getchardepth(f, 'y'), pdffontsize[f], 3);
+    fd->font_dim[FONTBBOX2_CODE].val = fd->font_dim[DESCENT_CODE].val;
     fd->font_dim[FONTBBOX3_CODE].val =
         dividescaled(getquad(f), pdffontsize[f], 3);
     fd->font_dim[FONTBBOX4_CODE].val =
-        dividescaled(getcharheight(f, 'H'), pdffontsize[f], 3);
+        fd->font_dim[CAPHEIGHT_CODE].val > fd->font_dim[ASCENT_CODE].val ?
+        fd->font_dim[CAPHEIGHT_CODE].val : fd->font_dim[ASCENT_CODE].val;
     for (i = 0; i < INT_KEYS_NUM; i++)
         fd->font_dim[i].set = true;
 }
@@ -418,7 +418,7 @@ static void write_fontdescriptor(fd_entry * fd)
     assert(fd != NULL && fd->fm != NULL);
 
     if (is_fontfile(fd->fm))
-        write_fontfile(fd); /* this will set fd->ff_found if font file is found */
+        write_fontfile(fd);     /* this will set fd->ff_found if font file is found */
     if (fd->fn_objnum != 0)
         write_fontname_object(fd);
     if (fd->fd_objnum == 0)
@@ -585,14 +585,13 @@ void create_fontdictionary(fm_entry * fm, integer font_objnum,
             fo->fd->tx_tree = mark_chars(fo, fo->fd->tx_tree, f);
         if (!is_type1(fo->fm))
             write_fontdescriptor(fo->fd);
-    }
-    else {
+    } else {
         /* builtin fonts still need the /Widths array and /FontDescriptor
          * (to avoid error 'font FOO contains bad /BBox')
          */
         create_charwidth_array(fo, f);
         write_charwidth_array(fo);
-        create_fontdescriptor(fo, f);   
+        create_fontdescriptor(fo, f);
         write_fontdescriptor(fo->fd);
         if (!is_std_t1font(fo->fm))
             pdftex_warn("font `%s' is not a standard font; "

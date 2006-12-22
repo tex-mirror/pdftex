@@ -287,7 +287,7 @@ int check_fm_entry(fm_entry * fm, boolean warn)
             pdftex_warn
                 ("ambiguous entry for `%s': font file present but not included, "
                  "will be treated as font file not present", fm->tfm_name);
-        xfree(fm->ff_name); 
+        xfree(fm->ff_name);
         /* do not set variable |a| as this entry will be still accepted */
     }
 
@@ -295,7 +295,8 @@ int check_fm_entry(fm_entry * fm, boolean warn)
     if (fm->ps_name == NULL && !is_fontfile(fm)) {
         if (warn)
             pdftex_warn
-                ("invalid entry for `%s': both ps_name and font file missing", fm->tfm_name);
+                ("invalid entry for `%s': both ps_name and font file missing",
+                 fm->tfm_name);
         a += 1;
     }
 
@@ -307,9 +308,10 @@ int check_fm_entry(fm_entry * fm, boolean warn)
                  fm->tfm_name);
         a += 2;
     }
-    
+
     /* SlantFont and ExtendFont can be used only with Type1 fonts */
-    if ((fm->slant != 0 || fm->extend != 0) && !is_type1(fm)) {
+    if ((fm->slant != 0 || fm->extend != 0)
+        && !(is_t1fontfile(fm) && is_included(fm))) {
         if (warn)
             pdftex_warn
                 ("invalid entry for `%s': SlantFont/ExtendFont can be used only with embedded Type1 fonts",
@@ -535,7 +537,7 @@ static void fm_scan_line()
         else
             set_type1(fm);
     } else
-        set_type1(fm);  /* assume a builtin font is Type1 */
+        set_type1(fm);          /* assume a builtin font is Type1 */
     if (check_fm_entry(fm, true) != 0)
         goto bad_line;
     /*
@@ -621,7 +623,7 @@ boolean hasfmentry(internalfontnumber f)
 
 
 /* check whether a map entry is valid for font replacement */
-static boolean fm_valid_for_font_replacement(fm_entry *fm)
+static boolean fm_valid_for_font_replacement(fm_entry * fm)
 {
     ff_entry *ff;
 
@@ -704,29 +706,29 @@ fm_entry *lookup_fontmap(char *ps_name)
     }
     tmp.ps_name = s;
 
-    fm = (fm_entry *) avl_t_find (&t, ps_tree, &tmp);
+    fm = (fm_entry *) avl_t_find(&t, ps_tree, &tmp);
     if (fm == NULL)
-        return NULL;    /* no entry found */
+        return NULL;            /* no entry found */
 
     /* at this point we know there is at least one fm_entry with given ps_name;
      * we test all such entries and return the first one that is valid for font
      * replacement */
 
     t2 = t;
-    fm2 = (fm_entry *) avl_t_prev (&t2);
+    fm2 = (fm_entry *) avl_t_prev(&t2);
 
     /* search forward */
     do {
         if (fm_valid_for_font_replacement(fm))
             return fm;
         fm = (fm_entry *) avl_t_next(&t);
-    } while (fm != NULL && comp_fm_entry_ps (fm, &tmp, NULL) == 0);
+    } while (fm != NULL && comp_fm_entry_ps(fm, &tmp, NULL) == 0);
 
     /* search backward */
-    while (fm2 != NULL && comp_fm_entry_ps (fm2, &tmp, NULL) == 0) {
+    while (fm2 != NULL && comp_fm_entry_ps(fm2, &tmp, NULL) == 0) {
         if (fm_valid_for_font_replacement(fm2))
             return fm2;
-        fm2 = (fm_entry *) avl_t_prev (&t2);
+        fm2 = (fm_entry *) avl_t_prev(&t2);
     }
 
     return NULL;
