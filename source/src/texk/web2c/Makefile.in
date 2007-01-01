@@ -89,7 +89,6 @@ CTANGLEBOOT = @CTANGLEBOOT@
 TANGLE = @TANGLE@
 CTANGLE = @CTANGLE@
 TIE = @TIE@
-WEAVE = weave
 
 # Calling tangle
 tangle = WEBINPUTS=$(srcdir) $(TANGLE)
@@ -427,9 +426,9 @@ dvitype_args = -output-level=2 -dpi=72.27 -page-start='*.*.*.*.*.*.*.*.*.*'
 
 # 
 # Metafont
-mf_c = mfini.c mf0.c mf1.c mf2.c
-mf_o = mfini.o mf0.o mf1.o mf2.o mfextra.o
-mfn_o = mfini.o mf0.o mf1.o mf2.o mfnowin.o
+mf_c = mfini.c mf0.c mf1.c 
+mf_o = mfini.o mf0.o mf1.o mfextra.o
+mfn_o = mfini.o mf0.o mf1.o mfnowin.o
 mf: $(mf_o) $(windowlib)
 	$(kpathsea_link) $(mf_o) $(windowlink) $(LOADLIBES)
 mf-nowin: $(mfn_o) window/trap.o
@@ -484,6 +483,7 @@ trap-clean:
 	rm -f mftrap.pl trap.72270gf trap.typ
 # 
 # MetaPost
+kpse_include mpdir/mpostlib.mk
 kpse_include metapost.mk
 # 
 # TeX
@@ -560,6 +560,7 @@ kpse_include etexdir/etex.mk
 kpse_include omegadir/omega.mk
 kpse_include alephdir/aleph.mk
 kpse_include pdftexdir/pdftex.mk
+kpse_include xetexdir/xetex.mk
 # 
 # Common
 programs = bibtex ctangle ctie cweave dvicopy dvitomp dvitype gftodvi gftopk \
@@ -567,7 +568,8 @@ programs = bibtex ctangle ctie cweave dvicopy dvitomp dvitype gftodvi gftopk \
  pooltype tangle tftopl tie $(ttf2afm) vftovp vptovf weave
 engines = $(tex) $(etex) $(mf) $(mfn) $(mpost) \
           $(omega) $(aleph) \
-          $(pdftex) $(pdfetex)
+          $(pdftex) $(pdfetex) \
+          $(xetex)
 
 programs: $(programs) $(engines) $(mpware_programs) \
           $(omegafonts_programs) $(otps_programs) $(pdftosrc)
@@ -885,8 +887,9 @@ install-tex-pool: tex.pool $(texpooldir)
 	$(INSTALL_DATA) tex.pool $(texpooldir)/tex.pool
 install-mf-pool: mf.pool $(mfpooldir)
 	$(INSTALL_DATA) mf.pool $(mfpooldir)/mf.pool
-install-mpost-pool: mp.pool $(mppooldir)
-	$(INSTALL_DATA) mp.pool $(mppooldir)/mp.pool
+install-mpost-pool: # no longer used, the strings are in the binary
+# install-mpost-pool: mp.pool $(mppooldir)
+# 	$(INSTALL_DATA) mp.pool $(mppooldir)/mp.pool
 
 # Auxiliary files.
 install-data:: $(web2cdir)
@@ -999,7 +1002,7 @@ manpages:
 @MAINT@	cd $(distdir); rm -f $(addsuffix .c, $(programs) tangleboot)
 @MAINT@	cd $(distdir); rm -f $(addsuffix .h, $(programs) tangleboot)
 @MAINT@	cd $(distdir); rm -f etex.ch omega.ch aleph.ch
-@MAINT@	cd $(distdir); rm -f pdfetex.ch
+@MAINT@	cd $(distdir); rm -f pdftex.ch
 @MAINT@	cd $(distdir); bash -c "rm -f tests/x* tests/allbib.{bbl,blg,dvi,log}"
 @MAINT@	cd $(distdir)/tests && ln -s ../../../../tests/xampl.bib .
 @MAINT@	cd $(distdir); bash -c "rm -f $(omega_files) alephmem.h"
@@ -1115,7 +1118,7 @@ installcheck:
 
 # 
 # Cleaning.
-all_subdirs = doc lib man $(mpware) web2c window $(omegafonts) $(otps) $(pdftexdir)
+all_subdirs = doc lib man $(mpware) web2c window $(omegafonts) $(otps) $(pdftexdir) $(mpostdir)
 
 # Having a multiple-target rule with the subdir loop fails because of
 # the dependencies introduced by clean.mk.  Yet, we want the

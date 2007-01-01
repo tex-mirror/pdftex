@@ -30,6 +30,10 @@ extern strnumber getjobname P1H(strnumber);
 /* MP defined poolASCIIcode instead of packedASCIIcode, sigh. */
 typedef poolASCIIcode packedASCIIcode;
 #endif
+#ifdef XeTeX
+/* XeTeX redefines "ASCII" types.... */
+typedef packedUTF16code packedASCIIcode;
+#endif
 extern void calledit P4H(packedASCIIcode *, poolpointer, integer, integer);
 
 #ifdef MF
@@ -48,3 +52,7 @@ extern void remembersourceinfo P2H(strnumber, int);
 #ifdef pdfTeX
 #include <pdftexdir/pdftex.h>
 #endif /* pdfTeX */
+
+#ifdef XeTeX
+#include <xetexdir/xetex.h>
+#endif /* XeTeX */

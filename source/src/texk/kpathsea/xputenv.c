@@ -98,7 +98,7 @@ xputenv(const char *var, const char *value)
         saved_env = XRETALLOC(saved_env, saved_count, const char *);
     } else {
         /* We owned the old string. */
-        free((char **)saved_env[cur_loc]);
+        free(saved_env[cur_loc]);
     }
     saved_env[cur_loc] = cur_item;
 

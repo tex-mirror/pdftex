@@ -11,18 +11,18 @@ programs = dmp mpto newer makempx
 default: all
 all: $(programs) 
 
-dmp: dmp.o $(kpathsea)
-	$(kpathsea_link) dmp.o $(LOADLIBES)
+dmp: dmp.o dmp_ffile.o
+	$(kpathsea_link) dmp.o dmp_ffile.o $(LOADLIBES)
 mpto: mpto.o
 	$(kpathsea_link) mpto.o
 newer: newer.o
 	$(link_command) newer.o
-makempx: makempx.in Makefile.in
-	sed -e 's,@BINDIR@,$(bindir),g' -e 's,@web2cver@,@WEB2CVERSION@,g' \
-	    <$(srcdir)/makempx.in >$@
-	-chmod a+x $@
+makempx: makempx.o
+	$(kpathsea_link) makempx.o $(LOADLIBES)
 
-newer.o dmp.o: ../c-auto.h
+dmp.o dmp_ffile.o:  dmp.h
+
+newer.o dmp.o makempx.o: ../c-auto.h
 
 checkdir = $(srcdir)/../check
 check: mpto makempx newer dmp

@@ -30,9 +30,7 @@
 #include <kpathsea/readable.h>
 #include <kpathsea/tex-make.h>
 #include <kpathsea/variable.h>
-#ifndef  WIN32
-#  include <sys/wait.h>
-#endif
+
 
 /* We never throw away stdout, since that is supposed to be the filename
    found, if all is successful.  This variable controls whether stderr

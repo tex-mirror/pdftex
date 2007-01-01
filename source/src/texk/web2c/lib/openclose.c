@@ -17,8 +17,6 @@ extern string fullnameoffile;
 extern boolean recorder_enabled;
 /* For the output-dir option. */
 extern string output_directory;
-/* for shelling out to the system */
-extern boolean shellenabledp;
 
 /* Define some variables. */
 string fullnameoffile;       /* Defaults to NULL.  */
@@ -26,15 +24,6 @@ static string recorder_name; /* Defaults to NULL.  */
 static FILE *recorder_file;  /* Defaults to NULL.  */
 boolean recorder_enabled;    /* Defaults to false. */
 string output_directory;     /* Defaults to NULL.  */
-
-/* The code that implements popen() needs an array for tracking 
-   the 16 possible pipe file pointers, because these need to be
-   closed using pclose() */
-
-static FILE *pipes [] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
-                         NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
-
-
 
 /* For TeX and MetaPost.  See below.  Always defined so we don't have to
    #ifdef, and thus this file can be compiled once and go in lib.a.  */
@@ -79,7 +68,6 @@ boolean
 open_input P3C(FILE **, f_ptr,  int, filefmt,  const_string, fopen_mode)
 {
     string fname = NULL;
-    int i; /* iterator */
 #ifdef FUNNY_CORE_DUMP
     /* This only applies if a preloaded TeX/Metafont is being made;
        it allows automatic creation of the core dump (typing ^\ loses
@@ -96,25 +84,6 @@ open_input P3C(FILE **, f_ptr,  int, filefmt,  const_string, fopen_mode)
         free(fullnameoffile);
     fullnameoffile = NULL;
     
-    /* opening a read pipe is straightforward, only have to
-       skip past the pipe symbol in the file name. filename
-       quoting is assumed to happen elsewhere (it is :-)) */
-
-    if (shellenabledp && *(nameoffile+1) == '|') {
-      /* the user requested a pipe */
-      fname = (string)xmalloc(strlen(nameoffile+1));
-      strcpy(fname,nameoffile+1);
-      *f_ptr = popen(fname+1,"r");
-      free(fname);
-      for (i=0;i<=15;i++) {
-	if (pipes[i]==NULL) {
-	  pipes[i] = *f_ptr;
-	  break;
-	}
-      }
-      return *f_ptr != NULL;
-    }
-
     /* Handle -output-directory.
        FIXME: We assume that it is OK to look here first.  Possibly it
        would be better to replace lookups in "." with lookups in the
@@ -222,42 +191,15 @@ boolean
 open_output P2C(FILE **, f_ptr,  const_string, fopen_mode)
 {
     string fname;
-    int i; /* iterator */
     boolean absolute = kpse_absolute_p(nameoffile+1, false);
 
-    /* opening a write pipe takes a little bit more work, because TeX
-       will perhaps have appended ".tex".  To avoid user confusion as
-       much as possible, this extension is stripped when the command
-       is a bare word.  Some small string trickery is needed to make
-       sure the correct number of bytes is free()-d afterwards */
-
-    if (shellenabledp && *(nameoffile+1) == '|') {
-      /* the user requested a pipe */
-      fname = (string)xmalloc(strlen(nameoffile+1));
-      strcpy(fname,nameoffile+1);
-      if (index(fname,' ')==NULL && index(fname,'>')==NULL) {
-        *(fname+strlen(fname)-4) = 0;
-	*f_ptr = popen(fname+1,"w");
-	*(fname+strlen(fname)) = '.';
-      } else {
-	*f_ptr = popen(fname+1,"w");
-      }
-      free(fname);
-      for (i=0;i<=15;i++) {
-	if (pipes[i]==NULL) {
-	  pipes[i] = *f_ptr;
-	  break;
-	}
-      }
-      return *f_ptr != NULL;
-    }
     /* If we have an explicit output directory, use it. */
     if (output_directory && !absolute) {
-      fname = concat3(output_directory, DIR_SEP_STRING, nameoffile + 1);
+        fname = concat3(output_directory, DIR_SEP_STRING, nameoffile + 1);
     } else {
-      fname = nameoffile + 1;
+        fname = nameoffile + 1;
     }
-      
+
     /* Is the filename openable as given?  */
     *f_ptr = fopen (fname, fopen_mode);
 
@@ -292,24 +234,13 @@ open_output P2C(FILE **, f_ptr,  const_string, fopen_mode)
 /* Close F.  */
 
 void
-aclose P1C(FILE *, f)
+close_file P1C(FILE *, f)
 {
-  int i; /* iterator */
-
   /* If F is null, just return.  bad_pool might close a file that has
      never been opened.  */
   if (!f)
     return;
-
-  /* if this file was a pipe, pclose() it and return */    
-  for (i=0;i<=15;i++) {
-    if (pipes[i]==f) {
-      pclose(f);
-      pipes[i] = NULL;
-      return;
-    }
-  }
-
+    
   if (fclose (f) == EOF) {
     /* It's not always nameoffile, we might have opened something else
        in the meantime.  And it's not easy to extract the filenames out

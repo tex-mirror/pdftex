@@ -18,7 +18,6 @@ along with pdfTeX; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 $Id: writeenc.c,v 1.3 2005/12/26 14:20:13 hahe Exp hahe $
-
 */
 
 #include "ptexlib.h"
@@ -30,16 +29,15 @@ struct avl_table *fe_tree = NULL;
 
 /* AVL sort fe_entry into fe_tree by name */
 
-static int comp_fe_entry (const void *pa, const void *pb, void *p)
+static int comp_fe_entry(const void *pa, const void *pb, void *p)
 {
-    return strcmp (((const fe_entry *) pa)->name,
-                   ((const fe_entry *) pb)->name);
+    return strcmp(((const fe_entry *) pa)->name, ((const fe_entry *) pb)->name);
 }
 
-fe_entry *new_fe_entry ()
+fe_entry *new_fe_entry()
 {
     fe_entry *fe;
-    fe = xtalloc (1, fe_entry);
+    fe = xtalloc(1, fe_entry);
     fe->name = NULL;
     fe->fe_objnum = 0;
     fe->glyph_names = NULL;     /* encoding file not yet read in */
@@ -47,138 +45,138 @@ fe_entry *new_fe_entry ()
     return fe;
 }
 
-fe_entry *lookup_fe_entry (char *s)
+fe_entry *lookup_fe_entry(char *s)
 {
     fe_entry fe;
-    assert (s != NULL);
+    assert(s != NULL);
     fe.name = s;
     if (fe_tree == NULL) {
-        fe_tree = avl_create (comp_fe_entry, NULL, &avl_xallocator);
-        assert (fe_tree != NULL);
+        fe_tree = avl_create(comp_fe_entry, NULL, &avl_xallocator);
+        assert(fe_tree != NULL);
     }
-    return (fe_entry *) avl_find (fe_tree, &fe);
+    return (fe_entry *) avl_find(fe_tree, &fe);
 }
 
-void register_fe_entry (fe_entry * fe)
+void register_fe_entry(fe_entry * fe)
 {
     void **aa;
     if (fe_tree == NULL) {
-        fe_tree = avl_create (comp_fe_entry, NULL, &avl_xallocator);
-        assert (fe_tree != NULL);
+        fe_tree = avl_create(comp_fe_entry, NULL, &avl_xallocator);
+        assert(fe_tree != NULL);
     }
-    assert (fe != NULL);
-    assert (fe->name != NULL);
-    assert (lookup_fe_entry (fe->name) == NULL);        /* encoding not yet registered */
-    aa = avl_probe (fe_tree, fe);
-    assert (aa != NULL);
+    assert(fe != NULL);
+    assert(fe->name != NULL);
+    assert(lookup_fe_entry(fe->name) == NULL);  /* encoding not yet registered */
+    aa = avl_probe(fe_tree, fe);
+    assert(aa != NULL);
 }
 
-fe_entry *get_fe_entry (char *s)
+fe_entry *get_fe_entry(char *s)
 {
     fe_entry *fe;
-    if ((fe = lookup_fe_entry (s)) == NULL) {
-        fe = new_fe_entry ();
+    char **gl;
+    if ((fe = lookup_fe_entry(s)) == NULL && (gl = load_enc_file(s)) != NULL) {
+        fe = new_fe_entry();
         fe->name = s;
-        fe->glyph_names = load_enc_file (s);
-        register_fe_entry (fe);
+        fe->glyph_names = gl;
+        register_fe_entry(fe);
     }
     return fe;
 }
 
 /**********************************************************************/
 
-void epdf_write_enc (char **glyph_names, integer fe_objnum)
+void epdf_write_enc(char **glyph_names, integer fe_objnum)
 {
     int i, i_old;
-    assert (glyph_names != NULL);
-    assert (fe_objnum != 0);
-    pdfbegindict (fe_objnum, 1);
-    pdf_puts ("/Type /Encoding\n");
-    pdf_printf ("/Differences [");
+    assert(glyph_names != NULL);
+    assert(fe_objnum != 0);
+    pdfbegindict(fe_objnum, 1);
+    pdf_puts("/Type /Encoding\n");
+    pdf_printf("/Differences [");
     for (i = 0, i_old = -2; i < 256; i++)
         if (glyph_names[i] != notdef) {
             if (i == i_old + 1) /* no gap */
-                pdf_printf ("/%s", glyph_names[i]);
+                pdf_printf("/%s", glyph_names[i]);
             else {
                 if (i_old == -2)
-                    pdf_printf ("%i/%s", i, glyph_names[i]);
+                    pdf_printf("%i/%s", i, glyph_names[i]);
                 else
-                    pdf_printf (" %i/%s", i, glyph_names[i]);
+                    pdf_printf(" %i/%s", i, glyph_names[i]);
             }
             i_old = i;
         }
-    pdf_puts ("]\n");
-    pdfenddict ();
+    pdf_puts("]\n");
+    pdfenddict();
 }
 
-void write_enc (char **glyph_names, struct avl_table *tx_tree,
-                integer fe_objnum)
+void write_enc(char **glyph_names, struct avl_table *tx_tree, integer fe_objnum)
 {
     int i_old, *p;
     struct avl_traverser t;
-    assert (glyph_names != NULL);
-    assert (tx_tree != NULL);
-    assert (fe_objnum != 0);
-    pdfbegindict (fe_objnum, 1);
-    pdf_puts ("/Type /Encoding\n");
-    pdf_printf ("/Differences [");
-    avl_t_init (&t, tx_tree);
-    for (i_old = -2, p = (int *) avl_t_first (&t, tx_tree); p != NULL;
-         p = (int *) avl_t_next (&t)) {
+    assert(glyph_names != NULL);
+    assert(tx_tree != NULL);
+    assert(fe_objnum != 0);
+    pdfbegindict(fe_objnum, 1);
+    pdf_puts("/Type /Encoding\n");
+    pdf_printf("/Differences [");
+    avl_t_init(&t, tx_tree);
+    for (i_old = -2, p = (int *) avl_t_first(&t, tx_tree); p != NULL;
+         p = (int *) avl_t_next(&t)) {
         if (*p == i_old + 1)    /* no gap */
-            pdf_printf ("/%s", glyph_names[*p]);
+            pdf_printf("/%s", glyph_names[*p]);
         else {
             if (i_old == -2)
-                pdf_printf ("%i/%s", *p, glyph_names[*p]);
+                pdf_printf("%i/%s", *p, glyph_names[*p]);
             else
-                pdf_printf (" %i/%s", *p, glyph_names[*p]);
+                pdf_printf(" %i/%s", *p, glyph_names[*p]);
         }
         i_old = *p;
     }
-    pdf_puts ("]\n");
-    pdfenddict ();
+    pdf_puts("]\n");
+    pdfenddict();
 }
 
-void write_fontencoding (fe_entry * fe)
+void write_fontencoding(fe_entry * fe)
 {
-    assert (fe != NULL);
-    write_enc (fe->glyph_names, fe->tx_tree, fe->fe_objnum);
+    assert(fe != NULL);
+    write_enc(fe->glyph_names, fe->tx_tree, fe->fe_objnum);
 }
 
-void write_fontencodings ()
+void write_fontencodings()
 {
     fe_entry *fe;
     struct avl_traverser t;
     if (fe_tree == NULL)
         return;
-    avl_t_init (&t, fe_tree);
-    for (fe = (fe_entry *) avl_t_first (&t, fe_tree); fe != NULL;
-         fe = (fe_entry *) avl_t_next (&t))
+    avl_t_init(&t, fe_tree);
+    for (fe = (fe_entry *) avl_t_first(&t, fe_tree); fe != NULL;
+         fe = (fe_entry *) avl_t_next(&t))
         if (fe->fe_objnum != 0)
-            write_fontencoding (fe);
+            write_fontencoding(fe);
 }
 
 /**********************************************************************/
 /* cleaning up... */
 
-static void destroy_fe_entry (void *pa, void *pb)
+static void destroy_fe_entry(void *pa, void *pb)
 {
     fe_entry *p;
     int i;
     p = (fe_entry *) pa;
-    xfree (p->name);
+    xfree(p->name);
     if (p->glyph_names != NULL)
         for (i = 0; i < 256; i++)
             if (p->glyph_names[i] != notdef)
-                xfree (p->glyph_names[i]);
-    xfree (p->glyph_names);
-    xfree (p);
+                xfree(p->glyph_names[i]);
+    xfree(p->glyph_names);
+    xfree(p);
 }
 
-void enc_free ()
+void enc_free()
 {
     if (fe_tree != NULL)
-        avl_destroy (fe_tree, destroy_fe_entry);
+        avl_destroy(fe_tree, destroy_fe_entry);
     fe_tree = NULL;
 }
 

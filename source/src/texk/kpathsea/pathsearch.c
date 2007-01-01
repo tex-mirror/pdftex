@@ -289,9 +289,9 @@ path_search P4C(const_string, path,  string, name,
     
     /* Did we find anything anywhere?  */
     if (found && STR_LIST (*found)) {
-      if (all) {
+      if (all)
         str_list_concat (&ret_list, *found);
-      } else {
+      else {
         str_list_add (&ret_list, STR_LIST_ELT (*found, 0));
         done = true;
       }
