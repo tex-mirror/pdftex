@@ -40,7 +40,9 @@ web2c_options=-c$basefile
 precmd=
 midcmd=
 fixwrites_options=
-splitup_options="-i -l 10000"
+splitup_options="-i -l 11500"
+# was 10000, but that caused pdfetex4.c to appear. With 11500, the number of
+# files for pdf{e}tex is unchanged.
 postcmd=
 output="> $cfile"
 output_files="$cfile $basefile.h"
@@ -48,8 +50,24 @@ output_files="$cfile $basefile.h"
 case $basefile in
   bibtex)
     midcmd="| sed -f $srcdir/web2c/cvtbib.sed";;
-  mf|mp) # MF and MP are almost the same.
+  mf) # MF and MP are almost the same.
     more_defines="$srcdir/web2c/texmf.defines $srcdir/web2c/mfmp.defines"
+    precmd="| sed -f $srcdir/web2c/cvtmf1.sed"
+    web2c_options="-m -c${basefile}coerce"
+    hfile=texmfmp.h
+    midcmd="| sed -f $srcdir/web2c/cvtmf2.sed"
+    postcmd="| ./web2c/splitup $splitup_options $basefile"
+    cfile=${basefile}1.c # last output file, or thereabouts
+    output=
+    output_files="$basefile[0-9].c ${basefile}ini.c ${basefile}d.h \
+${basefile}coerce.h"
+    ;;
+  mp) # MP now needs mp.defines for font inclusion library
+    more_defines="$srcdir/web2c/texmf.defines $srcdir/web2c/mfmp.defines"
+    prog_defines="$srcdir/${basefile}dir/$basefile.defines"
+    if test -f $prog_defines; then
+       more_defines="$more_defines $prog_defines"
+     fi
     precmd="| sed -f $srcdir/web2c/cvtmf1.sed"
     web2c_options="-m -c${basefile}coerce"
     hfile=texmfmp.h
@@ -60,7 +78,7 @@ case $basefile in
     output_files="$basefile[0-9].c ${basefile}ini.c ${basefile}d.h \
 ${basefile}coerce.h"
     ;;
-  tex|eomega|etex|pdftex|pdfetex|omega|aleph)
+  tex|eomega|etex|pdftex|pdfetex|omega|aleph|xetex)
     more_defines="$srcdir/web2c/texmf.defines"
     prog_defines="$srcdir/${basefile}dir/$basefile.defines"
     if test -f $prog_defines; then
@@ -105,7 +123,7 @@ case $basefile in
     sed -e 's/(buftype)//g' -e 's/(pdstype)//g' <bibtex.h >xbibtex.h
     mv xbibtex.h bibtex.h
     ;;
-  tex|eomega|etex|pdftex|pdfetex|omega|aleph|mf|mp)
+  tex|eomega|etex|pdftex|pdfetex|omega|aleph|mf|mp|xetex)
     sleep 2 # so timestamps are definitely later, to avoid make weirdness
     cat ${basefile}coerce.h $srcdir/web2c/coerce.h >x${basefile}coerce.h
     mv x${basefile}coerce.h ${basefile}coerce.h

@@ -6,6 +6,21 @@
 #include <kpathsea/c-pathch.h> /* for IS_DIR_SEP, used in the change files */
 #include <kpathsea/tex-make.h> /* for kpse_make_tex_discard_errors */
 
+#ifdef XeTeX
+/* added typedefs for unicodefile and voidpointer */
+#define XETEX_UNICODE_FILE_DEFINED	1
+typedef struct {
+  FILE *f;
+  long  savedChar;
+  short skipNextLF;
+  short encodingMode;
+  void *conversionData;
+} UFILE;
+typedef UFILE* unicodefile;
+
+typedef void* voidpointer;
+#endif
+
 /* If we have these macros, use them, as they provide a better guide to
    the endianess when cross-compiling. */
 #if defined (BYTE_ORDER) && defined (BIG_ENDIAN) && defined (LITTLE_ENDIAN)
@@ -28,15 +43,15 @@
 
 /* Some things are the same except for the name.  */
 #ifdef TeX
-#if defined (pdfeTeX)
-#define TEXMFPOOLNAME "pdfetex.pool"
-#define TEXMFENGINENAME "pdfetex"
-#elif defined (pdfTeX)
+#if defined (pdfTeX)
 #define TEXMFPOOLNAME "pdftex.pool"
 #define TEXMFENGINENAME "pdftex"
 #elif defined (eTeX)
 #define TEXMFPOOLNAME "etex.pool"
 #define TEXMFENGINENAME "etex"
+#elif defined (XeTeX)
+#define TEXMFPOOLNAME "xetex.pool"
+#define TEXMFENGINENAME "xetex"
 #elif defined (Omega)
 #define TEXMFPOOLNAME "omega.pool"
 #define TEXMFENGINENAME "omega"
@@ -88,6 +103,13 @@ extern int tfmtemp, texinputtype;
 /* TeX, MF and MetaPost use this.  */
 extern boolean openinnameok P1H(const_string);
 extern boolean openoutnameok P1H(const_string);
+
+/* pdfTeX uses these for pipe support */
+#if defined(pdfTeX) || defined(pdfeTeX)
+extern boolean open_in_or_pipe P3H(FILE **, int, const_string fopen_mode);
+extern boolean open_out_or_pipe P2H(FILE **, const_string fopen_mode);
+extern void close_file_or_pipe P1H(FILE *);
+#endif
 
 /* All but the Omega family use this. */
 #if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
@@ -146,7 +168,11 @@ extern void ipcpage P1H(int);
 
 /* Read a line of input as quickly as possible.  */
 #define	inputln(stream, flag) input_line (stream)
+#ifdef XeTeX
+extern boolean input_line P1H(UFILE *);
+#else
 extern boolean input_line P1H(FILE *);
+#endif
 
 /* This routine has to return four values.  */
 #define	dateandtime(i,j,k,l) get_date_and_time (&(i), &(j), &(k), &(l))
@@ -171,6 +197,18 @@ extern void topenin P1H(void);
 /* Set an array size from texmf.cnf.  */
 extern void setupboundvariable P3H(integer *, const_string, integer);
 
+/* These defines reroute the file i/o calls to the new pipe-enabled 
+   functions in texmfmp.c*/
+
+#if defined(pdfTeX) || defined(pdfeTeX)
+#undef aopenin
+#undef aopenout
+#undef aclose
+#define aopenin(f,p)  open_in_or_pipe(&(f),p,FOPEN_RBIN_MODE)
+#define aopenout(f)   open_out_or_pipe(&(f),FOPEN_W_MODE)
+#define aclose(f)     close_file_or_pipe(f)
+#endif
+
 /* `bopenin' (and out) is used only for reading (and writing) .tfm
    files; `wopenin' (and out) only for dump files.  The filenames are
    passed in as a global variable, `nameoffile'.  */
@@ -182,6 +220,9 @@ extern void setupboundvariable P3H(integer *, const_string, integer);
 #define wopenin(f)	open_input (&(f), DUMP_FORMAT, FOPEN_RBIN_MODE)
 #define wopenout	bopenout
 #define wclose		aclose
+#ifdef XeTeX
+#define uopenin(f,p,m,d) u_open_in(&(f), p, FOPEN_RBIN_MODE, m, d)
+#endif
 
 /* Used in tex.ch (section 1338) to get a core dump in debugging mode.  */
 #ifdef unix
@@ -222,8 +263,8 @@ extern void paintrow (/*screenrow, pixelcolor, transspec, screencol*/);
     for (i = 0; i < (len); i++) {                                       \
       if ((&(base))[i] < (low) || (&(base))[i] > (high)) {              \
         FATAL5 ("Item %u (=%ld) of .fmt array at %lx <%ld or >%ld",     \
-                i, (integer) (&(base))[i], (unsigned long) &(base),     \
-                (integer) low, (integer) high);                         \
+                i, (unsigned long) (&(base))[i], (unsigned long) &(base),\
+                (unsigned long) low, (unsigned long) high);             \
       }                                                                 \
     }									\
   } while (0)
@@ -238,8 +279,8 @@ extern void paintrow (/*screenrow, pixelcolor, transspec, screencol*/);
     for (i = 0; i < (len); i++) {                                       \
       if ((&(base))[i] > (high)) {              			\
         FATAL4 ("Item %u (=%ld) of .fmt array at %lx >%ld",     	\
-                i, (integer) (&(base))[i], (unsigned long) &(base),     \
-                (integer) high);                         		\
+                i, (unsigned long) (&(base))[i], (unsigned long) &(base),\
+                (unsigned long) high);                         		\
       }                                                                 \
     }									\
   } while (0)

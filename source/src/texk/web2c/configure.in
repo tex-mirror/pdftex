@@ -16,7 +16,7 @@ dnl to build part of the distribution may not have any given program.
 dnl Even main.c isn't guaranteed, but then nothing is, really ...
 AC_INIT(web2c/main.c)
 
-WEB2CVERSION=7.5.5
+WEB2CVERSION=7.5.6
 AC_SUBST(WEB2CVERSION)
 AC_DEFINE_UNQUOTED(WEB2CVERSION," (Web2C $WEB2CVERSION)")
 
@@ -95,6 +95,12 @@ sinclude(../../libs/libpng/withenable.ac)
 sinclude(../../libs/zlib/zlib.ac)
 sinclude(../../libs/libpng/libpng.ac)
 sinclude(../../libs/xpdf/libxpdf.ac)
+sinclude(../../libs/freetype2/withenable.ac)
+sinclude(../../libs/freetype2/freetype2.ac)
+sinclude(../../libs/teckit/withenable.ac)
+sinclude(../../libs/teckit/teckit.ac)
+sinclude(../../libs/icu-xetex/withenable.ac)
+sinclude(../../libs/icu-xetex/icu-xetex.ac)
 
 # Whether to build mf-nowin.
 : ${with_mf_nowin=no} # Default.
@@ -151,8 +157,7 @@ else
 fi
 
 # For pdfeTeX
-if test -d $srcdir/pdfetexdir && test -d $srcdir/pdftexdir \
-    && test -d $srcdir/etexdir; then
+if test -d $srcdir/pdftexdir; then
   test "${with_pdfetex+set}" = set || with_pdfetex=yes
 else
   if test "x$with_pdfetex" = xyes; then
@@ -161,9 +166,21 @@ else
   with_pdfetex=no
 fi
 
+# For XeTeX
+if test -d $srcdir/xetexdir \
+    && test -d $srcdir/etexdir; then
+  test "${with_xetex+set}" = set || with_xetex=yes
+else
+  if test "x$with_xetex" = xyes; then
+    AC_MSG_WARN(Not all sources of XeTeX are available.)
+  fi
+  with_xetex=no
+fi
+
 # Check whether C++ compiler works.  Prevent exit if it doesn't.
 if test "x$with_pdftex"  = xyes ||
-   test "x$with_pdfetex" = xyes
+   test "x$with_pdfetex" = xyes ||
+   test "x$with_xetex"   = xyes
 then
   # First test whether the compiler works in a subshell, and if so,
   # do it again in the main shell so we see the result.
@@ -176,8 +193,11 @@ then
     && AC_MSG_WARN(No C++ compiler: pdfTeX will not be compiled.)
   test "x$with_pdfetex" = xyes \
     && AC_MSG_WARN(No C++ compiler: pdfeTeX will not be compiled.)
+  test "x$with_xetex" = xyes \
+    && AC_MSG_WARN(No C++ compiler: XeTeX will not be compiled.)
   with_pdftex=no
   with_pdfetex=no
+  with_xetex=no
   true
 }
 fi
@@ -194,7 +214,8 @@ CXXHACKLINK='$(kpathsea_cxx_link)'
 CXXHACKLDLIBS='$(LOADLIBES)'
 if test "x$with_cxx_runtime_hack" = xyes &&
    { test "x$with_pdftex"  = xyes ||
-     test "x$with_pdfetex" = xyes; }
+     test "x$with_pdfetex" = xyes ||
+     test "x$with_xetex"   = xyes; }
 then
   AC_MSG_CHECKING(for statically linking C++ runtime library)
 
@@ -257,6 +278,41 @@ else
   PETEX='#! '
 fi
 AC_SUBST(PETEX)
+
+if test "x$with_xetex" = xyes; then
+  XETEX=
+else
+  XETEX='#! '
+fi
+AC_SUBST(XETEX)
+
+sinclude(xetexdir/withenable.ac)
+sinclude(xetexdir/tests.ac)
+if test "x$with_xetex" = xyes; then
+  AC_HAS_CARBON
+
+  if test "x$has_carbon" = "xyes"; then
+    XETEX_MACOSX=
+    XETEX_GENERIC='#! '
+  else
+    XETEX_MACOSX='#! '
+    XETEX_GENERIC=
+
+    AC_HAS_LIBFONTCONFIG
+    if test "x$LDFONTCONFIG" = "x"; then
+      AC_MSG_ERROR([
+Cannot build XeTeX without libfontconfig.
+Use the --with-fontconfig=DIR option to specify the prefix where
+fontconfig is installed.
+      ])
+    fi
+    AC_SUBST(FONTCONFIGCPPFLAGS)
+    AC_SUBST(FONTCONFIGLDFLAGS)
+    AC_SUBST(LDFONTCONFIG)
+  fi
+  AC_SUBST(XETEX_MACOSX)
+  AC_SUBST(XETEX_GENERIC)
+fi
 
 # For e-TeX, three choices: no, yes, and tex.  In the latter case, we
 # have to comment out the normal TeX build (TEX), as well as enable the
@@ -357,12 +413,12 @@ KPSE_CROSS_PATH_PROG(TANGLE, tangle, ./tangle)
 KPSE_CROSS_PATH_PROG(CTANGLEBOOT, ctangle, ./ctangleboot)
 KPSE_CROSS_PATH_PROG(CTANGLE, ctangle, ./ctangle)
 KPSE_CROSS_PATH_PROG(TIE, tie, ./tie)
-if test "x$with_omega" = xyes || test "x$with_aleph" = xyes; then
+if test "x$with_omega" = xyes || test "x$with_aleph" = xyes || test "x$with_xetex" = xyes; then
 KPSE_CROSS_PATH_PROG(OTANGLE, otangle, ./otangle)
 fi
 
 dnl Generate `Makefile's, `config.status', and our header file.
 KPSE_CONFIG_FILES([Makefile doc/Makefile lib/Makefile man/Makefile mpware/Makefile 
-          web2c/Makefile window/Makefile])
+          mpdir/Makefile web2c/Makefile window/Makefile])
 AC_CONFIG_FILES([fmtutil.cnf:fmtutil.in])
 AC_OUTPUT

@@ -1,0 +1,162 @@
+The pdfTeX team is happy to announce the release of a new stable version:
+
+===========================================================================
+                               pdfTeX 1.40.0
+===========================================================================
+
+This is the announcement of pdfTeX 1.40.0, an extended version of TeX that
+can create PDF directly from TeX source files and enhance the result of TeX
+typesetting with the help of PDF.
+
+===========================================================================
+  Main changes of pdfTeX 1.40.0
+===========================================================================
+
+- pdfetex (as a separate binary/program) is gone; all extensions are now in
+  pdftex. The make files still know about the target pdfetex, but it's just
+  a copy of pdftex
+- The sources of TeX, eTeX and pdfTeX have been merged into one file
+  pdftex.web and one change file pdftex.ch. The sources of TeX and eTeX
+  distributed are just there for reference
+- New features:
+  - pdfTeX can now generate PDF 1.5 object streams, which leads to smaller
+    PDFs. This is controlled by setting \pdfobjcompresslevel to a value >0
+    (3 compress everything, 2 don't compress /Info, 1 also don't compress
+    embedded PDFs) and works only with PDF >=1.5
+  - pdfTeX now supports another image file format: JBIG2 files (.jbig2)
+  - the memory allocated for objects and destination names now grows
+    dynamically
+  - pdfTeX now generates smaller PDFs since for char positioning the width
+    of chars (/Widths) is stored with more precision and so the chars must
+    rarely be positioned separately
+  - the PK resolution is now taken from the "pk_dpi" parameter in texmf.cnf
+    if it has not been set in the format file or by the user
+  - pdfTeX now removes the generated pdf in case of a fatal error
+  - pdfTeX now sets /ModDate and /Trapped in the InfoDict by default (the
+    values can be overridden with \pdfinfo)
+  - the format of warnings and errors issued by pdfTeX has been changed and
+    unified
+  - the output of -version has been extended and now includes information
+    about the libraries actually used, which can be handy when using shared
+    libraries
+  - rules and their positioning on the page are now inside a qQ group
+- New primitives:
+  - pdfTeX can now handle colourstacks. 
+    - \pdfcolorstackinit
+      A stack is initialized by \pdfcolorstackinit. It expands to the
+      number of the new stack. The common case, the traditinal color stack
+      is already initialized as first stack: \pdfcolorstackinit page direct
+      {0 g 0 G} The keyword "page" means that this stack is page based. At
+      the start of the new page, the current stack value is automatically
+      set.
+    - \pdfcolorstack
+      \pdfcolorstack <stack number> push {<new color>}
+      pushes the current value on the stack and sets the <new color>.
+      \pdfcolorstack <stack number> pop 
+      pops and sets the current stack value.
+      \pdfcolorstack <stack number> current
+      sets the current stack value without changing the stack. This is
+      useful for stacks that are initialized without keyword "page".  Thus
+      the page start setting can be set manually.
+      \pdfcolorstack <stack number> set {<new color>}
+      The current value is set to <new color>.
+  - Transformation matrices can now be manipulated more cleanly:
+    Currently matrix changes are done and hidden inside \pdfliteral nodes;
+    pdfTeX doesn't parse its contents and does not know the new settings of
+    the transform matrix. Thus the new primitives to save pdfTeX from
+    parsing \pdfliteral contents and to notify pdfTeX about matrix changes
+    to use them in calculating link and anchor positions.
+    - \pdfsetmatrix{<a> <b> <c> <d>}
+      is the equivalent to \pdfliteral{<a> <b> <c> <d> 0 0 cm}
+    - \pdfsave is the equivalent to \pdfliteral{q}
+    - \pdfrestore is the equivalent to \pdfliteral{Q}
+  - \pdfprimitive\TeX-primitive executes the original \TeX-primitive even
+    if the command has been redefined since. E.g.
+      \let\relax\undefined\pdfprimitive\relax
+    expands to \relax.
+    \ifpdfprimitive\TeX-primitive is true if \TeX-primitive has its
+    original meaning
+  - \ifpdfabsnum and \ifpdfabsdim are like \ifnum and \ifdim, but don't
+    care about negative numbers
+  - shell escape: if the first character of a filename for \openin,
+    \openout \input is a pipe symbol (|), the filename is assumed to be a
+    request for a pipe to a command line that is given in the rest of the
+    filename
+  - draftmode: With \pdfdraftmode=1 or the commandline switch -draftmode
+    pdfTeX doesn't write the output pdf and doesn't actually read any
+    images, thus speeding up compilations when you know you need an extra
+    run but don't care about the output, e.g. just to get the BibTeX
+    references right
+  - \pdfpxdimen (introduced in 1.30) is now a real dimension parameter. It
+    allows one base dimensions on pixels. 1px defaults to 1bp (or 72dpi),
+    but can be changed with the \pdfpxdimen primitive:
+      \pdfpxdimen=1in % 1 dpi
+      \divide\pdfpxdimen by 96 % 96 dpi
+      \hsize=1200px
+    Now \hsize is (1in/96)*1200
+  - \pdflastlink returns the object number of the last \pdfstartlink
+  - \pdfsavepos now works in DVI mode
+- Fonts:
+  - support for subfonts: This creates all needed map entries for subfonts
+    automatically and handles Unicode mappings
+  - ToUnicode entries for Type1 fonts (patch 580)
+- HZ:
+  - added patch 462: HZ font expansion in autoexpand mode now produces
+    smaller pdf files, as it works by modififying the text matrix for
+    single fonts instead of embedding many expanded font versions.
+    Therefore HZ now can be used also for TrueType fonts and even for
+    non-embedded fonts (e.g.  Times-Roman)
+- Bugfixes:
+  - the PDF statistics in the log are now correct
+  - added JFIF detection patch to writejpg.c (bug 548)
+  - bugfix: invalid pdf created if font name contains space (509)
+  - bugfix: truetype OS/2 v3 fonts (594)
+  - bugfix: Type1C (CFF) fonts of embedded pdfs didn't get replaced
+
+For complete release notes see http://www.pdftex.org/NEWS
+
+===========================================================================
+  Legal notice / license
+===========================================================================
+
+pdfTeX is copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
+
+pdfTeX is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+For a complete README (with a full discussion of the license)
+please look at http://www.pdftex.org/README
+
+===========================================================================
+  The files / installation
+===========================================================================
+
+You should first try to get a new version of pdfTeX through your
+distribution.
+
+If you want to compile it yourself, have a look at http://www.pdftex.org --
+there you can find links to the pdfTeX sources on CTAN. And some useful
+documentation. 
+
+===========================================================================
+  Mailing lists / web pages:
+===========================================================================
+
+  Mailing list:
+    http://tug.org/mailman/listinfo/pdftex
+
+  Related web pages:
+    http://www.pdftex.org
+    http://sarovar.org/projects/pdftex/
+    http://www.tug.org/tex-live/
+    http://www.tug.org/tetex/
+    http://www.tex.ac.uk/cgi-bin/texfaq2html?introduction=yes
+    http://www.dante.de/
+    http://tug.org/
+    http://www.pragma-ade.com/
+
+Have fun!
+
+Martin Schröder (martin@pdftex.org) for the pdfTeX team, January 2007

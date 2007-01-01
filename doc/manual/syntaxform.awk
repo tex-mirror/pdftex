@@ -1,5 +1,6 @@
-#$Id: syntaxform.awk,v 1.12 2004/12/28 13:35:09 hahe Exp $
+#$Id: syntaxform.awk,v 1.13 2006/02/10 21:27:48 hhenkel Exp $
 # pdftex-t.tex --> pdftex-syntax.txt
+# requires gawk due to gensub() function
 
 BEGIN{
   buffer = "";

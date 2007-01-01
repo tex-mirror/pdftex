@@ -14,6 +14,10 @@
   \supported
  \fi}
 
+% to trick \if..\fi balancing
+% \def\otherwise{\else}
+% \def\endif{\fi}
+
 \def\supported{\expandafter\iftrue}
 \def\notsupported{\expandafter\iffalse}
 
@@ -24,7 +28,7 @@
  \else#4\fi}
 
 \def\pdfTeX{pdf\TeX}
-\def\primitive#1{{\tt\char92\relax#1}}
+\def\cs#1{{\tt\string#1}}
 \def\newpage{\null\vfill\eject}
 
 \parindent=0pt
@@ -54,6 +58,12 @@
                         % numbers out of range will be fixed to the most
                         % closed allowed value. Recommended value for most
                         % cases is 6 or 7.
+
+\ifversion 1.40.0
+ \pdfobjcompresslevel=0 % having pdfTeX 1.40.0 or higher and PDF 1.5 or higher,
+                        % we can also control non-stream compression level. See
+                        % pdfTeX manual for details.
+\fi
 
 \pdfdecimaldigits=3     % number of digits after decimal point for real
                         % number in pdf output; the larger value the
@@ -140,13 +150,13 @@
                           % If \pdfinclusionerrorlevel is set to one, warning only
                           % (synonym of obsolete \pdfoptionpdfinclusionerrorlevel).
 
-\ifversion1.30.0
+\ifversion 1.30.0
 \pdfimagehicolor=1      % enables 16-bit colors for PNG inclusions;
                         % defaults to 1 if \pdfminorversion>=5,
 \pdfimageapplygamma=1   % enables gamma correction for PNG inclusions,
 \pdfgamma=1000          % sets pdfTeX `device gamma,'
 \pdfimagegamma=2200     % sets image gamma, if can't be taken from the image itself.
-\fi                     % (see below for details).
+\fi                  % (see below for details).
 
 % Version of pdftex can be accessed via \pdftexversion and \pdftexrevision.
 
@@ -215,7 +225,7 @@ A simple picture:
 % of `direct'. If the keyword is `page', pdfTeX closes internal text block with `ET'
 % before putting the literal content; like with `direct', without translation.
 
-\feature 1.30.0 {\primitive\pdfliteral{ \tt page} keyword}
+\feature 1.30.0 {\cs\pdfliteral{ \tt page} keyword}
 ...and now look at the lower-left corner of the page.\par
 \pdfliteral page {q 1 j 0 1 0 rg 0 0 1 RG 0 0 10 10 re B Q}
 \pdfliteral page {q -1 0 0 1 612 0 cm .5 g}\hfill Do you like that?\pdfliteral page {Q}
@@ -377,7 +387,11 @@ We may change it, lets say to \the\pdfrandomseed.\par
 % \pdfstrcmp{aaa}{abc} returns -1 since 'aaa'<'abc'
 % \pdfstrcmp{abc}{ABC} returns 1  since 'aaa'>'ABC'
 % \endfeature
-% This is still experimental, as well as regex support
+% This is still experimental, as well as regex support.
+
+% Starting from version 1.40.0 there are two handy primitives for absolute
+% values comparison. This is e-TeX however...
+% \feature 1.40.0 {Absolute \cs\if's}\fi\endfeature
 
 % Thanks to Heiko Oberdiek, starting from pdfTeX 1.30.0 a set of expandable
 % string handlers are available. \pdfescapestring converts its parameter into a
@@ -414,9 +428,10 @@ Bytes 7 to 13 of the source are hex {\tt\pdffiledump offset 7 length 7{\jobname}
 
 \endfeature
 
-% \pdfsavepos saves coordinates of the current position on the page relative to
-% lower-left corner. \pdflastxpos and \pdflastypos are available while shipping
-% out the page. Both are integers; the position is expressed in scaled points.
+% \pdfsavepos saves coordinates of the current position (basepoint) on the page
+% relative to lower-left corner. \pdflastxpos and \pdflastypos are available
+% while shipping out the page. Both are integers; the position is expressed in
+% scaled points. Starting from pdfTeX 1.40.0, availavle also in DVI mode.
 
 \pdfsavepos
 \write16{Position: X=\number\pdflastxpos sp, Y=\number\pdflastypos sp.}
@@ -508,6 +523,30 @@ The last image has \the\pdflastximagepages\ page(s).
 \pdfximage              % include the image at resolution 1200 dpi
     width \dimen0 {pic.pdf}  % by setting image width to the calculated value
 \pdfrefximage \pdflastximage
+
+% While working with bitmap graphic it might be more convenient to operate on 
+% pixels rather then dimension units. Starting from version 1.30.0, pdfTeX offers
+% a special, scalable unit called `px'. The real value associated with `px' is controlled
+% via \pdfpxdimen primitive. It used to be a count register defaulted to 65536 (1pt = 1px).
+% Starting from pdfTeX 1.40.0, \pdfpxdimen is a true dimen defaulted to 1bp, that implies
+% 72dpi resolution.
+
+
+\feature 1.30.0 {Scalable {\tt px} unit}
+
+\ifversion 1.40.0
+ \pdfpxdimen=0.06bp % 1200dpi -> 72/1200
+\else
+ \pdfpxdimen=3946   % 1200dpi -> 72*65781/1200
+\fi
+
+640 pixels in 1200dpi makes \dimen0=640px \the\dimen0.
+
+\endfeature
+
+
+% ... Be aware of rounding error significant for large resolutions
+% 1200 pixels in 1200dpi makes \dimen0=1200px \the\dimen0. -> 72.25342pt < 72.27
 
 \newpage
 
@@ -670,15 +709,15 @@ end;
 % Starting from pdfTeX 1.21a, one may test if this option is enabled using
 % \ifeof condition (distribution dependent):
 
-\feature 1.21 {Shell escape detection (via \primitive{ifeof})}
-Shell escape (via \primitive{ifeof}) seems to be
+\feature 1.21 {Shell escape detection (via \cs{ifeof})}
+Shell escape (via \cs{ifeof}) seems to be
 \ifeof18 disabled\else enabled\fi.
 \endfeature
 
 % ...pdfTeX 1.30.0 introduces its own primitive integer flag
 
-\feature 1.30.0 {Shell escape detection (via \primitive{pdfshellescape})}
-Shell escape (via \primitive{pdfshellescape}) seems to be
+\feature 1.30.0 {Shell escape detection (via \cs\pdfshellescape)}
+Shell escape (via \cs\pdfshellescape) seems to be
 \ifnum\pdfshellescape=1 disabled\else enabled\fi.
 \endfeature
 
@@ -951,6 +990,10 @@ This is a page containing destination `num 1'
                         % \pdfendlink
 }
 
+\feature 1.40.0 {Last link object}
+The link is object \the\pdflastlink.
+\endfeature
+
 % more link examples
 
 \leftline{%
@@ -1003,9 +1046,9 @@ This is a page containing destination `num 1'
     its end must be in horizontal mode and the parent boxes must have the
     same box nesting level.\Black
     \pdfendlink
-    A common mistake here is using \primitive{pdfstartlink} at the
-    beginning of the text without \primitive{indent}, \primitive{noindent}
-    or \primitive{leavevmode}, so \primitive{pdfstartlink}
+    A common mistake here is using \cs{\pdfstartlink} at the
+    beginning of the text without \cs{\indent}, \cs{\noindent}
+    or \cs{\leavevmode}, so \cs{\pdfstartlink}
     will end up in vertical mode and cause an error.
     \par}
 
