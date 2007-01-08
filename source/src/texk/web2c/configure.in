@@ -95,6 +95,7 @@ sinclude(../../libs/libpng/withenable.ac)
 sinclude(../../libs/zlib/zlib.ac)
 sinclude(../../libs/libpng/libpng.ac)
 sinclude(../../libs/xpdf/libxpdf.ac)
+sinclude(../../libs/obsdcompat/libobsd-compat.ac)
 sinclude(../../libs/freetype2/withenable.ac)
 sinclude(../../libs/freetype2/freetype2.ac)
 sinclude(../../libs/teckit/withenable.ac)
@@ -288,6 +289,19 @@ AC_SUBST(XETEX)
 
 sinclude(xetexdir/withenable.ac)
 sinclude(xetexdir/tests.ac)
+
+sinclude(xetexdir/acx_pthread.m4)
+ACX_PTHREAD
+
+# the following is for OpenBSD, where the PTHREAD_CFLAGS setting is defeated by -nodefaultlibs in the xetex link;
+# similar hackery might be needed on other systems (groan) -- JK 2007-01-07
+case "${host}" in
+*-*-*bsd*)
+  if test "x$PTHREAD_LIBS" = "x"; then
+    PTHREAD_LIBS="-lpthread"
+  fi ;;
+esac
+
 if test "x$with_xetex" = xyes; then
   AC_HAS_CARBON
 
@@ -382,11 +396,6 @@ if test "$with_pdftex" = yes || \
    test "$with_pdfetex" = yes
 then
   KPSE_CONFIG_FILES([pdftexdir/Makefile])
-fi
-
-# Don't bother with pdfelib unless pdfeTeX is requested.
-if test "$with_pdfetex" = yes; then
-  AC_CONFIG_FILES([pdfetexdir/Makefile])
 fi
 
 dnl Create tests subdirectory.
