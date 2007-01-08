@@ -1,12 +1,12 @@
 % interface=english modes=letter,screen output=pdftex
 % vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.652 2006/12/21 22:38:08 hhenkel Exp $
+% $Id: pdftex-t.tex,v 1.671 2007/01/01 15:59:08 oneiros Exp $
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
 
-\setvariables[pdftex][titlepagelines=55]
+\setvariables[pdftex][titlepagelines=55] % 55 should be ok for non-rc* version
 
 %D We use a multi purpose style (using modes) that enable us
 %D to generate an A4, letter and screen version.
@@ -61,7 +61,7 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.652 2006/12/21 22:38:08 hhenkel Exp $
+\rcsscan $Id: pdftex-t.tex,v 1.671 2007/01/01 15:59:08 oneiros Exp $
 
 \def\currentpdftex{1.40.0}
 
@@ -70,10 +70,12 @@
 \def\eTeX{{$\varepsilon$}-\kern-.125em\TeX}
 \def\eg{e.\,g.}
 \def\Eg{E.\,g.}
+\def\PDFReference{PDF Reference} % PDF with capital letters
 
 \abbreviation [AFM]        {afm}        {Adobe Font Metrics}
 %\abbreviation [AMIGA]      {Amiga}      {Amiga hardware platform}
 %\abbreviation [AMIWEB]     {AmiWeb2c}   {\AMIGA\ distribution}
+\abbreviation [BIBTEX]     {bib\TeX}    {Handles bibliographies}
 \abbreviation [ASCII]      {ascii}      {American Standard Code for Information Interchange}
 \abbreviation [CMACTEX]    {CMac\TeX}   {\MAC\ \WEBC\ distribution}
 \abbreviation [CONTEXT]    {\ConTeXt}   {general purpose macro package}
@@ -161,6 +163,7 @@
 \useURL [andreas]    [mailto:andreas.scherer@pobox.com]
 \useURL [christian]  [mailto:cschenk@berlin.snafu.de]
 \useURL [context]    [http://www.pragma-ade.com]
+\useURL [pdfreference] [http://www.adobe.com/devnet/pdf/pdf_reference.html]
 
 % where the bug reports should go:
 \useURL [ptex_bugs]  [mailto:pdftex@tug.org]                                  [] [pdftex@tug.org]
@@ -297,12 +300,6 @@
 
 \setuptyping
   [margin=standard]
-
-\definetype
-  [esctype]
-\setuptype
-  [esctype]
-  [option=commands,escape=@]
 
 \definetyping
   [esctyping]
@@ -669,7 +666,7 @@ produces normal \DVI\ output, otherwise it generates \PDF\ output
 that looks identical to the \DVI\ output. An important aspect of this
 project is to investigate alternative justification algorithms (\eg\
 a~font expansion algorithm akin to the \HZ\ micro||typography algorithm by
-Prof.~Hermann Zapf), optionally making use of multiple master fonts.
+Prof.~Hermann Zapf), optionally making use of Multiple Master fonts.
 
 \PDFTEX\ is based on the original \TEX\ sources and \WEBC, and has been
 successfully compiled on \UNIX, \WIN\ and \MSDOS\ systems. It is under
@@ -718,7 +715,7 @@ Please send questions or suggestions by email to \from[ptex_bugs].
 
 \subsection{Legal Notice}
 
-Copyright \copyright\ 1996||2006  \THANH.
+Copyright \copyright\ 1996||2007  \THANH.
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
 or any later version published by the Free Software Foundation;
@@ -737,46 +734,35 @@ The first line specifies the version used; currently \PDFTEX\ produces
 level 1.4 output by default. \PDF\ viewers are supposed to silently skip
 over all elements they cannot handle.
 
-A~\PDF\ file consist of objects. These objects can be recognized by their
+A~\PDF\ file consists of objects. These objects can be recognized by their
 number and keywords:
 
 \starttyping
 9 0 obj << /Type /Catalog /Pages 5 0 R >> endobj
 \stoptyping
 
-Here \typ{9 0 obj ... endobj} is the object capsule. The first number is
-the object number. Later we will see that \PDFTEX\ gives access to this
-number. One can for instance create an object by using \type{\pdfobj} after
-which \type{\pdflastobj} returns the number. So
-
-\starttyping
-\pdfobj{/Type /Catalog /Pages 5 0 R}
-\stoptyping
-
-inserts an object into the file, while \type{\pdflastobj} returns the
-number \PDFTEX\ assigned to this object. The sequence \type{5 0 R} is
-an object reference, a~pointer to another object (no.~5). The second
-number (here a~zero) is currently not used in \PDFTEX; it is the version
-number of the object. It is for instance used by \PDF\ editors, when
-they replace objects by new ones. In general this rather direct way of
-pushing objects in the files by primitives like \type{\pdfobj} is not
-very useful, and only makes sense when implementing, say, fill||in field
-support or annotation content reuse. We will come to that later. Unless
-such direct objects are referenced by others, they will just end up as
-isolated entities, not doing any real harm but bloating the \PDF\ file.
+Here \typ{9 0 obj ... endobj} is the object capsule. The first number
+is the object number. The sequence \type{5 0 R} is an object reference,
+a~pointer to another object (no.~5). The second number (here a~zero)
+is currently not used in \PDFTEX; it is the version number of the
+object. It is for instance used by \PDF\ editors, when they replace
+objects by new ones.
 
 When a~viewer opens a~\PDF\ file, it goes right to the end of the
 file, looking for the keyword \type{startxref}. The number after
-\type{startxref} gives the absolute position (byte offset from the file
-start) of the so called \quote {object cross-reference table}. This
-table in turn tells the byte offsets of all objects that make up the
-\PDF\ file, providing fast random access to the individual objects. The
-actual starting point of the file's object structure is defined after
-the \type{trailer}: The \type{/Root} entry points to the \type{/Catalog}
-object. In this object the viewer can find the pointer \type{/Pages}
-to the page list. In our example we have only one page. The trailer also
-holds an \type{/Info} entry, which points to an object with a~bit more
-about the document. Just follow the thread:
+\type{startxref} gives the absolute position (byte offset from the
+file start) of the so called \quote {object cross-reference table}
+that begins with the keyword \type{xref}. This table in turn tells the
+byte offsets of all objects that make up the \PDF\ file, providing fast
+random access to the individual objects (here the \type{xref} table
+shows 11~objects, numbered from~0 to~10; the object no.~0 is always
+unused). The actual starting point of the file's object structure is
+defined after the \type{trailer}: The \type{/Root} entry points to the
+\type{/Catalog} object (no.~9). In this object the viewer can find the
+pointer \type{/Pages} to the page list object (no.~5). In our example we
+have only one page. The trailer also holds an \type{/Info} entry, which
+points to an object (no.~10) with a~bit more about the document. Just
+follow the thread:
 
 \startnarrower
 \type{/Root}     $\longrightarrow$ object~9 $\longrightarrow$
@@ -794,43 +780,80 @@ can be compressed, where the level of compression can be set with
 \type {\pdfcompresslevel} (compression is switched off for the title
 page). Let's take a~closer look at this stream in object~3. Often
 (but not in our example) there is a~transformation matrix, six numbers
-followed by \type{cm}. As in \POSTSCRIPT, the operator comes after
-the operands. Between \type{BT} and \type{ET} comes the text. A~font
-is selected by a~\type{Tf} operator, which is given a~resource name
+followed by \type{cm}. As in \POSTSCRIPT, the operator comes after the
+operands. Between \type{BT} and \type{ET} comes the text. A~font is
+selected by a~\type{Tf} operator, which is given a~font resource name
 \type{/F..} and the font size. The actual text goes into \type{()}
 bracket pairs so that it creates a~\POSTSCRIPT\ string. The numbers
-inbetween bracket pairs provide fine glyph positioning (kerning). When
-one analyzes a~file produced by a~less sophisticated typesetting engine,
-whole sequences of words can be recognized. In \PDF\ files generated by
-\PDFTEX\ however, many words come out rather fragmented, mainly because
-a~lot of kerning takes place; in our example the \type{80} moves the
-text \type{(elcome)} left towards the letter \type{(W)}. \PDF\ viewers
-in search mode simply ignore the kerning information in these text
-streams. When a~document is searched, the search engine reconstructs
-the text from these (string) snippets.
+inbetween bracket pairs provide horizontal movements like spaces and
+fine glyph positioning (kerning). When one analyzes a~file produced by
+a~less sophisticated typesetting engine, whole sequences of words can
+be recognized. In \PDF\ files generated by \PDFTEX\ however, many words
+come out rather fragmented, mainly because a~lot of kerning takes place;
+in our example the \type{80} moves the text \type{(elcome)} left towards
+the letter \type{(W)} by 80/1000 of the font size. \PDF\ viewers in search
+mode simply ignore the kerning information in these text streams. When
+a~document is searched, the search engine reconstructs the text from these
+(string) snippets.
 
-The title page example uses an Adobe Times||Roman font. This is one of the
-14 so||called standard fonts that should always be present in any \PDF\
-viewer application, and therefore need not be embedded in the \PDF\ file.
-However, when we use for instance a~Computer Modern Roman font, we have
-to make sure that this font is later available to the \PDF\ viewer, and
-the best way to do this is to embed the font (it's highly recommended
-to embed even the standard fonts).
+Every \type{/Page} object points also to a~\type{/Resources} object
+(no.~1) that gives all ingredients needed to assemble the page. In our
+example only a~\type{/Font} object (no.~4) is referenced, which in turn
+tells that the text is typeset in \type{/Font} \type{/Times-Roman}. The
+\type{/Font} object points also to a~\type{/Widths} array (object no.~7)
+that tells for each character by how much the viewer must move forward
+horizontally after typesetting a~glyph. More details about the font
+can be found in the \type{/FontDescriptor} object (no.~8); if a~font
+file is embedded, this object points to the font program stream. But as
+the Times-Roman font used for our example is one of the 14 so||called
+standard fonts that should always be present in any \PDF\ viewer and
+therefore need not be embedded in the \PDF\ file, it is left out here
+for brevity. However, when we use for instance a~Computer Modern Roman
+font, we have to make sure that this font is later available to the \PDF\
+viewer, and the best way to do this is to embed the font.
 
-In this simple file, we don't specify in what way the file should be opened,
+It's highly recommended nowadays to embed even the standard fonts, as
+modern viewers often don't use the original 14~standard fonts anymore,
+but instead approximate them by instances of built||in Multiple Master
+fonts (\eg\ the Adobe Reader~7 approximates the Times-Roman variants by
+the Minion font). So you never really know how it looks exactly at the
+viewer side unless you embed every font.
+
+In this simple file we don't specify in what way the file should be opened,
 for instance full screen or clipped. A~closer look at the page object no.~2
 (\typ{/Type /Page}) shows that a~mediabox (\typ{/MediaBox}) is part of the
 page description. A~mediabox acts like the (high-resolution) bounding box
 in a~\POSTSCRIPT\ file. \PDFTEX\ users can add dictionary stuff to page
 objects by the \type{\pdfpageattr} primitive.
 
-Although in most cases macro packages will shield users from these internals,
-\PDFTEX\ provides access to many of the entries described here, either
-automatically by translating the \TEX\ data structures into \PDF\ ones, or
-manually by pushing entries to the catalog, page, info or self created
-objects. Those who, after this introduction, feel unsure how to
-proceed, are advised to read on but skip \in{section}[primitives]. Before we
-come to that section, we will describe how to get started with \PDFTEX.
+Although in most cases macro packages will shield users from these
+internals, \PDFTEX\ provides access to many of the entries described
+here, either automatically by translating the \TEX\ data structures
+into \PDF\ ones, or manually by pushing entries to the catalog, page,
+info or self created objects. One can for instance create an object by
+using \type{\pdfobj} after which \type{\pdflastobj} returns the number. So
+
+\starttyping
+\pdfobj{/Type /Catalog /Pages 5 0 R}
+\stoptyping
+
+inserts an object into the \PDF\ file, while \type{\pdflastobj}
+returns the number \PDFTEX\ assigned to this object. Unless objects
+are referenced by others, they will just end up as isolated entities,
+not doing any real harm but bloating the \PDF\ file. In general this
+rather direct way of pushing objects in the \PDF\ files by primitives like
+\type{\pdfobj} is not very useful, and only makes sense when implementing,
+say, fill||in field support or annotation content reuse. We will come
+to that later.
+
+For those who want to learn more about the gory \PDF\ details, the best
+bet is to read the \PDFReference. As of the time of writing you can
+download this book as a~big \PDF\ file from Adobe's PDF Technology Center,
+\from[pdfreference] --- or get the heavy paper version.
+
+Those who, after this introduction, feel unsure how to proceed, are
+advised to read on but skip \in{section}[primitives]. Before we come to
+that section, we will describe how to get started with \PDFTEX.
 
 %***********************************************************************
 
@@ -911,9 +934,9 @@ The next step is to put the freshly compiled \filename{pdftex},
 \filename{pdftosrc}, and \filename{ttf2afm} binaries and the
 pool file \filename{pdftex.pool} into their proper places within
 the \TDS\ structure of the \TEX\ system. Put the binary files
-into the binary directory (\eg\ for a~typical \TETEX\ system)
-\filename{/usr/local/teTeX/bin/i686-pc-linux-gnu}, and the pool file
-into \filename{/usr/local/teTeX/share/texmf/web2c}.
+into the binary directory (\eg\ for a~typical \TEXLIVE\ system)
+\filename{/usr/local/texlive/2006/bin/x86_64-linux}, and the pool file
+into \filename{/usr/local/texlive/2006/texmf/web2c}.
 
 Don't forget to do a~\filename{texconfig-sys init} afterwards, so that
 all formats are regenerated system-wide with the fresh \filename{pdftex}
@@ -926,7 +949,7 @@ binary.
 \WEBC||based programs, including \PDFTEX, use the \WEBC\ run||time
 configuration file called \filename {texmf.cnf}.  The location
 of this file is the appropriate position within the \TDS\ tree
-relative to the place of the \PDFTEX\ binary; on a~\TETEX\ system,
+relative to the place of the \PDFTEX\ binary; on a~\TEXLIVE\ system,
 file \filename{texmf.cnf} typically is located either in directory
 \filename{texmf/web2c} or \filename{texmf-local/web2c}.  The path to
 file \filename{texmf.cnf} can also be set up by the environment variable
@@ -1306,7 +1329,8 @@ pool_size=500000
 
        This might appear if you forgot to install the proper \filename
        {pdftex.pool} when installing a~new version of the \PDFTEX\
-       binary. \Eg\ under \TETEX\ then run \type{texconfig-sys init}.
+       binary. \Eg\ under \TEXLIVE\ then run \type{texconfig-sys init}
+       as root.
 
 %\head  \type{! I can't find file `*pdftex.ini'.} \crlf
 %       \type{<*> *pdftex.ini}
@@ -1416,17 +1440,15 @@ Some nice samples of \PDFTEX\ output can be found at
 
 \section{Setting up fonts}
 
-\PDFTEX\ can work with Type~1 and TrueType fonts, but a~source must be
-available for all fonts used in the document, except for the 14 standard
-fonts supplied by the \PDF\ viewer (Times, Helvetica, Courier, Symbol
-and Dingbats).  It is possible to use \METAFONT||generated fonts in
-\PDFTEX\ --- but it is strongly recommended not to use these fonts if an
-equivalent is available in Type~1 or TrueType format, if only because
-bitmap Type~3 fonts render very poorly in (older versions of) Adobe
-Reader. Given the
-free availability of Type~1 versions of all the Computer Modern fonts,
-and the ability to use standard \POSTSCRIPT\ fonts, there is rarely
-a~need to use bitmap fonts in \PDFTEX.
+\PDFTEX\ can work with Type~1 and TrueType fonts (and to some extent also
+with OpenType fonts). Font files should be available and embedded for all
+fonts used in the document. It is possible to use \METAFONT||generated
+fonts in \PDFTEX\ --- but it is strongly recommended not to use these
+fonts if an equivalent is available in Type~1 or TrueType format, if
+only because bitmap Type~3 fonts render very poorly in (older versions
+of) Adobe Reader. Given the free availability of Type~1 versions of all
+the Computer Modern fonts, and the ability to use standard \POSTSCRIPT\
+fonts, there is rarely a~need to use bitmap fonts in \PDFTEX.
 
 %***********************************************************************
 
@@ -1434,13 +1456,13 @@ a~need to use bitmap fonts in \PDFTEX.
 
 Font map files provide the connection between \TEX\ \TFM\ font files
 and the outline font file names. They contain also information about
-re||encoding arrays, partial downloading, and character transformation
-parameters (like SlantFont and ExtendFont). Those map files were first
-created for \DVI\ postprocessors. But, as \PDFTEX\ in \PDF\ output mode
-includes all \PDF\ processing steps, it also needs to know about font
-mapping, and therefore reads in one or more map files.  Map files are
-not read in when \PDFTEX\ is in \DVI\ mode. Pixel fonts can be used
-without being listed in the map file.
+re||encoding arrays, partial font embedding (``subsetting''), and
+character transformation parameters (like SlantFont and ExtendFont). Those
+map files were first created for \DVI\ postprocessors. But, as \PDFTEX\
+in \PDF\ output mode includes all \PDF\ processing steps, it also needs
+to know about font mapping, and therefore reads in one or more map files.
+Map files are not read in when \PDFTEX\ is in \DVI\ mode. Pixel fonts
+can be used without being listed in the map file.
 
 By default, \PDFTEX\ reads the map file \filename{pdftex.map}.  In \WEBC,
 map files are searched for using the \type{TEXFONTMAPS} config file value
@@ -1503,10 +1525,10 @@ strictly speaking it's optional).
 \startdescription {fontflags}
 
 specify some characteristics of the font. The following description of
-these flags is taken, with slight modification, from the \PDF\ Reference
-Manual (the section on font descriptor flags). Viewers can adapt their
-rendering to these flags, especially when they substitute a~replacements
-for not embedded fonts.
+these flags is taken, with slight modification, from the \PDFReference\
+(the section on font descriptor flags). Viewers can adapt their rendering
+to these flags, especially when they substitute a~non-embedded font by
+some own approximation.
 
 \startnarrower
 
@@ -1570,9 +1592,9 @@ features of bold characters may be thickened at small text sizes.
 
 \stopnarrower
 
-If the font flags are not given, \PDFTEX\ treats it as being~4,
-a~symbolic font. If you do not know the correct value, it is best not to
-specify it at all, as specifying a~bad value of font flags may cause
+If the {\em fontflags} field is not given, \PDFTEX\ treats it as being~4,
+a~symbolic font. If you do not know the correct value, it is best not
+to specify it at all, as specifying a~bad value of font flags may cause
 troubles in viewers. On the other hand this option is not absolutely
 useless because it provides backward compatibility with older map files
 (see the {\em fontfile} description below).
@@ -1591,15 +1613,17 @@ instruction must be enclosed by double quotes \type{"}.
 
 \stopdescription
 
-\startdescription {encoding}
+\startdescription {encodingfile}
 
-specifies the name of the file containing the external encoding vector to be
-used for the font. The file name may be preceded by a~\type{<}, but the
-effect is the same. The format of the encoding vector is identical to that
-used by \type{dvips}. If no encoding is specified, the font's built||in
-default encoding is used. It may be omitted if you are sure that the font
-resource has the correct built||in encoding. In general this option is highly
-preferred and is {\em required} when subsetting a~TrueType font.
+specifies the name of the file containing the external encoding vector
+to be used for the font. The encoding file must have name extension
+\type{.enc}, and the full file name including this extension must be given
+with preceding~\type{<} character. The format of the encoding vector is
+identical to that used by \type{dvips}. If no encoding is specified,
+the font's built||in default encoding is used. The {\em encodingfile}
+field may be omitted if you are sure that the font resource has the
+correct built||in encoding. In general this option is highly recommended,
+and it is {\em required} when subsetting a~TrueType font.
 
 \stopdescription
 
@@ -1608,10 +1632,10 @@ preferred and is {\em required} when subsetting a~TrueType font.
 sets the name of the font file to be embedded into the \PDF\ output for a
 given \TeX\ font (the {\em tfmname}~$\longleftrightarrow$~{\em fontfile}
 mapping is the most prominent use of the \filename{pdftex.map} file).
-The font file name must belong to a~Type~1 or TrueType font file. If the
-{\em fontfile} name is missing, no font embedding can take place; in case
-the {\em basename} field does not contain one of the 14 standard font
-names also a~warning will be given. Not embedding a~font into a~\PDF\
+The font file name must belong to a~Type~1 or TrueType font file. If
+the {\em fontfile} field is missing, no font embedding can take place;
+in case the {\em basename} field does not contain one of the 14 standard
+font names also a~warning will be given. Not embedding a~font into a~\PDF\
 file might be troublesome, as it requires that the font or some similar
 looking replacement font is available within the \PDF\ viewer, so that
 it can render the glyphs with its own font version.
@@ -1622,12 +1646,12 @@ which tells how to handle the font file:
 \startitemize
 
 \item  If the font file name is preceded by a~\type{<} character, the
-       font file will be partially downloaded (``subsetted''), meaning
-       that only used glyphs are going into the \PDF\ file. This is the
-       most common use and is {\em strongly recommended} for any font,
-       as it ensures the portability and reduces the size of the \PDF\
-       output. Subsetted fonts are included in such a~way that name and
-       cache clashes are minimized.
+       font file will be only partially embedded  into the \PDF\ file
+       (``subsetted''), meaning that only used glyphs are going into
+       the \PDF\ file. This is the most common use and is {\em strongly
+       recommended} for any font, as it ensures the portability and
+       reduces the size of the \PDF\ output. Subsetted fonts are included
+       in such a~way that name and cache clashes are minimized.
 
 \item  If the font file name is preceded by a~double \type{<<}, the font
        file will be included entirely --- all glyphs of the font
@@ -1682,27 +1706,27 @@ be more useful when better Type~3 font handling is more common.}. If no
 \PGC\ source is available, \PDFTEX\ will try to use \PK~fonts as \DVI\
 drivers do, creating \PK~fonts on||the||fly if needed.
 
-Lines containing nothing apart from {\em tfmname} stand for scalable Type~3
-fonts. For scalable fonts as Type~1, TrueType and scalable Type~3 font, all
-the fonts loaded from a~\TFM\ at various sizes will be included only once in
-the \PDF\ output. Thus if a~font, let's say \type{csr10}, is described in one
-of the map files, then it will be treated as scalable. As a~result the font
-source for csr10 will be included only once for \type{csr10}, \type{csr10
-at 12pt} etc. So \PDFTEX\ tries to do its best to avoid multiple downloading
-of identical font sources. Thus vector \PGC\ fonts should be specified as
-scalable Type~3 in map files like:
+Lines containing nothing apart from {\em tfmname} stand for scalable
+Type~3 fonts. For scalable fonts as Type~1, TrueType and scalable Type~3
+font, all the fonts loaded from a~\TFM\ at various sizes will be included
+only once in the \PDF\ output. Thus if a~font, let's say \type{csr10}, is
+described in one of the map files, then it will be treated as scalable. As
+a~result the font source for csr10 will be included only once for
+\type{csr10}, \type{csr10 at 12pt} etc. So \PDFTEX\ tries to do its best
+to avoid multiple embedding of identical font sources. Thus vector \PGC\
+fonts should be specified as scalable Type~3 in map files like:
 
 \starttyping
 csr10
 \stoptyping
 
 It doesn't hurt much if a~scalable Type~3 font is not given in map files,
-except that the font source will be downloaded multiple times for various
-sizes, which causes a~much larger \PDF\ output. On the other hand if a~font
-in the map files is defined as scalable Type~3 font and its \PGC\ source
-is not scalable or not available, \PDFTEX\ will use \PK\ fonts instead; the
-\PDF\ output is still valid but some fonts may look ugly because of the
-scaled bitmap.
+except that the font source will be embedded into the \PDF\ file multiple
+times for various sizes, which causes a~much larger \PDF\ output. On
+the other hand if a~font in the map files is defined as scalable Type~3
+font and its \PGC\ source is not scalable or not available, \PDFTEX\
+will use \PK\ fonts instead; the \PDF\ output is still valid but some
+fonts may look ugly because of the scaled bitmap.
 
 To summarize this rather confusing story, we include some example lines.
 The most common way is to embed only a~glyph subset from a~font like this,
@@ -1712,47 +1736,25 @@ with re||encoding:
 ptmri8r Times-Italic <8r.enc <ptmri8a.pfb
 \stoptyping
 
-The \type{<} preceding the encoding file name may be left out.
 Without re||encoding it looks like this:
 
 \starttyping
 cmr10 CMR10 <cmr10.pfb
 \stoptyping
 
-The fontfile is missing, so viewers will use their own font (with and
-without re||encoding):
-
-\starttyping
-ptmr8r  Times-Roman  <8r.enc
-psyr Symbol
-\stoptyping
-
-Not embedding fonts like this is rather risky and should normally
-be avoided. You might use this trick to typeset with the 14~standard
-fonts (\eg\ Times, Helvetica, Symbol), if you want very small \PDF\
-files. Remember that if a~font is not embedded and it's none of the
-14 standard \PDF\ fonts, the result on the viewer side depends on the
-availability of the right font there. If in doubt, always embed all fonts,
-even the 14 standard ones.
-
 A~SlantFont is specified similarly as for \type{dvips}. The \type
 {SlantFont} or \type{ExtendFont} entries work only with embedded Type1
 fonts:
 
 \starttyping
-psyro           ".167 SlantFont"         <usyr.pfb
-pcrr8rn Courier ".85 ExtendFont" <8r.enc <pcrr8a.pfb
+psyro   StandardSymL ".167 SlantFont"         <usyr.pfb
+pcrr8rn Courier      ".85 ExtendFont" <8r.enc <pcrr8a.pfb
 \stoptyping
 
-Entirely download a~font without re||encoding:
+Entirely embed a~font into the \PDF\ file without and with re||encoding:
 
 \starttyping
-pgsr8a GillSans <<pgsr8a.pfb
-\stoptyping
-
-Entirely download a~font with re||encoding:
-
-\starttyping
+fmvr8x MarVoSym         <<marvosym.pfb
 pgsr8r GillSans <8r.enc <<pgsr8a.pfb
 \stoptyping
 
@@ -1762,7 +1764,30 @@ A~TrueType font can be used in the same way as a~Type~1 font:
 verdana8r Verdana <8r.enc <verdana.ttf
 \stoptyping
 
-\subsection{TrueType fonts}
+Now follow a few cases with non-embedded fonts. If the fontfile is
+missing, the viewer application will have to use its own approximation
+of the missing font (with and without re||encoding):
+
+\starttyping
+ptmr8r Times-Roman <8r.enc
+psyr Symbol
+\stoptyping
+
+In the next example the numerical font flags give some rough hint what
+general characteristics the GillSans font has, so \eg\ the Adobe Reader
+might try an approximation, if it doesn't have the font resource nor
+any clue how a font named GillSans should look like:
+
+\starttyping
+pgsr8r GillSans 32 <8r.enc
+\stoptyping
+
+Not embedding fonts is rather risky and should generally be avoided.
+If in doubt, always embed all fonts, even the 14 standard ones.
+
+%***********************************************************************
+
+\subsection{Helper tools for TrueType fonts}
 
 As mentioned above, \PDFTEX\ can work with TrueType fonts. Defining
 TrueType fonts is similar to Type~1. The only extra thing to do
@@ -1819,24 +1844,13 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.652 2006/12/21 22:38:08 hhenkel Exp $
+%%S $Id: pdftex-t.tex,v 1.671 2007/01/01 15:59:08 oneiros Exp $
 %%S NL
 %%S integer registers:
 
 \subsubject{Integer registers}
 
 \startpacked
-
-Sometimes we do not want to include a~font, but need to re||encode it.
-This only works for fonts with Adobe Standard Encoding. The font
-flags specify how such a~font looks like, so \eg\ the Adobe Reader can
-generate a~similar instance if the font resource is not available on
-the target system.
-
-\starttyping
-pgsr8r GillSans 32 <8r.enc
-\stoptyping
-
 
 \Syntax {
 \Tex {\pdfoutput} \Whatever{integer}
@@ -1930,10 +1944,9 @@ pgsr8r GillSans 32 <8r.enc
 \Tex {\pdfimagegamma} \Whatever{integer}
 }
 
-% \pdfpxdimen was a count in pdfTeX 1.30.0
-% \Syntax {
-% \Tex {\pdfpxdimen} \Whatever{integer}
-% }
+\Syntax {
+\Tex {\pdfdraftmode} \Whatever{integer}
+}
 
 \stoppacked
 
@@ -1972,7 +1985,6 @@ pgsr8r GillSans 32 <8r.enc
 \Tex {\pdfthreadmargin} \Whatever{dimen}
 }
 
-% starting from pdfTeX 1.40.0, \pdfpxdimen is a dimen
 \Syntax {
 \Tex {\pdfpxdimen} \Whatever{dimen}
 }
@@ -2130,6 +2142,11 @@ pgsr8r GillSans 32 <8r.enc
 
 \Syntax {
 \Tex {\pdffiledump} \Optional{offset \Something{number}} \Optional{length \Something{number}} \Something{general text}
+\Whatever{expandable}
+}
+
+\Syntax {
+\Tex {\pdfcolorstackinit} \Optional{page} \Optional{direct} \Something{general text}
 \Whatever{expandable}
 }
 
@@ -2336,6 +2353,22 @@ pgsr8r GillSans 32 <8r.enc
 \Tex {\pdfprimitive} \Something{control sequence}
 }
 
+\Syntax {
+\Tex {\pdfcolorstack} \Something{stack number} \Something{stack action}
+\Something{general text}
+}
+
+\Syntax {
+\Tex {\pdfsetmatrix}
+}
+
+\Syntax {
+\Tex {\pdfsave}
+}
+
+\Syntax {
+\Tex {\pdfrestore}
+}
 \stoppacked
 
 \subsubject{General definitions and syntax rules}
@@ -2578,6 +2611,11 @@ pgsr8r GillSans 32 <8r.enc
   \Literal{direct:}
 }
 
+\Syntax {
+\Something{stack action} \Means %
+  \Literal{set} \Or \Literal{push} \Or \Literal{pop} \Or \Literal{current}
+}
+
 \stoppacked
 
  A~\Something {general text} is expanded immediately, like \type{\special}
@@ -2707,21 +2745,20 @@ all non-stream objects are compressed with the exception of any objects
 coming with embedded \PDF\ files (``paranoid'' mode, to avoid yet unknown
 problems), and also the \type{/Info} dictionary is not compressed for
 clear-text legibility. When set to~2, also all non-stream objects coming
-with embedded \PDF\ files are compressed, but the \text{/Info} dictionary
+with embedded \PDF\ files are compressed, but the \type{/Info} dictionary
 is still not compressed. Finally, when set to~3, all non-stream objects
-are compressed, including the \text{/Info} dictionary (this means that
-the \text{/Info} can't be read as clear text any more). If object streams
+are compressed, including the \type{/Info} dictionary (this means that
+the \type{/Info} can't be read as clear text any more). If object streams
 are to be used, currently \type{\pdfobjcompresslevel=2} is recommended,
 
-\description{Caveat:} The \type{\pdfcompresslevel} feature is new and
-still somewhat experimental (feedback welcome). \PDF\ files generated
-with object streams enabled can't be read with (old) \PDF\ viewers that
-don't understand \PDF-1.5 files. For widest distribution and unknown
-audience, don't activate object stream writing. The \PDF-1.5 standard
-describes also a~hybrid object compression mode that gives some backward
-compatibility, but this is currently not implemented, as \PDF-1.5 seems
-to be rather quickly adopted by modern \PDF\ viewers. Also not implemented is
-the optional \type{/Extends} key.
+\description{Caveat:} \PDF\ files generated with object streams enabled
+can't be read with (old) \PDF\ viewers that don't understand \PDF-1.5
+files. For widest distribution and unknown audience, don't activate
+object stream writing. The \PDF-1.5 standard describes also a~hybrid
+object compression mode that gives some backward compatibility, but this
+is currently not implemented, as \PDF-1.5 seems to be rather quickly
+adopted by modern \PDF\ viewers. Also not implemented is the optional
+\type{/Extends} key.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfdecimaldigits} \Whatever{integer}}}
 
@@ -2810,7 +2847,7 @@ and the values, being strings, are given between parentheses. All keys
 are optional. Possible keys are \type{/Author}, \type{/CreationDate}
 (defaults to current date including time zone info), \type{/ModDate},
 \type{/Creator} (defaults to \type {TeX}), \type{/Producer} (defaults
-to \esctype{pdfTeX-@currentpdftex}), \type{/Title}, \type{/Subject},
+to \hbox{\tt pdfTeX-\currentpdftex}), \type{/Title}, \type{/Subject},
 and \type{/Keywords}.
 
 \type{/CreationDate} and \type{/ModDate} are expressed in the form
@@ -2818,7 +2855,7 @@ and \type{/Keywords}.
 the month, \type{DD} is the day, hh is the hour, \type{mm} is the minutes,
 \type{ss} is the seconds, and \type{TZ..} is an optional string denoting
 the time zone. An example of this format is shown below.  For details
-please refer to the \PDF\ Reference.
+please refer to the \PDFReference.
 
 Multiple appearances of \type{\pdfinfo} will be concatenated. In general, if
 a~key is given more than once, one may expect that the first appearance will be used.
@@ -2829,13 +2866,13 @@ by the user.
 An example of the use of \type{\pdfinfo} is:
 
 \startesctyping
-\pdfinfo
-  { /Title        (example.pdf)
+\pdfinfo {
+    /Title        (example.pdf)
     /Creator      (TeX)
     /Producer     (pdfTeX @currentpdftex)
     /Author       (Tom and Jerry)
-    /CreationDate (D:20060216154343+01'00')
-    /ModDate      (D:20060216155343+01'00')
+    /CreationDate (D:20061226154343+01'00')
+    /ModDate      (D:20061226155343+01'00')
     /Subject      (Example)
     /Keywords     (mouse, cat) }
 \stopesctyping
@@ -2883,7 +2920,7 @@ open action directly into the catalog.
 
 This primitive inserts the \Something{general text} to the \type
 {/Names} array. The text must
-conform to the specifications as laid down in the \PDF\ Reference,
+conform to the specifications as laid down in the \PDFReference,
 otherwise the document can be invalid.
 
 \pdftexprimitive {\Syntax {\Tex {\pdftrailer} \Something{general text}}}
@@ -2902,8 +2939,8 @@ dictionary. \introduced{1.11a}
 \bookmark{\type{\pdfpkresolution}}
 
 This integer parameter specifies the default resolution of embedded \PK\
-fonts and is read when \PDFTEX\ downloads a~\PK\ font during finishing
-the \PDF\ output. As bitmap fonts are still rendered poorly by some \PDF\
+fonts and is read when \PDFTEX\ embeds a~\PK\ font during finishing the
+\PDF\ output. As bitmap fonts are still rendered poorly by some \PDF\
 viewers, it is best to use Type~1 fonts when available.
 
 \pdftexprimitive {\Syntax {\Tex {\pdffontexpand}
@@ -2938,7 +2975,7 @@ gaps is acceptable. This glyph stretching and shrinking is called
 There are two different modes for font expansion:
 
 First, if the \type{autoexpand} option is there --- which is the
-recommended mode --- only a single map entry is needed for all expanded
+recommended mode --- only a~single map entry is needed for all expanded
 font versions, using the name of the unexpanded \TFM\ file ({\em
 tfmname}). No expanded {\em tfmname} versions need to mentioned (they are
 ignored), as \PDFTEX\ generates expanded copies of the unexpanded \TFM\
@@ -2956,9 +2993,9 @@ in all required expansion values. The expanded {\em tfmname} variants
 are constructed by adding the font expansion value to the {\em tfmname}
 of the base font, \eg\ there must be a~map entry with {\em tfmname}
 \type{sometfm+10} for 1\,\% stretch or \type {sometfm-15} for 1.5\,\%
-shrink. This also means, that for each expanded font variant a \TFM\
+shrink. This also means, that for each expanded font variant a~\TFM\
 file with properly expanded metrics must exist. Having several map
-entries for the various expansion values of a font requires to provide
+entries for the various expansion values of a~font requires to provide
 for each expansion value an individually crafted font file with expanded
 glyphs. Depending on how these glyphs are generated, this might give
 slightly better glyph forms than the rather simple glyph stretching
@@ -2982,7 +3019,7 @@ the different scaling parameters. It is up to the user to determine
 to what extent mixing slightly remastered fonts can be used without
 violating the design. Think of an~O: when geometrically stretched, the
 vertical part of the glyph becomes thicker, and looks incompatible with
-an unscaled original.  With a~multiple master situation, one can stretch
+an unscaled original.  With a~Multiple Master situation, one can stretch
 while keeping this thickness compatible.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfadjustspacing} \Whatever{integer}}}
@@ -3137,7 +3174,7 @@ for more details.
 
 This primitive inserts the \Something{general text} to the \type {/Font}
 dictionary. The text must conform to the specifications as laid down in the
-\PDF\ Reference, otherwise the document can be invalid.
+\PDFReference, otherwise the document can be invalid.
 
 \pdftexprimitive {\Syntax {\Tex {\pdffontname} \Something{font} \Whatever
 {expandable}}}
@@ -3200,96 +3237,99 @@ of six \ASCII\ characters.
 
 \bookmark{\type{\pdfmapfile}}
 
-This primitive is used for managing font map files, to make them known
-to \PDFTEX\ so that they can be read in.  If no \type{\pdfmapfile}
-primitive is given, the default map file \filename{pdftex.map} will be
-read in by \PDFTEX.
+This primitive is used for reading a~font map file consisting of
+one or more font map lines. The name of the map file is given in
+the \Something{map spec} together with an optional leading modifier
+character. If no \type{\pdfmapfile} primitive is given, the default map
+file \filename{pdftex.map} will be read by \PDFTEX. There is a~companion
+primitive \type{\pdfmapline} that allows to scan single map lines;
+its map line argument has the same syntax as the map lines from a~map
+file. Both primitives can be used concurrently. The \type{\pdfmapfile}
+primitive is fast for reading external bulk font map information (many
+map lines collected in a~map file), whereas the \type{\pdfmapline} allows
+to put the font map information for individual \TeX\ fonts right into
+the \TeX\ source or a~style file. In any case the map line information
+is scanned by \PDFTEX, and in the most common case the data are put into
+a~fresh internal map entry data structure, which is then consulted once
+a~font is called.
 
 Normally there is no need for the \PDFTEX\ user to bother about the
-\type{\pdfmapfile} primitive, as the main \TEX\ distributions provide
-nice helper tools that automatically assemble the default font map
-file. Prominent tool examples are the scripts \type{updmap} and
-\type{updmap-sys} coming with \TETEX\ and \TEXLIVE.
+\type{\pdfmapfile} or \type{\pdfmapline} primitives, as the main \TEX\
+distributions provide nice helper tools that automatically assemble
+the default font map file. Prominent tool examples are the scripts
+\type{updmap} and \type{updmap-sys} coming with \TEXLIVE\ and \TETEX.
+If your map file isn't in the current directory (or a~standard system
+directory), you will need to set the \type{TEXFONTMAPS} variable (in
+\WEBC) or give an explicit path so that it will be found.
 
-The operation mode of the \type{\pdfmapfile} primitive is selected by
-a~flag letter (\type{+}, \type{=}, \type{-}, or omitted). This flag defines
-how a~map file is going to be handled, and how a~collision between an
-existing map entry and a~newer one is resolved; either ignoring a~later
-entry, or replacing or deleting an existing entry.  But in any case,
-map entries of fonts already in use are kept untouched.  The companion
-primitive \type{\pdfmapline} allows something similar, only that a~single
-map line for one font (instead of a~map file name) is given as argument.
-Here are two examples:
+When the \type{\pdfmapfile} or \type{\pdfmapline} primitive is read
+by \PDFTEX, the argument (map file or map line) will be processed
+{\em immediately}, and the internal map entry database is updated.
+The operation mode of the \type{\pdfmapfile} and \type{\pdfmapline}
+primitives is selected by an optional modifier character (\type{+},
+\type{=}, \type{-}) in front of the {\em tfmname} field. This modifier
+defines how the individual map lines are going to be handled, and how
+a~collision between an already registered map entry and a~newer one is
+resolved; either ignoring a~later entry, or replacing or deleting an
+existing entry. But in any case, map entries of fonts already in use
+are kept untouched. Here are two examples:
 
 \starttyping
 \pdfmapfile{+myfont.map}
 \pdfmapline{+ptmri8r Times-Italic <8r.enc <ptmri8a.pfb}
 \stoptyping
 
-The general map handling function is that map items, which are either map
-file names or single font map lines (in case of the \type{\pdfmapline}
-primitive) are put into an auxiliary list of pending map items. During
-the next page shipout, this list is processed and all pending map items
-are sequentially scanned for their map entries, and an internal map
-entry database is updated, using one of the modes described below. Then
-the list of pending map items is cleared.  All \type{\pdfmapfile}
-and \type{\pdfmapline} commands can also be given after shipout of the
-first page.
+When no modifier character is given (\eg\ \type{\pdfmapfile{foo.map}}
+or \type{\pdfmapline{phvr8r Helvetica}}) and there hasn't already been
+any call of one of these primitives before, then the default map file
+\filename{pdftex.map} will {\em not} be read in. Apart from this the
+given map file will be processed similarly as with a~\type{+} modifier:
+duplicate later map entries within the file are ignored and a~warning is
+issued. This means, that you can block reading of the default map file
+also by an empty \type{\pdfmapfile{}} or \type{\pdfmapline{}} early in
+the \TeX\ file. When the default map file is large but you don't need it
+anyway, these command variants might considerably speed up the \PDFTEX\
+startup process.
 
-If your map file isn't in the current directory (or a~standard system
-directory), you will need to set the \type{TEXFONTMAPS} variable (in
-\WEBC) or give an explicit path so that it will be found.
+If a~modifier is given, the mechanism is so that before reading the
+items given as arguments to \type{\pdfmapfile} or \type{\pdfmapline}
+the default map file will be read first --- if this hasn't already
+been done or been prevented by the above blocking cases. This should
+be mostly compatible with the traditional behaviour. If you want to add
+support for a~new font through an additional font map file while keeping
+all the existing mappings, don't use the primitive versions without
+modifier, but instead type either \type{\pdfmapfile{+myfont.map}} or
+\type{\pdfmapfile{=myfont.map}}, as described below.
 
-\type{\pdfmapfile{foo.map}} (\type{+}/\type{=}/\type{-} flags omitted)
-clears the list of pending map items and starts a~new list with the only
-pending file \type{foo.map}. When the file \filename{foo.map} is scanned,
-duplicate map entries are ignored and a~warning is issued. When this
-command is given at the beginning of a~\TEX\ run, the default map file
-\filename{pdftex.map} will {\em not} be read in.  This is compatible
-with the former behaviour.
+\type{\pdfmapfile {+foo.map}} reads the file \filename{foo.map}; duplicate
+later map entries within the file are ignored and a~warning is issued.
 
-If you want to add support for a~new font through an additional font map
-file while keeping all the existing mappings, don't use this version
-of command, but instead type either \type{\pdfmapfile{+myfont.map}}
-or \type{\pdfmapfile{=myfont.map}}, as described below.
-
-\type{\pdfmapfile {+foo.map}} puts the file \filename{foo.map} into the
-list of pending map items. When the file \filename{foo.map} is scanned,
-duplicate map entries are ignored and a~warning is issued. This is
-compatible with the former behaviour.
-
-\type{\pdfmapfile {=foo.map}} puts the file \filename{foo.map} into the
-list of pending map items. When the file \filename{foo.map} is scanned,
+\type{\pdfmapfile {=foo.map}} reads the file \filename{foo.map};
 matching map entries in the database are replaced by new entries from
-\filename{foo.map}.
+\filename{foo.map} (if they aren't already in use).
 
-\type{\pdfmapfile {-foo.map}} puts the file \filename{foo.map} into the
-list of pending map items. When the file \filename{foo.map} is scanned,
-matching map entries are deleted from the database.
-
-\type{\pdfmapfile {}} clears the list of pending map items. It does
-not affect map entries already registered into the database. This is
-compatible with the former behaviour.  When this command is given at the
-beginning of a~\PDFTEX\ run, the default map file \filename{pdftex.map}
-will {\em not} be read in.  This may help with quick program startup,
-if no fonts are required.
+\type{\pdfmapfile {-foo.map}} reads the file \filename{foo.map}; matching
+map entries are deleted from the database (if not yet in use).
 
 If you want to use a~base map file name other than \type{pdftex.map},
 or change its processing options through a~\PDFTEX\ format, you can do
-this by appending the \type{\pdfmapfile} command to the
-\type{\everyjob{}} token list for the \type{-ini} run, \eg:
+this by appending the \type{\pdfmapfile} command to the \type{\everyjob{}}
+token list for the \type{-ini} run, \eg:
 
 \starttyping
 \everyjob\expandafter{\the\everyjob\pdfmapfile{+myspecial.map}}
 \dump
 \stoptyping
 
+This would always read the file \type{myspecial.map} after the default
+\type{pdftex.map} file.
+
 \pdftexprimitive {\Syntax {\Tex {\pdfmapline} \Something{map spec}}}
 
 \bookmark{\type{\pdfmapline}}
 
 Similar to \type{\pdfmapfile}, but here you can give a~single
-map line (like the ones in map files) as an argument. The modifiers
+map line (like the ones in map files) as an argument. The optional modifiers
 (\type{+-=}) have the same effect as with \type{\pdfmapfile}; see also
 the description above.  Example:
 
@@ -3297,12 +3337,13 @@ the description above.  Example:
 \pdfmapline{+ptmri8r Times-Italic <8r.enc <ptmri8a.pfb}
 \stoptyping
 
-This primitive (especially the \type{\pdfmapline{=...}} variant) allows
-quick checks of a~new font map entry, before writing it into
-a~map file.
+This primitive (especially the \type{\pdfmapline{=...}} variant) is useful
+for temporary quick checks of a~new font map entry during development,
+before finally putting it into a~map file.
 
-\type{\pdfmapline {}} clears the list of pending map items a~similar
-way as \type{\pdfmapfile{}} does. \introduced{1.20a}
+\type{\pdfmapline {}} like \type{\pdfmapfile {}} blocks reading
+of the default map file, if it comes early enough in the \TeX\
+input. \introduced{1.20a}
 
 \pdftexprimitive {\Syntax {\Tex {\pdftracingfonts} \Whatever{integer}}}
 
@@ -3586,7 +3627,7 @@ is stated wrongly.
 Similarly to \type{\pdfxform}, the optional text given by \Something{attr
 spec} will be written as additional attributes of the image before
 other keys of the image dictionary. One should be aware, that slightly
-different type of PDF object is created while including \PNG, \JPEG,
+different type of \PDF\ object is created while including \PNG, \JPEG,
 or \JBIG2\ bitmaps and \PDF\ images.
 
 While working with \PDF\ or \JBIG2\ images, \Something{page spec}
@@ -3679,7 +3720,7 @@ files are currently ignored.
 %  is specified with \pdfximage), 1 is media, 2 is crop, 3 is bleed, 4 is trim
 %  and 5 is artbox. This can only be set once per object, i.\,e.\ the value used at
 %  \pdfximage is remembered.
-%    See the pdf reference for an explanation of the boxes.
+%    See the PDF Reference for an explanation of the boxes.
 
 When \PDF\ files are included, the command \type{\pdfximage} allows the selection
 of which \PDF\ page box to use in the optional field \Something{image attr
@@ -3764,7 +3805,6 @@ If specified, the parameter must appear before any data is written to the
 \PDF\ output.
 \introduced{1.30.0}
 
-% \pdftexprimitive {\Syntax {\Tex {\pdfpxdimen} \Whatever{integer}}} % 1.30.0
 \pdftexprimitive {\Syntax {\Tex {\pdfpxdimen} \Whatever{dimen}}}
 
 \bookmark{\type{\pdfpxdimen}}
@@ -3902,11 +3942,11 @@ as the boxes containing \type{\pdfstartlink} and \type{\pdfendlink} will be
 treated as part of the hyperlink. The hyperlink is written out only if the
 corresponding whatsit node is searched at shipout time.
 
-Additional attributes, which are explained in great detail in the \PDF\
-Reference Manual, can be given via \Something{attr spec}\unkern. Typically, the
-attributes specify the color and thickness of any border around the link.
-Thus \typ {/C [0.9 0 0] /Border [0 0 2]} specifies a~color (in \RGB) of dark
-red, and a~border thickness of 2~points.
+Additional attributes, which are explained in great detail in the
+\PDFReference, can be given via \Something{attr spec}\unkern. Typically,
+the attributes specify the color and thickness of any border around
+the link.  Thus \typ {/C [0.9 0 0] /Border [0 0 2]} specifies a~color
+(in \RGB) of dark red, and a~border thickness of 2~points.
 
 While all graphics and text in a~\PDF\ document have relative positions,
 annotations have internally hard||coded absolute positions. Again this
@@ -4037,25 +4077,28 @@ an article thread.
 
 \bookmark{\type{\pdfliteral}}
 
-Like \type{\special} in normal \TEX, this command inserts raw \PDF\ code
-into the output. This allows support of color and text transformation. This
-primitive is heavily used in the \METAPOST\ inclusion macros. Normally
-\PDFTEX\ ends a~text section in the \PDF\ output and resets the
-transformation matrix before inserting \Something{general text}\unkern, however this
-can be turned off by giving the optional keyword \Literal {direct}. This
-command appends a~whatsit node to the list being built. \Something{general
-text} is expanded when the whatsit node is created and not when it is shipped
+Like \type{\special} in normal \TEX, this command inserts raw
+\PDF\ code into the output. This allows support of color and text
+transformation. This primitive is heavily used in the \METAPOST\
+inclusion macros. Normally \PDFTEX\ ends a~text section in the \PDF\
+output and sets the transformation matrix to the current location on the
+page before inserting \Something{general text}\unkern, however this can be
+turned off by giving the optional keyword \Literal {direct}. This command
+appends a~whatsit node to the list being built. \Something{general text}
+is expanded when the whatsit node is created and not when it is shipped
 out, as with \type{\special}.
 
-Starting from version 1.30.0, \PDFTEX\ allows to use \type{page} keyword
-instead of \type{direct}. Both modifies the default behaviour of
-\type{\pdfliteral}, avoiding translation of the coordinates space before
-inserting the literal code. The difference is that \type{page} keyword,
-instructs \PDFTEX\ to close \type{BT ET} block before inserting anything.
-It means that the literal code inserted  refers to the origin (lower-left
-corner of the page) and can be safely enclosed with \type{q Q}. Note, that
-in most cases, using \type{q Q} operators inside \type{\pdfliteral} with
-\type{direct} keyword, will produce corrupted PDF output.
+Starting from version 1.30.0, \PDFTEX\ allows to use a~new keyword
+\type{page} instead of \type{direct}. Both modify the default behaviour
+of \type{\pdfliteral}, avoiding translation of the coordinates space
+before inserting the literal code. The difference is that the \type{page}
+keyword instructs \PDFTEX\ to close a~\type{BT ET} text block before
+inserting anything. It means that the literal code inserted refers to the
+origin (lower||left corner of the page) and can be safely enclosed with
+\type{q Q}. Note, that in most cases using \type{q Q} operators inside
+\type{\pdfliteral} with \type{direct} keyword will produce corrupted
+\PDF\ output, as the \PDF\ standard doesn't allow to do anything like
+this within a~\type{BT ET} block.
 
 % HE: \unkern is a kludge here; wanted to have tight "{pdf:"
 \pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:} \Something{text} \Rbrace}}
@@ -4170,7 +4213,7 @@ that it compares absolute values of dimensions. \introduced{1.40.0}
 
 The commands generates a~uniformly distributed random integer value between
 0 (inclusive) and \Something{number} (exclusive). This primitive expands to
-a list of tokens. \introduced{1.30.0}
+a~list of tokens. \introduced{1.30.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfnormaldeviate} \Whatever{expandable}}}
 
@@ -4269,6 +4312,45 @@ hexadecimal format (same as \type{\pdfescapehex}), starting at offset
 \Something{number} or 0 with length \Something{number}, if given. The first ten
 bytes of the source of this manual are {\tt \pdffiledump length 10
 {./pdftex-t.tex}}. \introduced{1.30.0}
+
+%***********************************************************************
+
+\subsection{Colourstack}
+%TODO: Document
+
+\pdftexprimitive{\Syntax {
+\Tex {\pdfcolorstackinit} \Optional{page} \Optional{direct} \Something{general text}
+\Whatever{expandable}}}
+
+\bookmark{\type{\pdfcolorstackinit}}
+
+\introduced{1.40.0}
+
+\pdftexprimitive{\Syntax {
+\Tex {\pdfcolorstack} \Something{stack number} \Something{stack action}
+\Something{general text}}}
+
+\bookmark{\type{\pdfcolorstack}}
+
+\introduced{1.40.0}
+
+\pdftexprimitive{\Syntax {\Tex {\pdfsetmatrix}}}
+
+\bookmark{\type{\pdfsetmatrix}}
+
+\introduced{1.40.0}
+
+\pdftexprimitive{\Syntax {\Tex {\pdfsave}}}
+
+\bookmark{\type{\pdfsave}}
+
+\introduced{1.40.0}
+
+\pdftexprimitive{\Syntax {\Tex {\pdfrestore}}}
+
+\bookmark{\type{\pdfrestore}}
+
+\introduced{1.40.0}
 
 %***********************************************************************
 
@@ -4394,6 +4476,17 @@ undefined and never was a~primitive, nothing happens and no error is raised.
 If the control sequence was initially expandable, \type{\pdfprimitive}
 expands either. Otherwise \type{\pdfprimitive} doesn't expand. \introduced{1.40.0}
 
+\pdftexprimitive {\Syntax {\tex {pdfdraftmode} \Whatever{integer}}}
+
+\bookmark{\type{\pdfdraftmode}}
+
+%FIXME: -draftmode should be in tt; bibtex-logo is wrong
+When set to 1 (or switched on by the commandline switch -draftmode) \PDFTEX\
+doesn't write the output pdf and doesn't actually read any images but does
+everything else (including writing auxiliary files), thus speeding up
+compilations when you know you need an extra run but don't care about the
+output, e.g. just to get the \BIBTEX\ references right.
+\introduced{1.40.0}
 
 %***********************************************************************
 
@@ -4540,13 +4633,6 @@ manual.
 
 %***********************************************************************
 
-\section{Limitations of \PDFTEX}
-
-\PDFTEX\ currently lacks a~colorstack.
-This can be overcome by the \type{pdfcolmk} package.
-
-%***********************************************************************
-
 \stopbodymatter
 
 %D We did use some abbreviations. Only those really used will end up in the
@@ -4624,14 +4710,14 @@ this object contains these additional keys:
 \HL
 \stoptabulate
 
-The \PDF\ reference manual says: \quotation {Although viewer applications
-can store custom metadata in the document information dictionary, it is
+The \PDFReference\ says: \quotation {Although viewer applications can
+store custom metadata in the document information dictionary, it is
 inappropriate to store private content or structural information there;
 such information should be stored in the document catalog instead.}
 
-Although it would seem more natural to put this infomation in the document
-information dictionary, we have to obey the rules laid down in the \PDF\
-reference. The following key ends up in the document catalog.
+Although it would seem more natural to put this infomation in the
+document information dictionary, we have to obey the rules laid down in
+the \PDFReference. The following key ends up in the document catalog.
 
 \starttabulate[|lT|l|p|]
 \HL

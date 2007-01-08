@@ -37,25 +37,24 @@
 # metafont and metapost:
 mf		mf		-		-translate-file=cp227.tcx mf.ini
 mpost		mpost		-		-translate-file=cp227.tcx mpost.mp
-metafun		mpost		-		-translate-file=cp227.tcx metafun.mp
 
 # Standard formats (plain, latex) with all engines:
-
+#
 # Change "tex.ini -> bplain.ini" and "- -> language.dat"
-# if you want babel support in tex. Add -translate-file=cp227.tcx before tex.ini
-# if you want to make all characters directly "printable" for
+# if you want babel support in tex. Add -translate-file=cp227.tcx before
+# tex.ini if you want to make all characters directly "printable" for
 # any \write (instead of ^^xy).
-tex		tex		-		tex.ini
-pdftex		pdftex		language.def	-translate-file=cp227.tcx *pdftex.ini
-latex		pdftex		language.dat	-translate-file=cp227.tcx *latex.ini
-etex		pdftex		language.def	-translate-file=cp227.tcx *etex.ini
-pdfetex		pdftex		-		-translate-file=cp227.tcx *pdftex.ini
-pdflatex	pdftex		language.dat	-translate-file=cp227.tcx *pdflatex.ini
-@OMEGA@omega		omega		-	omega.ini
-@OMEGA@lambda		omega		language.dat	lambda.ini
-@ALEPH@aleph		aleph		-		*aleph.ini
-@ALEPH@lamed		aleph		language.dat	*lambda.ini
-@XETEX@xetex	xetex	-	-etex xetex.ini
+tex		tex	-		tex.ini
+pdftex		pdftex	language.def	-translate-file=cp227.tcx *pdftex.ini
+latex		pdftex	language.dat	-translate-file=cp227.tcx *latex.ini
+etex		pdftex	language.def	-translate-file=cp227.tcx *etex.ini
+pdfetex		pdftex	language.def	-translate-file=cp227.tcx *pdfetex.ini
+pdflatex	pdftex	language.dat	-translate-file=cp227.tcx *pdflatex.ini
+@OMEGA@omega	omega	-		omega.ini
+@OMEGA@lambda	omega	language.dat	lambda.ini
+@ALEPH@aleph	aleph	-		*aleph.ini
+@ALEPH@lamed	aleph	language.dat	*lambda.ini
+@XETEX@xetex	xetex	-		-etex xetex.ini
 @XETEX@xelatex	xetex	language.dat	-etex xelatex.ini
 
 # The amstex format:
@@ -67,13 +66,6 @@ amstex	pdftex		-		-translate-file=cp227.tcx *amstex.ini
 # Change "pdfamstex.ini -> pdfbamstex.ini" and "- -> language.dat"
 # if you want babel support in pdfamstex:
 #! pdfamstex	pdftex			-	-translate-file=cp227.tcx *pdfamstex.ini
-
-# Context formats:
-#! cont-cz	pdftex		cont-usr.tex	-8bit *cont-cz.ini
-#! cont-de	pdftex		cont-usr.tex	-8bit *cont-de.ini
-cont-en	pdftex		cont-usr.tex	-8bit *cont-en.ini
-#! cont-nl	pdftex		cont-usr.tex	-8bit *cont-nl.ini
-#! cont-uk	pdftex		cont-usr.tex	-8bit *cont-uk.ini
 
 # language-specific things:
 
@@ -118,10 +110,6 @@ mllatex		pdftex	language.dat	-translate-file=cp227.tcx -mltex mllatex.ini
 
 # The TeX Live version of eplain.ini includes Babel support:
 eplain	pdftex		language.dat	-translate-file=cp227.tcx *eplain.ini
-@XETEX@xeplain	xetex		language.dat	-etex xeplain.ini
-
-# mptopdf utility
-mptopdf		pdftex	-		-translate-file=cp227.tcx mptopdf.tex
 
 # --- strange things
 texsis		pdftex	-		-translate-file=cp227.tcx texsis.ini

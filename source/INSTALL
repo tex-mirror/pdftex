@@ -1,14 +1,14 @@
 pdfTeX
 ======
 
-INSTALL for pdfTeX 1.40.0
+INSTALL for pdfTeX 1.40.1
 =========================
 
 This distribution is a stripped-down version of the teTeX distribution.
 All source code is in the directory src; the script build.sh will generate and
 populate a directory build.
 
-The code of pdfTeX is in src/texk/web2c/pdfetexdir
+The code of pdfTeX is in src/texk/web2c/pdftexdir
 
 Try the script build.sh in this directory. If it succeeds, you should end up
 with the files pdftex and pdftex.pool in build/texk/web2c
