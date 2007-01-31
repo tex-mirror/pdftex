@@ -1,22 +1,19 @@
 The pdfTeX team is happy to announce the release of a new stable version:
 
 ===========================================================================
-                               pdfTeX 1.40.1
+                               pdfTeX 1.40.2
 ===========================================================================
 
-This is the announcement of pdfTeX 1.40.1, an extended version of TeX that
+This is the announcement of pdfTeX 1.40.2, an extended version of TeX that
 can create PDF directly from TeX source files and enhance the result of TeX
 typesetting with the help of PDF.
 
 ===========================================================================
-  Main changes of pdfTeX 1.40.1
+  Main changes of pdfTeX 1.40.2
 ===========================================================================
 
-- bugfix: the shell escape function was a bit broken
-- bugfix: \pdffontattr gave confusing warnings
-- allow JBIG2 images only with PDF >= 1.4
-- allow \pdfglyphtounicode in dvi mode for format generation
-- pdfTeX uses libpng 1.2.15
+- bugfix: maplines starting with = would not work as advertised
+- bugfix: xpdf would complain that PDF 1.7 is too new
 
 For complete release notes see http://www.pdftex.org/NEWS
 

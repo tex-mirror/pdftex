@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.88 2006/12/21 19:49:39 hhenkel Exp $
+# $Id: Makefile,v 1.89 2007/01/25 07:18:57 hhenkel Exp $
 #
 # Makefile for pdfTeX documentation
 
@@ -24,25 +24,25 @@ all:	pdftex-a.pdf \
 booklet:	pdftex-b.pdf pdftex-b-e.pdf pdftex-b-o.pdf
 
 pdftex-a.pdf:	pdftex-t.tex pdftex-t.txt
-	texexec --result $@ $<
+	texexec --result=$@ $<
 
 pdftex-l.pdf:	pdftex-t.tex pdftex-t.txt
-	texexec --mode=letter --result $@ $<
+	texexec --mode=letter --result=$@ $<
 
 pdftex-s.pdf:	pdftex-t.tex pdftex-i.tex
-	texexec --mode=screen --result $@ $<
+	texexec --mode=screen --result=$@ $<
 
 pdftex-b.pdf:	pdftex-a.pdf
 	texexec --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
-	--result $@ $<
+	--result=$@ $<
 
 pdftex-b-e.pdf:	pdftex-a.pdf
 	texexec --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
-	--pages=even --result $@ $<
+	--pages=even --result=$@ $<
 
 pdftex-b-o.pdf:	pdftex-a.pdf
 	texexec --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
-	--pages=odd --result $@ $<
+	--pages=odd --result=$@ $<
 
 pdftex-t.txt:	pdftex-w.pdf Makefile
 	cat $< \

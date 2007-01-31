@@ -231,6 +231,43 @@ A simple picture:
 \pdfliteral page {q -1 0 0 1 612 0 cm .5 g}\hfill Do you like that?\pdfliteral page {Q}
 \endfeature
 
+% Every page in PDF document has its own graphic state, automatically restored
+% by the viever application. In example, unless set explicitly, text colour at
+% the beginning of the every page is always black, regardless the text color at
+% the end of the previous page. This may be a little bit confusing for those
+% who get used to dvi output and color macros based on Postscript specials. In
+% the case of PDF, passing text colour (as well as any other graphic
+% properties) between pages requires much more care. Since normally we don't
+% know where TeX is going to break tyhe page, one probably need to use \mark(s)
+% register(s) for page-wise graphic stack, as it is in pdfcolor.tex macro input above.
+
+\feature 1.40.0 {Graphic stack}
+\def\pdfsetcolor#1{}% disable generic color support of pdfcolor.tex
+
+% pdfTeX 1.40.0 introduces graphic stack support. \pdfcolorstackinit primitive
+% introduces new graphic stack and returns its number. Here we create a
+% page-wise color stack with black as an initial stack value. \pdfcolorstack
+% command operates on graphic stacks.
+
+\chardef\Color=\pdfcolorstackinit page direct{0 g}
+default color,
+\pdfcolorstack\Color set{1 1 0 0 k}
+some new default
+\pdfcolorstack\Color push{0 1 1 0 k}
+red,
+\pdfcolorstack\Color push{1 0 1 0 k}
+green,
+\vfill\eject
+still green,
+\pdfcolorstack\Color pop
+red again,
+\pdfcolorstack\Color pop
+default again,
+\pdfcolorstack\Color set{0 g}
+back to black.
+
+\endfeature
+
 \bigskip
 
 % User-defined object can be inserted into the pdf output by \pdfobj. The
@@ -524,7 +561,7 @@ The last image has \the\pdflastximagepages\ page(s).
     width \dimen0 {pic.pdf}  % by setting image width to the calculated value
 \pdfrefximage \pdflastximage
 
-% While working with bitmap graphic it might be more convenient to operate on 
+% While working with bitmap graphic it might be more convenient to operate on
 % pixels rather then dimension units. Starting from version 1.30.0, pdfTeX offers
 % a special, scalable unit called `px'. The real value associated with `px' is controlled
 % via \pdfpxdimen primitive. It used to be a count register defaulted to 65536 (1pt = 1px).
@@ -663,8 +700,8 @@ Hacked image color space.
 
 % the figure cmr10.103 was created by running Metapost on cmr10.mf
 
-% \convertMPtoPDF {filename} {x scale} {y scale}
-\convertMPtoPDF{cmr10.103}{1}{1}
+%\convertMPtoPDF {filename} {x scale} {y scale}
+%\convertMPtoPDF{cmr10.103}{1}{1}
 \newpage
 
 % It is possible to have Metapost code inside the tex sources and call
@@ -1154,6 +1191,37 @@ The link is object \the\pdflastlink.
 
 % For better understaing \pdfliteral rules, play with the transformations above using
 % `direct' and `page' modifiers. Expect surprises, including corrupted output...
+
+% One may already notice that any transformation applied to text or some other
+% page graphic object do not affect active rectangles of links and other
+% annotations. This is because those rectangles are kept in PDF as a different
+% structure then the page content. pdfTeX is not aware of any transformation
+% shown above (\pdfliteral content is not analyzed anyhow), so any annotation
+% related to the box being transformed remains untouched.
+
+% Check it out:
+% \pdfliteral{q 0.87 -0.5 0.5 0.87 0 0 cm}
+% \setbox0\hbox{\f\pdfstartlink goto page \pageno{/FitH}Link\pdfendlink}
+% \avoidboxdimen0
+% \pdfliteral{Q}
+
+% pdfTeX 1.40.0 comes with three extra primitives that fixes this problem.
+% \pdfsetmatrix primitive inserts first four numbers of the afine
+% transformation matrix into the page content stream and updates annotations
+% accordingly. \pdfsave saves the current matrix, \pdfrestore resores the
+% previously saved matrix.
+
+\bigskip
+
+\feature 1.40.0 {Saving/restoring transformation matrix}
+
+\setbox0\hbox{\f\pdfstartlink goto page \pageno{/FitH}Link\pdfendlink}
+\pdfsave
+\pdfsetmatrix{0.87 -0.5 0.5 0.87}
+\avoidboxdimen0
+\pdfrestore
+
+\endfeature
 
 % To have a smoothly readable PDF output one may use a newline character to
 % separate entries written directly do PDF code. No matter for the viewer.

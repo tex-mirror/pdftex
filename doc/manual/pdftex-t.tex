@@ -1,7 +1,7 @@
 % interface=english modes=letter,screen output=pdftex
 % vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.671 2007/01/01 15:59:08 oneiros Exp $
+% $Id: pdftex-t.tex,v 1.675 2007/01/25 10:37:13 hhenkel Exp $
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
@@ -13,7 +13,7 @@
 %D
 %D Default A4 size manual:
 %D
-%D texexec --result pdftex-a.pdf pdftex-t
+%D texexec --result=pdftex-a.pdf pdftex-t
 %D
 %D Letter size manual:
 %D
@@ -61,7 +61,7 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.671 2007/01/01 15:59:08 oneiros Exp $
+\rcsscan $Id: pdftex-t.tex,v 1.675 2007/01/25 10:37:13 hhenkel Exp $
 
 \def\currentpdftex{1.40.0}
 
@@ -1844,7 +1844,7 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.671 2007/01/01 15:59:08 oneiros Exp $
+%%S $Id: pdftex-t.tex,v 1.675 2007/01/25 10:37:13 hhenkel Exp $
 %%S NL
 %%S integer registers:
 
@@ -3698,7 +3698,7 @@ of 72\,dpi would be taken. The \type{\pdfimageresolution} is read when
 \PDFTEX\ creates an image via \type{\pdfximage}. The given value is
 clipped to the range 0..65535\,[dpi].
 
-Currently this parameter is used particularily for calculating the
+Currently this parameter is used particularly for calculating the
 dimensions of \JPEG\ images in \EXIF\ format (unless at least one
 dimension is stated explicitely); the resolution values coming with \EXIF\
 files are currently ignored.
@@ -4316,7 +4316,9 @@ bytes of the source of this manual are {\tt \pdffiledump length 10
 %***********************************************************************
 
 \subsection{Colourstack}
-%TODO: Document
+
+\PDFTEX\ 1.40.0 comes with a colour stack support (actually any graphic state
+stack).
 
 \pdftexprimitive{\Syntax {
 \Tex {\pdfcolorstackinit} \Optional{page} \Optional{direct} \Something{general text}
@@ -4324,7 +4326,10 @@ bytes of the source of this manual are {\tt \pdffiledump length 10
 
 \bookmark{\type{\pdfcolorstackinit}}
 
-\introduced{1.40.0}
+The primitive initializes new graphic stack and returns its number. Optional
+\Literal{page} keyword instructs \PDFTEX\ to restore the graphic at the
+beginning of every new page. Also optional \Literal{direct} has the same effect
+as for \Tex{\pdfliteral} primitive. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {
 \Tex {\pdfcolorstack} \Something{stack number} \Something{stack action}
@@ -4332,25 +4337,53 @@ bytes of the source of this manual are {\tt \pdffiledump length 10
 
 \bookmark{\type{\pdfcolorstack}}
 
-\introduced{1.40.0}
+The command operates on the stack of a given number. If \Something{stack action}
+is \Literal{push} keyword, the new value provided as \Something{general text}
+is inserted into the top of the graphic stack and becomes the current stack
+value. If followed by \Literal{pop}, the top value is removed from the stack
+and the new top value becomes the current. \Literal{set} keyword replaces the
+current value with \Something{general text} without changing the stack size.
+\Literal{current} keyword instructs just to use the current stack value
+without modifying the stack at all. \introduced{1.40.0}
+
+\subsection{Transformations}
+
+Since the content of \Tex{\pdfliteral} is not interpreted anyhow, any
+transformation inserted directly into the content stream, as well as saving
+and restoring the current transformation matrix, remains unnoticed by
+\PDFTEX\ positioning mechanism. As a consequence, links and other annotations
+(that are formed in \PDF\ as different layer then the page content) are not
+affected by such user-defined transformations. \PDFTEX\ 1.40.0 solves this
+problem with three new primitives.
 
 \pdftexprimitive{\Syntax {\Tex {\pdfsetmatrix}}}
 
 \bookmark{\type{\pdfsetmatrix}}
 
-\introduced{1.40.0}
+Afine transformations are normally expressed with six numbers. First four
+(no unit) values defining scaling, rotating and skewing, plus two extra
+dimensions for shifting. Since the translation is handled by \TeX\ itself,
+\Tex{\pdfsetmatrix} primitive expects as an argument a string containing
+just first four numbers of the transformation separated by a space and assumes two
+position coordinates to be 0. In example, \type{\pdfsetmatrix{0.87 -0.5 0.5 0.87}}
+rotates the current space by 30 degrees, inserting \type{0.87 -0.5 0.5 0.87 0 0 cm}
+into the content stream. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfsave}}}
 
 \bookmark{\type{\pdfsave}}
 
-\introduced{1.40.0}
+The command saves the current transformation by inserting \type{q} operator into the
+content stream. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfrestore}}}
 
 \bookmark{\type{\pdfrestore}}
 
-\introduced{1.40.0}
+The command restores previously saved transformation by inserting \type{Q}
+operator into the content stream. One should keep in mind that \Tex{\pdfsave}
+and \Tex{\pdfrestore} pairs should always be properly nested and should start
+and end at the same group level. \introduced{1.40.0}
 
 %***********************************************************************
 
@@ -4667,7 +4700,7 @@ to one of the maintainers.
 
 \startbuffer
     \input tufte
-    \blank
+    \blank[big]
     \startcolumns
         \input tufte
     \stopcolumns
