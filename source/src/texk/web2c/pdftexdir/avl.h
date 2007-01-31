@@ -1,7 +1,7 @@
-/* Produced by texiweb from libavl.w on 2003/01/06 at 18:07. */
+/* Produced by texiweb from libavl.w. */
 
 /* libavl - library for manipulation of binary trees.
-   Copyright (C) 1998-2002 Free Software Foundation, Inc.
+   Copyright (C) 1998-2002, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -27,10 +27,6 @@
 #define AVL_H 1
 
 #include <stddef.h>
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 
 /* Function types. */
 typedef int avl_comparison_func (const void *avl_a, const void *avl_b,
@@ -115,9 +111,5 @@ void *avl_t_next (struct avl_traverser *);
 void *avl_t_prev (struct avl_traverser *);
 void *avl_t_cur (struct avl_traverser *);
 void *avl_t_replace (struct avl_traverser *, void *);
-
-#if defined(__cplusplus)
-}
-#endif  
 
 #endif /* avl.h */

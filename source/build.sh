@@ -57,6 +57,7 @@ then
   # do a configure without all the things we don't need
   echo "ignore warnings and errors about the main texmf tree"
   ../src/configure \
+              --with-cxx-runtime-hack \
               --without-aleph     \
               --without-bibtex8   \
               --without-cjkutils  \
@@ -69,6 +70,7 @@ then
               --without-dvipdfm   \
               --without-dvipdfmx  \
               --without-dvipng    \
+              --without-dvipos    \
               --without-dvipsk    \
               --without-etex      \
               --without-gsftopk   \
@@ -80,6 +82,7 @@ then
               --without-musixflx  \
               --without-omega     \
               --without-pdfopen   \
+              --without-ps2eps    \
               --without-ps2pkm    \
               --without-psutils   \
               --without-sam2p     \
@@ -87,6 +90,7 @@ then
               --without-t1utils   \
               --without-tetex     \
               --without-tex4htk   \
+              --without-texi2html \
               --without-texinfo   \
               --without-texlive   \
               --without-ttf2pk    \

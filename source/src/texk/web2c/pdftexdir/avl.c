@@ -1,7 +1,7 @@
-/* Produced by texiweb from libavl.w on 2003/01/06 at 18:07. */
+/* Produced by texiweb from libavl.w. */
 
 /* libavl - library for manipulation of binary trees.
-   Copyright (C) 1998-2002 Free Software Foundation, Inc.
+   Copyright (C) 1998-2002, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -703,6 +703,9 @@ avl_t_replace (struct avl_traverser *trav, void *new)
   return old;
 }
 
+/* Destroys |new| with |avl_destroy (new, destroy)|,
+   first setting right links of nodes in |stack| within |new|
+   to null pointers to avoid touching uninitialized data. */
 static void
 copy_error_recovery (struct avl_node **stack, int height,
                      struct avl_table *new, avl_item_func *destroy)
