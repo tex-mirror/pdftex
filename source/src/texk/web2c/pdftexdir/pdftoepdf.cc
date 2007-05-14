@@ -1,5 +1,5 @@
 /*
-Copyright 1996-2006 Han The Thanh, <thanh@pdftex.org>
+Copyright 1996-2007 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -849,14 +849,14 @@ void write_epdf(void)
                 sprintf(s, "/Matrix [%.8f %.8f %.8f %.8f %.8f %.8f]\n",
                         scale[0],
                         scale[1], scale[2], scale[3], scale[4], scale[5]);
-                pdf_printf(stripzeros(s));
+                pdf_puts(stripzeros(s));
             }
         }
     }
 
     sprintf(s, "/BBox [%.8f %.8f %.8f %.8f]\n",
             pagebox->x1, pagebox->y1, pagebox->x2, pagebox->y2);
-    pdf_printf(stripzeros(s));
+    pdf_puts(stripzeros(s));
 
     // write the page Group if it's there
     if (page->getGroup() != NULL) {

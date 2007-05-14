@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -25,7 +25,7 @@ $Id: writet1.c,v 1.6 2006/12/12 20:38:11 hahe Exp hahe $
 #include <kpathsea/c-proto.h>
 #include <string.h>
 
-#define t1_log(s)        tex_printf(s)
+#define t1_log(s)        tex_printf("%s",s)
 #define get_length1()    t1_length1 = t1_offset() - t1_save_offset
 #define get_length2()    t1_length2 = t1_offset() - t1_save_offset
 #define get_length3()    t1_length3 = fixedcontent? t1_offset() - t1_save_offset : 0
@@ -558,7 +558,7 @@ static void t1_start_eexec(void)
         *t1_line_ptr++ = 0;
     }
     t1_eexec_encrypt = true;
-    t1_putline();           /* to put the first four bytes */
+    t1_putline();               /* to put the first four bytes */
 }
 
 static void t1_stop_eexec(void)

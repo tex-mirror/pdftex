@@ -285,9 +285,9 @@ known as `\eTeX'.
 @d eTeX_banner=='This is e-TeX, Version 3.141592',eTeX_version_string
   {printed when \eTeX\ starts}
 @#
-@d pdftex_version==140 { \.{\\pdftexversion} }
-@d pdftex_revision=="3" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.3' {current \pdfTeX\ version}
+@d pdftex_version==150 { \.{\\pdftexversion} }
+@d pdftex_revision=="0" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='-1.50.0-alpha-20070219' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
