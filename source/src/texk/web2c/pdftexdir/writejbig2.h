@@ -1,5 +1,5 @@
 /***********************************************************************
-Copyright (c) 2002-2006 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 2002-2007 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -14,13 +14,13 @@ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 for more details.
 
 You should have received a copy of the GNU General Public License along
-with pdfTeX; if not, write to the Free Software Foundation, Inc., 59
-Temple Place, Suite 330, Boston, MA 02111-1307 USA
+with pdfTeX; if not, write to the Free Software Foundation, Inc., 51
+Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 This is experimental JBIG2 image support to pdfTeX. JBIG2 image decoding
 is part of Adobe PDF-1.4, and requires Acroread 5.0 or later.
 
-$Id: writejbig2.h,v 1.40 2006/05/31 19:18:51 hahe Exp hahe $
+$Id$
 ***********************************************************************/
 
 #include <stdlib.h>
@@ -119,33 +119,33 @@ typedef struct _FILEINFO {
 
 /**********************************************************************/
 
-static int comp_file_entry (const void *, const void *, void *);
-static int comp_page_entry (const void *, const void *, void *);
-static int comp_segment_entry (const void *, const void *, void *);
-int ygetc (FILE *);
-FILEINFO *new_fileinfo ();
-PAGEINFO *new_pageinfo ();
-void initseginfo (SEGINFO *);
-void initlinkedlist (LIST *);
-LIST *litem_append (LIST *);
-void pages_maketree (LIST *);
-void segments_maketree (LIST *);
-PAGEINFO *find_pageinfo (LIST *, unsigned long);
-SEGINFO *find_seginfo (LIST *, unsigned long);
-unsigned int read2bytes (FILE *);
-unsigned long read4bytes (FILE *);
-unsigned long getstreamlen (LITEM *, boolean);
-void readfilehdr (FILEINFO *);
-boolean readseghdr (FILEINFO *, SEGINFO *);
-void writeseghdr (FILEINFO *, SEGINFO *);
-void checkseghdr (FILEINFO *, SEGINFO *);
-void checkseghdrflags (SEGINFO * sip);
-void markpage0seg (FILEINFO *, unsigned long);
-unsigned long findstreamstart (FILEINFO *);
-void rd_jbig2_info (FILEINFO *);
-void wr_jbig2 (FILEINFO *, unsigned long);
-void read_jbig2_info (integer);
-void write_jbig2 (integer);
-void flushjbig2page0objects ();
+static int comp_file_entry(const void *, const void *, void *);
+static int comp_page_entry(const void *, const void *, void *);
+static int comp_segment_entry(const void *, const void *, void *);
+int ygetc(FILE *);
+FILEINFO *new_fileinfo();
+PAGEINFO *new_pageinfo();
+void initseginfo(SEGINFO *);
+void initlinkedlist(LIST *);
+LIST *litem_append(LIST *);
+void pages_maketree(LIST *);
+void segments_maketree(LIST *);
+PAGEINFO *find_pageinfo(LIST *, unsigned long);
+SEGINFO *find_seginfo(LIST *, unsigned long);
+unsigned int read2bytes(FILE *);
+unsigned long read4bytes(FILE *);
+unsigned long getstreamlen(LITEM *, boolean);
+void readfilehdr(FILEINFO *);
+boolean readseghdr(FILEINFO *, SEGINFO *);
+void writeseghdr(FILEINFO *, SEGINFO *);
+void checkseghdr(FILEINFO *, SEGINFO *);
+void checkseghdrflags(SEGINFO * sip);
+void markpage0seg(FILEINFO *, unsigned long);
+unsigned long findstreamstart(FILEINFO *);
+void rd_jbig2_info(FILEINFO *);
+void wr_jbig2(FILEINFO *, unsigned long);
+void read_jbig2_info(integer);
+void write_jbig2(integer);
+void flushjbig2page0objects();
 
 /**********************************************************************/
