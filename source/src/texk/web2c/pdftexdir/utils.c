@@ -30,6 +30,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/utils.c#24 $
 #include <kpathsea/c-proto.h>
 #include <kpathsea/c-stat.h>
 #include <kpathsea/c-fopen.h>
+#include <kpathsea/str-list.h>
 #include <string.h>
 #include <time.h>
 #include <float.h>              /* for DBL_EPSILON */
@@ -1828,3 +1829,70 @@ void allocvffnts(void)
         vfifnts = vf_i_fnts_array;
     }
 }
+
+/* This is just a kludge to avoid namespace problems in pdftoepdf.cc: most of
+ * the web2c functions are not visible there.
+ */
+void set_pdf_includelayers(int numlayers)
+{
+    pdfincludelayers = numlayers;
+}
+
+/* ---------------------------------------------------------------------------
+ * functions to handle a list of layer names ( a list of strings)
+ */
+
+/* the list */
+static str_list_type pdflayernames_list;
+
+/* Initializises the list; if it's new, it's created; otherwise it's properly
+ * free'd. 
+ */
+void pdflayernames_init()
+{
+    int i, l;
+    if (STR_LIST(pdflayernames_list) == NULL) {
+        pdflayernames_list = str_list_init();
+    } else {
+        // free the strings
+        for (i = 0, l = STR_LIST_LENGTH(pdflayernames_list); i < l; ++i) {
+            free(STR_LIST_ELT(pdflayernames_list, i));
+        }
+        str_list_free(&pdflayernames_list);
+        // and init the list properly
+        pdflayernames_init();
+    }
+}
+
+/* appends a name */
+void pdflayernames_append_name(string name)
+{
+    str_list_add(&pdflayernames_list, xstrdup(name));
+}
+
+/* n starts with 1; our indexes start with 0 */
+void pdflayernamesgetname(integer n)
+{
+    string name;
+    size_t len;
+
+    if (n > STR_LIST_LENGTH(pdflayernames_list)) {
+        pdftex_fail("Layer %i unknown (I know only %d)", (int)n,
+                    STR_LIST_LENGTH(pdflayernames_list));
+    }
+
+    /* put name on top of string pool and update poolptr */
+    name = STR_LIST_ELT(pdflayernames_list, n - 1);
+    len = strlen(name);
+
+    if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
+        poolptr = poolsize;
+        /* error by str_toks that calls str_room(1) */
+        return;
+    }
+
+    memcpy(&strpool[poolptr], name, len);
+    poolptr += len;
+}
+
+// vim: ts=4

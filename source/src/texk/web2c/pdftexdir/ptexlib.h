@@ -264,6 +264,7 @@ extern scaled getlly();
 extern scaled geturx();
 extern scaled getury();
 extern void allocvffnts();
+extern void pdflayernamesgetname(integer n);
 
 /* vfpacket.c */
 extern eightbits packetbyte(void);

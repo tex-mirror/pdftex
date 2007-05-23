@@ -20,30 +20,27 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 $Id: pdftoepdf.cc,v 1.9 2006/09/01 18:06:52 hahe Exp hahe $
 */
 
-#include <stdlib.h>
+#include <assert.h>
+#include <ctype.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <aconf.h>
-#include <GString.h>
-#include <gmem.h>
-#include <gfile.h>
-#include <config.h>
-#include <assert.h>
-#include "Object.h"
-#include "Stream.h"
-#include "Array.h"
-#include "Dict.h"
-#include "XRef.h"
-#include "Catalog.h"
-#include "Link.h"
-#include "Page.h"
-#include "GfxFont.h"
-#include "PDFDoc.h"
-#include "GlobalParams.h"
-#include "Error.h"
+#include <goo/gmem.h>
+#include <goo/GString.h>
+#include <goo/gfile.h>
+#include <xpdf/aconf.h>
+#include <xpdf/Object.h>
+#include <xpdf/Array.h>
+#include <xpdf/Dict.h>
+#include <xpdf/GfxFont.h>
+#include <xpdf/GlobalParams.h>
+#include <xpdf/Link.h>
+#include <xpdf/Page.h>
+#include <xpdf/PDFDoc.h>
+#include <xpdf/Stream.h>
+#include <xpdf/XRef.h>
 
 #include "epdf.h"
 
@@ -77,7 +74,8 @@ $Id: pdftoepdf.cc,v 1.9 2006/09/01 18:06:52 hahe Exp hahe $
 class PdfObject {
   public:
     PdfObject() {               // nothing
-    } ~PdfObject() {
+    } 
+    ~PdfObject() {
         iObject.free();
     }
     Object *operator->() {
@@ -658,6 +656,48 @@ static PDFRectangle *get_pagebox(Page * page, integer pagebox_spec)
     return page->getMediaBox(); // to make the compiler happy
 }
 
+// Helper vor read_pdf_info
+void read_layer_infos (PdfDocument *pdf_doc)
+{
+    int i, l;
+    Object ocProperties, catDict;
+
+    set_pdf_includelayers(0);
+    pdflayernames_init(); 
+    pdf_doc->xref->getCatalog(&catDict);
+    catDict.dictLookup("OCProperties", &ocProperties);
+    if (ocProperties.isDict()) {
+        Object ocgs, ref, ocg, ocgName;
+        ocProperties.dictLookup("OCGs", &ocgs);
+        if (ocgs.isArray()) {
+            set_pdf_includelayers(ocgs.arrayGetLength());
+            for (i = 0, l = ocgs.arrayGetLength(); i < l; ++i) {
+                ocgs.arrayGetNF(i, &ref);
+                if (ref.isRef()) {
+                    ref.fetch(pdf_doc->xref, &ocg);
+                    if (ocg.isDict()) {
+                        ocg.dictLookup("Name", &ocgName);
+                        if (!ocgName.isNull()) {
+                            pdflayernames_append_name(ocgName.getString()->getCString());
+                        }
+                        else {
+                            pdftex_fail("Empty layername in OCG");
+                        }
+                    }
+                    else {
+                        pdftex_fail("OCG is not a dictionary");
+                    }
+                }
+                else {
+                    pdftex_fail("Element in OCGs array is not a reference");
+                }
+            }
+        }
+        else {
+            pdftex_fail("OCGs is not an array");
+        }
+    }
+}
 
 // Reads various information about the PDF and sets it up for later inclusion.
 // This will fail if the PDF version of the PDF is higher than
@@ -763,6 +803,9 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
         }
     }
     pdf_doc->xref = pdf_doc->doc->getXRef();
+
+    read_layer_infos (pdf_doc);
+
     return page_num;
 }
 
@@ -994,3 +1037,5 @@ void epdf_check_mem()
         delete globalParams;
     }
 }
+
+// vim: ts=4

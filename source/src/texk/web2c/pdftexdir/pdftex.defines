@@ -92,6 +92,7 @@ $Id: //depot/Build/source.development/TeX/texk/web2c/pdftexdir/pdftex.defines#15
 @define function geturx;
 @define function getury;
 @define procedure allocvffnts;
+@define procedure pdflayernamesgetname();
 
 { functions from vfpacket.c }
 @define function newvfpacket();

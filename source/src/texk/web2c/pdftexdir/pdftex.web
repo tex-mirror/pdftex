@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20070404' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20070523' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -10604,7 +10604,9 @@ such that |job_name_code| remains last.
 @d normal_deviate_code      = pdftex_first_expand_code + 23 {end of \pdfTeX's command codes}
 @d pdf_insert_ht_code       = pdftex_first_expand_code + 24 {command code for \.{\\pdfinsertht}}
 @d pdf_ximage_bbox_code     = pdftex_first_expand_code + 25 {command code for \.{\\pdfximagebbox}}
-@d pdftex_convert_codes     = pdftex_first_expand_code + 26 {end of \pdfTeX's command codes}
+@d pdf_includelayers_code   = pdftex_first_expand_code + 26 {number of layers of the last included pdf}
+@d pdf_layername_code       = pdftex_first_expand_code + 27 {name of a layer}
+@d pdftex_convert_codes     = pdftex_first_expand_code + 28 {end of \pdfTeX's command codes}
 @d job_name_code=pdftex_convert_codes {command code for \.{\\jobname}}
 
 @<Put each...@>=
@@ -10674,6 +10676,10 @@ primitive("pdfinsertht",convert,pdf_insert_ht_code);@/
 @!@:pdf_insert_ht_}{\.{\\pdfinsertht} primitive@>
 primitive("pdfximagebbox",convert,pdf_ximage_bbox_code);@/
 @!@:pdf_ximage_bbox_}{\.{\\pdfximagebbox} primitive@>
+primitive("pdfincludelayers",convert,pdf_includelayers_code);@/
+@!@:pdf_includelayers_}{\.{\\pdfincludelayers} primitive@>
+primitive("pdflayername",convert,pdf_layername_code);@/
+@!@:pdf_layername_}{\.{\\pdflayername} primitive@>
 
 @ @<Cases of |print_cmd_chr|...@>=
 convert: case chr_code of
@@ -10709,6 +10715,8 @@ convert: case chr_code of
   normal_deviate_code:    print_esc("pdfnormaldeviate");
   pdf_insert_ht_code: print_esc("pdfinsertht");
   pdf_ximage_bbox_code: print_esc("pdfximagebbox");
+  pdf_includelayers_code: print_esc("pdfincludelayers");
+  pdf_layername_code:     print_esc("pdflayername");
   othercases print_esc("jobname")
   endcases;
 
@@ -11086,6 +11094,38 @@ pdf_ximage_bbox_code: begin
     if (j < 1) or (j > 4) then
         pdf_error("pdfximagebbox", "invalid parameter");
 end;
+pdf_includelayers_code: do_nothing;
+pdf_layername_code:
+  begin
+    scan_int;
+    if pdf_includelayers<1 then
+      pdf_error("pdf inclusion", "No layers found, but trying to select layers");
+    if cur_val<1 then
+        begin
+          print_err("pdf inclusion: Only positive layer numbers allowed");
+          error;
+        end
+      else 
+        if cur_val > pdf_includelayers then
+          begin
+            print_err("pdf inclusion: layer ");
+            print_int(cur_val);
+            print(" does not exist (only ");
+            print_int(pdf_includelayers);
+            print(")");
+            help2("The pdf you tried to include does not have as many layers")
+              ("as you think. Please specify a smaller number.");
+            error;
+          end
+        else
+          begin
+            b := pool_ptr;
+            pdflayernamesgetname(cur_val);
+            link(garbage) := str_toks(b);
+            ins_list(link(temp_head));
+          end;
+    return;
+  end;
 end {there are no other cases}
 
 @ @<Print the result of command |c|@>=
@@ -11169,6 +11209,7 @@ pdf_ximage_bbox_code: begin
     endcases;
     print("pt");
 end;
+pdf_includelayers_code: print_int(pdf_includelayers);
 job_name_code: print(job_name);
 end {there are no other cases}
 
@@ -14845,6 +14886,7 @@ pdf_image_hicolor := 1;
 pdf_image_apply_gamma := 0;
 pdf_px_dimen := one_bp;
 pdf_draftmode := 0;
+pdf_includelayers := 0;
 
 @ The subroutines define the corresponding macros so we can use them
 in C.
@@ -15103,6 +15145,7 @@ end
 @!microseconds: integer;
 @!fixed_pdf_draftmode: integer; {fixed \\pdfdraftmode}
 @!fixed_pdf_draftmode_set: boolean; {|fixed_pdf_draftmode| has been set?}
+@!pdf_includelayers: integer;
 
 @ @<Set init...@>=
 pdf_gone := 0;
@@ -15120,6 +15163,7 @@ zip_write_state := no_zip;
 pdf_minor_version_written := false;
 fixed_pdfoutput_set := false;
 fixed_pdf_draftmode_set := false;
+pdf_includelayers := 0;
 
 @ @p
 function fix_int(val, min, max: integer): integer;

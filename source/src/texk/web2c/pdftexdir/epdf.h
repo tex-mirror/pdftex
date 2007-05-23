@@ -41,6 +41,7 @@ extern "C" {
 
 #include <web2c/c-auto.h>       /* define SIZEOF_LONG */
 #include <web2c/config.h>       /* define type integer */
+#include <kpathsea/types.h>     /* define type string */
 
 #include <web2c/pdftexdir/ptexmac.h>
 
@@ -118,6 +119,10 @@ extern "C" {
 /* utils.c */
     extern char *convertStringToPDFString (char *in, int len);
     extern char *stripzeros (char *a);
+    extern void set_pdf_includelayers (int numlayers);
+    extern void pdflayernames_init();
+    extern void pdflayernames_append_name(string name);
+    extern void pdflayernames_get_name(integer n);
 
 /* config.c */
     extern integer cfgpar (integer);
@@ -126,3 +131,5 @@ extern "C" {
     extern void avl_put_obj (integer, integer);
     extern integer avl_find_obj (integer, integer, integer);
 }
+
+// vim: ts=4
