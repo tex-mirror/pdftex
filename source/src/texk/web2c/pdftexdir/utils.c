@@ -1877,7 +1877,7 @@ void pdflayernamesgetname(integer n)
     size_t len;
 
     if (n > STR_LIST_LENGTH(pdflayernames_list)) {
-        pdftex_fail("Layer %i unknown (I know only %d)", (int)n,
+        pdftex_fail("Layer %i unknown (I know only %d)", (int) n,
                     STR_LIST_LENGTH(pdflayernames_list));
     }
 

@@ -657,13 +657,13 @@ static PDFRectangle *get_pagebox(Page * page, integer pagebox_spec)
 }
 
 // Helper vor read_pdf_info
-void read_layer_infos (PdfDocument *pdf_doc)
+void read_layer_infos(PdfDocument * pdf_doc)
 {
     int i, l;
     Object ocProperties, catDict;
 
     set_pdf_includelayers(0);
-    pdflayernames_init(); 
+    pdflayernames_init();
     pdf_doc->xref->getCatalog(&catDict);
     catDict.dictLookup("OCProperties", &ocProperties);
     if (ocProperties.isDict()) {
@@ -678,22 +678,19 @@ void read_layer_infos (PdfDocument *pdf_doc)
                     if (ocg.isDict()) {
                         ocg.dictLookup("Name", &ocgName);
                         if (!ocgName.isNull()) {
-                            pdflayernames_append_name(ocgName.getString()->getCString());
-                        }
-                        else {
+                            pdflayernames_append_name(ocgName.getString()->
+                                                      getCString());
+                        } else {
                             pdftex_fail("Empty layername in OCG");
                         }
-                    }
-                    else {
+                    } else {
                         pdftex_fail("OCG is not a dictionary");
                     }
-                }
-                else {
+                } else {
                     pdftex_fail("Element in OCGs array is not a reference");
                 }
             }
-        }
-        else {
+        } else {
             pdftex_fail("OCGs is not an array");
         }
     }
@@ -804,7 +801,7 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
     }
     pdf_doc->xref = pdf_doc->doc->getXRef();
 
-    read_layer_infos (pdf_doc);
+    read_layer_infos(pdf_doc);
 
     return page_num;
 }
