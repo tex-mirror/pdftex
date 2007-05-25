@@ -413,8 +413,29 @@ static void write_fontfile(fd_entry * fd)
 
 static void write_fontdescriptor(fd_entry * fd)
 {
+    static const int std_flags[] = {
+        /* indices for << start with 0, but bits start with 1, so the numbers 
+         * for << are 1 lower than the bits in table 5.20 */
+        /* *INDENT-OFF* */
+        1 + 2 + (1 << 5),                       /* Courier */
+        1 + 2 + (1 << 5)            + (1 << 18),/* Courier-Bold */
+        1 + 2 + (1 << 5) + (1 << 6),            /* Courier-Oblique */
+        1 + 2 + (1 << 5) + (1 << 6) + (1 << 18),/* Courier-BoldOblique */
+                (1 << 5),                       /* Helvetica */
+                (1 << 5)            + (1 << 18),/* Helvetica-Bold */
+                (1 << 5) + (1 << 6),            /* Helvetica-Oblique */
+                (1 << 5) + (1 << 6) + (1 << 18),/* Helvetica-BoldOblique */
+              4,                                /* Symbol */
+            2 + (1 << 5),                       /* Times-Roman */
+            2 + (1 << 5)            + (1 << 18),/* Times-Bold */
+            2 + (1 << 5) + (1 << 6),            /* Times-Italic */
+            2 + (1 << 5) + (1 << 6) + (1 << 18),/* Times-BoldItalic */
+              4                                 /* ZapfDingbats */
+        /* *INDENT-ON* */
+    };
     char *glyph;
     struct avl_traverser t;
+    int fd_flags;
     assert(fd != NULL && fd->fm != NULL);
 
     if (is_fontfile(fd->fm))
@@ -426,10 +447,21 @@ static void write_fontdescriptor(fd_entry * fd)
     pdfbegindict(fd->fd_objnum, 1);
     pdf_puts("/Type /FontDescriptor\n");
     write_fontname(fd, "FontName");
-    if (!fd->ff_found && fd->fm->fd_flags == 4)
-        pdf_puts("/Flags 34\n");        /* assumes a roman sans serif font */
-    else
-        pdf_printf("/Flags %i\n", (int) fd->fm->fd_flags);
+    if (fd->fm->fd_flags != FD_FLAGS_NOT_SET_IN_MAPLINE)
+        fd_flags = (int) fd->fm->fd_flags;
+    else if (fd->ff_found)
+        fd_flags = FD_FLAGS_DEFAULT_EMBED;
+    else {
+        fd_flags = is_std_t1font(fd->fm)
+            ? std_flags[check_std_t1font(fd->fm->ps_name)]
+            : FD_FLAGS_DEFAULT_NON_EMBED;
+        pdftex_warn("No flags specified for non-embedded font `%s' (%s) (I'm using %i): "
+                    "fix your map entry.",
+                    fd->fm->ps_name != NULL ? fd->fm->ps_name : "No name given",
+                    fd->fm->tfm_name,
+                    fd_flags);
+    }
+    pdf_printf("/Flags %i\n", fd_flags);
     write_fontmetrics(fd);
     if (fd->ff_found) {
         if (is_subsetted(fd->fm) && is_type1(fd->fm)) {
@@ -617,3 +649,4 @@ void dopdffont(integer font_objnum, internalfontnumber f)
 }
 
 /**********************************************************************/
+// vim: ts=4

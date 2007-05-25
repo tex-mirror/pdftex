@@ -76,6 +76,11 @@ typedef struct {
     char *unicode_seq;          /* multiple unicode sequence */
 } glyph_unicode_entry;
 
+#  define FD_FLAGS_NOT_SET_IN_MAPLINE -1
+#  define FD_FLAGS_DEFAULT_EMBED  4     /* a symbol font */
+#  define FD_FLAGS_DEFAULT_NON_EMBED 0x22
+                                        /* a nonsymbolic serif font */
+
 typedef struct {
     /* parameters scanned from the map file: */
     char *tfm_name;             /* TFM file name (1st field in map line) */
@@ -178,6 +183,7 @@ extern void pdfinitmapfile(string map_name);
 extern fm_entry *new_fm_entry(void);
 extern void delete_fm_entry(fm_entry *);
 extern int avl_do_entry(fm_entry *, int);
+extern int check_std_t1font(char *s);
 
 /* papersiz.c */
 extern integer myatodim(char **);
@@ -350,3 +356,4 @@ static const key_entry font_key[FONT_KEYS_NUM] = {
 
 /**********************************************************************/
 #endif                          /* PDFTEXLIB */
+// vim: ts=4
