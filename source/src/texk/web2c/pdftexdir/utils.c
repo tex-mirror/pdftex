@@ -685,7 +685,7 @@ void unescapehex(poolpointer in)
         first = true;
     }
     if (!first) {               /* last hex digit is omitted */
-        strpool[poolptr++] = ch << 4;
+        strpool[poolptr++] = a;
     }
 }
 
