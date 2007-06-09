@@ -287,7 +287,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20070523' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20070609' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -19672,7 +19672,7 @@ begin
     if not trapped_given then begin
         pdf_print_ln("/Trapped /False");
     end;
-    pdf_str_entry_ln("PTEX.Fullbanner", pdftex_banner);
+    pdf_str_entry_ln("PTEX.Fullbanner", pdftex_banner_escaped);
     pdf_end_dict;
 end;
 
@@ -19693,6 +19693,7 @@ print_mod_date;
 
 @ @<Glob...@>=
 @!pdftex_banner: str_number;   {the complete banner}
+@!pdftex_banner_escaped: str_number;   {the complete banner escaped as a PDF string}
 
 @ @<Output the |obj_tab|@>=
 l := 0;

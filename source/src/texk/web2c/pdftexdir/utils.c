@@ -347,6 +347,8 @@ void makepdftexbanner(void)
                  "%s%s %s", ptexbanner, versionstring, kpathsea_version_string);
     check_nprintf(i, slen);
     pdftexbanner = maketexstring(s);
+    /* escape the banner for use in PTEX.Fullbanner; most likely not needed, but safe */
+    pdftexbannerescaped = maketexstring(convertStringToPDFString(s, strlen(s)));
     xfree(s);
     pdftexbanner_init = true;
 }
