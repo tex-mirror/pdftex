@@ -1897,4 +1897,70 @@ void pdflayernamesgetname(integer n)
     poolptr += len;
 }
 
+/* ---------------------------------------------------------------------------
+ * functions to handle a list of layer numbers ( a list of ints)
+ */
+
+/* the list */
+static struct {
+    unsigned length;
+    unsigned allocated;
+    int *list;
+} pdflayer_object_numbers_list;
+
+
+/* Initializises the list; if it's new, it's created; otherwise it's properly
+ * free'd. 
+ */
+void pdflayer_object_numbers_init()
+{
+    if (pdflayer_object_numbers_list.length != 0)
+        free(pdflayer_object_numbers_list.list);
+    pdflayer_object_numbers_list.length = 0;
+    pdflayer_object_numbers_list.allocated = 0;
+    pdflayer_object_numbers_list.list = NULL;
+}
+
+/* appends a number */
+void pdflayer_object_numbers_append(int obj_number)
+{
+    if (pdflayer_object_numbers_list.allocated <
+        pdflayer_object_numbers_list.length + 1) {
+        pdflayer_object_numbers_list.allocated =
+            1.2 * ++pdflayer_object_numbers_list.allocated;
+        XRETALLOC(pdflayer_object_numbers_list.list,
+                  pdflayer_object_numbers_list.allocated, int);
+    }
+    pdflayer_object_numbers_list.list[pdflayer_object_numbers_list.length++] =
+        obj_number;
+}
+
+/* n starts with 1; our indexes start with 0 */
+void pdflayerobjectnumbersget(integer n)
+{
+    int obj_number;
+    string s;
+    size_t len;
+
+    if (pdflayer_object_numbers_list.length > 0
+        && n > pdflayer_object_numbers_list.length) {
+        pdftex_fail("Layer %i unknown (I know only %d)", (int) n,
+                    pdflayer_object_numbers_list.length);
+    }
+
+    /* put obj_number on top of string pool and update poolptr */
+    obj_number = pdflayer_object_numbers_list.list[n - 1];
+    len = asprintf(&s, "%i", obj_number);
+
+    if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
+        poolptr = poolsize;
+        /* error by str_toks that calls str_room(1) */
+        return;
+    }
+
+    memcpy(&strpool[poolptr], s, len);
+    poolptr += len;
+    free(s);
+}
+
 // vim: ts=4

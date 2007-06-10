@@ -288,7 +288,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20070609' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20070610' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -10607,7 +10607,8 @@ such that |job_name_code| remains last.
 @d pdf_ximage_bbox_code     = pdftex_first_expand_code + 25 {command code for \.{\\pdfximagebbox}}
 @d pdf_includelayers_code   = pdftex_first_expand_code + 26 {number of layers of the last included pdf}
 @d pdf_layername_code       = pdftex_first_expand_code + 27 {name of a layer}
-@d pdftex_convert_codes     = pdftex_first_expand_code + 28 {end of \pdfTeX's command codes}
+@d pdf_layernumber_code     = pdftex_first_expand_code + 28 {new object number of a layer}
+@d pdftex_convert_codes     = pdftex_first_expand_code + 29 {end of \pdfTeX's command codes}
 @d job_name_code=pdftex_convert_codes {command code for \.{\\jobname}}
 
 @<Put each...@>=
@@ -10681,6 +10682,8 @@ primitive("pdfincludelayers",convert,pdf_includelayers_code);@/
 @!@:pdf_includelayers_}{\.{\\pdfincludelayers} primitive@>
 primitive("pdflayername",convert,pdf_layername_code);@/
 @!@:pdf_layername_}{\.{\\pdflayername} primitive@>
+primitive("pdflayernumber",convert,pdf_layernumber_code);@/
+@!@:pdf_layernumber_}{\.{\\pdflayernumber} primitive@>
 
 @ @<Cases of |print_cmd_chr|...@>=
 convert: case chr_code of
@@ -10718,6 +10721,7 @@ convert: case chr_code of
   pdf_ximage_bbox_code: print_esc("pdfximagebbox");
   pdf_includelayers_code: print_esc("pdfincludelayers");
   pdf_layername_code:     print_esc("pdflayername");
+  pdf_layernumber_code:   print_esc("pdflayernumber");
   othercases print_esc("jobname")
   endcases;
 
@@ -11096,7 +11100,7 @@ pdf_ximage_bbox_code: begin
         pdf_error("pdfximagebbox", "invalid parameter");
 end;
 pdf_includelayers_code: do_nothing;
-pdf_layername_code:
+pdf_layername_code, pdf_layernumber_code:
   begin
     scan_int;
     if pdf_includelayers<1 then
@@ -11121,7 +11125,10 @@ pdf_layername_code:
         else
           begin
             b := pool_ptr;
-            pdflayernamesgetname(cur_val);
+            case c of 
+              pdf_layername_code: pdflayernamesgetname(cur_val);
+              pdf_layernumber_code: pdflayerobjectnumbersget(cur_val);
+            end;
             link(garbage) := str_toks(b);
             ins_list(link(temp_head));
           end;

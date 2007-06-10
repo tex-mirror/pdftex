@@ -122,7 +122,8 @@ extern "C" {
     extern void set_pdf_includelayers(int numlayers);
     extern void pdflayernames_init();
     extern void pdflayernames_append_name(string name);
-    extern void pdflayernames_get_name(integer n);
+    extern void pdflayer_object_numbers_init();
+    extern void pdflayer_object_numbers_append(int obj_number);
 
 /* config.c */
     extern integer cfgpar(integer);

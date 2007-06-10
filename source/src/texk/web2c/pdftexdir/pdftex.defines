@@ -93,6 +93,7 @@ $Id$
 @define function getury;
 @define procedure allocvffnts;
 @define procedure pdflayernamesgetname();
+@define procedure pdflayerobjectnumbersget();
 
 { functions from vfpacket.c }
 @define function newvfpacket();

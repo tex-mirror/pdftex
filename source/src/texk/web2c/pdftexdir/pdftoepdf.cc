@@ -71,10 +71,11 @@ $Id$
 // and &obj to get a pointer to the object.
 // It is no longer necessary to call Object::free explicitely.
 
+/* *INDENT-OFF* */
 class PdfObject {
   public:
     PdfObject() {               // nothing
-    } 
+    }
     ~PdfObject() {
         iObject.free();
     }
@@ -90,6 +91,7 @@ class PdfObject {
   public:
     Object iObject;
 };
+/* *INDENT-ON* */
 
 // When copying the Resources of the selected page, all objects are copied
 // recusively top-down. Indirect objects however are not fetched during
@@ -270,6 +272,21 @@ static int addInObj(InObjType type, Ref ref, fd_entry * fd, integer e)
     else
         n->num = pdfnewobjnum();
     return n->num;
+}
+
+static int getNewObjectNumber(Ref ref)
+{
+    InObj *p;
+    if (inObjList == 0) {
+        pdftex_fail("No objects copied yet");
+    } else {
+        for (p = inObjList; p != 0; p = p->next) {
+            if (p->ref.num == ref.num && p->ref.gen == ref.gen) {
+                return p->num;
+            }
+        }
+        pdftex_fail("Object not yet copied: %i %i", ref.num, ref.gen);
+    }
 }
 
 static void copyObject(Object *);
@@ -656,18 +673,19 @@ static PDFRectangle *get_pagebox(Page * page, integer pagebox_spec)
     return page->getMediaBox(); // to make the compiler happy
 }
 
-// Helper vor read_pdf_info
+// Helper for read_pdf_info
 void read_layer_infos(PdfDocument * pdf_doc)
 {
-    int i, l;
     Object ocProperties, catDict;
 
     set_pdf_includelayers(0);
     pdflayernames_init();
+    pdflayer_object_numbers_init();
     pdf_doc->xref->getCatalog(&catDict);
     catDict.dictLookup("OCProperties", &ocProperties);
     if (ocProperties.isDict()) {
         Object ocgs, ref, ocg, ocgName;
+        int i, l, new_number;
         ocProperties.dictLookup("OCGs", &ocgs);
         if (ocgs.isArray()) {
             set_pdf_includelayers(ocgs.arrayGetLength());
@@ -683,6 +701,13 @@ void read_layer_infos(PdfDocument * pdf_doc)
                         } else {
                             pdftex_fail("Empty layername in OCG");
                         }
+                        new_number = getNewObjectNumber(ref.getRef());
+                        pdflayer_object_numbers_append(new_number);
+                        /*
+                           fprintf(stderr, "\nOCG: (%s) %i %i",
+                           ocgName.getString()->getCString(),
+                           (ref.getRef()).num, new_number);
+                         */
                     } else {
                         pdftex_fail("OCG is not a dictionary");
                     }
@@ -800,8 +825,6 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
         }
     }
     pdf_doc->xref = pdf_doc->doc->getXRef();
-
-    read_layer_infos(pdf_doc);
 
     return page_num;
 }
@@ -974,6 +997,7 @@ void write_epdf(void)
         }
         pdf_puts(">>\n");
     }
+    read_layer_infos(pdf_doc);
     // write the page contents
     page->getContents(&contents);
     if (contents->isStream()) {
