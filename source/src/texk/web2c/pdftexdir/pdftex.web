@@ -10678,12 +10678,12 @@ primitive("pdfinsertht",convert,pdf_insert_ht_code);@/
 @!@:pdf_insert_ht_}{\.{\\pdfinsertht} primitive@>
 primitive("pdfximagebbox",convert,pdf_ximage_bbox_code);@/
 @!@:pdf_ximage_bbox_}{\.{\\pdfximagebbox} primitive@>
-primitive("pdfincludelayers",convert,pdf_includelayers_code);@/
-@!@:pdf_includelayers_}{\.{\\pdfincludelayers} primitive@>
+primitive("pdfnumberoflayers",convert,pdf_includelayers_code);@/
+@!@:pdf_includelayers_}{\.{\\pdfnumberoflayers} primitive@>
 primitive("pdflayername",convert,pdf_layername_code);@/
 @!@:pdf_layername_}{\.{\\pdflayername} primitive@>
-primitive("pdflayernumber",convert,pdf_layernumber_code);@/
-@!@:pdf_layernumber_}{\.{\\pdflayernumber} primitive@>
+primitive("pdflayerobjectnumber",convert,pdf_layernumber_code);@/
+@!@:pdf_layernumber_}{\.{\\pdflayerobjectnumber} primitive@>
 
 @ @<Cases of |print_cmd_chr|...@>=
 convert: case chr_code of
@@ -10719,9 +10719,9 @@ convert: case chr_code of
   normal_deviate_code:    print_esc("pdfnormaldeviate");
   pdf_insert_ht_code: print_esc("pdfinsertht");
   pdf_ximage_bbox_code: print_esc("pdfximagebbox");
-  pdf_includelayers_code: print_esc("pdfincludelayers");
+  pdf_includelayers_code: print_esc("pdfnumberoflayers");
   pdf_layername_code:     print_esc("pdflayername");
-  pdf_layernumber_code:   print_esc("pdflayernumber");
+  pdf_layernumber_code:   print_esc("pdflayerobjectnumber");
   othercases print_esc("jobname")
   endcases;
 
