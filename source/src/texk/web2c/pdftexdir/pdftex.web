@@ -8857,8 +8857,9 @@ if cur_cs < hash_base then
 else
   cur_cs := prim_lookup(text(cur_cs));
 if cur_cs<>undefined_primitive then begin
-  if cur_cmd>max_command then begin
-    cur_cmd := prim_eq_type(cur_cs);
+  t := prim_eq_type(cur_cs);
+  if t>max_command then begin
+    cur_cmd := t;
     cur_chr := prim_equiv(cur_cs);
     cur_tok := (cur_cmd*@'400)+cur_chr;
     cur_cs  := 0;
