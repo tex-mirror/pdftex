@@ -10,6 +10,8 @@ pdfTeX 3.141592-1.40.4 was released on 2007-06-??
 - bugfix: Copying a box with \pdfstartlink inside produced the same /Link
   annotation object multiply, with same object number and identical coordinates
   on the page (799)
+- bugfix: \pdfprimitive was broken (see
+  http://www.ntg.nl/pipermail/ntg-pdftex/2007-April/002860.html)
 - pdfTeX uses libpng 1.2.18
 
 -------------------------------------------------
