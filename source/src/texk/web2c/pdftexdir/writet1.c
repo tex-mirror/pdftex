@@ -1384,7 +1384,8 @@ static void t1_read_subrs()
     t1_getline();
     while (!(t1_charstrings() || t1_subrs())) {
         t1_scan_param();
-        t1_putline();
+        if (!t1_prefix("/UniqueID"))    /* ignore UniqueID for subsetted fonts */
+            t1_putline();
         t1_getline();
     }
   found:
