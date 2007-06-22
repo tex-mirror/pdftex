@@ -2,9 +2,10 @@
 pdfTeX 3.141592-1.40.4 was released on 2007-06-??
 -------------------------------------------------
 - bugfix: It was impossible to set the font Flags to 4 in map entries (762)
-- bugfix: The font Flags of non-embedded fonts were wrong (794). Now pdfTeX
-  uses the Flags from map entries (if found) or guesses values for the base14
-  fonts
+- bugfix: The font Flags of non-embedded fonts were wrong (794). 
+  Now pdfTeX uses the Flags from map entries (if found) or guesses values for
+  the base14 fonts
+- bugfix: Subsetted fonts still had their private UniqueID copied (774)
 - bugfix: \pdfunescapehex returned a wrong result if the last character was not
   a hexadecimal digit and the last hex pair was incomplete (777)
 - bugfix: Copying a box with \pdfstartlink inside produced the same /Link
