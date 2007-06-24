@@ -17506,7 +17506,6 @@ function vf_def_font(f: internal_font_number): internal_font_number;
 var k: internal_font_number;
     s: str_number;
     ds, fs: scaled;
-    i: integer;
     cs: four_quarters;
 begin
     cs.b0 := vf_byte; cs.b1 := vf_byte; cs.b2 := vf_byte; cs.b3 := vf_byte;
@@ -17548,7 +17547,7 @@ end;
 procedure do_vf(f: internal_font_number); {process \.{VF} file with font internal number |f|}
 var cmd, k, n: integer;
     cc, cmd_length, packet_length: integer;
-    tfm_width, t: scaled;
+    tfm_width: scaled;
     s: str_number;
     stack_level: vf_stack_index;
     save_vf_nf: internal_font_number;
@@ -17845,9 +17844,6 @@ var f, k, n: internal_font_number;
     char_move: boolean;
     w, x, y, z: scaled;
     s: str_number;
-    old_vf_z: integer;
-    old_vf_alpha: integer;
-    old_vf_beta: 1..16;
 begin
     incr(vf_cur_s);
     if vf_cur_s > vf_max_recursion then
@@ -20027,12 +20023,17 @@ begin
         return;
     l := prev_char_p;
     r := link(p);
-    if type(l) = ligature_node then
-        l := lig_char(l);
-    if type(r) = ligature_node then
-        r := lig_char(r);
-    if not (is_char_node(l) and is_char_node(r) and
-            (font(l) = font(r)) and
+    if not is_char_node(l) then
+        if type(l) = ligature_node then
+            l := lig_char(l)
+        else
+            return;
+    if not is_char_node(r) then
+        if type(r) = ligature_node then
+            r := lig_char(r)
+        else
+            return;
+    if not ((font(l) = font(r)) and 
             (pdf_font_stretch[font(l)] <> null_font))
     then
         return;
@@ -20051,12 +20052,17 @@ begin
         return;
     l := prev_char_p;
     r := link(p);
-    if type(l) = ligature_node then
-        l := lig_char(l);
-    if type(r) = ligature_node then
-        r := lig_char(r);
-    if not (is_char_node(l) and is_char_node(r) and
-            (font(l) = font(r)) and
+    if not is_char_node(l) then
+        if type(l) = ligature_node then
+            l := lig_char(l)
+        else
+            return;
+    if not is_char_node(r) then
+        if type(r) = ligature_node then
+            r := lig_char(r)
+        else
+            return;
+    if not ((font(l) = font(r)) and 
             (pdf_font_shrink[font(l)] <> null_font))
     then
         return;
@@ -20253,30 +20259,32 @@ if p<>null then
     x := x + width(p);
     end;
   kern_node: begin
-    if (m = cal_expand_ratio) and (subtype(p) = normal) then begin
-        k := kern_stretch(p);
-        if k <> 0 then begin
-            subtype(p) := substituted;
-            font_stretch := font_stretch + k;
+    if subtype(p) = normal then begin
+        if m = cal_expand_ratio then begin
+            font_stretch := font_stretch + kern_stretch(p);
+            font_shrink := font_shrink + kern_shrink(p);
+        end
+        else if m = subst_ex_font then begin
+            if font_expand_ratio > 0 then
+                k := kern_stretch(p)
+            else if font_expand_ratio < 0 then
+                k := kern_shrink(p)
+            else
+                pdfassert(0);
+            if k <> 0 then begin
+                if is_char_node(link(p)) then
+                    width(p) := get_kern(font(prev_char_p),
+                                         character(prev_char_p),
+                                         character(link(p)))
+                else if type(link(p)) = ligature_node then
+                    width(p) := get_kern(font(prev_char_p),
+                                         character(prev_char_p),
+                                         character(lig_char(link(p))));
+            end;
         end;
-        k := kern_shrink(p);
-        if k <> 0 then begin
-            subtype(p) := substituted;
-            font_shrink := font_shrink + k;
-        end;
-      end
-    else if (m = subst_ex_font) and (subtype(p) = substituted) then begin
-        if type(link(p)) = ligature_node then
-            width(p) := get_kern(font(prev_char_p),
-                                 character(prev_char_p),
-                                 character(lig_char(link(p))))
-        else
-            width(p) := get_kern(font(prev_char_p),
-                                 character(prev_char_p),
-                                 character(link(p)))
-      end;
-    x := x + width(p);
     end;
+    x := x + width(p);
+  end;
   math_node: begin x:=x+width(p);
     if TeXXeT_en then @<Adjust \(t)the LR stack for the |hpack| routine@>;
     end;
