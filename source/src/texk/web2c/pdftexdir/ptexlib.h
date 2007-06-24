@@ -274,12 +274,12 @@ extern void pdflayernamesgetname(integer n);
 extern void pdflayerobjectnumbersget(integer n);
 
 /* vfpacket.c */
-extern eightbits packetbyte(void);
 extern integer newvfpacket(internalfontnumber);
+extern void storepacket(internalfontnumber, eightbits, strnumber);
+extern void startpacket(internalfontnumber, eightbits);
+extern eightbits packetbyte(void);
 extern void poppacketstate(void);
 extern void pushpacketstate(void);
-extern void startpacket(internalfontnumber, integer);
-extern void storepacket(integer, integer, integer);
 extern void vf_free(void);
 
 /* writeenc.c */

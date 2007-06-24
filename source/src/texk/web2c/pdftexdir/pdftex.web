@@ -10776,7 +10776,7 @@ pdf_font_name_code, pdf_font_objnum_code, pdf_font_size_code: begin
     if cur_val = null_font then
         pdf_error("font", "invalid font identifier");
     if c <> pdf_font_size_code then begin
-        pdf_check_vf(cur_val);
+        pdf_check_vf_cur_val;
         if not font_used[cur_val] then
             pdf_init_font_cur_val;
     end;
@@ -15363,6 +15363,7 @@ begin
     print(": "); print(p);
     if append_nl then
         print_ln;
+  if history=spotless then history:=warning_issued;
 end;
 
 procedure pdf_os_get_os_buf(s: integer); {check that |s| bytes more
@@ -16774,28 +16775,15 @@ during adjusting spacing. Such fonts are linked via the |pdf_font_elink| array.
 @d virtual_font_type = 1 {virtual font}
 @d real_font_type = 2 {real font}
 @d subst_font_type = 3 {substituted font}
-@d pdf_check_vf(#) == begin
-    tmp_f := #;
-    do_vf;
-    if pdf_font_type[#] = virtual_font_type then
-        pdf_error("font", "command cannot be used with virtual font");
-end
-
-@d pdf_check_new_font(#) ==
-    if pdf_font_type[#] = new_font_type then begin
-        tmp_f := #;
-        do_vf;
-    end
 
 @<Declare procedures that need to be declared forward for \pdfTeX@>=
-procedure do_vf; forward;
+procedure pdf_check_vf_cur_val; forward;
 procedure pdf_init_font_cur_val; forward;
 procedure scan_pdf_ext_toks; forward;
 
 @ @<Glob...@>=
 @!pdf_font_type: ^eight_bits; {the type of font}
 @!pdf_font_attr: ^str_number; {pointer to additional attributes}
-@!tmp_f: internal_font_number; {temporary register to pass parameter to some subroutines}
 
 @ Here come some subroutines to deal with expanded fonts for HZ-algorithm.
 
@@ -17118,45 +17106,6 @@ begin
     load_expand_font := k;
 end;
 
-function auto_expand_vf(f: internal_font_number): boolean;
-{check for a virtual auto-expanded font}
-var save_f, bf, lf: internal_font_number;
-    e, k: integer;
-begin
-    auto_expand_vf := false;
-    if (not pdf_font_auto_expand[f]) or (pdf_font_blink[f] = null_font) then
-        return; {not an auto-expanded font}
-    bf := pdf_font_blink[f];
-    if pdf_font_type[bf] = new_font_type then {we must process the base font first}
-    begin
-        save_f := tmp_f;
-        tmp_f := bf;
-        do_vf;
-        tmp_f := save_f;
-    end;
-
-    if pdf_font_type[bf] <> virtual_font_type then
-        return; {not a virtual font}
-
-    e := pdf_font_expand_ratio[f];
-    for k := 0 to vf_local_font_num[bf] - 1 do begin
-        lf := vf_default_font[bf] + k;
-        allocvffnts;
-        {copy vf local font numbers:}
-        vf_e_fnts[vf_nf] := vf_e_fnts[lf];
-        {definition of local vf fonts are expanded from base fonts:}
-        vf_i_fnts[vf_nf] := auto_expand_font(vf_i_fnts[lf], e);
-        copy_expand_params(vf_i_fnts[vf_nf], vf_i_fnts[lf], e);
-        incr(vf_nf);
-    end;
-    vf_packet_base[f] := vf_packet_base[bf];
-    vf_local_font_num[f] := vf_local_font_num[bf];
-    vf_default_font[f] := vf_nf - vf_local_font_num[f];
-
-    pdf_font_type[f] := virtual_font_type;
-    auto_expand_vf := true;
-end;
-
 function fix_expand_value(f: internal_font_number; e: integer): integer;
 {return the multiple of |pdf_font_step[f]| that is nearest to |e|}
 var step: integer;
@@ -17304,7 +17253,7 @@ begin
             pdf_error("font expansion", "font has been expanded with different parameters");
     end
     else begin
-        if pdf_font_type[f] <> new_font_type then
+        if pdf_font_type[f] = real_font_type then
             pdf_warning("font expansion", "font should be expanded before its first use",
                         true, true);
         set_expand_params(f, auto_expand, font_stretch, font_shrink, font_step, 0);
@@ -17313,12 +17262,29 @@ begin
     end;
 end;
 
+@ We implement robust letter spacing using virtual font.
+
+@d vf_replace_z ==
+begin
+    vf_alpha:=16;
+    while vf_z>=@'40000000 do begin
+        vf_z:=vf_z div 2;
+        vf_alpha:=vf_alpha+vf_alpha;
+    end;
+    vf_beta:=256 div vf_alpha;
+    vf_alpha:=vf_alpha*vf_z;
+end
+
+@p
 function letter_space_font(u: pointer; f: internal_font_number; e: integer): internal_font_number;
 var k: internal_font_number;
-    w, r, fs: scaled;
+    w, r: scaled;
     s: str_number;
     i, nw: integer;
     old_setting:0..max_selector;
+    vf_z: integer;
+    vf_alpha: integer;
+    vf_beta: 1..16;
 begin
     {read a new font and expand the character widths}
     k := read_font_info(u, font_name[f], "", font_size[f]);
@@ -17350,8 +17316,7 @@ begin
     vf_default_font[k] := vf_nf - 1;
     pdf_font_type[k] := virtual_font_type;
 
-    fs := font_size[f];
-    vf_z := fs;
+    vf_z := font_size[f];
     vf_replace_z;
     w := round_xn_over_d(quad(f), e, 2000);
     if w > 0 then
@@ -17448,50 +17413,24 @@ created by |tokens_to_string|}
 pdf_resname_prefix := 0;
 last_tokens_string := 0;
 
-
 @ Here we implement reading information from \.{VF} file.
 
 @d vf_max_packet_length = 10000 {max length of character packet in \.{VF} file}
-
 @#
-@d vf_error = 61 {label to go to when an error occur}
 @d do_char = 70 {label to go to typesetting a character of virtual font}
 @#
 @d long_char = 242 {\.{VF} command for general character packet}
 @d vf_id = 202 {identifies \.{VF} files}
 @d put1=133 {typeset a character}
-
-@#
-@d vf_byte == getc(vf_file) {get a byte from\.{VF} file}
-@d vf_packet(#) == vf_packet_start[vf_packet_base[#] + vf_packet_end
-@d vf_packet_end(#) == #]
-
-@#
-@d bad_vf(#) == begin vf_err_str := #; goto vf_error; end {go out \.{VF}
-processing with an error message}
 @d four_cases(#) == #,#+1,#+2,#+3
-
 @#
 @d tmp_b0 == tmp_w.qqqq.b0
 @d tmp_b1 == tmp_w.qqqq.b1
 @d tmp_b2 == tmp_w.qqqq.b2
 @d tmp_b3 == tmp_w.qqqq.b3
 @d tmp_int == tmp_w.int
-
 @#
-@d scaled3u == {convert |tmp_b1..tmp_b3| to an unsigned scaled dimension}
-(((((tmp_b3*vf_z)div@'400)+(tmp_b2*vf_z))div@'400)+(tmp_b1*vf_z))div vf_beta
-@d scaled4(#) == {convert |tmp_b0..tmp_b3| to a scaled dimension}
-  #:=scaled3u;
-  if tmp_b0>0 then if tmp_b0=255 then # := # - vf_alpha
-@d scaled3(#) == {convert |tmp_b1..tmp_b3| to a scaled dimension}
-  #:=scaled3u; @+ if tmp_b1>127 then # := # - vf_alpha
-@d scaled2 == {convert |tmp_b2..tmp_b3| to a scaled dimension}
-  if tmp_b2>127 then tmp_b1:=255 else tmp_b1:=0;
-  scaled3
-@d scaled1 == {convert |tmp_b3| to a scaled dimension}
-  if tmp_b3>127 then tmp_b1:=255 else tmp_b1:=0;
-  tmp_b2:=tmp_b1; scaled3
+@d bad_vf(#) == vf_error(font_name[f], #) {quit with an error message telling the vf filename}
 
 @<Glob...@>=
 @!vf_packet_base: ^integer; {base addresses of character packets from virtual fonts}
@@ -17503,34 +17442,46 @@ processing with an error message}
 @!vf_e_fnts: ^integer; {external font numbers}
 @!vf_i_fnts: ^internal_font_number; {corresponding internal font numbers}
 @!tmp_w: memory_word; {accumulator}
-@!vf_z: integer; {multiplier}
-@!vf_alpha: integer; {correction for negative values}
-@!vf_beta: 1..16; {divisor}
 
 @ @<Set init...@>=
 vf_nf := 0;
 
 @ The |do_vf| procedure attempts to read the \.{VF} file for a font, and sets
 |pdf_font_type| to |real_font_type| if the \.{VF} file could not be found
-or loaded, otherwise sets |pdf_font_type| to |virtual_font_type|.  At this
-time, |tmp_f| is the internal font number of the current \.{TFM} font.  To
+or loaded, otherwise sets |pdf_font_type| to |virtual_font_type|. To
 process font definitions in virtual font we call |vf_def_font|.
 
-@p procedure vf_replace_z;
+@p
+procedure vf_error(filename, msg: str_number);
+var old_setting:0..max_selector; {holds print |selector|}
+    s: str_number;
 begin
-    vf_alpha:=16;
-    while vf_z>=@'40000000 do begin
-        vf_z:=vf_z div 2;
-        vf_alpha:=vf_alpha+vf_alpha;
-    end;
-    vf_beta:=256 div vf_alpha;
-    vf_alpha:=vf_alpha*vf_z;
+    str_room(length(filename) + 3);
+    old_setting:=selector; selector:=new_string;
+    print(filename);
+    print(".vf");
+    s := make_string;
+    selector:=old_setting;
+    pdf_error(s, msg);
+end;
+
+function vf_byte: eight_bits; {read a byte from |vf_file|}
+var i: integer;
+begin
+    i := getc(vf_file);
+    if i < 0 then
+        pdf_error("vf", "unexpected EOF or error");
+    vf_byte := i;
 end;
 
 function vf_read(k: integer): integer; {read |k| bytes as an integer from \.{VF} file}
 var i: integer;
 begin
-    i := 0;
+    pdfassert((k > 0) and (k <= 4));
+    i := vf_byte;
+    if (k = 4) and (i > 127) then
+        i := i - 256;
+    decr(k);
     while k > 0 do begin
         i := i*256 + vf_byte;
         decr(k);
@@ -17555,18 +17506,17 @@ function vf_def_font(f: internal_font_number): internal_font_number;
 var k: internal_font_number;
     s: str_number;
     ds, fs: scaled;
+    i: integer;
     cs: four_quarters;
 begin
     cs.b0 := vf_byte; cs.b1 := vf_byte; cs.b2 := vf_byte; cs.b3 := vf_byte;
-    tmp_b0 := vf_byte; tmp_b1 := vf_byte; tmp_b2 := vf_byte; tmp_b3 := vf_byte;
-    scaled4(fs);
+    fs := sqxfw(vf_read(4), font_size[f]);
     ds := vf_read(4) div @'20;
     tmp_b0 := vf_byte;
     tmp_b1 := vf_byte;
     while tmp_b0 > 0 do begin
         decr(tmp_b0);
-        if vf_byte > 0 then
-            do_nothing; {skip the font path}
+        call_func(vf_byte); {skip the font path}
     end;
     str_room(tmp_b1);
     while tmp_b1 > 0 do begin
@@ -17595,18 +17545,14 @@ begin
     vf_def_font := k;
 end;
 
-procedure do_vf; {process \.{VF} file with font internal number |f|}
-label vf_error;
+procedure do_vf(f: internal_font_number); {process \.{VF} file with font internal number |f|}
 var cmd, k, n: integer;
-    cc, cmd_length: integer;
-    tfm_width: scaled;
-    vf_err_str, s: str_number;
+    cc, cmd_length, packet_length: integer;
+    tfm_width, t: scaled;
+    s: str_number;
     stack_level: vf_stack_index;
     save_vf_nf: internal_font_number;
-    f: internal_font_number;
-
 begin
-    f := tmp_f;
     pdf_font_type[f] := real_font_type;
     if auto_expand_vf(f) then
         return; {auto-expanded virtual font}
@@ -17622,16 +17568,6 @@ begin
         bad_vf("POST command expected");
     b_close(vf_file);
     pdf_font_type[f] := virtual_font_type;
-    return;
-vf_error:
-    print_nl("Error in processing VF font (");
-    print(font_name[f]);
-    print(".vf): ");
-    print(vf_err_str);
-    print(", virtual font will be ignored");
-    print_ln;
-    b_close(vf_file);
-    update_terminal;
 end;
 
 @ @<Open |vf_file|, return if not found@>=
@@ -17646,7 +17582,7 @@ if vf_byte <> vf_id then
     bad_vf("wrong id byte");
 cmd_length := vf_byte;
 for k := 1 to cmd_length do
-    tmp_int := vf_byte;
+    call_func(vf_byte); {skip the comment}
 tmp_b0 := vf_byte; tmp_b1 := vf_byte; tmp_b2 := vf_byte; tmp_b3 := vf_byte;
 if ((tmp_b0 <> 0) or (tmp_b1 <> 0) or (tmp_b2 <> 0) or (tmp_b3 <> 0)) and
    ((font_check[f].b0 <> 0) or (font_check[f].b1 <> 0) or
@@ -17662,9 +17598,7 @@ if vf_read(4) div @'20 <> font_dsize[f] then begin
     print(font_name[f]);
     print(".vf ignored");
 end;
-update_terminal;
-vf_z := font_size[f];
-vf_replace_z
+update_terminal
 
 @ @<Process the font definitions@>=
 cmd := vf_byte;
@@ -17684,38 +17618,36 @@ vf_local_font_num[f] := vf_nf - save_vf_nf;
 
 @ @<Build a character packet@>=
 if cmd = long_char then begin
-    vf_packet_length := vf_read(4);
+    packet_length := vf_read(4);
     cc := vf_read(4);
     if not is_valid_char(cc) then
         bad_vf("invalid character code");
-    tmp_b0 := vf_byte; tmp_b1 := vf_byte; tmp_b2 := vf_byte; tmp_b3 := vf_byte;
-    scaled4(tfm_width);
+    tfm_width := sqxfw(vf_read(4), font_size[f]);
 end
 else begin
-    vf_packet_length := cmd;
+    packet_length := cmd;
     cc := vf_byte;
     if not is_valid_char(cc) then
         bad_vf("invalid character code");
-    tmp_b1 := vf_byte; tmp_b2 := vf_byte; tmp_b3 := vf_byte;
-    scaled3(tfm_width);
+    tfm_width := sqxfw(vf_read(3), font_size[f]);
 end;
-if vf_packet_length < 0 then
+if packet_length < 0 then
     bad_vf("negative packet length");
-if vf_packet_length > vf_max_packet_length then
+if packet_length > vf_max_packet_length then
     bad_vf("packet length too long");
-if (tfm_width <> char_width(f)(char_info(f)(cc))) then begin
+if abs(tfm_width - char_width(f)(char_info(f)(cc))) > 1 then begin
     print_nl("character width mismatch in font ");
     print(font_name[f]);
     print(".vf ignored");
 end;
-str_room(vf_packet_length);
-while vf_packet_length > 0 do begin
+str_room(packet_length);
+while packet_length > 0 do begin
     cmd := vf_byte;
-    decr(vf_packet_length);
+    decr(packet_length);
     @<Cases of \.{DVI} commands that can appear in character packet@>;
     if cmd <> nop then
         append_char(cmd);
-    vf_packet_length := vf_packet_length - cmd_length;
+    packet_length := packet_length - cmd_length;
     while cmd_length > 0 do begin
         decr(cmd_length);
         append_char(vf_byte);
@@ -17723,7 +17655,7 @@ while vf_packet_length > 0 do begin
 end;
 if stack_level <> 0 then
     bad_vf("more PUSHs than POPs in character packet");
-if vf_packet_length <> 0 then
+if packet_length <> 0 then
     bad_vf("invalid packet length or DVI command in packet");
 @<Store the packet being built@>;
 cmd := vf_byte
@@ -17740,7 +17672,7 @@ else if ((fnt_num_0 <= cmd) and (cmd <= fnt_num_0 + 63)) or
         ((fnt1 <= cmd) and (cmd <= fnt1 + 3)) then begin
     if cmd >= fnt1 then begin
         k := vf_read(cmd - fnt1 + 1);
-        vf_packet_length := vf_packet_length - (cmd - fnt1 + 1);
+        packet_length := packet_length - (cmd - fnt1 + 1);
     end
     else
         k := cmd - fnt_num_0;
@@ -17773,7 +17705,7 @@ four_cases(y1):     cmd_length := cmd - y1 + 1;
 four_cases(z1):     cmd_length := cmd - z1 + 1;
 four_cases(xxx1):  begin
     cmd_length := vf_read(cmd - xxx1 + 1);
-    vf_packet_length := vf_packet_length - (cmd - xxx1 + 1);
+    packet_length := packet_length - (cmd - xxx1 + 1);
     if cmd_length > vf_max_packet_length then
         bad_vf("packet length too long");
     if cmd_length < 0 then
@@ -17800,6 +17732,49 @@ end;
 othercases
     bad_vf("improver DVI command");
 endcases
+
+@ @p
+procedure pdf_check_vf_cur_val;
+var f: internal_font_number;
+begin
+    f := cur_val;
+    do_vf(f);
+    if pdf_font_type[f] = virtual_font_type then
+        pdf_error("font", "command cannot be used with virtual font");
+end;
+
+function auto_expand_vf(f: internal_font_number): boolean;
+{check for a virtual auto-expanded font}
+var bf, lf: internal_font_number;
+    e, k: integer;
+begin
+    auto_expand_vf := false;
+    if (not pdf_font_auto_expand[f]) or (pdf_font_blink[f] = null_font) then
+        return; {not an auto-expanded font}
+    bf := pdf_font_blink[f];
+    if pdf_font_type[bf] = new_font_type then {we must process the base font first}
+        do_vf(bf);
+    if pdf_font_type[bf] <> virtual_font_type then
+        return; {not a virtual font}
+
+    e := pdf_font_expand_ratio[f];
+    for k := 0 to vf_local_font_num[bf] - 1 do begin
+        lf := vf_default_font[bf] + k;
+        allocvffnts;
+        {copy vf local font numbers:}
+        vf_e_fnts[vf_nf] := vf_e_fnts[lf];
+        {definition of local vf fonts are expanded from base fonts:}
+        vf_i_fnts[vf_nf] := auto_expand_font(vf_i_fnts[lf], e);
+        copy_expand_params(vf_i_fnts[vf_nf], vf_i_fnts[lf], e);
+        incr(vf_nf);
+    end;
+    vf_packet_base[f] := vf_packet_base[bf];
+    vf_local_font_num[f] := vf_local_font_num[bf];
+    vf_default_font[f] := vf_nf - vf_local_font_num[f];
+
+    pdf_font_type[f] := virtual_font_type;
+    auto_expand_vf := true;
+end;
 
 @ The |do_vf_packet| procedure is called in order to interpret the
 character packet for a virtual character. Such a packet may contain the
@@ -17833,7 +17808,11 @@ vf_stack_ptr := 0;
 character packet}
 var i: integer;
 begin
-    i := 0;
+    pdfassert((k > 0) and (k <= 4));
+    i := packet_byte;
+    if (k = 4) and (i > 127) then
+        i := i - 256;
+    decr(k);
     while k > 0 do begin
         i := i*256 + packet_byte;
         decr(k);
@@ -17841,77 +17820,60 @@ begin
     packet_read := i;
 end;
 
-function packet_scaled(k: integer): integer; {get |k| bytes from packet as a
+function packet_scaled(k: integer; fs: scaled): scaled; {get |k| bytes from packet as a
 scaled}
-var s: scaled;
+var fw: integer;
 begin
+    fw := packet_read(k);
     case k of
-    1: begin
-        tmp_b3 := packet_byte;
-        scaled1(s);
-    end;
-    2: begin
-        tmp_b2 := packet_byte;
-        tmp_b3 := packet_byte;
-        scaled2(s);
-    end;
-    3: begin
-        tmp_b1 := packet_byte;
-        tmp_b2 := packet_byte;
-        tmp_b3 := packet_byte;
-        scaled3(s);
-    end;
-    4: begin
-        tmp_b0 := packet_byte;
-        tmp_b1 := packet_byte;
-        tmp_b2 := packet_byte;
-        tmp_b3 := packet_byte;
-        scaled4(s);
-    end;
-    othercases pdf_error("vf", "invalid number size");
+    1:  if fw > 127 then
+            fw := fw - 256;
+    2:  if fw > @"8000 then
+            fw := fw - @"10000;
+    3:  if fw > @"800000 then
+            fw := fw - @"1000000;
     endcases;
-    packet_scaled := s;
+    packet_scaled := sqxfw(fw, fs);
 end;
 
-procedure do_vf_packet(f: internal_font_number; c: eight_bits); {typeset the \.{DVI} commands in the
-character packet for character |c| in current font |f|}
+procedure do_vf_packet(vf_f: internal_font_number; c: eight_bits); {typeset the
+\.{DVI} commands in the character packet for character |c| in current font |f|}
 label do_char, continue;
-var save_vf, k, n: internal_font_number;
-    save_h, save_v: scaled;
+var f, k, n: internal_font_number;
+    save_cur_h, save_cur_v: scaled;
     cmd: integer;
     char_move: boolean;
     w, x, y, z: scaled;
     s: str_number;
+    old_vf_z: integer;
+    old_vf_alpha: integer;
+    old_vf_beta: 1..16;
 begin
     incr(vf_cur_s);
     if vf_cur_s > vf_max_recursion then
         overflow("max level recursion of virtual fonts", vf_max_recursion);
-    push_packet_state;
-    start_packet(f, c);
-    vf_z := font_size[f];
-    vf_replace_z;
-    save_vf := f;
-    f := vf_i_fnts[vf_default_font[save_vf]];
-    save_v := cur_v;
-    save_h := cur_h;
+    save_cur_v := cur_v;
+    save_cur_h := cur_h;
+    push_packet_state;      {save pointer and length of the current packet}
+    start_packet(vf_f, c);  {set pointer and length of the new packet}
+    f := vf_i_fnts[vf_default_font[vf_f]];
     w := 0; x := 0; y := 0; z := 0;
     while vf_packet_length > 0 do begin
         cmd := packet_byte;
         @<Do typesetting the \.{DVI} commands in virtual character packet@>;
 continue:
     end;
-    cur_h := save_h;
-    cur_v := save_v;
-    pop_packet_state;
-    vf_z := font_size[f];
-    vf_replace_z;
+    pop_packet_state; {restore pointer and length of the previous packet}
+    cur_v := save_cur_v;
+    cur_h := save_cur_h;
     decr(vf_cur_s);
 end;
 
 @ The following code typesets a character to PDF output.
 
-@d output_one_char(#)==begin
-    pdf_check_new_font(f);
+@d output_one_char(#) == begin
+    if pdf_font_type[f] = new_font_type then
+        do_vf(f);
     if pdf_font_type[f] = virtual_font_type then
         do_vf_packet(f, #)
     else begin
@@ -17920,7 +17882,6 @@ end;
         adv_char_width(f, #);
     end;
 end
-
 
 @<Do typesetting the \.{DVI} commands in virtual character packet@>=
 if (cmd >= set_char_0) and (cmd <= set_char_0 + 127)  then begin
@@ -17938,13 +17899,13 @@ else if ((fnt_num_0 <= cmd) and (cmd <= fnt_num_0 + 63)) or (cmd = fnt1) then be
     else
         k := cmd - fnt_num_0;
     n := 0;
-    while (n < vf_local_font_num[save_vf]) and
-          (vf_e_fnts[vf_default_font[save_vf] + n] <> k) do
+    while (n < vf_local_font_num[vf_f]) and
+          (vf_e_fnts[vf_default_font[vf_f] + n] <> k) do
         incr(n);
-    if (n = vf_local_font_num[save_vf]) then
+    if (n = vf_local_font_num[vf_f]) then
         pdf_error("vf", "local font not found")
     else
-        f := vf_i_fnts[vf_default_font[save_vf] + n];
+        f := vf_i_fnts[vf_default_font[vf_f] + n];
 end
 else case cmd of
 push: begin
@@ -17982,8 +17943,8 @@ four_cases(set1), four_cases(put1): begin
     goto do_char;
 end;
 set_rule, put_rule: begin
-    rule_ht := packet_scaled(4);
-    rule_wd := packet_scaled(4);
+    rule_ht := packet_scaled(4, font_size[vf_f]);
+    rule_wd := packet_scaled(4, font_size[vf_f]);
     if (rule_wd > 0) and (rule_ht > 0) then begin
         pdf_set_rule(cur_h, cur_v, rule_wd, rule_ht);
         if cmd = set_rule then
@@ -17991,27 +17952,27 @@ set_rule, put_rule: begin
     end;
 end;
 four_cases(right1):
-    cur_h := cur_h + packet_scaled(cmd - right1 + 1);
+    cur_h := cur_h + packet_scaled(cmd - right1 + 1, font_size[vf_f]);
 w0, four_cases(w1): begin
     if cmd > w0 then
-        w := packet_scaled(cmd - w0);
+        w := packet_scaled(cmd - w0, font_size[vf_f]);
     cur_h := cur_h + w;
 end;
 x0, four_cases(x1): begin
     if cmd > x0 then
-        x := packet_scaled(cmd - x0);
+        x := packet_scaled(cmd - x0, font_size[vf_f]);
     cur_h := cur_h + x;
 end;
 four_cases(down1):
-    cur_v := cur_v + packet_scaled(cmd - down1 + 1);
+    cur_v := cur_v + packet_scaled(cmd - down1 + 1, font_size[vf_f]);
 y0, four_cases(y1): begin
     if cmd > y0 then
-        y := packet_scaled(cmd - y0);
+        y := packet_scaled(cmd - y0, font_size[vf_f]);
     cur_v := cur_v + y;
 end;
 z0, four_cases(z1): begin
     if cmd > z0 then
-        z := packet_scaled(cmd - z0);
+        z := packet_scaled(cmd - z0, font_size[vf_f]);
     cur_v := cur_v + z;
 end;
 four_cases(xxx1):  begin
@@ -34340,7 +34301,7 @@ begin
     f := cur_val;
     if f = null_font then
         pdf_error("font", "invalid font identifier");
-    pdf_check_vf(f);
+    pdf_check_vf_cur_val;
     if not font_used[f] then
         pdf_init_font(f);
     scan_pdf_ext_toks;
