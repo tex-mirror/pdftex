@@ -2,7 +2,7 @@
 pdfTeX 3.141592-1.40.4 was released on 2007-06-??
 -------------------------------------------------
 - bugfix: It was impossible to set the font Flags to 4 in map entries (762)
-- bugfix: The font Flags of non-embedded fonts were wrong (794). 
+- bugfix: The font Flags of non-embedded fonts were wrong (794)
   Now pdfTeX uses the Flags from map entries (if found) or guesses values for
   the base14 fonts
 - bugfix: Subsetted fonts still had their private UniqueID copied (774)
@@ -11,6 +11,9 @@ pdfTeX 3.141592-1.40.4 was released on 2007-06-??
 - bugfix: Copying a box with \pdfstartlink inside produced the same /Link
   annotation object multiply, with same object number and identical coordinates
   on the page (799)
+- bugfix: When trying to use a font without TFM, without map entry, and no PK
+  font available, a broken PDF was produced. Now no PDF is generated and the
+  error messages have been improved (721)
 - bugfix: \pdfprimitive was broken (see
   http://www.ntg.nl/pipermail/ntg-pdftex/2007-April/002860.html)
 - pdfTeX uses libpng 1.2.18

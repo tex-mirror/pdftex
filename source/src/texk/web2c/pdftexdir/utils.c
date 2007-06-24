@@ -1639,7 +1639,7 @@ void pdfshipoutbegin(boolean shipping_page)
 void pdfshipoutend(boolean shipping_page)
 {
     if (pos_stack_used > 0) {
-        pdftex_warn("%u unmatched \\pdfsave after %s shipout",
+        pdftex_fail("%u unmatched \\pdfsave after %s shipout",
                     (unsigned int) pos_stack_used,
                     ((shipping_page) ? "page" : "form"));
     }

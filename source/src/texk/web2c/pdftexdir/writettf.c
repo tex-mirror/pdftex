@@ -302,7 +302,9 @@ static void ttf_copy_encoding(void)
             e = ttfenc_tab + *q;
             e->code = charcodes[*q];
             if (e->code == -1)
-                pdftex_warn("character %i is not mapped to any charcode", *q);
+                pdftex_warn
+                    ("character %i in subfont %s is not mapped to any charcode",
+                     *q, fd_cur->fm->tfm_name);
             else {
                 assert(e->code < 0x10000);
                 sprintf(buf, "/c%4.4X", (int) e->code);
@@ -1335,9 +1337,7 @@ void writettf(fd_entry * fd)
     set_cur_file_name(fd_cur->fm->ff_name);
     if (is_subsetted(fd_cur->fm) && (fd_cur->fe == NULL)
         && !is_subfont(fd_cur->fm)) {
-        pdftex_warn("Subset TrueType must be a reencoded or a subfont");
-        cur_file_name = NULL;
-        return;
+        pdftex_fail("Subset TrueType must be a reencoded or a subfont");
     }
     if (!ttf_open()) {
         pdftex_fail("cannot open TrueType font file for reading");
