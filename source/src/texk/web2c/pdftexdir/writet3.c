@@ -113,8 +113,7 @@ static void t3_write_glyph(internalfontnumber f)
                    "%i %i %i %i %i %i %i %i =", &glyph_index,
                    &width, &height, &depth, &llx, &lly, &urx, &ury) != 8) {
             remove_eol(p, t3_line_array);
-            pdftex_warn("invalid glyph preamble: `%s'", t3_line_array);
-            return;
+            pdftex_fail("invalid glyph preamble: `%s'", t3_line_array);
         }
         if (glyph_index < fontbc[f] || glyph_index > fontec[f])
             return;
@@ -193,9 +192,7 @@ static boolean writepk(internalfontnumber f)
     if (name == NULL ||
         !FILESTRCASEEQ(cur_file_name, font_ret.name) ||
         !kpse_bitmap_tolerance((float) font_ret.dpi, (float) dpi)) {
-        pdftex_warn("Font %s at %i not found", cur_file_name, (int) dpi);
-        cur_file_name = NULL;
-        return false;
+        pdftex_fail("Font %s at %i not found", cur_file_name, (int) dpi);
     }
     t3_file = xfopen(name, FOPEN_RBIN_MODE);
     t3_image_used = true;
@@ -290,10 +287,7 @@ void writet3(int objnum, internalfontnumber f)
         sscanf(t3_line_array + strlen(t3_font_scale_str) + 1, "%g",
                &t3_font_scale) < 1 || t3_font_scale <= 0
         || t3_font_scale > 1000) {
-        pdftex_warn("missing or invalid font scale");
-        t3_close();
-        cur_file_name = NULL;
-        return;
+        pdftex_fail("missing or invalid font scale");
     }
     while (!t3_eof())
         t3_write_glyph(f);

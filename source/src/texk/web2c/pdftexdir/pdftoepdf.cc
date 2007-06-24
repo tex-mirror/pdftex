@@ -590,9 +590,9 @@ static void copyObject(Object * obj)
     } else if (obj->isRef()) {
         ref = obj->getRef();
         if (ref.num == 0) {
-            pdftex_warn
-                ("PDF inclusion: reference to invalid object was replaced by <null>");
-            pdf_puts("null");
+            pdftex_fail
+                ("PDF inclusion: reference to invalid object"
+                 " (is the included pdf broken?)");
         } else
             pdf_printf("%d 0 R", addOther(ref));
     } else {
@@ -637,8 +637,9 @@ static void writeEncodings()
     for (r = encodingList; r != 0; r = r->next) {
         for (i = 0; i < 256; i++) {
             if (r->font->isCIDFont()) {
-                pdftex_warn
-                    ("PDF inclusion: CID font included, encoding maybe wrong");
+                pdftex_fail
+                    ("PDF inclusion: CID fonts are not supported"
+                     " (try to disable font replacement to fix this)");
             }
             if ((s = ((Gfx8BitFont *) r->font)->getCharName(i)) != 0)
                 glyphNames[i] = s;

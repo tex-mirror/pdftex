@@ -288,7 +288,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20070610' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20070624' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -19411,7 +19411,9 @@ for k := font_base + 1 to font_ptr do
            print_font_identifier(i);
            print(" and ");
            print_font_identifier(k);
-           print(" has conflicting attributes"); print_ln; print_ln;
+           print(" have conflicting attributes; I will ignore the attributes assigned to ");
+           print_font_identifier(i);
+           print_ln; print_ln;
         end;
     end;
 fixed_gen_tounicode := pdf_gen_tounicode;
