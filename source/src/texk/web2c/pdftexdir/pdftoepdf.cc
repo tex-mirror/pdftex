@@ -281,7 +281,7 @@ static void copyName(char *s)
     pdf_puts("/");
     for (; *s != 0; s++) {
         if (isdigit(*s) || isupper(*s) || islower(*s) || *s == '_' ||
-            *s == '.' || *s == '-')
+            *s == '.' || *s == '-' || *s == '+')
             pdfout(*s);
         else
             pdf_printf("#%.2X", *s & 0xFF);

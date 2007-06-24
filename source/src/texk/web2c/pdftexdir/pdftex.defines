@@ -98,6 +98,7 @@ $Id$
 @define function packetbyte;
 @define procedure startpacket();
 @define procedure storepacket();
+@define function sqxfw();
 
 { functions from writefont.c }
 @define procedure dopdffont();
@@ -133,6 +134,9 @@ $Id$
 
 { functions from tounicode.c }
 @define procedure deftounicode();
+
+{ functions from pdftex.web (thanks Taco for the trick) }
+@define function autoexpandvf();
 
 { end of pdftex.defines }
 { vim: set syntax=web : }

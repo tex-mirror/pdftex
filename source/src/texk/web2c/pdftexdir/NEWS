@@ -14,6 +14,7 @@ pdfTeX 3.141592-1.40.4 was released on 2007-06-??
 - bugfix: When trying to use a font without TFM, without map entry, and no PK
   font available, a broken PDF was produced. Now no PDF is generated and the
   error messages have been improved (721)
+- bugfix: Problems with vf fonts (722)
 - bugfix: \pdfprimitive was broken (see
   http://www.ntg.nl/pipermail/ntg-pdftex/2007-April/002860.html)
 - pdfTeX uses libpng 1.2.18
