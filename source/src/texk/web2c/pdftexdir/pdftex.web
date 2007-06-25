@@ -15997,7 +15997,7 @@ end;
 @* \[32d] The cross-reference table.
 
 The cross-reference table |obj_tab| is an array of |obj_tab_size| of
-|tab_entry|. Each entry contains five integer fields and represents an object
+|obj_entry|. Each entry contains five integer fields and represents an object
 in PDF file whose object number is the index of this entry in |obj_tab|.
 Objects in |obj_tab| maybe linked into list; objects in such a linked list have
 the same type.
