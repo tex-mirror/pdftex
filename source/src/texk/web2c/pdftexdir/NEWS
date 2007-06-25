@@ -18,6 +18,7 @@ pdfTeX 3.141592-1.40.4 was released on 2007-06-??
 - bugfix: Font expansion lead to wrong log output of \kerns (736)
 - bugfix: \pdfprimitive was broken (see
   http://www.ntg.nl/pipermail/ntg-pdftex/2007-April/002860.html)
+- bugfix: nc/nd was broken (752)
 - pdfTeX uses libpng 1.2.18
 - pdfTeX uses xpdf 3.02
 

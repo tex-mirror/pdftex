@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2004 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -427,14 +427,15 @@ void copy_png(integer img)
                 pdftex_fail("writepng: fseek in PNG file failed");
         }
     } while (endflag == false);
-    pdf_printf("/Length %d\n", streamlength);
-    pdf_printf("/Filter /FlateDecode\n");
-    pdf_printf("/DecodeParms << ");
-    pdf_printf("/Colors %d ", png_info(img)->color_type == 2 ? 3 : 1);
-    pdf_printf("/Columns %d ", (int) png_info(img)->width);
-    pdf_printf("/BitsPerComponent %i ", (int) png_info(img)->bit_depth);
-    pdf_printf("/Predictor %d ", 10);   /* actual predictor defined on line basis */
-    pdf_printf(">>\n>>\nstream\n");
+    pdf_printf("/Length %d\n"
+               "/Filter/FlateDecode\n"
+               "/DecodeParms<<"
+               "/Colors %d"
+               "/Columns %d"
+               "/BitsPerComponent %i"
+               "/Predictor 10>>\n>>\nstream\n", streamlength,
+               png_info(img)->color_type == 2 ? 3 : 1,
+               (int) png_info(img)->width, (int) png_info(img)->bit_depth);
     /* 2nd pass to copy data */
     endflag = false;
     if (fseek(fp, 8, SEEK_SET) != 0)

@@ -59,7 +59,7 @@ clean::
 depend:
 	rm -f $(OBJS) ttf2afm.o pdftosrc.o
 	XXCFLAGS=-MM XCFLAGS=-MM $(MAKE) -k $(OBJS) ttf2afm.o pdftosrc.o | \
-	    grep -v "^$(CC)\|$(CXX)\|$(AR)\|make\|klibtool" | \
+	    grep -v "^$(CC)\|$(CXX)\|$(AR)\|make\" | \
 	    sed 's: [^ ]*/\.\./libs/[^ ]*::g' > $(srcdir)/depend.mk
 
 kpse_include pdftexdir/depend.mk

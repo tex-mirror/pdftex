@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2006 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -25,7 +25,7 @@ $Id$
 #include <kpathsea/c-proto.h>
 #include <string.h>
 
-#define t1_log(s)        tex_printf(s)
+#define t1_log(s)        tex_printf("%s",s)
 #define get_length1()    t1_length1 = t1_offset() - t1_save_offset
 #define get_length2()    t1_length2 = t1_offset() - t1_save_offset
 #define get_length3()    t1_length3 = fixedcontent? t1_offset() - t1_save_offset : 0
