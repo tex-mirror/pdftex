@@ -50,7 +50,6 @@ Execute file makefiles.cmd.
 
 pdftex-t.tex --> (awk -f syntaxform.awk) --> pdftex-syntax.txt
 
-
 3.2 Generating title page of manual
 -----------------------------------
 
