@@ -56,4 +56,4 @@ pdftex-t.tex --> (awk -f syntaxform.awk) --> pdftex-syntax.txt
 pdftex-w.tex --> (pdfetex) --> pdftex-w.pdf
   --> (expand, fmt, grep) --> pdftex-t.txt
 
-$Id: README,v 1.23 2006/12/22 23:38:29 hhenkel Exp $
+$Id$

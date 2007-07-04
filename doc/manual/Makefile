@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.89 2007/01/25 07:18:57 hhenkel Exp $
+# $Id$
 #
 # Makefile for pdfTeX documentation
 
