@@ -16100,7 +16100,7 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d pdf_setmatrix_node_size == 2
 @d pdf_setmatrix_data(#)   == link(#+1) {data}
 
-@# {data structure for \.{\\pdsave}}
+@# {data structure for \.{\\pdfsave}}
 @d pdf_save_node_size      == 2
 
 @# {data structure for \.{\\pdfrestore}}
@@ -31927,6 +31927,7 @@ begin @<If dumping is not allowed, abort@>;
 @<Dump the table of equivalents@>;
 @<Dump the font information@>;
 @<Dump the hyphenation tables@>;
+@<Dump pdftex data@>;
 @<Dump a couple more things and the closing check word@>;
 @<Close the format file@>;
 end;
@@ -31956,6 +31957,7 @@ begin @<Undump constants for consistency check@>;
 @<Undump the table of equivalents@>;
 @<Undump the font information@>;
 @<Undump the hyphenation tables@>;
+@<Undump pdftex data@>;
 @<Undump a couple more things and the closing check word@>;
 load_fmt_file:=true; return; {it worked!}
 bad_fmt: wake_up_terminal;
@@ -32346,6 +32348,78 @@ while j>0 do
   j:=j-x; op_start[k]:=qo(j);
   end;
 @!init trie_not_ready:=false @+tini
+
+@ Store some of the pdftex data structures in the format. The idea here is
+to ensure that any data structures referenced from pdftex-specific whatsit
+nodes are retained. For the sake of simplicity and speed, all the filled parts
+of |pdf_mem| and |obj_tab| are retained, in the present implementation. We also
+retain three of the linked lists that start from |head_tab|, so that it is
+possible to, say, load an image in the \.{INITEX} run and then reference it in a
+\.{VIRTEX} run that uses the dumped format.
+
+@<Dump pdftex data@>=
+begin
+dumpimagemeta; {the image information array }
+dump_int(pdf_mem_size);
+dump_int(pdf_mem_ptr);
+for k:=1 to pdf_mem_ptr-1 do begin 
+  dump_int(pdf_mem[k]);
+  end;
+print_ln; print_int(pdf_mem_ptr-1); print(" words of pdfTeX memory");
+dump_int(obj_tab_size);
+dump_int(obj_ptr);
+dump_int(sys_obj_ptr);
+for k:=1 to sys_obj_ptr do begin
+  dump_int(obj_tab[k].int0);
+  dump_int(obj_tab[k].int1);
+  dump_int(obj_tab[k].int3);
+  dump_int(obj_tab[k].int4);
+  end;
+print_ln; print_int(sys_obj_ptr); print(" indirect objects");
+dump_int(pdf_obj_count);
+dump_int(pdf_xform_count);
+dump_int(pdf_ximage_count);
+dump_int(head_tab[obj_type_obj]);
+dump_int(head_tab[obj_type_xform]);
+dump_int(head_tab[obj_type_ximage]);
+dump_int(pdf_last_obj);
+dump_int(pdf_last_xform);
+dump_int(pdf_last_ximage);
+end
+
+@ And restoring the pdftex data structures from the format. The
+two function arguments to |undumpimagemeta| have been restored
+already in an earlier module.
+
+@<Undump pdftex data@>=
+begin
+undumpimagemeta(pdf_minor_version,pdf_inclusion_errorlevel);  {the image information array }
+undump_int(pdf_mem_size); 
+pdf_mem := xrealloc_array(pdf_mem, integer, pdf_mem_size);
+undump_int(pdf_mem_ptr);
+for k:=1 to pdf_mem_ptr-1 do begin
+  undump_int(pdf_mem[k]);
+  end;
+undump_int(obj_tab_size);
+undump_int(obj_ptr);
+undump_int(sys_obj_ptr);
+for k:=1 to sys_obj_ptr do begin
+  undump_int(obj_tab[k].int0);
+  undump_int(obj_tab[k].int1);
+  obj_tab[k].int2 := -1; 
+  undump_int(obj_tab[k].int3);
+  undump_int(obj_tab[k].int4);
+  end;
+undump_int(pdf_obj_count);
+undump_int(pdf_xform_count);
+undump_int(pdf_ximage_count);
+undump_int(head_tab[obj_type_obj]);
+undump_int(head_tab[obj_type_xform]);
+undump_int(head_tab[obj_type_ximage]);
+undump_int(pdf_last_obj);
+undump_int(pdf_last_xform);
+undump_int(pdf_last_ximage);
+end
 
 @ We have already printed a lot of statistics, so we set |tracing_stats:=0|
 to prevent them from appearing again.

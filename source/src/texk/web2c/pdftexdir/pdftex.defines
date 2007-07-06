@@ -122,6 +122,9 @@ $Id$
 @define procedure updateimageprocset();
 @define procedure writeimage();
 
+@define procedure dumpimagemeta;
+@define procedure undumpimagemeta();
+
 { functions from writet3.c }
 @define function getpkcharwidth();
 
