@@ -11,6 +11,8 @@ pdfTeX 3.141592-1.50.0 was released on 2007-0?-??
   - find out the pdf object number of a layer with
     \pdflayerobjectnumber<number> (i.e. \pdflayerobjectnumber1 expands to the
     object number of the OCG of the first layer)
+- bugfix: The -recorder option of web2c didn't record fonts, included images
+  and some other files (772)
 
 -------------------------------------------------
 pdfTeX 3.141592-1.40.3 was released on 2007-02-04

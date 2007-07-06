@@ -195,6 +195,7 @@ static boolean writepk(internalfontnumber f)
         pdftex_fail("Font %s at %i not found", cur_file_name, (int) dpi);
     }
     t3_file = xfopen(name, FOPEN_RBIN_MODE);
+    recorder_record_input(name);
     t3_image_used = true;
     is_pk_font = true;
     tex_printf(" <%s", (char *) name);

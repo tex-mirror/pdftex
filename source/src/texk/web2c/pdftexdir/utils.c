@@ -922,6 +922,7 @@ void getfilemoddate(strnumber s)
         return;                 /* empty string */
     }
 
+    recorder_record_input(file_name);
     /* get file status */
     if (stat(file_name, &file_data) == 0) {
         size_t len;
@@ -951,6 +952,7 @@ void getfilesize(strnumber s)
         return;                 /* empty string */
     }
 
+    recorder_record_input(file_name);
     /* get file status */
     if (stat(file_name, &file_data) == 0) {
         size_t len;
@@ -1001,6 +1003,7 @@ void getmd5sum(strnumber s, boolean file)
             xfree(file_name);
             return;
         }
+        recorder_record_input(file_name);
         md5_init(&state);
         while ((read = fread(&file_buf, sizeof(char), FILE_BUF_SIZE, f)) > 0) {
             md5_append(&state, (const md5_byte_t *) file_buf, read);
@@ -1058,6 +1061,7 @@ void getfiledump(strnumber s, int offset, int length)
         xfree(file_name);
         return;
     }
+    recorder_record_input(file_name);
     if (fseek(f, (long) offset, SEEK_SET) != 0) {
         xfree(file_name);
         return;
