@@ -1,29 +1,28 @@
 -------------------------------------------------
-pdfTeX 3.141592-1.40.4 was released on 2007-06-??
+pdfTeX 3.141592-1.40.4 was released on 2007-07-??
 -------------------------------------------------
-- bugfix: It was impossible to set the font Flags to 4 in map entries (762)
-- bugfix: The font Flags of non-embedded fonts were wrong (794)
-  Now pdfTeX uses the Flags from map entries (if found) or guesses values for
-  the base14 fonts
-- bugfix: Subsetted fonts still had their private UniqueID copied (774)
-- bugfix: \pdfunescapehex returned a wrong result if the last character was not
-  a hexadecimal digit and the last hex pair was incomplete (777)
-- bugfix: Copying a box with \pdfstartlink inside produced the same /Link
-  annotation object multiply, with same object number and identical coordinates
-  on the page (799)
-- bugfix: When trying to use a font without TFM, without map entry, and no PK
-  font available, a broken PDF was produced. Now no PDF is generated and the
-  error messages have been improved (721)
-- bugfix: Problems with vf fonts (722)
-- bugfix: Font expansion lead to wrong log output of \kerns (736)
-- bugfix: \pdfprimitive was broken (see
-  http://www.ntg.nl/pipermail/ntg-pdftex/2007-April/002860.html)
-- bugfix: nc/nd was broken (752)
-- bugfix: The -recorder option of web2c didn't record fonts, included images
-  and some other files (772)
-- bugfix: Mixed up font descriptor from pdf inclusion (810)
-- bugfix: Using \pdfximage in IniTeX before \dump caused a crash when the
-  format was used (824)
+- Bugfixes: 
+  - It was impossible to set the font Flags to 4 in map entries (762)
+  - The font Flags of non-embedded fonts were wrong (794)
+    Now pdfTeX uses the Flags from map entries (if found) or guesses values for
+    the base14 fonts. It also warns when you not-embedd a font without Flags
+  - Subsetted fonts still had their private UniqueID copied (774)
+  - \pdfunescapehex returned a wrong result if the last character was not a
+    hexadecimal digit and the last hex pair was incomplete (777)
+  - Copying a box with \pdfstartlink inside produced the same /Link annotation
+    object multiply, with same object number and identical coordinates on the
+    page (799)
+  - When trying to use a font without TFM, without map entry, and no PK font
+    available, a broken PDF was produced. Now no PDF is generated and the error
+    messages have been improved (721)
+  - Problems with vf fonts (722)
+  - Font expansion led to wrong log output of \kerns (736)
+  - \pdfprimitive was broken (see
+    http://www.ntg.nl/pipermail/ntg-pdftex/2007-April/002860.html)
+  - The -recorder option of web2c didn't record fonts, included images and some
+    other files (772)
+  - Using \pdfximage in IniTeX before \dump caused a crash when the format was
+    used (824)
 - Improvements: 
   - pdf compression is now a bit faster (patch 726)
 - pdfTeX uses libpng 1.2.18
