@@ -283,6 +283,7 @@ integer readimage(strnumber s, integer page_num, strnumber page_name,
         pdftex_fail("cannot find image file");
     /* kpse_find_file perhaps changed the file name */
     cur_file_name = img_name(img);
+    recorder_record_input(cur_file_name);
     /* type checks */
     checktypebyheader(img);
     checktypebyextension(img);
@@ -314,7 +315,7 @@ integer readimage(strnumber s, integer page_num, strnumber page_name,
         if (pdfversion < 4) {
             pdftex_fail
                 ("JBIG2 images only possible with at least PDF 1.4; you are generating PDF 1.%i",
-                 (int)pdfversion);
+                 (int) pdfversion);
         }
         jbig2_ptr(img) = xtalloc(1, JBIG2_IMAGE_INFO);
         img_type(img) = IMAGE_TYPE_JBIG2;

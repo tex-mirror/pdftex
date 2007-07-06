@@ -19,6 +19,8 @@ pdfTeX 3.141592-1.40.4 was released on 2007-06-??
 - bugfix: \pdfprimitive was broken (see
   http://www.ntg.nl/pipermail/ntg-pdftex/2007-April/002860.html)
 - bugfix: nc/nd was broken (752)
+- bugfix: The -recorder option of web2c didn't record fonts, included images
+  and some other files (772)
 - pdfTeX uses libpng 1.2.18
 - pdfTeX uses xpdf 3.02
 
