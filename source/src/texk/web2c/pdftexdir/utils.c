@@ -438,6 +438,7 @@ void libpdffinish()
     ttf_free();
     sfd_free();
     glyph_unicode_free();
+    zip_free();
 }
 
 /* Converts any string given in in in an allowed PDF string which can be

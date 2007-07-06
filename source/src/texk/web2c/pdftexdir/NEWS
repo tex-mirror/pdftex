@@ -22,6 +22,8 @@ pdfTeX 3.141592-1.40.4 was released on 2007-06-??
 - bugfix: The -recorder option of web2c didn't record fonts, included images
   and some other files (772)
 - bugfix: Mixed up font descriptor from pdf inclusion (810)
+- Improvements: 
+  - pdf compression is now a bit faster (patch 726)
 - pdfTeX uses libpng 1.2.18
 - pdfTeX uses xpdf 3.02
 
