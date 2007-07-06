@@ -15,6 +15,8 @@ pdfTeX 3.141592-1.50.0 was released on 2007-0?-??
   - pdf compression is now a bit faster (patch 726)
 - bugfix: The -recorder option of web2c didn't record fonts, included images
   and some other files (772)
+- bugfix: Using \pdfximage in IniTeX before \dump caused a crash when the
+  format was used (824)
 
 -------------------------------------------------
 pdfTeX 3.141592-1.40.3 was released on 2007-02-04
