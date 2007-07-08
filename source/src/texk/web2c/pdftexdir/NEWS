@@ -11,6 +11,8 @@ pdfTeX 3.141592-1.50.0 was released on 2007-0?-??
     - find out the pdf object number of a layer with
       \pdflayerobjectnumber<number> (i.e. \pdflayerobjectnumber1 expands to the
       object number of the OCG of the first layer)
+  - \pdfignoreddimen (812)
+  - \pdfcopyfont (747)
 
 -------------------------------------------------
 pdfTeX 3.141592-1.40.4 was released on 2007-07-??
