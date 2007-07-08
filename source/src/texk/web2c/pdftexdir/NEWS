@@ -38,6 +38,7 @@ pdfTeX 3.141592-1.40.4 was released on 2007-07-??
   - Using \pdfximage in IniTeX before \dump caused a crash when the format was
     used (824)
   - \letterspacefont had some problems (712)
+  - \letterspacefont and \pdffontexpand had some problems (747)
 - Improvements: 
   - pdf compression is now a bit faster (patch 726)
 - pdfTeX uses libpng 1.2.18
