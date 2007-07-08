@@ -17236,7 +17236,8 @@ var k: internal_font_number;
 begin
     {read a new font and expand the character widths}
     k := read_font_info(u, font_name[f], "", font_size[f]);
-    set_no_ligatures(k); {disable ligatures for letter-spaced fonts}
+    if scan_keyword("nolig") then
+        set_no_ligatures(k); {disable ligatures for letter-spaced fonts}
     nw := height_base[k] - width_base[k];
     for i := 0 to nw - 1 do
         font_info[width_base[k] + i].sc :=
