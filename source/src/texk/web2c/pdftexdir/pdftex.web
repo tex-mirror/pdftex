@@ -5660,7 +5660,8 @@ that will be defined later.
 @d pdf_append_kern_code      = pdftex_first_integer_code + 23 {append kern before certain characters?}
 @d pdf_gen_tounicode_code    = pdftex_first_integer_code + 24 {generate ToUnicode for fonts?}
 @d pdf_draftmode_code        = pdftex_first_integer_code + 25 {switch on draftmode if positive}
-@d pdf_int_pars=pdftex_first_integer_code + 26 {total number of \pdfTeX's integer parameters}
+@d pdf_inclusion_copy_font_code     = pdftex_first_integer_code + 26 {generate ToUnicode for fonts?}
+@d pdf_int_pars=pdftex_first_integer_code + 27 {total number of \pdfTeX's integer parameters}
 @#
 @d etex_int_base=pdf_int_pars {base for \eTeX's integer parameters}
 @d tracing_assigns_code=etex_int_base {show assignments}
@@ -5765,6 +5766,7 @@ that will be defined later.
 @d pdf_image_hicolor    == int_par(pdf_image_hicolor_code)
 @d pdf_image_apply_gamma == int_par(pdf_image_apply_gamma_code)
 @d pdf_draftmode        == int_par(pdf_draftmode_code)
+@d pdf_inclusion_copy_font == int_par(pdf_inclusion_copy_font_code)
 @#
 @d tracing_assigns==int_par(tracing_assigns_code)
 @d tracing_groups==int_par(tracing_groups_code)
@@ -5866,6 +5868,7 @@ pdf_prepend_kern_code:    print_esc("pdfprependkern");
 pdf_append_kern_code:    print_esc("pdfappendkern");
 pdf_gen_tounicode_code:    print_esc("pdfgentounicode");
 pdf_draftmode_code:        print_esc("pdfdraftmode");
+pdf_inclusion_copy_font_code:    print_esc("pdfinclusioncopyfonts");
 @/@<Cases for |print_param|@>@/
 othercases print("[unknown integer parameter!]")
 endcases;
@@ -6041,6 +6044,8 @@ primitive("pdfgentounicode",assign_int,int_base+pdf_gen_tounicode_code);@/
 @!@:pdf_gen_tounicode_}{\.{\\pdfgentounicode} primitive@>
 primitive("pdfdraftmode",assign_int,int_base+pdf_draftmode_code);@/
 @!@:pdf_draftmode_}{\.{\\pdfdraftmode} primitive@>
+primitive("pdfinclusioncopyfonts",assign_int,int_base+pdf_inclusion_copy_font_code);@/
+@!@:pdf_inclusion_copy_font_}{\.{\\pdfinclusioncopyfonts} primitive@>
 
 @ @<Cases of |print_cmd_chr|...@>=
 assign_int: if chr_code<count_base then print_param(chr_code-int_base)
@@ -15217,6 +15222,7 @@ begin
         fixed_image_apply_gamma := fix_int(pdf_image_apply_gamma, 0, 1);
         fixed_pdf_objcompresslevel := fix_int(pdf_objcompresslevel, 0, 3);
         fixed_pdf_draftmode     := fix_int(pdf_draftmode, 0, 1);
+        fixed_inclusion_copy_font      := fix_int(pdf_inclusion_copy_font, 0, 1);
         if (fixed_pdf_minor_version >= 5) and (fixed_pdf_objcompresslevel > 0) then
             pdf_os_enable := true
         else begin
@@ -15694,6 +15700,7 @@ DVI}
 @!fixed_pk_resolution: integer;
 @!fixed_decimal_digits: integer;
 @!fixed_gen_tounicode: integer;
+@!fixed_inclusion_copy_font: integer;
 @!pk_scale_factor: integer;
 @!pdf_output_option: integer;
 @!pdf_output_value: integer;
