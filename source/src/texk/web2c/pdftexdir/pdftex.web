@@ -4781,7 +4781,8 @@ that might be expanded by `\.{\\the}'.
 @d hyph_data=99 {hyphenation data ( \.{\\hyphenation}, \.{\\patterns} )}
 @d set_interaction=100 {define level of interaction ( \.{\\batchmode}, etc.~)}
 @d letterspace_font=101 {letterspace a font ( \.{\\letterspacefont} )}
-@d max_command=101 {the largest command code seen at |big_switch|}
+@d pdf_copy_font=102 {create a new font instance ( \.{\\pdfcopyfont} )}
+@d max_command=102 {the largest command code seen at |big_switch|}
 
 @ The remaining command codes are extra special, since they cannot get through
 \TeX's scanner to the main control routine. They have been given values higher
@@ -6662,6 +6663,8 @@ primitive("font",def_font,0);@/
 @!@:font_}{\.{\\font} primitive@>
 primitive("letterspacefont",letterspace_font,0);@/
 @!@:letterspace_font_}{\.{\\letterspacefont} primitive@>
+primitive("pdfcopyfont",pdf_copy_font,0);@/
+@!@:pdf_copy_font_}{\.{\\pdfcopyfont} primitive@>
 primitive("fontdimen",assign_font_dimen,0);@/
 @!@:font_dimen_}{\.{\\fontdimen} primitive@>
 primitive("halign",halign,0);@/
@@ -6740,6 +6743,7 @@ char_num: print_esc("char");
 cs_name: print_esc("csname");
 def_font: print_esc("font");
 letterspace_font: print_esc("letterspacefont");
+pdf_copy_font: print_esc("pdfcopyfont");
 delim_num: print_esc("delimiter");
 divide: print_esc("divide");
 end_cs_name: print_esc("endcsname");
@@ -9525,7 +9529,7 @@ var m:halfword; {|chr_code| part of the operand token}
 begin m:=cur_chr;
 case cur_cmd of
 def_code: @<Fetch a character code from some table@>;
-toks_register,assign_toks,def_family,set_font,def_font,letterspace_font: @<Fetch a token list or
+toks_register,assign_toks,def_family,set_font,def_font,letterspace_font,pdf_copy_font: @<Fetch a token list or
   font identifier, provided that |level=tok_val|@>;
 assign_int: scanned_result(eqtb[m].int)(int_val);
 assign_dimen: scanned_result(eqtb[m].sc)(dimen_val);
@@ -13183,7 +13187,7 @@ procedure scan_font_ident;
 var f:internal_font_number;
 @!m:halfword;
 begin @<Get the next non-blank non-call...@>;
-if (cur_cmd=def_font) or (cur_cmd=letterspace_font) then f:=cur_font
+if (cur_cmd=def_font) or (cur_cmd=letterspace_font) or (cur_cmd=pdf_copy_font) then f:=cur_font
 else if cur_cmd=set_font then f:=cur_chr
 else if cur_cmd=def_family then
   begin m:=cur_chr; scan_four_bit_int; f:=equiv(m+cur_val);
@@ -16745,6 +16749,8 @@ else if type(#) = ligature_node then begin
     f := font(lig_char(#));
 end
 
+@d non_existent_path == "///..."
+
 @p
 procedure set_tag_code(f: internal_font_number; c: eight_bits; i: integer);
 var fixedi:integer;
@@ -17018,7 +17024,10 @@ var k: internal_font_number;
 begin
     if fs <> 0 then begin
         for k := font_base + 1 to font_ptr do
-            if str_eq_str(font_name[k], s) and (font_size[k] = fs) then begin
+            if (font_area[k] <> non_existent_path) and 
+               str_eq_str(font_name[k], s) and 
+               (font_size[k] = fs) then 
+            begin
                 flush_str(s);
                 tfm_lookup := k;
                 return;
@@ -17026,7 +17035,9 @@ begin
     end
     else begin
         for k := font_base + 1 to font_ptr do
-            if str_eq_str(font_name[k], s) then begin
+            if (font_area[k] <> non_existent_path) and 
+               str_eq_str(font_name[k], s) then
+            begin
                 flush_str(s);
                 tfm_lookup := k;
                 return;
@@ -17119,15 +17130,15 @@ begin
 end;
 
 procedure set_expand_params(f: internal_font_number; auto_expand: boolean;
-                            font_stretch, font_shrink, font_step, expand_ratio: integer);
+                            stretch_limit, shrink_limit, font_step, expand_ratio: integer);
 {expand a font with given parameters}
 begin
     pdf_font_step[f] := font_step;
     pdf_font_auto_expand[f] := auto_expand;
-    if font_stretch > 0 then
-        pdf_font_stretch[f] := get_expand_font(f, font_stretch);
-    if font_shrink > 0 then
-        pdf_font_shrink[f] := get_expand_font(f, -font_shrink);
+    if stretch_limit > 0 then
+        pdf_font_stretch[f] := get_expand_font(f, stretch_limit);
+    if shrink_limit > 0 then
+        pdf_font_shrink[f] := get_expand_font(f, -shrink_limit);
     if expand_ratio <> 0 then
         pdf_font_expand_ratio[f] := expand_ratio;
 end;
@@ -17141,7 +17152,7 @@ begin
         lf := vf_i_fnts[vf_default_font[f] + k];
         set_expand_params(lf, pdf_font_auto_expand[f],
                           pdf_font_expand_ratio[pdf_font_stretch[f]],
-                          pdf_font_expand_ratio[pdf_font_shrink[f]],
+                          -pdf_font_expand_ratio[pdf_font_shrink[f]],
                           pdf_font_step[f], pdf_font_expand_ratio[f]);
         if pdf_font_type[lf] = virtual_font_type then
             vf_expand_local_fonts(lf);
@@ -17149,7 +17160,7 @@ begin
 end;
 
 procedure read_expand_font; {read font expansion spec and load expanded font}
-var font_shrink, font_stretch, font_step: integer;
+var shrink_limit, stretch_limit, font_step: integer;
     f: internal_font_number;
     auto_expand: boolean;
 begin
@@ -17159,23 +17170,23 @@ begin
     if f = null_font then
         pdf_error("font expansion", "invalid font identifier");
     if pdf_font_blink[f] <> null_font then
-        pdf_error("font expansion", "\pdffontexpand cannot be used this way (the base font has been expanded or letter-spaced)");
+        pdf_error("font expansion", "\pdffontexpand cannot be used this way (the base font has been expanded)");
     scan_optional_equals;
     scan_int;
-    font_stretch := fix_int(cur_val, 0, 1000);
+    stretch_limit := fix_int(cur_val, 0, 1000);
     scan_int;
-    font_shrink := fix_int(cur_val, 0, 500);
+    shrink_limit := fix_int(cur_val, 0, 500);
     scan_int;
     font_step := fix_int(cur_val, 0, 100);
     if font_step = 0 then
         pdf_error("font expansion", "invalid step");
-    font_stretch := font_stretch - font_stretch mod font_step;
-    if font_stretch < 0 then
-        font_stretch := 0;
-    font_shrink := font_shrink - font_shrink mod font_step;
-    if font_shrink < 0 then
-        font_shrink := 0;
-    if (font_stretch = 0) and (font_shrink = 0) then
+    stretch_limit := stretch_limit - stretch_limit mod font_step;
+    if stretch_limit < 0 then
+        stretch_limit := 0;
+    shrink_limit := shrink_limit - shrink_limit mod font_step;
+    if shrink_limit < 0 then
+        shrink_limit := 0;
+    if (stretch_limit = 0) and (shrink_limit = 0) then
         pdf_error("font expansion", "invalid limit(s)");
     auto_expand := false;
     if scan_keyword("autoexpand") then begin
@@ -17189,22 +17200,27 @@ begin
     if (pdf_font_step[f] <> 0) then
     {this font has been expanded, ensure the expansion parameters are identical}
     begin
-        if (pdf_font_step[f] <> font_step) or
-           ((pdf_font_stretch[f] = null_font) and (font_stretch <> 0)) or
-           ((pdf_font_stretch[f] <> null_font) and
-            (pdf_font_expand_ratio[pdf_font_stretch[f]] <> font_stretch)) or
-           ((pdf_font_shrink[f] = null_font) and (font_shrink <> 0)) or
+        if pdf_font_step[f] <> font_step then
+            pdf_error("font expansion", "font has been expanded with different expansion step");
+            
+        if ((pdf_font_stretch[f] = null_font) and (stretch_limit <> 0)) or
+            ((pdf_font_stretch[f] <> null_font) and
+            (pdf_font_expand_ratio[pdf_font_stretch[f]] <> stretch_limit)) then
+            pdf_error("font expansion", "font has been expanded with different stretch limit");
+             
+        if ((pdf_font_shrink[f] = null_font) and (shrink_limit <> 0)) or
            ((pdf_font_shrink[f] <> null_font) and
-            (pdf_font_expand_ratio[pdf_font_shrink[f]] <> -font_shrink)) or
-           (pdf_font_auto_expand[f] <> auto_expand)
-        then
-            pdf_error("font expansion", "font has been expanded with different parameters");
+            (-pdf_font_expand_ratio[pdf_font_shrink[f]] <> shrink_limit)) then
+            pdf_error("font expansion", "font has been expanded with different shrink limit");
+
+        if pdf_font_auto_expand[f] <> auto_expand then
+            pdf_error("font expansion", "font has been expanded with different auto expansion value");
     end
     else begin
-        if pdf_font_type[f] = real_font_type then
+        if (pdf_font_type[f] <> new_font_type) and (pdf_font_type[f] <> virtual_font_type) then
             pdf_warning("font expansion", "font should be expanded before its first use",
                         true, true);
-        set_expand_params(f, auto_expand, font_stretch, font_shrink, font_step, 0);
+        set_expand_params(f, auto_expand, stretch_limit, shrink_limit, font_step, 0);
         if pdf_font_type[f] = virtual_font_type then
             vf_expand_local_fonts(f);
     end;
@@ -17336,6 +17352,106 @@ begin
     k := cur_val;
     scan_int;
     f := letter_space_font(u, k, fix_int(cur_val, -1000, 1000));
+    equiv(u):=f; eqtb[font_id_base+f]:=eqtb[u]; font_id_text(f):=t;
+end;
+
+function is_letterspaced_font(f: internal_font_number): boolean;
+label done;
+var i, j: pool_pointer;
+begin
+    is_letterspaced_font := false;
+    if pdf_font_type[f] <> virtual_font_type then
+        return;
+    i := str_start[font_name[f] + 1] - 1;
+    j := str_start[font_name[f]];
+    if (str_pool[i - 1] <> 'l') or (str_pool[i] <> 's') then
+        return;
+    i := i - 2;
+    while i >= j do begin
+        if (str_pool[i] < '0') or (str_pool[i] > '9') then
+            goto done;
+        i := i - 1;
+    end;
+done:
+    if i < j then
+        return;
+    if (str_pool[i] <> '+') and (str_pool[i] <> '-') then
+        return;
+    is_letterspaced_font := true;
+end;
+
+function copy_font_info(f: internal_font_number): internal_font_number;
+{create a copy of |f| in the font mem}
+var lf, bc, ec, i: halfword;
+    k: internal_font_number;
+begin
+    if (pdf_font_expand_ratio[f] <> 0) or (pdf_font_step[f] <> 0) then
+        pdf_error("\pdfcopyfont", "cannot copy an expanded font");
+    if is_letterspaced_font(f) then
+        pdf_error("\pdfcopyfont", "cannot copy a letterspaced font");
+
+    k := font_ptr + 1;
+    incr(font_ptr);
+    if (font_ptr >= font_max) then
+        overflow("maximum internal font number (font_max)", font_max);
+    font_name[k] := font_name[f];
+    font_area[k] := non_existent_path; {to avoid interferences with |new_font()| and |tfm_lookup()|}
+    hyphen_char[k] := hyphen_char[f];
+    skew_char[k] := skew_char[f];
+    font_bchar[k] := font_bchar[f];
+    font_false_bchar[k] := font_false_bchar[f];
+    font_bc[k] := font_bc[f];
+    font_ec[k] := font_ec[f];
+    font_size[k] := font_size[f];
+    font_dsize[k] := font_dsize[f];
+    font_params[k] := font_params[f];
+    font_glue[k] := font_glue[f];
+    bchar_label[k] := bchar_label[f];
+
+    {set base addresses}
+    bc := font_bc[f];
+    ec := font_ec[f];
+    char_base[k] := fmem_ptr - bc;
+    width_base[k] := char_base[k] + ec + 1;
+
+    height_base[k] := width_base[k] + (height_base[f] - width_base[f]);
+    depth_base[k] := height_base[k] + (depth_base[f] - height_base[f]);
+    italic_base[k] := depth_base[k] + (italic_base[f] - depth_base[f]);
+    lig_kern_base[k] := italic_base[k] + (lig_kern_base[f] - italic_base[f]);
+    kern_base[k] := lig_kern_base[k] + (kern_base[f] - lig_kern_base[f]);
+    exten_base[k] := kern_base[k] + (exten_base[f] - kern_base[f]);
+    param_base[k] := exten_base[k] + (param_base[f] - exten_base[f]);
+
+    {allocate memory for the new font |k| and copy data from |f|}
+    lf := (param_base[f] - char_base[f]) + font_params[f] + 1;
+    if (fmem_ptr + lf >= font_mem_size) then
+        overflow("number of words of font memory (font_mem_size)", font_mem_size);
+    for i := 0 to lf - 1 do
+        font_info[char_base[k] + bc + i] := font_info[char_base[f] + bc + i];
+    fmem_ptr := fmem_ptr + lf;
+
+    copy_font_info := k;
+end;
+
+procedure make_font_copy(a: small_number);
+{make a font copy for further use with font expansion}
+var u:pointer; {user's font identifier}
+@!t:str_number; {name for the frozen font identifier}
+@!old_setting:0..max_selector; {holds |selector| setting}
+@!f, k:internal_font_number;
+begin
+    get_r_token; u:=cur_cs;
+    if u>=hash_base then t:=text(u)
+    else if u>=single_base then
+      if u=null_cs then t:="FONT"@+else t:=u-single_base
+    else  begin old_setting:=selector; selector:=new_string;
+      print("FONT"); print(u-active_base); selector:=old_setting;
+    @.FONTx@>
+      str_room(1); t:=make_string;
+      end;
+    define(u,set_font,null_font); scan_optional_equals; scan_font_ident;
+    k := cur_val;
+    f := copy_font_info(k);
     equiv(u):=f; eqtb[font_id_base+f]:=eqtb[u]; font_id_text(f):=t;
 end;
 
@@ -17488,7 +17604,7 @@ begin
     if (pdf_font_step[f] <> 0) then
         set_expand_params(k, pdf_font_auto_expand[f],
                           pdf_font_expand_ratio[pdf_font_stretch[f]],
-                          pdf_font_expand_ratio[pdf_font_shrink[f]],
+                          -pdf_font_expand_ratio[pdf_font_shrink[f]],
                           pdf_font_step[f], pdf_font_expand_ratio[f]);
     vf_def_font := k;
 end;
@@ -19811,8 +19927,8 @@ location |adjust_tail|.
 @ @<Glob...@>=
 @!pdf_font_blink: ^internal_font_number; {link to base font (used for expanded fonts only)}
 @!pdf_font_elink: ^internal_font_number; {link to expanded fonts (used for base fonts only)}
-@!pdf_font_stretch: ^integer; {limit of stretching}
-@!pdf_font_shrink: ^integer; {limit of shrinking}
+@!pdf_font_stretch: ^integer; {link to font expanded by stretch limi}
+@!pdf_font_shrink: ^integer; {link to font expanded by shrink limit}
 @!pdf_font_step: ^integer;  {amount of one step of expansion}
 @!pdf_font_expand_ratio: ^integer; {expansion ratio of a particular font}
 @!pdf_font_auto_expand: ^boolean; {this font is auto-expanded?}
@@ -19890,8 +20006,8 @@ begin
     k := pdf_font_shrink[f];
     if k <> null_font then begin
         if max_shrink_ratio < 0 then
-            max_shrink_ratio := pdf_font_expand_ratio[k]
-        else if max_shrink_ratio <> pdf_font_expand_ratio[k] then
+            max_shrink_ratio := -pdf_font_expand_ratio[k]
+        else if max_shrink_ratio <> -pdf_font_expand_ratio[k] then
             pdf_error("font expansion", "using fonts with different limit of expansion in one paragraph is not allowed");
     end;
     check_expand_pars := true;
@@ -20052,13 +20168,13 @@ begin
     if ef = 0 then
         return;
     if (pdf_font_stretch[f] <> null_font) and (ex_ratio > 0) then
-        k := expand_font(f, divide_scaled(ex_ratio*
-                                pdf_font_expand_ratio[pdf_font_stretch[f]]*ef,
-                                1000000, 0))
+        k := expand_font(f, ext_xn_over_d(ex_ratio*ef,
+                                          pdf_font_expand_ratio[pdf_font_stretch[f]],
+                                          1000000))
     else if (pdf_font_shrink[f] <> null_font) and (ex_ratio < 0) then
-        k := expand_font(f, -divide_scaled(ex_ratio*
-                                pdf_font_expand_ratio[pdf_font_shrink[f]]*ef,
-                                1000000, 0))
+        k := expand_font(f, ext_xn_over_d(ex_ratio*ef,
+                                          -pdf_font_expand_ratio[pdf_font_shrink[f]],
+                                          1000000))
     else
         k := f;
     if k <> f then begin
@@ -30745,6 +30861,7 @@ any_mode(def_family),
 any_mode(set_font),
 any_mode(def_font),
 any_mode(letterspace_font),
+any_mode(pdf_copy_font),
 any_mode(register),
 any_mode(advance),
 any_mode(multiply),
@@ -31487,6 +31604,7 @@ endcases;
 @<Assignments@>=
 def_font: new_font(a);
 letterspace_font: new_letterspaced_font(a);
+pdf_copy_font: make_font_copy(a);
 
 @ @<Declare subprocedures for |prefixed_command|@>=
 procedure new_font(@!a:small_number);
