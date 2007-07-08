@@ -18503,7 +18503,7 @@ end
 else begin
     @<Calculate page dimensions and margins@>;
     pdf_last_page := get_obj(obj_type_page, total_pages + 1, 0);
-    obj_aux(pdf_last_page) := 1; {mark that this page has beed created}
+    obj_aux(pdf_last_page) := 1; {mark that this page has been created}
     pdf_new_dict(obj_type_others, 0, 0);
     pdf_last_stream := obj_ptr;
     cur_h := cur_h_offset;
