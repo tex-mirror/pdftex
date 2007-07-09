@@ -316,6 +316,8 @@ extern void img_free(void);
 extern void updateimageprocset(integer);
 extern void writeimage(integer);
 extern integer imagecolordepth(integer img);
+extern void dumpimagemeta();
+extern void undumpimagemeta(integer, integer);
 
 /* writejbig2.c */
 extern void flushjbig2page0objects();
