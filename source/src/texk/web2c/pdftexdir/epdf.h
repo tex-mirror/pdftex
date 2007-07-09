@@ -72,6 +72,7 @@ extern "C" {
     extern integer pdfbufsize;
     extern integer pdfosmode;
     extern eightbits pdflastbyte;
+    extern integer fixedinclusioncopyfont;
 
     extern char notdef[];
 

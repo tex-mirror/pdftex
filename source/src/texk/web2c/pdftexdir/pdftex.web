@@ -4920,7 +4920,7 @@ level is kept in the global quantities |mode|, |head|, |tail|, |prev_graf|,
 |aux|, and |mode_line|, which live in a \PASCAL\ record that is ready to
 be pushed onto |nest| if necessary.
 
-@d ignore_depth==-65536000 {|prev_depth| value that is ignored}
+@d ignore_depth==-65536000 {magic dimension value to mean `ignore me'}
 
 @<Types...@>=
 @!list_state_record=record@!mode_field:-mmode..mmode;@+
@@ -5034,7 +5034,7 @@ end;
 @ @<Show the auxiliary...@>=
 case abs(m) div (max_command+1) of
 0: begin print_nl("prevdepth ");
-  if a.sc<=ignore_depth then print("ignored")
+  if a.sc<=pdf_ignored_dimen then print("ignored")
   else print_scaled(a.sc);
   if nest[p].pg_field<>0 then
     begin print(", prevgraf ");
@@ -5659,7 +5659,8 @@ that will be defined later.
 @d pdf_append_kern_code      = pdftex_first_integer_code + 23 {append kern before certain characters?}
 @d pdf_gen_tounicode_code    = pdftex_first_integer_code + 24 {generate ToUnicode for fonts?}
 @d pdf_draftmode_code        = pdftex_first_integer_code + 25 {switch on draftmode if positive}
-@d pdf_int_pars=pdftex_first_integer_code + 26 {total number of \pdfTeX's integer parameters}
+@d pdf_inclusion_copy_font_code     = pdftex_first_integer_code + 26 {generate ToUnicode for fonts?}
+@d pdf_int_pars=pdftex_first_integer_code + 27 {total number of \pdfTeX's integer parameters}
 @#
 @d etex_int_base=pdf_int_pars {base for \eTeX's integer parameters}
 @d tracing_assigns_code=etex_int_base {show assignments}
@@ -5764,6 +5765,7 @@ that will be defined later.
 @d pdf_image_hicolor    == int_par(pdf_image_hicolor_code)
 @d pdf_image_apply_gamma == int_par(pdf_image_apply_gamma_code)
 @d pdf_draftmode        == int_par(pdf_draftmode_code)
+@d pdf_inclusion_copy_font == int_par(pdf_inclusion_copy_font_code)
 @#
 @d tracing_assigns==int_par(tracing_assigns_code)
 @d tracing_groups==int_par(tracing_groups_code)
@@ -5865,6 +5867,7 @@ pdf_prepend_kern_code:    print_esc("pdfprependkern");
 pdf_append_kern_code:    print_esc("pdfappendkern");
 pdf_gen_tounicode_code:    print_esc("pdfgentounicode");
 pdf_draftmode_code:        print_esc("pdfdraftmode");
+pdf_inclusion_copy_font_code:    print_esc("pdfinclusioncopyfonts");
 @/@<Cases for |print_param|@>@/
 othercases print("[unknown integer parameter!]")
 endcases;
@@ -6040,6 +6043,8 @@ primitive("pdfgentounicode",assign_int,int_base+pdf_gen_tounicode_code);@/
 @!@:pdf_gen_tounicode_}{\.{\\pdfgentounicode} primitive@>
 primitive("pdfdraftmode",assign_int,int_base+pdf_draftmode_code);@/
 @!@:pdf_draftmode_}{\.{\\pdfdraftmode} primitive@>
+primitive("pdfinclusioncopyfonts",assign_int,int_base+pdf_inclusion_copy_font_code);@/
+@!@:pdf_inclusion_copy_font_}{\.{\\pdfinclusioncopyfonts} primitive@>
 
 @ @<Cases of |print_cmd_chr|...@>=
 assign_int: if chr_code<count_base then print_param(chr_code-int_base)
@@ -6147,8 +6152,9 @@ here, and the 256 \.{\\dimen} registers.
 @d pdf_last_line_depth_code   = pdftex_first_dimen_code + 8
 @d pdf_each_line_height_code  = pdftex_first_dimen_code + 9
 @d pdf_each_line_depth_code   = pdftex_first_dimen_code + 10
-@d pdf_px_dimen_code       = pdftex_first_dimen_code + 11
-@d pdftex_last_dimen_code  = pdftex_first_dimen_code + 11 {last number defined in this section}
+@d pdf_ignored_dimen_code   = pdftex_first_dimen_code + 11
+@d pdf_px_dimen_code       = pdftex_first_dimen_code + 12
+@d pdftex_last_dimen_code  = pdftex_first_dimen_code + 12 {last number defined in this section}
 @d dimen_pars = pdftex_last_dimen_code + 1 {total number of dimension parameters}
 @d scaled_base=dimen_base+dimen_pars
   {table of 256 user-defined \.{\\dimen} registers}
@@ -6188,6 +6194,7 @@ here, and the 256 \.{\\dimen} registers.
 @d pdf_last_line_depth   == dimen_par(pdf_last_line_depth_code)
 @d pdf_each_line_height  == dimen_par(pdf_each_line_height_code)
 @d pdf_each_line_depth   == dimen_par(pdf_each_line_depth_code)
+@d pdf_ignored_dimen   == dimen_par(pdf_ignored_dimen_code)
 @d pdf_px_dimen      == dimen_par(pdf_px_dimen_code)
 
 @p procedure print_length_param(@!n:integer);
@@ -6224,6 +6231,7 @@ pdf_first_line_height_code: print_esc("pdffirstlineheight");
 pdf_last_line_depth_code: print_esc("pdflastlinedepth");
 pdf_each_line_height_code: print_esc("pdfeachlineheight");
 pdf_each_line_depth_code: print_esc("pdfeachlinedepth");
+pdf_ignored_dimen_code: print_esc("pdfignoreddimen");
 pdf_px_dimen_code:      print_esc("pdfpxdimen");
 othercases print("[unknown dimen parameter!]")
 endcases;
@@ -6296,6 +6304,8 @@ primitive("pdfeachlineheight",assign_dimen,dimen_base+pdf_each_line_height_code)
 @!@:pdf_each_line_height_}{\.{\\pdfeachlineheight} primitive@>
 primitive("pdfeachlinedepth",assign_dimen,dimen_base+pdf_each_line_depth_code);@/
 @!@:pdf_each_line_depth_}{\.{\\pdfeachlinedepth} primitive@>
+primitive("pdfignoreddimen",assign_dimen,dimen_base+pdf_ignored_dimen_code);@/
+@!@:pdf_ignored_dimen_}{\.{\\pdfignoreddimen} primitive@>
 primitive("pdfpxdimen",assign_dimen,dimen_base+pdf_px_dimen_code);@/
 @!@:pdf_px_dimen_}{\.{\\pdfpxdimen} primitive@>
 
@@ -15160,6 +15170,7 @@ begin
         fixed_image_apply_gamma := fix_int(pdf_image_apply_gamma, 0, 1);
         fixed_pdf_objcompresslevel := fix_int(pdf_objcompresslevel, 0, 3);
         fixed_pdf_draftmode     := fix_int(pdf_draftmode, 0, 1);
+        fixed_inclusion_copy_font      := fix_int(pdf_inclusion_copy_font, 0, 1);
         if (fixed_pdf_minor_version >= 5) and (fixed_pdf_objcompresslevel > 0) then
             pdf_os_enable := true
         else begin
@@ -15637,6 +15648,7 @@ DVI}
 @!fixed_pk_resolution: integer;
 @!fixed_decimal_digits: integer;
 @!fixed_gen_tounicode: integer;
+@!fixed_inclusion_copy_font: integer;
 @!pk_scale_factor: integer;
 @!pdf_output_option: integer;
 @!pdf_output_value: integer;
@@ -20756,7 +20768,7 @@ baselineskip calculation is handled by the |append_to_vlist| routine.
 @p procedure append_to_vlist(@!b:pointer);
 var d:scaled; {deficiency of space between baselines}
 @!p:pointer; {a new glue specification}
-begin if prev_depth>ignore_depth then
+begin if prev_depth>pdf_ignored_dimen then
   begin d:=width(baseline_skip)-prev_depth-height(b);
   if d<line_skip_limit then p:=new_param_glue(line_skip_code)
   else  begin p:=new_skip_param(baseline_skip_code);
@@ -23002,7 +23014,7 @@ entered, so that the columns will generate a list for subsequent packaging.
 procedure init_span(@!p:pointer);
 begin push_nest;
 if mode=-hmode then space_factor:=1000
-else  begin prev_depth:=ignore_depth; normal_paragraph;
+else  begin prev_depth:=pdf_ignored_dimen; normal_paragraph;
   end;
 cur_span:=p;
 end;
@@ -25318,14 +25330,21 @@ if left_skip<>zero_glue then
   link(r):=q; q:=r;
   end
 
+@ @<Initialize table entries...@>=
+pdf_ignored_dimen := ignore_depth;
+pdf_each_line_height := pdf_ignored_dimen;
+pdf_each_line_depth := pdf_ignored_dimen;
+pdf_first_line_height := pdf_ignored_dimen;
+pdf_last_line_depth := pdf_ignored_dimen;
+
 @ @<Append the new box to the current vertical list...@>=
-if pdf_each_line_height <> 0 then
+if pdf_each_line_height <> pdf_ignored_dimen then
     height(just_box) := pdf_each_line_height;
-if pdf_each_line_depth <> 0 then
+if pdf_each_line_depth <> pdf_ignored_dimen then
     depth(just_box) := pdf_each_line_depth;
-if (pdf_first_line_height <> 0) and (cur_line = prev_graf + 1) then
+if (pdf_first_line_height <> pdf_ignored_dimen) and (cur_line = prev_graf + 1) then
     height(just_box) := pdf_first_line_height;
-if (pdf_last_line_depth <> 0) and (cur_line + 1 = best_line) then
+if (pdf_last_line_depth <> pdf_ignored_dimen) and (cur_line + 1 = best_line) then
     depth(just_box) := pdf_last_line_depth;
 if pre_adjust_head <> pre_adjust_tail then
     append_list(pre_adjust_head)(pre_adjust_tail);
@@ -27935,7 +27954,7 @@ end
 @ @<Fire up the user's output routine and |return|@>=
 begin output_active:=true;
 incr(dead_cycles);
-push_nest; mode:=-vmode; prev_depth:=ignore_depth; mode_line:=-line;
+push_nest; mode:=-vmode; prev_depth:=pdf_ignored_dimen; mode_line:=-line;
 begin_token_list(output_routine,output_text);
 new_save_level(output_group); normal_paragraph;
 scan_left_brace;
@@ -28571,11 +28590,11 @@ is short, since the |scan_rule_spec| routine already does most of what is
 required; thus, there is no need for a special action procedure.
 
 Note that baselineskip calculations are disabled after a rule in vertical
-mode, by setting |prev_depth:=ignore_depth|.
+mode, by setting |prev_depth:=pdf_ignored_dimen|.
 
 @<Cases of |main_control| that build...@>=
 vmode+hrule,hmode+vrule,mmode+vrule: begin tail_append(scan_rule_spec);
-  if abs(mode)=vmode then prev_depth:=ignore_depth
+  if abs(mode)=vmode then prev_depth:=pdf_ignored_dimen
   else if abs(mode)=hmode then space_factor:=1000;
   end;
 
@@ -29100,7 +29119,7 @@ else  begin if k=vmode then scan_spec(vbox_group,true)
   end;
 push_nest; mode:=-k;
 if k=vmode then
-  begin prev_depth:=ignore_depth;
+  begin prev_depth:=pdf_ignored_dimen;
   if every_vbox<>null then begin_token_list(every_vbox,every_vbox_text);
   end
 else  begin space_factor:=1000;
@@ -29301,7 +29320,7 @@ else
     saved(1) := 0;
 save_ptr := save_ptr + 2;
 new_save_level(insert_group); scan_left_brace; normal_paragraph;
-push_nest; mode:=-vmode; prev_depth:=ignore_depth;
+push_nest; mode:=-vmode; prev_depth:=pdf_ignored_dimen;
 end;
 
 @ @<Cases of |handle...@>=
@@ -30235,7 +30254,7 @@ end
 
 @ @<Cases of |main_control| that build...@>=
 mmode+vcenter: begin scan_spec(vcenter_group,false); normal_paragraph;
-  push_nest; mode:=-vmode; prev_depth:=ignore_depth;
+  push_nest; mode:=-vmode; prev_depth:=pdf_ignored_dimen;
   if every_vbox<>null then begin_token_list(every_vbox,every_vbox_text);
   end;
 
@@ -32078,6 +32097,7 @@ begin @<Undump constants for consistency check@>;
 @<Undump the hyphenation tables@>;
 @<Undump pdftex data@>;
 @<Undump a couple more things and the closing check word@>;
+prev_depth := pdf_ignored_dimen;
 load_fmt_file:=true; return; {it worked!}
 bad_fmt: wake_up_terminal;
   wterm_ln('(Fatal format file error; I''m stymied)');
