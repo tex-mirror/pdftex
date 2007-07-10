@@ -51,7 +51,7 @@
 \setupcapitals
   [title=no]
 
-\def\rcsscan $#1 #2,v #3 #4/#5/#6 #7${
+\def\rcsscan $#1 #2 #3 #4-#5-#6 #7${
   \def\rcsrevision{#3}
   \def\rcsyear{#4}
   \def\rcsmonth{#5}
@@ -3745,6 +3745,7 @@ available starting from \PDFTEX\ 1.30.0, as a~shortened synonym of obsolete
 \bookmark{\type{\pdfforcepagebox}}
 
 This primitive is obsolete. Use \type{\pdfpagebox} instead.
+
 \pdftexprimitive {\Syntax {\Tex {\pdfoptionalwaysusepdfpagebox} \Whatever{integer}}}
 
 \bookmark{\type{\pdfoptionalwaysusepdfpagebox}}
