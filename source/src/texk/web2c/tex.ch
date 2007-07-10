@@ -2218,7 +2218,7 @@ var k:0..buf_size; {index into |buffer|}
 if e=".tex" then show_context;
 @y
 if (e=".tex") or (e="") then show_context;
-print_ln; print("(Retry if file name is empty or CTRL-D to exit.");
+print_ln; print("(Enter the null string to re-try, or <eof> to exit");
 if (e<>"") then
   begin
     print(" Default file extension is `"); print(e); print("'");
