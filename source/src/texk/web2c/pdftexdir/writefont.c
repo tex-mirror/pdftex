@@ -137,9 +137,32 @@ static void preset_fontmetrics(fd_entry * fd, internalfontnumber f)
         fd->font_dim[i].set = true;
 }
 
+static void fix_fontmetrics(fd_entry * fd)
+{
+    intparm *p = (intparm *) fd->font_dim;
+    if (!p[FONTBBOX1_CODE].set || !p[FONTBBOX2_CODE].set ||
+        !p[FONTBBOX3_CODE].set || !p[FONTBBOX4_CODE].set) {
+        pdftex_warn("font `%s' doesn't have a BoundingBox", fd->fm->ff_name);
+        return;
+    }
+    if (!p[ASCENT_CODE].set) {
+        p[ASCENT_CODE].val = p[FONTBBOX4_CODE].val;
+        p[ASCENT_CODE].set = true;
+    }
+    if (!p[DESCENT_CODE].set) {
+        p[DESCENT_CODE].val = p[FONTBBOX2_CODE].val;
+        p[DESCENT_CODE].set = true;
+    }
+    if (!p[CAPHEIGHT_CODE].set) {
+        p[CAPHEIGHT_CODE].val = p[FONTBBOX4_CODE].val;
+        p[CAPHEIGHT_CODE].set = true;
+    }
+}
+
 static void write_fontmetrics(fd_entry * fd)
 {
     int i;
+    fix_fontmetrics(fd);
     if (fd->font_dim[FONTBBOX1_CODE].set && fd->font_dim[FONTBBOX2_CODE].set
         && fd->font_dim[FONTBBOX3_CODE].set && fd->font_dim[FONTBBOX4_CODE].set)
         pdf_printf("/%s [%i %i %i %i]\n", font_key[FONTBBOX1_CODE].pdfname,

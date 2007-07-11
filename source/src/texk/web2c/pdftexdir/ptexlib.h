@@ -314,6 +314,8 @@ extern void img_free(void);
 extern void updateimageprocset(integer);
 extern void writeimage(integer);
 extern integer imagecolordepth(integer img);
+extern void dumpimagemeta();
+extern void undumpimagemeta(integer, integer);
 
 /* writejbig2.c */
 extern void flushjbig2page0objects();
@@ -335,6 +337,7 @@ extern void ttf_free(void);
 
 /* writezip.c */
 extern void writezip(boolean);
+extern void zip_free(void);
 
 /* avlstuff.c */
 extern int comp_int_entry(const void *, const void *, void *);

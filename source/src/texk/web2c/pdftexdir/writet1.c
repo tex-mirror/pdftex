@@ -920,9 +920,10 @@ static boolean t1_open_fontfile(const char *open_name_prefix)
 {
     ff_entry *ff;
     ff = check_ff_exist(fd_cur->fm->ff_name, is_truetype(fd_cur->fm));
-    if (ff->ff_path != NULL)
+    if (ff->ff_path != NULL) {
         t1_file = xfopen(cur_file_name = ff->ff_path, FOPEN_RBIN_MODE);
-    else {
+        recorder_record_input(ff->ff_path);
+    } else {
         set_cur_file_name(fd_cur->fm->ff_name);
         pdftex_fail("cannot open Type 1 font file for reading");
         return false;
