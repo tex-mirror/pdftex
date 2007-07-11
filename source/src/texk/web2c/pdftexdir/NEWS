@@ -1,5 +1,5 @@
 -------------------------------------------------
-pdfTeX 3.141592-1.40.4 was released on 2007-07-??
+pdfTeX 3.141592-1.40.4 was released on 2007-07-11
 -------------------------------------------------
 - Bugfixes: 
   - It was impossible to set the font Flags to 4 in map entries (762)
@@ -27,6 +27,7 @@ pdfTeX 3.141592-1.40.4 was released on 2007-07-??
   - \letterspacefont and \pdffontexpand had some problems (747)
 - Improvements: 
   - pdf compression is now a bit faster (patch 726)
+  - the behaviour of TeX when it asks for a file name has been improved (756)
 - pdfTeX uses libpng 1.2.18
 - pdfTeX uses xpdf 3.02
 

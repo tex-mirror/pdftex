@@ -1,10 +1,10 @@
 pdfTeX
 ======
 
-README for version 3.14159-1.40.3
+README for version 3.14159-1.40.4
 =================================
 
-This directory contains the version 1.40.3 of pdfTeX, an extended version
+This directory contains the version 1.40.4 of pdfTeX, an extended version
 of eTeX that can create PDF directly from TeX source files and enhance the
 result of TeX typesetting with the help of PDF. When PDF output is not
 selected, pdfTeX produces normal DVI output, otherwise it produces PDF
@@ -37,8 +37,8 @@ pdfTeX is copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
 
 pdfTeX is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
-version.
+Foundation; either version 2.1 of the License, or (at your option) any
+later version.
 
 pdfTeX is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
