@@ -1,4 +1,4 @@
-# $Id: Makefile.in 4071 2007-03-21 00:11:23Z karl $
+# $Id: Makefile.in 4628 2007-07-16 16:47:44Z karl $
 # Makefile for teTeX distribution, also used for TeX Live.
 
 # This program is free software; you can redistribute it and/or modify
@@ -121,13 +121,15 @@ uninstall:
 Makefile: Makefile.in config.status
 	$(SHELL) ./config.status
 
-all: @LIBSDEP@
 all clean mostlyclean:
 	esubdirs="$(LIBSDIRS) $(ESUBDIRS)"; \
 	  for dir in $$esubdirs; do \
 	    echo making $@ in $$dir; \
 	    (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) $@; else true; fi) || exit 1; \
 	  done
+
+# to build libraries only, when working on drivers.
+lib: @LIBSDEP@
 
 distclean: clean
 	cleandirs="$(LIBSDIRS) $(ESUBDIRS)"; \
