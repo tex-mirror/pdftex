@@ -35944,11 +35944,6 @@ begin
         pdf_last_y_pos := pdf_xform_height + pdf_xform_depth - cur_v;
 end
 
-@ @<Save current position to |pdf_snapx_refpos|@>=
-begin
-    pdf_snapx_refpos := cur_h;
-end
-
 @ @<Output a Image node in a vlist@>=
 begin cur_v:=cur_v+pdf_height(p)+pdf_depth(p); save_v:=cur_v;
   cur_h:=left_edge;
