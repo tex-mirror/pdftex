@@ -1839,6 +1839,9 @@ the \TEX\ macro programming language. All primitives are prefixed by
 \type{\leftmarginkern}, and \type{\rightmarginkern}. The general
 definitions and syntax rules follow after the list of primitives.
 
+% FIXME: All primitives should at least be mentioned here; an entry in section
+% 7 ([primitives]) is also highly desired.
+
 %%S This is the list of new or extended primitives provided by pdftex.
 %%S Don't edit this file, as it is now auto-generated from the
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
@@ -1952,6 +1955,26 @@ definitions and syntax rules follow after the list of primitives.
 \Tex {\pdfdraftmode} \Whatever{integer}
 }
 
+% FIXME: [primitives]
+\Syntax {
+\Tex {\pdfadjustinterwordglue} \Whatever{integer}
+}
+
+% FIXME: [primitives]
+\Syntax {
+\Tex {\pdfinclusioncopyfonts} \Whatever{integer}
+}
+
+% FIXME: [primitives]
+\Syntax {
+\Tex {\pdfprependkern} \Whatever{integer}
+}
+
+% FIXME: [primitives]
+\Syntax {
+\Tex {\pdfappendkern} \Whatever{integer}
+}
+
 \stoppacked
 
 %%S NL
@@ -1993,6 +2016,11 @@ definitions and syntax rules follow after the list of primitives.
 \Tex {\pdfpxdimen} \Whatever{dimen}
 }
 
+% FIXME: [primitives]
+\Syntax {
+\Tex {\pdfignoreddimen} \Whatever{dimen}
+}
+
 % todo:
 \iffalse
 \Syntax {
@@ -2029,6 +2057,7 @@ definitions and syntax rules follow after the list of primitives.
 \Tex {\pdfpageattr} \Whatever{tokens}
 }
 
+% FIXME: [primitives]
 \Syntax {
 \Tex {\pdfpageresources} \Whatever{tokens}
 }
@@ -2154,6 +2183,18 @@ definitions and syntax rules follow after the list of primitives.
 \Whatever{expandable}
 }
 
+% FIXME: [primitives]
+\Syntax {
+\Tex {\pdfinsertheight} \Something{integer}
+\Whatever{expandable}
+}
+
+% FIXME: [primitives]
+\Syntax {
+\Tex {\pdfximagebbox} \Something{integer} \Something{bbox spec}
+\Whatever{expandable}
+}
+
 \stoppacked
 
 %%S NL
@@ -2199,6 +2240,7 @@ definitions and syntax rules follow after the list of primitives.
 \Tex {\pdflastypos} \Whatever{read||only integer}
 }
 
+% FIXME: [primitives]
 \Syntax {
 \Tex {\pdflastdemerits} \Whatever{read||only integer}
 }
@@ -2372,6 +2414,17 @@ definitions and syntax rules follow after the list of primitives.
 
 \Syntax {
 \Tex {\pdfrestore}
+}
+
+% FIXME: [primitives]
+\Syntax {
+\Tex {\letterspacefont} \Something{control sequence} \Optional{=} \Something{font}
+\Something{number}
+}
+
+% FIXME: [primitives]
+\Syntax {
+\Tex {\pdfcopyfont} \Something{control sequence} \Optional{=} \Something{font}
 }
 \stoppacked
 
@@ -2618,6 +2671,12 @@ definitions and syntax rules follow after the list of primitives.
 \Syntax {
 \Something{stack action} \Means %
   \Literal{set} \Or \Literal{push} \Or \Literal{pop} \Or \Literal{current}
+}
+
+% FIXME: [primitives]
+\Syntax {
+\Something{bbox spec} \Means %
+  \Literal{1} \Or \Literal{2} \Or \Literal{3} \Or \Literal{4}
 }
 
 \stoppacked
