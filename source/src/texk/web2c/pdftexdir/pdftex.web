@@ -33098,12 +33098,11 @@ stays the same.
 @d reset_timer_code            == pdftex_first_extension_code + 24
 @d pdf_font_expand_code        == pdftex_first_extension_code + 25
 @d set_random_seed_code        == pdftex_first_extension_code + 26
-@d pdf_snap_ref_point_node     == pdftex_first_extension_code + 27
-@d pdf_glyph_to_unicode_code   == pdftex_first_extension_code + 28
-@d pdf_colorstack_node         == pdftex_first_extension_code + 29
-@d pdf_setmatrix_node          == pdftex_first_extension_code + 30
-@d pdf_save_node               == pdftex_first_extension_code + 31
-@d pdf_restore_node            == pdftex_first_extension_code + 32
+@d pdf_glyph_to_unicode_code   == pdftex_first_extension_code + 27
+@d pdf_colorstack_node         == pdftex_first_extension_code + 28
+@d pdf_setmatrix_node          == pdftex_first_extension_code + 29
+@d pdf_save_node               == pdftex_first_extension_code + 30
+@d pdf_restore_node            == pdftex_first_extension_code + 31
 @d pdftex_last_extension_code  == pdf_restore_node
 
 @<Put each...@>=
@@ -33159,8 +33158,6 @@ primitive("pdfendthread",extension,pdf_end_thread_node);@/
 @!@:pdf_end_thread_}{\.{\\pdfendthread} primitive@>
 primitive("pdfsavepos",extension,pdf_save_pos_node);@/
 @!@:pdf_save_pos_}{\.{\\pdfsavepos} primitive@>
-primitive("pdfsnaprefpoint",extension,pdf_snap_ref_point_node);@/
-@!@:pdf_snap_ref_point_}{\.{\\pdfsnaprefpoint} primitive@>
 primitive("pdfinfo",extension,pdf_info_code);@/
 @!@:pdf_info_}{\.{\\pdfinfo} primitive@>
 primitive("pdfcatalog",extension,pdf_catalog_code);@/
@@ -33223,7 +33220,6 @@ extension: case chr_code of
   pdf_refxform_node: print_esc("pdfrefxform");
   pdf_refximage_node: print_esc("pdfrefximage");
   pdf_save_pos_node: print_esc("pdfsavepos");
-  pdf_snap_ref_point_node: print_esc("pdfsnaprefpoint");
   pdf_start_link_node: print_esc("pdfstartlink");
   pdf_start_thread_node: print_esc("pdfstartthread");
   pdf_thread_node: print_esc("pdfthread");
@@ -33277,7 +33273,6 @@ begin case cur_chr of
   pdf_refxform_node: @<Implement \.{\\pdfrefxform}@>;
   pdf_refximage_node: @<Implement \.{\\pdfrefximage}@>;
   pdf_save_pos_node: @<Implement \.{\\pdfsavepos}@>;
-  pdf_snap_ref_point_node: @<Implement \.{\\pdfsnaprefpoint}@>;
   pdf_start_link_node: @<Implement \.{\\pdfstartlink}@>;
   pdf_start_thread_node: @<Implement \.{\\pdfstartthread}@>;
   pdf_thread_node: @<Implement \.{\\pdfthread}@>;
@@ -34351,12 +34346,6 @@ end
 @!pdf_last_y_pos: integer;
 @!pdf_snapx_refpos: integer;
 
-@ @<Implement \.{\\pdfsnaprefpoint}@>=
-begin
-    check_pdfoutput("\pdfsnaprefpoint", true);
-    new_whatsit(pdf_snap_ref_point_node, small_node_size);
-end
-
 @ @<Declare procedures needed in |do_ext...@>=
 function new_snap_node(s: small_number): pointer;
 var p: pointer;
@@ -34847,7 +34836,6 @@ pdf_start_thread_node: begin
 end;
 pdf_end_thread_node: print_esc("pdfendthread");
 pdf_save_pos_node: print_esc("pdfsavepos");
-pdf_snap_ref_point_node: print_esc("pdfsnaprefpoint");
 othercases print("whatsit?")
 endcases
 
@@ -34940,8 +34928,6 @@ pdf_end_thread_node:
     r := get_node(small_node_size);
 pdf_save_pos_node:
     r := get_node(small_node_size);
-pdf_snap_ref_point_node:
-    r := get_node(small_node_size);
 othercases confusion("ext2")
 @:this can't happen ext2}{\quad ext2@>
 endcases
@@ -35009,8 +34995,6 @@ end;
 pdf_end_thread_node:
     free_node(p, small_node_size);
 pdf_save_pos_node:
-    free_node(p, small_node_size);
-pdf_snap_ref_point_node:
     free_node(p, small_node_size);
 othercases confusion("ext3")
 @:this can't happen ext3}{\quad ext3@>
@@ -35945,8 +35929,6 @@ pdf_save_pos_node:
     @<Save current position to |pdf_last_x_pos|, |pdf_last_y_pos|@>;
 special_node:
     pdf_special(p);
-pdf_snap_ref_point_node:
-    @<Save current position to |pdf_snapx_refpos|@>;
 othercases out_what(p);
 endcases
 
@@ -36017,8 +35999,6 @@ pdf_save_pos_node:
     @<Save current position to |pdf_last_x_pos|, |pdf_last_y_pos|@>;
 special_node:
     pdf_special(p);
-pdf_snap_ref_point_node:
-    @<Save current position to |pdf_snapx_refpos|@>;
 othercases out_what(p);
 endcases
 
