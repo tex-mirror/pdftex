@@ -16,7 +16,12 @@ pdfTeX 3.141592-1.50.0 was released on 2007-0?-??
   - \pdfinclusioncopyfonts (813)
 
 -------------------------------------------------
-pdfTeX 3.141592-1.40.4 was released on 2007-07-??
+pdfTeX 3.141592-1.40.5 was released on 2007-08-??
+-------------------------------------------------
+- pdfTeX uses xpdf 3.02pl1
+
+-------------------------------------------------
+pdfTeX 3.141592-1.40.4 was released on 2007-07-11
 -------------------------------------------------
 - Bugfixes: 
   - It was impossible to set the font Flags to 4 in map entries (762)
