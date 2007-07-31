@@ -1,5 +1,6 @@
 #! /bin/sh
 # Written by Martin Schröder for pdfTeX. Public Domain.
+# $Id$
 #
 # builds new pdftex binaries
 # ----------
@@ -105,7 +106,7 @@ fi
 (cd texk/web2c/web2c; $MAKE) || exit 1
 (cd texk/web2c; $MAKE ../kpathsea/libkpathsea.la) || exit 1
 (cd texk/web2c/lib; $MAKE) || exit 1
-(cd texk/web2c; $MAKE pdftex pdfetex pdftosrc ttf2afm) || exit 1
+(cd texk/web2c; $MAKE pdftexbin) || exit 1
 # strip them
 (cd texk/web2c; $STRIP pdf*tex pdftosrc ttf2afm)
 # go back
