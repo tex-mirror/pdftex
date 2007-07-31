@@ -1,44 +1,21 @@
 The pdfTeX team is happy to announce the release of a new stable version:
 
 ===========================================================================
-                               pdfTeX 1.40.4
+                               pdfTeX 1.40.5
 ===========================================================================
 
-This is the announcement of pdfTeX 1.40.4, an extended version of TeX that
+This is the announcement of pdfTeX 1.40.5, an extended version of TeX that
 can create PDF directly from TeX source files and enhance the result of TeX
 typesetting with the help of PDF.
 
 ===========================================================================
-  Main changes of pdfTeX 1.40.4
+  Main changes of pdfTeX 1.40.5
 ===========================================================================
 
 - Bugfixes: 
-  - It was impossible to set the font Flags to 4 in map entries (762)
-  - The font Flags of non-embedded fonts were wrong (794)
-    Now pdfTeX uses the Flags from map entries (if found) or guesses values
-    for the base14 fonts. It also warns when you not-embedd a font without
-    Flags
-  - Subsetted fonts still had their private UniqueID copied (774)
-  - \pdfunescapehex returned a wrong result if the last character was not a
-    hexadecimal digit and the last hex pair was incomplete (777)
-  - Copying a box with \pdfstartlink inside produced the same /Link
-    annotation object multiply, with same object number and identical
-    coordinates on the page (799)
-  - When trying to use a font without TFM, without map entry, and no PK
-    font available, a broken PDF was produced. Now no PDF is generated and
-    the error messages have been improved (721)
-  - \pdfprimitive was broken (see
-    http://www.ntg.nl/pipermail/ntg-pdftex/2007-April/002860.html)
-  - The -recorder option of web2c didn't record fonts, included images and
-    some other files (772)
-  - Using \pdfximage in IniTeX before \dump caused a crash when the format
-    was used (824)
-- Improvements: 
-  - pdf compression is now a bit faster (patch 726)
-  - the behaviour of TeX when it asks for a file name has been improved
-    (756)
-- pdfTeX uses libpng 1.2.18
-- pdfTeX uses xpdf 3.02
+  - calling 'pdftex %' would crash (830)
+  - fflush the recorder file
+- pdfTeX uses xpdf 3.02pl1
 
 For complete release notes see http://www.pdftex.org/NEWS
 
@@ -50,7 +27,7 @@ pdfTeX is copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
 
 pdfTeX is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2.1 of the License, or (at your option) any later
+Foundation; either version 2 of the License, or (at your option) any later
 version.
 
 For a complete README (with a full discussion of the license)
