@@ -288,7 +288,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20070729' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20070806' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -5655,13 +5655,14 @@ that will be defined later.
 @d pdf_protrude_chars_code   = pdftex_first_integer_code + 18 {protrude chars at left/right edge of paragraphs}
 @d pdf_tracing_fonts_code    = pdftex_first_integer_code + 19 {level of font detail in log}
 @d pdf_objcompresslevel_code = pdftex_first_integer_code + 20 {activate object streams}
-@d pdf_adjust_interword_glue_code    = pdftex_first_integer_code + 21 {adjust interword glue?}
-@d pdf_prepend_kern_code     = pdftex_first_integer_code + 22 {prepend kern before certain characters?}
-@d pdf_append_kern_code      = pdftex_first_integer_code + 23 {append kern before certain characters?}
-@d pdf_gen_tounicode_code    = pdftex_first_integer_code + 24 {generate ToUnicode for fonts?}
-@d pdf_draftmode_code        = pdftex_first_integer_code + 25 {switch on draftmode if positive}
-@d pdf_inclusion_copy_font_code     = pdftex_first_integer_code + 26 {generate ToUnicode for fonts?}
-@d pdf_int_pars=pdftex_first_integer_code + 27 {total number of \pdfTeX's integer parameters}
+@d pdf_suppress_ptex_info_code = pdftex_first_integer_code + 21 {suppress /PTEX.* entries in PDF dictionaries}
+@d pdf_adjust_interword_glue_code    = pdftex_first_integer_code + 22 {adjust interword glue?}
+@d pdf_prepend_kern_code     = pdftex_first_integer_code + 23 {prepend kern before certain characters?}
+@d pdf_append_kern_code      = pdftex_first_integer_code + 24 {append kern before certain characters?}
+@d pdf_gen_tounicode_code    = pdftex_first_integer_code + 25 {generate ToUnicode for fonts?}
+@d pdf_draftmode_code        = pdftex_first_integer_code + 26 {switch on draftmode if positive}
+@d pdf_inclusion_copy_font_code     = pdftex_first_integer_code + 27 {generate ToUnicode for fonts?}
+@d pdf_int_pars=pdftex_first_integer_code + 28 {total number of \pdfTeX's integer parameters}
 @#
 @d etex_int_base=pdf_int_pars {base for \eTeX's integer parameters}
 @d tracing_assigns_code=etex_int_base {show assignments}
@@ -5750,6 +5751,7 @@ that will be defined later.
 @d pdf_output           == int_par(pdf_output_code)
 @d pdf_compress_level   == int_par(pdf_compress_level_code)
 @d pdf_objcompresslevel == int_par(pdf_objcompresslevel_code)
+@d pdf_suppress_ptex_info == int_par(pdf_suppress_ptex_info_code)
 @d pdf_decimal_digits   == int_par(pdf_decimal_digits_code)
 @d pdf_move_chars       == int_par(pdf_move_chars_code)
 @d pdf_image_resolution == int_par(pdf_image_resolution_code)
@@ -5845,6 +5847,7 @@ error_context_lines_code:print_esc("errorcontextlines");
 pdf_output_code:           print_esc("pdfoutput");
 pdf_compress_level_code:   print_esc("pdfcompresslevel");
 pdf_objcompresslevel_code: print_esc("pdfobjcompresslevel");
+pdf_suppress_ptex_info_code: print_esc("pdfsuppressptexinfo");
 pdf_decimal_digits_code:   print_esc("pdfdecimaldigits");
 pdf_move_chars_code:       print_esc("pdfmovechars");
 pdf_image_resolution_code: print_esc("pdfimageresolution");
@@ -5996,6 +5999,8 @@ primitive("pdfcompresslevel",assign_int,int_base+pdf_compress_level_code);@/
 @!@:pdf_compress_level_}{\.{\\pdfcompresslevel} primitive@>
 primitive("pdfobjcompresslevel",assign_int,int_base+pdf_objcompresslevel_code);@/
 @!@:pdf_objcompresslevel_}{\.{\\pdfobjcompresslevel} primitive@>
+primitive("pdfsuppressptexinfo",assign_int,int_base+pdf_suppress_ptex_info_code);@/
+@!@:pdf_suppress_ptex_info__}{\.{\\pdfsuppressptexinfo} primitive@>
 primitive("pdfdecimaldigits",assign_int,int_base+pdf_decimal_digits_code);@/
 @!@:pdf_decimal_digits_}{\.{\\pdfdecimaldigits} primitive@>
 primitive("pdfmovechars",assign_int,int_base+pdf_move_chars_code);@/
@@ -14900,6 +14905,7 @@ pdf_h_origin := (one_hundred_inch + 50) div 100;
 pdf_v_origin := (one_hundred_inch + 50) div 100;
 pdf_compress_level := 9;
 pdf_objcompresslevel := 0;
+pdf_suppress_ptex_info := 0;
 pdf_decimal_digits := 3;
 pdf_image_resolution := 72;
 pdf_minor_version := 4;
@@ -14922,6 +14928,11 @@ in C.
 @p function get_pdf_compress_level: integer;
 begin
     get_pdf_compress_level := pdf_compress_level;
+end;
+
+function get_pdf_suppress_ptex_info: integer;
+begin
+    get_pdf_suppress_ptex_info := pdf_suppress_ptex_info;
 end;
 
 function get_nullfont: internal_font_number;
@@ -19767,7 +19778,9 @@ begin
     if not trapped_given then begin
         pdf_print_ln("/Trapped /False");
     end;
-    pdf_str_entry_ln("PTEX.Fullbanner", pdftex_banner_escaped);
+    if pdf_suppress_ptex_info mod 2 = 0 then begin
+        pdf_str_entry_ln("PTEX.Fullbanner", pdftex_banner_escaped);
+    end;
     pdf_end_dict;
 end;
 

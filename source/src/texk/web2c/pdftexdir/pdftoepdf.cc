@@ -44,6 +44,10 @@ $Id$
 
 #include "epdf.h"
 
+extern "C" {
+    extern integer getpdfsuppressptexinfo();
+}
+
 // This file is mostly C and not very much C++; it's just used to interface
 // the functions of xpdf, which happens to be written in C++.
 
@@ -64,6 +68,11 @@ $Id$
 // this has been registered with Adobe by Hans Hagen.
 
 #define pdfkeyprefix "PTEX"
+
+#define MASK_PTEX_FULLBANNER 0x01
+#define MASK_PTEX_FILENAME   0x02
+#define MASK_PTEX_PAGENUMBER 0x04
+#define MASK_PTEX_INFODICT   0x08
 
 // PdfObject encapsulates the xpdf Object type,
 // and properly frees its resources on destruction.
@@ -846,6 +855,7 @@ void write_epdf(void)
     int rotate;
     double scale[6] = { 0, 0, 0, 0, 0, 0 };
     bool writematrix = false;
+    int ptex_info = getpdfsuppressptexinfo();
     PdfDocument *pdf_doc = (PdfDocument *) epdf_doc;
     (pdf_doc->occurences)--;
 #ifdef DEBUG
@@ -864,15 +874,21 @@ void write_epdf(void)
     pdf_puts("/FormType 1\n");
 
     // write additional information
-    pdf_printf("/%s.FileName (%s)\n", pdfkeyprefix,
-               convertStringToPDFString(pdf_doc->file_name,
-                                        strlen(pdf_doc->file_name)));
-    pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, (int) epdf_selected_page);
-    pdf_doc->doc->getDocInfoNF(&info);
-    if (info.isRef()) {
-        // the info dict must be indirect (PDF Ref p. 61)
-        pdf_printf("/%s.InfoDict ", pdfkeyprefix);
-        pdf_printf("%d 0 R\n", addOther(info.getRef()));
+    if ((ptex_info & MASK_PTEX_FILENAME) == 0) {
+        pdf_printf("/%s.FileName (%s)\n", pdfkeyprefix,
+                   convertStringToPDFString(pdf_doc->file_name,
+                                            strlen(pdf_doc->file_name)));
+    }
+    if ((ptex_info & MASK_PTEX_PAGENUMBER) == 0) {
+        pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, (int) epdf_selected_page);
+    }
+    if ((ptex_info & MASK_PTEX_INFODICT) == 0) {
+        pdf_doc->doc->getDocInfoNF(&info);
+        if (info.isRef()) {
+            // the info dict must be indirect (PDF Ref p. 61)
+            pdf_printf("/%s.InfoDict ", pdfkeyprefix);
+            pdf_printf("%d 0 R\n", addOther(info.getRef()));
+        }
     }
     // get the pagebox (media, crop...) to use.
     pagebox = get_pagebox(page, epdf_page_box);
