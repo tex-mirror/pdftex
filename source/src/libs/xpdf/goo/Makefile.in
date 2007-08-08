@@ -30,17 +30,14 @@ kpse_include ../../texk/make/library.mk
 #------------------------------------------------------------------------
 
 .SUFFIXES:
-.SUFFIXES: .cc .c .o
+.SUFFIXES: .cc .o
 
 .cc.o:
 	$(CXX) $(ALLCXXFLAGS) -c $<
-.c.o:
-	$(CC) $(ALLCFLAGS) -c $<
 
 #------------------------------------------------------------------------
 
 CXX_SRC = \
-	$(srcdir)/FixedPoint.cc \
 	$(srcdir)/GHash.cc \
 	$(srcdir)/GList.cc \
 	$(srcdir)/GString.cc \
@@ -48,14 +45,11 @@ CXX_SRC = \
 	$(srcdir)/gmempp.cc \
 	$(srcdir)/gfile.cc
 
-C_SRC = \
-	$(srcdir)/parseargs.c
 
 #------------------------------------------------------------------------
 
-GOO_CXX_OBJS = FixedPoint.o GHash.o GList.o GString.o gmem.o gmempp.o gfile.o
-GOO_C_OBJS = parseargs.o
-GOO_OBJS = $(GOO_CXX_OBJS) $(GOO_C_OBJS)
+GOO_CXX_OBJS = GHash.o GList.o GString.o gmem.o gmempp.o gfile.o
+GOO_OBJS = $(GOO_CXX_OBJS)
 
 libGoo.a: $(GOO_OBJS)
 	rm -f $@
@@ -76,7 +70,6 @@ distclean maintainer-clean extraclean: clean
 depend:
 	srcdirparent=`(cd $(srcdirparent) >/dev/null; pwd)`; \
 	  ($(CXX) $(ALLCXXFLAGS) -MM $(srcdir)/*.cc; \
-	   $(CC) $(ALLCFLAGS) -MM $(srcdir)/*.c) \
 	     | sed 's|$(srcdir)|$$(srcdir)|' \
              | sed 's|'$$srcdirparent/'|$$(srcdirparent)/|g' > $(srcdir)/depend.mk
 

@@ -1,5 +1,6 @@
 ## pdftexlib.mk - Makefile fragment for libraries used by pdf[ex]tex.
 # Public domain.
+# $Id$
 
 # The pdf*tex programs depend on a number of libraries.
 # Include dependencies to get the built if we don't do make
@@ -40,7 +41,7 @@ $(LIBXPDFDIR)/fofi/libfofi.a: $(LIBXPDFSRCDIR)/fofi/*.cc \
 	$(LIBXPDFSRCDIR)/fofi/*.h
 	cd $(LIBXPDFDIR)/fofi; $(MAKE) $(common_makeargs) libfofi.a
 $(LIBXPDFDIR)/goo/libGoo.a: $(LIBXPDFSRCDIR)/goo/*.cc \
-	$(LIBXPDFSRCDIR)/goo/*.c $(LIBXPDFSRCDIR)/goo/*.h
+	$(LIBXPDFSRCDIR)/goo/*.h
 	cd $(LIBXPDFDIR)/goo; $(MAKE) $(common_makeargs) libGoo.a
 $(LIBXPDFDIR)/xpdf/libxpdf.a: $(LIBXPDFSRCDIR)/xpdf/*.cc \
 	$(LIBXPDFSRCDIR)/xpdf/*.h

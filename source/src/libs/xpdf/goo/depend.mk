@@ -1,5 +1,3 @@
-FixedPoint.o: $(srcdir)/FixedPoint.cc ../aconf.h \
-  $(srcdirparent)/aconf2.h
 gfile.o: $(srcdir)/gfile.cc ../aconf.h \
   $(srcdirparent)/aconf2.h \
   $(srcdir)/GString.h \
@@ -26,6 +24,3 @@ GString.o: $(srcdir)/GString.cc ../aconf.h \
 gmem.o: $(srcdir)/gmem.cc ../aconf.h \
   $(srcdirparent)/aconf2.h \
   $(srcdir)/gmem.h
-parseargs.o: $(srcdir)/parseargs.c \
-  $(srcdir)/parseargs.h \
-  $(srcdir)/gtypes.h
