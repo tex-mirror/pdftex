@@ -19,7 +19,9 @@
 
 class Dict;
 class XRef;
+#ifndef PDF_PARSER_ONLY
 class OutputDev;
+#endif
 class Links;
 class Catalog;
 
@@ -148,6 +150,7 @@ public:
   // Get contents.
   Object *getContents(Object *obj) { return contents.fetch(xref, obj); }
 
+#ifndef PDF_PARSER_ONLY
   // Display a page.
   void display(OutputDev *out, double hDPI, double vDPI,
 	       int rotate, GBool useMediaBox, GBool crop,
@@ -170,7 +173,6 @@ public:
 
   void processLinks(OutputDev *out, Catalog *catalog);
 
-#ifndef PDF_PARSER_ONLY
   // Get the page's default CTM.
   void getDefaultCTM(double *ctm, double hDPI, double vDPI,
 		     int rotate, GBool useMediaBox, GBool upsideDown);

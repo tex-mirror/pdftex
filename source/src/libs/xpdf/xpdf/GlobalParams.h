@@ -33,7 +33,9 @@ class UnicodeMap;
 class UnicodeMapCache;
 class CMap;
 class CMapCache;
+#ifndef PDF_PARSER_ONLY
 struct XpdfSecurityHandler;
+#endif
 class GlobalParams;
 #ifdef WIN32
 class WinFontList;
@@ -319,8 +321,10 @@ public:
 
   //----- security handlers
 
+#ifndef PDF_PARSER_ONLY
   void addSecurityHandler(XpdfSecurityHandler *handler);
   XpdfSecurityHandler *getSecurityHandler(char *name);
+#endif
 
 private:
 
@@ -332,7 +336,9 @@ private:
   void parseCIDToUnicode(GList *tokens, GString *fileName, int line);
   void parseUnicodeToUnicode(GList *tokens, GString *fileName, int line);
   void parseUnicodeMap(GList *tokens, GString *fileName, int line);
+#ifndef PDF_PARSER_ONLY
   void parseCMapDir(GList *tokens, GString *fileName, int line);
+#endif
   void parseToUnicodeDir(GList *tokens, GString *fileName, int line);
   void parseDisplayFont(GList *tokens, GHash *fontHash,
 			DisplayFontParamKind kind,

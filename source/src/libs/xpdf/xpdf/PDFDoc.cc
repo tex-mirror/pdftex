@@ -27,12 +27,16 @@
 #include "Stream.h"
 #include "XRef.h"
 #include "Link.h"
+#ifndef PDF_PARSER_ONLY
 #include "OutputDev.h"
+#endif
 #include "Error.h"
 #include "ErrorCodes.h"
 #include "Lexer.h"
 #include "Parser.h"
+#ifndef PDF_PARSER_ONLY
 #include "SecurityHandler.h"
+#endif
 #ifndef DISABLE_OUTLINE
 #include "Outline.h"
 #endif
@@ -274,11 +278,14 @@ void PDFDoc::checkHeader() {
 GBool PDFDoc::checkEncryption(GString *ownerPassword, GString *userPassword) {
   Object encrypt;
   GBool encrypted;
+#ifndef PDF_PARSER_ONLY
   SecurityHandler *secHdlr;
+#endif
   GBool ret;
 
   xref->getTrailerDict()->dictLookup("Encrypt", &encrypt);
   if ((encrypted = encrypt.isDict())) {
+#ifndef PDF_PARSER_ONLY
     if ((secHdlr = SecurityHandler::make(this, &encrypt))) {
       if (secHdlr->checkEncryption(ownerPassword, userPassword)) {
 	// authorization succeeded
@@ -295,9 +302,12 @@ GBool PDFDoc::checkEncryption(GString *ownerPassword, GString *userPassword) {
       }
       delete secHdlr;
     } else {
+#endif
       // couldn't find the matching security handler
       ret = gFalse;
+#ifndef PDF_PARSER_ONLY
     }
+#endif
   } else {
     // document is not encrypted
     ret = gTrue;
@@ -306,6 +316,7 @@ GBool PDFDoc::checkEncryption(GString *ownerPassword, GString *userPassword) {
   return ret;
 }
 
+#ifndef PDF_PARSER_ONLY
 void PDFDoc::displayPage(OutputDev *out, int page,
 			 double hDPI, double vDPI, int rotate,
 			 GBool useMediaBox, GBool crop, GBool printing,
@@ -344,14 +355,17 @@ void PDFDoc::displayPageSlice(OutputDev *out, int page,
 				       printing, catalog,
 				       abortCheckCbk, abortCheckCbkData);
 }
+#endif
 
 Links *PDFDoc::getLinks(int page) {
   return catalog->getPage(page)->getLinks(catalog);
 }
 
+#ifndef PDF_PARSER_ONLY
 void PDFDoc::processLinks(OutputDev *out, int page) {
   catalog->getPage(page)->processLinks(out, catalog);
 }
+#endif
 
 GBool PDFDoc::isLinearized() {
   Parser *parser;

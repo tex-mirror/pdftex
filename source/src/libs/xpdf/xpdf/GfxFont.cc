@@ -1502,6 +1502,7 @@ GString *GfxCIDFont::getCollection() {
   return cMap ? cMap->getCollection() : (GString *)NULL;
 }
 
+#ifndef PDF_PARSER_ONLY
 //------------------------------------------------------------------------
 // GfxFontDict
 //------------------------------------------------------------------------
@@ -1566,3 +1567,4 @@ GfxFont *GfxFontDict::lookup(char *tag) {
   }
   return NULL;
 }
+#endif

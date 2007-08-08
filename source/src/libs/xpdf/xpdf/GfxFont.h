@@ -291,6 +291,7 @@ private:
   int cidToGIDLen;
 };
 
+#ifndef PDF_PARSER_ONLY
 //------------------------------------------------------------------------
 // GfxFontDict
 //------------------------------------------------------------------------
@@ -316,5 +317,6 @@ private:
   GfxFont **fonts;		// list of fonts
   int numFonts;			// number of fonts
 };
+#endif
 
 #endif

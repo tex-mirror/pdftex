@@ -19,8 +19,8 @@
 #include "Dict.h"
 #include "XRef.h"
 #include "Link.h"
-#include "OutputDev.h"
 #ifndef PDF_PARSER_ONLY
+#include "OutputDev.h"
 #include "Gfx.h"
 #include "GfxState.h"
 #include "Annot.h"
@@ -256,6 +256,7 @@ Links *Page::getLinks(Catalog *catalog) {
   return links;
 }
 
+#ifndef PDF_PARSER_ONLY
 void Page::display(OutputDev *out, double hDPI, double vDPI,
 		   int rotate, GBool useMediaBox, GBool crop,
 		   GBool printing, Catalog *catalog,
@@ -272,7 +273,6 @@ void Page::displaySlice(OutputDev *out, double hDPI, double vDPI,
 			GBool printing, Catalog *catalog,
 			GBool (*abortCheckCbk)(void *data),
 			void *abortCheckCbkData) {
-#ifndef PDF_PARSER_ONLY
   PDFRectangle *mediaBox, *cropBox;
   PDFRectangle box;
   Gfx *gfx;
@@ -344,7 +344,6 @@ void Page::displaySlice(OutputDev *out, double hDPI, double vDPI,
   delete annotList;
 
   delete gfx;
-#endif
 }
 
 void Page::makeBox(double hDPI, double vDPI, int rotate,
@@ -420,7 +419,6 @@ void Page::processLinks(OutputDev *out, Catalog *catalog) {
   delete links;
 }
 
-#ifndef PDF_PARSER_ONLY
 void Page::getDefaultCTM(double *ctm, double hDPI, double vDPI,
 			 int rotate, GBool useMediaBox, GBool upsideDown) {
   GfxState *state;

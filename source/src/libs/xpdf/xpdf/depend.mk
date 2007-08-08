@@ -115,7 +115,6 @@ Gfx.o: $(srcdir)/Gfx.cc ../aconf.h \
   $(srcdir)/GfxFont.h \
   $(srcdir)/GfxState.h \
   $(srcdir)/Function.h \
-  $(srcdir)/OutputDev.h \
   $(srcdir)/Page.h \
   $(srcdir)/Error.h \
   $(srcdir)/config.h \
@@ -259,33 +258,6 @@ Object.o: $(srcdir)/Object.cc ../aconf.h \
   $(srcdir)/Error.h \
   $(srcdir)/config.h \
   $(srcdir)/XRef.h
-Outline.o: $(srcdir)/Outline.cc ../aconf.h \
-  $(srcdirparent)/aconf2.h \
-  $(goodir)/gmem.h \
-  $(goodir)/GString.h \
-  $(goodir)/GList.h \
-  $(goodir)/gtypes.h \
-  $(srcdir)/Link.h \
-  $(srcdir)/Object.h \
-  $(srcdir)/Array.h \
-  $(srcdir)/Dict.h \
-  $(srcdir)/Stream.h \
-  $(srcdir)/PDFDocEncoding.h \
-  $(srcdir)/CharTypes.h \
-  $(srcdir)/Outline.h
-OutputDev.o: $(srcdir)/OutputDev.cc ../aconf.h \
-  $(srcdirparent)/aconf2.h \
-  $(srcdir)/Object.h \
-  $(goodir)/gtypes.h \
-  $(goodir)/gmem.h \
-  $(goodir)/GString.h \
-  $(srcdir)/Array.h \
-  $(srcdir)/Dict.h \
-  $(srcdir)/Stream.h \
-  $(srcdir)/GfxState.h \
-  $(srcdir)/Function.h \
-  $(srcdir)/OutputDev.h \
-  $(srcdir)/CharTypes.h
 Page.o: $(srcdir)/Page.cc ../aconf.h \
   $(srcdirparent)/aconf2.h \
   $(srcdir)/GlobalParams.h \
@@ -299,7 +271,6 @@ Page.o: $(srcdir)/Page.cc ../aconf.h \
   $(srcdir)/Stream.h \
   $(srcdir)/XRef.h \
   $(srcdir)/Link.h \
-  $(srcdir)/OutputDev.h \
   $(srcdir)/Error.h \
   $(srcdir)/config.h \
   $(srcdir)/Page.h
@@ -334,13 +305,10 @@ PDFDoc.o: $(srcdir)/PDFDoc.cc ../aconf.h \
   $(srcdir)/Catalog.h \
   $(srcdir)/XRef.h \
   $(srcdir)/Link.h \
-  $(srcdir)/OutputDev.h \
   $(srcdir)/Error.h \
   $(srcdir)/ErrorCodes.h \
   $(srcdir)/Lexer.h \
   $(srcdir)/Parser.h \
-  $(srcdir)/SecurityHandler.h \
-  $(srcdir)/Outline.h \
   $(srcdir)/PDFDoc.h
 PDFDocEncoding.o: $(srcdir)/PDFDocEncoding.cc \
   $(srcdir)/PDFDocEncoding.h \
@@ -349,25 +317,6 @@ PSTokenizer.o: $(srcdir)/PSTokenizer.cc ../aconf.h \
   $(srcdirparent)/aconf2.h \
   $(srcdir)/PSTokenizer.h \
   $(goodir)/gtypes.h
-SecurityHandler.o: $(srcdir)/SecurityHandler.cc \
-  ../aconf.h $(srcdirparent)/aconf2.h \
-  $(goodir)/GString.h \
-  $(srcdir)/PDFDoc.h \
-  $(srcdir)/XRef.h \
-  $(goodir)/gtypes.h \
-  $(srcdir)/Object.h \
-  $(goodir)/gmem.h \
-  $(srcdir)/Array.h \
-  $(srcdir)/Dict.h \
-  $(srcdir)/Stream.h \
-  $(srcdir)/Catalog.h \
-  $(srcdir)/Page.h \
-  $(srcdir)/Decrypt.h \
-  $(srcdir)/Error.h \
-  $(srcdir)/config.h \
-  $(srcdir)/GlobalParams.h \
-  $(srcdir)/CharTypes.h \
-  $(srcdir)/SecurityHandler.h
 Stream.o: $(srcdir)/Stream.cc ../aconf.h \
   $(srcdirparent)/aconf2.h \
   $(goodir)/gmem.h \

@@ -26,7 +26,9 @@ class OutputDev;
 class Links;
 class LinkAction;
 class LinkDest;
+#ifndef DISABLE_OUTLINE
 class Outline;
+#endif
 
 //------------------------------------------------------------------------
 // PDFDoc
@@ -92,6 +94,7 @@ public:
 		   GBool (*abortCheckCbk)(void *data) = NULL,
 		   void *abortCheckCbkData = NULL);
 
+#ifndef PDF_PARSER_ONLY
   // Display a range of pages.
   void displayPages(OutputDev *out, int firstPage, int lastPage,
 		    double hDPI, double vDPI, int rotate,
@@ -106,6 +109,7 @@ public:
 			int sliceX, int sliceY, int sliceW, int sliceH,
 			GBool (*abortCheckCbk)(void *data) = NULL,
 			void *abortCheckCbkData = NULL);
+#endif
 
   // Find a page, given its object ID.  Returns page number, or 0 if
   // not found.
@@ -120,8 +124,10 @@ public:
   LinkDest *findDest(GString *name)
     { return catalog->findDest(name); }
 
+#ifndef PDF_PARSER_ONLY
   // Process the links for a page.
   void processLinks(OutputDev *out, int page);
+#endif
 
 #ifndef DISABLE_OUTLINE
   // Return the outline object.

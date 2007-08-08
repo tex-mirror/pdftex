@@ -1340,6 +1340,7 @@ void GlobalParams::parseUnicodeMap(GList *tokens, GString *fileName,
   unicodeMaps->add(encodingName->copy(), name->copy());
 }
 
+#ifndef PDF_PARSER_ONLY
 void GlobalParams::parseCMapDir(GList *tokens, GString *fileName, int line) {
   GString *collection, *dir;
   GList *list;
@@ -1357,6 +1358,7 @@ void GlobalParams::parseCMapDir(GList *tokens, GString *fileName, int line) {
   }
   list->append(dir->copy());
 }
+#endif
 
 void GlobalParams::parseToUnicodeDir(GList *tokens, GString *fileName,
 				     int line) {
@@ -2993,6 +2995,7 @@ void GlobalParams::setErrQuiet(GBool errQuietA) {
   unlockGlobalParams;
 }
 
+#ifndef PDF_PARSER_ONLY
 void GlobalParams::addSecurityHandler(XpdfSecurityHandler *handler) {
 #ifdef ENABLE_PLUGINS
   lockGlobalParams;
@@ -3033,6 +3036,7 @@ XpdfSecurityHandler *GlobalParams::getSecurityHandler(char *name) {
 
   return NULL;
 }
+#endif
 
 #ifdef ENABLE_PLUGINS
 //------------------------------------------------------------------------
