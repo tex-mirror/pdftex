@@ -13,9 +13,8 @@ BuiltinFont.o: $(srcdir)/BuiltinFont.cc ../aconf.h \
   $(srcdir)/FontEncodingTables.h \
   $(srcdir)/BuiltinFont.h \
   $(goodir)/gtypes.h
-BuiltinFontTables.o:  \
- $(srcdir)/BuiltinFontTables.cc ../aconf.h \
-  $(srcdirparent)/aconf2.h \
+BuiltinFontTables.o: $(srcdir)/BuiltinFontTables.cc \
+  ../aconf.h $(srcdirparent)/aconf2.h \
   $(srcdir)/FontEncodingTables.h \
   $(srcdir)/BuiltinFontTables.h \
   $(srcdir)/BuiltinFont.h \
@@ -35,9 +34,8 @@ Catalog.o: $(srcdir)/Catalog.cc ../aconf.h \
   $(srcdir)/config.h \
   $(srcdir)/Link.h \
   $(srcdir)/Catalog.h
-CharCodeToUnicode.o:  \
- $(srcdir)/CharCodeToUnicode.cc ../aconf.h \
-  $(srcdirparent)/aconf2.h \
+CharCodeToUnicode.o: $(srcdir)/CharCodeToUnicode.cc \
+  ../aconf.h $(srcdirparent)/aconf2.h \
   $(goodir)/gmem.h \
   $(goodir)/gfile.h \
   $(goodir)/gtypes.h \
@@ -65,7 +63,11 @@ Decrypt.o: $(srcdir)/Decrypt.cc ../aconf.h \
   $(goodir)/gmem.h \
   $(srcdir)/Decrypt.h \
   $(goodir)/gtypes.h \
-  $(goodir)/GString.h
+  $(goodir)/GString.h \
+  $(srcdir)/Object.h \
+  $(srcdir)/Array.h \
+  $(srcdir)/Dict.h \
+  $(srcdir)/Stream.h
 Dict.o: $(srcdir)/Dict.cc ../aconf.h \
   $(srcdirparent)/aconf2.h \
   $(goodir)/gmem.h \
@@ -99,26 +101,6 @@ Function.o: $(srcdir)/Function.cc ../aconf.h \
   $(srcdir)/Error.h \
   $(srcdir)/config.h \
   $(srcdir)/Function.h
-Gfx.o: $(srcdir)/Gfx.cc ../aconf.h \
-  $(srcdirparent)/aconf2.h \
-  $(goodir)/gmem.h \
-  $(srcdir)/GlobalParams.h \
-  $(goodir)/gtypes.h \
-  $(srcdir)/CharTypes.h \
-  $(srcdir)/Object.h \
-  $(goodir)/GString.h \
-  $(srcdir)/Array.h \
-  $(srcdir)/Dict.h \
-  $(srcdir)/Stream.h \
-  $(srcdir)/Lexer.h \
-  $(srcdir)/Parser.h \
-  $(srcdir)/GfxFont.h \
-  $(srcdir)/GfxState.h \
-  $(srcdir)/Function.h \
-  $(srcdir)/Page.h \
-  $(srcdir)/Error.h \
-  $(srcdir)/config.h \
-  $(srcdir)/Gfx.h
 GfxFont.o: $(srcdir)/GfxFont.cc ../aconf.h \
   $(srcdirparent)/aconf2.h \
   $(goodir)/gmem.h \
@@ -156,8 +138,8 @@ GfxState.o: $(srcdir)/GfxState.cc ../aconf.h \
   $(srcdir)/Page.h \
   $(srcdir)/GfxState.h \
   $(srcdir)/Function.h
-GlobalParams.o: $(srcdir)/GlobalParams.cc \
-  ../aconf.h $(srcdirparent)/aconf2.h \
+GlobalParams.o: $(srcdir)/GlobalParams.cc ../aconf.h \
+  $(srcdirparent)/aconf2.h \
   $(goodir)/gmem.h \
   $(goodir)/GString.h \
   $(goodir)/GList.h \
@@ -273,6 +255,7 @@ Page.o: $(srcdir)/Page.cc ../aconf.h \
   $(srcdir)/Link.h \
   $(srcdir)/Error.h \
   $(srcdir)/config.h \
+  $(srcdir)/Catalog.h \
   $(srcdir)/Page.h
 Parser.o: $(srcdir)/Parser.cc ../aconf.h \
   $(srcdirparent)/aconf2.h \
@@ -283,12 +266,12 @@ Parser.o: $(srcdir)/Parser.cc ../aconf.h \
   $(srcdir)/Array.h \
   $(srcdir)/Dict.h \
   $(srcdir)/Stream.h \
+  $(srcdir)/Decrypt.h \
   $(srcdir)/Parser.h \
   $(srcdir)/Lexer.h \
   $(srcdir)/XRef.h \
   $(srcdir)/Error.h \
-  $(srcdir)/config.h \
-  $(srcdir)/Decrypt.h
+  $(srcdir)/config.h
 PDFDoc.o: $(srcdir)/PDFDoc.cc ../aconf.h \
   $(srcdirparent)/aconf2.h \
   $(goodir)/GString.h \
@@ -330,7 +313,6 @@ Stream.o: $(srcdir)/Stream.cc ../aconf.h \
   $(srcdir)/Dict.h \
   $(srcdir)/Stream.h \
   $(srcdir)/Lexer.h \
-  $(srcdir)/Decrypt.h \
   $(srcdir)/GfxState.h \
   $(srcdir)/Function.h \
   $(srcdir)/JBIG2Stream.h \
