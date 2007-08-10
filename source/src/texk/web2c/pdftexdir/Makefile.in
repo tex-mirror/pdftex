@@ -40,7 +40,8 @@ XCPPFLAGS=-I.. -I$(srcdir)/.. -I../.. -I$(srcdir)/../.. -I$(LIBMD5DIR) \
 
 OBJS = epdf.o mapfile.o utils.o vfpacket.o pkin.o \
 writefont.o writet1.o writet3.o writezip.o writeenc.o writettf.o \
-writejpg.o writejbig2.o writepng.o writeimg.o pdftoepdf.o avl.o avlstuff.o subfont.o tounicode.o
+writejpg.o writejbig2.o writepng.o writeimg.o pdftoepdf.o avl.o \
+avlstuff.o subfont.o tounicode.o pdflib.o
 
 all: libpdf.a
 

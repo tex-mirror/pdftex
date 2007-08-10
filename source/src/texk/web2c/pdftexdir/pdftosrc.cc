@@ -25,46 +25,33 @@ $Id$
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <aconf.h>
 #include <assert.h>
-#include <GString.h>
-#include <gmem.h>
-#include <gfile.h>
-#include "Object.h"
-#include "Stream.h"
-#include "Array.h"
-#include "Dict.h"
-#include "XRef.h"
-#include "Catalog.h"
-#include "Page.h"
-#include "GfxFont.h"
-#include "PDFDoc.h"
-#include "GlobalParams.h"
-#include "Error.h"
 
-static XRef *xref = 0;
+#include "pdflib.h"
+
+static p_XRef *xref = 0;
 
 int main(int argc, char *argv[])
 {
     char *p, buf[1024];
-    PDFDoc *doc;
-    GString *fileName;
-    Stream *s;
-    Object srcStream, srcName, catalogDict;
+    p_PDFDoc *doc;
+    p_GString *fileName;
+    p_Stream *s;
+    p_Object srcStream, catalogDict, srcName;
     FILE *outfile;
     char *outname;
     int objnum = 0, objgen = 0;
     bool extract_xref_table = false;
     int c;
-    fprintf(stderr, "pdftosrc version %s\n", xpdfVersion);
+    fprintf(stderr, "pdftosrc version %s\n", getPDFLibVersion());
     if (argc < 2) {
         fprintf(stderr,
                 "Usage: pdftosrc <PDF-file> [<stream-object-number>]\n");
         exit(1);
     }
-    fileName = new GString(argv[1]);
-    globalParams = new GlobalParams();
-    doc = new PDFDoc(fileName);
+    fileName = new p_GString(argv[1]);
+    initGlobalParams();
+    doc = new p_PDFDoc(fileName);
     if (!doc->isOk()) {
         fprintf(stderr, "Invalid PDF file\n");
         exit(1);
@@ -89,7 +76,8 @@ int main(int argc, char *argv[])
             exit(1);
         }
         srcName.initNull();
-        srcStream.getStream()->getDict()->lookup("SourceName", &srcName);
+        //srcStream.getStream()->getDict()->lookup("SourceName", &srcName);
+        srcStream.getStream()->Dict_lookup("SourceName", &srcName);
         if (!srcName.isString()) {
             fprintf(stderr, "No SourceName found\n");
             exit(1);
@@ -142,10 +130,10 @@ int main(int argc, char *argv[])
             else {              // e->offset is the object number of the object stream
                 // e->gen is the local index inside that object stream
                 //int objStrOffset = xref->getEntry(e->offset)->offset;
-                Object tmpObj;
+                p_Object tmpObj;
 
                 xref->fetch(i, e->gen, &tmpObj);        // to ensure xref->objStr is set
-                ObjectStream *objStr = xref->getObjStr();
+                p_ObjectStream *objStr = xref->getObjStr();
                 assert(objStr != NULL);
                 int *localOffsets = objStr->getOffsets();
                 assert(localOffsets != NULL);
@@ -174,5 +162,5 @@ int main(int argc, char *argv[])
     fclose(outfile);
     catalogDict.free();
     delete doc;
-    delete globalParams;
+    deleteGlobalParams();
 }

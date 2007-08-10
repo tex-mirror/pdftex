@@ -27,26 +27,11 @@ $Id$
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <goo/gmem.h>
-#include <goo/GString.h>
-#include <goo/gfile.h>
-#include <xpdf/aconf.h>
-#include <xpdf/Object.h>
-#include <xpdf/Array.h>
-#include <xpdf/Dict.h>
-#include <xpdf/GfxFont.h>
-#include <xpdf/GlobalParams.h>
-#include <xpdf/Link.h>
-#include <xpdf/Page.h>
-#include <xpdf/PDFDoc.h>
-#include <xpdf/Stream.h>
-#include <xpdf/XRef.h>
+#include "pdflib.h"
 
 #include "epdf.h"
 
-extern "C" {
-    extern integer getpdfsuppressptexinfo();
-}
+extern "C" integer getpdfsuppressptexinfo();
 
 // This file is mostly C and not very much C++; it's just used to interface
 // the functions of xpdf, which happens to be written in C++.
@@ -74,11 +59,11 @@ extern "C" {
 #define MASK_PTEX_PAGENUMBER 0x04
 #define MASK_PTEX_INFODICT   0x08
 
-// PdfObject encapsulates the xpdf Object type,
+// PdfObject encapsulates the xpdf p_Object type,
 // and properly frees its resources on destruction.
-// Use obj-> to access members of the Object,
+// Use obj-> to access members of the p_Object,
 // and &obj to get a pointer to the object.
-// It is no longer necessary to call Object::free explicitely.
+// It is no longer necessary to call p_Object::free explicitely.
 
 /* *INDENT-OFF* */
 class PdfObject {
@@ -88,17 +73,17 @@ class PdfObject {
     ~PdfObject() {
         iObject.free();
     }
-    Object *operator->() {
+    p_Object *operator->() {
         return &iObject;
     }
-    Object *operator&() {
+    p_Object *operator&() {
         return &iObject;
     }
   private:                     // no copying or assigning
     PdfObject(const PdfObject &);
     void operator=(const PdfObject &);
   public:
-    Object iObject;
+    p_Object iObject;
 };
 /* *INDENT-ON* */
 
@@ -126,7 +111,7 @@ struct InObj {
 
 struct UsedEncoding {
     integer enc_objnum;
-    GfxFont *font;
+    p_GfxFont *font;
     UsedEncoding *next;
 };
 
@@ -140,8 +125,8 @@ static GBool isInit = gFalse;
 
 struct PdfDocument {
     char *file_name;
-    PDFDoc *doc;
-    XRef *xref;
+    p_PDFDoc *doc;
+    p_XRef *xref;
     InObj *inObjList;
     int occurences;             // number of references to the document; the doc can be
     // deleted when this is negative
@@ -150,7 +135,7 @@ struct PdfDocument {
 
 static PdfDocument *pdfDocuments = 0;
 
-static XRef *xref = 0;
+static p_XRef *xref = 0;
 
 // Returns pointer to PdfDocument record for PDF file.
 // Creates a new record if it doesn't exist yet.
@@ -178,10 +163,10 @@ static PdfDocument *find_add_document(char *file_name)
     fprintf(stderr, "\npdfTeX Debug: Creating %s (%d)\n", p->file_name,
             p->occurences);
 #endif
-    GString *docName = new GString(p->file_name);
-    p->doc = new PDFDoc(docName);       // takes ownership of docName
+    p_GString *docName = new p_GString(p->file_name);
+    p->doc = new p_PDFDoc(docName);     // takes ownership of docName
     if (!p->doc->isOk() || !p->doc->okToPrint()) {
-        pdftex_fail("xpdf: reading PDF image failed");
+        pdftex_fail("%s: reading PDF image failed", getPDFLibName());
     }
     p->inObjList = 0;
     p->next = pdfDocuments;
@@ -216,18 +201,18 @@ static void delete_document(PdfDocument * pdf_doc)
 // Replacement for
 //      Object *initDict(Dict *dict1){ initObj(objDict); dict = dict1; return this; }
 
-static void initDictFromDict(PdfObject & obj, Dict * dict)
+static void initDictFromDict(PdfObject & obj, p_Dict * dict)
 {
     obj->initDict(xref);
     for (int i = 0, l = dict->getLength(); i < l; i++) {
-        Object obj1;
+        p_Object obj1;
         obj->dictAdd(copyString(dict->getKey(i)), dict->getValNF(i, &obj1));
     }
 }
 
 // --------------------------------------------------------------------
 
-static int addEncoding(GfxFont * gfont)
+static int addEncoding(p_GfxFont * gfont)
 {
     UsedEncoding *n;
     n = new UsedEncoding;
@@ -298,7 +283,7 @@ static int getNewObjectNumber(Ref ref)
     }
 }
 
-static void copyObject(Object *);
+static void copyObject(p_Object *);
 
 static void copyName(char *s)
 {
@@ -312,7 +297,7 @@ static void copyName(char *s)
     }
 }
 
-static void copyDictEntry(Object * obj, int i)
+static void copyDictEntry(p_Object * obj, int i)
 {
     PdfObject obj1;
     copyName(obj->dictGetKey(i));
@@ -322,7 +307,7 @@ static void copyDictEntry(Object * obj, int i)
     pdf_puts("\n");
 }
 
-static void copyDict(Object * obj)
+static void copyDict(p_Object * obj)
 {
     int i, l;
     if (!obj->isDict())
@@ -332,7 +317,7 @@ static void copyDict(Object * obj)
         copyDictEntry(obj, i);
 }
 
-static void copyFontDict(Object * obj, InObj * r)
+static void copyFontDict(p_Object * obj, InObj * r)
 {
     int i, l;
     char *key;
@@ -356,7 +341,7 @@ static void copyFontDict(Object * obj, InObj * r)
     pdf_puts(">>");
 }
 
-static void copyStream(Stream * str)
+static void copyStream(p_Stream * str)
 {
     int c;
     str->reset();
@@ -365,7 +350,7 @@ static void copyStream(Stream * str)
     pdflastbyte = pdfbuf[pdfptr - 1];
 }
 
-static void copyProcSet(Object * obj)
+static void copyProcSet(p_Object * obj)
 {
     int i, l;
     PdfObject procset;
@@ -386,11 +371,11 @@ static void copyProcSet(Object * obj)
 
 #define REPLACE_TYPE1C true
 
-static void copyFont(char *tag, Object * fontRef)
+static void copyFont(char *tag, p_Object * fontRef)
 {
     PdfObject fontdict, subtype, basefont, fontdescRef, fontdesc, charset,
         fontfile, ffsubtype;
-    GfxFont *gfont;
+    p_GfxFont *gfont;
     fd_entry *fd;
     fm_entry *fontmap;
     // Check whether the font has already been embedded before analysing it.
@@ -426,8 +411,8 @@ static void copyFont(char *tag, Object * fontRef)
             embed_whole_font(fd);
         addFontDesc(fontdescRef->getRef(), fd);
         copyName(tag);
-        gfont = GfxFont::makeFont(xref, tag, fontRef->getRef(),
-                                  fontdict->getDict());
+        gfont = p_GfxFont::makeFont(xref, tag, fontRef->getRef(),
+                                    fontdict->getDict());
         pdf_printf(" %d 0 R ", addFont(fontRef->getRef(), fd,
                                        addEncoding(gfont)));
     } else {
@@ -437,7 +422,7 @@ static void copyFont(char *tag, Object * fontRef)
     }
 }
 
-static void copyFontResources(Object * obj)
+static void copyFontResources(p_Object * obj)
 {
     PdfObject fontRef;
     int i, l;
@@ -456,7 +441,7 @@ static void copyFontResources(Object * obj)
     pdf_puts(">>\n");
 }
 
-static void copyOtherResources(Object * obj, char *key)
+static void copyOtherResources(p_Object * obj, char *key)
 {
     // copies all other resources (write_epdf handles Fonts and ProcSets),
     // but gives a warning if an object is not a dictionary.
@@ -529,13 +514,13 @@ static char *convertNumToPDF(double n)
     return (char *) buf;
 }
 
-static void copyObject(Object * obj)
+static void copyObject(p_Object * obj)
 {
     PdfObject obj1;
     int i, l, c;
     Ref ref;
     char *p;
-    GString *s;
+    p_GString *s;
     if (obj->isBool()) {
         pdf_printf("%s", obj->getBool()? "true" : "false");
     } else if (obj->isInt()) {
@@ -592,7 +577,7 @@ static void copyObject(Object * obj)
         copyDict(&obj1);
         pdf_puts(">>\n");
         pdf_puts("stream\n");
-        copyStream(obj->getStream()->getBaseStream());
+        copyStream(obj->getBaseStream());
         if (pdflastbyte != '\n')
             pdf_puts("\n");
         pdf_puts("endstream");  // can't simply write pdfendstream()
@@ -615,7 +600,7 @@ static void writeRefs()
     InObj *r;
     for (r = inObjList; r != 0; r = r->next) {
         if (!r->written) {
-            Object obj1;
+            p_Object obj1;
             r->written = 1;
             xref->fetch(r->ref.num, r->ref.gen, &obj1);
             if (r->type == objFont) {
@@ -650,7 +635,7 @@ static void writeEncodings()
                     ("PDF inclusion: CID fonts are not supported"
                      " (try to disable font replacement to fix this)");
             }
-            if ((s = ((Gfx8BitFont *) r->font)->getCharName(i)) != 0)
+            if ((s = ((p_Gfx8BitFont *) r->font)->getCharName(i)) != 0)
                 glyphNames[i] = s;
             else
                 glyphNames[i] = notdef;
@@ -665,7 +650,7 @@ static void writeEncodings()
 }
 
 // get the pagebox according to the pagebox_spec
-static PDFRectangle *get_pagebox(Page * page, integer pagebox_spec)
+static p_PDFRectangle *get_pagebox(p_Page * page, integer pagebox_spec)
 {
     if (pagebox_spec == pdfboxspecmedia)
         return page->getMediaBox();
@@ -686,7 +671,7 @@ static PDFRectangle *get_pagebox(Page * page, integer pagebox_spec)
 // Helper for read_pdf_info
 void read_layer_infos(PdfDocument * pdf_doc)
 {
-    Object ocProperties, catDict;
+    p_Object ocProperties, catDict;
 
     set_pdf_includelayers(0);
     pdflayernames_init();
@@ -694,7 +679,7 @@ void read_layer_infos(PdfDocument * pdf_doc)
     pdf_doc->xref->getCatalog(&catDict);
     catDict.dictLookup("OCProperties", &ocProperties);
     if (ocProperties.isDict()) {
-        Object ocgs, ref, ocg, ocgName;
+        p_Object ocgs, ref, ocg, ocgName;
         int i, l, new_number;
         ocProperties.dictLookup("OCGs", &ocgs);
         if (ocgs.isArray()) {
@@ -743,15 +728,14 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
               integer pdf_inclusion_errorlevel)
 {
     PdfDocument *pdf_doc;
-    Page *page;
+    p_Page *page;
     int rotate;
-    PDFRectangle *pagebox;
+    p_PDFRectangle *pagebox;
     float pdf_version_found, pdf_version_wanted;
     // initialize
     if (!isInit) {
-        globalParams = new GlobalParams();
-        globalParams->setErrQuiet(gFalse);
-        isInit = gTrue;
+        initGlobalParams();
+        globalParams_setErrQuiet(gFalse);
     }
     // open PDF file
     pdf_doc = find_add_document(image_name);
@@ -775,8 +759,8 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
     epdf_num_pages = pdf_doc->doc->getCatalog()->getNumPages();
     if (page_name) {
         // get page by name
-        GString name(page_name);
-        LinkDest *link = pdf_doc->doc->findDest(&name);
+        p_GString name(page_name);
+        p_LinkDest *link = pdf_doc->doc->findDest(&name);
         if (link == 0 || !link->isOk())
             pdftex_fail("PDF inclusion: invalid destination <%s>", page_name);
         Ref ref = link->getPageRef();
@@ -845,10 +829,10 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
 
 void write_epdf(void)
 {
-    Page *page;
+    p_Page *page;
     PdfObject contents, obj1, obj2;
     PdfObject group, metadata, pieceinfo, separationInfo;
-    Object info;
+    p_Object info;
     char *key;
     char s[256];
     int i, l;
@@ -867,7 +851,7 @@ void write_epdf(void)
     encodingList = 0;
     page = pdf_doc->doc->getCatalog()->getPage(epdf_selected_page);
     rotate = page->getRotate();
-    PDFRectangle *pagebox;
+    p_PDFRectangle *pagebox;
     // write the Page header
     pdf_puts("/Type /XObject\n");
     pdf_puts("/Subtype /Form\n");
@@ -880,7 +864,8 @@ void write_epdf(void)
                                             strlen(pdf_doc->file_name)));
     }
     if ((ptex_info & MASK_PTEX_PAGENUMBER) == 0) {
-        pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, (int) epdf_selected_page);
+        pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix,
+                   (int) epdf_selected_page);
     }
     if ((ptex_info & MASK_PTEX_INFODICT) == 0) {
         pdf_doc->doc->getDocInfoNF(&info);
@@ -1022,12 +1007,12 @@ void write_epdf(void)
         contents->streamGetDict()->incRef();
         copyDict(&obj1);
         pdf_puts(">>\nstream\n");
-        copyStream(contents->getStream()->getBaseStream());
+        copyStream(contents->getBaseStream());
         pdfendstream();
     } else if (contents->isArray()) {
         pdfbeginstream();
         for (i = 0, l = contents->arrayGetLength(); i < l; ++i) {
-            Object contentsobj;
+            p_Object contentsobj;
             copyStream((contents->arrayGet(i, &contentsobj))->getStream());
             contentsobj.free();
         }
@@ -1072,7 +1057,7 @@ void epdf_check_mem()
             delete_document(p);
         }
         // see above for globalParams
-        delete globalParams;
+        deleteGlobalParams();
     }
 }
 

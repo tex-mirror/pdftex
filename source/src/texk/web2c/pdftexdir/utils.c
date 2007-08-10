@@ -38,7 +38,7 @@ $Id$
 #include "zlib.h"
 #include "ptexlib.h"
 #include "png.h"
-#include "xpdf/config.h"        /* just to get the xpdf version */
+#include "pdflib.h"
 
 #define check_nprintf(size_get, size_want) \
     if ((unsigned)(size_get) >= (unsigned)(size_want)) \
@@ -1269,9 +1269,10 @@ void initversionstring(char **versions)
     (void) asprintf(versions,
                     "Compiled with libpng %s; using libpng %s\n"
                     "Compiled with zlib %s; using zlib %s\n"
-                    "Compiled with xpdf version %s\n",
+                    "Compiled with %s version %s\n",
                     PNG_LIBPNG_VER_STRING, png_libpng_ver,
-                    ZLIB_VERSION, zlib_version, xpdfVersion);
+                    ZLIB_VERSION, zlib_version, getPDFLibName(),
+                    getPDFLibVersion());
 }
 
 

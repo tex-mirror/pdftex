@@ -9,7 +9,7 @@ utils.o: utils.c ptexlib.h ../pdftexd.h ../texmfmp.h ../cpascal.h \
  ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h ptexmac.h \
  ../../../libs/zlib/zlib.h ../../../libs/zlib/zconf.h \
  ../../../libs/md5/md5.h pdftexextra.h \
- ../../../libs/obsdcompat/openbsd-compat.h
+ ../../../libs/obsdcompat/openbsd-compat.h pdflib.h
 vfpacket.o: vfpacket.c ptexlib.h ../pdftexd.h ../texmfmp.h \
  ../cpascal.h ../config.h ../help.h ../texmfmem.h ../pdftexcoerce.h \
  ptexmac.h
@@ -45,9 +45,10 @@ pdftoepdf.o: pdftoepdf.cc ../../../libs/xpdf/xpdf/Object.h \
  ../../../libs/xpdf/xpdf/Dict.h ../../../libs/xpdf/xpdf/Stream.h \
  ../../../libs/xpdf/xpdf/XRef.h ../../../libs/xpdf/xpdf/Catalog.h \
  ../../../libs/xpdf/xpdf/Page.h ../../../libs/xpdf/xpdf/GfxFont.h \
- ../../../libs/xpdf/xpdf/Error.h epdf.h
+ ../../../libs/xpdf/xpdf/Error.h epdf.h pdflib.h
+pdflib.o: pdflib.cc pdflib.h
 ttf2afm.o: ttf2afm.c writettf.h macnames.c
-pdftosrc.o: pdftosrc.cc ../../../libs/xpdf/xpdf/Object.h \
+pdftosrc.o: pdftosrc.cc pdflib.h ../../../libs/xpdf/xpdf/Object.h \
  ../../../libs/xpdf/xpdf/Array.h ../../../libs/xpdf/xpdf/Dict.h \
  ../../../libs/xpdf/xpdf/Stream.h ../../../libs/xpdf/xpdf/XRef.h \
  ../../../libs/xpdf/xpdf/Catalog.h ../../../libs/xpdf/xpdf/Page.h \

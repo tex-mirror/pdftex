@@ -155,8 +155,8 @@ ttf2afm-clean:
 # pdftosrc
 pdftosrc = pdftosrc
 
-pdftosrc: $(pdftexdir)/pdftosrc.o $(LIBXPDFDEP)
-	@CXXHACKLINK@ $(pdftexdir)/pdftosrc.o $(LDLIBXPDF) -lm @CXXLDEXTRA@
+pdftosrc: $(pdftexdir)/pdftosrc.o $(pdftexdir)/pdflib.o $(LIBXPDFDEP)
+	@CXXHACKLINK@ $(pdftexdir)/pdftosrc.o $(pdftexdir)/pdflib.o $(LDLIBXPDF) -lm @CXXLDEXTRA@
 $(pdftexdir)/pdftosrc.o:$(srcdir)/$(pdftexdir)/pdftosrc.cc
 	cd $(pdftexdir) && $(MAKE) pdftosrc.o
 check: pdftosrc-check
