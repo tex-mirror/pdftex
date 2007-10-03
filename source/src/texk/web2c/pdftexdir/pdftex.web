@@ -288,7 +288,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20070806' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20070917' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -5674,7 +5674,8 @@ that will be defined later.
 @d last_line_fit_code=etex_int_base+6 {adjustment for last line of paragraph}
 @d saving_vdiscards_code=etex_int_base+7 {save items discarded from vlists}
 @d saving_hyph_codes_code=etex_int_base+8 {save hyphenation codes for languages}
-@d eTeX_state_code=etex_int_base+9 {\eTeX\ state variables}
+@d suppress_fontnotfound_error_code=etex_int_base+9 {surpress errors for missing fonts}
+@d eTeX_state_code=etex_int_base+10 {\eTeX\ state variables}
 @d etex_int_pars=eTeX_state_code+eTeX_states {total number of \eTeX's integer parameters}
 @#
 @d int_pars=etex_int_pars {total number of integer parameters}
@@ -5779,6 +5780,7 @@ that will be defined later.
 @d last_line_fit==int_par(last_line_fit_code)
 @d saving_vdiscards==int_par(saving_vdiscards_code)
 @d saving_hyph_codes==int_par(saving_hyph_codes_code)
+@d suppress_fontnotfound_error==int_par(suppress_fontnotfound_error_code)
 
 @<Assign the values |depth_threshold:=show_box_depth|...@>=
 depth_threshold:=show_box_depth;
@@ -12917,7 +12919,9 @@ begin g:=null_font;@/
 @<Read and check the font data; |abort| if the \.{TFM} file is
   malformed; if there's no room for this font, say so and |goto
   done|; otherwise |incr(font_ptr)| and |goto done|@>;
-bad_tfm: @<Report that the font won't be loaded@>;
+bad_tfm: if suppress_fontnotfound_error=0 then begin 
+  @<Report that the font won't be loaded@>; 
+  end;
 done: if file_opened then b_close(tfm_file);
 read_font_info:=g;
 end;
@@ -36144,6 +36148,8 @@ primitive("savingvdiscards",assign_int,int_base+saving_vdiscards_code);@/
 @!@:saving_vdiscards_}{\.{\\savingvdiscards} primitive@>
 primitive("savinghyphcodes",assign_int,int_base+saving_hyph_codes_code);@/
 @!@:saving_hyph_codes_}{\.{\\savinghyphcodes} primitive@>
+primitive("suppressfontnotfounderror",assign_int,int_base+suppress_fontnotfound_error_code);@/
+@!@:suppress_fontnotfound_error_codes_}{\.{\\suppressfontnotfounderror} primitive@>
 
 @ @d every_eof==equiv(every_eof_loc)
 
@@ -36160,6 +36166,7 @@ pre_display_direction_code:print_esc("predisplaydirection");
 last_line_fit_code:print_esc("lastlinefit");
 saving_vdiscards_code:print_esc("savingvdiscards");
 saving_hyph_codes_code:print_esc("savinghyphcodes");
+suppress_fontnotfound_error_code:print_esc("suppressfontnotfounderror");
 
 @ In order to handle \.{\\everyeof} we need an array |eof_seen| of
 boolean variables.
