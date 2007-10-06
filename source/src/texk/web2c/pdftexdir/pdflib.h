@@ -253,18 +253,25 @@ class p_Object:private Object {
 
 class p_ObjectStream:private ObjectStream {
   public:
+    p_ObjectStream(p_XRef * xref, int objStrNumA):ObjectStream((XRef *) xref,
+                                                               objStrNumA) {
+    };
     int *getOffsets() {
         return ObjectStream::getOffsets();
-    } Guint getFirstOffset() {
+    }
+    Guint getFirstOffset() {
         return ObjectStream::getFirstOffset();
     }
 };
 
 class p_XRef:private XRef {
   public:
-    p_Object * getCatalog(p_Object * obj) {
+    p_XRef(BaseStream * strA):XRef(strA) {
+    };
+    p_Object *getCatalog(p_Object * obj) {
         return (p_Object *) XRef::getCatalog((Object *) obj);
-    } p_Object *fetch(int num, int gen, p_Object * obj) {
+    }
+    p_Object *fetch(int num, int gen, p_Object * obj) {
         return (p_Object *) XRef::fetch(num, gen, (Object *) obj);
     }
     int getSize() {
@@ -280,9 +287,12 @@ class p_XRef:private XRef {
 
 class p_Dict:private Dict {
   public:
+    p_Dict(p_XRef * xrefA):Dict((XRef *) xrefA) {
+    };
     int incRef() {
         return Dict::incRef();
-    } int getLength() {
+    }
+    int getLength() {
         return Dict::getLength();
     }
     p_Object *lookup(char *key, p_Object * obj) {
@@ -306,9 +316,12 @@ class p_Stream:private Stream {
 
 class p_LinkDest:private LinkDest {
   public:
+    p_LinkDest(Array * a):LinkDest(a) {
+    };
     GBool isOk() {
         return LinkDest::isOk();
-    } Ref getPageRef() {
+    }
+    Ref getPageRef() {
         return LinkDest::getPageRef();
     }
 };
@@ -323,9 +336,14 @@ class p_PDFRectangle:private PDFRectangle {
 
 class p_Page:private Page {
   public:
-    p_PDFRectangle * getMediaBox() {
+    p_Page(p_XRef * xrefA, int numA, p_Dict * pageDict,
+           PageAttrs * attrsA):Page((XRef *) xrefA, numA, (Dict *) pageDict,
+                                    attrsA) {
+    };
+    p_PDFRectangle *getMediaBox() {
         return (p_PDFRectangle *) Page::getMediaBox();
-    } p_PDFRectangle *getCropBox() {
+    }
+    p_PDFRectangle *getCropBox() {
         return (p_PDFRectangle *) Page::getCropBox();
     }
     p_PDFRectangle *getBleedBox() {
@@ -362,9 +380,12 @@ class p_Page:private Page {
 
 class p_Catalog:private Catalog {
   public:
+    p_Catalog(p_XRef * xrefA):Catalog((XRef *) xrefA) {
+    };
     int getNumPages() {
         return Catalog::getNumPages();
-    } p_Page *getPage(int i) {
+    }
+    p_Page *getPage(int i) {
         return (p_Page *) Catalog::getPage(i);
     }
     int findPage(int num, int gen) {
@@ -378,13 +399,24 @@ class p_GfxFont:private GfxFont {
                                p_Dict * fontDict) {
         return (p_GfxFont *) GfxFont::makeFont((XRef *) xref, tagA, idA,
                                                (Dict *) fontDict);
-    } virtual GBool isCIDFont() {
+    }
+    p_GfxFont(char *tagA, Ref idA, p_GString * nameA):GfxFont(tagA, idA,
+                                                              (GString *)
+                                                              nameA) {
+    };
+    virtual GBool isCIDFont() {
         return gFalse;
     }
 };
 
 class p_Gfx8BitFont:private Gfx8BitFont {
   public:
+    p_Gfx8BitFont(p_XRef * xref, char *tagA, Ref idA, p_GString * nameA,
+                  GfxFontType typeA,
+                  p_Dict * fontDict):Gfx8BitFont((XRef *) xref, tagA, idA,
+                                                 (GString *) nameA, typeA,
+                                                 (Dict *) fontDict) {
+    };
     char *getCharName(int code) {
         return Gfx8BitFont::getCharName(code);
     }
