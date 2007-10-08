@@ -166,7 +166,8 @@ static PdfDocument *find_add_document(char *file_name)
     p_GString *docName = new p_GString(p->file_name);
     p->doc = new p_PDFDoc(docName);     // takes ownership of docName
     if (!p->doc->isOk() || !p->doc->okToPrint()) {
-        pdftex_fail("%s: reading PDF image failed", getPDFLibName());
+        pdftex_fail("%s: reading PDF image failed (%i)", getPDFLibName(),
+                    p->doc->isOk());
     }
     p->inObjList = 0;
     p->next = pdfDocuments;
@@ -696,6 +697,7 @@ void read_layer_infos(PdfDocument * pdf_doc)
                         } else {
                             pdftex_fail("Empty layername in OCG");
                         }
+                        addOther(ref.getRef()); // make sure the object is copied
                         new_number = getNewObjectNumber(ref.getRef());
                         pdflayer_object_numbers_append(new_number);
                         /*
