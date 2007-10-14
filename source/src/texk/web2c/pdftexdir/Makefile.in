@@ -57,11 +57,8 @@ kpse_include ../make/clean.mk
 clean::
 	rm -f libpdf.a ttf2afm pdftosrc
 
-# this is broken
-# depend:
-#	rm -f $(OBJS) ttf2afm.o pdftosrc.o
-#	XXCFLAGS=-MM XCFLAGS=-MM $(MAKE) -k $(OBJS) ttf2afm.o pdftosrc.o | \
-#	    grep -v "^$(CC)\|$(CXX)\|$(AR)\|make\" | \
-#	    sed 's: [^ ]*/\.\./libs/[^ ]*::g' > $(srcdir)/depend.mk
+depend:
+	$(CXX) -MM $(ALL_CPPFLAGS) $(srcdir)/*.c | \
+	  cat >$(srcdir)/depend.mk
 
 kpse_include pdftexdir/depend.mk
