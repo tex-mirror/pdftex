@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.19 August 19, 2007
+ * Last changed in libpng 1.2.22 [October 13, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1673,7 +1673,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       buf++; /* Skip the null string terminator from previous parameter. */
 
       png_debug1(3, "Reading pCAL parameter %d\n", i);
-      for (params[i] = buf; *buf != 0x00 && buf <= endptr; buf++)
+      for (params[i] = buf; buf <= endptr && *buf != 0x00; buf++)
          /* Empty loop to move past each parameter string */ ;
 
       /* Make sure we haven't run out of data yet */
@@ -1770,6 +1770,17 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    for (ep = buffer; *ep; ep++)
       /* empty loop */ ;
    ep++;
+
+   if (buffer + slength < ep)
+   {
+       png_warning(png_ptr, "Truncated sCAL chunk");
+#if defined(PNG_FIXED_POINT_SUPPORTED) && \
+    !defined(PNG_FLOATING_POINT_SUPPORTED)
+       png_free(png_ptr, swidth);
+#endif
+      png_free(png_ptr, buffer);
+       return;
+   }
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    height = png_strtod(png_ptr, ep, &vp);
@@ -1994,7 +2005,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* empty loop */ ;
 
    /* zTXt must have some text after the chunkdataword */
-   if (text == chunkdata + slength - 1)
+   if (text >= chunkdata + slength - 2)
    {
       png_warning(png_ptr, "Truncated zTXt chunk");
       png_free(png_ptr, chunkdata);
@@ -2114,6 +2125,13 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* empty loop */ ;
    lang_key++;        /* skip NUL separator */
 
+   if (lang_key >= chunkdata + slength)
+   {
+      png_warning(png_ptr, "Truncated iTXt chunk");
+      png_free(png_ptr, chunkdata);
+      return;
+   }
+
    for (text = lang_key; *text; text++)
       /* empty loop */ ;
    text++;        /* skip NUL separator */
@@ -2206,8 +2224,8 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
        }
 #endif
        png_strncpy((png_charp)png_ptr->unknown_chunk.name,
-	 (png_charp)png_ptr->chunk_name,
-         png_sizeof((png_charp)png_ptr->chunk_name));
+	 (png_charp)png_ptr->chunk_name, 4);
+       png_ptr->unknown_chunk.name[4] = '\0';
        png_ptr->unknown_chunk.data = (png_bytep)png_malloc(png_ptr, length);
        png_ptr->unknown_chunk.size = (png_size_t)length;
        png_crc_read(png_ptr, (png_bytep)png_ptr->unknown_chunk.data, length);
@@ -2911,7 +2929,7 @@ png_read_finish_row(png_structp png_ptr)
                png_ptr->idat_size = png_get_uint_31(png_ptr, chunk_length);
                png_reset_crc(png_ptr);
                png_crc_read(png_ptr, png_ptr->chunk_name, 4);
-               if (png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+               if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
                   png_error(png_ptr, "Not enough image data");
 
             }

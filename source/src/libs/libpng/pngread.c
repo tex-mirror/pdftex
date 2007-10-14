@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.2.19 August 19, 2007
+ * Last changed in libpng 1.2.20 September 7, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -415,7 +415,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       /* This should be a binary subdivision search or a hash for
        * matching the chunk name rather than a linear search.
        */
-      if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+      if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
         if(png_ptr->mode & PNG_AFTER_IDAT)
           png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
 

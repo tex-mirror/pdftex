@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.20 September 8, 2007
+ * Last changed in libpng 1.2.22 [October 13, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -216,7 +216,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 
-   if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+   if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
      if(png_ptr->mode & PNG_AFTER_IDAT)
         png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
 
@@ -273,7 +273,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       }
       png_handle_PLTE(png_ptr, info_ptr, png_ptr->push_length);
    }
-   else if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+   else if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
    {
       /* If we reach an IDAT chunk, this means we have read all of the
        * header chunks, and we can start reading the image (or if this
@@ -678,7 +678,7 @@ png_push_read_IDAT(png_structp png_ptr)
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
 
-      if (png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+      if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
       {
          png_ptr->process_mode = PNG_READ_CHUNK_MODE;
          if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
@@ -1120,7 +1120,7 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
       for (text = key; *text; text++)
          /* empty loop */ ;
 
-      if (text != key + png_ptr->current_text_size)
+      if (text < key + png_ptr->current_text_size)
          text++;
 
       text_ptr = (png_textp)png_malloc(png_ptr,
@@ -1215,7 +1215,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
          /* empty loop */ ;
 
       /* zTXt can't have zero text */
-      if (text == key + png_ptr->current_text_size)
+      if (text >= key + png_ptr->current_text_size)
       {
          png_ptr->current_text = NULL;
          png_free(png_ptr, key);
@@ -1412,7 +1412,7 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
       for (lang = key; *lang; lang++)
          /* empty loop */ ;
 
-      if (lang != key + png_ptr->current_text_size)
+      if (lang < key + png_ptr->current_text_size - 3)
          lang++;
 
       comp_flag = *lang++;
@@ -1422,10 +1422,14 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
          /* empty loop */ ;
       lang_key++;        /* skip NUL separator */
 
-      for (text = lang_key; *text; text++)
-         /* empty loop */ ;
+      text=lang_key;
+      if (lang_key < key + png_ptr->current_text_size - 1)
+      {
+        for (; *text; text++)
+           /* empty loop */ ;
+      }
 
-      if (text != key + png_ptr->current_text_size)
+      if (text < key + png_ptr->current_text_size)
          text++;
 
       text_ptr = (png_textp)png_malloc(png_ptr,
@@ -1487,8 +1491,8 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
       }
 #endif
       png_strncpy((png_charp)png_ptr->unknown_chunk.name,
-	 (png_charp)png_ptr->chunk_name,
-        png_sizeof((png_charp)png_ptr->chunk_name));
+	 (png_charp)png_ptr->chunk_name, 4);
+      png_ptr->unknown_chunk.name[4] = '\0';
       png_ptr->unknown_chunk.data = (png_bytep)png_malloc(png_ptr, length);
       png_ptr->unknown_chunk.size = (png_size_t)length;
       png_crc_read(png_ptr, (png_bytep)png_ptr->unknown_chunk.data, length);
