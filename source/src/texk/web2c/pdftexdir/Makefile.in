@@ -64,7 +64,7 @@ clean::
 	rm -f libpdf.a ttf2afm pdftosrc
 
 depend:
-	$(CXX) -MM $(ALL_CPPFLAGS) $(srcdir)/*.c | \
+	$(CXX) -MM $(ALL_CPPFLAGS) $(srcdir)/*.c $(srcdir)/*.cc | \
 	  cat >$(srcdir)/depend.mk
 
 kpse_include pdftexdir/depend.mk
