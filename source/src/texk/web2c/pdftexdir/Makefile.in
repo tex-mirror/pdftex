@@ -40,9 +40,9 @@ LIBOBSDCOMPATSRCDIR=$(srcdir)/$(LIBOBSDCOMPATDIR)
 
 XCPPFLAGS=-I.. -I$(srcdir)/.. -I../.. -I$(srcdir)/../.. -I$(LIBMD5DIR) \
   -I$(LIBMD5SRCDIR) @LIBPNGCPPFLAGS@ @ZLIBCPPFLAGS@ \
-  -I$(LIBXPDFDIR) -I$(LIBXPDFDIR)/.. -I$(LIBXPDFSRCDIR) -I$(LIBXPDFSRCDIR)/.. \
+  @LIBXPDFCPPFLAGS@ \
   -I$(LIBOBSDCOMPATDIR) -I$(LIBOBSDCOMPATDIR)/.. -I$(LIBOBSDCOMPATSRCDIR) \
-  -I$(LIBOBSDCOMPATSRCDIR)/.. -DpdfTeX
+  -I$(LIBOBSDCOMPATSRCDIR)/.. -DpdfTeX -DPDF_PARSER_ONLY -DDISABLE_OUTLINE
 
 OBJS = epdf.o mapfile.o utils.o vfpacket.o pkin.o \
 writefont.o writet1.o writet3.o writezip.o writeenc.o writettf.o \
