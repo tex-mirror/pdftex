@@ -288,7 +288,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20071008' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20071017' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -15286,8 +15286,10 @@ neccesary. We call |pdf_begin_stream| to begin a stream  and |pdf_end_stream|
 to finish it. The stream contents will be compressed if compression is turn on.
 
 @p procedure pdf_flush; {flush out the |pdf_buf|}
+var saved_pdf_gone : integer;
 begin
     if not pdf_os_mode then begin
+        saved_pdf_gone := pdf_gone;
         case zip_write_state of
             no_zip: if pdf_ptr > 0 then begin
                 if fixed_pdf_draftmode = 0 then write_pdf(0, pdf_ptr - 1);
@@ -15302,6 +15304,8 @@ begin
             end;
         end;
         pdf_ptr := 0;
+        if saved_pdf_gone > pdf_gone then
+            pdf_error("file size", "File size exceeds architectural limits (pdf_gone wraps around)");
     end;
 end;
 
