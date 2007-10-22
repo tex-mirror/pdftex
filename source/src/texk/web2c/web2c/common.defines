@@ -191,6 +191,7 @@
 @define type char = 0..255;
 @define type getoptstruct;
 @define type integer;
+@define type longinteger;
 @define type memoryword; {for gftodvi, TeX, and Metafont}
 @define type pointertobyte;
 @define type real;
