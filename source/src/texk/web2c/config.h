@@ -100,9 +100,15 @@ typedef INTEGER_TYPE integer;
   #define LONGINTEGER_MIN INT_LEAST64_MIN
 #else
   /* C++ or <C99; let's hope long is 64bit */
-  #define LONGINTEGER_TYPE long
-  #define LONGINTEGER_MAX LONG_MAX
-  #define LONGINTEGER_MIN LONG_MIN
+  #if SIZEOF_LONG > 4
+    #define LONGINTEGER_TYPE long
+    #define LONGINTEGER_MAX LONG_MAX
+    #define LONGINTEGER_MIN LONG_MIN
+  #else
+    #define LONGINTEGER_TYPE off_t
+    #define LONGINTEGER_MAX LLONG_MAX
+    #define LONGINTEGER_MIN LLONG_MIN
+  #endif
 #endif
 typedef LONGINTEGER_TYPE longinteger;
 
