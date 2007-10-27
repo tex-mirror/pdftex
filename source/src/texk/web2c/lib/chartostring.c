@@ -3,7 +3,7 @@
 
 Written in 1994 by Karl Berry.  Public domain.  */
 
-#include "config.h"
+#include <web2c/config.h>
 
 /* This is needed because web2c turns the Pascal construct 'x' into the
    C character constant 'x', not the string "x". And we need to keep it
