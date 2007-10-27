@@ -100,6 +100,7 @@ then
               --without-xdvik     \
               --without-xdvipdfmx \
               --without-xetex     \
+              --disable-largefile \
               || exit 1 
 fi
 # make the binaries
