@@ -288,7 +288,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20071017' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20071029' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -19839,7 +19839,9 @@ end
 
 @ @<Output the cross-reference stream dictionary@>=
 pdf_new_dict(obj_type_others, 0, 0);
-if obj_offset(sys_obj_ptr) > 16777215 then
+if obj_offset(sys_obj_ptr) > ((16777216 * 256) - 1) then
+    xref_offset_width := 5
+else if obj_offset(sys_obj_ptr) > 16777215 then
     xref_offset_width := 4
 else if obj_offset(sys_obj_ptr) > 65535 then
     xref_offset_width := 3
