@@ -16680,10 +16680,10 @@ begin
     end;
 end;
 
-procedure pdf_out_bytes(n, w: integer); {print out an integer as
+procedure pdf_out_bytes(n: longinteger; w: integer); {print out an integer as
 a number of bytes; used for outputting \.{/XRef} cross-reference stream}
 var k: integer;
-byte: array[0..3] of integer; {digits in a number being output}
+byte: array[0..7] of integer; {digits in a number being output}
 begin
     k := 0;
     repeat byte[k] := n mod 256; n := n div 256; incr(k);
