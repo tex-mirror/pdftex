@@ -1,5 +1,5 @@
 -------------------------------------------------
-pdfTeX 3.141592-1.50.0 was released on 2007-0?-??
+pdfTeX 3.141592-1.50.0 was released on 200?-??-??
 -------------------------------------------------
 - New features:
   - pdftex now knows a bit about pdf layers (new in PDF 1.5).
@@ -17,6 +17,7 @@ pdfTeX 3.141592-1.50.0 was released on 2007-0?-??
   - \pdfsuppressptexinfo (846)
   - \suppressfontnotfounderror (864)
 - pdfTeX uses libpng 1.2.23
+- pdfTeX uses xpdf 3.02pl2
 
 -------------------------------------------------
 pdfTeX 3.141592-1.40.5 was released on 2007-08-??
