@@ -16,7 +16,7 @@ pdfTeX 3.141592-1.50.0 was released on 2007-0?-??
   - \pdfinclusioncopyfonts (813)
   - \pdfsuppressptexinfo (846)
   - \suppressfontnotfounderror (864)
-- pdfTeX uses libpng 1.2.22
+- pdfTeX uses libpng 1.2.23
 
 -------------------------------------------------
 pdfTeX 3.141592-1.40.5 was released on 2007-08-??
