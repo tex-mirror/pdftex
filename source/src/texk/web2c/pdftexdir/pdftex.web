@@ -19468,8 +19468,8 @@ write_fontstuff
 
 @ We will generate in each single step the parents of all Pages/Page objects in
 the previous level. These new generated Pages object will create a new level of
-Pages tree. We will repeat this until search only one Pages object. This one
-will be the Root object.
+the Pages tree. We will repeat this until we have only one Pages object. This
+one will be the Root object.
 
 @<Output pages tree@>=
 a := sys_obj_ptr + 1; {all Pages objects whose children are not Page objects

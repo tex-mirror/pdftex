@@ -909,13 +909,10 @@ void write_epdf(void)
     // write the Resources dictionary
     if (page->getResourceDict() == NULL) {
         // Resources can be missing (files without them have been spotted
-        // in the wild). This violates the PDF Ref., which claims they are
-        // required, but all RIPs accept them.
-        // We "replace" them with empty /Resources, although in form xobjects
-        // /Resources are not required.
+        // in the wild); in which case the /Resouces of the /Page will be used.
+	// "This practice is not recommended".
         pdftex_warn
-            ("PDF inclusion: no /Resources detected. Replacing with empty /Resources.");
-        pdf_puts("/Resources <<>>\n");
+            ("PDF inclusion: /Resources missing. 'This practice is not recommended' (PDF Ref)");
     } else {
         initDictFromDict(obj1, page->getResourceDict());
         page->getResourceDict()->incRef();
