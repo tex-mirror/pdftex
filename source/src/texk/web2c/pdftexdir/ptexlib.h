@@ -228,7 +228,7 @@ extern void pdftex_warn(const char *, ...);
 extern void setjobid(int, int, int, int);
 __attribute__ ((format(printf, 1, 2)))
 extern void tex_printf(const char *, ...);
-extern void writestreamlength(integer, integer);
+extern void writestreamlength(integer, longinteger);
 extern char *convertStringToPDFString(const char *in, int len);
 extern void printID(strnumber);
 extern void printcreationdate();

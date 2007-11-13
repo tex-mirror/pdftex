@@ -401,14 +401,14 @@ int xputc(int c, FILE * stream)
     return i;
 }
 
-void writestreamlength(integer length, integer offset)
+void writestreamlength(integer length, longinteger offset)
 {
     if (jobname_cstr == NULL)
         jobname_cstr = xstrdup(makecstring(jobname));
     if (fixedpdfdraftmode == 0) {
-        xfseek(pdffile, offset, SEEK_SET, jobname_cstr);
+        xfseek(pdffile, (off_t)offset, SEEK_SET, jobname_cstr);
         fprintf(pdffile, "%li", (long int) length);
-        xfseek(pdffile, pdfoffset(), SEEK_SET, jobname_cstr);
+        xfseek(pdffile, (off_t)pdfoffset(), SEEK_SET, jobname_cstr);
     }
 }
 
@@ -1060,7 +1060,7 @@ void getfiledump(strnumber s, int offset, int length)
         return;
     }
     recorder_record_input(file_name);
-    if (fseek(f, (long) offset, SEEK_SET) != 0) {
+    if (fseek(f, (off_t) offset, SEEK_SET) != 0) {
         xfree(file_name);
         return;
     }

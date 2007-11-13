@@ -90,6 +90,10 @@ typedef SCHAR_TYPE schar;
 #endif /* not INTEGER_TYPE */
 
 typedef INTEGER_TYPE integer;
+
+/* We need a type that's at least off_t wide */
+typedef off_t longinteger;
+
 
 /* I don't want to write a configure test for remove when all Unix
    machines have unlink.  But, for the sake of non-Unix machines that
