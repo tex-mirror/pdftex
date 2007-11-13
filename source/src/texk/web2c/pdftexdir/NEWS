@@ -1,6 +1,8 @@
 -------------------------------------------------
 pdfTeX 3.141592-1.40.6 was released on 2007-11-??
 -------------------------------------------------
+- Bugfixes:
+  - broken map files would lead to core dumps
 - pdfTeX uses xpdf 3.02pl2
 - pdfTeX uses libpng 1.2.23
 

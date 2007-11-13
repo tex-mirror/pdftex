@@ -528,7 +528,7 @@ static void fm_scan_line()
   done:
     if (fm->ps_name != NULL && (check_std_t1font(fm->ps_name) >= 0))
         set_std_t1font(fm);
-    if (is_fontfile(fm)) {
+    if (is_fontfile(fm) && strlen(fm_fontfile(fm)) > 3) {
         if (strcasecmp(strend(fm_fontfile(fm)) - 4, ".ttf") == 0)
             set_truetype(fm);
         else if (strcasecmp(strend(fm_fontfile(fm)) - 4, ".otf") == 0)
