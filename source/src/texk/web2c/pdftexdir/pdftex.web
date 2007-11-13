@@ -15286,7 +15286,7 @@ neccesary. We call |pdf_begin_stream| to begin a stream  and |pdf_end_stream|
 to finish it. The stream contents will be compressed if compression is turn on.
 
 @p procedure pdf_flush; {flush out the |pdf_buf|}
-var saved_pdf_gone : integer;
+var saved_pdf_gone : longinteger;
 begin
     if not pdf_os_mode then begin
         saved_pdf_gone := pdf_gone;
