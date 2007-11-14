@@ -2,10 +2,11 @@
 pdfTeX 3.141592-1.40.6 was released on 2007-11-??
 -------------------------------------------------
 - Bugfixes:
-  - broken map files would lead to core dumps
   - PDFs > 2GiB (LFS) would be broken, even on 64-bit systems. Now the basic
     support for LFS is there, you only need to supply the right compiler flags
     (this is not yet done automatically).
+  - broken map files would lead to core dumps
+  - unusual TrueType fonts would lead to an assertion error (874)
 - pdfTeX uses xpdf 3.02pl2
 - pdfTeX uses libpng 1.2.23
 

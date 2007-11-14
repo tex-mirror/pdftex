@@ -847,7 +847,7 @@ static int prepend_subset_tags(int index, char *p)
 {
     const boolean is_unicode = (name_tab[index].platform_id == 3);
     int i;
-    assert(index > 0 && index < name_record_num && fd_cur->subset_tag != NULL);
+    assert(index >= 0 && index < name_record_num && fd_cur->subset_tag != NULL);
     if (is_unicode) {
         for (i = 0; i < 6; ++i) {
             *p++ = 0;
