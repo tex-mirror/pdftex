@@ -42,6 +42,8 @@ pdfTeX 3.141592-1.40.4 was released on 2007-07-11
     available, a broken PDF was produced. Now no PDF is generated and the error
     messages have been improved (721)
   - Problems with vf fonts (722)
+  - With pdf inclusion the font descriptor could get mixed up and miss some
+    required keys (810)
   - Font expansion led to wrong log output of \kerns (736)
   - \pdfprimitive was broken (see
     http://www.ntg.nl/pipermail/ntg-pdftex/2007-April/002860.html)
