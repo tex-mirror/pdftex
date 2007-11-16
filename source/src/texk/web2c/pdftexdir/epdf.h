@@ -102,10 +102,10 @@ extern "C" {
     __attribute__ ((format(printf, 1, 2)))
     extern void tex_printf(const char *, ...);
     extern void write_epdf(void);
-    extern void zpdfbegindict(integer, bool);
+//    extern void zpdfbegindict(integer, bool);
     extern void zpdfbeginobj(integer, bool);
-    extern void zpdfcreateobj(integer, integer);
-    extern void zpdfnewdict(integer, integer, bool);
+//    extern void zpdfcreateobj(integer, integer);
+//    extern void zpdfnewdict(integer, integer, bool);
     extern void zpdfosgetosbuf(integer);
 
 /* epdf.c */
