@@ -1,5 +1,6 @@
 2007-11-16  Martin Schröder <martin@pdftex.org>
 	* tex.ch: increase ssup_max_strings und sup_main_memory
+	* tangle.ch: increase max_bytes
 
 2007-07-15  Karl Berry  <karl@tug.org>
 
