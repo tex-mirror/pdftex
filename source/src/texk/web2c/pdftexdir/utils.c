@@ -1195,6 +1195,7 @@ char *makecfilename(strnumber s)
 
 /* function strips trailing zeros in string with numbers; */
 /* leading zeros are not stripped (as in real life) */
+
 char *stripzeros(char *a)
 {
     enum { NONUM, DOTNONUM, INT, DOT, LEADDOT, FRAC } s = NONUM, t = NONUM;
@@ -2094,6 +2095,18 @@ integer pdfdopagedivert(integer objnum, integer divnum)
     return p->objnum;
 }
 
+void movelist(divert_list_entry * d, divert_list_entry * dto)
+{
+    if (d != NULL && d->first != NULL && d->divnum != dto->divnum) {    /* no undivert of empty list or into self */
+        if (dto->first == NULL)
+            dto->first = d->first;
+        else
+            dto->last->next = d->first;
+        dto->last = d->last;
+        d->first = d->last = NULL;      /* one could as well remove this divert_list_entry */
+    }
+}
+
 /* undivert from diversion <divnum> into diversion <curdivnum> */
 
 void pdfdopageundivert(integer divnum, integer curdivnum)
@@ -2104,8 +2117,6 @@ void pdfdopageundivert(integer divnum, integer curdivnum)
     pages_entry *p;
     int i;
 #endif
-    if (divnum != 0 && divnum == curdivnum)
-        return;                 /* no undivert into self */
     // initialize the tree
     ensure_list_tree();
     // find the diversion <curdivnum> list where diversion <divnum> should go
@@ -2113,27 +2124,12 @@ void pdfdopageundivert(integer divnum, integer curdivnum)
     if (divnum == 0) {          /* 0 = special case: undivert _all_ lists */
         avl_t_init(&t, divert_list_tree);
         for (d = avl_t_first(&t, divert_list_tree); d != NULL;
-             d = avl_t_next(&t)) {
-            if (d->first == NULL || d->divnum == curdivnum)     /* no undivert of empty list or into self */
-                continue;
-            if (dto->first == NULL)
-                dto->first = d->first;
-            else
-                dto->last->next = d->first;
-            dto->last = d->last;
-            d->first = d->last = NULL;  /* one could as well remove this divert_list_entry */
-        }
+             d = avl_t_next(&t))
+            movelist(d, dto);
     } else {
         tmp.divnum = divnum;
         d = (divert_list_entry *) avl_find(divert_list_tree, &tmp);
-        if (d != NULL && d->first != NULL) {
-            if (dto->first == NULL)
-                dto->first = d->first;
-            else
-                dto->last->next = d->first;
-            dto->last = d->last;
-            d->first = d->last = NULL;  /* one could as well remove this divert_list_entry */
-        }
+        movelist(d, dto);
     }
 #ifdef DEBUG
     printf("\n");
@@ -2160,15 +2156,13 @@ void write_pages(pages_entry * p, int parent)
     assert(p != NULL);
     pdfbegindict(p->objnum, 1);
     pdf_printf("/Type /Pages\n");
-    if (parent == 0) {          /* it's root */
+    if (parent == 0)            /* it's root */
         printpdfpagesattr();
-    } else {
+    else
         pdf_printf("/Parent %d 0 R\n", parent);
-    }
     pdf_printf("/Count %d\n/Kids [", p->number_of_pages);
-    for (i = 0; i < p->number_of_kids; i++) {
+    for (i = 0; i < p->number_of_kids; i++)
         pdf_printf("%d 0 R ", p->kids[i]);
-    }
     removelastspace();
     pdf_printf("]\n");
     pdfenddict();
