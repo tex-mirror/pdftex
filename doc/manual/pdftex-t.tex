@@ -4524,7 +4524,7 @@ Every \type{/Page} object is appended to the currently active diversion
 at the {\em end} of the page shipout.  By \Syntax {\Tex
 {\pdfpageundivert}}~\Something{number} the list of \type{/Page}
 objects with the given number is appended to the currently active
-diversion, and then this undiverted list is void.  This means that all
+diversion, after which this undiverted list is void.  This means that all
 pages from undiverted lists while shipping out a page go {\em before} that
 page.  If a diversion requested by \Tex{\pdfpageundivert} is void, nothing
 happens.  A diversion is never undiverted into itself; an attempt to do so
