@@ -288,7 +288,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20071029' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20071126' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -15184,6 +15184,7 @@ end
 @!fixed_pdf_draftmode: integer; {fixed \\pdfdraftmode}
 @!fixed_pdf_draftmode_set: boolean; {|fixed_pdf_draftmode| has been set?}
 @!pdf_includelayers: integer;
+@!page_divert_val: integer;
 
 @ @<Set init...@>=
 pdf_gone := 0;
@@ -15202,6 +15203,7 @@ pdf_minor_version_written := false;
 fixed_pdfoutput_set := false;
 fixed_pdf_draftmode_set := false;
 pdf_includelayers := 0;
+page_divert_val := 0;
 
 @ @p
 function fix_int(val, min, max: integer): integer;
@@ -16129,18 +16131,16 @@ well.
 @# {types of objects}
 @d obj_type_others              == 0 {objects which are not linked in any list}
 @d obj_type_page                == 1 {index of linked list of Page objects}
-@d obj_type_pages               == 2 {index of linked list of Pages objects}
-@d obj_type_font                == 3 {index of linked list of Fonts objects}
-@d obj_type_outline             == 4 {index of linked list of outline objects}
-@d obj_type_dest                == 5 {index of linked list of destination objects}
-@d obj_type_obj                 == 6 {index of linked list of raw objects}
-@d obj_type_xform               == 7 {index of linked list of XObject forms}
-@d obj_type_ximage              == 8 {index of linked list of XObject image}
-@d obj_type_thread              == 9 {index of linked list of num article threads}
+@d obj_type_font                == 2 {index of linked list of Fonts objects}
+@d obj_type_outline             == 3 {index of linked list of outline objects}
+@d obj_type_dest                == 4 {index of linked list of destination objects}
+@d obj_type_obj                 == 5 {index of linked list of raw objects}
+@d obj_type_xform               == 6 {index of linked list of XObject forms}
+@d obj_type_ximage              == 7 {index of linked list of XObject image}
+@d obj_type_thread              == 8 {index of linked list of num article threads}
 @d head_tab_max                 == obj_type_thread {max index of |head_tab|}
 
 @# {max number of kids for balanced trees}
-@d pages_tree_kids_max     == 6 {max number of kids of Pages tree node}
 @d name_tree_kids_max      == 6 {max number of kids of node of name tree for
 name destinations}
 
@@ -16164,6 +16164,7 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d pdf_literal_data(#)     == link(#+1) {data}
 @d pdf_literal_mode(#)     == info(#+1) {mode of resetting the text matrix
                               while writing data to the page stream}
+@d pdf_page_divert_data(#) == info(#+1) {data}
 @# {modes of setting the current transformation matrix (CTM)}
 @d set_origin              == 0 {end text (ET) if needed, set CTM to current point}
 @d direct_page             == 1 {end text (ET) if needed, but don't change the CTM}
@@ -18900,6 +18901,7 @@ pdf_print_ln(" ]")
 
 @ @<Write out page object@>=
 pdf_begin_dict(pdf_last_page, 1);
+pdf_last_pages := pdf_do_page_divert(pdf_last_page, page_divert_val);
 pdf_print_ln("/Type /Page");
 pdf_indirect_ln("Contents", pdf_last_stream);
 pdf_indirect_ln("Resources", pdf_last_resources);
@@ -18909,16 +18911,9 @@ pdf_print_mag_bp(cur_page_height);
 pdf_print_ln("]");
 if pdf_page_attr <> null then
     pdf_print_toks_ln(pdf_page_attr);
-@<Generate parent pages object@>;
+pdf_indirect_ln("Parent", pdf_last_pages);
 @<Generate array of annotations or beads in page@>;
 pdf_end_dict
-
-@ @<Generate parent pages object@>=
-if total_pages mod pages_tree_kids_max = 1 then begin
-    pdf_create_obj(obj_type_pages, pages_tree_kids_max);
-    pdf_last_pages := obj_ptr;
-end;
-pdf_indirect_ln("Parent", pdf_last_pages)
 
 @ @<Generate array of annotations or beads in page@>=
 if (pdf_annot_list <> null) or (pdf_link_list <> null) then begin
@@ -19395,15 +19390,11 @@ else begin
     if fixed_pdf_draftmode = 0 then begin
         pdf_flush; {to make sure that the output file name has been already
         created}
-        if total_pages mod pages_tree_kids_max <> 0 then
-            obj_info(pdf_last_pages) := total_pages mod pages_tree_kids_max;
-        {last pages object may have less than |pages_tree_kids_max| children}
         flush_jbig2_page0_objects; {flush page 0 objects from JBIG2 images, if any}
         @<Check for non-existing pages@>;
-        @<Reverse the linked list of Page and Pages objects@>;
         @<Check for non-existing destinations@>;
         @<Output fonts definition@>;
-        @<Output pages tree@>;
+	pdf_last_pages := output_pages_tree;
         @<Output outlines@>;
         @<Output name tree@>;
         @<Output article threads@>;
@@ -19477,27 +19468,6 @@ while obj_aux(k) = 0 do begin
 end;
 head_tab[obj_type_page] := k
 
-@ @<Reverse the linked list of Page and Pages objects@>=
-k := head_tab[obj_type_page];
-l := 0;
-repeat
-    i := obj_link(k);
-    obj_link(k) := l;
-    l := k;
-    k := i;
-until k = 0;
-head_tab[obj_type_page] := l;
-k := head_tab[obj_type_pages];
-pages_tail := k;
-l := 0;
-repeat
-    i := obj_link(k);
-    obj_link(k) := l;
-    l := k;
-    k := i;
-until k = 0;
-head_tab[obj_type_pages] := l
-
 @ @<Output fonts definition@>=
 for k := font_base + 1 to font_ptr do
     if font_used[k] and hasfmentry(k) and (pdf_font_num[k] < 0) then begin
@@ -19531,77 +19501,12 @@ while k <> 0 do begin
 end;
 write_fontstuff
 
-@ We will generate in each single step the parents of all Pages/Page objects in
-the previous level. These new generated Pages object will create a new level of
-the Pages tree. We will repeat this until we have only one Pages object. This
-one will be the Root object.
-
-@<Output pages tree@>=
-a := sys_obj_ptr + 1; {all Pages objects whose children are not Page objects
-                       should have index greater than |a|}
-l := head_tab[obj_type_pages]; {|l| is the index of current Pages object
-                                which is being output}
-k := head_tab[obj_type_page]; {|k| is the index of current child of |l|}
-b := 0;
-repeat
-    i := 0; {counter of Pages object in current level}
-    c := 0; {first Pages object in previous level}
-    if obj_link(l) = 0 then
-        is_root := true {only Pages object; total pages is
-                         not greater than |pages_tree_kids_max|}
-    else
-        is_root := false;
-    repeat
-        if not is_root then begin
-            if i mod pages_tree_kids_max = 0 then begin {create a new Pages object
-                                                         for next level}
-                pdf_last_pages := pdf_new_objnum;
-                if c = 0 then
-                    c := pdf_last_pages;
-                obj_link(pages_tail) := pdf_last_pages;
-                pages_tail := pdf_last_pages;
-                obj_link(pdf_last_pages) := 0;
-                obj_info(pdf_last_pages) := obj_info(l);
-            end
-            else
-                obj_info(pdf_last_pages) := obj_info(pdf_last_pages) +
-                    obj_info(l);
-        end;
-        @<Output the current Pages object in this level@>;
-        incr(i);
-        l := obj_link(l);
-    until (l = c);
-    b := c;
-    if l = 0 then
-        goto done;
-until false;
-done:
-
-@ @<Output the current Pages object in this level@>=
-pdf_begin_dict(l, 1);
-pdf_print_ln("/Type /Pages");
-pdf_int_entry_ln("Count", obj_info(l));
-if not is_root then
-    pdf_indirect_ln("Parent", pdf_last_pages);
-pdf_print("/Kids [");
-j := 0;
-repeat
-    pdf_print_int(k);
-    pdf_print(" 0 R ");
-    k := obj_link(k);
-    incr(j);
-until ((l < a) and (j = obj_info(l))) or
-    (k = 0) or ((k = b) and (b <> 0)) or
-    (j = pages_tree_kids_max);
-remove_last_space;
-pdf_print_ln("]");
-if k = 0 then begin
-    k := head_tab[obj_type_pages];
-    head_tab[obj_type_pages] := 0;
+@ @p
+procedure print_pdf_pages_attr;
+begin
+    if pdf_pages_attr <> null then
+        pdf_print_toks_ln(pdf_pages_attr);
 end;
-if is_root and (pdf_pages_attr <> null) then
-    pdf_print_toks_ln(pdf_pages_attr);
-pdf_end_dict;
 
 @ The name tree is very similiar to Pages tree so its construction should be
 certain from Pages tree construction. For intermediate node |obj_info| will be
@@ -19840,6 +19745,9 @@ end
 @ @<Output the cross-reference stream dictionary@>=
 pdf_new_dict(obj_type_others, 0, 0);
 if obj_offset(sys_obj_ptr) > ((16777216 * 256) - 1) then
+    {this obviously works only on platforms with more than 32 bits; the
+expression is not a constant because otherwise tangle would scream number too
+large}
     xref_offset_width := 5
 else if obj_offset(sys_obj_ptr) > 16777215 then
     xref_offset_width := 4
@@ -32760,9 +32668,8 @@ This program doesn't bother to close the input files that may still be open.
 procedure close_files_and_terminate;
 label done, done1;
 var a, b, c, i, j, k, l: integer; {all-purpose index}
-    is_root: boolean; {|pdf_last_pages| is root of Pages tree?}
     is_names: boolean; {flag for name tree output: is it Names or Kids?}
-    root, outlines, threads, names_tree, dests: integer;
+    root, outlines, threads, names_tree, dests, pages: integer;
     xref_offset_width, names_head, names_tail: integer;
 begin @<Finish the extensions@>;
 @!stat if tracing_stats>0 then @<Output statistics about this job@>;@;@+tats@/
@@ -33126,8 +33033,10 @@ stays the same.
 @d pdf_glyph_to_unicode_code   == pdftex_first_extension_code + 27
 @d pdf_colorstack_node         == pdftex_first_extension_code + 28
 @d pdf_setmatrix_node          == pdftex_first_extension_code + 29
-@d pdf_save_node               == pdftex_first_extension_code + 30
-@d pdf_restore_node            == pdftex_first_extension_code + 31
+@d pdf_page_divert_node        == pdftex_first_extension_code + 30
+@d pdf_page_undivert_node      == pdftex_first_extension_code + 31
+@d pdf_save_node               == pdftex_first_extension_code + 32
+@d pdf_restore_node            == pdftex_first_extension_code + 33
 @d pdftex_last_extension_code  == pdf_restore_node
 
 @<Put each...@>=
@@ -33207,6 +33116,10 @@ primitive("pdffontexpand",extension,pdf_font_expand_code);@/
 @!@:pdf_font_expand_}{\.{\\pdffontexpand} primitive@>
 primitive("pdfglyphtounicode",extension,pdf_glyph_to_unicode_code);@/
 @!@:pdf_glyph_to_unicode_}{\.{\\pdfglyphtounicode} primitive@>
+primitive("pdfpagedivert",extension,pdf_page_divert_node);@/
+@!@:pdf_page_divert_}{\.{\\pdfpagedivert} primitive@>
+primitive("pdfpageundivert",extension,pdf_page_undivert_node);@/
+@!@:pdf_page_undivert_}{\.{\\pdfpageundivert} primitive@>
 
 @ The variable |write_loc| just introduced is used to provide an
 appropriate error message in case of ``runaway'' write texts.
@@ -33254,6 +33167,8 @@ extension: case chr_code of
   reset_timer_code: print_esc("pdfresettimer");
   set_random_seed_code: print_esc("pdfsetrandomseed");
   pdf_glyph_to_unicode_code: print_esc("pdfglyphtounicode");
+  pdf_page_divert_node: print_esc("pdfpagedivert");
+  pdf_page_undivert_node: print_esc("pdfpageundivert");
   othercases print("[unknown extension!]")
   endcases;
 
@@ -33307,6 +33222,8 @@ begin case cur_chr of
   reset_timer_code: @<Implement \.{\\pdfresettimer}@>;
   set_random_seed_code: @<Implement \.{\\pdfsetrandomseed}@>;
   pdf_glyph_to_unicode_code: @<Implement \.{\\pdfglyphtounicode}@>;
+  pdf_page_divert_node: @<Implement \.{\\pdfpagedivert}@>;
+  pdf_page_undivert_node: @<Implement \.{\\pdfpageundivert}@>;
 othercases confusion("ext1")
 @:this can't happen ext1}{\quad ext1@>
 endcases;
@@ -34557,6 +34474,24 @@ begin
     glyph_to_unicode;
 end
 
+@ @<Implement \.{\\pdfpagedivert}@>=
+begin
+    check_pdfoutput("\pdfpagedivert", true);
+    new_whatsit(pdf_page_divert_node, small_node_size);
+    pdf_page_divert_data(tail) := 0;
+    scan_int;
+    pdf_page_divert_data(tail) := cur_val;
+end
+
+@ @<Implement \.{\\pdfpageundivert}@>=
+begin
+    check_pdfoutput("\pdfpageundivert", true);
+    new_whatsit(pdf_page_undivert_node, small_node_size);
+    pdf_page_divert_data(tail) := 0;
+    scan_int;
+    pdf_page_divert_data(tail) := cur_val;
+end
+
 @ The following function are needed for outputing article thread.
 
 @<Declare procedures needed in |do_ext...@>=
@@ -34861,6 +34796,14 @@ pdf_start_thread_node: begin
 end;
 pdf_end_thread_node: print_esc("pdfendthread");
 pdf_save_pos_node: print_esc("pdfsavepos");
+pdf_page_divert_node: begin
+    print_esc("pdfpagedivert ");
+    print_int(pdf_page_divert_data(p));
+end;
+pdf_page_undivert_node: begin
+    print_esc("pdfpageundivert ");
+    print_int(pdf_page_divert_data(p));
+end;
 othercases print("whatsit?")
 endcases
 
@@ -34953,6 +34896,14 @@ pdf_end_thread_node:
     r := get_node(small_node_size);
 pdf_save_pos_node:
     r := get_node(small_node_size);
+pdf_page_divert_node: begin
+    r := get_node(small_node_size);
+    pdf_page_divert_data(r) := pdf_page_divert_data(p);
+end;
+pdf_page_undivert_node: begin
+    r := get_node(small_node_size);
+    pdf_page_divert_data(r) := pdf_page_divert_data(p);
+end;
 othercases confusion("ext2")
 @:this can't happen ext2}{\quad ext2@>
 endcases
@@ -35020,6 +34971,10 @@ end;
 pdf_end_thread_node:
     free_node(p, small_node_size);
 pdf_save_pos_node:
+    free_node(p, small_node_size);
+pdf_page_divert_node:
+    free_node(p, small_node_size);
+pdf_page_undivert_node:
     free_node(p, small_node_size);
 othercases confusion("ext3")
 @:this can't happen ext3}{\quad ext3@>
@@ -35954,6 +35909,12 @@ pdf_save_pos_node:
     @<Save current position to |pdf_last_x_pos|, |pdf_last_y_pos|@>;
 special_node:
     pdf_special(p);
+pdf_page_divert_node:
+    if is_shipping_page then
+        page_divert_val := pdf_page_divert_data(p);
+pdf_page_undivert_node:
+    if is_shipping_page then
+        pdf_do_page_undivert(pdf_page_divert_data(p), page_divert_val);
 othercases out_what(p);
 endcases
 
@@ -36019,6 +35980,12 @@ pdf_save_pos_node:
     @<Save current position to |pdf_last_x_pos|, |pdf_last_y_pos|@>;
 special_node:
     pdf_special(p);
+pdf_page_divert_node:
+    if is_shipping_page then
+        page_divert_val := pdf_page_divert_data(p);
+pdf_page_undivert_node:
+    if is_shipping_page then
+        pdf_do_page_undivert(pdf_page_divert_data(p), page_divert_val);
 othercases out_what(p);
 endcases
 

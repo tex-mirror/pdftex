@@ -272,6 +272,11 @@ extern scaled getury();
 extern void allocvffnts();
 extern void pdflayernamesgetname(integer n);
 extern void pdflayerobjectnumbersget(integer n);
+extern integer pdfdopagedivert(integer, integer);
+extern void pdfdopageundivert(integer, integer);
+extern void insertpageintopagestree(integer, integer);
+extern void insertpageintopagestree(integer, integer);
+extern integer outputpagestree();
 
 /* vfpacket.c */
 extern integer newvfpacket(internalfontnumber);

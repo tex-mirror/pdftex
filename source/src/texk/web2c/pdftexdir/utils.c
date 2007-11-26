@@ -2,7 +2,6 @@
 Copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
-
 pdfTeX is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -409,9 +408,9 @@ void writestreamlength(integer length, longinteger offset)
     if (jobname_cstr == NULL)
         jobname_cstr = xstrdup(makecstring(jobname));
     if (fixedpdfdraftmode == 0) {
-        xfseek(pdffile, (off_t)offset, SEEK_SET, jobname_cstr);
+        xfseek(pdffile, (off_t) offset, SEEK_SET, jobname_cstr);
         fprintf(pdffile, "%li", (long int) length);
-        xfseek(pdffile, (off_t)pdfoffset(), SEEK_SET, jobname_cstr);
+        xfseek(pdffile, (off_t) pdfoffset(), SEEK_SET, jobname_cstr);
     }
 }
 
@@ -483,7 +482,6 @@ char *convertStringToPDFString(const char *in, int len)
     out[j] = '\0';
     return pstrbuf;
 }
-
 
 /* Converts any string given in in in an allowed PDF string which can be
  * handled by printf et.al.: \ is escaped to \\, parenthesis are escaped and
@@ -1854,7 +1852,7 @@ void set_pdf_includelayers(int numlayers)
 static str_list_type pdflayernames_list;
 
 /* Initializises the list; if it's new, it's created; otherwise it's properly
- * free'd. 
+ * free'd.
  */
 void pdflayernames_init()
 {
@@ -1916,7 +1914,7 @@ static struct {
 
 
 /* Initializises the list; if it's new, it's created; otherwise it's properly
- * free'd. 
+ * free'd.
  */
 void pdflayer_object_numbers_init()
 {
@@ -1967,6 +1965,248 @@ void pdflayerobjectnumbersget(integer n)
     memcpy(&strpool[poolptr], s, len);
     poolptr += len;
     free(s);
+}
+
+/**********************************************************************/
+/* Page diversions */
+
+#ifdef DEBUG
+#  define PAGES_TREE_KIDSMAX 3
+#else
+#  define PAGES_TREE_KIDSMAX 6
+#endif
+
+struct avl_table *divert_list_tree = NULL;
+
+typedef struct pages_entry_ {
+    integer objnum;             /* object number of this /Pages object */
+    integer number_of_pages;    /* total number of all pages below */
+    integer number_of_kids;     /* number of direct kid objects */
+    integer kids[PAGES_TREE_KIDSMAX];   /* array of kid object numbers */
+    struct pages_entry_ *next;
+} pages_entry;
+
+typedef struct divert_list_entry_ {
+    integer divnum;
+    pages_entry *first;
+    pages_entry *last;
+} divert_list_entry;
+
+static int comp_divert_list_entry(const void *pa, const void *pb, void *p)
+{
+    if (((const divert_list_entry *) pa)->divnum >
+        ((const divert_list_entry *) pb)->divnum)
+        return 1;
+    if (((const divert_list_entry *) pa)->divnum <
+        ((const divert_list_entry *) pb)->divnum)
+        return -1;
+    return 0;
+}
+
+pages_entry *new_pages_entry()
+{
+    pages_entry *p;
+    int i;
+    p = xtalloc(1, pages_entry);
+    p->number_of_pages = p->number_of_kids = 0;
+    for (i = 0; i < PAGES_TREE_KIDSMAX; i++)
+        p->kids[i] = 0;
+    p->next = NULL;
+    pdfcreateobj(0, 0);
+    p->objnum = objptr;
+    return p;
+}
+
+divert_list_entry *new_divert_list_entry()
+{
+    divert_list_entry *d;
+    d = xtalloc(1, divert_list_entry);
+    d->first = d->last = NULL;
+    return d;
+}
+
+void ensure_list_tree()
+{
+    if (divert_list_tree == NULL) {
+        divert_list_tree =
+            avl_create(comp_divert_list_entry, NULL, &avl_xallocator);
+        assert(divert_list_tree != NULL);
+    }
+}
+
+divert_list_entry *get_divert_list(integer divnum)
+{
+    divert_list_entry *d, tmp;
+    void **aa;
+    tmp.divnum = divnum;
+    d = (divert_list_entry *) avl_find(divert_list_tree, &tmp);
+    if (d == NULL) {
+        d = new_divert_list_entry();
+        d->divnum = divnum;
+        aa = avl_probe(divert_list_tree, d);
+        assert(aa != NULL);
+    }
+    return d;
+}
+
+/* pdfdopagedivert() returns the current /Parent object number */
+
+integer pdfdopagedivert(integer objnum, integer divnum)
+{
+    divert_list_entry *d;
+    pages_entry *p;
+#ifdef DEBUG
+    pages_entry *q;
+    struct avl_traverser t;
+    int i;
+#endif
+    // initialize the tree
+    ensure_list_tree();
+    // make sure we have a list for this diversion
+    d = get_divert_list(divnum);
+    if (d->first == NULL || d->last->number_of_kids == PAGES_TREE_KIDSMAX) {
+        // append a new pages_entry
+        p = new_pages_entry();
+        if (d->first == NULL)
+            d->first = p;
+        else
+            d->last->next = p;
+        d->last = p;
+    }
+    p = d->last;
+    p->kids[p->number_of_kids++] = objnum;
+    p->number_of_pages++;
+#ifdef DEBUG
+    printf("\n");
+    avl_t_init(&t, divert_list_tree);
+    for (d = avl_t_first(&t, divert_list_tree); d != NULL; d = avl_t_next(&t)) {
+        printf("===== D-LIST %ld: ", d->divnum);
+        for (q = d->first; q != NULL; q = q->next) {
+            printf("P=%ld NK=%d (", q->objnum, q->number_of_kids);
+            for (i = 0; i < q->number_of_kids; i++)
+                printf("%ld ", q->kids[i]);
+            printf(") ");
+        }
+        printf("\n");
+    }
+    printf("\n");
+#endif
+    return p->objnum;
+}
+
+/* undivert from diversion <divnum> into diversion <curdivnum> */
+
+void pdfdopageundivert(integer divnum, integer curdivnum)
+{
+    divert_list_entry *d, *dto, tmp;
+    struct avl_traverser t;
+#ifdef DEBUG
+    pages_entry *p;
+    int i;
+#endif
+    if (divnum != 0 && divnum == curdivnum)
+        return;                 /* no undivert into self */
+    // initialize the tree
+    ensure_list_tree();
+    // find the diversion <curdivnum> list where diversion <divnum> should go
+    dto = get_divert_list(curdivnum);
+    if (divnum == 0) {          /* 0 = special case: undivert _all_ lists */
+        avl_t_init(&t, divert_list_tree);
+        for (d = avl_t_first(&t, divert_list_tree); d != NULL;
+             d = avl_t_next(&t)) {
+            if (d->first == NULL || d->divnum == curdivnum)     /* no undivert of empty list or into self */
+                continue;
+            if (dto->first == NULL)
+                dto->first = d->first;
+            else
+                dto->last->next = d->first;
+            dto->last = d->last;
+            d->first = d->last = NULL;  /* one could as well remove this divert_list_entry */
+        }
+    } else {
+        tmp.divnum = divnum;
+        d = (divert_list_entry *) avl_find(divert_list_tree, &tmp);
+        if (d != NULL && d->first != NULL) {
+            if (dto->first == NULL)
+                dto->first = d->first;
+            else
+                dto->last->next = d->first;
+            dto->last = d->last;
+            d->first = d->last = NULL;  /* one could as well remove this divert_list_entry */
+        }
+    }
+#ifdef DEBUG
+    printf("\n");
+    avl_t_init(&t, divert_list_tree);
+    for (d = avl_t_first(&t, divert_list_tree); d != NULL; d = avl_t_next(&t)) {
+        printf("===== U-LIST %ld: ", d->divnum);
+        for (p = d->first; p != NULL; p = p->next) {
+            printf("P=%ld NK=%d (", p->objnum, p->number_of_kids);
+            for (i = 0; i < p->number_of_kids; i++)
+                printf("%ld ", p->kids[i]);
+            printf(") ");
+        }
+        printf("\n");
+    }
+    printf("\n");
+#endif
+}
+
+/* write a /Pages object */
+
+void write_pages(pages_entry * p, int parent)
+{
+    int i;
+    assert(p != NULL);
+    pdfbegindict(p->objnum, 1);
+    pdf_printf("/Type /Pages\n");
+    if (parent == 0) {          /* it's root */
+        printpdfpagesattr();
+    } else {
+        pdf_printf("/Parent %d 0 R\n", parent);
+    }
+    pdf_printf("/Count %d\n/Kids [", p->number_of_pages);
+    for (i = 0; i < p->number_of_kids; i++) {
+        pdf_printf("%d 0 R ", p->kids[i]);
+    }
+    removelastspace();
+    pdf_printf("]\n");
+    pdfenddict();
+}
+
+/* loop over all /Pages objects, output them, create their parents,
+ * recursing bottom up. */
+
+pages_entry *output_pages_list(pages_entry * pe)
+{
+    pages_entry *p, *q, *root;
+    if (pe->next == NULL)       /* everything fits into one pages_entry */
+        return pe;              /* --> /Pages root found */
+    else
+        q = root = new_pages_entry();   /* one level higher needed */
+    for (p = pe; p != NULL; p = p->next) {
+        if (q->number_of_kids == PAGES_TREE_KIDSMAX) {
+            q->next = new_pages_entry();
+            q = q->next;
+        }
+        q->kids[q->number_of_kids++] = p->objnum;
+        q->number_of_pages += p->number_of_pages;
+        write_pages(p, q->objnum);
+    }
+    root = output_pages_list(root);     /* recurse through next higher level */
+    return root;
+}
+
+integer outputpagestree()
+{
+    divert_list_entry *d;
+    pages_entry *p;
+    pdfdopageundivert(0, 0);    /* concatenate all diversions into diversion 0 */
+    d = get_divert_list(0);     /* get diversion 0 */
+    assert(d->first != NULL);
+    p = output_pages_list(d->first);
+    write_pages(p, 0);          /* /Pages root object */
+    return p->objnum;
 }
 
 // vim: ts=4

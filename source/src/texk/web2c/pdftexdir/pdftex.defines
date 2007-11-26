@@ -94,6 +94,9 @@ $Id$
 @define procedure allocvffnts;
 @define procedure pdflayernamesgetname();
 @define procedure pdflayerobjectnumbersget();
+@define function pdfdopagedivert();
+@define procedure pdfdopageundivert();
+@define function outputpagestree;
 
 { functions from vfpacket.c }
 @define function newvfpacket();

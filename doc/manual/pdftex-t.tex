@@ -2425,6 +2425,15 @@ definitions and syntax rules follow after the list of primitives.
 \Syntax {
 \Tex {\pdfcopyfont} \Something{control sequence} \Optional{=} \Something{font}
 }
+
+\Syntax {
+\Tex {\pdfpagedivert} \Something{number}
+}
+
+\Syntax {
+\Tex {\pdfpageundivert} \Something{number}
+}
+
 \stoppacked
 
 \subsubject{General definitions and syntax rules}
@@ -4473,6 +4482,67 @@ and end at the same group level. \introduced{1.40.0}
 
 %***********************************************************************
 
+\subsection{Page diversions}
+
+\pdftexprimitive{\Syntax {\Tex {\pdfpagedivert}} \Something{number}}
+
+\bookmark{\type{\pdfpagedivert}}
+
+\introduced{1.50.0}
+
+\pdftexprimitive{\Syntax {\Tex {\pdfpageundivert}} \Something{number}}
+
+\bookmark{\type{\pdfpageundivert}}
+
+\introduced{1.50.0}
+
+These two primitives allow the re-arranging of pages in the PDF output.
+They don't affect the order how page {\em content} is written to
+the PDF file; they also don't touch the pages' contents at all
+(i.\,e.\ page numbers as they appear on the pages are not affected).
+Instead these primitives work by manipulation of the sequence of
+\type{/Page} {\em objects} before these finally go into the so-called
+\type{/Pages} tree.
+The order of \type{/Page} objects within the \type{/Pages} tree gives the
+page sequence as it's known to a viewer application.
+
+The idea of diversions is gleaned from the venerable macro processor m4
+(which in fact provides the same sequence of items upon given commands
+\type{divert()} and \type{undivert()}).  Think of a diversion as a linked
+list, to which stuff is appended at the end.  Each diversion is denoted by
+a non-negative integer number (negative numbers work too, but differently
+from the behaviour known from m4, and their use is discouraged for future
+extensibility).
+At the begin of the \PDFTEX\ run always diversion~0 is active.
+By \Syntax {\Tex {\pdfpagedivert}}~\Something{number} another diversion
+with the given number is activated; this allows to switch back and forth
+between diversions.  There is only one diversion active at the same time;
+the active diversion is always the one specified by the most recent
+\Tex{\pdfpagedivert}.
+
+Every \type{/Page} object is appended to the currently active diversion
+at the {\em end} of the page shipout.  By \Syntax {\Tex
+{\pdfpageundivert}}~\Something{number} the list of \type{/Page}
+objects with the given number is appended to the currently active
+diversion, and then this undiverted list is void.  This means that all
+pages from undiverted lists while shipping out a page go {\em before} that
+page.  If a diversion requested by \Tex{\pdfpageundivert} is void, nothing
+happens.  A diversion is never undiverted into itself; an attempt to do so
+is silently ignored.  Both primitives are also ignored during the shipout
+of \type{/Form /XObjects} by \Tex{\pdfrefxform}.
+
+The number~0 plays a special role as parameter to \Tex{\pdfpageundivert}:
+By \Tex{\pdfpageundivert}~0 {\em all} existing diversions are appended to
+the currently active diversion in ascending numerical order.
+At the end of any \PDFTEX\ run always an implicit \Tex{\pdfpagedivert}~0
+followed by a \Tex{\pdfpageundivert}~0 is done, so that all pages from any
+existing diversion end up in diversion~0.  From this final list of pages
+the \type{/Pages} tree is built.  By the principle of these two primitives,
+every page will appear exactly {\em once} in the PDF file, no less, no
+more.
+
+%***********************************************************************
+
 \subsection{Miscellaneous}
 
 \pdftexprimitive {\Syntax {\Tex {\vadjust}
@@ -4908,7 +4978,8 @@ purposes (given that \PDFTEX\ and the fonts are set up properly).
     \setupcolumns[n=2]
 \stopmode
 
-\startcolumns[tolerance=verytolerant,distance=10pt] \widowpenalty10000 \clubpenalty10000
+\startcolumns[tolerance=verytolerant,distance=10pt] \widowpenalty10000
+\clubpenalty10000 \hbadness10000
 
 \startlines
 Version 1.2, November 2002
@@ -5289,6 +5360,7 @@ parties remain in full compliance.
 
 \gnusection{10}{FUTURE REVISIONS OF THIS LICENSE}
 
+\hfuzz3pt
 The Free Software Foundation may publish new, revised versions
 of the GNU Free Documentation License from time to time.  Such new
 versions will be similar in spirit to the present version, but may
