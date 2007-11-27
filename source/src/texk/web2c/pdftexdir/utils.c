@@ -2081,11 +2081,11 @@ integer pdfdopagedivert(integer objnum, integer divnum)
     printf("\n");
     avl_t_init(&t, divert_list_tree);
     for (d = avl_t_first(&t, divert_list_tree); d != NULL; d = avl_t_next(&t)) {
-        printf("===== D-LIST %ld: ", d->divnum);
+        printf("===== D-LIST %d: ", d->divnum);
         for (q = d->first; q != NULL; q = q->next) {
-            printf("P=%ld NK=%d (", q->objnum, q->number_of_kids);
+            printf("P=%d NK=%d (", q->objnum, q->number_of_kids);
             for (i = 0; i < q->number_of_kids; i++)
-                printf("%ld ", q->kids[i]);
+                printf("%d ", q->kids[i]);
             printf(") ");
         }
         printf("\n");
@@ -2135,11 +2135,11 @@ void pdfdopageundivert(integer divnum, integer curdivnum)
     printf("\n");
     avl_t_init(&t, divert_list_tree);
     for (d = avl_t_first(&t, divert_list_tree); d != NULL; d = avl_t_next(&t)) {
-        printf("===== U-LIST %ld: ", d->divnum);
+        printf("===== U-LIST %d: ", d->divnum);
         for (p = d->first; p != NULL; p = p->next) {
-            printf("P=%ld NK=%d (", p->objnum, p->number_of_kids);
+            printf("P=%d NK=%d (", p->objnum, p->number_of_kids);
             for (i = 0; i < p->number_of_kids; i++)
-                printf("%ld ", p->kids[i]);
+                printf("%d ", p->kids[i]);
             printf(") ");
         }
         printf("\n");
