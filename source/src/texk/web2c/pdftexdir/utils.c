@@ -2169,15 +2169,17 @@ void write_pages(pages_entry * p, int parent)
 }
 
 /* loop over all /Pages objects, output them, create their parents,
- * recursing bottom up. */
+ * recursing bottom up, return the /Pages root object number */
 
-pages_entry *output_pages_list(pages_entry * pe)
+integer output_pages_list(pages_entry * pe)
 {
-    pages_entry *p, *q, *root;
-    if (pe->next == NULL)       /* everything fits into one pages_entry */
-        return pe;              /* --> /Pages root found */
-    else
-        q = root = new_pages_entry();   /* one level higher needed */
+    pages_entry *p, *q, *r;
+    assert(pe != NULL);
+    if (pe->next == NULL) {     /* everything fits into one pages_entry */
+        write_pages(pe, 0);     /* --> /Pages root found */
+        return pe->objnum;
+    }
+    q = r = new_pages_entry();  /* one level higher needed */
     for (p = pe; p != NULL; p = p->next) {
         if (q->number_of_kids == PAGES_TREE_KIDSMAX) {
             q->next = new_pages_entry();
@@ -2187,20 +2189,15 @@ pages_entry *output_pages_list(pages_entry * pe)
         q->number_of_pages += p->number_of_pages;
         write_pages(p, q->objnum);
     }
-    root = output_pages_list(root);     /* recurse through next higher level */
-    return root;
+    return output_pages_list(r);        /* recurse through next higher level */
 }
 
 integer outputpagestree()
 {
     divert_list_entry *d;
-    pages_entry *p;
     pdfdopageundivert(0, 0);    /* concatenate all diversions into diversion 0 */
     d = get_divert_list(0);     /* get diversion 0 */
-    assert(d->first != NULL);
-    p = output_pages_list(d->first);
-    write_pages(p, 0);          /* /Pages root object */
-    return p->objnum;
+    return output_pages_list(d->first);
 }
 
 // vim: ts=4
