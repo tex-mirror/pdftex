@@ -15118,6 +15118,7 @@ end
 @!microseconds: integer;
 @!fixed_pdf_draftmode: integer; {fixed \\pdfdraftmode}
 @!fixed_pdf_draftmode_set: boolean; {|fixed_pdf_draftmode| has been set?}
+@!pdf_page_group_val: integer;
 
 @ @<Set init...@>=
 pdf_gone := 0;
@@ -15135,6 +15136,8 @@ zip_write_state := no_zip;
 pdf_minor_version_written := false;
 fixed_pdfoutput_set := false;
 fixed_pdf_draftmode_set := false;
+pdf_page_group_val := -1;
+
 
 @ @p
 function fix_int(val, min, max: integer): integer;
@@ -18845,6 +18848,12 @@ pdf_print_ln("]");
 if pdf_page_attr <> null then
     pdf_print_toks_ln(pdf_page_attr);
 @<Generate parent pages object@>;
+if pdf_page_group_val > 0 then begin
+    pdf_print("/Group ");
+    pdf_print_int(pdf_page_group_val);
+    pdf_print_ln(" 0 R");
+    pdf_page_group_val := -1;
+end;
 @<Generate array of annotations or beads in page@>;
 pdf_end_dict
 
@@ -35797,7 +35806,7 @@ begin
     image := obj_ximage_data(pdf_ximage_objnum(p));
     pdf_end_text;
     pdf_print_ln("q");
-    if pdf_lookup_list(pdf_ximage_list, pdf_ximage_objnum(p)) = null then
+    if pdf_lookup_list(pdf_ximage_list, pdf_ximage_objnum(p)) = null then 
         pdf_append_list(pdf_ximage_objnum(p))(pdf_ximage_list);
     if not is_pdf_image(image) then begin
         pdf_print_real(ext_xn_over_d(pdf_width(p),
@@ -35810,6 +35819,7 @@ begin
         pdf_print_bp(pdf_y(cur_v));
     end
     else begin
+        if pdf_page_group_val<1 then pdf_page_group_val := image_group_ref (image);
         pdf_print_real(ext_xn_over_d(pdf_width(p),
                        ten_pow[6], image_width(image)), 6);
         pdf_print(" 0 0 ");

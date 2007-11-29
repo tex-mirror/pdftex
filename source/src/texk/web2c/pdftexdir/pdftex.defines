@@ -113,6 +113,7 @@ $Id$
 @define function imageheight();
 @define function imagepages();
 @define function imagecolordepth();
+@define function imagegroupref();
 @define function imagewidth();
 @define function imagexres();
 @define function imageyres();

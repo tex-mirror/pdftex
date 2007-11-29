@@ -38,6 +38,7 @@ integer epdf_selected_page;
 integer epdf_num_pages;
 integer epdf_page_box;
 void *epdf_doc;
+integer epdf_lastGroupObjectNum;
 
 static integer new_image_entry(void)
 {
@@ -50,6 +51,7 @@ static integer new_image_entry(void)
     image_ptr->width = 0;
     image_ptr->height = 0;
     image_ptr->colorspace_ref = 0;
+    image_ptr->group_ref = 0;
     return image_ptr++ - image_array;
 }
 
@@ -133,6 +135,11 @@ integer imagecolordepth(integer img)
         pdftex_fail("unknown type of image");
         return -1;              /* to make the compiler happy */
     }
+}
+
+integer imagegroupref(integer img)
+{
+    return img_group_ref(img);
 }
 
 /*
@@ -301,6 +308,7 @@ integer readimage(strnumber s, integer page_num, strnumber page_name,
         pdf_ptr(img)->orig_y = bp2int(epdf_orig_y);
         pdf_ptr(img)->selected_page = page_num;
         pdf_ptr(img)->doc = epdf_doc;
+        img_group_ref(img) = epdf_lastGroupObjectNum;
         break;
     case IMAGE_TYPE_PNG:
         img_pages(img) = 1;
@@ -348,12 +356,16 @@ void writeimage(integer img)
         epdf_doc = pdf_ptr(img)->doc;
         epdf_selected_page = pdf_ptr(img)->selected_page;
         epdf_page_box = pdf_ptr(img)->page_box;
+        epdf_lastGroupObjectNum = img_group_ref(img);
         write_epdf();
         break;
     default:
         pdftex_fail("unknown type of image");
     }
     tex_printf(">");
+    if (img_type(img) == IMAGE_TYPE_PDF) {
+        write_additional_epdf_objects();
+    }
     cur_file_name = NULL;
 }
 
@@ -462,6 +474,7 @@ void dumpimagemeta()
         dumpinteger(img_yres(img));
         dumpinteger(img_pages(img));
         dumpinteger(img_colorspace_ref(img));
+        dumpinteger(img_group_ref(img));
 
         /* the image_struct is not dumped at all, except for a few
            variables that are needed to restore the contents */
@@ -496,6 +509,7 @@ void undumpimagemeta(integer pdfversion, integer pdfinclusionerrorlevel)
         undumpinteger(img_yres(img));
         undumpinteger(img_pages(img));
         undumpinteger(img_colorspace_ref(img));
+        undumpinteger(img_group_ref(img));
 
         /* if img_name(img)==NULL -- which it shouldn't be -- the next line
            will trigger an assertion failure. */

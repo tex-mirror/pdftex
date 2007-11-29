@@ -50,19 +50,6 @@ $Id$
 // This file is mostly C and not very much C++; it's just used to interface
 // the functions of xpdf, which happens to be written in C++.
 
-// Used flags below:
-//   PDFTEX_COPY_PAGEGROUP
-//     If pdfTeX should copy a page group (a new feature in PDF 1.4 for
-//     transparency) of an included file. The current support for this is
-//     most likely broken. pdfTeX will at least give a warning if this flag
-//     is not set. Surprisingly Acrobat and Jaws display files without a
-//     page group correctly, so it might be safe to not set the flag.
-//     See also PDFTEX_COPY_PAGEGROUP_NOFAIL.
-//   PDFTEX_COPY_PAGEGROUP_NOFAIL
-//     If set to false, pdfTeX will treat a page group in an included file
-//     as an error and abort gracefully. This is only evaluated if
-//     PDFTEX_COPY_PAGEGROUP is set.
-
 // The prefix "PTEX" for the PDF keys is special to pdfTeX;
 // this has been registered with Adobe by Hans Hagen.
 
@@ -124,6 +111,8 @@ struct UsedEncoding {
 static InObj *inObjList;
 static UsedEncoding *encodingList;
 static GBool isInit = gFalse;
+static bool groupIsIndirect;
+static PdfObject lastGroup;
 
 // --------------------------------------------------------------------
 // Maintain list of open embedded PDF files
@@ -272,6 +261,21 @@ static int addInObj(InObjType type, Ref ref, fd_entry * fd, integer e)
     else
         n->num = pdfnewobjnum();
     return n->num;
+}
+
+static int getNewObjectNumber(Ref ref)
+{
+    InObj *p;
+    if (inObjList == 0) {
+        pdftex_fail("No objects copied yet");
+    } else {
+        for (p = inObjList; p != 0; p = p->next) {
+            if (p->ref.num == ref.num && p->ref.gen == ref.gen) {
+                return p->num;
+            }
+        }
+        pdftex_fail("Object not yet copied: %i %i", ref.num, ref.gen);
+    }
 }
 
 static void copyObject(Object *);
@@ -763,6 +767,29 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
             }
         }
     }
+    // get the group and make sure it's indirect
+    if (page->getGroup() != NULL) {
+        initDictFromDict(lastGroup, page->getGroup());
+        if (lastGroup->dictGetLength() > 0) {
+            groupIsIndirect = lastGroup->isRef();
+            if (groupIsIndirect) {
+                // FIXME: Here we already copy the object. It would be
+                // better to do this only after write_epdf, otherwise we
+                // may copy ununsed /Group objects
+                copyObject(&lastGroup);
+                epdf_lastGroupObjectNum =
+                    getNewObjectNumber(lastGroup->getRef());
+            } else {
+                // make the group an indirect object; copying is done later
+                // by write_additional_epdf_objects after write_epdf
+                epdf_lastGroupObjectNum = pdfnewobjnum();
+            }
+            pdf_puts("\n");
+        }
+    } else {
+        epdf_lastGroupObjectNum = 0;
+    }
+
     pdf_doc->xref = pdf_doc->doc->getXRef();
     return page_num;
 }
@@ -775,7 +802,7 @@ void write_epdf(void)
 {
     Page *page;
     PdfObject contents, obj1, obj2;
-    PdfObject group, metadata, pieceinfo, separationInfo;
+    PdfObject metadata, pieceinfo, separationInfo;
     Object info;
     char *key;
     char s[256];
@@ -860,26 +887,14 @@ void write_epdf(void)
     pdf_puts(stripzeros(s));
 
     // write the page Group if it's there
-    if (page->getGroup() != NULL) {
-#if PDFTEX_COPY_PAGEGROUP
-#  if PDFTEX_COPY_PAGEGROUP_NOFAIL
-        // FIXME: This will most likely produce incorrect PDFs :-(
-        initDictFromDict(group, page->getGroup());
-        if (group->dictGetLength() > 0) {
+    if (epdf_lastGroupObjectNum > 0) {
+        initDictFromDict(lastGroup, page->getGroup());
+        if (lastGroup->dictGetLength() > 0) {
             pdf_puts("/Group ");
-            copyObject(&group);
+            groupIsIndirect = lastGroup->isRef();
+            pdf_printf("%d 0 R", epdf_lastGroupObjectNum);
             pdf_puts("\n");
         }
-#  else
-        // FIXME: currently we don't know how to handle Page Groups so we abort gracefully :-(
-        pdftex_fail
-            ("PDF inclusion: Page Group detected which pdfTeX can't handle. Sorry.");
-#  endif
-#else
-        // FIXME: currently we don't know how to handle Page Groups so we at least give a warning :-(
-        pdftex_warn
-            ("PDF inclusion: Page Group detected which pdfTeX can't handle. Ignoring it.");
-#endif
     }
     // write the page Metadata if it's there
     if (page->getMetadata() != NULL) {
@@ -910,7 +925,7 @@ void write_epdf(void)
     if (page->getResourceDict() == NULL) {
         // Resources can be missing (files without them have been spotted
         // in the wild); in which case the /Resouces of the /Page will be used.
-	// "This practice is not recommended".
+        // "This practice is not recommended".
         pdftex_warn
             ("PDF inclusion: /Resources missing. 'This practice is not recommended' (PDF Ref)");
     } else {
@@ -960,6 +975,17 @@ void write_epdf(void)
     // save object list, xref
     pdf_doc->inObjList = inObjList;
     pdf_doc->xref = xref;
+}
+
+// Called after the xobject generated by write_epdf has been finished; used to
+// write out objects that have been made indirect
+void write_additional_epdf_objects(void)
+{
+    if ((epdf_lastGroupObjectNum > 0) && !groupIsIndirect) {
+        zpdfbeginobj(epdf_lastGroupObjectNum, 2);
+        copyObject(&lastGroup);
+        pdfendobj();
+    }
 }
 
 // Called when an image has been written and it's resources in image_tab are
