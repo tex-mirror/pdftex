@@ -63,6 +63,7 @@ typedef struct {
     integer y_res;
     integer num_pages;
     integer colorspace_ref;
+    integer group_ref;          // if it's <=0, the page has no group
     union {
         pdf_image_struct *pdf;
         png_image_struct png;
@@ -90,6 +91,7 @@ extern integer image_max;
 #define img_type(N)     (img_ptr(N)->image_type)
 #define img_color(N)    (img_ptr(N)->color_type)
 #define img_colorspace_ref(N) (img_ptr(N)->colorspace_ref)
+#define img_group_ref(N) (img_ptr(N)->group_ref)
 #define img_pages(N)    (img_ptr(N)->num_pages)
 #define img_width(N)    (img_ptr(N)->width)
 #define img_height(N)   (img_ptr(N)->height)
@@ -105,6 +107,7 @@ extern integer image_max;
 extern integer read_pdf_info(char *, char *, integer, integer, integer,
                              integer);
 extern void write_epdf(void);
+extern void write_additional_epdf_objects(void);
 extern void epdf_delete(void);
 extern void read_png_info(integer);
 extern void write_png(integer);

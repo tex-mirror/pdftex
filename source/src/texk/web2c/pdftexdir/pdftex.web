@@ -288,7 +288,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20071126' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20071129' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -15185,6 +15185,7 @@ end
 @!fixed_pdf_draftmode_set: boolean; {|fixed_pdf_draftmode| has been set?}
 @!pdf_includelayers: integer;
 @!page_divert_val: integer;
+@!pdf_page_group_val: integer;
 
 @ @<Set init...@>=
 pdf_gone := 0;
@@ -15204,6 +15205,7 @@ fixed_pdfoutput_set := false;
 fixed_pdf_draftmode_set := false;
 pdf_includelayers := 0;
 page_divert_val := 0;
+pdf_page_group_val := -1;
 
 @ @p
 function fix_int(val, min, max: integer): integer;
@@ -18912,6 +18914,12 @@ pdf_print_ln("]");
 if pdf_page_attr <> null then
     pdf_print_toks_ln(pdf_page_attr);
 pdf_indirect_ln("Parent", pdf_last_pages);
+if pdf_page_group_val > 0 then begin
+    pdf_print("/Group ");
+    pdf_print_int(pdf_page_group_val);
+    pdf_print_ln(" 0 R");
+    pdf_page_group_val := -1;
+end;
 @<Generate array of annotations or beads in page@>;
 pdf_end_dict
 
@@ -35733,7 +35741,7 @@ begin
     image := obj_ximage_data(pdf_ximage_objnum(p));
     pdf_end_text;
     pdf_print_ln("q");
-    if pdf_lookup_list(pdf_ximage_list, pdf_ximage_objnum(p)) = null then
+    if pdf_lookup_list(pdf_ximage_list, pdf_ximage_objnum(p)) = null then 
         pdf_append_list(pdf_ximage_objnum(p))(pdf_ximage_list);
     if not is_pdf_image(image) then begin
         pdf_print_real(ext_xn_over_d(pdf_width(p),
@@ -35746,6 +35754,7 @@ begin
         pdf_print_bp(pdf_y(cur_v));
     end
     else begin
+        if pdf_page_group_val<1 then pdf_page_group_val := image_group_ref (image);
         pdf_print_real(ext_xn_over_d(pdf_width(p),
                        ten_pow[6], image_width(image)), 6);
         pdf_print(" 0 0 ");

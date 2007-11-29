@@ -314,13 +314,14 @@ extern integer imagepages(integer);
 extern integer imagewidth(integer);
 extern integer imagexres(integer);
 extern integer imageyres(integer);
+extern integer imagecolordepth(integer);
+extern integer imagegroupref(integer);
 extern integer readimage(strnumber, integer, strnumber, integer, integer,
                          integer, integer);
 extern void deleteimage(integer);
 extern void img_free(void);
 extern void updateimageprocset(integer);
 extern void writeimage(integer);
-extern integer imagecolordepth(integer img);
 extern void dumpimagemeta();
 extern void undumpimagemeta(integer, integer);
 
