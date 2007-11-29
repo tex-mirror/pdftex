@@ -35900,7 +35900,7 @@ pdf_refobj_node:
 pdf_refxform_node:
     @<Output a Form node in a vlist@>;
 pdf_refximage_node:
-    @<Output a Image node in a vlist@>;
+    @<Output an Image node in a vlist@>;
 pdf_annot_node:
     do_annot(p, this_box, left_edge, top_edge + height(this_box));
 pdf_start_link_node:
@@ -35939,7 +35939,7 @@ begin
         pdf_last_y_pos := pdf_xform_height + pdf_xform_depth - cur_v;
 end
 
-@ @<Output a Image node in a vlist@>=
+@ @<Output an Image node in a vlist@>=
 begin cur_v:=cur_v+pdf_height(p)+pdf_depth(p); save_v:=cur_v;
   cur_h:=left_edge;
   out_image(p);
@@ -35970,7 +35970,7 @@ pdf_refobj_node:
 pdf_refxform_node:
     @<Output a Form node in a hlist@>;
 pdf_refximage_node:
-    @<Output a Image node in a hlist@>;
+    @<Output an Image node in a hlist@>;
 pdf_annot_node:
     do_annot(p, this_box, left_edge, base_line);
 pdf_start_link_node:
@@ -35998,7 +35998,7 @@ pdf_page_undivert_node:
 othercases out_what(p);
 endcases
 
-@ @<Output a Image node in a hlist@>=
+@ @<Output an Image node in a hlist@>=
 begin
   cur_v:=base_line+pdf_depth(p);
   edge:=cur_h;
