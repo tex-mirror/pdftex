@@ -19734,10 +19734,10 @@ for k := 1 to sys_obj_ptr do
         obj_link(l) := k;
         l := k;
     end;
-obj_link(l) := 0;
+obj_link(l) := 0
 
 @ @<Output the |obj_tab|@>=
-@<Build a linked list of free objects@>
+@<Build a linked list of free objects@>;
 pdf_save_offset := pdf_offset;
 pdf_print_ln("xref");
 pdf_print("0 "); pdf_print_int_ln(obj_ptr + 1);
@@ -19769,7 +19769,7 @@ else if obj_offset(sys_obj_ptr) > 255 then
     xref_offset_width := 2
 else
     xref_offset_width := 1;
-@<Build a linked list of free objects@>
+@<Build a linked list of free objects@>;
 pdf_print_ln("/Type /XRef");
 pdf_print("/Index [0 ");
 pdf_print_int(obj_ptr);
