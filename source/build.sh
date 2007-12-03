@@ -109,7 +109,7 @@ fi
 (cd texk/web2c/lib; $MAKE) || exit 1
 (cd texk/web2c; $MAKE pdftexbin) || exit 1
 # strip them
-(cd texk/web2c; $STRIP pdf*tex pdftosrc ttf2afm)
+# (cd texk/web2c; $STRIP pdf*tex pdftosrc ttf2afm)
 # go back
 cd ..
 # show the results

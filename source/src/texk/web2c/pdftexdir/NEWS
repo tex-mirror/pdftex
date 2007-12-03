@@ -1,5 +1,5 @@
 -------------------------------------------------
-pdfTeX 3.141592-1.40.6 was released on 2007-11-??
+pdfTeX 3.141592-1.40.6 was released on 2007-12-??
 -------------------------------------------------
 - Bugfixes:
   - PDFs > 2GiB (LFS) would be broken, even on 64-bit systems. Now the basic
@@ -8,6 +8,7 @@ pdfTeX 3.141592-1.40.6 was released on 2007-11-??
   - Page groups (see 1.10a below) are now handled correctly (741)
   - broken map files would lead to core dumps
   - unusual TrueType fonts would lead to an assertion error (874)
+  - the null object in object table was never initialized
 - pdfTeX uses xpdf 3.02pl2
 - pdfTeX uses libpng 1.2.23
 
