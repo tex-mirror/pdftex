@@ -19784,7 +19784,8 @@ end
 
 @ @<Output the cross-reference stream dictionary@>=
 pdf_new_dict(obj_type_others, 0, 0);
-if obj_offset(sys_obj_ptr) > ((16777216 * 256) - 1) then
+if (obj_offset(sys_obj_ptr) > 16777215) 
+        and (obj_offset(sys_obj_ptr) > ((16777216 * 256) - 1)) then
     {this obviously works only on platforms with more than 32 bits; the
 expression is not a constant because otherwise tangle would scream number too
 large}
