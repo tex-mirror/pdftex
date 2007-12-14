@@ -2,6 +2,7 @@
 pdfTeX 3.141592-1.40.6 was released on 2007-12-??
 -------------------------------------------------
 - Bugfixes:
+  - inclusion of encrypted PDFs was broken (861)
   - PDFs > 2GiB (LFS) would be broken, even on 64-bit systems. Now the basic
     support for LFS is there, you only need to supply the right compiler flags
     (this is not yet done automatically).
