@@ -310,6 +310,7 @@ class p_Stream:private Stream {
   public:
     virtual void reset() = 0;
     virtual int getChar() = 0;
+    virtual p_Stream *getUndecodedStream() = 0;
     p_Object *Dict_lookup(char *key, p_Object * obj) {
         return (p_Object *) getDict()->lookup(key, (Object *) obj);
 }};

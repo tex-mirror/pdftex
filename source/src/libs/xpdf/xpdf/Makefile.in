@@ -38,7 +38,7 @@ PDFTOEPDF_OBJS = \
 	GlobalParams.o JArithmeticDecoder.o JBIG2Stream.o JPXStream.o Lexer.o Link.o \
 	NameToCharCode.o Object.o PDFDoc.o Page.o \
 	Parser.o PDFDocEncoding.o Stream.o UnicodeMap.o XRef.o Function.o \
-	PSTokenizer.o
+	PSTokenizer.o SecurityHandler.o
 
 libxpdf.a: $(PDFTOEPDF_OBJS)
 	rm -f $@

@@ -2995,7 +2995,6 @@ void GlobalParams::setErrQuiet(GBool errQuietA) {
   unlockGlobalParams;
 }
 
-#ifndef PDF_PARSER_ONLY
 void GlobalParams::addSecurityHandler(XpdfSecurityHandler *handler) {
 #ifdef ENABLE_PLUGINS
   lockGlobalParams;
@@ -3036,7 +3035,6 @@ XpdfSecurityHandler *GlobalParams::getSecurityHandler(char *name) {
 
   return NULL;
 }
-#endif
 
 #ifdef ENABLE_PLUGINS
 //------------------------------------------------------------------------

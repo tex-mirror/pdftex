@@ -567,7 +567,7 @@ static void copyObject(p_Object * obj)
         copyDict(&obj1);
         pdf_puts(">>\n");
         pdf_puts("stream\n");
-        copyStream(obj->getBaseStream());
+        copyStream(obj->getStream()->getUndecodedStream());
         if (pdflastbyte != '\n')
             pdf_puts("\n");
         pdf_puts("endstream");  // can't simply write pdfendstream()
@@ -1006,7 +1006,7 @@ void write_epdf(void)
         contents->streamGetDict()->incRef();
         copyDict(&obj1);
         pdf_puts(">>\nstream\n");
-        copyStream(contents->getBaseStream());
+        copyStream(contents->getStream()->getUndecodedStream());
         pdfendstream();
     } else if (contents->isArray()) {
         pdfbeginstream();
