@@ -187,9 +187,6 @@ class p_Object:private Object {
     p_Stream *getStream() {
         return (p_Stream *) Object::getStream();
     }
-    p_Stream *getBaseStream() {
-        return (p_Stream *) Object::getStream()->getBaseStream();
-    }
     Ref getRef() {
         return Object::getRef();
     }
@@ -266,8 +263,6 @@ class p_ObjectStream:private ObjectStream {
 
 class p_XRef:private XRef {
   public:
-    p_XRef(BaseStream * strA):XRef(strA) {
-    };
     p_Object *getCatalog(p_Object * obj) {
         return (p_Object *) XRef::getCatalog((Object *) obj);
     }
