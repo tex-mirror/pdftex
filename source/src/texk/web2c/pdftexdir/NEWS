@@ -21,7 +21,7 @@ pdfTeX 3.141592-1.50.0 was released on 200?-??-??
   - Documents can now change the order of pages in the pdf with \pdfpagedivert
     and \pdfpageundivert.
   - \expanded (885)
-- pdfTeX uses libpng 1.2.23
+- pdfTeX uses libpng 1.2.24
 - pdfTeX uses xpdf 3.02pl2
 
 -------------------------------------------------
