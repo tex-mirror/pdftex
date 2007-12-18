@@ -34,6 +34,7 @@ enum StreamKind {
   strFlate,
   strJBIG2,
   strJPX,
+  strCrypt,
   strWeird			// internal-use stream types
 };
 
