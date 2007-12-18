@@ -4,7 +4,7 @@
 
    Tim Morgan  September 19, 1987.  */
 
-#include <web2c/config.h>
+#include "config.h"
 #include <kpathsea/getopt.h>
 
 #ifdef VMS

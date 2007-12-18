@@ -13,7 +13,7 @@
 #endif
 
 /* We must include this first, to resolve many C issues.  */
-#include <web2c/config.h>
+#include "config.h"
 
 /* We only use getopt in the applications, not in web2c itself.  */
 #include <kpathsea/getopt.h>
@@ -48,6 +48,7 @@
 #define odd(x)		((x) & 1)
 #define round(x)	zround ((double) (x))
 #define trunc(x)	((integer) (x))
+#undef floor /* MacOSX */
 #define floor(x)	((integer)floor((double)(x)))
 #define input stdin
 #define output stdout

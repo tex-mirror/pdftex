@@ -1,7 +1,7 @@
 /* fprintreal.c: print the real number R in the Pascal format N:M on the
    file F.  Public domain. */
 
-#include <web2c/config.h>
+#include "config.h"
 
 void
 fprintreal P4C(FILE*, f, double, r, int, n, int, m)

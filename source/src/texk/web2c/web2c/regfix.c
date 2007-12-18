@@ -5,7 +5,7 @@
 
    Tim Morgan   February 25, 1988.  */
 
-#include <web2c/config.h>
+#include "config.h"
 
 #ifdef REGFIX		/* REST OF FILE (almost) */
 

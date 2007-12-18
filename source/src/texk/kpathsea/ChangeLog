@@ -1,3 +1,40 @@
+2007-12-17  Karl Berry  <karl@tug.org>
+
+	* kpathsea.texi (Path searching options): clarify --expand-path doc.
+
+2007-12-15  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c (read_command_line, USAGE): improve --version and
+	--help messages.
+
+2007-12-01  Karl Berry  <karl@tug.org>
+
+	* texmf.in (MPMEMS, MFBASES, TEXFORMATS): switch to /$engine,
+	to try to avoid finding a format for the wrong engine.
+	From Akira.
+
+2007-11-05  Karl Berry  <karl@tug.org>
+
+	* texmf.in (allow_multiple_suffixes): unimplemented.
+	Reported by Akira, 17 Feb 2007 15:44:39.
+
+2007-10-24  Karl Berry  <karl@tug.org>
+
+	* mktexpk (MODE) <720>: epscszz.  From Akira.
+	(PKDESTDIR): Quote.  From Paul Vojta,
+	tex-k 22 Oct 2007 17:38:56.
+
+2007-09-11  Karl Berry  <karl@tug.org>
+
+	* texmf.in (TRFONTS): don't recurse through /usr.
+	Report from Michail Vidiassov, mp-i 10 Sep 2007 12:55:10.
+
+2007-08-27  Karl Berry  <karl@tug.org>
+
+	* fontmap.c (map_file_parse): free the original pointer, not the
+	potentially moved one (after whitespace skipping). 
+	From: "George N. White III", 25 Jul 2007 11:27:12.
+
 2007-07-29  Karl Berry  <karl@tug.org>
 
 	* depend.mk: regenerate again.

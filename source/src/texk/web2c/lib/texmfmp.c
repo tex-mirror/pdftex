@@ -88,9 +88,9 @@
 #define edit_var "MFEDIT"
 #endif /* MF */
 #ifdef MP
-#define BANNER "This is MetaPost, Version 0.993"
+#define BANNER "This is MetaPost, Version 1.002"
 #define COPYRIGHT_HOLDER "AT&T Bell Laboratories"
-#define AUTHOR "John Hobby"
+#define AUTHOR "John Hobby.\nCurrent maintainer of MetaPost: Taco Hoekwater"
 #define PROGRAM_HELP MPHELP
 #define BUG_ADDRESS "tex-k@mail.tug.org"
 #define DUMP_VAR MPmemdefault
@@ -335,7 +335,6 @@ maininit P2C(int, ac, string *, av)
 #endif /* TeX */
 }
 
-#ifndef WIN32
 /* The entry point: set up for reading the command line, which will
    happen in `topenin', then call the main body.  */
 
@@ -347,13 +346,16 @@ main P2C(int, ac,  string *, av)
   _response (&ac, &av);
 #endif
 
+#ifdef WIN32
+  _setmaxstdio(2048);
+#endif
+
   maininit(ac, av);
 
   /* Call the real main program.  */
   mainbody ();
   return EXIT_SUCCESS;
 } 
-#endif /* ! WIN32 */
 
 /* This is supposed to ``open the terminal for input'', but what we
    really do is copy command line arguments into TeX's or Metafont's
@@ -399,14 +401,7 @@ topenin P1H(void)
           case 0: ;
         };
         rval -= offsetsFromUTF8[extraBytes];
-        /* now rval is a USV; if it's >=64K, we need to put surrogates in the buffer */
-        if (rval > 0xFFFF) {
-          rval -= 0x10000;
-          buffer[k++] = 0xd800 + rval / 0x0400;
-          buffer[k++] = 0xdc00 + rval % 0x0400;
-        }
-        else
-          buffer[k++] = rval;
+        buffer[k++] = rval;
       }
 #else
       char *ptr = &(argv[i][0]);
@@ -887,7 +882,6 @@ static struct option long_options[]
       { "etex",                      0, &etexp, 1 },
 #endif /* eTeX || pdfTeX || Aleph */
       { "output-comment",            1, 0, 0 },
-      { "output-directory",          1, 0, 0 },
 #if defined(pdfTeX)
       { "draftmode",                 0, 0, 0 },
       { "output-format",             1, 0, 0 },
@@ -904,6 +898,7 @@ static struct option long_options[]
       { "file-line-error",           0, &filelineerrorstylep, 1 },
       { "no-file-line-error",        0, &filelineerrorstylep, -1 },
       { "jobname",                   1, 0, 0 },
+      { "output-directory",          1, 0, 0 },
       { "parse-first-line",          0, &parsefirstlinep, 1 },
       { "no-parse-first-line",       0, &parsefirstlinep, -1 },
       { "translate-file",            1, 0, 0 },
@@ -1808,13 +1803,21 @@ swap_items P3C(char *, p,  int, nitems,  int, size)
    OUT_FILE.  */
 
 void
+#ifdef XeTeX
+do_dump P4C(char *, p,  int, item_size,  int, nitems,  gzFile, out_file)
+#else
 do_dump P4C(char *, p,  int, item_size,  int, nitems,  FILE *, out_file)
+#endif
 {
 #if !defined (WORDS_BIGENDIAN) && !defined (NO_DUMP_SHARE)
   swap_items (p, nitems, item_size);
 #endif
 
+#ifdef XeTeX
+  if (gzwrite (out_file, p, item_size * nitems) != item_size * nitems)
+#else
   if (fwrite (p, item_size, nitems, out_file) != nitems)
+#endif
     {
       fprintf (stderr, "! Could not write %d %d-byte item(s).\n",
                nitems, item_size);
@@ -1832,9 +1835,17 @@ do_dump P4C(char *, p,  int, item_size,  int, nitems,  FILE *, out_file)
 /* Here is the dual of the writing routine.  */
 
 void
+#ifdef XeTeX
+do_undump P4C(char *, p,  int, item_size,  int, nitems,  gzFile, in_file)
+#else
 do_undump P4C(char *, p,  int, item_size,  int, nitems,  FILE *, in_file)
+#endif
 {
+#ifdef XeTeX
+  if (gzread (in_file, p, item_size * nitems) != item_size * nitems)
+#else
   if (fread (p, item_size, nitems, in_file) != nitems)
+#endif
     FATAL2 ("Could not undump %d %d-byte item(s)", nitems, item_size);
 
 #if !defined (WORDS_BIGENDIAN) && !defined (NO_DUMP_SHARE)

@@ -183,7 +183,6 @@ TEXINPUTS.texinfo       = .;$TEXMF/tex/{texinfo,plain,generic,}//
 % latex209, useful for macros that were written for 2.09 and do not
 % mention 2e at all, but can be used with 2e.
 TEXINPUTS.cslatex       = .;$TEXMF/tex/{cslatex,csplain,latex,generic,}//
-TEXINPUTS.platex        = .;$TEXMF/tex/{platex,latex,generic,}//
 TEXINPUTS.latex         = .;$TEXMF/tex/{latex,generic,}//
 TEXINPUTS.olatex        = .;$TEXMF/tex/{latex,generic,}//
 TEXINPUTS.latex209      = .;$TEXMF/tex/{latex209,generic,latex,}//
@@ -239,8 +238,6 @@ TEXINPUTS.context       = .;$TEXMF/tex/{context,plain,generic,}//
 % odd formats needing their own paths
 TEXINPUTS.lamstex       = .;$TEXMF/tex/{lamstex,plain,generic,}//
 TEXINPUTS.lollipop      = .;$TEXMF/tex/{lollipop,plain,generic,}//
-TEXINPUTS.platex-pl     = .;$TEXMF/tex/{platex,latex,generic,}//
-TEXINPUTS.pdfplatex     = .;$TEXMF/tex/{platex,latex,generic,}//
 
 % Earlier entries override later ones, so put this last.
 TEXINPUTS               = .;$TEXMF/tex/{$progname,generic,}//
@@ -261,18 +258,18 @@ TTF2TFMINPUTS =                 .;$TEXMF/ttf2pk//
 MFINPUTS = .;$TEXMF/metafont//;{$TEXMF/fonts,$VARTEXFONTS}/source//
 MPINPUTS = .;$TEXMF/metapost//
 
-% allow for compressed files, and various extenions
+% allow for compressed files, and various extensions.
 TEXDOCSSUFFIX   = ;.pdf;.ps;.dvi;.html;.txt;.tex
 TEXDOCSCOMPRESS = ;.gz;.bz2;.zip;.Z
 TEXDOCEXT       = {$TEXDOCSSUFFIX}{$TEXDOCSCOMPRESS}
 
-% Dump files (fmt/base/mem) for vir{tex,mf,mp} to read (see web2c/INSTALL),
-% and string pools (.pool) for ini{tex,mf,mp}.  It is silly that we have six
-% paths and directories here (they all resolve to a single place by default),
-% but historically ...
-TEXFORMATS = .;$TEXMF/web2c/{$engine,}//
-MFBASES = .;$TEXMF/web2c/{$engine,}//
-MPMEMS = .;$TEXMF/web2c/{$engine,}//
+% Dump files (fmt/base/mem) for vir{tex,mf,mp} to read (see
+% web2c/INSTALL), and string pools (.pool) for ini{tex,mf,mp}.  It is
+% painful that we have six paths and directories here (they all resolve
+% to a single place by default), but historically ...
+TEXFORMATS = .;$TEXMF/web2c{/$engine,}
+MFBASES = .;$TEXMF/web2c{/$engine,}
+MPMEMS = .;$TEXMF/web2c{/$engine,}
 TEXPOOL = .;$TEXMF/web2c
 MFPOOL = .;$TEXMF/web2c
 MPPOOL = .;$TEXMF/web2c
@@ -369,7 +366,7 @@ OPENTYPEFONTS = .;$TEXMF/fonts/opentype//
 PDFTEXCONFIG = .;$TEXMF/pdftex/{$progname,}//
 
 % Used by DMP (ditroff-to-mpx), called by makempx -troff.
-TRFONTS = /usr/{local,}/share/groff/{current/font,site-font}/devps
+TRFONTS = /usr{/local,}/share/groff/{current/font,site-font}/devps
 MPSUPPORT = .;$TEXMF/metapost/support
 
 % For xdvi to find mime.types and .mailcap, if they do not exist in
@@ -478,12 +475,6 @@ shell_escape = f
 %                  restrict absolute paths to be under $TEXMFOUTPUT.
 openout_any = p
 openin_any = a
-
-% Disable search on multiple suffixes filenames. In many case, when `foo.bar'
-% is looked for, you do not want to look for `foo.bar.tex' before. This flag
-% disables searching for standard suffixes if the file name has already an
-% extension of 3 characters. Default value is true (old behaviour).
-allow_multiple_suffixes =                       f
 
 % Allow TeX, MF, and MP to parse the first line of an input file for
 % the %&format construct.

@@ -3115,6 +3115,22 @@ fi
 
 
 
+# we don't currently support use of an installed graphite lib
+
+if test "$needs_graphite" = no; then
+  GRAPHITECPPFLAGS=
+  LDGRAPHITE=
+  GRAPHITEDEP=
+else
+  GRAPHITECPPFLAGS='-I$(GRAPHITESRCDIR)/include'
+  LDGRAPHITE='$(GRAPHITEDIR)/src/.libs/libgraphite.a'
+  GRAPHITEDEP='$(GRAPHITEDIR)/src/.libs/libgraphite.a'
+fi
+
+
+
+
+
 
 # The following line helps, e.g. for ncurses which properly detects the
 # system's terminfo definitions if configured without explicit --prefix.
@@ -3149,11 +3165,10 @@ if test "x$needs_icu" != xno && test "$using_system_icu" != yes; then
   subdirs="$subdirs icu-xetex"
 
 fi
-if test "x$needs_teckit" != xno; then
-  subdirs="$subdirs teckit"
+if test "x$needs_graphite_engine" != xno; then
+  subdirs="$subdirs graphite-engine"
 
 fi
-
 if test "x$needs_pnglib" != xno && test "$using_system_pnglib"  != yes; then
   ac_config_files="$ac_config_files libpng/Makefile"
 
@@ -3164,6 +3179,10 @@ if test "x$needs_zlib" != xno && test "$using_system_zlib"  != yes; then
 fi
 if test "x$needs_obsdcompat" != xno; then
   subdirs="$subdirs obsdcompat"
+
+fi
+if test "x$needs_teckit" != xno; then
+  subdirs="$subdirs teckit"
 
 fi
 
@@ -3362,6 +3381,9 @@ s%@ICUDEP@%$ICUDEP%g
 s%@TECKITCPPFLAGS@%$TECKITCPPFLAGS%g
 s%@LDTECKIT@%$LDTECKIT%g
 s%@TECKITDEP@%$TECKITDEP%g
+s%@GRAPHITECPPFLAGS@%$GRAPHITECPPFLAGS%g
+s%@LDGRAPHITE@%$LDGRAPHITE%g
+s%@GRAPHITEDEP@%$GRAPHITEDEP%g
 s%@subdirs@%$subdirs%g
 
 CEOF

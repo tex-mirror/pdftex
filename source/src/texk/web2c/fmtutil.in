@@ -88,14 +88,11 @@ cont-en	xetex		cont-usr.tex	-8bit *cont-en.ini
 #! cyramstex	pdftex		language.dat	-translate-file=cp227.tcx *cyramstx.ini
 
 # - Polish:
-platex		pdftex		language.dat	-translate-file=cp227.tcx *platex.ini
-pdfplatex	pdftex		language.dat	-translate-file=cp227.tcx *pdfplatex.ini
 mex		pdftex		mexconf.tex	-translate-file=cp227.tcx *mex.ini
 pdfmex		pdftex		mexconf.tex	-translate-file=cp227.tcx *pdfmex.ini
 utf8mex		pdftex		mexconf.tex	-enc *utf8mex.ini
 
 # - Polish with translated messages (experimental):
-#! platex-pl	pdftex		-		nls=pdftex-pl,il2-pl *platex.ini
 #! mex-pl	pdftex		mexconf.tex	nls=pdftex-pl,il2-pl *mex.ini
 #! pdfmex-pl	pdftex		mexconf.tex	nls=pdftex-pl,il2-pl *pdfmex.ini
 
