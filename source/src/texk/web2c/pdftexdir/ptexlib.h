@@ -164,6 +164,10 @@ extern integer ttf_length;
 extern strnumber last_tex_string;
 extern size_t last_ptr_index;
 
+/* loadpdftexpool.c */
+
+int loadpoolstrings (integer spare_size) ;
+
 /* pdftexlib function prototypes */
 
 /* epdf.c */

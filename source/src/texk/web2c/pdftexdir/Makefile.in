@@ -49,7 +49,7 @@ writefont.o writet1.o writet3.o writezip.o writeenc.o writettf.o \
 writejpg.o writejbig2.o writepng.o writeimg.o pdftoepdf.o avl.o \
 avlstuff.o subfont.o tounicode.o pdflib.o
 
-all: libpdf.a
+all: libpdf.a makecpool
 
 pdftosrc.o: $(srcdir)/pdftosrc.cc
 
@@ -57,6 +57,9 @@ libpdf.a: $(OBJS)
 	rm -f $@
 	$(AR) $(ARFLAGS) $@  $(OBJS)
 	$(RANLIB) $@
+        
+makecpool: makecpool.o
+	$(link_command) makecpool.o
 
 kpse_include ../make/clean.mk
 

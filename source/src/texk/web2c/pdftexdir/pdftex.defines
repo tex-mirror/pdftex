@@ -147,5 +147,8 @@ $Id$
 { functions from pdftex.web (thanks Taco for the trick) }
 @define function autoexpandvf();
 
+{ loadpdftexpool }
+@define function loadpoolstrings();
+
 { end of pdftex.defines }
 { vim: set syntax=web : }

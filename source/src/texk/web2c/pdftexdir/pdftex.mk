@@ -25,7 +25,7 @@ $(pdftexdir)/pdftex.version: $(srcdir)/$(pdftexdir)/pdftex.web
 
 # The C sources.
 pdftex_c = pdftexini.c pdftex0.c pdftex1.c pdftex2.c pdftex3.c
-pdftex_o = pdftexini.o pdftex0.o pdftex1.o pdftex2.o pdftex3.o pdftexextra.o
+pdftex_o = pdftexini.o pdftex0.o pdftex1.o pdftex2.o pdftex3.o pdftexextra.o loadpdftexpool.o
 
 # Making pdftex
 pdftex: pdftexd.h $(pdftex_o) $(pdftexextra_o) $(pdftexlibsdep)
@@ -42,6 +42,8 @@ $(pdftexdir)/pdftexextra.h: $(pdftexdir)/pdftexextra.in $(pdftexdir)/pdftex.vers
 	sed -e s/PDFTEX-VERSION/`cat $(pdftexdir)/pdftex.version`/ \
 	    -e s/ETEX-VERSION/`cat etexdir/etex.version`/ \
 	  $(srcdir)/$(pdftexdir)/pdftexextra.in >$@
+loadpdftexpool.c: pdftex.pool $(pdftexdir)/makecpool
+	$(pdftexdir)/makecpool pdftex.pool pdftexdir/ptexlib.h > loadpdftexpool.c
 
 # Tangling
 pdftex.p pdftex.pool: tangle $(srcdir)/$(pdftexdir)/pdftex.web pdftex.ch
@@ -81,7 +83,7 @@ pdftex-clean:
 	$(LIBTOOL) --mode=clean $(RM) pdftex
 	rm -f $(pdftex_o) $(pdftex_c) pdftexextra.c pdftexcoerce.h
 	rm -f $(pdftexdir)/pdftexextra.h
-	rm -f pdftexd.h pdftex.p pdftex.pool pdftex.ch
+	rm -f pdftexd.h pdftex.p pdftex.pool pdftex.ch loadpdftexpool.c
 	rm -f pdftex.fmt pdftex.log
 
 # Dumps

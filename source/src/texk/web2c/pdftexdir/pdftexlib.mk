@@ -78,10 +78,14 @@ pdflib_sources = $(srcdir)/pdftexdir/*.c $(srcdir)/pdftexdir/*.cc \
 pdftexdir/libpdf.a: $(pdflib_sources) pdftexdir/pdftexextra.h
 	cd pdftexdir && $(MAKE) $(common_makeargs) libpdf.a
 
+# makecpool:
+
+pdftexdir/makecpool: pdftexdir/makecpool.c
+	cd pdftexdir && $(MAKE) $(common_makeargs) makecpool
 
 # Convenience variables.
 
 pdftexlibs = $(pdflib) $(LDLIBPNG) $(LDZLIB) $(LDLIBXPDF) $(LIBMD5DEP) $(LDLIBOBSD)
-pdftexlibsdep = $(pdflib) $(LIBPNGDEP) $(ZLIBDEP) $(LIBXPDFDEP) $(LIBMD5DEP) $(LIBOBSDDEP)
+pdftexlibsdep = $(pdflib) $(LIBPNGDEP) $(ZLIBDEP) $(LIBXPDFDEP) $(LIBMD5DEP) $(LIBOBSDDEP) $(makecpool)
 
 ## end of pdftexlib.mk - Makefile fragment for libraries used by pdf[ex]tex.
