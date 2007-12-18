@@ -2,6 +2,8 @@
 pdfTeX 3.141592-1.50.0 was released on 200?-??-??
 -------------------------------------------------
 - New features:
+  - The pool file is no longer a separate file, but is now included in the
+    binary.
   - pdftex now knows a bit about pdf layers (new in PDF 1.5).
     After an included pdf has been written out, a document can
     - find out the number of layers with \pdfnumberoflayers (expands to the

@@ -1,7 +1,7 @@
 pdfTeX
 ======
 
-INSTALL for pdfTeX 1.40.3
+INSTALL for pdfTeX 1.50.0
 =========================
 
 This distribution is a stripped-down version of the teTeX distribution.
@@ -11,7 +11,7 @@ populate a directory build.
 The code of pdfTeX is in src/texk/web2c/pdftexdir
 
 Try the script build.sh in this directory. If it succeeds, you should end up
-with the files pdftex and pdftex.pool in build/texk/web2c
+with the files pdftex, pdftosrc and ttf2afm in build/texk/web2c
 
 If you are using a TeX distribution older than 2005 (e.g. teTeX 2.x), please
 first update your complete TeX installation.
