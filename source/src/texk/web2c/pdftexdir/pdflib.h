@@ -263,6 +263,9 @@ class p_ObjectStream:private ObjectStream {
 
 class p_XRef:private XRef {
   public:
+#if __GNUC__ < 4 // gcc 3 is broken and needs this
+    p_XRef();
+#endif
     p_Object *getCatalog(p_Object * obj) {
         return (p_Object *) XRef::getCatalog((Object *) obj);
     }
