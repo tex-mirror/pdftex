@@ -1,6 +1,6 @@
 /* config.h: All .c files include this first.
 
-Copyright (C) 1995, 1996, 2006 Karl Berry.
+Copyright (C) 1995, 1996, 2006, 2007 Karl Berry.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
+along with this program; if not, see <http://www.gnu.org/licenses/.  */
 
 #ifndef WEB2C_CONFIG_H
 #define WEB2C_CONFIG_H

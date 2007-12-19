@@ -1,6 +1,10 @@
-2007-11-16  Martin SchrÃ¶der <martin@pdftex.org>
-	* tex.ch: increase ssup_max_strings und sup_main_memory
-	* tangle.ch: increase max_bytes
+2007-12-19  Karl Berry  <karl@tug.org>
+
+	* tangle.ch (max_bytes): increase to 65535.
+
+	* config.h (LONGINTEGER_TYPE): switch to off_t.
+	
+	(Both of these from Martin S.)
 
 2007-10-23  Karl Berry  <karl@tug.org>
 
@@ -915,7 +919,7 @@
 
 	* tex.ch: Initialize source_filename_stack[0],
 	full_source_filename_stack[0] -- these can be read under some
-	circumstances.  Found by Krank KÃ¼ster <frank@kuesterei.ch>.
+	circumstances.  Found by Krank Küster <frank@kuesterei.ch>.
 
 	* tex.ch: Correct printing of |src_specials| when weaving.
 
@@ -1770,7 +1774,7 @@
 
 	* dvitomp.ch: A checksum failure should result in a warning, but
  	not in a non-zero return code.  This was done correctly in one
- 	location, wrong in another.  Reported by Berthold HÃ¶llmann.
+ 	location, wrong in another.  Reported by Berthold Höllmann.
 
 1999-05-30  Olaf Weber  <olaf@infovore.xs4all.nl>
 
