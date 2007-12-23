@@ -114,5 +114,5 @@ fi
 cd ..
 # show the results
 d="$B"/texk/web2c
-ls -l $d/pdf*tex $d/pdf*tex.pool $d/pdftosrc $d/ttf2afm
+ls -l $d/pdf*tex $d/pdftosrc $d/ttf2afm
 # vim: set syntax=sh ts=2:
