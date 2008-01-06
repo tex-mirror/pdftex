@@ -1,5 +1,57 @@
-2007-11-16  Martin Schröder <martin@pdftex.org>
-	* tex.ch: increase ssup_max_strings und sup_main_memory
+2008-01-02  Jonathan Kew  <jonathan_kew@sil.org>
+
+	* tex.ch (expand_depth, et al.): when calling expand, don't
+	recurse enough to clobber the os stack.  Default value 10000.
+
+2007-12-24  Karl Berry  <karl@tug.org>
+
+	* doc/web2c.texi (gftodvi invocation): talk a bit more about slant
+	fonts, pursuant to DEK's message to tex-k of 10 Jul 2005 18:38:11.
+
+2007-12-19  Martin Schröder <martin@oneiros.de>
+
+	* tex.ch (ssup_max_strings): increase to 2097151
+		 (sup_main_memory): increase to 256000000
+
+2007-12-19  Karl Berry  <karl@tug.org>
+
+	* tangle.ch (max_bytes): increase to 65535.
+
+	* config.h (LONGINTEGER_TYPE): switch to off_t.
+	
+	(Both of these from Martin S.)
+
+2007-10-23  Karl Berry  <karl@tug.org>
+
+	* config.h (LONGINTEGER_TYPE): #define, depending on the C version.
+	(longinteger): typedef.
+
+2007-10-01  Karl Berry  <karl@tug.org>
+
+	* cpascal.h (floor): #undef, since MaxOSX #defines it.
+	From Peter Dyballa, metapost list, 27 Sep 2007 15:25:03.
+
+2007-09-18  Karl Berry  <karl@tug.org>
+
+	* tex.ch (29.530): Wording of "Type <return>" msg.
+
+2007-09-16  Karl Berry  <karl@tug.org>
+
+	* c-auto.in (EDITOR): doc fix.
+
+2007-09-12  Karl Berry  <karl@tug.org>
+
+	* c-auto.in (EDITOR) [WIN32]: need "", and emacs preferred.
+	From Akira.
+
+2007-09-09  Karl Berry  <karl@tug.org>
+
+	* c-auto.in (EDITOR): 'quote' the filename.
+	Reported by Frank K, 17 Jul 2007 17:00:41, debian bug 433455.
+
+2007-08-24  Karl Berry  <karl@tug.org>
+
+	* doc/web2c.texi (Initial MetaPost): change pragma link.
 
 2007-07-15  Karl Berry  <karl@tug.org>
 

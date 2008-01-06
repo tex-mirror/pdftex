@@ -1,3 +1,78 @@
+2008-01-05  Karl Berry  <karl@tug.org>
+
+	* texmf.in (progname, engine): distinguish the unset values.
+	(main_memory): increase to 3M.
+	(font_mem_size): increase to 2.5M.
+	(trie_size): increase to 400K.
+	(save_size): increase to 50K.
+	These size changes per gwtex (except a bit more).
+
+2008-01-02  Karl Berry  <karl@tug.org>
+
+	* c-std.h (ALLOC_RETURN_TYPE) [!STDC_HEADERS]: just use void in
+	the unlikely event we're declaring *alloc ourselves.  No modern
+	system uses char * for them.
+
+2007-12-23  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c (subdir_match): new fn.
+	(lookup): call it if requested.
+	(subdir_paths): new global.
+	(read_command_line): new option --subdir.
+
+2007-12-22  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c (lookup): handle --all for regular lookups as well
+		as user-specific paths.
+	* pathsearch.c (search_list): uniqify list before returning.
+	(kpse_path_search_list_generic): new fn.
+	(kpse_all_path_search_list, kpse_path_search_list): rewrite to
+		call ..._generic.
+	* pathsearch.h (kpse_path_search_list_generic): declare it.
+	* str-list.c (str_list_uniqify): new fn.
+	* str-list.h (str_list_uniqify): declare it.
+	* tex-file.c (kpse_find_file_generic): new name for kpse_find_file
+		code, with addition of argument to find all.
+        (kpse_find_file): rewrite to call ..._generic.
+	* tex-file.h (kpse_find_file_generic): declare it.
+
+2007-12-17  Karl Berry  <karl@tug.org>
+
+	* kpathsea.texi (Path searching options): clarify --expand-path doc.
+
+2007-12-15  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c (read_command_line, USAGE): improve --version and
+	--help messages.
+
+2007-12-01  Karl Berry  <karl@tug.org>
+
+	* texmf.in (MPMEMS, MFBASES, TEXFORMATS): switch to /$engine,
+	to try to avoid finding a format for the wrong engine.
+	From Akira.
+
+2007-11-05  Karl Berry  <karl@tug.org>
+
+	* texmf.in (allow_multiple_suffixes): unimplemented.
+	Reported by Akira, 17 Feb 2007 15:44:39.
+
+2007-10-24  Karl Berry  <karl@tug.org>
+
+	* mktexpk (MODE) <720>: epscszz.  From Akira.
+	(PKDESTDIR): Quote.  From Paul Vojta,
+	tex-k 22 Oct 2007 17:38:56.
+
+2007-09-11  Karl Berry  <karl@tug.org>
+
+	* texmf.in (TRFONTS): don't recurse through /usr.
+	Report from Michail Vidiassov, mp-i 10 Sep 2007 12:55:10.
+
+2007-08-27  Karl Berry  <karl@tug.org>
+
+	* fontmap.c (map_file_parse): free the original pointer, not the
+	potentially moved one (after whitespace skipping). 
+	From: "George N. White III", 25 Jul 2007 11:27:12.
+
 2007-07-29  Karl Berry  <karl@tug.org>
 
 	* depend.mk: regenerate again.
