@@ -1,3 +1,41 @@
+2008-01-05  Karl Berry  <karl@tug.org>
+
+	* texmf.in (progname, engine): distinguish the unset values.
+	(main_memory): increase to 3M.
+	(font_mem_size): increase to 2.5M.
+	(trie_size): increase to 400K.
+	(save_size): increase to 50K.
+	These size changes per gwtex (except a bit more).
+
+2008-01-02  Karl Berry  <karl@tug.org>
+
+	* c-std.h (ALLOC_RETURN_TYPE) [!STDC_HEADERS]: just use void in
+	the unlikely event we're declaring *alloc ourselves.  No modern
+	system uses char * for them.
+
+2007-12-23  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c (subdir_match): new fn.
+	(lookup): call it if requested.
+	(subdir_paths): new global.
+	(read_command_line): new option --subdir.
+
+2007-12-22  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c (lookup): handle --all for regular lookups as well
+		as user-specific paths.
+	* pathsearch.c (search_list): uniqify list before returning.
+	(kpse_path_search_list_generic): new fn.
+	(kpse_all_path_search_list, kpse_path_search_list): rewrite to
+		call ..._generic.
+	* pathsearch.h (kpse_path_search_list_generic): declare it.
+	* str-list.c (str_list_uniqify): new fn.
+	* str-list.h (str_list_uniqify): declare it.
+	* tex-file.c (kpse_find_file_generic): new name for kpse_find_file
+		code, with addition of argument to find all.
+        (kpse_find_file): rewrite to call ..._generic.
+	* tex-file.h (kpse_find_file_generic): declare it.
+
 2007-12-17  Karl Berry  <karl@tug.org>
 
 	* kpathsea.texi (Path searching options): clarify --expand-path doc.
