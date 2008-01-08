@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2007 Martin Schröder <martin@pdftex.org, Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 2008 Martin Schröder <martin@pdftex.org, Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -359,6 +359,9 @@ class p_Page:private Page {
     }
     p_Dict *getGroup() {
         return (p_Dict *) Page::getGroup();
+    }
+    p_GString *getLastModified() {
+        return (p_GString*) Page::getLastModified();
     }
     p_Stream *getMetadata() {
         return (p_Stream *) Page::getMetadata();
