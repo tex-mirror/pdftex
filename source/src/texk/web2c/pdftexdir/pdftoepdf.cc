@@ -912,6 +912,10 @@ void write_epdf(void)
             pdf_puts("\n");
         }
     }
+    // copy LastModified (needed when PieceInfo is there)
+    if (page->getLastModified() != NULL) {
+        pdf_printf("/LastModified (%s)\n", page->getLastModified()->getCString());
+    }
     // write the page SeparationInfo if it's there
     if (page->getSeparationInfo() != NULL) {
         initDictFromDict(separationInfo, page->getSeparationInfo());
