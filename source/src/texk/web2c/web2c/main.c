@@ -23,7 +23,7 @@
    entirely on one line.  */
 #define max_line_length 78
 
-#define max_strings 20000
+#define max_strings 30000
 #define hash_prime 101
 #define sym_table_size 3000
 #define unused 271828
