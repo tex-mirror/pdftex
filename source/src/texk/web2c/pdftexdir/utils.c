@@ -1546,6 +1546,9 @@ integer colorstackskippagestart(int colstack_no)
     if (!colstack->page_start) {
         return 1;
     }
+    if (colstack->page_current == NULL) {
+        return 0;
+    }
     if (strcmp(COLOR_DEFAULT, colstack->page_current) == 0) {
         return 2;
     }
