@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2008 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -83,6 +83,11 @@ integer imageyres(integer img)
 boolean ispdfimage(integer img)
 {
     return img_type(img) == IMAGE_TYPE_PDF;
+}
+
+boolean ispngimage(integer img)
+{
+    return img_type(img) == IMAGE_TYPE_PNG;
 }
 
 boolean checkimageb(integer procset)
@@ -365,6 +370,10 @@ void writeimage(integer img)
     tex_printf(">");
     if (img_type(img) == IMAGE_TYPE_PDF) {
         write_additional_epdf_objects();
+    } else {
+        if (img_type(img) == IMAGE_TYPE_PNG) {
+            write_additional_png_objects();
+        }
     }
     cur_file_name = NULL;
 }

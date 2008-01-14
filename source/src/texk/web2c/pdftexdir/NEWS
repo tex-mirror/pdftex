@@ -6,7 +6,9 @@ pdfTeX 3.141592-1.40.6 was released on 2008-01-??
   - PDFs > 2GiB (LFS) would be broken, even on 64-bit systems. Now the basic
     support for LFS is there, you only need to supply the right compiler flags
     (this is not yet done automatically).
-  - Page groups (see 1.10a below) are now handled correctly (741)
+  - Page groups in pdfs (see 1.10a below) are now handled correctly (741)
+  - When including transparent PNGs pdftex now automatically adds a Page Group
+    (896)
   - broken map files would lead to core dumps
   - unusual TrueType fonts would lead to an assertion error (874)
   - the null object in object table was never initialized

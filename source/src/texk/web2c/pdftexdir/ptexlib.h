@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2008 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -300,6 +300,7 @@ extern boolean checkimageb(integer);
 extern boolean checkimagec(integer);
 extern boolean checkimagei(integer);
 extern boolean ispdfimage(integer);
+extern boolean ispngimage(integer);
 extern integer epdforigx(integer);
 extern integer epdforigy(integer);
 extern integer imageheight(integer);
