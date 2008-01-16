@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008 Martin Schröder <martin@pdftex.org, Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 2007, 2008 Martin Schröder <martin@pdftex.org, Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 

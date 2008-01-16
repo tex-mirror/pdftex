@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2008 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -111,6 +111,7 @@ extern void write_additional_epdf_objects(void);
 extern void epdf_delete(void);
 extern void read_png_info(integer);
 extern void write_png(integer);
+extern void write_additional_png_objects(void);
 extern void read_jpg_info(integer);
 extern void write_jpg(integer);
 extern void read_jbig2_info(integer);
