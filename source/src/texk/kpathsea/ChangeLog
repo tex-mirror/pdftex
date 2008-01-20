@@ -1,3 +1,12 @@
+2008-01-18  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c (subdir_match): XRETALLOC is a statement not a function.
+	* pathsearch.c (search_list): remove unused variable uniq_list.
+
+2008-01-16  Karl Berry  <karl@tug.org>
+
+	* absolute.c through config.h: replace FSF physical address with url.
+
 2008-01-15  Karl Berry  <karl@tug.org>
 
 	* variable.c (kpse_var_value): only free if new memory.
