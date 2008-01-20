@@ -1,21 +1,33 @@
 The pdfTeX team is happy to announce the release of a new stable version:
 
 ===========================================================================
-                               pdfTeX 1.40.5
+                               pdfTeX 1.40.6
 ===========================================================================
 
-This is the announcement of pdfTeX 1.40.5, an extended version of TeX that
+This is the announcement of pdfTeX 1.40.6, an extended version of TeX that
 can create PDF directly from TeX source files and enhance the result of TeX
 typesetting with the help of PDF.
 
 ===========================================================================
-  Main changes of pdfTeX 1.40.5
+  Main changes of pdfTeX 1.40.6
 ===========================================================================
 
-- Bugfixes: 
-  - calling 'pdftex %' would crash (830)
-  - fflush the recorder file
-- pdfTeX uses xpdf 3.02pl1
+- Bugfixes:
+  - inclusion of encrypted PDFs was broken (861)
+  - PDFs > 2GiB (LFS) would be broken, even on 64-bit systems. Now the
+    basic support for LFS is there, you only need to supply the right
+    compiler flags (this is not yet done automatically). See build.sh for
+    hints on compiling.
+  - Page groups in pdfs (see 1.10a below) are now handled correctly (741)
+  - When including transparent PNGs pdftex now automatically adds a Page
+    Group (896)
+  - broken map files would lead to core dumps
+  - unusual TrueType fonts would lead to an assertion error (874)
+  - the null object in object table was never initialized
+  - included PDFs with /PieceInfo lost their /LastModified date
+  - an empty colorstack crashed pdftex (897)
+- pdfTeX uses libpng 1.2.24
+- pdfTeX uses xpdf 3.02pl2
 
 For complete release notes see http://www.pdftex.org/NEWS
 
@@ -23,7 +35,7 @@ For complete release notes see http://www.pdftex.org/NEWS
   Legal notice / license
 ===========================================================================
 
-pdfTeX is copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
+pdfTeX is copyright (c) 1996-2008 Han The Thanh, <thanh@pdftex.org>
 
 pdfTeX is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
@@ -64,5 +76,5 @@ documentation.
 
 Have fun!
 
-Martin Schröder (martin@pdftex.org) for the pdfTeX team, July 2007
+Martin Schröder (martin@pdftex.org) for the pdfTeX team, January 2008
 // vim: tw=75:ts=2:expandtab:autoindent
