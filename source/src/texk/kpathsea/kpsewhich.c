@@ -1,7 +1,7 @@
 /* kpsewhich -- standalone path lookup and variable expansion for Kpathsea.
-   Ideas from Thomas Esser and Pierre MacKay.
+   Ideas from Thomas Esser, Pierre MacKay, and many others.
 
-   Copyright (C) 1995 - 2005 Karl Berry & Olaf Weber.
+   Copyright (C) 1995-2008 Karl Berry & Olaf Weber.
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,6 @@
    You should have received a copy of the GNU Lesser General Public
    License along with this library; if not, write to the Free Software
    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 */
 
 #include <kpathsea/config.h>
@@ -103,6 +102,8 @@ find_format P2C(string, name, boolean, is_filename)
     ret = user_format;
   } else if (FILESTRCASEEQ (name, "pdftex.cfg")) {
     ret = kpse_pdftex_config_format;
+  } else if (FILESTRCASEEQ (name, "config.ps")) {
+    ret = kpse_dvips_config_format;
   } else {
     int f;  /* kpse_file_format_type */
     unsigned name_len = strlen (name);
@@ -187,7 +188,7 @@ subdir_match P2C(str_list_type, subdirs,  string *, matches)
     string s = xstrdup (matches[m]);
     for (loc = strlen (s); loc > 0 && !IS_DIR_SEP (s[loc-1]); loc--)
       ;
-    while (IS_DIR_SEP (s[loc-1])) {
+    while (loc > 0 && IS_DIR_SEP (s[loc-1])) {
       loc--;
     }
     s[loc] = 0;  /* wipe out basename */
@@ -201,7 +202,7 @@ subdir_match P2C(str_list_type, subdirs,  string *, matches)
       }
       if (FILESTRCASEEQ (subdir, s + loc - subdir_len)) {
         /* matched, save this one.  */
-        ret = XRETALLOC (ret, len + 1, string);
+        XRETALLOC (ret, len + 1, string);
         ret[len-1] = matches[m];
         len++;
       }
@@ -304,8 +305,7 @@ lookup P1C(string, name)
 -help                  print this message and exit.\n\
 -interactive           ask for additional filenames to look up.\n\
 [-no]-mktex=FMT        disable/enable mktexFMT generation (FMT=pk/mf/tex/tfm).\n\
--mode=STRING           set device name for $MAKETEX_MODE to STRING;\n\
-                       no default.\n\
+-mode=STRING           set device name for $MAKETEX_MODE to STRING; no default.\n\
 -must-exist            search the disk as well as ls-R if necessary\n\
 -path=STRING           search in the path STRING.\n\
 -progname=STRING       set program name to STRING.\n\
@@ -441,10 +441,10 @@ read_command_line P2C(int, argc,  string *, argv)
     } else if (ARGUMENT_IS ("version")) {
       extern KPSEDLL char *kpathsea_version_string; /* from version.c */
       puts (kpathsea_version_string);
-      puts ("Copyright 2005 Karl Berry & Olaf Weber.\n\
-There is NO warranty.  You may redistribute this software\n\
-under the terms of the GNU General Public License.\n\
-For more information about these matters, see the files named GPL and LGPL.");
+      puts ("Copyright 2008 Karl Berry & Olaf Weber.\n\
+License LGPLv2.1+: GNU Lesser GPL version 2.1 or later <http://gnu.org/licenses/lgpl.html>\n\
+This is free software: you are free to change and redistribute it.\n\
+There is NO WARRANTY, to the extent permitted by law.\n");
       exit (0);
     }
 

@@ -2,8 +2,8 @@
 @setfilename kpathsea.info
 @settitle Kpathsea: A library for path searching
 
-@set version 3.5.6
-@set month-year January 2007
+@set version 3.5.6dev
+@set month-year January 2008
 
 @c Define new indices for commands, filenames, and options.
 @defcodeindex cm
@@ -35,7 +35,7 @@
 This file documents the Kpathsea library for path searching.
 
 Copyright @copyright{} 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-2004, 2005, 2007 Karl Berry & Olaf Weber.
+2004, 2005, 2007, 2008 Karl Berry & Olaf Weber.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -675,8 +675,11 @@ Variable expansion is implemented in the source file
 @cindex expansion, tilde
 
 @vindex HOME@r{, as ~ expansion}
+@vindex USERPROFILE@r{, as ~ expansion}
 A leading @samp{~} in a path element is replaced by the value of the
-environment variable @code{HOME}, or @file{.} if @code{HOME} is not set.
+environment variable @code{HOME}, or @file{.} if @code{HOME} is not
+set.  On Windows, the environment variable @code{USERPROFILE} is
+checked instead of @code{HOME}.
 
 A leading @samp{~@var{user}} in a path element is replaced by
 @var{user}'s home directory from the system @file{passwd} database.
@@ -1090,6 +1093,15 @@ with no associated suffix.  For example, for Dvips configuration files
 you can use @samp{--format="dvips config"}.  (The quotes are for the
 sake of the shell.)
 
+@flindex config.ps
+@flindex pdftex.cfg
+@flindex pdftexconfig.tex
+When the filename being searched for is @file{config.ps}, the format
+is automatically switched to @samp{dvips config}.  Similarly, when the
+filename is @file{pdftex.cfg}, the format is switched to @samp{pdftex
+config} (although @file{pdftex.cfg} is not used any more; look for
+@file{pdftexconfig.tex} instead.)
+
 Here's the current list of recognized names and the associated suffixes.
 @xref{Supported file formats}, for more information on each of these.
 @example
@@ -1182,7 +1194,7 @@ of guessing the search path from the filename.  @samp{//} and all the
 usual expansions are supported (@pxref{Path expansion}).  This option
 and @samp{--format} are mutually exclusive.  To output the complete
 directory expansion of a path, instead of doing a one-shot lookup, see
-@samp{--expand-path} in the following section.
+@samp{--expand-path} and @samp{--show-path} in the following section.
 
 @item --progname=@var{name}
 @opindex --progname=@var{name}
@@ -1208,7 +1220,9 @@ lookup:
 
 @item
 @opindex --var-value=@var{variable}
-@samp{--var-value=@var{variable}} output the value of @var{variable}.
+@samp{--var-value=@var{variable}} outputs the value of @var{variable},
+expanding @samp{$} (@pxref{Variable expansion} and @samp{~} (@pxref{Tilde
+expansion}) constructs, but not performing other expansions.
 
 @item
 @opindex --expand-braces=@var{string}
@@ -1225,9 +1239,13 @@ hierarchy.  @xref{Path expansion}.
 @item
 @opindex --expand-path=@var{string}
 @samp{--expand-path=@var{string}} outputs the complete expansion of
-@var{string} as a colon-separated path.  This is useful to construct a
-search path for a program that doesn't accept recursive subdirectory
-specifications.  Nonexistent directories are culled from the output:
+@var{string}, with each element separated by the usual path separator
+on the current system (@samp{;} on Windows, @samp{:} otherwise).
+This may be useful to construct a custom search path for a format not
+otherwise supported.  To retrieve the search path for a format that is
+already supported, see @samp{--show-path}, next.
+
+Nonexistent directories are culled from the output:
 
 @example
 $ kpsewhich --expand-path '/tmp'
@@ -1245,6 +1263,7 @@ For one-shot uses of an arbitrary (not built in to Kpathsea) path, see
 lookups of file type @var{name}.  Either a filename extension
 (@samp{pk}, @samp{.vf}, etc.) or an integer can be used, just as with
 @samp{--format}, described in the previous section.
+
 @end itemize
 
 
