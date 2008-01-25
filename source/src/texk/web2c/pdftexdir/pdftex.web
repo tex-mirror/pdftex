@@ -288,7 +288,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20080116' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20080125' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.141592',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -26853,10 +26853,7 @@ vertical list contains no character nodes, hence the |type| field exists
 for each node in the list.
 @^data structure assumptions@>
 
-@d discard_or_move = 60
 @p function prune_page_top(@!p:pointer;@!s:boolean):pointer;
-label discard_or_move;
-  {adjust top after page break}
 var prev_p:pointer; {lags one step behind |p|}
 @!q,@!r:pointer; {temporary variables for list manipulation}
 begin prev_p:=temp_head; link(temp_head):=p;
@@ -26868,12 +26865,6 @@ while p<>null do
     prev_p:=p; p:=link(prev_p);
     end;
   glue_node,kern_node,penalty_node: begin
-discard_or_move:
-    @{
-    print("discard_or_move: ");
-    show_node_list(p);
-    print_ln;
-    @}
     q:=p; p:=link(q); link(q):=null;
     link(prev_p):=p;
     if s then
@@ -32689,9 +32680,9 @@ This program doesn't bother to close the input files that may still be open.
 @<Last-minute...@>=
 procedure close_files_and_terminate;
 label done, done1;
-var a, b, c, i, j, k, l: integer; {all-purpose index}
+var a, b, i, j, k, l: integer; {all-purpose index}
     is_names: boolean; {flag for name tree output: is it Names or Kids?}
-    root, outlines, threads, names_tree, dests, pages: integer;
+    root, outlines, threads, names_tree, dests: integer;
     xref_offset_width, names_head, names_tail: integer;
 begin @<Finish the extensions@>;
 @!stat if tracing_stats>0 then @<Output statistics about this job@>;@;@+tats@/
