@@ -35750,7 +35750,7 @@ begin
 end;
 
 procedure out_image(p: pointer);
-var image: integer;
+var image, groupref: integer;
 begin
     image := obj_ximage_data(pdf_ximage_objnum(p));
     pdf_end_text;
@@ -35758,8 +35758,11 @@ begin
     if pdf_lookup_list(pdf_ximage_list, pdf_ximage_objnum(p)) = null then 
         pdf_append_list(pdf_ximage_objnum(p))(pdf_ximage_list);
     if not is_pdf_image(image) then begin
-        if is_png_image(image) and pdf_page_group_val<1 then 
-           pdf_page_group_val := image_group_ref (image);
+        if is_png_image(image) then begin
+           groupref := image_group_ref (image);
+           if (groupref>0) and (pdf_page_group_val<1) then 
+              pdf_page_group_val := groupref;
+        end;
         pdf_print_real(ext_xn_over_d(pdf_width(p),
                        ten_pow[6], one_hundred_bp), 4);
         pdf_print(" 0 0 ");
