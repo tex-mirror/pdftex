@@ -89,8 +89,9 @@ void read_png_info(integer img)
         pdftex_fail("unsupported type of color_type <%i>",
                     png_info(img)->color_type);
     }
-    if ((png_info(img)->color_type | PNG_COLOR_MASK_ALPHA)
-        && (fixedpdfminorversion >= 4)) {
+    if (fixedpdfminorversion >= 4
+        && (png_info(img)->color_type == PNG_COLOR_TYPE_GRAY_ALPHA
+            || png_info(img)->color_type == PNG_COLOR_TYPE_RGB_ALPHA)) {
         /* png with alpha channel in device colours; we have to add a Page
          * Group to make Adobe happy, so we have to create a dummy group object
          */
@@ -513,9 +514,13 @@ void write_png(integer img)
     }
     /* the switching between |png_info| and |png_ptr| queries has been trial and error.
      */
-    if (fixedpdfminorversion > 1 && png_info(img)->interlace_type == PNG_INTERLACE_NONE && (png_ptr(img)->transformations == 0 || png_ptr(img)->transformations == 0x2000)      /* gamma */
-        &&!(png_ptr(img)->color_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
-            png_ptr(img)->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+    if (fixedpdfminorversion > 1
+        && png_info(img)->interlace_type == PNG_INTERLACE_NONE
+        && (png_ptr(img)->transformations == PNG_TRANSFORM_IDENTITY
+            || png_ptr(img)->transformations == 0x2000)
+        /* gamma */
+        && !(png_ptr(img)->color_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
+             png_ptr(img)->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
         && (fixedimagehicolor || (png_ptr(img)->bit_depth <= 8))
         && (checked_gamma <= 1.01 && checked_gamma > 0.99)
         ) {

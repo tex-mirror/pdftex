@@ -13,10 +13,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with this library; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+   You should have received a copy of the GNU Lesser General Public License
+   along with this library; if not, see <http://www.gnu.org/licenses/>.  */
 
 #include <kpathsea/config.h>
 #include <kpathsea/c-ctype.h>
@@ -292,9 +290,10 @@ lookup P1C(string, name)
 
 /* Reading the options.  */
 
-#define USAGE "\
-  Standalone path lookup and expansion for Kpathsea.\n\
+#define USAGE "\n\
+Standalone path lookup and expansion for Kpathsea.\n\
 \n\
+-all                   output all matches (one per line), not just the first.\n\
 -debug=NUM             set debugging flags.\n\
 -D, -dpi=NUM           use a base resolution of NUM; default 600.\n\
 -engine=STRING         set engine name to STRING.\n\
@@ -306,10 +305,11 @@ lookup P1C(string, name)
 -interactive           ask for additional filenames to look up.\n\
 [-no]-mktex=FMT        disable/enable mktexFMT generation (FMT=pk/mf/tex/tfm).\n\
 -mode=STRING           set device name for $MAKETEX_MODE to STRING; no default.\n\
--must-exist            search the disk as well as ls-R if necessary\n\
+-must-exist            search the disk as well as ls-R if necessary.\n\
 -path=STRING           search in the path STRING.\n\
 -progname=STRING       set program name to STRING.\n\
 -show-path=NAME        output search path for file type NAME (see list below).\n\
+-subdir=STRING         only output matches whose directory part ends with STRING.\n\
 -var-value=STRING      output the value of variable $STRING.\n\
 -version               print version number and exit.\n \
 "

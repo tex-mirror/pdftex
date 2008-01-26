@@ -1,7 +1,7 @@
 /* fontmap.c: read files for additional font names.
 
    Copyright 2001, 2002, 2005 Olaf Weber.
-   Copyright 1993, 94, 95, 96, 97 Karl Berry.
+   Copyright 1993, 1994, 1995, 1996, 1997, 2008 Karl Berry.
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -13,11 +13,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with this library; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-*/
+   You should have received a copy of the GNU Lesser General Public License
+   along with this library; if not, see <http://www.gnu.org/licenses/>.  */
 
 #include <kpathsea/config.h>
 
@@ -88,7 +85,7 @@ map_file_parse P1C(const_string, map_filename)
 
   while ((orig_l = read_line (f)) != NULL) {
     string filename;
-    string l = orig_l;
+    string l = orig_l; /* save for free() */
     string comment_loc = strrchr (l, '%');
     if (!comment_loc) {
       comment_loc = strstr (l, "@c");
@@ -136,12 +133,13 @@ map_file_parse P1C(const_string, map_filename)
 
       } else {
         /* We've got everything.  Insert the new entry.  They were
-           already dynamically allocated, so don't bother with xstrdup.  */
+           already dynamically allocated by token(), so don't bother
+           with xstrdup.  */
         hash_insert_normalized (&map, alias, filename);
       }
     }
 
-    free (l);
+    free (orig_l);
   }
   
   xfclose (f, map_filename);

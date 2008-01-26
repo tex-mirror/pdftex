@@ -1,3 +1,16 @@
+2008-01-25  Karl Berry  <karl@tug.org>
+
+	* variable.c (expand): do ~ expansion here too, for --expand-var,
+	or mktexnam fails.
+	Report from Werner Lemberg, 24 Jan 2008 02:19:49.
+	* kpathsea.texi (Auxiliary tasks): document this.
+
+2008-01-21  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c, kpathsea.texi: document --all and --subdir.
+
+	* db.c through tex-file.c: replace FSF physical address with url.
+
 2008-01-18  Karl Berry  <karl@tug.org>
 
 	* kpsewhich.c (subdir_match): XRETALLOC is a statement not a function.
@@ -162,7 +175,7 @@
 	TEXMFSYSCONFIG, VARTEXFONTS, MIMELIBDIR, MAILCAPLIBDIR, TEXMFNCF):
 	use @texmf@ etc. expansions so that (hopefully)
 	--disable-multiplatform works again.  For TEXMFCNF, restore
-	inclusion of $TEXMF/web2c, too.  Reported by Peter Munster.
+	inclusion of $TEXMF/web2c, too.  Reported by Peter M\"unster.
 
 2007-03-21  Karl Berry  <karl@tug.org>
 

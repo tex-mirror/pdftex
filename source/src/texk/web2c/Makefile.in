@@ -497,6 +497,11 @@ texextra.c: lib/texmfmp.c
 	sed s/TEX-OR-MF-OR-MP/tex/ $(srcdir)/lib/texmfmp.c >$@
 tex.p tex.pool: tangle tex.web tex.ch
 	$(tangle) tex.web tex.ch
+tex.tex: weave tex.web tex.ch
+	$(WEAVE) $(srcdir)/tex.web $(srcdir)/tex.ch
+	{ echo '1s/ webmac/ pdfwebmac/'; echo w; echo q;} | ed $@ >/dev/null 2>&1
+tex.pdf: tex.tex
+	$(pdftex) tex.tex
 check: tex-check
 tex-check: trip tex.fmt
 # Test truncation (but don't bother showing the warning msg).
