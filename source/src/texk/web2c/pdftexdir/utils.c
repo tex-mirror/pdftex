@@ -383,7 +383,7 @@ size_t xfwrite(void *ptr, size_t size, size_t nmemb, FILE * stream)
 int xfflush(FILE * stream)
 {
     if (fflush(stream) != 0)
-        pdftex_fail("fflush() failed (%d)", errno);
+        pdftex_fail("fflush() failed (%s)", strerror(errno));
     return 0;
 }
 
@@ -391,7 +391,7 @@ int xgetc(FILE * stream)
 {
     int c = getc(stream);
     if (c < 0 && c != EOF)
-        pdftex_fail("getc() failed (%d)", errno);
+        pdftex_fail("getc() failed (%s)", strerror(errno));
     return c;
 }
 
@@ -399,7 +399,7 @@ int xputc(int c, FILE * stream)
 {
     int i = putc(c, stream);
     if (i < 0)
-        pdftex_fail("putc() failed (%d)", errno);
+        pdftex_fail("putc() failed (%s)", strerror(errno));
     return i;
 }
 
@@ -759,7 +759,7 @@ void printID(strnumber filename)
     md5_append(&state, (const md5_byte_t *) time_str, size);
     /* get the file name */
     if (getcwd(pwd, sizeof(pwd)) == NULL)
-        pdftex_fail("getcwd() failed (%d), path too long?", errno);
+        pdftex_fail("getcwd() failed (%s), path too long?", strerror(errno));
     file_name = makecstring(filename);
     md5_append(&state, (const md5_byte_t *) pwd, strlen(pwd));
     md5_append(&state, (const md5_byte_t *) "/", 1);
