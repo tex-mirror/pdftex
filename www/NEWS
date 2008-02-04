@@ -1,4 +1,24 @@
 -------------------------------------------------
+pdfTeX 3.141592-1.40.6 was released on 2008-02-04
+-------------------------------------------------
+- Bugfixes:
+  - inclusion of encrypted PDFs was broken (861)
+  - PDFs > 2GiB (LFS) would be broken, even on 64-bit systems. Now the basic
+    support for LFS is there, you only need to supply the right compiler flags
+    (this is not yet done automatically). See build.sh for hints on compiling.
+  - Page groups in pdfs (see the discussion in the notes vor v1.10a) are now
+    handled correctly (741)
+  - When including transparent PNGs pdftex now automatically adds a Page Group
+    (896)
+  - broken map files would lead to core dumps
+  - unusual TrueType fonts would lead to an assertion error (874)
+  - the null object in the object table was never initialized
+  - included PDFs with /PieceInfo lost their /LastModified date
+  - an empty colorstack crashed pdftex (897)
+- pdfTeX uses libpng 1.2.24
+- pdfTeX uses xpdf 3.02pl2
+
+-------------------------------------------------
 pdfTeX 3.141592-1.40.5 was released on 2007-07-31
 -------------------------------------------------
 - Bugfixes: 
@@ -24,6 +44,8 @@ pdfTeX 3.141592-1.40.4 was released on 2007-07-11
     available, a broken PDF was produced. Now no PDF is generated and the error
     messages have been improved (721)
   - Problems with vf fonts (722)
+  - With pdf inclusion the font descriptor could get mixed up and miss some
+    required keys (810)
   - Font expansion led to wrong log output of \kerns (736)
   - \pdfprimitive was broken (see
     http://www.ntg.nl/pipermail/ntg-pdftex/2007-April/002860.html)
