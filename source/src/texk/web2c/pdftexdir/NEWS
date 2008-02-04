@@ -1,6 +1,6 @@
------------------------------------------------------
-pdfTeX 3.141592-1.40.6-rc1 was released on 2008-01-20
------------------------------------------------------
+-------------------------------------------------
+pdfTeX 3.141592-1.40.6 was released on 2008-02-04
+-------------------------------------------------
 - Bugfixes:
   - inclusion of encrypted PDFs was broken (861)
   - PDFs > 2GiB (LFS) would be broken, even on 64-bit systems. Now the basic
@@ -12,7 +12,7 @@ pdfTeX 3.141592-1.40.6-rc1 was released on 2008-01-20
     (896)
   - broken map files would lead to core dumps
   - unusual TrueType fonts would lead to an assertion error (874)
-  - the null object in object table was never initialized
+  - the null object in the object table was never initialized
   - included PDFs with /PieceInfo lost their /LastModified date
   - an empty colorstack crashed pdftex (897)
 - pdfTeX uses libpng 1.2.24

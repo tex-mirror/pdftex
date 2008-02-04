@@ -4,14 +4,15 @@
 #
 # builds new pdftex binaries
 #
-# ----------
+# ----------------------
 # LFS support:
 # If you want to build binaries with LFS support, you may have to add the
 # right compiler & linker flags yourself, as this is not done automatically
 # by configure (see the section "Using LFS" at
 # http://www.suse.de/~aj/linux_lfs.html). You should also remove the
 # --disable-largefile switch for configure.
-# ----------
+# ----------------------
+#
 # try to find gnu make; we need it
 MAKE=make;
 if make -v 2>&1| grep "GNU Make" >/dev/null
