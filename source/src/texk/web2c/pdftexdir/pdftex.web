@@ -32716,7 +32716,7 @@ This program doesn't bother to close the input files that may still be open.
 @<Last-minute...@>=
 procedure close_files_and_terminate;
 label done, done1;
-var a, b, i, j, k, l: integer; {all-purpose index}
+var a, b, c, i, j, k, l: integer; {all-purpose index}
     is_root: boolean; {|pdf_last_pages| is root of Pages tree?}
     is_names: boolean; {flag for name tree output: is it Names or Kids?}
     root, outlines, threads, names_tree, dests: integer;
