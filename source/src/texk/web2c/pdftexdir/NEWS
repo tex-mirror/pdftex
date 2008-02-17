@@ -1,5 +1,5 @@
 -------------------------------------------------
-pdfTeX 3.141592-1.40.7 was released on 2008-02-??
+pdfTeX 3.141592-1.40.7 was released on 2008-02-17
 -------------------------------------------------
 - Bugfix:
   - PDFs > 2GiB (LFS) were still broken on 32-bit systems
