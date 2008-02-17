@@ -1,3 +1,28 @@
+2008-02-14  Karl Berry  <karl@tug.org>
+
+	* tex.ch (max_font_max): increase to 5000.
+	Taco mail to tex-live, 13 Feb 2008 10:00:35.
+	
+	* tex.ch (make_name_string): further change from
+	Jonathan, tex-implementors  12 Feb 2008 14:33:56.
+
+2008-02-11  Karl Berry  <karl@tug.org>
+
+	* tex.ch (make_name_string): avoid clobbering globals via
+	    This is TeX ...
+	    **abc%
+	    *de
+	From Akira and Jonathan Kew, tex-implementors 02 Feb 2008 20:42:18
+	et al.
+
+2008-01-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Convert from autoconf-2.13 to autoconf-2.59+:
+	* Makefile.in, doc/Makefile.in, mpdir/Makefile.in:
+	Add @configure_input@ lines.
+	* aclocal.m4 (new): Generated (aclocal -I ../m4).
+	* configure: Regenerated (autoconf).
+
 2008-01-18  Karl Berry  <karl@tug.org>
 
 	* cpascal.h (recorder_record_input, recorder_record_output): need
