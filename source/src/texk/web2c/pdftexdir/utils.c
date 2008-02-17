@@ -441,6 +441,7 @@ void libpdffinish()
     sfd_free();
     glyph_unicode_free();
     zip_free();
+    synctex_terminate();
 }
 
 /* Converts any string given in in in an allowed PDF string which can be

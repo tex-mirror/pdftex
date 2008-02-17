@@ -373,6 +373,9 @@ static const key_entry font_key[FONT_KEYS_NUM] = {
     , {"FontName", "FontName"}
 };
 
+/* synctex.c */
+extern void synctex_terminate(void);
+
 /**********************************************************************/
 #endif                          /* PDFTEXLIB */
 // vim: ts=4

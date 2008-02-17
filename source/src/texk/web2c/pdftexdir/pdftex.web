@@ -3188,6 +3188,7 @@ overflow("main memory size",mem_max+1-mem_min);
 found: link(r):=null; {this node is now nonempty}
 @!stat var_used:=var_used+s; {maintain usage statistics}
 tats@;@/
+@<Initialize bigger nodes with {\sl synctex} information@>;
 get_node:=r;
 exit:end;
 
@@ -3366,8 +3367,10 @@ glue should stretch or shrink or remain rigid; and |glue_order(p)|
 specifies the order of infinity to which glue setting applies (|normal|,
 |fil|, |fill|, or |filll|). The |subtype| field is not used.
 
+@d synctex_field_size=2 {Declare the {\sl synctex} field size to store the {\sl synctex} information: 2 integers for file tag and line}
+
 @d hlist_node=0 {|type| of hlist nodes}
-@d box_node_size=7 {number of words to allocate for a box node}
+@d box_node_size=7+synctex_field_size {a |box_node| is a synchronized node}
 @d width_offset=1 {position of |width| field in a box node}
 @d depth_offset=2 {position of |depth| field in a box node}
 @d height_offset=3 {position of |height| field in a box node}
@@ -3453,6 +3456,7 @@ In addition there is a |mark_class| field that contains the mark class.
 
 @d mark_node=4 {|type| of a mark node}
 @d small_node_size=2 {number of words to allocate for most node types}
+@d medium_node_size=small_node_size+synctex_field_size {|math_node|, |kern_node| and |glue_node| are synchronized nodes}
 @d mark_ptr(#)==link(#+1) {head of the token list for a mark}
 @d mark_class(#)==info(#+1) {the mark class}
 
@@ -3585,7 +3589,7 @@ discarded at a line break or one of the text direction primitives (
 
 @p function new_math(@!w:scaled;@!s:small_number):pointer;
 var p:pointer; {the new node}
-begin p:=get_node(small_node_size); type(p):=math_node;
+begin p:=get_node(medium_node_size); type(p):=math_node; {{\sl synctex} watch point: proper size}
 subtype(p):=s; width(p):=w; new_math:=p;
 end;
 
@@ -3681,7 +3685,7 @@ current \.{\\lineskip}.
 @p function new_param_glue(@!n:small_number):pointer;
 var p:pointer; {the new node}
 @!q:pointer; {the glue specification}
-begin p:=get_node(small_node_size); type(p):=glue_node; subtype(p):=n+1;
+begin p:=get_node(medium_node_size); type(p):=glue_node; subtype(p):=n+1; {{\sl synctex} watch point: proper size}
 leader_ptr(p):=null;@/
 q:=@<Current |mem| equivalent of glue parameter number |n|@>@t@>;
 glue_ptr(p):=q; incr(glue_ref_count(q));
@@ -3693,7 +3697,7 @@ whose argument points to a glue specification.
 
 @p function new_glue(@!q:pointer):pointer;
 var p:pointer; {the new node}
-begin p:=get_node(small_node_size); type(p):=glue_node; subtype(p):=normal;
+begin p:=get_node(medium_node_size); type(p):=glue_node; subtype(p):=normal; {{\sl synctex} watch point: proper size}
 leader_ptr(p):=null; glue_ptr(p):=q; incr(glue_ref_count(q));
 new_glue:=p;
 end;
@@ -3760,7 +3764,7 @@ inserted from \.{\\mkern} specifications in math formulas).
 
 @p function new_kern(@!w:scaled):pointer;
 var p:pointer; {the new node}
-begin p:=get_node(small_node_size); type(p):=kern_node;
+begin p:=get_node(medium_node_size); type(p):=kern_node; {{\sl synctex} whatch point: proper |kern_node| size}
 subtype(p):=normal;
 width(p):=w;
 new_kern:=p;
@@ -4498,19 +4502,25 @@ begin while p<>null do
   if is_char_node(p) then free_avail(p)
   else  begin case type(p) of
     hlist_node,vlist_node,unset_node: begin flush_node_list(list_ptr(p));
-      free_node(p,box_node_size); goto done;
+        free_node(p,box_node_size); goto done;
       end;
     rule_node: begin free_node(p,rule_node_size); goto done;
       end;
     ins_node: begin flush_node_list(ins_ptr(p));
-      delete_glue_ref(split_top_ptr(p));
-      free_node(p,ins_node_size); goto done;
+        delete_glue_ref(split_top_ptr(p));
+        free_node(p,ins_node_size); goto done;
       end;
     whatsit_node: @<Wipe out the whatsit node |p| and |goto done|@>;
     glue_node: begin fast_delete_glue_ref(glue_ptr(p));
-      if leader_ptr(p)<>null then flush_node_list(leader_ptr(p));
+	    if leader_ptr(p)<>null then flush_node_list(leader_ptr(p));
+		free_node(p, medium_node_size); {{\sl synctex} watch point: proper size}
+        goto done;
       end;
-    kern_node,math_node,penalty_node: do_nothing;
+    kern_node,math_node:begin
+        free_node(p, medium_node_size); {{\sl synctex} watch point: proper size}
+        goto done;
+      end;
+    penalty_node: do_nothing;
     margin_kern_node: begin
         free_avail(margin_char(p));
         free_node(p, margin_kern_node_size);
@@ -4519,7 +4529,7 @@ begin while p<>null do
     ligature_node: flush_node_list(lig_ptr(p));
     mark_node: delete_token_ref(mark_ptr(p));
     disc_node: begin flush_node_list(pre_break(p));
-      flush_node_list(post_break(p));
+        flush_node_list(post_break(p));
       end;
     adjust_node: flush_node_list(adjust_ptr(p));
     @t\4@>@<Cases of |flush_node_list| that arise in mlists only@>@;
@@ -4583,6 +4593,7 @@ while words>0 do
 @ @<Case statement to copy...@>=
 case type(p) of
 hlist_node,vlist_node,unset_node: begin r:=get_node(box_node_size);
+  @<Copy the box {\sl synctex} information@>;
   mem[r+6]:=mem[p+6]; mem[r+5]:=mem[p+5]; {copy the last two words}
   list_ptr(r):=copy_node_list(list_ptr(p)); {this affects |mem[r+5]|}
   words:=5;
@@ -4596,10 +4607,16 @@ ins_node: begin r:=get_node(ins_node_size); mem[r+4]:=mem[p+4];
   end;
 whatsit_node:@<Make a partial copy of the whatsit node |p| and make |r|
   point to it; set |words| to the number of initial words not yet copied@>;
-glue_node: begin r:=get_node(small_node_size); add_glue_ref(glue_ptr(p));
+glue_node: begin r:=get_node(medium_node_size); add_glue_ref(glue_ptr(p)); {{\sl synctex} watch point: proper size}
+  @<Copy the glue {\sl synctex} information@>;
   glue_ptr(r):=glue_ptr(p); leader_ptr(r):=copy_node_list(leader_ptr(p));
   end;
-kern_node,math_node,penalty_node: begin r:=get_node(small_node_size);
+kern_node,math_node:
+begin
+  words:=medium_node_size; {{\sl synctex}: proper size, do not copy the {\sl synctex} information}
+  r:=get_node(words);
+end;
+penalty_node: begin r:=get_node(small_node_size);
   words:=small_node_size;
   end;
 margin_kern_node: begin
@@ -5637,7 +5654,7 @@ that will be defined later.
 @d pdf_move_chars_code       = pdftex_first_integer_code + 3 {move chars 0..31 to higher area if possible}
 @d pdf_image_resolution_code = pdftex_first_integer_code + 4 {default image resolution}
 @d pdf_pk_resolution_code    = pdftex_first_integer_code + 5 {default resolution of PK font}
-@d pdf_unique_resname_code   = pdftex_first_integer_code + 6 {generate unique names for resouces}
+@d pdf_unique_resname_code   = pdftex_first_integer_code + 6 {generate unique names for resources}
 @d pdf_option_always_use_pdfpagebox_code = pdftex_first_integer_code + 7 {if the PDF inclusion should always use a specific PDF page box}
 @d pdf_option_pdf_inclusion_errorlevel_code = pdftex_first_integer_code + 8 {if the PDF inclusion should treat pdfs newer than |pdf_minor_version| as an error}
 @d pdf_minor_version_code = pdftex_first_integer_code + 9 {fractional part of the PDF version produced}
@@ -5675,7 +5692,10 @@ that will be defined later.
 @d eTeX_state_code=etex_int_base+10 {\eTeX\ state variables}
 @d etex_int_pars=eTeX_state_code+eTeX_states {total number of \eTeX's integer parameters}
 @#
-@d int_pars=etex_int_pars {total number of integer parameters}
+@d synctex_code=etex_int_pars {{\sl synctex}: for the \.{\\synctex} macro}
+@d synctex_int_pars=synctex_code+1 {total number of \TeX's integer parameters}
+@#
+@d int_pars=synctex_int_pars {total number of integer parameters}
 @d count_base=int_base+int_pars {256 user \.{\\count} registers}
 @d del_code_base=count_base+256 {256 delimiter code mappings}
 @d dimen_base=del_code_base+256 {beginning of region 6}
@@ -5767,6 +5787,8 @@ that will be defined later.
 @d pdf_image_apply_gamma == int_par(pdf_image_apply_gamma_code)
 @d pdf_draftmode        == int_par(pdf_draftmode_code)
 @d pdf_inclusion_copy_font == int_par(pdf_inclusion_copy_font_code)
+@#
+@d synctex == int_par(synctex_code)
 @#
 @d tracing_assigns==int_par(tracing_assigns_code)
 @d tracing_groups==int_par(tracing_groups_code)
@@ -5871,6 +5893,7 @@ pdf_append_kern_code:    print_esc("pdfappendkern");
 pdf_gen_tounicode_code:    print_esc("pdfgentounicode");
 pdf_draftmode_code:        print_esc("pdfdraftmode");
 pdf_inclusion_copy_font_code:    print_esc("pdfinclusioncopyfonts");
+@/@<synctex case for |print_param|@>@/
 @/@<Cases for |print_param|@>@/
 othercases print("[unknown integer parameter!]")
 endcases;
@@ -7528,6 +7551,7 @@ convention~(1), so it is declared in the following way:
 @!in_state_record = record
   @!state_field, @!index_field: quarterword;
   @!start_field,@!loc_field, @!limit_field, @!name_field: halfword;
+  @!synctex_tag_field: integer; {stack the tag of the current file}
   end;
 
 @ @<Glob...@>=
@@ -7546,6 +7570,7 @@ in our discussion of basic input-output routines. The other components of
 @d start==cur_input.start_field {starting position in |buffer|}
 @d limit==cur_input.limit_field {end of current line in |buffer|}
 @d name==cur_input.name_field {name of the current file}
+@d synctex_tag==cur_input.synctex_tag_field {{\sl synctex} tag of the current file}
 
 @ Let's look more closely now at the control variables
 (|state|,~|index|,~|start|,~|loc|,~|limit|,~|name|),
@@ -8164,6 +8189,7 @@ eof_seen[index]:=false;
 grp_stack[index]:=cur_boundary; if_stack[index]:=cond_ptr;
 line_stack[index]:=line; start:=first; state:=mid_line;
 name:=0; {|terminal_input| is now |true|}
+@<Prepare terminal input {\sl synctex} information@>;
 end;
 
 @ Conversely, the variables must be downdated when such a level of input
@@ -12400,6 +12426,7 @@ state:=new_line;
 if name=str_ptr-1 then {we can conserve string pool space now}
   begin flush_string; name:=cur_name;
   end;
+@<Prepare new file {\sl synctex} information@>;
 @<Read the first line of the new file@>;
 end;
 
@@ -14438,8 +14465,10 @@ save_loc:=dvi_offset+dvi_ptr; base_line:=cur_v;
 prev_p:=this_box+list_offset;
 @<Initialize |hlist_out| for mixed direction typesetting@>;
 left_edge:=cur_h;
+@<Start hlist {\sl synctex} information record@>;
 while p<>null do @<Output node |p| for |hlist_out| and move to the next node,
   maintaining the condition |cur_v=base_line|@>;
+@<Finish hlist {\sl synctex} information record@>;
 @<Finish |hlist_out| for mixed direction typesetting@>;
 prune_movements(save_loc);
 if cur_s>0 then dvi_pop(save_loc);
@@ -14485,10 +14514,19 @@ rule_node: begin rule_ht:=height(p); rule_dp:=depth(p); rule_wd:=width(p);
   goto fin_rule;
   end;
 whatsit_node: @<Output the whatsit node |p| in an hlist@>;
-glue_node: @<Move right or output leaders@>;
-margin_kern_node,
-kern_node:cur_h:=cur_h+width(p);
-math_node: @<Handle a math node in |hlist_out|@>;
+glue_node: begin
+  @<Record |glue_node| {\sl synctex} information@>
+  @<Move right or output leaders@>;
+end;
+margin_kern_node:cur_h:=cur_h+width(p);
+kern_node: begin
+  @<Record |kern_node| {\sl synctex} information@>;
+  cur_h:=cur_h+width(p);
+end;
+math_node: begin
+  @<Record |math_node| {\sl synctex} information@>;
+  @<Handle a math node in |hlist_out|@>;
+end;
 ligature_node: @<Make node |p| look like a |char_node| and |goto reswitch|@>;
 @/@<Cases of |hlist_out| that arise in mixed direction text only@>@;
 othercases do_nothing
@@ -14789,7 +14827,9 @@ var page_loc:integer; {location of the current |bop|}
 @!j,@!k:0..9; {indices to first ten count registers}
 @!s:pool_pointer; {index into |str_pool|}
 @!old_setting:0..max_selector; {saved |selector| setting}
-begin if tracing_output>0 then
+begin
+  @<Record sheet {\sl synctex} information@>
+  if tracing_output>0 then
   begin print_nl(""); print_ln;
   print("Completed box being shipped out");
 @.Completed box...@>
@@ -18346,9 +18386,11 @@ prev_p:=this_box+list_offset;
 @<Initialize |hlist_out| for mixed...@>;
 left_edge:=cur_h;
 @<Create link annotations for the current hbox if needed@>;
+@<Start hlist {\sl synctex} information record@>;
 while p<>null do
     @<Output node |p| for |pdf_hlist_out| and move to the next node,
     maintaining the condition |cur_v=base_line|@>;
+@<Finish hlist {\sl synctex} information record@>;
 @<Finish |hlist_out| for mixed...@>;
 decr(cur_s);
 end;
@@ -18383,10 +18425,19 @@ rule_node: begin rule_ht:=height(p); rule_dp:=depth(p); rule_wd:=width(p);
   goto fin_rule;
   end;
 whatsit_node: @<Output the whatsit node |p| in |pdf_hlist_out|@>;
-glue_node: @<(\pdfTeX) Move right or output leaders@>;
-margin_kern_node,
-kern_node:cur_h:=cur_h+width(p);
-math_node: @<Handle a math node in |hlist_out|@>;
+glue_node: begin
+  @<Record |glue_node| {\sl synctex} information@>
+  @<(\pdfTeX) Move right or output leaders@>;
+end;
+margin_kern_node:cur_h:=cur_h+width(p);
+kern_node: begin
+  @<Record |kern_node| {\sl synctex} information@>;
+  cur_h:=cur_h+width(p);
+end;
+math_node: begin
+  @<Record |math_node| {\sl synctex} information@>;
+  @<Handle a math node in |hlist_out|@>;
+end;
 ligature_node: @<Make node |p| look like a |char_node| and |goto reswitch|@>;
 @/@<Cases of |hlist_out| that arise in mixed direction text only@>@;
 othercases do_nothing
@@ -18657,7 +18708,9 @@ save_xform_list: pointer; {to save |pdf_xform_list|}
 save_image_procset: integer;  {to save |pdf_image_procset|}
 save_text_procset: integer;  {to save |pdf_text_procset|}
 pdf_last_resources: integer; {pointer to most recently generated Resources object}
-begin if tracing_output>0 then
+begin 
+  @<Record sheet {\sl synctex} information@>
+  if tracing_output>0 then
   begin print_nl(""); print_ln;
   print("Completed box being shipped out");
 @.Completed box...@>
@@ -20456,7 +20509,7 @@ begin while link(q)<>p do q:=link(q);
             update_adjust_list(pre_adjust_tail)
         else
             update_adjust_list(adjust_tail);
-        p := link(p); free_node(link(q), small_node_size);
+        p := link(p); free_node(link(q), small_node_size); {{\sl synctex} watch point: p is not a synchronized node}
     end
 else  begin link(adjust_tail):=p; adjust_tail:=p; p:=link(p);
   end;
@@ -21670,7 +21723,7 @@ if is_char_node(q) then
   begin r:=link(q);
   if r<>null then if link(r)=null then if not is_char_node(r) then
    if type(r)=kern_node then {unneeded italic correction}
-    begin free_node(r,small_node_size); link(q):=null;
+    begin free_node(r,medium_node_size); link(q):=null; {{\sl synctex}: r is a |kern_node|}
     end;
   end
 
@@ -25871,7 +25924,8 @@ done:
     begin link(t):=lig_ptr(lig_stack); {this is a charnode for |hu[j+1]|}
     t:=link(t); incr(j);
     end;
-  p:=lig_stack; lig_stack:=link(p); free_node(p,small_node_size);
+  p:=lig_stack; lig_stack:=link(p);
+  free_node(p,small_node_size); {{\sl synctex} watch point: proper size!}
   if lig_stack=null then set_cur_r@+else cur_r:=character(lig_stack);
   end {if |lig_stack| isn't |null| we have |cur_rh=non_char|}
 
@@ -25879,6 +25933,7 @@ done:
 wrap_lig(rt_hit);
 if w<>0 then
   begin link(t):=new_kern(w); t:=link(t); w:=0;
+  mem[t+2].int:=0; {{\sl synctex}: do nothing, it is too late}
   end;
 if lig_stack>null then
   begin cur_q:=t; cur_l:=character(lig_stack); ligature_present:=true;
@@ -27354,7 +27409,7 @@ We make |type(page_head)=glue_node|, so that an initial glue node on
 the current page will not be considered a valid breakpoint.
 
 @<Initialize the special list...@>=
-type(page_head):=glue_node; subtype(page_head):=normal;
+type(page_head):=glue_node; subtype(page_head):=normal; {{\sl synctex} watch point: box(|page_head|) size >= |glue_node| size}
 
 @ The global variable |output_active| is true during the time the
 user's output routine is driving \TeX.
@@ -28242,7 +28297,7 @@ When we begin this code we have |cur_q=tail| and |cur_l=character(lig_stack)|.
 main_p:=lig_ptr(lig_stack);
 if main_p>null then tail_append(main_p);
 temp_ptr:=lig_stack; lig_stack:=link(temp_ptr);
-free_node(temp_ptr,small_node_size);
+free_node(temp_ptr,small_node_size); {{\sl synctex} watch point: proper size!}
 main_i:=char_info(main_f)(cur_l); ligature_present:=true;
 if lig_stack=null then
   if main_p>null then goto main_loop_lookahead
@@ -36665,7 +36720,7 @@ if (((g_sign=stretching) and (stretch_order(g)=g_order)) or
     ((g_sign=shrinking) and (shrink_order(g)=g_order))) then
   begin fast_delete_glue_ref(g);
   if subtype(p)<a_leaders then
-    begin type(p):=kern_node; width(p):=rule_wd;
+    begin type(p):=kern_node; width(p):=rule_wd; {{\sl synctex} watch point: |glue_node| size == |kern_node| size}
     end
   else  begin g:=get_node(glue_spec_size);@/
     stretch_order(g):=filll+1; shrink_order(g):=filll+1; {will never match}
@@ -36844,7 +36899,7 @@ begin if not is_char_node(tail) then
  if (type(tail)=math_node)and(subtype(tail)=begin_M_code) then
   begin free_node(LR_temp,small_node_size); p:=head;
   while link(p)<>tail do p:=link(p);
-  free_node(tail,small_node_size); link(p):=null; tail:=p; goto done;
+  free_node(tail,medium_node_size); link(p):=null; tail:=p; goto done; {{\sl synctex}: proper size for |math_node|}
   end;
 link(tail):=LR_temp; tail:=LR_temp;
 done: LR_temp:=null;
@@ -36856,7 +36911,7 @@ put_LR(before) {this will never match}
 @ @<Adjust \(t)the LR stack for the |hp...@>=
 if end_LR(p) then
   if info(LR_ptr)=end_LR_type(p) then pop_LR
-  else  begin incr(LR_problems); type(p):=kern_node; subtype(p):=explicit;
+  else  begin incr(LR_problems); type(p):=kern_node; subtype(p):=explicit; {{\sl synctex} watch point: |math_node| size == |kern_node| size}
     end
 else push_LR(p)
 
@@ -36922,7 +36977,7 @@ else  begin push_LR(p);
   if LR_dir(p)<>cur_dir then
     @<Reverse an hlist segment and |goto reswitch|@>;
   end;
-type(p):=kern_node;
+type(p):=kern_node; {{\sl synctex} watch point: |math_node| size == |kern_node| size}
 end
 
 @ @<Check for LR anomalies at the end of |hl...@>=
@@ -36956,7 +37011,9 @@ edge_node: begin cur_h:=cur_h+width(p);
 append the reversed list, and set the width of the kern node.
 
 @<Reverse the complete hlist...@>=
-begin save_h:=cur_h; temp_ptr:=p; p:=new_kern(0); link(prev_p):=p;
+begin save_h:=cur_h; temp_ptr:=p; p:=new_kern(0);
+mem[p+2].int:=0; {{\sl synctex}: do nothing, it's too late}
+link(prev_p):=p;
 cur_h:=0; link(p):=reverse(this_box,null,cur_g,cur_glue); width(p):=-cur_h;
 cur_h:=save_h; subtype(this_box):=reversed;
 end
@@ -36968,7 +37025,7 @@ original list is attached to it.
 
 @<Reverse an hlist segment...@>=
 begin save_h:=cur_h; temp_ptr:=link(p); rule_wd:=width(p);
-free_node(p,small_node_size);
+free_node(p,medium_node_size); {{\sl synctex}: p is a |math_node|}
 cur_dir:=reflected; p:=new_edge(cur_dir,rule_wd); link(prev_p):=p;
 cur_h:=cur_h-left_edge+rule_wd;
 link(p):=reverse(this_box,new_edge(reflected,0),cur_g,cur_glue);
@@ -37027,7 +37084,7 @@ endcases;@/
 cur_h:=cur_h+rule_wd;
 next_p: link(p):=l;
 if type(p)=kern_node then if (rule_wd=0)or(l=null) then
-  begin free_node(p,small_node_size); p:=l;
+  begin free_node(p,medium_node_size); p:=l; {{\sl synctex} hook: proper size for |kern_node|}
   end;
 l:=p; p:=q;
 end
@@ -37054,13 +37111,13 @@ outer level are changed into kern nodes.
 math_node: begin rule_wd:=width(p);
 if end_LR(p) then
   if info(LR_ptr)<>end_LR_type(p) then
-    begin type(p):=kern_node; incr(LR_problems);
+    begin type(p):=kern_node; incr(LR_problems); {{\sl synctex} watch point: |math_node| size == |kern_node| size}
     end
   else  begin pop_LR;
     if n>min_halfword then
       begin decr(n); decr(subtype(p)); {change |after| into |before|}
       end
-    else  begin type(p):=kern_node;
+    else  begin type(p):=kern_node; {{\sl synctex} watch point: |math_node| size == |kern_node| size}
       if m>min_halfword then decr(m)
       else @<Finish the reversed hlist segment and |goto done|@>;
       end;
@@ -37069,7 +37126,7 @@ else  begin push_LR(p);
   if (n>min_halfword)or(LR_dir(p)<>cur_dir) then
     begin incr(n); incr(subtype(p)); {change |before| into |after|}
     end
-  else  begin type(p):=kern_node; incr(m);
+  else  begin type(p):=kern_node; incr(m); {{\sl synctex} watch point: |math_node| size == |kern_node| size}
     end;
   end;
 end;
@@ -37079,7 +37136,7 @@ final math node is released and the remaining list attached to the
 edge node terminating the reversed segment.
 
 @<Finish the reversed...@>=
-begin free_node(p,small_node_size);
+begin free_node(p,medium_node_size); {{\sl synctex}: p is a |kern_node|}
 link(t):=q; width(t):=rule_wd; edge_dist(t):=-cur_h-rule_wd; goto done;
 end
 
@@ -37119,6 +37176,7 @@ begin while p<>null do
   if is_char_node(p) then r:=get_avail
   else case type(p) of
   hlist_node,vlist_node: begin r:=get_node(box_node_size);
+	@<Copy the box {\sl synctex} information@>;
     mem[r+6]:=mem[p+6]; mem[r+5]:=mem[p+5]; {copy the last two words}
     words:=5; list_ptr(r):=null; {this affects |mem[r+5]|}
     end;
@@ -37127,10 +37185,12 @@ begin while p<>null do
   ligature_node: begin r:=get_avail; {only |font| and |character| are needed}
     mem[r]:=mem[lig_char(p)]; goto found;
     end;
-  kern_node,math_node: begin r:=get_node(small_node_size);
-    words:=small_node_size;
+  kern_node,math_node: begin
+      words:=medium_node_size; {{\sl synctex}: proper size for math and kern}
+	  r:=get_node(words);
     end;
-  glue_node: begin r:=get_node(small_node_size); add_glue_ref(glue_ptr(p));
+  glue_node: begin r:=get_node(medium_node_size); add_glue_ref(glue_ptr(p)); {{\sl synctex}: proper size for glue}
+    @<Copy the glue {\sl synctex} information@>;
     glue_ptr(r):=glue_ptr(p); leader_ptr(r):=null;
     end;
   whatsit_node:@<Make a partial copy of the whatsit...@>;
@@ -37226,28 +37286,31 @@ while q<>null do
     link(p):=l; l:=p;
     end;
 goto done;
-found:width(t):=width(p); link(t):=q; free_node(p,small_node_size);
+found:width(t):=width(p); link(t):=q; free_node(p,small_node_size); {{\sl synctex}: Unused label, see below}
 done:link(temp_head):=l;
 end;
 
 @ @<Adjust \(t)the LR stack for the |j...@>=
 if end_LR(p) then
   if info(LR_ptr)<>end_LR_type(p) then
-    begin type(p):=kern_node; incr(LR_problems);
+    begin type(p):=kern_node; incr(LR_problems); {{\sl synctex} watch point: |math_node| size == |kern_node| size}
     end
   else  begin pop_LR;
     if n>min_halfword then
       begin decr(n); decr(subtype(p)); {change |after| into |before|}
       end
-    else  begin if m>min_halfword then decr(m)@+else goto found;
-      type(p):=kern_node;
+    else  begin if m>min_halfword then decr(m)@+else begin
+	    width(t):=width(p); link(t):=q; free_node(p,medium_node_size);{{\sl synctex}: no more "goto found", proper size}
+	    goto done;
+	  end;
+	  type(p):=kern_node; {{\sl synctex} watch point: |math_node| size == |kern_node| size}
       end;
     end
 else  begin push_LR(p);
   if (n>min_halfword)or(LR_dir(p)<>cur_dir) then
     begin incr(n); incr(subtype(p)); {change |before| into |after|}
     end
-  else  begin type(p):=kern_node; incr(m);
+  else  begin type(p):=kern_node; incr(m); {{\sl synctex} watch point: |math_node| size == |kern_node| size}
     end;
   end
 
@@ -37453,10 +37516,13 @@ begin_file_reading; {set up |cur_file| and new level of input}
 line:=0; limit:=start; loc:=limit+1; {force line read}
 if tracing_scan_tokens>0 then
   begin if term_offset>max_print_line-3 then print_ln
-  else if (term_offset>0)or(file_offset>0) then print_char(" ");
-  name:=19; print("( "); incr(open_parens); update_terminal;
+    else if (term_offset>0)or(file_offset>0) then print_char(" ");
+	name:=19; print("( "); incr(open_parens); update_terminal;
   end
-else name:=18
+else begin
+    name:=18;
+	@<Prepare pseudo file {\sl synctex} information@>;
+end
 
 @ Here we read a line from the current pseudo file into |buffer|.
 
@@ -39206,6 +39272,193 @@ else  begin if cur_val>penalty(equiv(m)) then cur_val:=penalty(equiv(m));
   cur_val:=penalty(equiv(m)+cur_val);
   end;
 end
+
+@* \[53b] The {\sl synchronize texnology}.
+This section is devoted to the {\sl synchronize texnology} - or simply {\sl
+synctex} - used to synchronize between input and output.  This section explains
+how synchronization basics are implemented.  Before we enter into more
+technical details, let us recall in a few words what is synchronization.
+
+\TeX\ typesetting system clearly separates the input and the output material,
+and synchronization will provide a new link between both that can help text
+editors and viewers to work together.  More precisely, forwards synchronization
+is the ability, given a location in the input source file, to find what is the
+corresponding place in the output.  Backwards synchronization just performs the
+opposite: given a location in the output, retrieve the corresponding material
+in the input source file.
+
+For better code management and maintainance, we adopt a naming convention.
+Throughout this program, code related to the {\sl synchronize texnology} is
+tagged with the {\sl synctex} key word. Any code extract where {\sl synctex}
+plays its part, either explicitly or implicitly, (should) contain the string
+{\sl synctex}.  This naming convention also holds for external files.
+Moreover, all the code related to {\sl synctex} is gathered in this section,
+except the definitions.
+
+Synchronization is achieved with the help of an auxiliary file named `\.{{\sl
+jobname}.synctex}' ({\sl jobname} is the contents of the \.{\\jobname} macro),
+where a {\sl synctex} controller implemented in the external |synctex.c| file
+will store geometrical information.  This {\sl synctex} controller will take
+care of every technical details concerning the {\sl synctex} file, we will only
+focus on the messages the controller will receive from the \TeX\ program.
+
+The most accurate synchronization information should allow to map any character
+of the input source file to the corresponding location in the output, if
+relevant.  Ideally, the synchronization information of the input material
+consists of the file name, the line and column numbers of every character.  The
+synchronization information in the output is simply the page number and either
+point coordinates, or box dimensions and position.  The problem is that the
+mapping between these informations is only known at ship out time, which means
+that we must keep track of the input synchronization information until the
+pages ship out.
+
+As \TeX\ only knows about file names and line numbers, but forgets the column
+numbers, we only consider a restricted input synchronization information called
+{\sl synctex information}.  It consists of a unique file name identifier, the
+{\sl synctex file tag}, and the line number.
+ 
+Keeping track of such information, should be different whether characters or
+nodes are involved.  Actually, only certain nodes are involved in {\sl
+synctex}, we call them {\sl synchronized nodes}.  Synchronized nodes store the
+{\sl synctex} information in their last two words: the first one contains a
+{\sl synctex file tag} uniquely identifying the input file, and the second one
+contains the current line number, as returned by the \.{\\inputlineno}
+primitive.  The |synctex_field_size| macro contains the necessary size to store
+the {\sl synctex} information.
+
+When declaring the size of a new node, it is recommanded to use the following
+convention: if the node is synchronized, use a definition similar to
+|my_synchronized_node_size|={\sl xxx}+|synctex_field_size|.
+Moreover, one should expect that the {\sl synctex} information is always stored
+in the last two words of a synchronized node.
+
+@ By default, every node with a sufficiently big size is initialized at
+creation time in the |get_node| routine with the current {\sl synctex}
+information, whether or not the node is synchronized.  One purpose is to set
+this information very early in order to minimize code dependencies, including
+forthcoming extensions.  Another purpose is to avoid the assumption that every
+node type has a dedicated getter, where initialization should take place.
+Actually, it appears that some nodes are created using directly the |get_node|
+routine and not the dedicated constructor.  And finally, initializing the node
+at only one place is less error prone.
+
+@ @<Initialize bigger nodes with {\sl synctex} information@>=
+if s>=synctex_field_size+small_node_size then
+begin
+  mem[r+s-synctex_field_size].int := synctex_tag;
+  mem[r+s-synctex_field_size+1].int := line;
+end;
+
+@ Instead of storing the input file name, it is better to store just an
+identifier.  Each time \TeX\ opens a new file, it notifies the {\sl synctex}
+controller with a |synctex_start_input| message.  This controller will create a
+new {\sl synctex} file tag and will update the current input state record
+accordingly.  If the input comes from the terminal or a pseudo file, the
+|synctex_tag| is set to 0.  It results in automatically disabling
+synchronization for material input from the terminal or pseudo files.
+
+@ @<Prepare new file {\sl synctex} information@>=
+synctex_start_input; {Give control to the {\sl synctex} controller}
+
+@ @<Prepare terminal input {\sl synctex} information@>=
+synctex_tag:=0;
+
+@ @<Prepare pseudo file {\sl synctex} information@>=
+synctex_tag:=0;
+
+@ Synchronized nodes are boxes, math, kern and glue nodes.
+Other nodes should be synchronized too, in particular math noads.
+\TeX\ assumes that math, kern and glue nodes have the same size, this is why
+both are synchronized.
+{\sl In fine}, only horizontal lists are really used in {\sl synctex}, but all
+box nodes are considered the same with respect to synchronization, because a
+box node type is allowed to change at execution time.
+
+The next sections are the various messages sent to the {\sl synctex}
+controller.  The argument is either the box or the node currently shipped out.
+
+@ @<Start hlist {\sl synctex} information record@>=
+synctex_hlist(this_box);
+
+@ @<Finish hlist {\sl synctex} information record@>=
+synctex_tsilh(this_box);
+
+@ @<Record |glue_node| {\sl synctex} information@>=
+synctex_glue(p);
+
+@ @<Record |kern_node| {\sl synctex} information@>=
+synctex_kern(p);
+
+@ @<Record |math_node| {\sl synctex} information@>=
+synctex_math(p);
+
+@ @<Record sheet {\sl synctex} information@>=
+synctex_sheet(pdf_output);
+
+@ When making a copy of a synchronized node, we might also have to duplicate
+the {\sl synctex} information by copying the two last words.  This is the case
+for a |box_node| and for a |glue_node|, but not for a |math_node| nor a
+|kern_node|. These last two nodes always keep the {\sl synctex} information
+they received at creation time.
+ 
+@ @<Copy the box {\sl synctex} information@>=
+mem[r+box_node_size-synctex_field_size].int:=mem[p+box_node_size-synctex_field_size].int;
+mem[r+box_node_size-synctex_field_size+1].int:=mem[p+box_node_size-synctex_field_size+1].int;
+
+@ @<Copy the glue {\sl synctex} information@>=
+mem[r+medium_node_size-synctex_field_size].int:=mem[p+medium_node_size-synctex_field_size].int;
+mem[r+medium_node_size-synctex_field_size+1].int:=mem[p+medium_node_size-synctex_field_size+1].int;
+
+@ Enabling synchronization should be performed from the command line,
+|synctexoption| is used for that purpose.  This global integer variable is
+declared here but it is not used here.  This is just a placeholder where the
+command line controller will put the {\sl {\sl synctex}} related options, and
+the {\sl synctex} controller will read them.
+
+@ @<Glob...@>=
+@!synctexoption:integer;
+
+@ A convenient primitive is provided:
+\.{\\synctex=1} in the input source file enables synchronization whereas
+\.{\\synctex=0} disables it.
+Its memory address is |synctex_code|.
+
+@ @<Put each...@>=
+primitive("synctex",assign_int,int_base+synctex_code);@/
+@!@:synctex_}{\.{\\synctex} primitive@>
+
+@ @<synctex case for |print_param|@>=
+synctex_code:    print_esc("synctex");
+
+@ In order to give the {\sl synctex} controller read and write access to the
+contents of the \.{\\synctex} primitive, we declare |synctexoffset|, such that
+|mem[synctexoffset]| and \.{\\synctex} correpond to the same memory storage.
+|synctexoffset| is initialized to the correct value when quite everything is
+initialized.
+
+@ @<Glob...@>=
+@!synctexoffset:integer; {holds the true value of |synctex_code|}
+
+@ @<Initialize whatever...@>=
+synctexoffset:=int_base+synctex_code;
+
+@ {\sl Nota Bene:}
+The {\sl synctex} code is very close to the memory model.
+It is not connected to any other part of the code, except for memory
+management. It is possible to neutralize the {\sl synctex} code rather simply.
+The first step is to define a null |synctex_field_size|.
+The second step is to comment out the code in ``Initialize bigger nodes...''
+and every ``Copy ... {\sl synctex} information''.
+The last step will be to comment out the |synctex_tag_field| related code in
+the definition of |synctex_tag| and the various ``Prepare ... {\sl synctex}
+information''
+Then all the remaining code should be just harmless.
+The resulting program would behave exactly the same as if absolutely no {\sl
+synctex} related code was there, including memory management.
+Of course, all this assumes that {\sl synctex} is turned off from the command
+line.
+@^synctex@>
+@^synchronization@>
 
 @* \[54] System-dependent changes.
 This section should be replaced, if necessary, by any special

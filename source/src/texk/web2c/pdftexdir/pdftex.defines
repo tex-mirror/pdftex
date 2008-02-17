@@ -151,5 +151,14 @@ $Id$
 { loadpdftexpool }
 @define function loadpoolstrings();
 
+{ functions from the synctex controller in synctex.c }
+@define procedure synctexstartinput;
+@define procedure synctexsheet();
+@define procedure synctexhlist();
+@define procedure synctextsilh();
+@define procedure synctexmath();
+@define procedure synctexkern();
+@define procedure synctexglue();
+
 { end of pdftex.defines }
 { vim: set syntax=web : }
