@@ -1,3 +1,8 @@
+2008-02-17  Peter Breitenlohner <peb@mppmu.mpg.de>
+
+	* pdftex.web: Adapted to e-TeX changes (fixed a bug in hyph_code
+	handling and corrected a few typos in TeX text).
+
 2007-10-14  Karl Berry  <karl@tug.org>
 
 	* Makefile.in (depend): Run $(CXX) -MM directly, not through make.
