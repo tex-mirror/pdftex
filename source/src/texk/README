@@ -1,4 +1,4 @@
-$Id: README 5955 2007-12-27 19:15:42Z karl $
+$Id: README 6662 2008-02-17 19:29:39Z karl $
 Copyright 2006, 2007 TeX Users Group.
 (Originally written in 2006 by Karl Berry.)
 You may freely use, modify and/or distribute this file.
@@ -27,6 +27,9 @@ dvipng 1.9 - ok 5dec06
 
 dvi2tty 5.3.1 - needs update 18may07
   http://www.mesa.nl/pub/dvi2tty/
+
+lcdf-typetools 2.66 - ok 17feb08
+  http://www.lcdf.org/type/
 
 xdvik 22.84.10 - ok 4dec06
   http://xdvi.sourceforge.net/

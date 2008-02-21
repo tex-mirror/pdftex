@@ -1,4 +1,5 @@
-# $Id: Makefile.in 4628 2007-07-16 16:47:44Z karl $
+# $Id: Makefile.in 6488 2008-02-02 14:23:40Z peter $
+# @configure_input@
 # Makefile for teTeX distribution, also used for TeX Live.
 
 # This program is free software; you can redistribute it and/or modify
@@ -138,7 +139,7 @@ distclean: clean
 	    (if test -f $$dir/Makefile; then cd $$dir && $(MAKE) $@; else true; fi) || exit 1; \
 	  done
 	rm -f Makefile *.status *.cache *.log dialogconfig.h TAGS
-	rm -f libs/config.log libs/config.status libs/config.cache libs/kpse_empty
+	rm -f libs/config.log libs/config.status libs/config.cache
 	rm -f utils/texinfo/info/funs.h utils/texinfo/info/doc.c utils/texinfo/info/key.c
 
 tags TAGS:

@@ -1,3 +1,28 @@
+2008-02-21  Martin Schröder <martin@pdftex.org>
+        * lib.h, xfseek.c, xftell.c: LFS support: use off_t instead off long
+        and fseeko instead of fseek
+
+2008-02-14  Karl Berry  <karl@tug.org>
+
+	* texmf.in (font_mem_size): increase to 3000000.
+	(font_max): increase to 5000 (max_font_max increased in tex.ch).
+
+2008-02-11  Karl Berry  <karl@tug.org>
+
+	* install.texi: mention mktexfmt, other mktex updates.
+	(Bug report from Ken Brooks, 03 Aug 2006 15:15:03.)
+
+2008-02-08  Karl Berry  <karl@tug.org>
+
+	* texmf.in: texlive2008 to match texmf/web2c/texmf.cnf.
+
+2008-01-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Convert from autoconf-2.13 to autoconf-2.59+:
+	* Makefile.in: Add @configure_input@ line.
+	* aclocal.m4 (new): Generated (aclocal -I ../m4).
+	* configure: Regenerated (autoconf).
+
 2008-01-25  Karl Berry  <karl@tug.org>
 
 	* variable.c (expand): do ~ expansion here too, for --expand-var,
@@ -175,7 +200,7 @@
 	TEXMFSYSCONFIG, VARTEXFONTS, MIMELIBDIR, MAILCAPLIBDIR, TEXMFNCF):
 	use @texmf@ etc. expansions so that (hopefully)
 	--disable-multiplatform works again.  For TEXMFCNF, restore
-	inclusion of $TEXMF/web2c, too.  Reported by Peter M\"unster.
+	inclusion of $TEXMF/web2c, too.  Reported by Peter M.
 
 2007-03-21  Karl Berry  <karl@tug.org>
 
