@@ -478,11 +478,13 @@ static void write_fontdescriptor(fd_entry * fd)
         fd_flags = is_std_t1font(fd->fm)
             ? std_flags[check_std_t1font(fd->fm->ps_name)]
             : FD_FLAGS_DEFAULT_NON_EMBED;
-        pdftex_warn
-            ("No flags specified for non-embedded font `%s' (%s) (I'm using %i): "
-             "fix your map entry.",
-             fd->fm->ps_name != NULL ? fd->fm->ps_name : "No name given",
-             fd->fm->tfm_name, fd_flags);
+        if (!is_std_t1font(fd->fm)) {
+            pdftex_warn
+                ("No flags specified for non-embedded non-standard font `%s' (%s) (I'm using %i): "
+                 "fix your map entry.",
+                 fd->fm->ps_name != NULL ? fd->fm->ps_name : "No name given",
+                 fd->fm->tfm_name, fd_flags);
+        }
     }
     pdf_printf("/Flags %i\n", fd_flags);
     write_fontmetrics(fd);
