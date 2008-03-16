@@ -369,7 +369,7 @@ static void copyProcSet(Object * obj)
 static void copyFont(char *tag, Object * fontRef)
 {
     PdfObject fontdict, subtype, basefont, fontdescRef, fontdesc, charset,
-        fontfile, ffsubtype;
+        fontfile, ffsubtype, stemV;
     GfxFont *gfont;
     fd_entry *fd;
     fm_entry *fontmap;
@@ -398,7 +398,9 @@ static void copyFont(char *tag, Object * fontRef)
                                                      &ffsubtype)->isName()
                 && !strcmp(ffsubtype->getName(), "Type1C")))
         && (fontmap = lookup_fontmap(basefont->getName())) != NULL) {
-        fd = epdf_create_fontdescriptor(fontmap);
+        // copy the value of /StemV
+        fontdesc->dictLookup("StemV", &stemV);
+        fd = epdf_create_fontdescriptor(fontmap, stemV->getInt());
         if (fontdesc->dictLookup("CharSet", &charset) &&
             charset->isString() && is_subsetable(fontmap))
             epdf_mark_glyphs(fd, charset->getString()->getCString());
@@ -914,7 +916,8 @@ void write_epdf(void)
     }
     // copy LastModified (needed when PieceInfo is there)
     if (page->getLastModified() != NULL) {
-        pdf_printf("/LastModified (%s)\n", page->getLastModified()->getCString());
+        pdf_printf("/LastModified (%s)\n",
+                   page->getLastModified()->getCString());
     }
     // write the page SeparationInfo if it's there
     if (page->getSeparationInfo() != NULL) {
