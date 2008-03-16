@@ -729,6 +729,7 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
     if (!isInit) {
         initGlobalParams();
         globalParams_setErrQuiet(gFalse);
+        isInit = gTrue;
     }
     // open PDF file
     pdf_doc = find_add_document(image_name);
