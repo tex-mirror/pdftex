@@ -1,6 +1,7 @@
--------------------------------------------------
-pdfTeX 3.141592-1.50.0 was released on 2008-??-??
--------------------------------------------------
+--------------------------------------------------
+pdfTeX 3.1415926-1.50.0 was released on 2008-??-??
+--------------------------------------------------
+- Incorporated the new version of TeX: 3.1415926
 - New features:
   - The pool file is no longer a separate file, but is now included in the
     binary.
