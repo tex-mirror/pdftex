@@ -5,6 +5,7 @@ pdfTeX 3.1415926-1.40.8 was released on 2008-03-??
 - Bugfix:
   - Fonts from included PDFs for which maplines existed missed their /StemV
     values
+- pdfTeX uses libpng 1.2.25
 
 -------------------------------------------------
 pdfTeX 3.141592-1.40.7 was released on 2008-02-17

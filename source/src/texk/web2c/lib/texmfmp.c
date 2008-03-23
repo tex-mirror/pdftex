@@ -191,6 +191,11 @@ maininit P2C(int, ac, string *, av)
   kpse_record_input = recorder_record_input;
   kpse_record_output = recorder_record_output;
 
+#if /*defined (pdfTeX) ||*/ defined(XeTeX) || defined(__syncTeX__)
+  /* 0 means don't use Synchronize TeXnology.  */
+  synctexoption = 0;
+#endif
+
 #if defined(pdfTeX)
   ptexbanner = BANNER;
 #endif
@@ -292,8 +297,18 @@ maininit P2C(int, ac, string *, av)
   /* If we've set up the fmt/base default in any of the various ways
      above, also set its length.  */
   if (dump_name) {
-    /* adjust array for Pascal and provide extension */
-    DUMP_VAR = concat3 (" ", dump_name, DUMP_EXT);
+    const_string with_ext = NULL;
+    unsigned name_len = strlen (dump_name);
+    unsigned ext_len = strlen (DUMP_EXT);
+    
+    /* Provide extension if not there already.  */
+    if (name_len > ext_len
+        && FILESTRCASEEQ (dump_name + name_len - ext_len, DUMP_EXT)) {
+      with_ext = dump_name;
+    } else {
+      with_ext = concat (dump_name, DUMP_EXT);
+    }
+    DUMP_VAR = concat (" ", with_ext); /* adjust array for Pascal */
     DUMP_LENGTH_VAR = strlen (DUMP_VAR + 1);
   } else {
     /* For dump_name to be NULL is a bug.  */
@@ -393,7 +408,7 @@ topenin P1H(void)
       unsigned char *ptr = (unsigned char *)&(argv[i][0]);
       /* need to interpret UTF8 from the command line */
       UInt32 rval;
-      while (rval = *(ptr++)) {
+      while ((rval = *(ptr++)) != 0) {
         UInt16 extraBytes = bytesFromUTF8[rval];
         switch (extraBytes) { /* note: code falls through cases! */
           case 5: rval <<= 6; if (*ptr) rval += *(ptr++);
@@ -901,6 +916,10 @@ static struct option long_options[]
       { "no-shell-escape",           0, &shellenabledp, -1 },
       { "debug-format",              0, &debugformatfile, 1 },
       { "src-specials",              2, 0, 0 },
+#if /*defined(pdfTeX) ||*/ defined(XeTeX) || defined(__syncTeX__)
+      /* Synchronization: just like "interaction" above */
+      { "synctex",                   1, 0, 0 },
+#endif
 #endif /* TeX */
 #if defined (TeX) || defined (MF) || defined (MP)
       { "file-line-error-style",     0, &filelineerrorstylep, 1 },
@@ -1078,6 +1097,11 @@ parse_options P2C(int, argc,  string *, argv)
     } else if (ARGUMENT_IS ("help")) {
         usagehelp (PROGRAM_HELP, BUG_ADDRESS);
 
+#if /*defined (pdfTeX) ||*/ defined(XeTeX) || defined(__syncTeX__)
+    } else if (ARGUMENT_IS ("synctex")) {
+		/* Synchronize TeXnology: catching the command line option as an unsigned long  */
+		synctexoption = (int) strtoul(optarg, NULL, 0);
+ #endif
     } else if (ARGUMENT_IS ("version")) {
         char *versions;
 #if defined (pdfTeX) || defined(XeTeX)
@@ -1580,7 +1604,7 @@ getrandomseed()
 boolean
 input_line P1C(FILE *, f)
 {
-  int i;
+  int i = EOF;
 
   /* Recognize either LF or CR as a line terminator.  */
   last = first;
@@ -1883,6 +1907,8 @@ checkpoolpointer (poolpointer poolptr, size_t len)
   }
 }
 
+#ifndef MP  /* MP has its own in mpdir/utils.c */
+
 #ifndef XeTeX	/* XeTeX uses this from XeTeX_mac.c */
 static
 #endif
@@ -1898,7 +1924,7 @@ maketexstring(const_string s)
   len = strlen(s);
   checkpoolpointer (poolptr, len); /* in the XeTeX case, this may be more than enough */
 #ifdef XeTeX
-  while (rval = *(cp++)) {
+  while ((rval = *(cp++)) != 0) {
   UInt16 extraBytes = bytesFromUTF8[rval];
   switch (extraBytes) { /* note: code falls through cases! */
     case 5: rval <<= 6; if (*cp) rval += *(cp++);
@@ -1917,14 +1943,15 @@ maketexstring(const_string s)
   else
     strpool[poolptr++] = rval;
   }
-#else
+#else /* ! XeTeX */
   while (len-- > 0)
     strpool[poolptr++] = *s++;
-#endif
+#endif /* ! XeTeX */
 
   return (makestring());
 }
-#endif
+#endif /* !MP */
+#endif /* !pdfTeX */
 
 strnumber
 makefullnamestring()
@@ -1962,22 +1989,65 @@ compare_paths P2C(const_string, p1, const_string, p2)
   return ret;
 }
 
-#ifdef XeTeX
-#define strstartar strstart
-#endif
+#ifdef XeTeX /* the string pool is UTF-16 but we want a UTF-8 string */
+
+string
+gettexstring P1C(strnumber, s)
+{
+  unsigned bytesToWrite = 0;
+  poolpointer len, i, j;
+  string name;
+  len = strstart[s + 1 - 65536L] - strstart[s - 65536L];
+  name = (string)xmalloc(len * 3 + 1); /* max UTF16->UTF8 expansion (code units, not bytes) */
+  for (i = 0, j = 0; i < len; i++) {
+    unsigned c = strpool[i + strstart[s - 65536L]];
+    if (c >= 0xD800 && c <= 0xDBFF) {
+      unsigned lo = strpool[++i + strstart[s - 65536L]];
+      if (lo >= 0xDC00 && lo <= 0xDFFF)
+        c = (c - 0xD800) * 0x0400 + lo - 0xDC00;
+      else
+        c = 0xFFFD;
+    }
+    if (c < 0x80)
+      bytesToWrite = 1;
+    else if (c < 0x800)
+      bytesToWrite = 2;
+    else if (c < 0x10000)
+      bytesToWrite = 3;
+    else if (c < 0x110000)
+      bytesToWrite = 4;
+    else {
+      bytesToWrite = 3;
+      c = 0xFFFD;
+    }
+
+    j += bytesToWrite;
+    switch (bytesToWrite) { /* note: everything falls through. */
+      case 4: name[--j] = ((c | 0x80) & 0xBF); c >>= 6;
+      case 3: name[--j] = ((c | 0x80) & 0xBF); c >>= 6;
+      case 2: name[--j] = ((c | 0x80) & 0xBF); c >>= 6;
+      case 1: name[--j] =  (c | firstByteMark[bytesToWrite]);
+    }
+    j += bytesToWrite;
+  }
+  name[j] = 0;
+  return name;
+}
+
+#else
 
 string
 gettexstring P1C(strnumber, s)
 {
   poolpointer len;
   string name;
-#if !defined(Omega) && !defined(eOmega) && !defined(Aleph) && !defined(XeTeX)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
   len = strstart[s + 1] - strstart[s];
 #else
   len = strstartar[s + 1 - 65536L] - strstartar[s - 65536L];
 #endif
   name = (string)xmalloc (len + 1);
-#if !defined(Omega) && !defined(eOmega) && !defined(Aleph) && !defined(XeTeX)
+#if !defined(Omega) && !defined(eOmega) && !defined(Aleph)
   strncpy (name, (string)&strpool[strstart[s]], len);
 #else
   {
@@ -1990,9 +2060,7 @@ gettexstring P1C(strnumber, s)
   return name;
 }
 
-#ifdef XeTeX
-#undef strstartar
-#endif
+#endif /* not XeTeX */
 
 boolean
 isnewsource P2C(strnumber, srcfilename, int, lineno)

@@ -1,3 +1,89 @@
+2008-03-07  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* kpsewhich.c (main): change type of value from string to
+	const_string, to avoid warning.
+	* progname.c (selfdir): change type of elt from string to
+	const_string, to avoid warning.
+	* xputenv.c: change type of saved_env from const_string to
+	string, to avoid warning.
+
+2008-03-06  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* access.c, readlink.c: removed `#include <stdio.h>' preceeding
+	`#include <kpathsea/config.h>' (which in turn includes stdio.h).
+
+	* xfseek.c, xftell.c: reverted to state before 2008-02-21.
+	* xfseeko.c, xftello.c (both new): new functions using off_t
+	instead of long, and fseeko instead of fseek.
+	* lib.h: prototypes for xfseek, xfseeko, xftell, and xftello.
+	* Makefile.in (objects): added xfseeko.lo and xftello.lo.
+
+	* configure.in: construct package and (shared) library version
+	from m4_define'd parts, subtitute KPSE_LT_VERS ...
+	* Makefile.in ($(kpathsea)): ... here.
+
+2008-03-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* common.ac: add AC_SYS_LARGEFILE and AC_FUNC_FSEEKO.
+
+2008-03-02  Karl Berry  <karl@tug.org>
+
+	* cnf.c (read_all_cnf): change warning text when texmf.cnf is not
+	found to make it clear we are giving it, and keep it on one line.
+
+2008-01-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* common.ac: replace the private macro KPSE_STRUCT_ST_MTIM
+	by AC_CHECK_MEMBERS([struct stat.st_mtim]).
+
+	* common.ac: use AC_CHECK_DECLS([strstr]) and ...
+	* lib.h: ... replace `#ifndef HAVE_STRSTR' by
+	`#if !HAVE_DECL_STRSTR'.
+
+	* common.ac: Move AC_CONFIG_HEADERS from here ...
+	* configure.in: ... to here and replace PACKAGE_... by
+	KPSE_PACKAGE_... in c-auto.h, to avoid conflicts with other
+	packages.
+
+	* configure.in: use AH_TOP, AH_BOTTOM, and AC_DEFINE's third
+	argument to provide autoheader templates ...
+	* common.ac: m4 code to generate AC_DEFINE with a third argument
+	for MAKE_..._BY_DEFAULT and set them to 0 or 1 ...
+	* withenable.ac: use AC_DEFINE's third argument to provide
+	autoheader templates ...
+	* acconfig.h: ... removed.
+
+2008-02-24  Martin Schröder <martin@pdftex.org>
+        * lib.h: systypes.h instead of c-std.h
+
+2008-02-23  Martin Schröder <martin@pdftex.org>
+        * lib.h: include c-std.h to get off_t from stdio.h
+
+2008-02-21  Martin Schröder <martin@pdftex.org>
+        * lib.h, xfseek.c, xftell.c: LFS support: use off_t instead of long
+        and fseeko instead of fseek
+
+2008-02-14  Karl Berry  <karl@tug.org>
+
+	* texmf.in (font_mem_size): increase to 3000000.
+	(font_max): increase to 5000 (max_font_max increased in tex.ch).
+
+2008-02-11  Karl Berry  <karl@tug.org>
+
+	* install.texi: mention mktexfmt, other mktex updates.
+	(Bug report from Ken Brooks, 03 Aug 2006 15:15:03.)
+
+2008-02-08  Karl Berry  <karl@tug.org>
+
+	* texmf.in: texlive2008 to match texmf/web2c/texmf.cnf.
+
+2008-01-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Convert from autoconf-2.13 to autoconf-2.59+:
+	* Makefile.in: Add @configure_input@ line.
+	* aclocal.m4 (new): Generated (aclocal -I ../m4).
+	* configure: Regenerated (autoconf).
+
 2008-01-25  Karl Berry  <karl@tug.org>
 
 	* variable.c (expand): do ~ expansion here too, for --expand-var,
@@ -175,7 +261,7 @@
 	TEXMFSYSCONFIG, VARTEXFONTS, MIMELIBDIR, MAILCAPLIBDIR, TEXMFNCF):
 	use @texmf@ etc. expansions so that (hopefully)
 	--disable-multiplatform works again.  For TEXMFCNF, restore
-	inclusion of $TEXMF/web2c, too.  Reported by Peter M\"unster.
+	inclusion of $TEXMF/web2c, too.  Reported by Peter M.
 
 2007-03-21  Karl Berry  <karl@tug.org>
 

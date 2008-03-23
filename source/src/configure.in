@@ -3,7 +3,7 @@ dnl Top-level configure for TeX Live build.  Public domain.
 AC_INIT(texk/make/common.mk)
 
 AC_CONFIG_AUX_DIR(config)
-AC_SET_MAKE
+AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CXX
 
@@ -45,7 +45,6 @@ fi
 
 AC_CANONICAL_SYSTEM
 
-dnl Various compiler directives
 dnl Various compiler directives
 AC_MSG_CHECKING(whether to define additional compiler specific flags)
 case "$target" in
@@ -257,21 +256,12 @@ test "$needs_graphite" = yes \
 test "$needs_obsdcompat" = yes \
   && LIBSDIRS="$LIBOBSDCOMPATDIR $LIBSDIRS"
 
+dnl required subdir
 AC_CONFIG_SUBDIRS([libs])
 
-PKGS='dialog lcdf-typetools lzma-utils mkjobtexmf pdfopen ps2eps psutils t1utils texcount texi2html texinfo tpic2pdftex'
-ESUBDIRS=
-test -d utils || mkdir utils
-for pkg in $PKGS; do
-  if test -d $srcdir/utils/$pkg; then
-    if eval "test \"`echo '$with_'${pkg}|sed 's/-/_/g'`\" != no"; then
-      ESUBDIRS="$ESUBDIRS utils/$pkg"
-      AC_CONFIG_SUBDIRS([utils/$pkg])
-    fi
-  fi
-done
+dnl optional subdirs in utils/ => ESUBDIRS
+KPSE_CONFIG_SUBDIRS(kpse_utils_pkglist, [utils])
 
-AC_SUBST(ESUBDIRS)
 AC_SUBST(LIBSDEP)
 AC_SUBST(LIBSDIRS)
 

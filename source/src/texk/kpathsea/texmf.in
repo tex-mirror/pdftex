@@ -89,7 +89,7 @@ TEXMFHOME = ~/texmf
 %   TEXMFVAR = $TEXMFMAIN
 % For using a separate tree:
 %   TEXMFVAR = ~/.texmf-var  # teTeX 3.0 default
-TEXMFVAR = ~/.texlive2007/texmf-var
+TEXMFVAR = ~/.texlive2008/texmf-var
 
 % TEXMFCONFIG, where texconfig stores configuration data.
 % With teTeX-3.0 or later, this must be set.
@@ -99,7 +99,7 @@ TEXMFVAR = ~/.texlive2007/texmf-var
 %   TEXMFCONFIG = ~/.texmf-config  # teTeX 3.0 default
 % For using a separate tree:
 %   TEXMFCONFIG = $SELFAUTOPARENT/texmf-config
-TEXMFCONFIG = ~/.texlive2007/texmf-config
+TEXMFCONFIG = ~/.texlive2008/texmf-config
 
 % Now, list all the texmf trees. If you have multiple trees you can
 % use shell brace notation, like this:
@@ -546,10 +546,10 @@ extra_mem_bot.context = 4000000
 
 % Words of font info for TeX (total size of all TFM files, approximately).
 % Must be >= 20000 and <= 4000000 (without tex.ch changes).
-font_mem_size = 2500000
+font_mem_size = 3000000
 
-% Total number of fonts. Must be >= 50 and <= 2000 (without tex.ch changes).
-font_max = 2000
+% Total number of fonts. Must be >= 50 and <= 5000 (without tex.ch changes).
+font_max = 5000
 
 % Extra space for the hash table of control sequences (which allows 10K
 % names as distributed).

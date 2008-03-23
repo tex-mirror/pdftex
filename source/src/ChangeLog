@@ -1,3 +1,55 @@
+2008-03-09  Karl Berry  <karl@tug.org>
+
+	* Build: exit if no binaries.
+
+2008-03-08  Karl Berry  <karl@tug.org>
+
+	* Build: --debug
+
+2008-03-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* reautoconf: run first autoheader, then autoconf.
+
+2008-02-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.in: update (AC_SET_MAKE -> AC_PROG_MAKE_SET).
+	* tetex.ac: append --enable-tetex-build to args in addition
+	to exporting enable_tetex_build=yes (for maintainer mode).
+	* reautoconf: add autoheader, allow subdir selection.
+
+2008-02-21  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* reautoconf: major rewrite.
+
+2008-02-21  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* tetex.ac: --enable-muliplatform modifies libdir.
+
+	* withenable.ac (kpse_utils_pkglist): m4_defined list of all
+	optional packages, used to generate --without-PKG options.
+	* configure.in: use kpse_utils_pkglist to select subdirs.
+
+2008-02-02  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Convert from autoconf-2.13 to autoconf-2.59+:
+	* configure.in: Use KPSE_CONFIG_SUBDIRS.
+	* Makefile.in: Add @configure_input@ line.
+	* aclocal.m4 (new): Generated (aclocal -I texk/m4).
+	* configure: Regenerated (autoconf).
+
+2007-10-06  Karl Berry  <karl@tug.org>
+
+	* Build (TL_WORKDIR): allow override of "Work".
+
+2007-10-02  Karl Berry  <karl@tug.org>
+
+	* configure.in: remove sam2p special case, since we omitted the
+	program.
+
+2007-08-14  Joachim Schrod  <jschrod@acm.org>
+
+	* configure.in: dvipdfm and dvipdfmx need pnglib and zlib, too.
+
 2007-07-16  Karl Berry  <karl@tug.org>
 
 	* Makefile.in (lib): new target, depends on @LIBSDEP@.
