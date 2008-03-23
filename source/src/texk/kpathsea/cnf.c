@@ -197,8 +197,13 @@ read_all_cnf P1H(void)
       free (*cnf);
     }
     free (cnf_files);
-  } else
-    WARNING1 ("Configuration file texmf.cnf not found! Searched these directories:\n%s\nTrying to proceed..", cnf_path);
+  } else {
+    string warn = getenv ("KPATHSEA_WARNING");
+    if (!(warn && STREQ (warn, "0"))) {
+      WARNING1 ("kpathsea: configuration file texmf.cnf not found in these directories: %s", 
+        cnf_path);
+    }
+  }
 }
 
 /* Read the cnf files on the first call.  Return the first value in the

@@ -1,22 +1,16 @@
 #! /bin/sh
 
-echo "autoconf stuff in transition, do not use! --peb/martin/karl 1feb08"
-exit 1
-/bin/false
-
-# $Id: reautoconf 6497 2008-02-04 19:06:38Z peter $
+# $Id: reautoconf 6851 2008-03-04 16:37:41Z peter $
 # This "reautoconf" script found at the root of the TeX Live source tree 
-# runs a hacked autoconf 2.13 in various directories and the
-# current autoconf (from PATH) in the rest.
-# Adapted from Peter Breitenlohner's original version.
+# runs aclocal and autoconf (from PATH) in all relevant directories.
 #
 # Copyright 2008 Karl Berry.
 # Copyright 2005 Olaf Weber.
-# Copyright 2004 Peter Breitenlohner.
+# Copyright 2004 - 2008 Peter Breitenlohner.
 #
-# This program is free software; you can redistribute it and/or modify
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -25,72 +19,138 @@ exit 1
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this library; if not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 unset CDPATH
+
+usage="Usage: $0 [OPTION]... [DIR]...
+  Run \`aclocal' (if applicable) and \`autoconf' in a selection
+  of the directories DIR... (default all) in TeX Live source tree.
+
+Options:
+  -h, --help      display this help and exit successfully
+  -f, --force     include some optional packages
+  -n, --dry-run   don't run any commands; just print them
+  -q, --quiet     don't echo commands
+  -v, --verbose   verbosely report processing (default)
+
+Selection:
+  packages using KPSE macros are included
+  packages using automake are excluded
+  packages using GNU autoconf 2.60 or later:
+    with \`--force' included, otherwise excluded
+  packages using old autoconf versions are excluded
+
+Environment variables:
+  TL_ACLOCAL:    program to use instead of aclocal from PATH
+  TL_AUTOCONF:   program to use instead of autoconf from PATH
+  TL_AUTOHEADER: program to use instead of autoheader from PATH"
+
+force=no
+do_cmd=eval
+do_say=echo
+
+list=
+
+for option
+do
+  case $option in
+    -h | --help) echo "$usage"; exit 0
+      ;;
+    -f | --force) force=yes
+      ;;
+    -n | --dry-run) do_cmd=:
+      ;;
+    -q | --quiet) do_say=:
+      ;;
+    -v | --verbose) do_say=echo
+      ;;
+    -*) echo "$0: *** unrecognized option \`$option'"
+      echo "$usage"; exit 1
+      ;;
+    *) list="$list $option"
+      ;;
+  esac
+done
+
+[ "$do_cmd" = : ] && do_say=echo	# -n implies -v
 
 [ -f ./texk/make/common.mk ] || {
 	echo "$0: *** can't find ./texk/make/common.mk (from `pwd`)" >&2
 	exit 1
 }
 
-# Remember the topdir.
-topdir=`pwd`
-
-# "acold" runs our hacked autoconf-2.13 with special includes.
-acold () {	# $dir=current
-	echo "$0: running our autoconf2.13 in \`$dir'"
-	$topdir/texk/autoconf2.13 -m "$topdir/texk/etc/autoconf"
-}
-
-# acnew runs autoconf from PATH.
-acnew () {	# $dir=current, $dir/$rdir->./texk/m4 with the KPSE macros.
-	echo "$0: running $TL_AUTOCONF in \`$dir'"
-	$TL_AUTOCONF --force || return
-}
-
+: ${TL_ACLOCAL=aclocal}
+echo "$0: using \"$TL_ACLOCAL\" = `$TL_ACLOCAL --version | sed 1q`"
+echo "$0: if you want to use a different aclocal, set TL_ACLOCAL."
 : ${TL_AUTOCONF=autoconf}
-echo "$0: new $TL_AUTOCONF = `$TL_AUTOCONF --version | sed 1q`"
+echo "$0: using \"$TL_AUTOCONF\" = `$TL_AUTOCONF --version | sed 1q`"
 echo "$0: if you want to use a different autoconf, set TL_AUTOCONF."
+: ${TL_AUTOHEADER=autoheader}
+echo "$0: using \"$TL_AUTOHEADER\" = `$TL_AUTOHEADER --version | sed 1q`"
+echo "$0: if you want to use a different autoheader, set TL_AUTOHEADER."
 
-# Autoconf in . (the top level).
-dir=. rdir=texk/m4
-acold
+# Give users a chance to quit here
+# and set TL_ACLOCAL, TL_AUTOCONF and/or TL_AUTOHEADER
+$do_cmd sleep 5
 
-# Autoconf in all other directories
-for dir in `find utils libs texk -name configure.in | sed 's,/configure.in$,,'`; do
+do_it () {
+  $do_say "$0: running \"$@\""
+  $do_cmd "$@"
+}
+
+# process one directory
+do_one () {	# $base=configure.{in,ac}, $dir=current, $dir/$rdir->./texk/m4 with the KPSE macros
+  if grep 'AM_INIT_AUTOMAKE' $base >/dev/null 2>&1; then
+    $do_say "$0: $dir/$base ... uses automake, skipped."
+  elif grep 'm4_include(\['$rdir'/kpse_.*\.m4])' aclocal.m4 >/dev/null 2>&1; then
+    $do_say "$0: $dir/$base ... uses KPSE macros"
+    do_it "$TL_ACLOCAL -I $rdir && date >stamp-aclocal"
+    if grep '^kpse_include \.\./make/config.mk$' Makefile.in >/dev/null 2>&1; then
+      do_it "$TL_AUTOHEADER && date >stamp-auto.in"
+    fi
+    do_it "$TL_AUTOCONF && date >stamp-configure"
+  elif grep '# Generated by GNU Autoconf 2.6' configure >/dev/null 2>&1; then
+    if test "$force" = yes; then
+      $do_say "$0: $dir/$base ... uses modern autoconf, forced"
+      do_it $TL_AUTOCONF
+    else
+      $do_say "$0: $dir/$base ... uses modern autoconf, skipped"
+    fi
+  else
+    $do_say "$0: $dir/$base ... uses older autoconf, skipped."
+  fi
+}
+
+if test "x$list" = x; then
+  list=". `find libs utils texk -name configure.in -o -name configure.ac |
+    sed 's,/configure\...\$,,'`"
+fi
+
+# Autoconf in all directories
+for dir in $list; do
+  if test -f "$dir/configure.in"; then
+    base=configure.in
+  elif test -f "$dir/configure.ac"; then
+    base=configure.ac
+  else
+    continue
+  fi
   case $dir in
-    */texi*)	# texinfo and texi2html are automade
+    .)
+      rdir=texk/m4
     ;;
-    */ncurses)	# ncurses has its own special configure
+    texk)
+      rdir=m4
     ;;
-    */icu*)     # ICU needs new autoconf
-            (cd $dir; acnew)
+    texk/*)
+      rdir=`echo $dir | sed -e 's,^texk/,,' -e 's,[^/]*,..,g'`/m4
     ;;
-    */libgnuw32)# only for windows
+    *)
+      rdir=`echo $dir | sed 's,[^/]*,..,g'`/texk/m4
     ;;
-    utils/*)	# Skip everything in utils for now.
-    ;;
-    */curl)	# Is automade.
-    ;;
-    texk)	rdir=m4
-            (cd $dir; acold)
-    ;;
-    texk/*)	rdir=`echo $dir | sed -e 's,^texk/,,' -e 's,[^/]*,..,g'`/m4
-            case $dir in
-                    */devnag|*/dvipdfmx|*/xdvipdfmx)
-                            (cd $dir; acnew);;
-                    *)	(cd $dir; acold);;
-            esac
-    ;;
-    *)	rdir=`echo $dir | sed 's,[^/]*,..,g'`/texk/m4
-            case $dir in
-            */t1utils|*/lcdf-typetools|*/curl|*/expat)
-                    (cd $dir; acnew) ;;
-            *)	(cd $dir; acold) ;;
-            esac
-    ;;
-esac
+  esac
+  (cd $dir; do_one)
 done
 
 echo "$0: done."

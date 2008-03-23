@@ -763,8 +763,6 @@ utils/pdfopen
 utils/ps2eps
 utils/psutils
 utils/t1utils
-utils/texcount
-utils/texi2html
 utils/texinfo
 utils/tpic2pdftex
 texk'
@@ -1371,8 +1369,6 @@ Optional Packages:
   --without-ps2eps        do not build the ps2eps package
   --without-psutils       do not build the psutils package
   --without-t1utils       do not build the t1utils package
-  --without-texcount      do not build the texcount package
-  --without-texi2html     do not build the texi2html package
   --without-texinfo       do not build the texinfo package
   --without-tpic2pdftex   do not build the tpic2pdftex package
   --without-afm2pl        do not build the afm2pl package
@@ -1474,7 +1470,6 @@ Optional Packages:
   --with-freetype2-include=DIR
                           Specify the freetype2 header files location.
                             (both DIR and DIR/freetype2 will be added to the include paths)
-  --with-system-icu        use installed ICU library
   --with-icu-libdir=DIR
                           Specify directory where the ICU library resides.
   --with-icu-include=DIR
@@ -5235,8 +5230,14 @@ fi
 export enable_install_warnings
 
 # e.g. for lcdf-typetools
-: ${enable_tetex_build=yes}
-export enable_tetex_build
+# With --enable-maintainer-mode, just exporting enable_tetex_build=yes
+# isn't enough: e.g., `make' => `configure --recheck'.
+# FIXME: the same should also be done for other options
+if test "x$enable_tetex_build" = x; then
+  enable_tetex_build=yes
+  export enable_tetex_build
+  ac_configure_args="$ac_configure_args '--enable-tetex-build'"
+fi
 
 # for lcdf-typetools
 : ${with_kpathsea=yes}
@@ -5312,7 +5313,8 @@ esac
 export with_cxx_runtime_hack
 
 
-# withenable.ac - Written long ago by Thomas Esser and Sebastian Rahtz.
+e # withenable.ac - Written long ago by Thomas Esser and Sebastian Rahtz.
+
 # Public domain.
 
 # Check whether --enable-multiplatform was given.
@@ -5353,16 +5355,6 @@ fi
 # Check whether --with-t1utils was given.
 if test "${with_t1utils+set}" = set; then
   withval=$with_t1utils;
-fi
-
-# Check whether --with-texcount was given.
-if test "${with_texcount+set}" = set; then
-  withval=$with_texcount;
-fi
-
-# Check whether --with-texi2html was given.
-if test "${with_texi2html+set}" = set; then
-  withval=$with_texi2html;
 fi
 
 # Check whether --with-texinfo was given.
@@ -5797,19 +5789,23 @@ fi
 
 # Check whether --with-editor was given.
 if test "${with_editor+set}" = set; then
-  withval=$with_editor; cat >>confdefs.h <<_ACEOF
+  withval=$with_editor;
+else
+  with_editor="vi +%d %s"
+fi
+
+
+cat >>confdefs.h <<_ACEOF
 #define EDITOR "$with_editor"
 _ACEOF
-
-
-fi
 
 
 # Check whether --enable-ipc was given.
 if test "${enable_ipc+set}" = set; then
   enableval=$enable_ipc; if test "x$enableval" = xyes; then
-  cat >>confdefs.h <<\_ACEOF
-#define IPC 1
+
+cat >>confdefs.h <<\_ACEOF
+#define IPC
 _ACEOF
 
   # -lsocket is needed on Solaris, at least.  Maybe -lnsl on SCO, too?
@@ -5971,9 +5967,11 @@ fi
 
 # Check whether --enable-auto-core was given.
 if test "${enable_auto_core+set}" = set; then
-  enableval=$enable_auto_core; cat >>confdefs.h <<\_ACEOF
-#define FUNNY_CORE_DUMP 1
+  enableval=$enable_auto_core;
+cat >>confdefs.h <<\_ACEOF
+#define FUNNY_CORE_DUMP
 _ACEOF
+
 
 fi
 
@@ -5981,8 +5979,9 @@ fi
 # Check whether --enable-dump-share was given.
 if test "${enable_dump_share+set}" = set; then
   enableval=$enable_dump_share; if test "x$enableval" = xno; then
-  cat >>confdefs.h <<\_ACEOF
-#define NO_DUMP_SHARE 1
+
+cat >>confdefs.h <<\_ACEOF
+#define NO_DUMP_SHARE
 _ACEOF
 
 fi
@@ -6008,8 +6007,9 @@ fi
 # Check whether --with-epsfwin was given.
 if test "${with_epsfwin+set}" = set; then
   withval=$with_epsfwin; if test "x$withval" = xyes; then
-  cat >>confdefs.h <<\_ACEOF
-#define EPSFWIN 1
+
+cat >>confdefs.h <<\_ACEOF
+#define EPSFWIN
 _ACEOF
 
 fi
@@ -6020,8 +6020,9 @@ fi
 # Check whether --with-hp2627win was given.
 if test "${with_hp2627win+set}" = set; then
   withval=$with_hp2627win; if test "x$withval" = xyes; then
-  cat >>confdefs.h <<\_ACEOF
-#define HP2627WIN 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HP2627WIN
 _ACEOF
 
 fi
@@ -6032,8 +6033,9 @@ fi
 # Check whether --with-mftalkwin was given.
 if test "${with_mftalkwin+set}" = set; then
   withval=$with_mftalkwin; if test "x$withval" = xyes; then
-  cat >>confdefs.h <<\_ACEOF
-#define MFTALKWIN 1
+
+cat >>confdefs.h <<\_ACEOF
+#define MFTALKWIN
 _ACEOF
 
 fi
@@ -6044,8 +6046,9 @@ fi
 # Check whether --with-nextwin was given.
 if test "${with_nextwin+set}" = set; then
   withval=$with_nextwin; if test "x$withval" = xyes; then
-  cat >>confdefs.h <<\_ACEOF
-#define NEXTWIN 1
+
+cat >>confdefs.h <<\_ACEOF
+#define NEXTWIN
 _ACEOF
 
 fi
@@ -6056,8 +6059,9 @@ fi
 # Check whether --with-regiswin was given.
 if test "${with_regiswin+set}" = set; then
   withval=$with_regiswin; if test "x$withval" = xyes; then
-  cat >>confdefs.h <<\_ACEOF
-#define REGISWIN 1
+
+cat >>confdefs.h <<\_ACEOF
+#define REGISWIN
 _ACEOF
 
 fi
@@ -6069,8 +6073,9 @@ fi
 if test "${with_suntoolswin+set}" = set; then
   withval=$with_suntoolswin; if test "x$withval" = xyes; then
   wlibs="-lsuntool -lsunwindow -lpixrect $wlibs"
-  cat >>confdefs.h <<\_ACEOF
-#define SUNWIN 1
+
+cat >>confdefs.h <<\_ACEOF
+#define SUNWIN
 _ACEOF
 
 fi
@@ -6081,8 +6086,9 @@ fi
 # Check whether --with-tektronixwin was given.
 if test "${with_tektronixwin+set}" = set; then
   withval=$with_tektronixwin; if test "x$withval" = xyes; then
-  cat >>confdefs.h <<\_ACEOF
-#define TEKTRONIXWIN 1
+
+cat >>confdefs.h <<\_ACEOF
+#define TEKTRONIXWIN
 _ACEOF
 
 fi
@@ -6093,8 +6099,9 @@ fi
 # Check whether --with-unitermwin was given.
 if test "${with_unitermwin+set}" = set; then
   withval=$with_unitermwin; if test "x$withval" = xyes; then
-  cat >>confdefs.h <<\_ACEOF
-#define UNITERMWIN 1
+
+cat >>confdefs.h <<\_ACEOF
+#define UNITERMWIN
 _ACEOF
 
 fi
@@ -6162,7 +6169,8 @@ fi
 # Check whether --enable-grey was given.
 if test "${enable_grey+set}" = set; then
   enableval=$enable_grey; if test "$enableval" = yes; then
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define GREY 1
 _ACEOF
 
@@ -6180,7 +6188,8 @@ fi
 # Check whether --enable-color was given.
 if test "${enable_color+set}" = set; then
   enableval=$enable_color; if test "$enableval" = yes; then
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define COLOR 1
 _ACEOF
 
@@ -6202,11 +6211,13 @@ if test "${enable_t1lib+set}" = set; then
   enableval=$enable_t1lib; if test "$enableval" = yes; then
   T1LIB=1
   LDT1LIB=../../libs/t1lib/lib/.libs/libt1.a
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define LDT1LIB 1
 _ACEOF
 
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define T1LIB 1
 _ACEOF
 
@@ -6232,7 +6243,8 @@ fi
 # Check whether --enable-gf was given.
 if test "${enable_gf+set}" = set; then
   enableval=$enable_gf; if test "$enableval" != no; then
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define USE_GF 1
 _ACEOF
 
@@ -6245,7 +6257,8 @@ fi
 # Check whether --enable-a4 was given.
 if test "${enable_a4+set}" = set; then
   enableval=$enable_a4; if test "$enableval" = yes; then
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define A4 1
 _ACEOF
 
@@ -6289,7 +6302,8 @@ if test "${enable_magick+set}" = set; then
 
       X_EXTRA_LIBS="$X_EXTRA_LIBS $MAGIC_LIBDIR $MAGICK_LD"
       X_CFLAGS="$X_CFLAGS $MAGIC_INCLUDE $MAGICK_CPP"
-      cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define MAGICK 1
 _ACEOF
 
@@ -6480,12 +6494,9 @@ if test "${with_freetype2_include+set}" = set; then
 fi
 
 
-
-# Check whether --with-system_icu was given.
-if test "${with_system_icu+set}" = set; then
-  withval=$with_system_icu;
-fi
-
+# Not available because xetex uses a customized ICU layout engine
+# AC_ARG_WITH(system_icu,
+# [  --with-system-icu        use installed ICU library])
 
 
 # Check whether --with-icu_libdir was given.
@@ -8956,7 +8967,7 @@ else
   EXTRA_ICU_INCLUDE=
   EXTRA_ICU_LIBDIR=
 
-  if test "$with_system_icu" = yes; then
+  if test x"$with_system_icu" = xyes; then
     if test "x$with_icu_libdir" != x; then
       EXTRA_ICU_LIBDIR="-L$with_icu_libdir"
     fi
@@ -8972,7 +8983,7 @@ else
   LDFLAGS="$LDFLAGS $EXTRA_ICU_LIBDIR"
   CPP="$CPP $EXTRA_ICU_INCLUDE"
 
-  if test "$with_system_icu" = yes; then
+  if test x"$with_system_icu" = xyes; then
 
 { echo "$as_me:$LINENO: checking for ubidi_open in -licuuc" >&5
 echo $ECHO_N "checking for ubidi_open in -licuuc... $ECHO_C" >&6; }
@@ -9050,7 +9061,7 @@ fi
 
   fi
 
-  if test "$with_system_icu" = yes; then
+  if test x"$with_system_icu" = xyes; then
 
 for ac_header in ubidi.h
 do
@@ -9202,7 +9213,7 @@ echo "$as_me: WARNING: ubidi.h not found. Using my own ICU sources." >&2;}
   CPP=$OLD_CPP
   LIBS=$OLD_LIBS
 
-  if test "$with_system_icu" != yes; then
+  if test x"$with_system_icu" != xyes; then
     ICUCPPFLAGS='-I$(ICUDIR)/common -I$(ICUSRCDIR)/common -I$(ICUSRCDIR)/layout'
     LDICU='$(ICUDIR)/lib/libsicuuc.a $(ICUDIR)/lib/libsicule.a $(ICUDIR)/lib/libsicudata.a'
     ICUDEP='$(ICUDIR)/lib/libsicuuc.a $(ICUDIR)/lib/libsicule.a $(ICUDIR)/lib/libsicudata.a'
@@ -9329,18 +9340,6 @@ if test -d $srcdir/utils/t1utils; then
   if test "x$with_t1utils" != xno; then
     ESUBDIRS="$ESUBDIRS utils/t1utils"
     subdirs="$subdirs utils/t1utils"
-  fi
-fi
-if test -d $srcdir/utils/texcount; then
-  if test "x$with_texcount" != xno; then
-    ESUBDIRS="$ESUBDIRS utils/texcount"
-    subdirs="$subdirs utils/texcount"
-  fi
-fi
-if test -d $srcdir/utils/texi2html; then
-  if test "x$with_texi2html" != xno; then
-    ESUBDIRS="$ESUBDIRS utils/texi2html"
-    subdirs="$subdirs utils/texi2html"
   fi
 fi
 if test -d $srcdir/utils/texinfo; then
