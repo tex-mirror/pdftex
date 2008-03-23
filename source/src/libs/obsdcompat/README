@@ -1,6 +1,6 @@
 OpenBSD-Compat for pdfTeX v0.2
 ==============================
-$Id: README 108 2007-05-20 20:03:54Z ms $
+$Id$
 
 Herein is a (heavily butchered) version of the openbsd-compat "library" of
 openssh 4.6 for use with pdfTeX. All files have their respective copyrights and
