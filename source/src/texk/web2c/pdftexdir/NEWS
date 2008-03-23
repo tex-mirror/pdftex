@@ -1,6 +1,7 @@
--------------------------------------------------
-pdfTeX 3.141592-1.40.8 was released on 2008-03-??
--------------------------------------------------
+--------------------------------------------------
+pdfTeX 3.1415926-1.40.8 was released on 2008-03-??
+--------------------------------------------------
+- Incorporated the new version of TeX: 3.1415926
 - Bugfix:
   - Fonts from included PDFs for which maplines existed missed their /StemV
     values
