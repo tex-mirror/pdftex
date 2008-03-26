@@ -5,6 +5,7 @@ pdfTeX 3.1415926-1.40.8 was released on 2008-03-??
 - Bugfix:
   - Fonts from included PDFs for which maplines existed missed their /StemV
     values
+  - \pdflastximagepages was broken for JBIG2 images 
 - pdfTeX uses libpng 1.2.25
 
 -------------------------------------------------
