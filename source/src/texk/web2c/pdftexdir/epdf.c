@@ -16,14 +16,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with pdfTeX; if not, write to the Free Software Foundation, Inc., 51
 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-$Id$
 */
 
 #include "ptexlib.h"
 #include <kpathsea/c-vararg.h>
 #include <kpathsea/c-proto.h>
 #include <string.h>
+
+static const char _svn_version[] =
+    "$Id$ $URL$";
 
 extern void epdf_check_mem(void);
 extern void register_fd_entry(fd_entry *);

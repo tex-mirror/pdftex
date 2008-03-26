@@ -2,6 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+static const char _svn_version[] =
+    "$Id: writejbig2.c 396 2008-03-26 10:16:20Z oneiros $ $URL$";
+
 int main(int argc, char *argv[]) {
   if (argc!=3) {
 	puts("Need exactly two arguments: pool_name and header_name");
