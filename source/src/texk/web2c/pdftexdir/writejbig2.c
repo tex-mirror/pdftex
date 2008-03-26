@@ -1,5 +1,5 @@
 /***********************************************************************
-Copyright (c) 2002-2007 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 2002-2008 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -80,6 +80,11 @@ $Id$
 
 #include "writejbig2.h"
 #undef DEBUG
+
+/**********************************************************************/
+
+static const char _svn_version[] =
+    "$Id$";
 
 /**********************************************************************/
 
