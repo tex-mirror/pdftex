@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 static const char _svn_version[] =
-    "$Id: writejbig2.c 396 2008-03-26 10:16:20Z oneiros $ $URL$";
+    "$Id$ $URL$";
 
 int main(int argc, char *argv[]) {
   if (argc!=3) {
