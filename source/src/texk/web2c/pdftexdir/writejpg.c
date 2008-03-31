@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2008 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -107,6 +107,7 @@ void read_jpg_info(integer img)
     unsigned char jpg_id[] = "JFIF";
     img_xres(img) = img_yres(img) = 0;
     jpg_ptr(img)->file = xfopen(img_name(img), FOPEN_RBIN_MODE);
+    /* no LFS needed, as JPEG is limited to <4GiB */
     xfseek(jpg_ptr(img)->file, 0, SEEK_END, cur_file_name);
     jpg_ptr(img)->length = xftell(jpg_ptr(img)->file, cur_file_name);
     xfseek(jpg_ptr(img)->file, 0, SEEK_SET, cur_file_name);
