@@ -16,8 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with pdfTeX; if not, write to the Free Software Foundation, Inc., 51
 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-$Id$
 */
 
 #include "openbsd-compat.h"
@@ -38,6 +36,9 @@ $Id$
 #include "ptexlib.h"
 #include "png.h"
 #include "xpdf/config.h"        /* just to get the xpdf version */
+
+static const char _svn_version[] =
+    "$Id$ $URL$";
 
 #define check_nprintf(size_get, size_want) \
     if ((unsigned)(size_get) >= (unsigned)(size_want)) \

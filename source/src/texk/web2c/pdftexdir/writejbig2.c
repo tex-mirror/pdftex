@@ -1,5 +1,5 @@
 /***********************************************************************
-Copyright (c) 2002-2007 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 2002-2008 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -75,11 +75,15 @@ object exists, reference it. Else create fresh one.
 
 09 Dec. 2002: JBIG2 seg. page numbers > 0 are now set to 1, see PDF Ref.
 
-$Id$
 ***********************************************************************/
 
 #include "writejbig2.h"
 #undef DEBUG
+
+/**********************************************************************/
+
+static const char _svn_version[] =
+    "$Id$ $URL$";
 
 /**********************************************************************/
 
