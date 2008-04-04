@@ -1,12 +1,12 @@
 --------------------------------------------------
-pdfTeX 3.1415926-1.40.8 was released on 2008-03-??
+pdfTeX 3.1415926-1.40.8 was released on 2008-04-??
 --------------------------------------------------
 - Incorporated the new version of TeX: 3.1415926
 - Bugfix:
   - Fonts from included PDFs for which maplines existed missed their /StemV
     values
   - \pdflastximagepages was broken for JBIG2 images 
-- pdfTeX uses libpng 1.2.25
+- pdfTeX uses libpng 1.2.26
 
 -------------------------------------------------
 pdfTeX 3.141592-1.40.7 was released on 2008-02-17
