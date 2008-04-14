@@ -6,6 +6,8 @@ pdfTeX 3.1415926-1.40.8 was released on 2008-04-??
   - Fonts from included PDFs for which maplines existed missed their /StemV
     values
   - \pdflastximagepages was broken for JBIG2 images 
+  - included PDFs with a negative lly in the MediaBox with a depth != 0 with
+    \pdfximage were wrongly vertically diplaces (936)
 - pdfTeX uses libpng 1.2.26
 
 -------------------------------------------------
