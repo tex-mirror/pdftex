@@ -292,7 +292,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==150 { \.{\\pdftexversion} }
 @d pdftex_revision=="0" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.50.0-alpha-20080323' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.50.0-alpha-20080414' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.1415926',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -35843,7 +35843,7 @@ begin
                                    image_width(image)));
         pdf_out(" ");
         pdf_print_bp(pdf_y(cur_v) -
-                     ext_xn_over_d(pdf_height(p), epdf_orig_y(image),
+                     ext_xn_over_d(pdf_height(p) + pdf_depth(p), epdf_orig_y(image),
                                    image_height(image)));
     end;
     pdf_print_ln(" cm");
