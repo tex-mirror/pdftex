@@ -1,5 +1,5 @@
-/*
-Copyright (c) 2007 Martin Schröder <martin@pdftex.org, Han The Thanh, <thanh@pdftex.org>
+/* pdflib.cc: layer between pdftex and pdf library
+Copyright (c) 2007, 2008 Martin Schröder <martin@pdftex.org>
 
 This file is part of pdfTeX.
 
