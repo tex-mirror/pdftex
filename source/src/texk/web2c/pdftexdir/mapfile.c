@@ -1,5 +1,5 @@
-/*
-Copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
+/* mapfile.c: handling of map files/lines
+Copyright (c) 1996-2008 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -372,9 +372,9 @@ int check_std_t1font(char *s)
         { -1, -1, -1, -1, -1, -1, 8, 0, -1, 4, 10, 9, -1, -1, 5, 2, 12, 6, -1,
         3, -1, 7
     };
-    assert(s != NULL);
-    const size_t n = strlen(s);
     int k = -1;
+    const size_t n = strlen(s);
+    assert(n);
     if (n > 21)
         return false;
     if (n == 12) {              /* three names have length 12 */
