@@ -1,4 +1,4 @@
-/*  mapfile.c: handling of map files/lines
+/* mapfile.c: handling of map files/lines
 Copyright (c) 1996-2008 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
@@ -372,11 +372,12 @@ int check_std_t1font(char *s)
         { -1, -1, -1, -1, -1, -1, 8, 0, -1, 4, 10, 9, -1, -1, 5, 2, 12, 6, -1,
         3, -1, 7
     };
-    assert(s != NULL);
-    const size_t n = strlen(s);
+    size_t n;
     int k = -1;
+    assert(s != NULL);
+    n = strlen(s);
     if (n > 21)
-        return false;
+        return -1;
     if (n == 12) {              /* three names have length 12 */
         switch (*s) {
         case 'C':
@@ -389,7 +390,7 @@ int check_std_t1font(char *s)
             k = 13;             /* ZapfDingbats */
             break;
         default:
-            return false;
+            return -1;
         }
     } else
         k = index[n];
