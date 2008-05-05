@@ -187,6 +187,12 @@
 % problem with \type{} is already solved in ConTeXt as of 2006-02-14.
 \let\ifpdfabsnum\relax
 \let\ifpdfabsdim\relax
+% same with this:
+\let\ifpdfprimitive\relax
+
+% , so we no longer need that
+%% to get bookmarks for primitives like \ifpdfprimitive
+%%\appendtoks\def\tex#1{\string\\#1}\to\simplifiedcommands
 
 \def\Sugar    #1{\unskip\unskip\unskip\kern.25em{#1}\kern.25em\ignorespaces}
 \def\Something#1{\Sugar{\mathematics{\langle\hbox{#1}\rangle}}}
@@ -207,9 +213,6 @@
 
 % introduced
 \def\introduced#1{The primitive has been introduced in \PDFTEX\ #1.}
-
-% to get bookmarks for primitives like \ifpdfprimitive
-\appendtoks\def\tex#1{\string\\#1}\to\simplifiedcommands
 
 %D We typeset the \URL's in a monospaced font.
 
@@ -2135,9 +2138,7 @@ definitions and syntax rules follow after the list of primitives.
 \Tex {\pdfunescapehex} \Something{general text} \Whatever{expandable}
 }
 
-\Syntax {
-\tex {ifpdfprimitive} \Something{control sequence} \Whatever{expandable}
-}
+\Syntax {\Tex{\ifpdfprimitive} \Something{control sequence} \Whatever{expandable}}
 
 % Currently it's only experimental, so don't really document it
 % (also not in pdftex-syntax.txt)
@@ -2732,7 +2733,7 @@ situation.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfoutput} \Whatever{integer}}}
 
-\bookmark{\type{\pdfoutput}}
+\bookmark{\type{pdfoutput}}
 
 This parameter specifies whether the output format should be \DVI\ or
 \PDF. A~positive value means \PDF\ output, otherwise (default 0) one gets
@@ -2761,7 +2762,7 @@ is \DVI.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfminorversion} \Whatever{integer}}}
 
-\bookmark{\type{\pdfminorversion}}
+\bookmark{\type{pdfminorversion}}
 
 This primitive sets the \PDF\ version of the generated file and the latest
 allowed \PDF\ version of included \PDF{}s. \Eg, \type{\pdfminorversion=3} tells
@@ -2775,7 +2776,7 @@ command, that is obsolete by now.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfcompresslevel} \Whatever{integer}}}
 
-\bookmark{\type{\pdfcompresslevel}}
+\bookmark{\type{pdfcompresslevel}}
 
 This integer parameter specifies the level of {\em stream} compression
 (text, in||line graphics, and embedded \PNG\ images (only if they are
@@ -2788,7 +2789,7 @@ is great for \PDF\ stream debugging.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfobjcompresslevel} \Whatever{integer}}}
 
-\bookmark{\type{\pdfobjcompresslevel}}
+\bookmark{\type{pdfobjcompresslevel}}
 
 This integer parameter controls the compression of {\em non-stream}
 objects. In the \PDF-1.4 specification these objects still had to go into
@@ -2833,7 +2834,7 @@ adopted by modern \PDF\ viewers. Also not implemented is the optional
 
 \pdftexprimitive {\Syntax {\Tex {\pdfdecimaldigits} \Whatever{integer}}}
 
-\bookmark{\type{\pdfdecimaldigits}}
+\bookmark{\type{pdfdecimaldigits}}
 
 This integer parameter specifies the numeric accuracy of real coordinates as written
 to the \PDF\ file. It gives the maximal number of decimal digits after the
@@ -2851,7 +2852,7 @@ limit the accuracy to two digits by typing: \type{\twodigitMPoutput}.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfhorigin} \Whatever{dimension}}}
 
-\bookmark{\type{\pdfhorigin}}
+\bookmark{\type{pdfhorigin}}
 
 This parameter can be used to set the horizontal offset the output box
 from the top left corner of the page. A~value of 1~inch corresponds to the
@@ -2870,7 +2871,7 @@ command.  Or, you can preadjust the \type{\pdfhorigin} value before typing
 
 \pdftexprimitive {\Syntax {\Tex {\pdfvorigin} \Whatever{dimension}}}
 
-\bookmark{\type{\pdfvorigin}}
+\bookmark{\type{pdfvorigin}}
 
 This parameter is the vertical companion of \type{\pdfhorigin}, and the
 notes above regarding \type{\mag} and true dimensions apply. Also keep
@@ -2880,7 +2881,7 @@ in mind that the \TEX\ coordinate system starts in the top left corner
 
 \pdftexprimitive {\Syntax {\Tex {\pdfpagewidth} \Whatever{dimension}}}
 
-\bookmark{\type{\pdfpagewidth}}
+\bookmark{\type{pdfpagewidth}}
 
 This dimension parameter specifies the page width of the \PDF\ output
 (the screen, the paper, etc.). \PDFTEX\ reads this parameter when it
@@ -2895,7 +2896,7 @@ screen, you can be rather sure that this parameter is set wrong.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfpageheight} \Whatever{dimension}}}
 
-\bookmark{\type{\pdfpageheight}}
+\bookmark{\type{pdfpageheight}}
 
 Similar to the previous item, this dimension parameter specifies the
 page height of the \PDF\ output. If set to zero, the page height will
@@ -2907,7 +2908,7 @@ the wished true page height.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfinfo} \Something{general text}}}
 
-\bookmark{\type{\pdfinfo}}
+\bookmark{\type{pdfinfo}}
 
 This primitive allows the user to add information to the document info
 section; if this information is provided, it can be extracted, \eg\ by the
@@ -2951,7 +2952,7 @@ An example of the use of \type{\pdfinfo} is:
 \pdftexprimitive {\Syntax {\Tex {\pdfcatalog} \Something{general text}
 \Optional{\Something{open-action spec}}}}
 
-\bookmark{\type{\pdfcatalog}}
+\bookmark{\type{pdfcatalog}}
 
 Similar to the document info section is the document catalog, where keys
 are \type{/URI}, which provides the base \URL\ of the document, and \type
@@ -2987,7 +2988,7 @@ open action directly into the catalog.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfnames} \Something{general text}}}
 
-\bookmark{\type{\pdfnames}}
+\bookmark{\type{pdfnames}}
 
 This primitive inserts the \Something{general text} to the \type
 {/Names} array. The text must
@@ -2996,7 +2997,7 @@ otherwise the document can be invalid.
 
 \pdftexprimitive {\Syntax {\Tex {\pdftrailer} \Something{general text}}}
 
-\bookmark{\type{\pdftrailer}}
+\bookmark{\type{pdftrailer}}
 
 This command puts its argument text verbatim into the file trailer
 dictionary. \introduced{1.11a}
@@ -3007,7 +3008,7 @@ dictionary. \introduced{1.11a}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfpkresolution} \Whatever{integer}}}
 
-\bookmark{\type{\pdfpkresolution}}
+\bookmark{\type{pdfpkresolution}}
 
 This integer parameter specifies the default resolution of embedded \PK\
 fonts and is read when \PDFTEX\ embeds a~\PK\ font during finishing the
@@ -3018,7 +3019,7 @@ viewers, it is best to use Type~1 fonts when available.
 \Something{font} \Something{stretch} \Something{shrink}
 \Something{step} \Optional{\Literal{autoexpand}}}}
 
-\bookmark{\type{\pdffontexpand}}
+\bookmark{\type{pdffontexpand}}
 
 This extension to \TEX's font definitions controls a~\PDFTEX\ automatism
 called {\em font expansion}. We describe this by an example:
@@ -3095,7 +3096,7 @@ while keeping this thickness compatible.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfadjustspacing} \Whatever{integer}}}
 
-\bookmark{\type{\pdfadjustspacing}}
+\bookmark{\type{pdfadjustspacing}}
 
 This primitive provides a~switch for enabling font expansion. By default,
 \type{\pdfadjustspacing} is set to~0; then font expansion is disabled,
@@ -3120,7 +3121,7 @@ for the \type{\pdffontexpand} primitive, unless this is given with the
 
 \pdftexprimitive {\Syntax {\Tex {\efcode} \Something{font} \Whatever{integer}}}
 
-\bookmark{\type{\efcode}}
+\bookmark{\type{efcode}}
 
 We didn't yet tell the whole story. One can imagine that some glyphs
 are visually more sensitive to stretching or shrinking than others. Then
@@ -3145,7 +3146,7 @@ than would be comfortable.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfprotrudechars} \Whatever{integer}}}
 
-\bookmark{\type{\pdfprotrudechars}}
+\bookmark{\type{pdfprotrudechars}}
 
 Yet another way of optimizing paragraph breaking is to let certain
 characters move into the margin (`character protrusion'). When
@@ -3163,7 +3164,7 @@ zero||width character, for which protrusion is activated.
 
 \pdftexprimitive {\Syntax {\Tex {\rpcode} \Something{font} \Whatever{integer}}}
 
-\bookmark{\type{\rpcode}}
+\bookmark{\type{rpcode}}
 
 The amount that a~character from a~given font may shift into the right
 margin (`character protrusion') is set by the primitive \type {\rpcode}.
@@ -3188,7 +3189,7 @@ master's thesis.
 \pdftexprimitive {\Syntax {\Tex {\lpcode} \Something{font}
 \Whatever{integer}}}
 
-\bookmark{\type{\lpcode}}
+\bookmark{\type{lpcode}}
 
 This is similar to \type{\rpcode}, but affects the amount by which
 characters may protrude into the left margin. Also here the given integer
@@ -3196,7 +3197,7 @@ value is clipped to the range $-$1000..1000.
 
 \pdftexprimitive {\Syntax {\Tex {\leftmarginkern} \Something{box number} \Whatever{expandable}}}
 
-\bookmark{\type{\leftmarginkern}}
+\bookmark{\type{leftmarginkern}}
 
 The \Tex{\leftmarginkern} \Something{box number} primitive expands to the
 width of the margin kern at the left side of the horizontal list stored
@@ -3231,7 +3232,7 @@ proper margin kerning (which is then done by ordinary kerns).
 
 \pdftexprimitive {\Syntax {\Tex {\rightmarginkern} \Something{box number} \Whatever{expandable}}}
 
-\bookmark{\type{\rightmarginkern}}
+\bookmark{\type{rightmarginkern}}
 
 The \Tex{\rightmarginkern} \Something{box number} primitive expands to
 the width of the margin kern at the right side of the horizontal list
@@ -3241,7 +3242,7 @@ for more details.
 
 \pdftexprimitive {\Syntax {\Tex {\pdffontattr} \Something{font} \Something{general text}}}
 
-\bookmark{\type{\pdffontattr}}
+\bookmark{\type{pdffontattr}}
 
 This primitive inserts the \Something{general text} to the \type {/Font}
 dictionary. The text must conform to the specifications as laid down in the
@@ -3250,7 +3251,7 @@ dictionary. The text must conform to the specifications as laid down in the
 \pdftexprimitive {\Syntax {\Tex {\pdffontname} \Something{font} \Whatever
 {expandable}}}
 
-\bookmark{\type{\pdffontname}}
+\bookmark{\type{pdffontname}}
 
 In \PDF\ files produced by \PDFTEX\ one can recognize a~font resource
 by the prefix~\type{/F} followed by a~number, for instance \type{/F12}
@@ -3266,7 +3267,7 @@ number from the font resource name, but not the appended random string.
 \pdftexprimitive {\Syntax {\Tex {\pdffontobjnum} \Something{font} \Whatever
 {expandable}}}
 
-\bookmark{\type{\pdffontobjnum}}
+\bookmark{\type{pdffontobjnum}}
 
 This command is similar to \type{\pdffontname}, but it returns the
 \PDF\ object number of the font dictionary instead of the number from
@@ -3280,7 +3281,7 @@ access to all the font resources used in the document.
 \pdftexprimitive {\Syntax {\Tex {\pdffontsize} \Something{font} \Whatever
 {expandable}}}
 
-\bookmark{\type{\pdffontsize}}
+\bookmark{\type{pdffontsize}}
 
 This primitive expands to the font size of the given font, with unit
 \type{pt}.  \Eg, when using the plain \TeX\ macro package, the call
@@ -3289,7 +3290,7 @@ This primitive expands to the font size of the given font, with unit
 \pdftexprimitive {\Syntax {\Tex {\pdfincludechars} \Something{font}
 \Something{general text}}}
 
-\bookmark{\type{\pdfincludechars}}
+\bookmark{\type{pdfincludechars}}
 
 This command causes \PDFTEX\ to treat the characters in \Something{general
 text} as if they were used with \Something{font}\unkern, which means that the
@@ -3298,7 +3299,7 @@ output. Nothing is appended to the list being built.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfuniqueresname} \Whatever{integer}}}
 
-\bookmark{\type{\pdfuniqueresname}}
+\bookmark{\type{pdfuniqueresname}}
 
 When this primitive is assigned a~positive number, \PDF\ resource names
 will be made reasonably unique by appending a~random string consisting
@@ -3306,7 +3307,7 @@ of six \ASCII\ characters.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfmapfile} \Something{map spec}}}
 
-\bookmark{\type{\pdfmapfile}}
+\bookmark{\type{pdfmapfile}}
 
 This primitive is used for reading a~font map file consisting of
 one or more font map lines. The name of the map file is given in
@@ -3397,7 +3398,7 @@ This would always read the file \type{myspecial.map} after the default
 
 \pdftexprimitive {\Syntax {\Tex {\pdfmapline} \Something{map spec}}}
 
-\bookmark{\type{\pdfmapline}}
+\bookmark{\type{pdfmapline}}
 
 Similar to \type{\pdfmapfile}, but here you can give a~single
 map line (like the ones in map files) as an argument. The optional modifiers
@@ -3418,7 +3419,7 @@ input. \introduced{1.20a}
 
 \pdftexprimitive {\Syntax {\Tex {\pdftracingfonts} \Whatever{integer}}}
 
-\bookmark{\type{\pdftracingfonts}}
+\bookmark{\type{pdftracingfonts}}
 
 This integer parameter specifies the level of verbosity for info about
 expanded fonts given in the log, \eg\ when \type{\tracingoutput=1}.
@@ -3442,7 +3443,7 @@ recommended, to allow future extensions.  \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfmovechars} \Whatever{integer}}}
 
-\bookmark{\type{\pdfmovechars}}
+\bookmark{\type{pdfmovechars}}
 
 Since \PDFTEX\ version 1.30.0 the primitive \type{\pdfmovechars} is obsolete,
 and its use merely leads to a~warning. (This primitive specified whether
@@ -3451,7 +3452,7 @@ its sole purpose was to remedy certain bugs of early \PDF\ viewers.)
 
 \pdftexprimitive {\Syntax {\Tex {\pdfpkmode} \Whatever{tokens}}}
 
-\bookmark{\type{\pdfpkmode}}
+\bookmark{\type{pdfpkmode}}
 
 The \type{\pdfpkmode} is a~token register that sets the \METAFONT\ mode for
 pixel font generation. The contents of this register is dumped into the
@@ -3460,7 +3461,7 @@ format, so one can (optionally) preset it \eg\ in \type{pdftexconfig.tex}.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfnoligatures} \Something{font}}}
 
-\bookmark{\type{\pdfnoligatures}}
+\bookmark{\type{pdfnoligatures}}
 
 This diables all ligatures in the loaded font \Something{font}.
 \introduced{1.30.0}
@@ -3471,7 +3472,7 @@ This diables all ligatures in the loaded font \Something{font}.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfobj} \Something{object type spec}}}
 
-\bookmark{\type{\pdfobj}}
+\bookmark{\type{pdfobj}}
 
 This command creates a~raw \PDF\ object that is written to the \PDF\ file as
 \type{1 0 obj} \unknown\ \type{endobj}. The object is written to \PDF\ output as
@@ -3504,14 +3505,14 @@ built. The number of the most recently created object is accessible via
 
 \pdftexprimitive {\Syntax {\Tex {\pdflastobj} \Whatever{read||only integer}}}
 
-\bookmark{\type{\pdflastobj}}
+\bookmark{\type{pdflastobj}}
 
 This command returns the object number of the last object created by \type
 {\pdfobj}.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfrefobj} \Something{object number}}}
 
-\bookmark{\type{\pdfrefobj}}
+\bookmark{\type{pdfrefobj}}
 
 This command appends a~whatsit node to the list being built. When the whatsit
 node is searched at shipout time, \PDFTEX\ will write the object
@@ -3524,7 +3525,7 @@ to the \PDF\ output if it has not been written yet.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfpagesattr} \Whatever{tokens}}}
 
-\bookmark{\type{\pdfpagesattr}}
+\bookmark{\type{pdfpagesattr}}
 
 \PDFTEX\ expands this token list when it finishes the \PDF\ output and adds
 the resulting character stream to the root \type{Pages} object. When defined,
@@ -3545,7 +3546,7 @@ printed.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfpageattr} \Whatever{tokens}}}
 
-\bookmark{\type{\pdfpageattr}}
+\bookmark{\type{pdfpageattr}}
 
 This is similar to \type{\pdfpagesattr}, but has priority over it.
 It can be used to override any attribute given by \type{\pdfpagesattr}
@@ -3554,7 +3555,7 @@ a~page. The contents are added to the attributes of the current page.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfpageref} \Something{page number} \Whatever{expandable}}}
 
-\bookmark{\type{\pdfpageref}}
+\bookmark{\type{pdfpageref}}
 
 This primitive expands to the number of the page object that contains the
 dictionary for page \Something{page number}. If the page \Something{page
@@ -3563,7 +3564,7 @@ object will be generated, and \type{\pdfpageref} will expand to that
 object number.
 
 \Eg, if the dictionary for page~5 of the \TEX\ document is contained in
-\PDF\ object no.~18, \tex{pdfpageref5} expands to the number 18.
+\PDF\ object no.~18, \type{pdfpageref5} expands to the number 18.
 
 %***********************************************************************
 
@@ -3585,7 +3586,7 @@ text typeset by \TEX.
 \pdftexprimitive {\Syntax {\Tex {\pdfxform} \Optional{\Something{attr
 spec}} \Optional{\Something{resources spec}} \Something{box number}}}
 
-\bookmark{\type{\pdfxform}}
+\bookmark{\type{pdfxform}}
 
 This command creates a~form XObject corresponding to the contents of the
 box \Something{box number}. The box can contain other raw objects, form
@@ -3604,7 +3605,7 @@ and takes priority over later ones.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfrefxform} \Something{object number}}}
 
-\bookmark{\type{\pdfrefxform}}
+\bookmark{\type{pdfrefxform}}
 
 The form XObject is kept in memory and will be written to the \PDF\
 output only when its object number is referred to by \type{\pdfrefxform}
@@ -3619,7 +3620,7 @@ not written yet.
 
 \pdftexprimitive {\Syntax {\Tex {\pdflastxform}} \Whatever{read||only integer}}
 
-\bookmark{\type{\pdflastxform}}
+\bookmark{\type{pdflastxform}}
 
 The object number of the most recently created form XObject is accessible
 via \type {\pdflastxform}.
@@ -3630,7 +3631,7 @@ depends on visuals that show up on user request, but are hidden otherwise.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfxformname} \Something{object number} \Whatever{expandable}}}
 
-\bookmark{\type{\pdfxformname}}
+\bookmark{\type{pdfxformname}}
 
 In \PDF\ files produced by \PDFTEX\ one can recognize a~form Xobject by
 the prefix~\type{/Fm} followed by a~number, for instance \type{/Fm2}.
@@ -3658,7 +3659,7 @@ are bitmap graphics and for manipulating them similar commands are provided.
   \Something{general text}
 }}
 
-\bookmark{\type{\pdfximage}}
+\bookmark{\type{pdfximage}}
 
 This command creates an image object. The dimensions of the image can be
 controlled via \Something{rule spec}\unkern. The default values are zero for depth
@@ -3724,7 +3725,7 @@ automatically.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfrefximage} \Something{integer}}}
 
-\bookmark{\type{\pdfrefximage}}
+\bookmark{\type{pdfrefximage}}
 
 The image is kept in memory and will be written to the \PDF\ output only when
 its number is referred to by \type{\pdfrefximage} or \type{\pdfximage} is
@@ -3738,7 +3739,7 @@ written yet.
 \pdftexprimitive {\Syntax {\Tex {\pdflastximage} \Whatever{read||only
 integer}}}
 
-\bookmark{\type{\pdflastximage}}
+\bookmark{\type{pdflastximage}}
 
 The number of the most recently created XObject image is accessible via \type
 {\pdflastximage}.
@@ -3746,7 +3747,7 @@ The number of the most recently created XObject image is accessible via \type
 \pdftexprimitive {\Syntax {\Tex {\pdflastximagepages} \Whatever{read||only
 integer}}}
 
-\bookmark{\type{\pdflastximagepages}}
+\bookmark{\type{pdflastximagepages}}
 
 This read||only register returns the highest page number from a~file
 previously accessed via the \type{\pdfximage} command.
@@ -3755,7 +3756,7 @@ for \PNG\ and \JPEG\ files.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfimageresolution} \Whatever{integer}}}
 
-\bookmark{\type{\pdfimageresolution}}
+\bookmark{\type{pdfimageresolution}}
 
 The integer \type{\pdfimageresolution} parameter (unit: dots per
 inch, dpi) is a~last resort value, used only for bitmap (\JPEG, \PNG,
@@ -3782,7 +3783,7 @@ files are currently ignored.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfpagebox} \Whatever{integer}}}
 
-\bookmark{\type{\pdfpagebox}}
+\bookmark{\type{pdfpagebox}}
 
 %- It is now possible to specify the pdf page box to use when including pdfs.
 %  The syntax has been extended:
@@ -3809,19 +3810,19 @@ available starting from \PDFTEX\ 1.30.0, as a~shortened synonym of obsolete
 
 \pdftexprimitive {\Syntax {\Tex {\pdfforcepagebox} \Whatever{integer}}}
 
-\bookmark{\type{\pdfforcepagebox}}
+\bookmark{\type{pdfforcepagebox}}
 
 This primitive is obsolete. Use \type{\pdfpagebox} instead.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfoptionalwaysusepdfpagebox} \Whatever{integer}}}
 
-\bookmark{\type{\pdfoptionalwaysusepdfpagebox}}
+\bookmark{\type{pdfoptionalwaysusepdfpagebox}}
 
 This primitive is obsolete. Use \type{\pdfpagebox} instead.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfinclusionerrorlevel} \Whatever{integer}}}
 
-\bookmark{\type{\pdfinclusionerrorlevel}}
+\bookmark{\type{pdfinclusionerrorlevel}}
 
 This controls the behaviour of \PDFTEX\ when a~\PDF\ file is included
 that has a~newer version than the one specified by this primitive:
@@ -3832,13 +3833,13 @@ now obsolete.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfoptionpdfinclusionerrorlevel} \Whatever{integer}}}
 
-\bookmark{\type{\pdfoptionpdfinclusionerrorlevel}}
+\bookmark{\type{pdfoptionpdfinclusionerrorlevel}}
 
 This primitive is obsolete. Use \type{\pdfinclusionerrorlevel} instead.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfimagehicolor} \Whatever{integer}}}
 
-\bookmark{\type{\pdfimagehicolor}}
+\bookmark{\type{pdfimagehicolor}}
 
 This primitive, when set to~1, enables embedding of \PNG\ images with
 16~bit wide color channels at their full color resolution. As such
@@ -3854,7 +3855,7 @@ must appear before any data is written to the \PDF\ output.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfimageapplygamma} \Whatever{integer}}}
 
-\bookmark{\type{\pdfimageapplygamma}}
+\bookmark{\type{pdfimageapplygamma}}
 
 This primitive, when set to~1, enables gamma correction while embedding
 \PNG\ images, taking the values of the primitives \type {\pdfgamma} as
@@ -3866,7 +3867,7 @@ If specified, the parameter must appear before any data is written to the
 
 \pdftexprimitive {\Syntax {\Tex {\pdfgamma} \Whatever{integer}}}
 
-\bookmark{\type{\pdfgamma}}
+\bookmark{\type{pdfgamma}}
 
 This primitive defines the `device gamma' for \PDFTEX. Values are in
 promilles (same as for \type{\mag}). The default value of this primitive
@@ -3884,7 +3885,7 @@ If specified, the parameter must appear before any data is written to the
 
 \pdftexprimitive {\Syntax {\Tex {\pdfimagegamma} \Whatever{integer}}}
 
-\bookmark{\type{\pdfimagegamma}}
+\bookmark{\type{pdfimagegamma}}
 
 This primitive gives a~default `assumed gamma' value for \PNG\ images.
 Values are in promilles (same as for \type{\pdfamma}). The default value
@@ -3902,7 +3903,7 @@ If specified, the parameter must appear before any data is written to the
 
 \pdftexprimitive {\Syntax {\Tex {\pdfpxdimen} \Whatever{dimen}}}
 
-\bookmark{\type{\pdfpxdimen}}
+\bookmark{\type{pdfpxdimen}}
 
 While working with bitmap graphics or typesetting electronic documents,
 it might be convenient to base dimensions on pixels rather than \TeX's
@@ -3949,7 +3950,7 @@ primitives.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfannot} \Something{annot type spec}}}
 
-\bookmark{\type{\pdfannot}}
+\bookmark{\type{pdfannot}}
 
 This command appends a~whatsit node corresponding to an annotation to the
 list being built. The dimensions of the annotation can be controlled via the
@@ -3963,7 +3964,7 @@ if the corresponding whatsit node is searched at shipout time.
 \pdftexprimitive {\Syntax {\Tex {\pdflastannot} \Whatever{read||only
 integer}}}
 
-\bookmark{\type{\pdflastannot}}
+\bookmark{\type{pdflastannot}}
 
 This primitive returns the object number of the last annotation created by
 \type{\pdfannot}. These two primitives allow users to create any annotation
@@ -3982,7 +3983,7 @@ speed.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfdest} \Something{dest spec}}}
 
-\bookmark{\type{\pdfdest}}
+\bookmark{\type{pdfdest}}
 
 This primitive appends a~whatsit node which establishes a~destination for
 links and bookmark outlines; the link is identified by either a~number or
@@ -4024,7 +4025,7 @@ searched at shipout time.
 \pdftexprimitive {\Syntax {\Tex {\pdfstartlink} \Optional{\Something{rule
 spec}} \Optional{\Something{attr spec}} \Something{action spec}}}
 
-\bookmark{\type{\pdfstartlink}}
+\bookmark{\type{pdfstartlink}}
 
 This primitive is used along with \type{\pdfendlink} and appends a~whatsit
 node corresponding to the start of a~hyperlink. The whatsit node representing
@@ -4071,7 +4072,7 @@ performed in another \PDF\ file by specifying a~\Something{file spec}\unkern.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfendlink}}}
 
-\bookmark{\type{\pdfendlink}}
+\bookmark{\type{pdfendlink}}
 
 This primitive ends a~link started with \type{\pdfstartlink}. All text
 between \type{\pdfstartlink} and \type{\pdfendlink} will be treated as part
@@ -4081,7 +4082,7 @@ case it will make several links with the same content.
 \pdftexprimitive {\Syntax {\Tex {\pdflastlink} \Whatever{read||only
 integer}}}
 
-\bookmark{\type{\pdflastlink}}
+\bookmark{\type{pdflastlink}}
 
 This primitive returns the object number of the last link created by
 \type{\pdfstartlink} (analogous to \type{\pdflastannot}).
@@ -4089,14 +4090,14 @@ This primitive returns the object number of the last link created by
 
 \pdftexprimitive {\Syntax {\Tex {\pdflinkmargin} \Whatever{dimension}}}
 
-\bookmark{\type{\pdflinkmargin}}
+\bookmark{\type{pdflinkmargin}}
 
 This dimension parameter specifies the margin of the box representing
 a~hyperlink and is read when a~page containing hyperlinks is shipped out.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfdestmargin} \Whatever{dimension}}}
 
-\bookmark{\type{\pdfdestmargin}}
+\bookmark{\type{pdfdestmargin}}
 
 Margin added to the dimensions of the rectangle around the destinations.
 
@@ -4108,7 +4109,7 @@ Margin added to the dimensions of the rectangle around the destinations.
 \Optional{\Something{attr spec}} \Something{action spec}
 \Optional{\Literal {count} \Something{integer}} \Something{general text}}}
 
-\bookmark{\type{\pdfoutline}}
+\bookmark{\type{pdfoutline}}
 
 This primitive creates an outline (or bookmark) entry. The first parameter
 specifies the action to be taken, and is the same as that allowed for \type
@@ -4128,7 +4129,7 @@ is written to the \PDF\ output immediately.
 \Optional{\Something{rule spec}} \Optional
 {\Something{attr spec}} \Something{id spec}}}
 
-\bookmark{\type{\pdfthread}}
+\bookmark{\type{pdfthread}}
 
 Defines a~bead within an article thread. Thread beads with same
 identifiers (spread across the document) will be joined together.
@@ -4137,7 +4138,7 @@ identifiers (spread across the document) will be joined together.
 \Optional{\Something{rule spec}} \Optional
 {\Something{attr spec}} \Something{id spec}}}
 
-\bookmark{\type{\pdfstartthread}}
+\bookmark{\type{pdfstartthread}}
 
 This uses the same syntax as \type{\pdfthread}, apart that it must be
 followed by a~\type{\pdfendthread}.  \type{\pdfstartthread} and the
@@ -4152,13 +4153,13 @@ belong to the thread by a~box to change their box nesting level.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfendthread}}}
 
-\bookmark{\type{\pdfendthread}}
+\bookmark{\type{pdfendthread}}
 
 This ends an article thread started before by \type{\pdfstartthread}.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfthreadmargin} \Whatever{dimension}}}
 
-\bookmark{\type{\pdfthreadmargin}}
+\bookmark{\type{pdfthreadmargin}}
 
 Specifies a~margin to be added to the dimensions of a~bead within
 an article thread.
@@ -4170,7 +4171,7 @@ an article thread.
 \pdftexprimitive {\Syntax {\Tex {\pdfliteral} \Optional{\Something {pdfliteral spec}}
 \Something{general text}}}
 
-\bookmark{\type{\pdfliteral}}
+\bookmark{\type{pdfliteral}}
 
 Like \type{\special} in normal \TEX, this command inserts raw
 \PDF\ code into the output. This allows support of color and text
@@ -4198,19 +4199,19 @@ this within a~\type{BT ET} block.
 % HE: \unkern is a kludge here; wanted to have tight "{pdf:"
 \pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:} \Something{text} \Rbrace}}
 
-\bookmark{\type{\special}}
+\bookmark{\type{special}}
 
 This is equivalent to \Syntax{\Tex{\pdfliteral} \Lbrace \Something{text} \Rbrace}.
 
 \pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:direct:} \Something{text} \Rbrace}}
 
-\bookmark{\type{\special\ direct}}
+\bookmark{\type{special direct}}
 
 This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{direct} \Lbrace \Something{text} \Rbrace}.
 
 \pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:page:} \Something{text} \Rbrace}}
 
-\bookmark{\type{\special\ page}}
+\bookmark{\type{special page}}
 
 This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{page} \Lbrace \Something{text} \Rbrace}.
 
@@ -4220,7 +4221,7 @@ This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{page} \Lbrace \Somethin
 
 \pdftexprimitive {\Syntax {\Tex {\pdfescapestring} \Something {general text}}}
 
-\bookmark{\type{\pdfescapestring}}
+\bookmark{\type{pdfescapestring}}
 
 Starting from version 1.30.0, \PDFTEX\ provides a~mechanism for converting
 a~general text into \PDF\ string. Many characters that may be needed inside
@@ -4235,7 +4236,7 @@ text by the \PDF\ viewer.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfescapename} \Something {general text}}}
 
-\bookmark{\type{\pdfescapename}}
+\bookmark{\type{pdfescapename}}
 
 In analogy to \type{\pdfescapestring}, \type{\pdfescapename} replaces each
 special \PDF\ character inside the general text by its hexadecimal
@@ -4246,7 +4247,7 @@ interpretation of the text if used as a~\PDF\ name object. In example,
 
 \pdftexprimitive {\Syntax {\Tex {\pdfescapehex} \Something {general text}}}
 
-\bookmark{\type{\pdfescapehex}}
+\bookmark{\type{pdfescapehex}}
 
 This command converts each character of \Something{general text} into its
 hexadecimal representation. Each character of the argument becomes a~pair of
@@ -4254,7 +4255,7 @@ hexadecimal digits. \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfunescapehex} \Something {general text}}}
 
-\bookmark{\type{\pdfunescapehex}}
+\bookmark{\type{pdfunescapehex}}
 
 This command treats each character pair of \Something {general text} as
 a~hexadecimal number and returns an \ASCII\ character of this code.
@@ -4265,7 +4266,7 @@ a~hexadecimal number and returns an \ASCII\ character of this code.
 \pdftexprimitive {\Syntax {\Tex {\pdfstrcmp} \Something{general text}
 \Something{general text} \Whatever{expandable}}}
 
-\bookmark{\type{\pdfstrcmp}}
+\bookmark{\type{pdfstrcmp}}
 
 This command compares two strings and expands to 0 if the strings are
 equal, to $-1$ if the first string is $<$ then the second, and to $+1$ if
@@ -4276,7 +4277,7 @@ the first is $>$ than the second.
 \pdftexprimitive{\Syntax {\Tex {\pdfmdfivesum} \Something{general text}
 \Whatever{expandable}}}
 
-\bookmark{\type{\pdfmdfivesum}}
+\bookmark{\type{pdfmdfivesum}}
 
 This command expands to the \MDFIVE\ of \Something{general text} in uppercase
 hexadecimal format (same as \type{\pdfescapehex}).
@@ -4288,7 +4289,7 @@ hexadecimal format (same as \type{\pdfescapehex}).
 
 \pdftexprimitive{\Syntax {\Tex {\ifpdfabsnum}} \Something{number}}
 
-\bookmark{\type{\ifpdfabsnum}}
+\bookmark{\type{ifpdfabsnum}}
 
 The primitive works as normal \type{\ifnum} condition check, except that it compares
 absolute values of numbers. Although it seems to be a~trivial shortcut for a~couple of
@@ -4297,14 +4298,14 @@ absolute values of numbers. Although it seems to be a~trivial shortcut for a~cou
 
 \pdftexprimitive{\Syntax {\Tex {\ifpdfabsdim}} \Something{dimen}}
 
-\bookmark{\type{\ifpdfabsdim}}
+\bookmark{\type{ifpdfabsdim}}
 
 Like \type{\ifpdfabsnum}, the primitive works as normal \type{\ifdim} condition check, except
 that it compares absolute values of dimensions. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfuniformdeviate} \Something{number} \Whatever{expandable}}}
 
-\bookmark{\type{\pdfuniformdeviate}}
+\bookmark{\type{pdfuniformdeviate}}
 
 The commands generates a~uniformly distributed random integer value between
 0 (inclusive) and \Something{number} (exclusive). This primitive expands to
@@ -4312,7 +4313,7 @@ a~list of tokens. \introduced{1.30.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfnormaldeviate} \Whatever{expandable}}}
 
-\bookmark{\type{\pdfnormaldeviate}}
+\bookmark{\type{pdfnormaldeviate}}
 
 %MS Hopefully the random number doesn't influce the length of this paragraph;
 %MS otherwise texexec could loop :-)
@@ -4323,7 +4324,7 @@ tokens. \introduced{1.30.0}
 \pdftexprimitive {\Syntax {\Tex {\pdfrandomseed}} \Whatever{read||only
 integer}}
 
-\bookmark{\type{\pdfrandomseed}}
+\bookmark{\type{pdfrandomseed}}
 
 You can use \type{\the\pdfrandomseed} to query the current seed value, so
 you can \eg\ write the value to the log file.
@@ -4333,7 +4334,7 @@ commands like \type{\count}). \introduced{1.30.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfsetrandomseed} \Something{number}}}
 
-\bookmark{\type{\pdfsetrandomseed}}
+\bookmark{\type{pdfsetrandomseed}}
 
 This sets the random seed (\type{\pdfrandomseed}) to a~specific value,
 allowing you to re-play sequences of semi-randoms at a~later moment.
@@ -4346,7 +4347,7 @@ allowing you to re-play sequences of semi-randoms at a~later moment.
 \pdftexprimitive {\Syntax {\Tex {\pdfelapsedtime}} \Whatever{read||only
 integer}}
 
-\bookmark{\type{\pdfelapsedtime}}
+\bookmark{\type{pdfelapsedtime}}
 
 The command expands to a~number that represents the time elapsed from the
 moment of run start. The elapsed time is returned in `scaled seconds', that
@@ -4358,7 +4359,7 @@ the time exceeds 32767 seconds, the constant value $2^{31}-1$ will be returned.
 
 \pdftexprimitive{\type{\pdfresettimer}}
 
-\bookmark{\type{\pdfresettimer}}
+\bookmark{\type{pdfresettimer}}
 
 The command resets the internal timer so that \type{\pdfelapsedtime}
 starts returning micro||time from~0 again. \introduced{1.30.0}
@@ -4370,7 +4371,7 @@ starts returning micro||time from~0 again. \introduced{1.30.0}
 \pdftexprimitive{\Syntax {\Tex {\pdffilemoddate} \Something{general text}
 \Whatever{expandable}}}
 
-\bookmark{\type{\pdffilemoddate}}
+\bookmark{\type{pdffilemoddate}}
 
 Expands to the modification date of file \Something{general text} in the same
 format as for \type{\pdfcreationdate}, \eg\ it's {\tt \pdffilemoddate
@@ -4380,7 +4381,7 @@ format as for \type{\pdfcreationdate}, \eg\ it's {\tt \pdffilemoddate
 \pdftexprimitive{\Syntax {\Tex {\pdffilesize} \Something{general text}
 \Whatever{expandable}}}
 
-\bookmark{\type{\pdffilesize}}
+\bookmark{\type{pdffilesize}}
 
 Expands to the size of file \Something{general text}, \eg\ it's {\tt
 \pdffilesize {./pdftex-t.tex}} for the source of this manual.
@@ -4389,7 +4390,7 @@ Expands to the size of file \Something{general text}, \eg\ it's {\tt
 \pdftexprimitive{\Syntax {\Tex {\pdfmdfivesum} file \Something{general text}
 \Whatever{expandable}}}
 
-\bookmark{\type{\pdfmdfivesum\ file}}
+\bookmark{\type{pdfmdfivesum\ file}}
 
 Expands to the \MDFIVE\ of file \Something{general text} in uppercase
 hexadecimal format (same as \type{\pdfescapehex}), \eg\ it's {\tt
@@ -4400,7 +4401,7 @@ hexadecimal format (same as \type{\pdfescapehex}), \eg\ it's {\tt
 \Something{number}} \Optional{length \Something{number}} \Something{general
 text} \Whatever{expandable}}}
 
-\bookmark{\type{\pdffiledump}}
+\bookmark{\type{pdffiledump}}
 
 Expands to the dump of the file \Something{general text} in uppercase
 hexadecimal format (same as \type{\pdfescapehex}), starting at offset
@@ -4419,7 +4420,7 @@ stack).
 \Tex {\pdfcolorstackinit} \Optional{page} \Optional{direct} \Something{general text}
 \Whatever{expandable}}}
 
-\bookmark{\type{\pdfcolorstackinit}}
+\bookmark{\type{pdfcolorstackinit}}
 
 The primitive initializes new graphic stack and returns its number. Optional
 \Literal{page} keyword instructs \PDFTEX\ to restore the graphic at the
@@ -4430,7 +4431,7 @@ as for \Tex{\pdfliteral} primitive. \introduced{1.40.0}
 \Tex {\pdfcolorstack} \Something{stack number} \Something{stack action}
 \Something{general text}}}
 
-\bookmark{\type{\pdfcolorstack}}
+\bookmark{\type{pdfcolorstack}}
 
 The command operates on the stack of a given number. If \Something{stack action}
 is \Literal{push} keyword, the new value provided as \Something{general text}
@@ -4453,7 +4454,7 @@ problem with three new primitives.
 
 \pdftexprimitive{\Syntax {\Tex {\pdfsetmatrix}}}
 
-\bookmark{\type{\pdfsetmatrix}}
+\bookmark{\type{pdfsetmatrix}}
 
 Afine transformations are normally expressed with six numbers. First four
 (no unit) values defining scaling, rotating and skewing, plus two extra
@@ -4466,14 +4467,14 @@ into the content stream. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfsave}}}
 
-\bookmark{\type{\pdfsave}}
+\bookmark{\type{pdfsave}}
 
 The command saves the current transformation by inserting \type{q} operator into the
 content stream. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfrestore}}}
 
-\bookmark{\type{\pdfrestore}}
+\bookmark{\type{pdfrestore}}
 
 The command restores previously saved transformation by inserting \type{Q}
 operator into the content stream. One should keep in mind that \Tex{\pdfsave}
@@ -4486,13 +4487,13 @@ and end at the same group level. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfpagedivert}} \Something{number}}
 
-\bookmark{\type{\pdfpagedivert}}
+\bookmark{\type{pdfpagedivert}}
 
 \introduced{1.50.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfpageundivert}} \Something{number}}
 
-\bookmark{\type{\pdfpageundivert}}
+\bookmark{\type{pdfpageundivert}}
 
 \introduced{1.50.0}
 
@@ -4549,7 +4550,7 @@ more.
   \Optional{\Something{pre spec}} \Something{filler}
   \Lbrace \Something{vertical mode material} \Rbrace }}
 
-\bookmark{\type{\vadjust}}
+\bookmark{\type{vadjust}}
 
 The \type{\vadjust} implementation of \PDFTEX\ adds an optional
 qualifier \Something{pre spec} (which is the string \type{pre}) to
@@ -4563,7 +4564,7 @@ the line in which \type{\vadjust} appears. However with the qualifier
 
 \pdftexprimitive {\Syntax {\Tex {\quitvmode}}}
 
-\bookmark{\type{\quitvmode}}
+\bookmark{\type{quitvmode}}
 
 The primitive instructs \PDFTEX\ to quit the vertical mode and start typesetting
 a~paragraph. \type{\quitvmode} has the same effect as \type{\leavevmode} definition
@@ -4574,7 +4575,7 @@ with \type{\everypar} tokens list. No such risk while using \type{\quitvmode} in
 
 \pdftexprimitive {\Syntax {\Tex {\pdfsavepos}}}
 
-\bookmark{\type{\pdfsavepos}}
+\bookmark{\type{pdfsavepos}}
 
 This primitive marks the current absolute ($x,y$) position on the
 media, with the reference point in the lower left corner. It is active
@@ -4590,7 +4591,7 @@ in \DVI\ mode.
 \pdftexprimitive {\Syntax {\Tex {\pdflastxpos}} \Whatever{read||only
 integer}}
 
-\bookmark{\type{\pdflastxpos}}
+\bookmark{\type{pdflastxpos}}
 
 This primitive returns an integer number representing the absolute $x$
 coordinate of the last point marked by \type{\pdfsavepos}. The unit is
@@ -4599,14 +4600,14 @@ coordinate of the last point marked by \type{\pdfsavepos}. The unit is
 \pdftexprimitive {\Syntax {\Tex {\pdflastypos}} \Whatever{read||only
 integer}}
 
-\bookmark{\type{\pdflastypos}}
+\bookmark{\type{pdflastypos}}
 
 This primitive works similar to \type{\pdflastxpos}, only it returns
 the $y$ coordinate.
 
 \pdftexprimitive {\Syntax {\Tex {\pdftexversion} \Whatever{read||only integer}}}
 
-\bookmark{\type{\pdftexversion}}
+\bookmark{\type{pdftexversion}}
 \def\versplit#1#2#3{#1.#2#3}
 
 Returns the version of \PDFTEX\ multiplied by 100, \eg\ for \PDFTEX\
@@ -4615,7 +4616,7 @@ produce this document, it returns {\tt \number\pdftexversion}.
 
 \pdftexprimitive {\Syntax {\Tex {\pdftexrevision} \Whatever{expandable}}}
 
-\bookmark{\type{\pdftexrevision}}
+\bookmark{\type{pdftexrevision}}
 
 Returns the revision letter of \PDFTEX, \eg\ for \PDFTEX\ version
 \expandafter\versplit\the\pdftexversion.\pdftexrevision\ used to produce
@@ -4623,31 +4624,30 @@ this document, it returns the letter {\tt \pdftexrevision}.
 
 \pdftexprimitive {\Syntax {\Tex {\pdftexbanner} \Whatever{expandable}}}
 
-\bookmark{\type{\pdftexbanner}}
+\bookmark{\type{pdftexbanner}}
 
 Returns the \PDFTEX\ banner message, \eg\ for the version used here:
 {\tt \pdftexbanner}. \introduced{1.20a}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfcreationdate} \Whatever{expandable}}}
 
-\bookmark{\type{\pdfcreationdate}}
+\bookmark{\type{pdfcreationdate}}
 
 Expands to the date string \PDFTEX\ uses in the info dictionary of the
 document, \eg\ for this file {\tt\pdfcreationdate}. \introduced{1.30.0}
 
-\pdftexprimitive {\Syntax {\Tex {\pdfshellescape} \Whatever{read||only
-integer}}}
+\pdftexprimitive {\Syntax {\Tex {\pdfshellescape} \Whatever{read||only integer}}}
 
-\bookmark{\type{\pdfshellescape}}
+\bookmark{\type{pdfshellescape}}
 
 This primitive is~1 if \type{\write18} is enabled, 0 otherwise.
 \type{\write18} was \ifnum\pdfshellescape=0\relax not \fi enabled when this
 manual was typeset.
 \introduced{1.30.0}
 
-\pdftexprimitive {\Syntax {\tex {ifpdfprimitive} \Something{control sequence} \Whatever{expandable}}}
+\pdftexprimitive {\Syntax {\Tex{\ifpdfprimitive} \Something{control sequence} \Whatever{expandable}}}
 
-\bookmark{\tex{ifpdfprimitive}}
+\bookmark{\type{ifpdfprimitive}}
 
 This condition checks if the following control sequence has its primitive
 meaning. If it has, \type{\ifpdfprimitive} returns true. In any other case
@@ -4655,9 +4655,9 @@ meaning. If it has, \type{\ifpdfprimitive} returns true. In any other case
 \introduced{1.40.0}
 
 
-\pdftexprimitive {\Syntax {\tex {pdfprimitive} \Something{control sequence}}}
+\pdftexprimitive {\Syntax {\Tex {\pdfprimitive} \Something{control sequence}}}
 
-\bookmark{\type{\pdfprimitive}}
+\bookmark{\type{pdfprimitive}}
 
 This command executes the primitive meaning of the following control sequence,
 if it has been redefined or made undefined. If the following control sequence is
@@ -4665,9 +4665,9 @@ undefined and never was a~primitive, nothing happens and no error is raised.
 If the control sequence was initially expandable, \type{\pdfprimitive}
 expands either. Otherwise \type{\pdfprimitive} doesn't expand. \introduced{1.40.0}
 
-\pdftexprimitive {\Syntax {\tex {pdfdraftmode} \Whatever{integer}}}
+\pdftexprimitive {\Syntax {\Tex {\pdfdraftmode} \Whatever{integer}}}
 
-\bookmark{\type{\pdfdraftmode}}
+\bookmark{\type{pdfdraftmode}}
 
 %FIXME: -draftmode should be in tt; bibtex-logo is wrong
 When set to 1 (or switched on by the commandline switch -draftmode) \PDFTEX\

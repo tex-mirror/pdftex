@@ -8,11 +8,11 @@
 % make this sample version independent, we use compatibility sections.
 
 \def\ifversion#1.#2#3#4 {% 1.20, 1.30.0 ...
- \ifnum\pdftexversion<#1#2#3
-  \notsupported
- \else
-  \supported
- \fi}
+	\ifnum\pdftexversion<#1#2#3
+		\notsupported
+	\else
+		\supported
+	\fi}
 
 % to trick \if..\fi balancing
 % \def\otherwise{\else}
@@ -473,13 +473,29 @@ Bytes 7 to 13 of the source are hex {\tt\pdffiledump offset 7 length 7{\jobname}
 \pdfsavepos
 \write16{Position: X=\number\pdflastxpos sp, Y=\number\pdflastypos sp.}
 
-\newpage
-
 % pdfTeX 1.20 and higher allows to get the object number of already typeset page
 
-\feature 1.20 {Page object reference}
+\newpage
 
+\feature 1.20 {Page object reference}
 The previous page has been written as object \pdfpageref1.
+\endfeature
+
+% pdfTeX 1.50.0 comes with a pretty simple and powerful page tree control mechanism.
+% PDF document usually appears to the user as a flat structure of pages in ascending order.
+% However, internally, pages are arranged in a tree structure. With \pdfpagedivert<integer>
+% command we can specify to which page branch the current page should belong to. 
+% With \pdfpageundivert<integer> we append a given branch of pages to
+% to the page structure root. pdfTeX itself uses page diversion 0.
+
+\feature 1.50.0 {Page diversion control}
+
+First page diversion\pdfpagedivert 100 % start writing page objects to brach of ID 100
+\newpage
+Second page diversion\pdfpagedivert 200 % switch to some other branch
+\newpage
+\pdfpageundivert 200 % flush those pages first
+\pdfpageundivert 100 % then those
 
 \endfeature
 
@@ -776,9 +792,9 @@ Shell escape (via \cs\pdfshellescape) seems to be
 % Uncomment line below, if there is epstopdf utility available in your system
 
 %\immediate \write 18 {epstopdf --outfile=tmp.pdf cmr10.103} % call epstopdf
-\pdfximage height \vsize {tmp.pdf}      % insert the PDF converted from EPS
+%\pdfximage height \vsize {tmp.pdf}      % insert the PDF converted from EPS
 \topskip=0pt
-\pdfrefximage \pdflastximage
+%\pdfrefximage \pdflastximage
 \newpage
 
 % some text to try using threads
