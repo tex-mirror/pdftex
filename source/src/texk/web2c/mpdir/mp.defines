@@ -1,5 +1,5 @@
 {
-Copyright (c) 2006 Taco Hoekwater <taco@elvenkind.com>
+Copyright (c) 2006, 2008 Taco Hoekwater <taco@elvenkind.com>
 
 This file is part of MetaPost.
 
@@ -17,12 +17,8 @@ You should have received a copy of the GNU General Public License
 along with MetaPost; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id$
+$Id: mp.defines 7245 2008-03-30 16:31:52Z karl $
 }
-
-{ functions from loadpool.c }
-
-@define function loadpoolstrings();
 
 { functions from mapfile.c }
 
