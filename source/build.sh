@@ -37,14 +37,14 @@ STRIP=strip
 B=build
 # ----------
 # clean up, if needed
-if [ -e "$B"/Makefile -a $ONLY_MAKE = "FALSE" ]
+if [ -r "$B"/Makefile -a $ONLY_MAKE = "FALSE" ]
 then
   rm -rf "$B"
-elif [ ! -e "$B"/Makefile ]
+elif [ ! -r "$B"/Makefile ]
 then
     ONLY_MAKE=FALSE
 fi
-if [ ! -e "$B" ]
+if [ ! -r "$B" ]
 then
   mkdir "$B"
 fi
