@@ -1,5 +1,5 @@
 --------------------------------------------------
-pdfTeX 3.1415926-1.40.8 was released on 2008-04-??
+pdfTeX 3.1415926-1.40.8 was released on 2008-05-??
 --------------------------------------------------
 - Incorporated the new version of TeX: 3.1415926
 - Bugfix:
@@ -8,6 +8,7 @@ pdfTeX 3.1415926-1.40.8 was released on 2008-04-??
   - \pdflastximagepages was broken for JBIG2 images 
   - included PDFs with a negative lly in the MediaBox with a depth != 0 with
     \pdfximage were wrongly vertically diplaces (936)
+  - PDF inclusion was broken on ppc-darwin (941)
 - pdfTeX uses libpng 1.2.28
 
 -------------------------------------------------
