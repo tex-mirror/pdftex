@@ -23,7 +23,7 @@ pdfTeX 3.1415926-1.50.0 was released on 2008-??-??
     and \pdfpageundivert.
   - \expanded (885)
   - synctex
-- pdfTeX uses libpng 1.2.25
+- pdfTeX uses libpng 1.2.29
 - pdfTeX uses xpdf 3.02pl2
 
 -------------------------------------------------
