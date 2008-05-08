@@ -9,7 +9,7 @@ pdfTeX 3.1415926-1.40.8 was released on 2008-05-??
   - included PDFs with a negative lly in the MediaBox with a depth != 0 with
     \pdfximage were wrongly vertically diplaces (936)
   - PDF inclusion was broken on ppc-darwin (941)
-- pdfTeX uses libpng 1.2.28
+- pdfTeX uses libpng 1.2.29
 
 -------------------------------------------------
 pdfTeX 3.141592-1.40.7 was released on 2008-02-17
