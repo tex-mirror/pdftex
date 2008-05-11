@@ -217,6 +217,7 @@ void removepdffile(void)
 
    The output format of this fuction must be the same as pdf_error in
    pdftex.web! */
+
 __attribute__ ((noreturn, format(printf, 1, 2)))
 void pdftex_fail(const char *fmt, ...)
 {
@@ -247,6 +248,7 @@ void pdftex_fail(const char *fmt, ...)
 
 /* The output format of this fuction must be the same as pdf_warn in
    pdftex.web! */
+
 __attribute__ ((format(printf, 1, 2)))
 void pdftex_warn(const char *fmt, ...)
 {
@@ -1982,7 +1984,7 @@ void pdflayerobjectnumbersget(integer n)
 #  define PAGES_TREE_KIDSMAX 6
 #endif
 
-struct avl_table *divert_list_tree = NULL;
+static struct avl_table *divert_list_tree = NULL;
 
 typedef struct pages_entry_ {
     integer objnum;             /* object number of this /Pages object */
@@ -2009,7 +2011,7 @@ static int comp_divert_list_entry(const void *pa, const void *pb, void *p)
     return 0;
 }
 
-pages_entry *new_pages_entry()
+static pages_entry *new_pages_entry()
 {
     pages_entry *p;
     int i;
@@ -2023,7 +2025,7 @@ pages_entry *new_pages_entry()
     return p;
 }
 
-divert_list_entry *new_divert_list_entry()
+static divert_list_entry *new_divert_list_entry()
 {
     divert_list_entry *d;
     d = xtalloc(1, divert_list_entry);
@@ -2031,7 +2033,7 @@ divert_list_entry *new_divert_list_entry()
     return d;
 }
 
-void ensure_list_tree()
+static void ensure_list_tree()
 {
     if (divert_list_tree == NULL) {
         divert_list_tree =
@@ -2040,7 +2042,7 @@ void ensure_list_tree()
     }
 }
 
-divert_list_entry *get_divert_list(integer divnum)
+static divert_list_entry *get_divert_list(integer divnum)
 {
     divert_list_entry *d, tmp;
     void **aa;
@@ -2100,7 +2102,7 @@ integer pdfdopagedivert(integer objnum, integer divnum)
     return p->objnum;
 }
 
-void movelist(divert_list_entry * d, divert_list_entry * dto)
+static void movelist(divert_list_entry * d, divert_list_entry * dto)
 {
     if (d != NULL && d->first != NULL && d->divnum != dto->divnum) {    /* no undivert of empty list or into self */
         if (dto->first == NULL)
@@ -2155,7 +2157,7 @@ void pdfdopageundivert(integer divnum, integer curdivnum)
 
 /* write a /Pages object */
 
-void write_pages(pages_entry * p, int parent)
+static void write_pages(pages_entry * p, int parent)
 {
     int i;
     assert(p != NULL);
@@ -2176,7 +2178,7 @@ void write_pages(pages_entry * p, int parent)
 /* loop over all /Pages objects, output them, create their parents,
  * recursing bottom up, return the /Pages root object number */
 
-integer output_pages_list(pages_entry * pe)
+static integer output_pages_list(pages_entry * pe)
 {
     pages_entry *p, *q, *r;
     assert(pe != NULL);
