@@ -2,7 +2,7 @@
 
    Written in 1996 by Karl Berry.  Public domain.  */
 
-#include <web2c/config.h>
+#include "config.h"
 
 /* We're passed in the original WEB banner string, which has the form
 This is PROGRAM, Version VERSION-NUMBER

@@ -2,7 +2,7 @@
 
    Written in 1995 by Karl Berry.  Public domain.  */
 
-#include <web2c/config.h>
+#include "config.h"
 
 /* Return the basename of NAME, with trailing characters OLD replaced by
    NEW.  (If last characters in NAME are not OLD, just append NEW.)

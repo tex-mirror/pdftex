@@ -1,4 +1,4 @@
-$Id: README 7841 2008-05-04 17:04:24Z karl $
+$Id: README 7995 2008-05-09 23:09:19Z karl $
 Copyright 2006, 2007, 2008 TeX Users Group.
 You may freely use, modify and/or distribute this file.
 
@@ -44,7 +44,7 @@ dvipdfmx 20070518 - ok 21apr08
   -> http://www.ctan.org/tex-archive/dviware/dvipdfmx/
   dvipdfmx@project.ktug.or.kr (ChoF, Hirata, Matthias)
 
-dvipng 1.9 - ok 5dec06
+dvipng 1.10 - ok 10may08
   http://www.ctan.org/tex-archive/dviware/dvipng/
 
 dvipos - ?
@@ -69,7 +69,7 @@ musixflx - ?
 
 ps2pkm - ?
 
-lcdf-typetools 2.68 - ok 4may08
+lcdf-typetools 2.69 - ok 6may08
   http://www.lcdf.org/type/
 
 tex4htk 
