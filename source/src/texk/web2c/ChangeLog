@@ -1,3 +1,60 @@
+2008-04-29  Karl Berry  <karl@tug.org>
+
+	* doc/Makefile.in (install-data): do not cd $(srcdir) in any rule,
+	that fails when the install program is specified by a relative path.
+
+2008-04-28  Karl Berry  <karl@tug.org>
+
+	* fmtutil.in: disable cont-en, texexec et al. create it.
+
+2008-04-18  Karl Berry  <karl@tug.org>
+
+	* Makefile.in (tie): no need for $(native).
+
+2008-04-16  Karl Berry  <karl@tug.org>
+
+	* Makefile.in,
+	* web2c/makecpool.c,
+	* ...: use the one makecpool provided by Taco for all programs.
+
+2008-04-11  Karl Berry  <karl@tug.org>
+
+	* xetexdir/xetex.h (Byte): #define to my_Byte and then #undef to avoid typedef
+	conflict between TECkit_Common.h and zlib; sigh.
+
+2008-03-30  Karl Berry  <karl@tug.org>
+
+	* Makefile.in (web2c): pass . for native tooldir argument.
+	* web2c/convert: accept tooldir argument a la luatex.
+	* web2c/texmf.defines (loadpoolstrings): define here.
+	* web2c/loadpool.defines: remove.
+	* luatexdir/luatex.defines,
+	* mpdir/mp.defines,
+	* omegadir/omega.defines,
+	* alephdir/aleph.defines (loadpoolstrings): rm.
+
+2008-03-25  Karl Berry  <karl@tug.org>
+
+	 * Makefile.in,
+	 * tmf-pool.h,
+	 * mf-binpool.ch,
+	 * tex-mkcpool.c,
+	 * mf-mkcpool.c,
+	 * etexdir/etex.mk,
+	 * etexdir/etex-binpool.ch,
+	 * tex-binpool.ch,
+	 * web2c/convert,
+	 * web2c/loadpool.defines: integrate pool file in binary for
+	 tex, mf, and etex.  From Akira.
+
+	* tftopl.web: revised version 3.2 from Knuth.
+
+2008-03-24  Karl Berry  <karl@tug.org>
+
+	* tex.ch: use print_c_string to print the new prompt_file_name
+	help message, so it ends up in the log.
+	* cpascal.h (printcstring): #define it.
+
 2008-03-23  Karl Berry  <karl@tug.org>
 
 	* tex.web,
@@ -5,7 +62,6 @@
 
 	* tex.ch (prompt_file_name): output prompt_file_name_help_msg
 	instead of a string pool string.
-	* web2c/common.defines (promptfilenamehelpmsg): new var.
 	* cpascal.h: define it (conditionally for Windows).
 
 2008-03-22  Karl Berry  <karl@tug.org>

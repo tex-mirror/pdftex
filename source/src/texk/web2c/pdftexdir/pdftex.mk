@@ -25,7 +25,8 @@ $(pdftexdir)/pdftex.version: $(srcdir)/$(pdftexdir)/pdftex.web
 
 # The C sources.
 pdftex_c = pdftexini.c pdftex0.c pdftex1.c pdftex2.c pdftex3.c
-pdftex_o = pdftexini.o pdftex0.o pdftex1.o pdftex2.o pdftex3.o pdftexextra.o
+pdftex_o = pdftexini.o pdftex0.o pdftex1.o pdftex2.o pdftex3.o pdftexextra.o \
+pdftex-pool.o
 
 # Making pdftex
 pdftex: pdftexd.h $(pdftex_o) $(pdftexextra_o) $(pdftexlibsdep)
@@ -42,6 +43,8 @@ $(pdftexdir)/pdftexextra.h: $(pdftexdir)/pdftexextra.in $(pdftexdir)/pdftex.vers
 	sed -e s/PDFTEX-VERSION/`cat $(pdftexdir)/pdftex.version`/ \
 	    -e s/ETEX-VERSION/`cat etexdir/etex.version`/ \
 	  $(srcdir)/$(pdftexdir)/pdftexextra.in >$@
+pdftex-pool.c: pdftex.pool $(makecpool)
+	$(makecpool) pdftex.pool pdftexdir/ptexlib.h >$@ || rm -f $@
 
 # Tangling
 pdftex.p pdftex.pool: tangle $(srcdir)/$(pdftexdir)/pdftex.web pdftex.ch
@@ -170,10 +173,10 @@ pdftexbin:
 	$(MAKE) $(pdftex_bin)
 
 pdftex-cross:
-	$(MAKE) web2c-cross
+	$(MAKE) pdftex-web2c-cross
 	$(MAKE) pdftexbin
 
-web2c-cross: $(web2c_programs)
+pdftex-web2c-cross: $(web2c_programs)
 	@if test ! -x $(linux_build_dir)/tangle; then echo Error: linux_build_dir not ready; exit -1; fi
 	rm -f web2c/fixwrites web2c/splitup web2c/web2c
 	cp -f $(linux_build_dir)/web2c/fixwrites web2c

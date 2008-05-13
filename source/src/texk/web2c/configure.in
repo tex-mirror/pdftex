@@ -102,6 +102,8 @@ sinclude(../../libs/teckit/withenable.ac)
 sinclude(../../libs/teckit/teckit.ac)
 sinclude(../../libs/icu-xetex/withenable.ac)
 sinclude(../../libs/icu-xetex/icu-xetex.ac)
+sinclude(../../libs/graphite-engine/withenable.ac)
+sinclude(../../libs/graphite-engine/graphite-engine.ac)
 
 # Whether to build mf-nowin.
 : ${with_mf_nowin=no} # Default.
@@ -167,6 +169,18 @@ else
   with_pdfetex=no
 fi
 
+# For luaTeX.
+if test -d $srcdir/luatexdir; then
+  # Create build dir, if necessary.
+  test -d luatexdir || mkdir luatexdir
+  test "${with_luatex+set}" = set || with_luatex=yes
+else
+  if test "x$with_luatex" = xyes; then
+    AC_MSG_WARN(The luaTeX sources are not available.)
+  fi
+  with_luatex=no
+fi
+
 # For XeTeX
 if test -d $srcdir/xetexdir \
     && test -d $srcdir/etexdir; then
@@ -180,6 +194,7 @@ fi
 
 # Check whether C++ compiler works.  Prevent exit if it doesn't.
 if test "x$with_pdftex"  = xyes ||
+   test "x$with_luatex"  = xyes ||
    test "x$with_pdfetex" = xyes ||
    test "x$with_xetex"   = xyes
 then
@@ -194,10 +209,13 @@ then
     && AC_MSG_WARN(No C++ compiler: pdfTeX will not be compiled.)
   test "x$with_pdfetex" = xyes \
     && AC_MSG_WARN(No C++ compiler: pdfeTeX will not be compiled.)
+  test "x$with_luatex" = xyes \
+    && AC_MSG_WARN(No C++ compiler: luaTeX will not be compiled.)
   test "x$with_xetex" = xyes \
     && AC_MSG_WARN(No C++ compiler: XeTeX will not be compiled.)
   with_pdftex=no
   with_pdfetex=no
+  with_luatex=no
   with_xetex=no
   true
 }
@@ -215,6 +233,7 @@ CXXHACKLINK='$(kpathsea_cxx_link)'
 CXXHACKLDLIBS='$(LOADLIBES)'
 if test "x$with_cxx_runtime_hack" = xyes &&
    { test "x$with_pdftex"  = xyes ||
+     test "x$with_luatex"  = xyes ||
      test "x$with_pdfetex" = xyes ||
      test "x$with_xetex"   = xyes; }
 then
@@ -279,6 +298,13 @@ else
   PETEX='#! '
 fi
 AC_SUBST(PETEX)
+
+if test "x$with_luatex" = xyes; then
+  LTEX=
+else
+  LTEX='#! '
+fi
+AC_SUBST(LTEX)
 
 if test "x$with_xetex" = xyes; then
   XETEX=
@@ -396,6 +422,11 @@ if test "$with_pdftex" = yes || \
    test "$with_pdfetex" = yes
 then
   KPSE_CONFIG_FILES([pdftexdir/Makefile])
+fi
+
+# Ditto luatex.
+if test "$with_luatex" = yes; then
+  KPSE_CONFIG_FILES([luatexdir/Makefile])
 fi
 
 dnl Create tests subdirectory.

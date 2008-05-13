@@ -13,7 +13,7 @@
 #endif
 
 /* We must include this first, to resolve many C issues.  */
-#include <web2c/config.h>
+#include "config.h"
 
 /* We only use getopt in the applications, not in web2c itself.  */
 #include <kpathsea/getopt.h>
@@ -48,6 +48,7 @@
 #define odd(x)		((x) & 1)
 #define round(x)	zround ((double) (x))
 #define trunc(x)	((integer) (x))
+#undef floor /* MacOSX */
 #define floor(x)	((integer)floor((double)(x)))
 #define input stdin
 #define output stdout
@@ -123,6 +124,7 @@ typedef FILE *text;
 /* To work around casting problems.  */
 #define intcast(x) ((integer) (x))
 #define stringcast(x) ((string) (x))
+#define conststringcast(x) ((const_string) (x))
 
 /* For throwing away input from the file F.  */
 #define vgetc(f) (void) getc (f)
@@ -176,6 +178,8 @@ typedef unsigned char *pointertobyte;
    -- var2 lacks the *.  */
 #define cstring string
 
+#define constcstring const_string
+
 /* Not all C libraries have fabs, so we'll roll our own.  */
 #undef fabs
 #define fabs(x) ((x) >= 0.0 ? (x) : -(x))
@@ -197,6 +201,14 @@ typedef unsigned char *pointertobyte;
 #define promptfilenamehelpmsg "(Press Enter to retry, or Control-D to exit"
 #endif
 
+/* We use this rather than a simple fputs so that the string will end up
+   in the .log file, too.  */
+#define printcstring(STR)        \
+  do {                           \
+    const_string ch_ptr = (STR); \
+    while (*ch_ptr)              \
+      printchar(*(ch_ptr++));    \
+  } while (0)
 
 
 /* Tangle removes underscores from names.  Put them back for things that

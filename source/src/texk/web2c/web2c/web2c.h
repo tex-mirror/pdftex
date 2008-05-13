@@ -1,6 +1,6 @@
 /* web2c.h: general includes for the Web2c program itself.  Public domain.  */
 
-#include <web2c/config.h>
+#include "config.h"
 
 #define ex_32 2
 #define ex_real 3
