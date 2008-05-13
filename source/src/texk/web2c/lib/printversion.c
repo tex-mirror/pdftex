@@ -1,6 +1,6 @@
 /* printversion.c: Output for the standard GNU option --version.
 
-   Written in 1996 by K. Berry.  Public domain.  */
+   Written in 1996 by Karl Berry.  Public domain.  */
 
 #include <web2c/config.h>
 

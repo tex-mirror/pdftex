@@ -1,6 +1,6 @@
-% This is etex.ch in text format, as of October 12, 2004.
+% This is etex.ch, a
 % WEB change file containing code for various features extending TeX;
-% to be applied to tex.web (Version 3.141592) in order to define the
+% to be applied to tex.web in order to define the
 % e-TeX program.
  
 % Note: This file defines etex.web in terms of changes to be applied to
@@ -201,16 +201,16 @@ known as `\eTeX'.
 @z
 %---------------------------------------
 @x [1] m.2 l.188 - e-TeX basic
-@d banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
+@d banner=='This is TeX, Version 3.1415926' {printed when \TeX\ starts}
 @y
 @d eTeX_version=2 { \.{\\eTeXversion} }
 @d eTeX_revision==".2" { \.{\\eTeXrevision} }
 @d eTeX_version_string=='-2.2' {current \eTeX\ version}
 @#
-@d eTeX_banner=='This is e-TeX, Version 3.141592',eTeX_version_string
+@d eTeX_banner=='This is e-TeX, Version 3.1415926',eTeX_version_string
   {printed when \eTeX\ starts}
 @#
-@d TeX_banner=='This is TeX, Version 3.141592' {printed when \TeX\ starts}
+@d TeX_banner=='This is TeX, Version 3.1415926' {printed when \TeX\ starts}
 @#
 @d banner==eTeX_banner
 @#
@@ -1709,7 +1709,7 @@ The |nucleus| of such noads is
 @z
 %---------------------------------------
 @x [34] m.696 l.13697 - e-TeX middle
-right_noad: begin print_esc("right"); print_delimiter(nucleus(p));
+right_noad: begin print_esc("right"); print_delimiter(delimiter(p));
   end;
 end;
 if subtype(p)<>normal then
@@ -1719,7 +1719,7 @@ if type(p)<left_noad then print_subsidiary_data(nucleus(p),".");
 @y
 right_noad: begin if subtype(p)=normal then print_esc("right")
   else print_esc("middle");
-  print_delimiter(nucleus(p));
+  print_delimiter(delimiter(p));
   end;
 end;
 if type(p)<left_noad then

@@ -1,4 +1,5 @@
 # withenable.ac - Written long ago by Thomas Esser and Sebastian Rahtz.
+# $Id: withenable.ac 7263 2008-03-31 18:52:26Z karl $
 
 # Public domain.
 
@@ -10,13 +11,13 @@ dnl list of optional packages in utils/, i.e., subdirs of utils/
 dnl
 m4_define([kpse_utils_pkglist], [
 dialog
-mkjobtexmf
 pdfopen
 ps2eps
 psutils
 t1utils
 texinfo
 tpic2pdftex
+xindy
 ])
 
 # Options to avoid/include the packages in utils/.

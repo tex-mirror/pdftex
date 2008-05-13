@@ -1,3 +1,42 @@
+2008-05-05  Karl Berry  <karl@tug.org>
+
+	* recorder.h: declare our fn variables extern as they should be.
+	* cnf.c: make the definitions here.
+
+2008-05-04  Karl Berry  <karl@tug.org>
+
+	* finish changing license notices to use FSF url instead of
+	physical address, other minor consistency changes.
+
+2008-05-01  Karl Berry  <karl@tug.org>
+
+	* tex-file.c (ALT_SOURCES_SUFFIXES): new macro (.dtx, .ins).
+	(kpse_init_format) <kpse_texsource_format>: use it.
+
+2008-04-30  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c (read_command_line): leave two spaces before alt
+	suffixes, just so they can be distinguished.
+
+	* tex-file.c (ALT_TEX_SUFFIXES): define this (rather belatedly)
+	to check for .sty, .cls, etc.
+	Rename other *_SUFFIXES to ALT_*_SUFFIXES.
+	
+	* kpathsea.texi (File lookup): Document this.
+	* tex-file.c: (target_fontmaps, target_asis_name,
+	target_suffixed_names): new fns.
+	(kpse_find_file_generic): call them, respecting new cnf value
+	try_std_extension_first.
+
+2008-04-29  Karl Berry  <karl@tug.org>
+
+	* Makefile.in (install-data): do not cd $(srcdir) in any rule,
+	that fails when the install program is specified by a relative path.
+
+2008-03-27  Karl Berry  <karl@tug.org>
+
+	* tex-make.c: start "running" on a new line, tweak other msgs.
+
 2008-03-07  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* kpsewhich.c (main): change type of value from string to
