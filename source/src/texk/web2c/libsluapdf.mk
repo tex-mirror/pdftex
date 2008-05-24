@@ -1,4 +1,4 @@
-# $Id: libsluapdf.mk 7379 2008-04-11 16:47:47Z karl $
+# $Id: libsluapdf.mk 8302 2008-05-23 14:32:37Z thoekwater $
 # Libraries common to luatex and pdftex.
 # Public domain.
 
@@ -48,7 +48,7 @@ md5lib-clean:
 
 # obsdcompat
 LIBOBSDDIR=../../libs/obsdcompat
-LIBOBSDSRCDIR=$(srcdir)/$(LIBOBSDCOMPATDIR)
+LIBOBSDSRCDIR=$(srcdir)/$(LIBOBSDDIR)
 LIBOBSDDEP=@LIBOBSDDEP@
 LDLIBOBSD=@LDLIBOBSD@
 

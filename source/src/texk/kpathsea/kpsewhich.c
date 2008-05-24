@@ -98,10 +98,24 @@ find_format P2C(string, name, boolean, is_filename)
   
   if (is_filename && user_format != kpse_last_format) {
     ret = user_format;
-  } else if (FILESTRCASEEQ (name, "pdftex.cfg")) {
-    ret = kpse_pdftex_config_format;
   } else if (FILESTRCASEEQ (name, "config.ps")) {
     ret = kpse_dvips_config_format;
+  } else if (FILESTRCASEEQ (name, "dvipdfmx.cfg")) {
+    ret = kpse_program_text_format;
+  } else if (FILESTRCASEEQ (name, "fmtutil.cnf")) {
+    ret = kpse_web2c_format;
+  } else if (FILESTRCASEEQ (name, "glyphlist.txt")) {
+    ret = kpse_fontmap_format;
+  } else if (FILESTRCASEEQ (name, "mktex.cnf")) {
+    ret = kpse_web2c_format;
+  } else if (FILESTRCASEEQ (name, "pdfglyphlist.txt")) {
+    ret = kpse_fontmap_format;
+  } else if (FILESTRCASEEQ (name, "pdftex.cfg")) {
+    ret = kpse_pdftex_config_format;
+  } else if (FILESTRCASEEQ (name, "texmf.cnf")) {
+    ret = kpse_cnf_format;
+  } else if (FILESTRCASEEQ (name, "updmap.cfg")) {
+    ret = kpse_web2c_format;
   } else {
     int f;  /* kpse_file_format_type */
     unsigned name_len = strlen (name);
@@ -121,7 +135,7 @@ find_format P2C(string, name, boolean, is_filename)
       boolean found = false;
       
       if (!kpse_format_info[f].type)
-        kpse_init_format ((kpse_file_format_type)f);
+        kpse_init_format ((kpse_file_format_type) f);
 
       if (!is_filename) {
         /* Allow the long name, but only in the -format option.  We don't
@@ -480,7 +494,7 @@ main P2C(int, argc,  string *, argv)
   kpse_set_program_name (argv[0], progname);
 
   if (engine)
-    xputenv("engine", engine);
+    xputenv ("engine", engine);
   
   /* NULL for no fallback font.  */
   kpse_init_prog (uppercasify (kpse_program_name), dpi, mode, NULL);

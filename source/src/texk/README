@@ -1,4 +1,4 @@
-$Id: README 7995 2008-05-09 23:09:19Z karl $
+$Id: README 8322 2008-05-24 16:50:54Z karl $
 Copyright 2006, 2007, 2008 TeX Users Group.
 You may freely use, modify and/or distribute this file.
 
@@ -39,12 +39,11 @@ dviljk - Joachim Schrod
 dvipdfm - now moribund, but until dvipdfmx is a 100% replacement we
   cannot drop it.
 
-dvipdfmx 20070518 - ok 21apr08
-  http://project.ktug.or.kr/dvipdfmx/snapshot/current/
-  -> http://www.ctan.org/tex-archive/dviware/dvipdfmx/
+dvipdfmx 20080524 - ok 24may08
+  http://project.ktug.or.kr/dvipdfmx/snapshot/latest/
   dvipdfmx@project.ktug.or.kr (ChoF, Hirata, Matthias)
 
-dvipng 1.10 - ok 10may08
+dvipng 1.11 - ok 15may08
   http://www.ctan.org/tex-archive/dviware/dvipng/
 
 dvipos - ?
