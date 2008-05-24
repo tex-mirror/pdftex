@@ -289,7 +289,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="8" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.8-beta-20080513' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.8-beta-20080525' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.1415926',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -1376,10 +1376,7 @@ on the information that \.{WEB} has output while processing \TeX.
   but returns |false| if something goes wrong}
 label done,exit;
 var k,@!l:0..255; {small indices or counters}
-@!m,@!n:text_char; {characters input from |pool_file|}
 @!g:str_number; {garbage}
-@!a:integer; {accumulator for check sum}
-@!c:boolean; {check sum has been checked}
 begin pool_ptr:=0; str_ptr:=0; str_start[0]:=0;
 @<Make the first 256 strings@>;
 @<Read the other strings from the \.{TEX.POOL} file and return |true|,
