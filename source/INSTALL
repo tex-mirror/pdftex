@@ -1,8 +1,8 @@
 pdfTeX
 ======
 
-INSTALL for pdfTeX 1.40.7
-=========================
+INSTALL for pdfTeX 1.40.8-rc1
+=============================
 
 This distribution is a stripped-down version of the TeXlive distribution.
 All source code is in the directory src; the script build.sh will generate and
