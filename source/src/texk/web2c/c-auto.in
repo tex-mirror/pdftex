@@ -40,6 +40,9 @@
 /* Define if you have Carbon */
 #undef HAVE_CARBON
 
+/* Define to 1 if you have the `fmax' function. */
+#undef HAVE_FMAX
+
 /* Define to 1 if you have the <ft2build.h> header file. */
 #undef HAVE_FT2BUILD_H
 
@@ -51,9 +54,6 @@
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
-
-/* Define to 1 if you have the <locale.h> header file. */
-#undef HAVE_LOCALE_H
 
 /* Define if you have libfontconfig */
 #undef HAVE_LIBFONTCONFIG
@@ -72,6 +72,9 @@
 
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
+
+/* Define to 1 if you have the <locale.h> header file. */
+#undef HAVE_LOCALE_H
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H

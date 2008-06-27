@@ -1,20 +1,11 @@
 % original texmf.cnf -- runtime path configuration file for kpathsea.
-% (If you change or delete `original' on the previous line, the
-% distribution won't install its version over yours.)
 % Public domain.
 %
 % What follows is a super-summary of what this .cnf file can
 % contain. Please read the Kpathsea manual for more information.
 %
-% texmf.cnf is generated from texmf.in, by replacing @var@ with the
-% value of the Make variable `var', via a sed file texmf.sed, generated
-% (once) by kpathsea/Makefile (itself generated from kpathsea/Makefile.in
-% by configure).
-%
 % Any identifier (sticking to A-Za-z_ for names is safest) can be assigned.
 % The `=' (and surrounding spaces) is optional.
-% No % or @ in texmf.in, for the sake of autogeneration.
-% (However, %'s and @'s can be edited into texmf.cnf or put in envvar values.)
 % $foo (or ${foo}) in a value expands to the envvar or cnf value of foo.
 %
 % Earlier entries (in the same or another file) override later ones, and
@@ -53,15 +44,18 @@
 
 % The tree containing the runtime files closely related to the specific
 % program version used:
-TEXMFMAIN = @texmf@
+TEXMFMAIN = $SELFAUTOPARENT/texmf
 
 % The main distribution tree:
-TEXMFDIST = @texmf@-dist
+TEXMFDIST = $SELFAUTOPARENT/texmf-dist
+
+% Our documentation-only tree, arranged by language:
+TEXMFDOC = $SELFAUTOPARENT/texmf-doc
 
 % A place for local additions to a "standard" texmf tree.
 % This tree is not used for local configuration maintained by
 % texconfig, it uses TEXMFCONFIG below.
-TEXMFLOCAL = @texmf@-local
+TEXMFLOCAL = $SELFAUTOPARENT/../texmf-local
 
 % TEXMFSYSVAR, where texconfig-sys stores variable runtime data.
 % With teTeX-3.0 or later, this must be set.
@@ -69,7 +63,7 @@ TEXMFLOCAL = @texmf@-local
 %   TEXMFSYSVAR = $TEXMFMAIN
 % For using a separate tree:
 %   TEXMFSYSVAR = $SELFAUTOPARENT/texmf-var
-TEXMFSYSVAR = @texmf@-var
+TEXMFSYSVAR = $SELFAUTOPARENT/texmf-var
 
 % TEXMFSYSCONFIG, where texconfig-sys stores configuration data.
 % With teTeX-3.0 or later, this must be set.
@@ -77,7 +71,7 @@ TEXMFSYSVAR = @texmf@-var
 %   TEXMFSYSCONFIG = $TEXMFMAIN
 % For using a separate tree:
 %   TEXMFSYSCONFIG = $SELFAUTOPARENT/texmf-config
-TEXMFSYSCONFIG = @texmf@-config
+TEXMFSYSCONFIG = $SELFAUTOPARENT/texmf-config
 
 % User texmf trees are allowed as follows.
 % This used to be HOMETEXMF.
@@ -114,35 +108,23 @@ TEXMF = {$TEXMFCONFIG,$TEXMFVAR,$TEXMFHOME,!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$T
 % If a tree appears in this list, the mktex* scripts will use
 % VARTEXFONTS for generated files, if the original tree isn't writable;
 % otherwise the current working directory is used.
-SYSTEXMF = $TEXMFSYSVAR;$TEXMFLOCAL;$TEXMFMAIN;$TEXMFDIST
+SYSTEXMF = $TEXMFSYSVAR;$TEXMFMAIN;$TEXMFLOCAL;$TEXMFDIST
 
 % Where generated fonts may be written.  This tree is used when the sources
 % were found in a system tree and either that tree wasn't writable, or the
 % varfonts feature was enabled in MT_FEATURES in mktex.cnf.
-VARTEXFONTS = @vartexfonts@
+VARTEXFONTS = $TEXMFVAR/fonts
 
 % Where to look for ls-R files.  There need not be an ls-R in the
 % directories in this path, but if there is one, Kpathsea will use it.
+% By default, this is only the !! elements of TEXMF, plus texmf-doc, so
+% that mktexlsr does not create ls-R files in the non-!! elements --
+% because if an ls-R is present, it will be used, and the disk will not
+% be searched.  This is arguably a bug in kpathsea, but we will not
+% think about it now.
 %
-% By default, this is only the !! elements of TEXMF, so that mktexlsr
-% does not create ls-R files in the non-!! elements -- because if an
-% ls-R is present, it will be used, and the disk will not be searched.
-% This is arguably a bug in kpathsea, but we will not think about it now.
-% 
-TEXMFDBS = {!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$TEXMFMAIN,!!$TEXMFLOCAL,!!$TEXMFDIST}
+TEXMFDBS = {!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$TEXMFMAIN,!!$TEXMFLOCAL,!!$TEXMFDIST,!!$TEXMFDOC}
 
-% It may be convenient to define TEXMF like this:
-%   TEXMF = {$TEXMFHOME,!!$TEXMFLOCAL,!!$TEXMFMAIN,~}
-% which allows users to set up entire texmf trees, and tells TeX to
-% look in places like ~/tex and ~/bibtex.  If you do this, define TEXMFDBS
-% like this:
-%   TEXMFDBS = $TEXMFHOME;$TEXMFLOCAL;$TEXMFMAIN;$VARTEXFONTS
-% or mktexlsr will generate an ls-R file for ~ when called, which is
-% rarely desirable.  If you do this you'll want to define SYSTEXMF like
-% this:
-%   SYSTEXMF = $TEXMFLOCAL;$TEXMFMAIN;$TEXMFDIST
-% so that fonts from a user's tree won't escape into the global trees.
-%
 % On some systems, there will be a system tree which contains all the font
 % files that may be created as well as the formats.  For example
 %   TEXMFVAR = /var/lib/texmf
@@ -177,6 +159,7 @@ TEXINPUTS.ftex          = .;$TEXMF/tex/{formate,plain,generic,}//
 TEXINPUTS.jadetex       = .;$TEXMF/tex/{jadetex,plain,generic,}//
 TEXINPUTS.mex           = .;$TEXMF/tex/{mex,plain,generic,}//
 TEXINPUTS.texinfo       = .;$TEXMF/tex/{texinfo,plain,generic,}//
+TEXINPUTS.xetex         = .;$TEXMF/tex/{xetex,plain,generic,}//
 
 % LaTeX 2e specific macros are stored in latex/, macros that can only be
 % used with 2.09 in latex209/.  In addition, we look in the directory
@@ -186,6 +169,7 @@ TEXINPUTS.cslatex       = .;$TEXMF/tex/{cslatex,csplain,latex,generic,}//
 TEXINPUTS.latex         = .;$TEXMF/tex/{latex,generic,}//
 TEXINPUTS.olatex        = .;$TEXMF/tex/{latex,generic,}//
 TEXINPUTS.latex209      = .;$TEXMF/tex/{latex209,generic,latex,}//
+TEXINPUTS.xelatex       = .;$TEXMF/tex/{xelatex,latex,generic,}//
 
 % Fontinst needs to read afm files.
 TEXINPUTS.fontinst      = .;$TEXMF/{tex,fonts/afm}//
@@ -372,20 +356,22 @@ MPSUPPORT = .;$TEXMF/metapost/support
 % For xdvi to find mime.types and .mailcap, if they do not exist in
 % ~.  These are single directories, not paths.
 % (But the default mime.types, at least, may well suffice.)
-MIMELIBDIR = @prefix@/etc
-MAILCAPLIBDIR = @prefix@/etc
+MIMELIBDIR = $SELFAUTOPARENT/etc
+MAILCAPLIBDIR = $SELFAUTOPARENT/etc
 
-% Default settings for fontconfig library, used by Win32 versions of  
-% xetex/xdvipdfmx (note that fontconfig on Linux/Unix-like systems 
+% Default settings for fontconfig library, used by Win32 versions of
+% xetex/xdvipdfmx (note that fontconfig on Linux/Unix-like systems
 % will ignore settings in this file)
 FONTCONFIG_FILE=fonts.conf
-FONTCONFIG_PATH=$SELFAUTOLOC/conf
-FC_CACHEDIR=$SELFAUTOLOC/cache
+FONTCONFIG_PATH=$TEXMFSYSVAR/fonts/conf
+FC_CACHEDIR=$TEXMFSYSVAR/fonts/cache
 
 % TeX documentation and source files, for use with kpsewhich.
 % TeX Live has a separate hierarchy with just documentation, texmf-doc,
 % in addition to the doc files in the other hierarchies.
-TEXMFDOCDIR = $SELFAUTOPARENT/texmf-doc/doc
+% Also, find the English documentation first -- better than random, when
+% there are name collisions.
+TEXMFDOCDIR = $TEXMFDOC/doc{/english,}
 TEXDOCS = .;$TEXMF/doc//;$TEXMFDOCDIR//
 TEXSOURCES = .;$TEXMF/source//
 
@@ -402,7 +388,7 @@ OTPINPUTS = .;$TEXMF/omega/otp//
 OCPINPUTS = .;$TEXMF/omega/ocp//
 
 % Some additional input variables for several programs.  If you add
-% a program that uses the 'other text files' or 'other binary files'
+% a program that uses the `other text files' or `other binary files'
 % search formats, you'll want to add their variables here as well.
 T4HTINPUTS   = .;$TEXMF/tex4ht//
 
@@ -432,13 +418,10 @@ RUBYINPUTS   = .;$TEXMF/scripts/{$progname,$engine,}/ruby//
 % paradoxical), but the compile-time default in paths.h is built from it.
 % The SELFAUTO* variables are set automatically from the location of
 % argv[0], in kpse_set_progname.
-% 
-% The TETEXDIR stuff isn't likely to be relevant unless you're using
-% teTeX, but it doesn't hurt.
 %
-% For security reasons, it is better not to have . part of the path.
+% For security reasons, it is better not to include . in this path.
 %
-TEXMFCNF = {$SELFAUTOLOC,$SELFAUTODIR,$SELFAUTOPARENT}{,{/share,}/texmf{-local,}/web2c};/.$TETEXDIR;$TEXMF/web2c;@web2c@
+TEXMFCNF = {$SELFAUTOLOC,$SELFAUTODIR,$SELFAUTOPARENT}{,{/share,}/texmf{-local,}/web2c}
 
 # kpathsea 3.5.3 and later sets these at runtime. To avoid empty
 # expansions from binaries linked against an earlier version of the
@@ -452,19 +435,19 @@ engine = unsetengine
 % If this is true, `tex a.b' will look first for a.b.tex (within each
 % path element), and then for a.b, i.e., we try standard extensions
 % first.  If this is false, we first look for a.b and then a.b.tex,
+% first.  If this is false, we first look for a.b and then a.b.tex,
 % i.e., we try the name as-is first.
-% 
+%
 % Both names are always tried; the difference is the order in which they
 % are tried.  The setting applies to all searches, not just .tex.
-% 
+%
 % This setting only affects names being looked up which *already* have
 % an extension.  A name without an extension (e.g., `tex story') will
 % always have an extension added first.
-% 
+%
 % The default is true, because we already avoid adding the standard
 % extension(s) in most common cases.  E.g., babel.sty will only look for
 % babel.sty, not babel.sty.tex, regardless of this setting.
-% 
 try_std_extension_first = t
 
 % Enable system commands via \write18{...}?  Obviously insecure, despite
@@ -596,7 +579,7 @@ buf_size = 200000
 % for all known free hyphenation patterns to be loaded simultaneously
 % (as TeX Live does).
 %
-trie_size = 400000
+trie_size = 450000
 
 hyph_size = 8191        % prime number of hyphenation exceptions, >610, <32767.
                         % http://primes.utm.edu/curios/page.php/8191.html

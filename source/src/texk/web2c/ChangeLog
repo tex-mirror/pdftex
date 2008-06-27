@@ -1,3 +1,42 @@
+2008-06-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* help.h (CTANGLEHELP): Correct syntax for ctangle usage.
+	* (CWEAVEHELP): Correct syntax for cweave usage.
+
+2008-06-12  Karl Berry  <karl@tug.org>
+
+	* luatexdir/tex/texnodes.c: avoid identifier `prealloc', (wrongly)
+	defined in HP-UX <unistd.h>.
+
+2008-06-03  Karl Berry  <karl@tug.org>
+
+	* tex.ch (sup_param_size): increase to 32767.
+	ntg-pdftex mail from martin, 2 Jun 2008 14:15:42.
+
+2008-06-01  Karl Berry  <karl@tug.org>
+
+	* luatexdir/luatex.mk (install-exec): install texlua symlink.
+
+2008-05-31  Karl Berry  <karl@tug.org>
+
+	* Makefile.in (install-programs): stupidly forgot to install
+	$(basic_engines).
+
+2008-05-28  Karl Berry  <karl@tug.org>
+
+	* Makefile.in (basic_engines): split off tex/mf[n]/mpost.
+	(install-programs): handle basic_engines here.
+	(install-tex, install-mf, install-mpost; -exec, -data, -dumps):
+	remove all these.  Never try to make the dumps.
+	* luatexdir/luatex.mk,
+	* omegadir/omega.mk,
+	* xetexdir/xetex.mk,
+	* alephdir/aleph.mk,
+	* pdftexdir/pdftex.mk,
+	* etex/etex.mk: omit installation of pool files and dumps,
+	with consequent simplifications.  For etex.mk, also omit
+	installation of the binary.
+
 2008-05-25  Karl Berry  <karl@tug.org>
 
 	* cpascal.h (loadpoolstrings): declare.

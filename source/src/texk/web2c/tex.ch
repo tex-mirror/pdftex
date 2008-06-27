@@ -254,7 +254,7 @@ versions of the program.
 @!sup_max_in_open = 127;
 
 @!inf_param_size = 60;
-@!sup_param_size = 6000;
+@!sup_param_size = 32767;
 
 @!inf_save_size = 600;
 @!sup_save_size = 80000;
@@ -549,7 +549,7 @@ We define |input_ln| in C, for efficiency. Nevertheless we quote the module
 tini@/
 @#
 @!bound_default:integer; {temporary for setup}
-@!bound_name:^char; {temporary for setup}
+@!bound_name:const_cstring; {temporary for setup}
 @#
 @!mem_bot:integer;{smallest index in the |mem| array dumped by \.{INITEX};
   must not be less than |mem_min|}
@@ -2283,10 +2283,10 @@ var k:0..buf_size; {index into |buffer|}
 if e=".tex" then show_context;
 @y
 if (e=".tex") or (e="") then show_context;
-print_ln; print("(Type <return> to retry, or <eof> to exit");
+print_ln; print_c_string(prompt_file_name_help_msg);
 if (e<>"") then
   begin
-    print(" Default file extension is `"); print(e); print("'");
+    print("; default file extension is `"); print(e); print("'");
   end;
 print(")"); print_ln;
 @z
@@ -2319,7 +2319,7 @@ else
 @x [29.534] l.10285 - Adjust for C string conventions.
 @!months:packed array [1..36] of char; {abbreviations of month names}
 @y
-@!months:^char;
+@!months:const_cstring;
 @z
 
 @x [29.534] l.10300 - Filename change for the recorder.
@@ -3092,7 +3092,7 @@ arrays start at |0|.
 @!hyph_count:hyph_pointer; {the number of words in the exception dictionary}
 @y  18139
 @!hyph_word: ^str_number; {exception words}
-@!hyph_list: ^pointer; {list of hyphen positions}
+@!hyph_list: ^pointer; {lists of hyphen positions}
 @!hyph_link: ^hyph_pointer; {link array for hyphen exceptions hash table}
 @!hyph_count:integer; {the number of words in the exception dictionary}
 @!hyph_next:integer; {next free slot in hyphen exceptions hash table}
@@ -5048,7 +5048,7 @@ if j=18 then
     if clobbered then print("clobbered")
     else begin {We have the string; run system(3). We don't have anything
             reasonable to do with the return status, unfortunately discard it.}
-      system(stringcast(address_of(str_pool[str_start[str_ptr]])));
+      system(conststringcast(address_of(str_pool[str_start[str_ptr]])));
       print("executed");
       end;
     end

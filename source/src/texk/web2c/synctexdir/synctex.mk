@@ -30,12 +30,25 @@
 # use or other dealings in this Software without prior written  
 # authorization from the copyright holder.
 #
+# Acknowledgments:
+# ----------------
+# The author received useful remarks from the pdfTeX developers, especially Hahn The Thanh,
+# and significant help from XeTeX developer Jonathan Kew
+# 
+# Nota Bene:
+# ----------
+# If you include or use a significant part of the synctex package into a software,
+# I would appreciate to be listed as contributor and see "SyncTeX" highlighted.
+# 
+# Version 1
+# Thu Jun 19 09:39:21 UTC 2008
+# 
 # Notice:
 # -------
 # Makefile fragment for synctex.
 # It is included in web2c/Makefile.in
 
-synctex_dir = $(srcdir)/synctex
+synctex_dir = $(srcdir)/synctexdir
 
 Makefile: $(synctex_dir)/synctex.mk
 
@@ -201,15 +214,15 @@ xetexd.h-with_synctex = if test -z "`grep __SyncTeX__ xetexd.h`";\
 	fi
 xetexd.h-without_synctex = echo "warning: SyncTeX is NOT enabled"
 
-# the synctex tool, this is not yet implemented
+# the synctex tool
 synctex_parser.o: $(synctex_dir)/synctex_parser.c $(synctex_dir)/synctex_parser.h
-	$(compile) -c -I$(synctex_dir) $(ZLIBCPPFLAGS) -o $@ $<
+	$(compile) -c -DSYNCTEX_USE_LOCAL_HEADER -I$(synctex_dir) $(ZLIBCPPFLAGS) -o $@ $<
 
 synctex_main.o: $(synctex_dir)/synctex_main.c $(synctex_dir)/synctex_parser.h
 	$(compile) -c -I$(synctex_dir) $(ZLIBCPPFLAGS) -o $@ $<
 
 synctex:synctex_main.o synctex_parser.o $(ZLIBDEPS)
-	$(link_command) synctex_main.o synctex_parser.o $(LDZLIB)
+	$(link_command) synctex_main.o synctex_parser.o $(LDZLIB) $(LIBS)
 
 # Cleaning up.
 clean:: synctex-clean

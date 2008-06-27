@@ -31,11 +31,26 @@ shall not be used in advertising or otherwise to promote the sale,
 use or other dealings in this Software without prior written  
 authorization from the copyright holder.
 
+Acknowledgments:
+----------------
+The author received useful remarks from the pdfTeX developers, especially Hahn The Thanh,
+and significant help from XeTeX developer Jonathan Kew
+
+Nota Bene:
+----------
+If you include or use a significant part of the synctex package into a software,
+I would appreciate to be listed as contributor and see "SyncTeX" highlighted.
+
+Version 1
+Thu Jun 19 09:39:21 UTC 2008
+
 Important notice:
 -----------------
 This file is named "synctex_main.c".
 This is the command line interface to the synctex_parser.c.
 */
+
+#   include "web2c/c-auto.h" /* for inline && HAVE_xxx */
 
 #   include <stdlib.h>
 #   include <stdio.h>
@@ -44,16 +59,20 @@ This is the command line interface to the synctex_parser.c.
 #   include <math.h>
 #   include "synctex_parser.h"
 
-/* The code below uses strlcat and strlcpy, which avoids security warnings with some compilers.
-   However, if these are not available we simply use the old, unchecked versions;
-   this is OK because all the uses in this code are working with a buffer that's been
-   allocated based on measuring the strings involved. */
-#ifndef HAVE_STRLCAT
-#define strlcat(dst, src, size) strcat((dst), (src))
-#endif
-#ifndef HAVE_STRLCPY
-#define strlcpy(dst, src, size) strcpy((dst), (src))
-#endif
+/*  The code below uses strlcat and strlcpy, which avoids security warnings with some compilers.
+    However, if these are not available we simply use the old, unchecked versions;
+    this is OK because all the uses in this code are working with a buffer that's been
+    allocated based on measuring the strings involved. */
+#   ifndef HAVE_STRLCAT
+#       define strlcat(dst, src, size) strcat((dst), (src))
+#   endif
+#   ifndef HAVE_STRLCPY
+#       define strlcpy(dst, src, size) strcpy((dst), (src))
+#   endif
+#   ifndef HAVE_FMAX
+#       define fmax my_fmax
+inline static double my_fmax(double x, double y) { return (x < y) ? y : x; }
+#   endif
 
 #define SYNCTEX_DEBUG 0
 
@@ -108,7 +127,7 @@ void synctex_usage(char * error,va_list ap) {
 	}
 	fprintf((error?stderr:stdout),
 		"usage: synctex <subcommand> [options] [args]\n"
-		"Synchronize TeXnology command-line client, version 0.1\n\n"
+		"Synchronize TeXnology command-line client, version 1.0\n\n"
 		"The Synchronization TeXnology by Jérôme Laurens is a new feature of recent TeX engines.\n"
 		"It allows to synchronize between input and output, which means to\n"
 		"navigate from the source document to the typeset material and vice versa.\n\n"
@@ -357,7 +376,6 @@ proceed:
 						viewer = where+strlen(KEY);\
 						continue;\
 					}
-					#define SYNCTEX_MAX(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
 					TEST("&{output}","%s",synctex_scanner_get_output(scanner));
 					TEST("&{page}",  "%i",synctex_node_page(node)-1);
 					TEST("&{page+1}","%i",synctex_node_page(node));
@@ -365,8 +383,8 @@ proceed:
 					TEST("&{y}",     "%f",synctex_node_visible_v(node));
 					TEST("&{h}",     "%f",synctex_node_box_visible_h(node));
 					TEST("&{v}",     "%f",synctex_node_box_visible_v(node)+synctex_node_box_visible_depth(node));
-					TEST("&{width}", "%f",fabsf(synctex_node_box_visible_width(node)));
-					TEST("&{height}","%f",SYNCTEX_MAX((synctex_node_box_visible_height(node)+synctex_node_box_visible_depth(node)),1));
+					TEST("&{width}", "%f",fabs(synctex_node_box_visible_width(node)));
+					TEST("&{height}","%f",fmax(synctex_node_box_visible_height(node)+synctex_node_box_visible_depth(node),1));
 					TEST("&{before}","%s",(before && strlen(before)<SYNCTEX_STR_SIZE?before:""));
 					TEST("&{offset}","%i",offset);
 					TEST("&{middle}","%s",(middle && strlen(middle)<SYNCTEX_STR_SIZE?middle:""));
@@ -379,7 +397,7 @@ proceed:
 					synctex_help_view("Memory copy problem");
 					free(buffer);
 					return -1;
-				}\
+				}
 				printf("SyncTeX: Executing\n%s\n",buffer);
 				status = system(buffer);
 				free(buffer);

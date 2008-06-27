@@ -1,4 +1,36 @@
+2008-06-26  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* withenable.ac (kpse_utils_pkglist): add vlna.
+
+2008-06-09  Karl Berry  <karl@tug.org>
+
+	* Build: try using find instead of ls, to avoid short param list
+	on hp (Tim tlbuild mail, 6 Jun 2008 10:24:41).
+
+2008-06-08  Karl Berry  <karl@tug.org>
+
+	* utils/README: warn about nohup specifically.
+
+2008-05-29  Karl Berry  <karl@tug.org>
+
+	* Makefile.in (install): do not call selfautofix, we now keep
+	kpathsea/texmf.cnf as a slave copy of Master/texmf/web2c.
+	* selfautofix: remove file.
+
+2008-05-28  Karl Berry  <karl@tug.org>
+
+	* Makefile.in (install): invoke new run-texlinks target
+	in texk/tetex.
+
+	* Makefile.in (install-extra): do not go to omfonts, the omega.mk
+	targets take care of that.
+	Do not try to install release-tetex-src.txt.
+	Do not try to run fmtutil, updmap, mktexlsr, texlinks or anything else.
+	(world): since strip already depends on install, omit install.
+	Add echo's for when targets are finished.	
+
 2008-04-07  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
 	* configure.in: respect library dependencies.
 
 2008-03-25  Karl Berry  <karl@tug.org>

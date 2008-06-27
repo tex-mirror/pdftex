@@ -1,5 +1,5 @@
 # withenable.ac - Written long ago by Thomas Esser and Sebastian Rahtz.
-# $Id: withenable.ac 7263 2008-03-31 18:52:26Z karl $
+# $Id: withenable.ac 9056 2008-06-26 10:30:34Z peter $
 
 # Public domain.
 
@@ -17,6 +17,7 @@ psutils
 t1utils
 texinfo
 tpic2pdftex
+vlna
 xindy
 ])
 
