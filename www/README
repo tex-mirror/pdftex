@@ -1,8 +1,8 @@
 pdfTeX
 ======
 
-README for version 3.1415926-1.40.8-rc2
-=======================================
+README for version 3.1415926-1.40.8
+===================================
 
 This directory contains the version 1.40.8 of pdfTeX, an extended version
 of eTeX that can create PDF directly from TeX source files and enhance the
@@ -85,7 +85,7 @@ paragraph optimization is inspired by the work of Hermann Zapf.
 
 ------------------------------------------------------------------------------
 
-Please send bug reports, offers of help, etc. to martin@pdftex.org
+Please send bug reports, offers of help, etc. to  h a n t h e t h a n h @ g m a i l . c o m
 
 $Id$
 // vim: tw=75
