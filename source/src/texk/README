@@ -1,4 +1,4 @@
-$Id: README 8625 2008-06-09 21:04:32Z karl $
+$Id: README 9142 2008-07-01 15:42:36Z peter $
 Copyright 2006, 2007, 2008 TeX Users Group.
 You may freely use, modify and/or distribute this file.
 
@@ -85,7 +85,7 @@ web2c - maintained here by Karl Berry, ... - core web2c, plain tex, omega.
 
 xdv2pdf - Jonathan Kew
 
-xdvik 22.84.10 - ok 28apr08
-  http://xdvi.sourceforge.net/
+xdvik 22.84.14 - ok 01jul08
+  ftp://tug.org/tex/
 
 xdvipdfmx - Jonathan Kew

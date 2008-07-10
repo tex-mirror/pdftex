@@ -1,3 +1,32 @@
+2008-07-08  Karl Berry  <karl@tug.org>
+
+	* configure.in: version 3.5.7.
+
+2008-07-06  Karl Berry  <karl@tug.org>
+
+	* withenable.ac (texmfmain): do not bother with long verbose
+	complaint when the tree can't be found, since this is normal in TL. 
+
+2008-07-05  Karl Berry  <karl@tug.org>
+
+	* mktextfm (MAG): set to 0; why were we using MAG=1?  Left
+	over from when we included pregenerated pk's in the distribution?
+
+2008-07-04  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (max_strings): increase to 500000.
+	ctt posting from Benno Puetz, http://groups.google.com/group/comp.text.tex/browse_thread/thread/2c3aa2d09b4625e3 
+
+	* progname.c [HAVE_PROGRAM_INVOCATION_NAME]: remove all #ifdef's
+	except around the declaration, so that we always use our own code
+	to compute them.  This avoids painful system dependencies.
+
+2008-07-02  Karl Berry  <karl@tug.org>
+
+	* mktexlsr: doc fix.
+
+	* kpathsea.texi (Path searching options): mention --engine=/ trick.
+
 2008-06-16  Karl Berry  <karl@tug.org>
 
 	* texmf.cnf (TEXMFDOC): new var.
@@ -168,12 +197,15 @@
 	* acconfig.h: ... removed.
 
 2008-02-24  Martin Schröder <martin@pdftex.org>
+
         * lib.h: systypes.h instead of c-std.h
 
 2008-02-23  Martin Schröder <martin@pdftex.org>
+
         * lib.h: include c-std.h to get off_t from stdio.h
 
 2008-02-21  Martin Schröder <martin@pdftex.org>
+
         * lib.h, xfseek.c, xftell.c: LFS support: use off_t instead of long
         and fseeko instead of fseek
 
