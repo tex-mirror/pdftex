@@ -16,6 +16,11 @@
 # $Id$
 # Changelog:
 # ------------------------------------------------------------------------
+# r493 | oneiros | 2008-07-14 23:32:04 +0200 (Mo, 14 Jul 2008) | 2 lines
+#
+# Also set -DDISABLE_OUTLINE (pdftoepdf.cc had conflicting options)
+#
+# ------------------------------------------------------------------------
 # r390 | oneiros | 2008-03-23 16:51:58 +0100 (So, 23 Mär 2008) | 2 lines
 # 
 # Merge changes since r357 to everything but pdftexdir from trunk into stable
