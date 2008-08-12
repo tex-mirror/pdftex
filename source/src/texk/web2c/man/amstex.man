@@ -1,9 +1,9 @@
-.TH AMSTEX 1 "27 December 1992" "Web2C @VERSION@"
+.TH AMSTEX 1 "12 August 2008" "Web2C @VERSION@"
 .\"=====================================================================
 .if t .ds TX \fRT\\h'-0.1667m'\\v'0.20v'E\\v'-0.20v'\\h'-0.125m'X\fP
 .if n .ds TX TeX
-.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP for troff
-.el .ds OX TeX for nroff
+.if t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
+.if n .ds OX TeX\" for nroff
 .\" the same but obliqued
 .\" BX definition must follow TX so BX can use TX
 .if t .ds BX \fRB\s-2IB\s0\fP\*(TX
@@ -37,26 +37,20 @@ are present.
 .PP
 The \*(AX macros encourage writers to think about the content of their
 documents, rather than the form.  The ideal, not always realized, is to
-have no formatting commands (like ``switch to italic'' or ``skip 2
-picas'') in the document at all; instead, everything is done
-by specific markup instructions: ``emphasize'', ``start a section''.
-.PP
-\*(AX is the official typesetting system of the American Mathematical
-Society, and nearly all of its publications are typeset using \*(AX.  The
-online version of AMS Math Reviews uses \*(AX input syntax for display of
-mathematical material.  AMS authors can provide editors with
-computer-readable \*(AX files.
+have no formatting commands (like \(lqswitch to italic\(rq or \(lqskip 2
+picas\(rq) in the document at all; instead, everything is done
+by specific markup instructions: \(lqemphasize\(rq, \(lqstart a section\(rq.
 .PP
 For authors more familiar with \*(LX, an AMS-supported package called
 .I amsmath.sty
-is is available.
+is available, among others.
 .\"=====================================================================
 .SH FILES
 .TP
-.I amsguide.tex"
+.I amsguide.tex
 Documentation for \*(AX, typesettable by \*(TX.
 .TP
-.I amfndoc.tex"
+.I amfndoc.tex
 Documentation for AMS fonts, typesettable by \*(TX.
 .\"=====================================================================
 .SH "SEE ALSO"
@@ -66,4 +60,4 @@ Documentation for AMS fonts, typesettable by \*(TX.
 .br
 Michael Spivak,
 .IR "The Joy of \*(OX" ,
-2nd edition, Addison-Wesley, 1990, ISBN 0-8218-2997-1.
+2nd edition, American Mathematical Society, 1990, ISBN 0-8218-2997-1.
