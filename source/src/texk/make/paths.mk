@@ -1,5 +1,5 @@
 # paths.mk -- installation directories.
-# $Id: paths.mk 8409 2008-05-29 20:59:08Z karl $
+# $Id: paths.mk 10296 2008-08-12 23:46:59Z karl $
 
 # Do not change prefix and exec_prefix in Makefile.in!
 # configure doesn't propagate the change to the other Makefiles.
@@ -32,6 +32,7 @@ infodir = @infodir@
 manext = 1
 mandir = @mandir@
 man1dir = $(mandir)/man$(manext)
+man5dir = $(mandir)/man5
 
 # modifiable single-machine data.
 localstatedir = @localstatedir@
