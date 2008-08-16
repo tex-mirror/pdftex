@@ -1,5 +1,5 @@
 --------------------------------------------------
-pdfTeX 3.1415926-1.40.9 was released on 2008-08-??
+pdfTeX 3.1415926-1.40.9 was released on 2008-08-16
 --------------------------------------------------
 - bugfixes:
   - pdf inclusion (inconsistent use of -DDISABLE_OUTLINE)
