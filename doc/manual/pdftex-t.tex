@@ -1800,7 +1800,7 @@ extract \AFM\ from TrueType fonts (another conversion program is
 ttf2afm -e <encoding vector> -o <afm outputfile> <ttf input file>
 \stoptyping
 
- A~TrueType file can be recognized by its suffix \filename {ttf}. The optional
+A~TrueType file can be recognized by its suffix \filename {ttf}. The optional
 {\em encoding} specifies the encoding, which is the same as the encoding
 vector used in map files for \PDFTEX\ and \type{dvips}. If the encoding is
 not given, all the glyphs of the \AFM\ output will be mapped to \type
@@ -1822,12 +1822,264 @@ There are a~few limitations with TrueType fonts in comparison with
 Type~1 fonts:
 
 \startitemize[a,packed]
-\item  The special effects SlantFont|/|ExtendFont cannot be used.
+\item  The special effects SlantFont|/|ExtendFont cannot be used. (Update:
+this is no longer true since version 1.40.0).
 \item  To subset a~TrueType font, the font must be specified as re||encoded,
        therefore an encoding vector must be given.
 \item  TrueType fonts coming with embedded \PDF\ files are kept
        untouched; they are not replaced by local ones.
 \stopitemize
+
+\subsection{A closer look at TrueType fonts and \PDFTEX}
+The most common outline format for \TEX\ is Type~1. The TrueType format is slightly
+different from Type~1, and getting it right requires some extra work.
+In particular, it is important to understand how TrueType handles encoding and glyph
+names (or more precisely, glyph identity).
+
+We start with Type~1, since \TEX\ users are more familiar with that. In the
+Type~1 format glyphs are referred to by names (such as `/A', `/comma', and so on).
+Each glyph is identified by its name; so, given a glyph name, it is easy to tell
+whether or not a Type~1 font contains that glyph. Encoding with Type~1 is therefore simple:
+for each number $n$ in the range 0 to 255, an encoding tells us the name of
+the glyph that should be used to render (or display) the charcode $n$. 
+
+With TrueType the situation is not that simple, since TrueType does not use names to
+refer to glyphs, but uses indices instead. This means that each glyph
+is identified by its index, not its name. The indices are numbers that
+differ from font to font. The TrueType format handles encodings by a mechanism called
+``cmap'', which (roughly) consists of tables mapping from character codes
+to glyph indices. A TrueType font can contain one or more such tables (each
+corresponding to an encoding).
+
+Since glyph names are not strictly necessary for TrueType, they are not always
+available inside a TrueType font. Given a TrueType font, one of the following cases
+may arise.
+
+\startitemize[a,packed]
+\item The font contains correct names for all its glyphs. This is the ideal
+     situation and is often the case for high-quality latin fonts.
+
+\item The font contains wrong name for all or most of its glyphs. This is
+     the worst situation that often happens with poor-quality fonts, or
+     fonts converted from other formats.
+
+\item The font contains no glyph names at all. Newer versions of Palatino
+     fonts by Linotype (v1.40, coming with Windows XP) are examples of this.
+
+\item the font contains correct names for most glyphs, and no names or
+     wrong names for a few glyphs. This happens from time to time.
+\stopitemize
+
+One may wonder why things can be so complex with glyph names in TrueType. The
+reason is that Type~1 fonts rely on correct names to work properly. If a glyph
+has a wrong name, it gets noticed immediately. As mentioned before, TrueType does
+not use names for encoding. So, if glyph names in a TrueType font are wrong or
+missing, it is usually not a big deal and often goes unnoticed.
+
+The potential problem with using TrueType in \PDFTEX\ is that we are so used to
+the Type~1 encoding convention, which relies on correct glyph names. Furthermore,
+most font tools rely on this convention and all encoding files (.enc files) use
+glyph names. But, as explained above, glyph names in TrueType are not very reliable.
+If we encounter a font that does not have correct names for its glyphs, we need
+to do some more work.
+
+If glyph names are not correct, we need a better way to refer to a glyph in
+TrueType fonts, rather than using names. The most reliable way seems to be via
+Unicode: most TrueType fonts provide a correct mapping from unicode value to glyph
+index. This is something we can count on, since it is required for a
+TrueType font to be usable.
+
+ From version 1.21a \PDFTEX\ supports the naming convention `uniXXXX' in
+encoding files. This only makes sense with TrueType fonts, of course. When
+\PDFTEX\ sees for example `uni12AB', it will
+
+\startitemize[a,packed]
+\item read the table <unicode> -> <glyph-index> from the font,
+\item look up the value '12AB' in the table, and if found then pick the
+     relevant glyph index.
+\stopitemize
+
+ttf2afm also does the same lookup when it sees names like `uni12AB'.
+
+Now let us review the minimal steps to get a TrueType font working with \PDFTEX:
+\startitemize[a,packed]
+\item generate an afm from TrueType using ttf2afm. Example:
+     \starttyping
+     ttf2afm -e 8r.enc -o times.afm times.ttf
+     \stoptyping
+\item convert afm to tfm using whatever tool suitable: afm2tfm, fontinst,
+     afm2pl, etc. Example:
+     \starttyping
+     afm2tfm times.afm -T 8r.enc
+     \stoptyping
+\item create the needed map entry for the font. Example:
+     \starttyping
+     \pdfmapfile{+times TimesNewRomanPSMT <8r.enc <times.ttf}
+     \stoptyping
+\stopitemize
+
+That deals with the easiest case: when glyph names are correct. Now let us
+consider a font where we cannot rely on glyph names: Palatino by Linotype
+version 1.40, for example. Let us assume that we want to use the T1 encoding
+with this font. So we put pala.ttf and ec.enc in the current directory before
+proceeding further.
+
+The first attempt would be:
+\starttyping
+ttf2afm -e ec.enc -o pala.afm pala.ttf
+\stoptyping
+
+However, since the names in ec.enc are not available in pala.ttf (in fact
+there are no names inside the font), we would get a bunch of warnings:
+\starttyping
+Warning: ttf2afm (file pala.ttf): no names available in `post' table, print
+glyph names as indices
+
+Warning: ttf2afm (file pala.ttf): glyph `grave' not found
+.
+.
+.
+\stoptyping
+
+and the output pala.afm will contain no names at all. Instead of glyph
+names in ec.enc, we get weird things like `index123'. And glyphs are
+not encoded:
+\starttyping
+C -1 ; WX 832 ; N index10 ; B 24 -3 807 689 ;
+.
+.
+.
+\stoptyping
+
+We try again, this time without giving encoding:
+\starttyping
+ttf2afm -o pala.afm pala.ttf
+\stoptyping
+
+Since this time we did not ask ttf2afm to re-encode the output afm, we get
+fewer warnings:
+\starttyping
+Warning: ttf2afm (file pala.ttf): no names available in `post' table, print
+glyph names as indices
+\stoptyping
+
+and the afm output is the same as in the previous attempt. This is not
+very useful, since there is little we can do with names like
+`index123'.
+
+So we try to go with Unicode:
+
+\starttyping
+ttf2afm -u -o pala.afm pala.ttf
+\stoptyping
+
+This time we get another bunch of warnings like:
+\starttyping
+Warning: ttf2afm (file pala.ttf): glyph 108 have multiple encodings (the
+first one being used): uni0162 uni021A
+.
+.
+\stoptyping
+
+At first sight it is hard to understand what tfm2afm is telling us with
+this message. So let us recap the connection between glyph name, glyph index
+and unicode value:
+\startitemize[a,packed]
+\item glyphs are identified internally by index.
+\item <glyph-name> -> <glyph-index> is optional, and not always reliable.
+     So is <glyph-index> -> <glyph-name>.
+\item <unicode> -> <glyph-index> is (almost) always present and reliable.
+\item <glyph-index> -> <unicode> is not always reliable, and need not even
+     be a mapping, since there can be more than one unicode value mapping to
+     a given glyph index. Given a glyph index, there may be no corresponding
+     unicode value, or there may be more than one. If there is none, the glyph index
+     will be used (`index123', for example). Now suppose that there are more
+     than one, as in the case above (where 0162 and 021A are both mapped to glyph
+     index 108). We have asked ttf2afm to print glyphs by unicode, and ttf2afm
+     cannot know which value to print in this case.
+     Hence it simply sticks with the first unicode value and writes a warning.
+\stopitemize
+
+Now if all we want is to use pala.ttf with T1 encoding (and do not care
+about ligatures), probably the easiest way is to create a new enc file
+ec-uni.enc from ec.enc, with all glyph names replaced by unicode values. This
+can be done easily for example by a Perl script that reads the AGL (Adobe
+Glyph List, available at
+http://www.adobe.com/devnet/opentype/archives/glyphlist.txt) and
+converts all glyph names to unicode. Assuming that we already have
+ec-uni.enc, the steps needed to create the tfm are as follows.
+\starttyping
+ttf2afm -u -e ec-uni.enc -o pala-t1.afm pala.ttf
+afm2pl pala-t1.afm
+pltotf pala-t1.pl
+\stoptyping
+
+We could then use the font as follows.
+\starttyping
+\pdfmapline{+pala-t1 <ec-uni.enc <pala.ttf}
+\font\f=pala-t1\f
+This is a test of font Palatino Regular in T1 encoding.
+\stoptyping
+
+If we want to do more than just using pala.ttf with T1 encoding, for
+example processing the afm output with fontinst for a more complex font
+setup, then we must proceed slightly differently. Having an afm file where
+all glyph names are converted to `uniXXXX' form is not very useful for
+fontinst. Instead, we need an afm file with AGL names to use with fontinst.
+We can do so as follows.
+
+\startitemize[a,packed]
+\item Generate an afm  with glyph names in form `uniXXXX'.
+     \starttyping
+     ttf2afm -u -o pala.afm pala.ttf
+     \stoptyping
+\item Convert pala.afm to pala-agl.afm, so that pala-agl.afm contains AGL
+     names only. Again, a simple Perl script can do that.
+\item Process pala-agl.afm by fontinst as needed.
+\item In the final stage, when we already have the tfm's from fontinst and
+     friends, plus the map entries (generated by fontinst, or created
+     manually), we need to replace the encoding by its counterpart with
+     `uniXXXX' names. For example, if fontinst tell us to add a line saying
+     \starttyping
+     pala-agl-8r <8r.enc <pala.ttf
+     \stoptyping
+     to our map file, then we need to change that line to
+     \starttyping
+     pala-agl-8r <8r-uni.enc <pala.ttf
+     \stoptyping
+     where 8r-uni.enc is derived from 8r.enc by converting all glyph names
+     to the `uniXXXX' form.
+\stopitemize
+
+Another problem that happens from time to time is the case when we are
+totally sure that a glyph exists inside a font but we don't get that glyph
+in the output of \PDFTEX. The likely reason of this problem is that the
+glyph is referred by different names at various places during the process
+of creating support for the font, like tfm, vf, enc or map files. For
+example the names `dcroat', `dbar', `dslash' and `dmacron' can all refer to
+the same glyph in a TrueType font. The origin of a glyph name can come from
+several sources:
+
+\startitemize[a,packed]
+\item the name comes from the font itself.
+\item the name comes from a predefined scheme called ''the standard Macintosh
+ordering of glyphs''. Unfortunately the TrueType specifications by various companies (Apple, Microsoft and Adobe)
+are not consistent in this scheme and there are minor differences, for
+example `dmacron' vs `dslash'.
+\item the name comes out after conversion Unicode -> glyph name according
+to AGL.
+\stopitemize
+
+In such situation, probably the easiest and safest way to get the glyph we
+want is to use a font editor like FontForge, look into the font to find out
+the Unicode for the glyph and then use the `uniXXXX' form to instruct
+ttf2afm and \PDFTEX\ to pick up that glyph.
+
+Another way to get a problematic TrueType font to work with \PDFTEX\ is
+simply to convert the font to Type~1 format using FontForge. While it
+sounds like a quick hack, in certain cases it can be a simple and effective
+workaround.
+
 
 %***********************************************************************
 
