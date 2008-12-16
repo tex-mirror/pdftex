@@ -103,7 +103,7 @@
 \abbreviation [MIKTEX]     {MikTeX}     {\WIN\ distribution}
 \abbreviation [MLTEX]      {ML\TeX}     {ML\TeX\ extension to \TEX}
 \abbreviation [MPTOPDF]    {mptopdf}    {\METAPOST\ to \PDF\ conversion tool}
-\abbreviation [MSDOS]      {MSDos}      {Microsoft DOS platform (Intel)}
+\abbreviation [MSDOS]      {MS-DOS}     {Microsoft DOS platform (Intel)}
 \abbreviation [PDFETEX]    {pdfe\TeX}   {\ETEX\ extension producing \PDF\ output}
 \abbreviation [PDFLATEX]   {pdf\LaTeX}  {\TEX\ extension producing \PDF\ output (\LATEX\ format loaded)}
 \abbreviation [PDFTEX]     {pdf\TeX}    {\TEX\ extension producing \PDF\ output}
@@ -212,7 +212,7 @@
 \def\Something#1{\Sugar{\mathematics{\langle}\prewordbreak{#1}\prewordbreak\mathematics{\rangle}}}
 
 % introduced
-\def\introduced#1{The primitive has been introduced in \PDFTEX\ #1.}
+\def\introduced#1{The primitive was introduced in \PDFTEX\ #1.}
 
 %D We typeset the \URL's in a monospaced font.
 
@@ -1833,13 +1833,15 @@ this is no longer true since version 1.40.0).
        untouched; they are not replaced by local ones.
 \stopitemize
 
+
+%***********************************************************************
 \subsection{A closer look at TrueType fonts and \PDFTEX}
 The most common outline format for \TEX\ is Type~1. The TrueType format is slightly
 different from Type~1, and getting it right requires some extra work.
 In particular, it is important to understand how TrueType handles encoding and glyph
 names (or more precisely, glyph identity).
 
-We start with Type~1, since \TEX\ users are more familiar with that. In the
+We start with Type~1, since most \TEX\ users are more familiar with it. In the
 Type~1 format glyphs are referred to by names (such as `/A', `/comma', and so on).
 Each glyph is identified by its name; so, given a glyph name, it is easy to tell
 whether or not a Type~1 font contains that glyph. Encoding with Type~1 is therefore simple:
@@ -1888,13 +1890,13 @@ to do some more work.
 
 If glyph names are not correct, we need a better way to refer to a glyph in
 TrueType fonts, rather than using names. The most reliable way seems to be via
-Unicode: most TrueType fonts provide a correct mapping from unicode value to glyph
+Unicode: most TrueType fonts provide a correct mapping from Unicode value to glyph
 index. This is something we can count on, since it is required for a
 TrueType font to be usable.
 
  From version 1.21a \PDFTEX\ supports the naming convention `uniXXXX' in
-encoding files. This only makes sense with TrueType fonts, of course. When
-\PDFTEX\ sees for example `uni12AB', it will
+encoding (.enc) files. This only makes sense with TrueType fonts, of course. When
+\PDFTEX\ sees for example `/uni12AB', it will
 
 \startitemize[a,packed]
 \item read the table <unicode> -> <glyph-index> from the font,
@@ -1918,10 +1920,11 @@ Now let us review the minimal steps to get a TrueType font working with \PDFTEX:
 \item create the needed map entry for the font. Example:
      \starttyping
      \pdfmapline{+times TimesNewRomanPSMT <8r.enc <times.ttf}
+     \font\f=times \f Hello this is Times.
      \stoptyping
 \stopitemize
 
-That deals with the easiest case: when glyph names are correct. Now let us
+The above deals with the easiest case: when glyph names are correct. Now let us
 consider a font where we cannot rely on glyph names: Palatino by Linotype
 version 1.40, for example. Let us assume that we want to use the T1 encoding
 with this font. So we put pala.ttf and ec.enc in the current directory before
@@ -1933,15 +1936,12 @@ ttf2afm -e ec.enc -o pala.afm pala.ttf
 \stoptyping
 
 However, since the names in ec.enc are not available in pala.ttf (in fact
-there are no names inside the font), we would get a bunch of warnings:
+there are no names inside the font), we get a bunch of warnings:
 \starttyping
 Warning: ttf2afm (file pala.ttf): no names available in `post' table, print
 glyph names as indices
-
 Warning: ttf2afm (file pala.ttf): glyph `grave' not found
-.
-.
-.
+...
 \stoptyping
 
 and the output pala.afm will contain no names at all. Instead of glyph
@@ -1949,12 +1949,10 @@ names in ec.enc, we get weird things like `index123'. And glyphs are
 not encoded:
 \starttyping
 C -1 ; WX 832 ; N index10 ; B 24 -3 807 689 ;
-.
-.
-.
+...
 \stoptyping
 
-We try again, this time without giving encoding:
+We try again, this time without giving an encoding:
 \starttyping
 ttf2afm -o pala.afm pala.ttf
 \stoptyping
@@ -1976,40 +1974,39 @@ So we try to go with Unicode:
 ttf2afm -u -o pala.afm pala.ttf
 \stoptyping
 
-This time we get another bunch of warnings like:
+This time we get a different bunch of warnings, for instance:
 \starttyping
 Warning: ttf2afm (file pala.ttf): glyph 108 have multiple encodings (the
 first one being used): uni0162 uni021A
-.
-.
 \stoptyping
 
 At first sight it is hard to understand what tfm2afm is telling us with
 this message. So let us recap the connection between glyph name, glyph index
-and unicode value:
+and Unicode value:
 \startitemize[a,packed]
-\item glyphs are identified internally by index.
+\item TrueType glyphs are identified internally by index.
 \item <glyph-name> -> <glyph-index> is optional, and not always reliable.
-     So is <glyph-index> -> <glyph-name>.
+     Likewise <glyph-index> -> <glyph-name>.
 \item <unicode> -> <glyph-index> is (almost) always present and reliable.
 \item <glyph-index> -> <unicode> is not always reliable, and need not even
-     be a mapping, since there can be more than one unicode value mapping to
+     be a mapping, since there can be more than one Unicode value mapping to
      a given glyph index. Given a glyph index, there may be no corresponding
-     unicode value, or there may be more than one. If there is none, the glyph index
+     Unicode value, or there may be more than one. If there is none, the glyph index
      will be used (`index123', for example). Now suppose that there are more
      than one, as in the case above (where 0162 and 021A are both mapped to glyph
-     index 108). We have asked ttf2afm to print glyphs by unicode, and ttf2afm
-     cannot know which value to print in this case.
-     Hence it simply sticks with the first unicode value and writes a warning.
+     index 108). We have asked ttf2afm to print glyphs by Unicode, and ttf2afm
+     cannot know for sure which value to print in this case.
+     Hence it outputs the first Unicode value and issues the warning.
 \stopitemize
 
-Now if all we want is to use pala.ttf with T1 encoding (and do not care
-about ligatures), probably the easiest way is to create a new enc file
-ec-uni.enc from ec.enc, with all glyph names replaced by unicode values. This
-can be done easily for example by a Perl script that reads the AGL (Adobe
+Now if all we want is to use pala.ttf with T1 encoding,
+probably the easiest way is to create a new enc file
+ec-uni.enc from ec.enc, with all glyph names replaced by Unicode
+values. (This simple approach won't handle ligatures; see below.)
+This can be done easily for example by a script that reads the AGL (Adobe
 Glyph List, available at
 http://www.adobe.com/devnet/opentype/archives/glyphlist.txt) and
-converts all glyph names to unicode. Assuming that we already have
+converts all glyph names to Unicode. Assuming that we have
 ec-uni.enc, the steps needed to create the tfm are as follows.
 \starttyping
 ttf2afm -u -e ec-uni.enc -o pala-t1.afm pala.ttf
@@ -2029,7 +2026,7 @@ example processing the afm output with fontinst for a more complex font
 setup, then we must proceed slightly differently. Having an afm file where
 all glyph names are converted to `uniXXXX' form is not very useful for
 fontinst. Instead, we need an afm file with AGL names to use with fontinst.
-We can do so as follows.
+We can do this as follows.
 
 \startitemize[a,packed]
 \item Generate an afm  with glyph names in form `uniXXXX'.
@@ -2037,7 +2034,7 @@ We can do so as follows.
      ttf2afm -u -o pala.afm pala.ttf
      \stoptyping
 \item Convert pala.afm to pala-agl.afm, so that pala-agl.afm contains AGL
-     names only. Again, a simple Perl script can do that.
+     names only. Again, a simple script can do that.
 \item Process pala-agl.afm by fontinst as needed.
 \item In the final stage, when we already have the tfm's from fontinst and
      friends, plus the map entries (generated by fontinst, or created
@@ -2057,7 +2054,7 @@ We can do so as follows.
 Another problem that happens from time to time is the case when we are
 totally sure that a glyph exists inside a font but we don't get that glyph
 in the output of \PDFTEX. The likely reason of this problem is that the
-glyph is referred by different names at various places during the process
+glyph is referenced by different names at various places during the process
 of creating support for the font, like tfm, vf, enc or map files. For
 example the names `dcroat', `dbar', `dslash' and `dmacron' can all refer to
 the same glyph in a TrueType font. The origin of a glyph name can come from
@@ -2067,9 +2064,9 @@ several sources:
 \item the name comes from the font itself.
 \item the name comes from a predefined scheme called ''the standard Macintosh
 ordering of glyphs''. Unfortunately the TrueType specifications by various companies (Apple, Microsoft and Adobe)
-are not consistent in this scheme and there are minor differences, for
-example `dmacron' vs `dslash'.
-\item the name comes out after conversion Unicode -> glyph name according
+are not consistent in this scheme and there are small differences; one
+example is `dmacron' vs `dslash'.
+\item the name comes out after conversion <unicode> -> <glyph-name> according
 to AGL.
 \stopitemize
 
@@ -2080,7 +2077,7 @@ ttf2afm and \PDFTEX\ to pick up that glyph.
 
 Another way to get a problematic TrueType font to work with \PDFTEX\ is
 simply to convert the font to Type~1 format using FontForge. While it
-sounds like a quick hack, in certain cases it can be a simple and effective
+sounds like a quick hack, it can be a simple and effective
 workaround.
 
 
@@ -4669,9 +4666,9 @@ bytes of the source of this manual are {\tt \pdffiledump length 10
 
 %***********************************************************************
 
-\subsection{Colourstack}
+\subsection{Color stack}
 
-\PDFTEX\ 1.40.0 comes with a colour stack support (actually any graphic state
+\PDFTEX\ 1.40.0 comes with color stack support (actually any graphic state
 stack).
 
 \pdftexprimitive{\Syntax {
@@ -4680,7 +4677,7 @@ stack).
 
 \bookmark{\type{\pdfcolorstackinit}}
 
-The primitive initializes new graphic stack and returns its number. Optional
+The primitive initializes a new graphic stack and returns its number. Optional
 \Literal{page} keyword instructs \PDFTEX\ to restore the graphic at the
 beginning of every new page. Also optional \Literal{direct} has the same effect
 as for \Tex{\pdfliteral} primitive. \introduced{1.40.0}
@@ -4937,7 +4934,7 @@ output, e.g. just to get the \BIBTEX\ references right.
 
 %***********************************************************************
 
-\section{Graphics and color}
+\section{Graphics}
 
 \PDFTEX\ supports inclusion of pictures in \PNG, \JPEG, \JBIGTWO, and
 \PDF\ format; a~few differences between these are discussed below. The
