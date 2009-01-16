@@ -34778,7 +34778,7 @@ pdf_annot_node: begin
     print_mark(pdf_annot_data(p));
 end;
 pdf_start_link_node: begin
-    print_esc("pdflink");
+    print_esc("pdfstartlink");
     @<Display <rule spec> for whatsit node created by \pdfTeX@>;
     if pdf_link_attr(p) <> null then begin
         print(" attr");
@@ -35526,7 +35526,7 @@ nesting level.
 
 @ @<Types...@>=
 @!pdf_link_stack_record = record
-    nesting_level: small_number;
+    nesting_level: integer;
     link_node: pointer; {holds a copy of the corresponding |pdf_start_link_node|}
     ref_link_node: pointer; {points to original |pdf_start_link_node|, or a
                              copy of |link_node| created by |append_link| in
