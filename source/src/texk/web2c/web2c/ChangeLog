@@ -1,3 +1,22 @@
+2009-03-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* common.defines, convert, fixwrites.c, splitup.c: remove all
+	references to Omega, eOmega, and pdfeTeX.
+
+2009-03-27  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* convert (splitup_options for luatex)): avoid to split the C
+	code (from Taco).
+
+2009-03-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* splitup.c: avoid using program_invocation_name (from Taco).
+
+2009-02-26  Karl Berry  <karl@tug.org>
+
+	* texmf.defines (runsystem): new fn.
+	(system): remove procedure.
+
 2008-05-25  Karl Berry  <karl@tug.org>
 
 	* texmf.defines (loadpoolstrings): formatting.

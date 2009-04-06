@@ -72,7 +72,7 @@ string engine = NULL;
    that form.  If it doesn't, return 0.  */
 
 static unsigned
-find_dpi P1C(string, s)
+find_dpi (string s)
 {
   unsigned dpi_number = 0;
   string extension = find_suffix (s);
@@ -83,16 +83,17 @@ find_dpi P1C(string, s)
   return dpi_number;
 }
 
-/* Use the file type from -format if that was specified, else guess
-   dynamically from NAME.  Return kpse_last_format if undeterminable.
-   This function is also used to parse the -format string, a case which
-   we distinguish by setting is_filename to false.
+/* Use the file type from -format if that was specified (i.e., the
+   user_format global variable), else guess dynamically from NAME.
+   Return kpse_last_format if undeterminable.  This function is also
+   used to parse the -format string, a case which we distinguish by
+   setting is_filename to false.
 
-   Note that a few filenames have been hard-coded for format types that
+   A few filenames have been hard-coded for format types that
    differ from what would be inferred from their extensions. */
 
 static kpse_file_format_type
-find_format P2C(string, name, boolean, is_filename)
+find_format (kpathsea kpse, string name, boolean is_filename)
 {
   kpse_file_format_type ret;
   
@@ -116,8 +117,10 @@ find_format P2C(string, name, boolean, is_filename)
     ret = kpse_cnf_format;
   } else if (FILESTRCASEEQ (name, "updmap.cfg")) {
     ret = kpse_web2c_format;
+  } else if (FILESTRCASEEQ (name, "XDvi")) {
+    ret = kpse_program_text_format;
   } else {
-    int f;  /* kpse_file_format_type */
+    int f = 0;  /* kpse_file_format_type */
     unsigned name_len = strlen (name);
 
 /* Have to rely on `try_len' being declared here, since we can't assume
@@ -127,26 +130,25 @@ find_format P2C(string, name, boolean, is_filename)
   (ftry) && try_len <= name_len \
      && FILESTRCASEEQ (ftry, name + name_len - try_len))
 
-    f = 0;
     while (f != kpse_last_format) {
       unsigned try_len;
       const_string *ext;
       const_string ftry;
       boolean found = false;
       
-      if (!kpse_format_info[f].type)
-        kpse_init_format ((kpse_file_format_type) f);
+      if (!kpse->format_info[f].type)
+        kpathsea_init_format (kpse, (kpse_file_format_type) f);
 
       if (!is_filename) {
         /* Allow the long name, but only in the -format option.  We don't
            want a filename confused with a format name.  */
-        ftry = kpse_format_info[f].type;
+        ftry = kpse->format_info[f].type;
         found = TRY_SUFFIX (ftry);
       }
-      for (ext = kpse_format_info[f].suffix; !found && ext && *ext; ext++){
+      for (ext = kpse->format_info[f].suffix; !found && ext && *ext; ext++) {
         found = TRY_SUFFIX (*ext);
       }      
-      for (ext = kpse_format_info[f].alt_suffix; !found && ext && *ext; ext++){
+      for (ext = kpse->format_info[f].alt_suffix; !found && ext && *ext; ext++){
         found = TRY_SUFFIX (*ext);
       }
 
@@ -188,7 +190,7 @@ find_format P2C(string, name, boolean, is_filename)
    Perhaps later we will implement wildcards or // or something.  */
 
 static string *
-subdir_match P2C(str_list_type, subdirs,  string *, matches)
+subdir_match (str_list_type subdirs,  string *matches)
 {
   string *ret = XTALLOC1 (string);
   unsigned len = 1;
@@ -230,7 +232,7 @@ subdir_match P2C(str_list_type, subdirs,  string *, matches)
 /* Look up a single filename NAME.  Return 0 if success, 1 if failure.  */
 
 static unsigned
-lookup P1C(string, name)
+lookup (kpathsea kpse, string name)
 {
   int i;
   string ret = NULL;
@@ -238,14 +240,14 @@ lookup P1C(string, name)
   
   if (user_path) {
     if (show_all) {
-      ret_list = kpse_all_path_search (user_path, name);
+        ret_list = kpathsea_all_path_search (kpse, user_path, name);
     } else {
-       ret = kpse_path_search (user_path, name, must_exist);
+      ret = kpathsea_path_search (kpse, user_path, name, must_exist);
     }
     
   } else {
     /* No user-specified search path, check user format or guess from NAME.  */
-    kpse_file_format_type fmt = find_format (name, true);
+      kpse_file_format_type fmt = find_format (kpse, name, true);
 
     switch (fmt) {
       case kpse_pk_format:
@@ -257,8 +259,8 @@ lookup P1C(string, name)
           unsigned local_dpi = find_dpi (name);
           if (!local_dpi)
             local_dpi = dpi;
-          ret = kpse_find_glyph (remove_suffix (name), local_dpi, fmt,
-                                 &glyph_ret);
+          ret = kpathsea_find_glyph (kpse, remove_suffix (name), local_dpi, fmt,
+                                     &glyph_ret);
         }
         break;
 
@@ -269,9 +271,9 @@ lookup P1C(string, name)
 
       default:
         if (show_all) {
-          ret_list = kpse_find_file_generic (name, fmt, must_exist, true);
+          ret_list = kpathsea_find_file_generic (kpse, name, fmt, must_exist, true);
         } else {
-          ret = kpse_find_file (name, fmt, must_exist);
+          ret = kpathsea_find_file (kpse, name, fmt, must_exist);
         }
     }
   }
@@ -306,8 +308,14 @@ lookup P1C(string, name)
 
 #define USAGE "\n\
 Standalone path lookup and expansion for Kpathsea.\n\
+The default is to look up each FILENAME in turn and report its\n\
+first match (if any) to standard output.\n\
 \n\
--all                   output all matches (one per line), not just the first.\n\
+When looking up format (.fmt/.base/.mem) files, it is usually necessary\n\
+to also use -engine, or nothing will be returned; in particular, -engine=/\n\
+will return matching format files for any engine.\n\
+\n\
+-all                   output all matches, one per line.\n\
 -debug=NUM             set debugging flags.\n\
 -D, -dpi=NUM           use a base resolution of NUM; default 600.\n\
 -engine=STRING         set engine name to STRING.\n\
@@ -322,8 +330,8 @@ Standalone path lookup and expansion for Kpathsea.\n\
 -must-exist            search the disk as well as ls-R if necessary.\n\
 -path=STRING           search in the path STRING.\n\
 -progname=STRING       set program name to STRING.\n\
--show-path=NAME        output search path for file type NAME (see list below).\n\
--subdir=STRING         only output matches whose directory part ends with STRING.\n\
+-show-path=NAME        output search path for file type NAME (list below).\n\
+-subdir=STRING         only output matches whose directory ends with STRING.\n\
 -var-value=STRING      output the value of variable $STRING.\n\
 -version               print version number and exit.\n \
 "
@@ -360,7 +368,7 @@ static struct option long_options[]
       { 0, 0, 0, 0 } };
 
 static void
-read_command_line P2C(int, argc,  string *, argv)
+read_command_line (kpathsea kpse, int argc,  string *argv)
 {
   int g;   /* `getopt' return code.  */
   int option_index;
@@ -377,7 +385,7 @@ read_command_line P2C(int, argc,  string *, argv)
     assert (g == 0); /* We have no short option names.  */
 
     if (ARGUMENT_IS ("debug")) {
-      kpathsea_debug |= atoi (optarg);
+      kpse->debug |= atoi (optarg);
 
     } else if (ARGUMENT_IS ("dpi") || ARGUMENT_IS ("D")) {
       dpi = atoi (optarg);
@@ -399,30 +407,30 @@ read_command_line P2C(int, argc,  string *, argv)
 
     } else if (ARGUMENT_IS ("help")) {
       int f; /* kpse_file_format_type */
-      extern KPSEDLL char *kpse_bug_address; /* from version.c */
+      extern KPSEDLL char *kpathsea_bug_address; /* from version.c */
       
       printf ("Usage: %s [OPTION]... [FILENAME]...\n", argv[0]);
       fputs (USAGE, stdout);
       putchar ('\n');
-      fputs (kpse_bug_address, stdout);
+      fputs (kpathsea_bug_address, stdout);
 
       /* Have to set this for init_format to work.  */
-      kpse_set_program_name (argv[0], progname);
+      kpathsea_set_program_name (kpse, argv[0], progname);
 
       puts ("\nRecognized format names and their suffixes:");
       for (f = 0; f < kpse_last_format; f++) {
         const_string *ext;
-        kpse_init_format ((kpse_file_format_type)f);
-        printf ("%s:", kpse_format_info[f].type);
-        for (ext = kpse_format_info[f].suffix; ext && *ext; ext++) {
+        kpathsea_init_format (kpse, (kpse_file_format_type)f);
+        printf ("%s:", kpse->format_info[f].type);
+        for (ext = kpse->format_info[f].suffix; ext && *ext; ext++) {
           putchar (' ');
           fputs (*ext, stdout);
         }
-        if (kpse_format_info[f].alt_suffix) {
+        if (kpse->format_info[f].alt_suffix) {
           /* leave extra space between default and alt suffixes */
           putchar (' ');
         }
-        for (ext = kpse_format_info[f].alt_suffix; ext && *ext; ext++) {
+        for (ext = kpse->format_info[f].alt_suffix; ext && *ext; ext++) {
           putchar (' ');
           fputs (*ext, stdout);
         }
@@ -432,13 +440,13 @@ read_command_line P2C(int, argc,  string *, argv)
       exit (0);
 
     } else if (ARGUMENT_IS ("mktex")) {
-      kpse_maketex_option (optarg, true);
+      kpathsea_maketex_option (kpse, optarg, true);
 
     } else if (ARGUMENT_IS ("mode")) {
       mode = optarg;
 
     } else if (ARGUMENT_IS ("no-mktex")) {
-      kpse_maketex_option (optarg, false);
+      kpathsea_maketex_option (kpse, optarg, false);
 
     } else if (ARGUMENT_IS ("path")) {
       user_path = optarg;
@@ -485,50 +493,55 @@ There is NO WARRANTY, to the extent permitted by law.\n");
 }
 
 int
-main P2C(int, argc,  string *, argv)
+main (int argc,  string *argv)
 {
   unsigned unfound = 0;
+  kpathsea kpse = kpathsea_new();
+  read_command_line (kpse, argc, argv);
 
-  read_command_line (argc, argv);
-
-  kpse_set_program_name (argv[0], progname);
+  kpathsea_set_program_name (kpse, argv[0], progname);
 
   if (engine)
-    xputenv ("engine", engine);
+      kpathsea_xputenv (kpse, "engine", engine);
   
   /* NULL for no fallback font.  */
-  kpse_init_prog (uppercasify (kpse_program_name), dpi, mode, NULL);
+  kpathsea_init_prog (kpse, uppercasify (kpse->program_name), dpi, mode, NULL);
   
   /* Have to do this after setting the program name.  */
-  if (user_format_string)
-    user_format = find_format (user_format_string, false);
+  if (user_format_string) {  
+      user_format = find_format (kpse, user_format_string, false);
+    if (user_format == kpse_last_format) {
+      WARNING1 ("kpsewhich: Ignoring unknown file type `%s'",
+                user_format_string);
+    }
+  }
   
   /* Variable expansion.  */
   if (var_to_expand)
-    puts (kpse_var_expand (var_to_expand));
+      puts (kpathsea_var_expand (kpse, var_to_expand));
 
   /* Brace expansion. */
   if (braces_to_expand)
-    puts (kpse_brace_expand (braces_to_expand));
+    puts (kpathsea_brace_expand (kpse, braces_to_expand));
   
   /* Path expansion. */
   if (path_to_expand)
-    puts (kpse_path_expand (path_to_expand));
+    puts (kpathsea_path_expand (kpse, path_to_expand));
 
   /* Show a search path. */
   if (path_to_show) {
     if (user_format != kpse_last_format) {
-      if (!kpse_format_info[user_format].type) /* needed if arg was numeric */
-        kpse_init_format (user_format);
-      puts (kpse_format_info[user_format].path);
+      if (!kpse->format_info[user_format].type) /* needed if arg was numeric */
+        kpathsea_init_format (kpse, user_format);
+      puts (kpse->format_info[user_format].path);
     } else {
-      WARNING1 ("kpsewhich: Ignoring unknown file type `%s'", path_to_show);
+      WARNING ("kpsewhich: Cannot show path for unknown file type");
     }
   }
 
   /* Var to value. */
   if (var_to_value) {
-    const_string value = kpse_var_value (var_to_value);
+    const_string value = kpathsea_var_value (kpse, var_to_value);
     if (!value) {
       unfound++;
       value="";
@@ -543,17 +556,17 @@ main P2C(int, argc,  string *, argv)
   }
   
   for (; optind < argc; optind++) {
-    unfound += lookup (argv[optind]);
+      unfound += lookup (kpse, argv[optind]);
   }
 
   if (interactive) {
     for (;;) {
       string name = read_line (stdin);
       if (!name || STREQ (name, "q") || STREQ (name, "quit")) break;
-      unfound += lookup (name);
+      unfound += lookup (kpse, name);
       free (name);
     }
   }
-  
+  kpathsea_finish(kpse);
   return unfound > 255 ? 1 : unfound;
 }

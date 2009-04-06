@@ -1,12 +1,11 @@
 #! /bin/sh
-
-# $Id: reautoconf 6851 2008-03-04 16:37:41Z peter $
+# $Id: reautoconf 12442 2009-03-20 07:23:18Z peter $
 # This "reautoconf" script found at the root of the TeX Live source tree 
 # runs aclocal and autoconf (from PATH) in all relevant directories.
 #
 # Copyright 2008 Karl Berry.
 # Copyright 2005 Olaf Weber.
-# Copyright 2004 - 2008 Peter Breitenlohner.
+# Copyright 2004 - 2009 Peter Breitenlohner.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +19,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+echo "The TeX Live build system is currently under reconstruction"
+exit 1
 
 unset CDPATH
 
@@ -82,13 +84,13 @@ done
 
 : ${TL_ACLOCAL=aclocal}
 echo "$0: using \"$TL_ACLOCAL\" = `$TL_ACLOCAL --version | sed 1q`"
-echo "$0: if you want to use a different aclocal, set TL_ACLOCAL."
+echo "$0:  if you want to use a different aclocal, set TL_ACLOCAL."
 : ${TL_AUTOCONF=autoconf}
 echo "$0: using \"$TL_AUTOCONF\" = `$TL_AUTOCONF --version | sed 1q`"
-echo "$0: if you want to use a different autoconf, set TL_AUTOCONF."
+echo "$0:  if you want to use a different autoconf, set TL_AUTOCONF."
 : ${TL_AUTOHEADER=autoheader}
 echo "$0: using \"$TL_AUTOHEADER\" = `$TL_AUTOHEADER --version | sed 1q`"
-echo "$0: if you want to use a different autoheader, set TL_AUTOHEADER."
+echo "$0:  if you want to use a different autoheader, set TL_AUTOHEADER."
 
 # Give users a chance to quit here
 # and set TL_ACLOCAL, TL_AUTOCONF and/or TL_AUTOHEADER
@@ -129,7 +131,10 @@ fi
 
 # Autoconf in all directories
 for dir in $list; do
-  if test -f "$dir/configure.in"; then
+  if test ! -d "$dir"; then
+    echo "$0: $dir not a directory, skipping." >&2
+    continue
+  elif test -f "$dir/configure.in"; then
     base=configure.in
   elif test -f "$dir/configure.ac"; then
     base=configure.ac
@@ -137,18 +142,10 @@ for dir in $list; do
     continue
   fi
   case $dir in
-    .)
-      rdir=texk/m4
-    ;;
-    texk)
-      rdir=m4
-    ;;
-    texk/*)
-      rdir=`echo $dir | sed -e 's,^texk/,,' -e 's,[^/]*,..,g'`/m4
-    ;;
-    *)
-      rdir=`echo $dir | sed 's,[^/]*,..,g'`/texk/m4
-    ;;
+    .)      rdir=texk/m4 ;;
+    texk)   rdir=m4 ;;
+    texk/*) rdir=`echo $dir | sed -e 's,^texk/,,' -e 's,[^/]*,..,g'`/m4 ;;
+    *)      rdir=`echo $dir | sed 's,[^/]*,..,g'`/texk/m4 ;;
   esac
   (cd $dir; do_one)
 done

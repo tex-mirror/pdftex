@@ -1,3 +1,38 @@
+2009-03-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmfmp.c: remove all references to Omega, eOmega, and pdfeTeX.
+
+2009-03-28  Karl Berry  <karl@tug.org>
+
+	* texmfmp.c (mk_shellcmdlist, shell_cmd_is_allowed): not static,
+	so luatex can access.  From Taco.
+
+2009-03-27  Taco Hoekwater  <taco@luatex.org>
+
+	* texmfmp.c (parse_options): add #ifndef luaTeX guard for 
+	--src-specials, because luaTeX does not implement it.
+	(parse_src_specials_option): add #ifndef luaTeX guard for
+	 the same reason.
+
+2009-03-02  Karl Berry  <karl@tug.org>
+
+	* texmfmp.c (long_options): make -enable-write18 and -disable-write18
+	synonyms for -shell-escape and -no-shell-escape.
+
+2009-02-26  Karl Berry  <karl@tug.org>
+
+	* texmfmp.c: Implementation of restricted shell escapes from Akira.
+	(mk_shellcmdlist, init_shell_escape, char_needs_quote, Isspace,
+	shell_cmd_is_allowed, runsystem, runpopen): new fns.
+	(long_options, parse_cmd_line): new option --shell-restricted.
+	(main): call init_shell_escape.
+	(open_in_or_pipe, open_out_or_pipe): call runpopen.
+
+2009-02-06  Karl Berry  <karl@tug.org>
+
+	* texmfmp.c (maininit) [__SyncTeX__]: omit warning about no
+	SyncTeX for Omega and MF/MP.
+
 2008-03-24  Karl Berry  <karl@tug.org>
 
 	* printversion.c: it's 2008.

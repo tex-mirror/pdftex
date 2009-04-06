@@ -1,3 +1,49 @@
+2009-03-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am, configure.ac: remove Omega.
+
+	* tex.ch, texmfmem.h, texmfmp-help.h, texmfmp.h: remove all
+	references to Omega, eOmega, and pdfeTeX.
+
+2009-03-28  Karl Berry  <karl@tug.org>
+
+	* texmfmp.h: shell escape declarations.
+
+2009-03-27 Taco Hoekwater <taco@luatex.org>
+
+	* configure.ac: With the new luatex, what used to be 
+	luatexdir/luafontforge/ is now luatexdir/luafontloader/.
+
+2009-03-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmfmp-help.h [eTeX,TeX]: Document -synctex switch.
+
+2009-03-02  Karl Berry  <karl@tug.org>
+
+	* texmfmp-help.h (PDFTEXHELP): --no-mktex can now apply to pk
+	files too.
+
+2009-02-26  Karl Berry  <karl@tug.org>
+
+	* texmfmp-help.h: mention --shell-restricted.
+	* tex.ch (c_int_type, shell_enabled_p, address_of): remove _'s
+	to reduce differences with luatex.
+	(restrictedshell): new global.
+	(system): replace with runsystem, for restricted mode.
+
+2009-01-26  Karl Berry  <karl@tug.org>
+
+	* configure.in (with_cxx_runtime_hack): use
+	#include <iostream>
+	  using namespace std;
+	for the hello,world test, to placate the backward-incompatible
+	standard.
+
+2008-11-18  Karl Berry  <karl@tug.org>
+
+	* Makefile.in (install-data): mkinstalldirs man1dir man5dir.
+	Report from Angelo Graziosi, tlbuild 17 Nov 2008 01:03:51.
+
 2008-08-13  Karl Berry  <karl@tug.org>
 
 	* Makefile.in (install-data): Also install synctex.[15].
@@ -1172,7 +1218,7 @@ x2008-05-31  Karl Berry  <karl@tug.org>
 	(gftopk-clean): Remove gftopk.h.
 	(programs): Add $(pdftosrc).
 
-	* fmtutil.in: Remove mfw rule (sync with teTeX/TeX live).
+	* fmtutil.in: Remove mfw rule (sync with teTeX/TeX Live).
 
 	* withenable.ac: New option: --enable-fmtutil.
 

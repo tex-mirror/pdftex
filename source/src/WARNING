@@ -1,0 +1,18 @@
+	CONSTRUCTION WORK
+	=================
+
+The TeX Live build system is currently under reconstruction.
+
+At the moment the `Build' script should succeed, but might as well fail.
+
+Please inform me of any failures!
+
+The new build system is nearly complete, except for the directories
+
+	texk/xdvik
+	texk/web2c/xetexdir
+	utils/xindy
+
+and a few features not yet available.
+
+Peter Breitenlohner	2009-04-02	14:00 UTC

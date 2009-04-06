@@ -1,6 +1,5 @@
 # withenable.ac - Written long ago by Thomas Esser and Sebastian Rahtz.
-# $Id: withenable.ac 9056 2008-06-26 10:30:34Z peter $
-
+# $Id: withenable.ac 11963 2009-01-25 01:57:18Z karl $
 # Public domain.
 
 AC_ARG_ENABLE([multiplatform],
@@ -15,7 +14,6 @@ pdfopen
 ps2eps
 psutils
 t1utils
-texinfo
 tpic2pdftex
 vlna
 xindy
