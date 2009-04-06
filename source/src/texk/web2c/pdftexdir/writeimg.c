@@ -23,9 +23,6 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include <kpathsea/c-auto.h>
 #include <kpathsea/c-memstr.h>
 
-static const char _svn_version[] =
-    "$Id$ $URL$";
-
 #define bp2int(p)    round(p*(onehundredbp/100.0))
 
 /* define image_ptr, image_array & image_limit */

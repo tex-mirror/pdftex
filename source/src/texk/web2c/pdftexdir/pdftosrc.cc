@@ -40,9 +40,6 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "GlobalParams.h"
 #include "Error.h"
 
-static const char _svn_version[] =
-    "$Id$ $URL$";
-
 static XRef *xref = 0;
 
 int main(int argc, char *argv[])

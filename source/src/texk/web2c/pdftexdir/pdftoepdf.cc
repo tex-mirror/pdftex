@@ -44,9 +44,6 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 #include "epdf.h"
 
-static const char _svn_version[] =
-    "$Id$ $URL$";
-
 // This file is mostly C and not very much C++; it's just used to interface
 // the functions of xpdf, which happens to be written in C++.
 

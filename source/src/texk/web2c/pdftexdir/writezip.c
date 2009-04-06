@@ -22,9 +22,6 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "zlib.h"
 #include <assert.h>
 
-static const char _svn_version[] =
-    "$Id$ $URL$";
-
 #define ZIP_BUF_SIZE  32768
 
 #define check_err(f, fn) \
