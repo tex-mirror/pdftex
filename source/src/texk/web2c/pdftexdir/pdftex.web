@@ -9427,7 +9427,9 @@ label exit;
 var p:pointer; {tail of the backup list}
 @!q:pointer; {new node being added to the token list via |store_new_token|}
 @!k:pool_pointer; {index into |str_pool|}
+@!save_cur_cs:pointer; {to save |cur_cs|}
 begin p:=backup_head; link(p):=null; k:=str_start[s];
+save_cur_cs:=cur_cs;
 while k<str_start[s+1] do
   begin get_x_token; {recursion is possible here}
 @^recursion@>
@@ -9438,6 +9440,7 @@ while k<str_start[s+1] do
   else if (cur_cmd<>spacer)or(p<>backup_head) then
     begin back_input;
     if p<>backup_head then back_list(link(backup_head));
+    cur_cs:=save_cur_cs;
     scan_keyword:=false; return;
     end;
   end;
