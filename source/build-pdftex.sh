@@ -4,10 +4,7 @@
 set -e
 set -x
 
-topDir=$(dirname $0)
-if [ $topDir = "." ]; then
-    topDir=$(pwd)
-fi
+topDir=$(cd $(dirname $0) && pwd)
 
 pdftexDir=$topDir/src/texk/web2c/pdftexdir
 if [ ! -d $pdftexDir ]; then
@@ -86,6 +83,7 @@ OTHER_OPTS="\
 buildDir=$(pwd)/build-pdftex
 rm -rf $buildDir && mkdir $buildDir && cd $buildDir
 
+export CONFIG_SHELL=/bin/bash
 $topDir/src/configure $DISABLED_PROGS $OTHER_OPTS "$@"
 make all 2>&1 | tee make.log
 
