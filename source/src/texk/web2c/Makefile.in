@@ -74,6 +74,10 @@ DIST_COMMON = README $(am__configure_deps) $(dist_check_SCRIPTS) \
 @MFN_TRUE@@MF_TRUE@am__append_5 = mf-nowin
 @ETEX_TRUE@am__append_6 = etex
 @PDFTEX_TRUE@am__append_7 = pdftex
+@MINGW32_TRUE@am__append_8 = \
+@MINGW32_TRUE@	pdftexdir/regex/regex.c \
+@MINGW32_TRUE@	pdftexdir/regex/regex.h
+
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../m4/kpse-asm.m4 \
@@ -116,6 +120,19 @@ nodist_libmf_a_OBJECTS = $(am__objects_1) libmf_a-mf-pool.$(OBJEXT)
 libmf_a_OBJECTS = $(nodist_libmf_a_OBJECTS)
 libpdftex_a_AR = $(AR) $(ARFLAGS)
 libpdftex_a_LIBADD =
+am__libpdftex_a_SOURCES_DIST = pdftexdir/avl.c pdftexdir/avl.h \
+	pdftexdir/avlstuff.c pdftexdir/avlstuff.h pdftexdir/epdf.c \
+	pdftexdir/epdf.h pdftexdir/image.h pdftexdir/mapfile.c \
+	pdftexdir/pdftex.h pdftexdir/pdftoepdf.cc pdftexdir/pkin.c \
+	pdftexdir/ptexlib.h pdftexdir/ptexmac.h pdftexdir/subfont.c \
+	pdftexdir/tounicode.c pdftexdir/utils.c pdftexdir/vfpacket.c \
+	pdftexdir/writeenc.c pdftexdir/writefont.c \
+	pdftexdir/writeimg.c pdftexdir/writejbig2.c \
+	pdftexdir/writejbig2.h pdftexdir/writejpg.c \
+	pdftexdir/writepng.c pdftexdir/writet1.c pdftexdir/writet3.c \
+	pdftexdir/writettf.c pdftexdir/writettf.h pdftexdir/writezip.c \
+	pdftexdir/regex/regex.c pdftexdir/regex/regex.h
+@MINGW32_TRUE@am__objects_2 = libpdftex_a-regex.$(OBJEXT)
 am_libpdftex_a_OBJECTS = libpdftex_a-avl.$(OBJEXT) \
 	libpdftex_a-avlstuff.$(OBJEXT) libpdftex_a-epdf.$(OBJEXT) \
 	libpdftex_a-mapfile.$(OBJEXT) libpdftex_a-pdftoepdf.$(OBJEXT) \
@@ -126,7 +143,8 @@ am_libpdftex_a_OBJECTS = libpdftex_a-avl.$(OBJEXT) \
 	libpdftex_a-writejbig2.$(OBJEXT) \
 	libpdftex_a-writejpg.$(OBJEXT) libpdftex_a-writepng.$(OBJEXT) \
 	libpdftex_a-writet1.$(OBJEXT) libpdftex_a-writet3.$(OBJEXT) \
-	libpdftex_a-writettf.$(OBJEXT) libpdftex_a-writezip.$(OBJEXT)
+	libpdftex_a-writettf.$(OBJEXT) libpdftex_a-writezip.$(OBJEXT) \
+	$(am__objects_2)
 libpdftex_a_OBJECTS = $(am_libpdftex_a_OBJECTS)
 am__EXEEXT_1 = bibtex$(EXEEXT) dvicopy$(EXEEXT) dvitomp$(EXEEXT) \
 	dvitype$(EXEEXT) gftodvi$(EXEEXT) gftopk$(EXEEXT) \
@@ -175,9 +193,9 @@ nodist_dvitype_OBJECTS = dvitype.$(OBJEXT)
 dvitype_OBJECTS = $(nodist_dvitype_OBJECTS)
 dvitype_LDADD = $(LDADD)
 dvitype_DEPENDENCIES = $(proglib) $(am__DEPENDENCIES_1)
-am__objects_2 = etex-etexini.$(OBJEXT) etex-etex0.$(OBJEXT) \
+am__objects_3 = etex-etexini.$(OBJEXT) etex-etex0.$(OBJEXT) \
 	etex-etex1.$(OBJEXT) etex-etex2.$(OBJEXT)
-nodist_etex_OBJECTS = $(am__objects_2) etex-etex-pool.$(OBJEXT) \
+nodist_etex_OBJECTS = $(am__objects_3) etex-etex-pool.$(OBJEXT) \
 	etex-etexextra.$(OBJEXT)
 etex_OBJECTS = $(nodist_etex_OBJECTS)
 am__DEPENDENCIES_2 = $(proglib) $(am__DEPENDENCIES_1)
@@ -217,10 +235,10 @@ nodist_patgen_OBJECTS = patgen.$(OBJEXT)
 patgen_OBJECTS = $(nodist_patgen_OBJECTS)
 patgen_LDADD = $(LDADD)
 patgen_DEPENDENCIES = $(proglib) $(am__DEPENDENCIES_1)
-am__objects_3 = pdftex-pdftexini.$(OBJEXT) pdftex-pdftex0.$(OBJEXT) \
+am__objects_4 = pdftex-pdftexini.$(OBJEXT) pdftex-pdftex0.$(OBJEXT) \
 	pdftex-pdftex1.$(OBJEXT) pdftex-pdftex2.$(OBJEXT) \
 	pdftex-pdftex3.$(OBJEXT)
-nodist_pdftex_OBJECTS = $(am__objects_3) pdftex-pdftex-pool.$(OBJEXT) \
+nodist_pdftex_OBJECTS = $(am__objects_4) pdftex-pdftex-pool.$(OBJEXT) \
 	pdftex-pdftexextra.$(OBJEXT)
 pdftex_OBJECTS = $(nodist_pdftex_OBJECTS)
 am__DEPENDENCIES_4 = libpdftex.a $(am__DEPENDENCIES_1) \
@@ -252,9 +270,9 @@ nodist_tangleboot_OBJECTS = tangleboot.$(OBJEXT)
 tangleboot_OBJECTS = $(nodist_tangleboot_OBJECTS)
 tangleboot_LDADD = $(LDADD)
 tangleboot_DEPENDENCIES = $(proglib) $(am__DEPENDENCIES_1)
-am__objects_4 = tex-texini.$(OBJEXT) tex-tex0.$(OBJEXT) \
+am__objects_5 = tex-texini.$(OBJEXT) tex-tex0.$(OBJEXT) \
 	tex-tex1.$(OBJEXT) tex-tex2.$(OBJEXT)
-nodist_tex_OBJECTS = $(am__objects_4) tex-tex-pool.$(OBJEXT) \
+nodist_tex_OBJECTS = $(am__objects_5) tex-tex-pool.$(OBJEXT) \
 	tex-texextra.$(OBJEXT)
 tex_OBJECTS = $(nodist_tex_OBJECTS)
 tex_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
@@ -322,7 +340,7 @@ SOURCES = $(libmd5_a_SOURCES) $(nodist_libmf_a_SOURCES) \
 	$(nodist_tie_SOURCES) $(ttf2afm_SOURCES) \
 	$(EXTRA_ttf2afm_SOURCES) $(nodist_vftovp_SOURCES) \
 	$(nodist_vptovf_SOURCES) $(nodist_weave_SOURCES)
-DIST_SOURCES = $(libmd5_a_SOURCES) $(libpdftex_a_SOURCES) \
+DIST_SOURCES = $(libmd5_a_SOURCES) $(am__libpdftex_a_SOURCES_DIST) \
 	$(EXTRA_libpdftex_a_SOURCES) $(gftodvi_SOURCES) \
 	$(md5main_SOURCES) $(pdftosrc_SOURCES) $(ttf2afm_SOURCES) \
 	$(EXTRA_ttf2afm_SOURCES)
@@ -533,6 +551,7 @@ EXTRA_DIST = PROJECTS cftests config.h cpascal.h help.h tangle.web \
 	$(pdftex_ch_srcs) pdftexdir/pdftex.defines pdftexdir/pdftex.h \
 	pdftexdir/pdftexextra.in pdftexdir/ChangeLog pdftexdir/NEWS \
 	pdftexdir/README pdftexdir/change-files.txt \
+	pdftexdir/regex/COPYING.LIB pdftexdir/regex/README \
 	pdftexdir/pdftex.mak pdftexdir/Makefile.in.orig \
 	pdftexdir/pdftex.mk pdftexdir/pdftexlib.mk fmtutil.in \
 	Makefile.in.orig configure.in.orig
@@ -661,38 +680,21 @@ pdftosrc_SOURCES = pdftexdir/pdftosrc.cc
 pdftosrc_LDADD = $(pdftex_ldadd) $(LDADD)
 pdftosrc_DEPENDENCIES = $(pdftex_dependencies) libpdftex.a
 libpdftex_a_CPPFLAGS = $(pdftex_cppflags)
-libpdftex_a_SOURCES = \
-	pdftexdir/avl.c \
-	pdftexdir/avl.h \
-	pdftexdir/avlstuff.c \
-	pdftexdir/avlstuff.h \
-	pdftexdir/epdf.c \
-	pdftexdir/epdf.h \
-	pdftexdir/image.h \
-	pdftexdir/mapfile.c \
-	pdftexdir/pdftex.h \
-	pdftexdir/pdftoepdf.cc \
-	pdftexdir/pkin.c \
-	pdftexdir/ptexlib.h \
-	pdftexdir/ptexmac.h \
-	pdftexdir/subfont.c \
-	pdftexdir/tounicode.c \
-	pdftexdir/utils.c \
-	pdftexdir/vfpacket.c \
-	pdftexdir/writeenc.c \
-	pdftexdir/writefont.c \
-	pdftexdir/writeimg.c \
-	pdftexdir/writejbig2.c \
-	pdftexdir/writejbig2.h \
-	pdftexdir/writejpg.c \
-	pdftexdir/writepng.c \
-	pdftexdir/writet1.c \
-	pdftexdir/writet3.c \
-	pdftexdir/writettf.c \
-	pdftexdir/writettf.h \
-	pdftexdir/writezip.c
-
-EXTRA_libpdftex_a_SOURCES = pdftexdir/macnames.c
+libpdftex_a_SOURCES = pdftexdir/avl.c pdftexdir/avl.h \
+	pdftexdir/avlstuff.c pdftexdir/avlstuff.h pdftexdir/epdf.c \
+	pdftexdir/epdf.h pdftexdir/image.h pdftexdir/mapfile.c \
+	pdftexdir/pdftex.h pdftexdir/pdftoepdf.cc pdftexdir/pkin.c \
+	pdftexdir/ptexlib.h pdftexdir/ptexmac.h pdftexdir/subfont.c \
+	pdftexdir/tounicode.c pdftexdir/utils.c pdftexdir/vfpacket.c \
+	pdftexdir/writeenc.c pdftexdir/writefont.c \
+	pdftexdir/writeimg.c pdftexdir/writejbig2.c \
+	pdftexdir/writejbig2.h pdftexdir/writejpg.c \
+	pdftexdir/writepng.c pdftexdir/writet1.c pdftexdir/writet3.c \
+	pdftexdir/writettf.c pdftexdir/writettf.h pdftexdir/writezip.c \
+	$(am__append_8)
+EXTRA_libpdftex_a_SOURCES = pdftexdir/macnames.c \
+	pdftexdir/regex/regcomp.c pdftexdir/regex/regex_internal.c \
+	pdftexdir/regex/regex_internal.h pdftexdir/regex/regexec.c
 libmd5_a_CPPFLAGS = -I$(srcdir)/libmd5
 libmd5_a_SOURCES = libmd5/md5.c libmd5/md5.h
 md5main_CPPFLAGS = -I$(srcdir)/libmd5
@@ -962,6 +964,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpdftex_a-mapfile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpdftex_a-pdftoepdf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpdftex_a-pkin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpdftex_a-regcomp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpdftex_a-regex.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpdftex_a-regex_internal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpdftex_a-regexec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpdftex_a-subfont.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpdftex_a-tounicode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpdftex_a-utils.Po@am__quote@
@@ -1368,6 +1374,20 @@ libpdftex_a-writezip.obj: pdftexdir/writezip.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpdftex_a-writezip.obj `if test -f 'pdftexdir/writezip.c'; then $(CYGPATH_W) 'pdftexdir/writezip.c'; else $(CYGPATH_W) '$(srcdir)/pdftexdir/writezip.c'; fi`
 
+libpdftex_a-regex.o: pdftexdir/regex/regex.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpdftex_a-regex.o -MD -MP -MF $(DEPDIR)/libpdftex_a-regex.Tpo -c -o libpdftex_a-regex.o `test -f 'pdftexdir/regex/regex.c' || echo '$(srcdir)/'`pdftexdir/regex/regex.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpdftex_a-regex.Tpo $(DEPDIR)/libpdftex_a-regex.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pdftexdir/regex/regex.c' object='libpdftex_a-regex.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpdftex_a-regex.o `test -f 'pdftexdir/regex/regex.c' || echo '$(srcdir)/'`pdftexdir/regex/regex.c
+
+libpdftex_a-regex.obj: pdftexdir/regex/regex.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpdftex_a-regex.obj -MD -MP -MF $(DEPDIR)/libpdftex_a-regex.Tpo -c -o libpdftex_a-regex.obj `if test -f 'pdftexdir/regex/regex.c'; then $(CYGPATH_W) 'pdftexdir/regex/regex.c'; else $(CYGPATH_W) '$(srcdir)/pdftexdir/regex/regex.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpdftex_a-regex.Tpo $(DEPDIR)/libpdftex_a-regex.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pdftexdir/regex/regex.c' object='libpdftex_a-regex.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpdftex_a-regex.obj `if test -f 'pdftexdir/regex/regex.c'; then $(CYGPATH_W) 'pdftexdir/regex/regex.c'; else $(CYGPATH_W) '$(srcdir)/pdftexdir/regex/regex.c'; fi`
+
 libpdftex_a-macnames.o: pdftexdir/macnames.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpdftex_a-macnames.o -MD -MP -MF $(DEPDIR)/libpdftex_a-macnames.Tpo -c -o libpdftex_a-macnames.o `test -f 'pdftexdir/macnames.c' || echo '$(srcdir)/'`pdftexdir/macnames.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpdftex_a-macnames.Tpo $(DEPDIR)/libpdftex_a-macnames.Po
@@ -1381,6 +1401,48 @@ libpdftex_a-macnames.obj: pdftexdir/macnames.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pdftexdir/macnames.c' object='libpdftex_a-macnames.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpdftex_a-macnames.obj `if test -f 'pdftexdir/macnames.c'; then $(CYGPATH_W) 'pdftexdir/macnames.c'; else $(CYGPATH_W) '$(srcdir)/pdftexdir/macnames.c'; fi`
+
+libpdftex_a-regcomp.o: pdftexdir/regex/regcomp.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpdftex_a-regcomp.o -MD -MP -MF $(DEPDIR)/libpdftex_a-regcomp.Tpo -c -o libpdftex_a-regcomp.o `test -f 'pdftexdir/regex/regcomp.c' || echo '$(srcdir)/'`pdftexdir/regex/regcomp.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpdftex_a-regcomp.Tpo $(DEPDIR)/libpdftex_a-regcomp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pdftexdir/regex/regcomp.c' object='libpdftex_a-regcomp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpdftex_a-regcomp.o `test -f 'pdftexdir/regex/regcomp.c' || echo '$(srcdir)/'`pdftexdir/regex/regcomp.c
+
+libpdftex_a-regcomp.obj: pdftexdir/regex/regcomp.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpdftex_a-regcomp.obj -MD -MP -MF $(DEPDIR)/libpdftex_a-regcomp.Tpo -c -o libpdftex_a-regcomp.obj `if test -f 'pdftexdir/regex/regcomp.c'; then $(CYGPATH_W) 'pdftexdir/regex/regcomp.c'; else $(CYGPATH_W) '$(srcdir)/pdftexdir/regex/regcomp.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpdftex_a-regcomp.Tpo $(DEPDIR)/libpdftex_a-regcomp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pdftexdir/regex/regcomp.c' object='libpdftex_a-regcomp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpdftex_a-regcomp.obj `if test -f 'pdftexdir/regex/regcomp.c'; then $(CYGPATH_W) 'pdftexdir/regex/regcomp.c'; else $(CYGPATH_W) '$(srcdir)/pdftexdir/regex/regcomp.c'; fi`
+
+libpdftex_a-regex_internal.o: pdftexdir/regex/regex_internal.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpdftex_a-regex_internal.o -MD -MP -MF $(DEPDIR)/libpdftex_a-regex_internal.Tpo -c -o libpdftex_a-regex_internal.o `test -f 'pdftexdir/regex/regex_internal.c' || echo '$(srcdir)/'`pdftexdir/regex/regex_internal.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpdftex_a-regex_internal.Tpo $(DEPDIR)/libpdftex_a-regex_internal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pdftexdir/regex/regex_internal.c' object='libpdftex_a-regex_internal.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpdftex_a-regex_internal.o `test -f 'pdftexdir/regex/regex_internal.c' || echo '$(srcdir)/'`pdftexdir/regex/regex_internal.c
+
+libpdftex_a-regex_internal.obj: pdftexdir/regex/regex_internal.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpdftex_a-regex_internal.obj -MD -MP -MF $(DEPDIR)/libpdftex_a-regex_internal.Tpo -c -o libpdftex_a-regex_internal.obj `if test -f 'pdftexdir/regex/regex_internal.c'; then $(CYGPATH_W) 'pdftexdir/regex/regex_internal.c'; else $(CYGPATH_W) '$(srcdir)/pdftexdir/regex/regex_internal.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpdftex_a-regex_internal.Tpo $(DEPDIR)/libpdftex_a-regex_internal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pdftexdir/regex/regex_internal.c' object='libpdftex_a-regex_internal.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpdftex_a-regex_internal.obj `if test -f 'pdftexdir/regex/regex_internal.c'; then $(CYGPATH_W) 'pdftexdir/regex/regex_internal.c'; else $(CYGPATH_W) '$(srcdir)/pdftexdir/regex/regex_internal.c'; fi`
+
+libpdftex_a-regexec.o: pdftexdir/regex/regexec.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpdftex_a-regexec.o -MD -MP -MF $(DEPDIR)/libpdftex_a-regexec.Tpo -c -o libpdftex_a-regexec.o `test -f 'pdftexdir/regex/regexec.c' || echo '$(srcdir)/'`pdftexdir/regex/regexec.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpdftex_a-regexec.Tpo $(DEPDIR)/libpdftex_a-regexec.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pdftexdir/regex/regexec.c' object='libpdftex_a-regexec.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpdftex_a-regexec.o `test -f 'pdftexdir/regex/regexec.c' || echo '$(srcdir)/'`pdftexdir/regex/regexec.c
+
+libpdftex_a-regexec.obj: pdftexdir/regex/regexec.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpdftex_a-regexec.obj -MD -MP -MF $(DEPDIR)/libpdftex_a-regexec.Tpo -c -o libpdftex_a-regexec.obj `if test -f 'pdftexdir/regex/regexec.c'; then $(CYGPATH_W) 'pdftexdir/regex/regexec.c'; else $(CYGPATH_W) '$(srcdir)/pdftexdir/regex/regexec.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpdftex_a-regexec.Tpo $(DEPDIR)/libpdftex_a-regexec.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pdftexdir/regex/regexec.c' object='libpdftex_a-regexec.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpdftex_a-regexec.obj `if test -f 'pdftexdir/regex/regexec.c'; then $(CYGPATH_W) 'pdftexdir/regex/regexec.c'; else $(CYGPATH_W) '$(srcdir)/pdftexdir/regex/regexec.c'; fi`
 
 etex-etexini.o: etexini.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(etex_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT etex-etexini.o -MD -MP -MF $(DEPDIR)/etex-etexini.Tpo -c -o etex-etexini.o `test -f 'etexini.c' || echo '$(srcdir)/'`etexini.c
