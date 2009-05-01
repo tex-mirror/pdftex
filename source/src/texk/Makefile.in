@@ -44,11 +44,21 @@ DIST_COMMON = README $(am__configure_deps) \
 	../build-aux/ltmain.sh ../build-aux/missing \
 	../build-aux/texinfo.tex ../build-aux/ylwrap ChangeLog
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/../m4/kpse-cxx-hack.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/../m4/kpse-common.m4 \
+	$(top_srcdir)/../m4/kpse-cxx-hack.m4 \
+	$(top_srcdir)/../m4/kpse-freetype-flags.m4 \
+	$(top_srcdir)/../m4/kpse-freetype2-flags.m4 \
+	$(top_srcdir)/../m4/kpse-gd-flags.m4 \
+	$(top_srcdir)/../m4/kpse-graphite-flags.m4 \
+	$(top_srcdir)/../m4/kpse-kpathsea-flags.m4 \
+	$(top_srcdir)/../m4/kpse-libpng-flags.m4 \
 	$(top_srcdir)/../m4/kpse-options.m4 \
 	$(top_srcdir)/../m4/kpse-pkgs.m4 \
 	$(top_srcdir)/../m4/kpse-setup.m4 \
+	$(top_srcdir)/../m4/kpse-t1lib-flags.m4 \
+	$(top_srcdir)/../m4/kpse-teckit-flags.m4 \
 	$(top_srcdir)/../m4/kpse-web2c.m4 \
+	$(top_srcdir)/../m4/kpse-zlib-flags.m4 \
 	$(top_srcdir)/../ac/withenable.ac \
 	$(top_srcdir)/../utils/ac/withenable.ac \
 	$(top_srcdir)/../utils/dialog/ac/withenable.ac \
@@ -61,7 +71,6 @@ am__aclocal_m4_deps = $(top_srcdir)/../m4/kpse-cxx-hack.m4 \
 	$(top_srcdir)/../texk/ac/withenable.ac \
 	$(top_srcdir)/../texk/web2c/ac/withenable.ac \
 	$(top_srcdir)/../texk/web2c/ac/web2c.ac \
-	$(top_srcdir)/../texk/one/ac/withenable.ac \
 	$(top_srcdir)/../texk/afm2pl/ac/withenable.ac \
 	$(top_srcdir)/../texk/bibtex8/ac/withenable.ac \
 	$(top_srcdir)/../texk/cjkutils/ac/withenable.ac \
@@ -90,10 +99,14 @@ am__aclocal_m4_deps = $(top_srcdir)/../m4/kpse-cxx-hack.m4 \
 	$(top_srcdir)/../texk/ttfdump/ac/withenable.ac \
 	$(top_srcdir)/../texk/xdv2pdf/ac/withenable.ac \
 	$(top_srcdir)/../texk/xdvik/ac/withenable.ac \
+	$(top_srcdir)/../texk/xdvik/ac/xdvik.ac \
 	$(top_srcdir)/../texk/xdvipdfmx/ac/withenable.ac \
+	$(top_srcdir)/../texk/tetex/ac/withenable.ac \
+	$(top_srcdir)/../texk/texlive/ac/withenable.ac \
 	$(top_srcdir)/../texk/kpathsea/ac/withenable.ac \
 	$(top_srcdir)/../texk/kpathsea/ac/web2c.ac \
 	$(top_srcdir)/../libs/ac/withenable.ac \
+	$(top_srcdir)/../libs/icu/ac/withenable.ac \
 	$(top_srcdir)/../libs/teckit/ac/withenable.ac \
 	$(top_srcdir)/../libs/graphite/ac/withenable.ac \
 	$(top_srcdir)/../libs/xpdf/ac/withenable.ac \
@@ -222,7 +235,6 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I ../m4
 SUBDIRS = dummy . $(SUBTEXK)
 DIST_SUBDIRS = dummy $(DIST_SUBTEXK)
-EXTRA_DIST = README.orig
 SUBTEXK_AUX = subtexkdir-configure subtexkdir-conf.args
 noinst_DATA = $(SUBTEXK_AUX)
 DISTCLEANFILES = $(noinst_DATA)

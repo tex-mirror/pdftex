@@ -37,7 +37,7 @@ FOFI_SRC = $(top_srcdir)/$(XPDF_TREE)/fofi
 XPDF_SRC = $(top_srcdir)/$(XPDF_TREE)/xpdf
 
 INCLUDES = -Igoo -Ifofi -Ixpdf -I$(GOO_SRC) -I$(FOFI_SRC) -I$(XPDF_SRC)
-AM_CPPFLAGS = $(XPDF_SELF_FLAGS)
+AM_CPPFLAGS = -DPDF_PARSER_ONLY
 
 noinst_LIBRARIES = libxpdf.a
 
@@ -98,24 +98,27 @@ xpdf_libxpdf_a_sources = \
 	$(XPDF_SRC)/UnicodeMap.cc \
 	$(XPDF_SRC)/XRef.cc
 
-## ######
 ## Patch for xpdf-3.02pl2
-
+##
 EXTRA_DIST += xpdf-3.02-pl2.patch
 
-## Patch required to build with -DPDF_PARSER_ONLY
+## Patch for xpdf-3.02pl3
+##
+EXTRA_DIST += xpdf-3.02-pl3.patch
 
+## Patch required to build with -DPDF_PARSER_ONLY
+##
 EXTRA_DIST += xpdf-3.02-PDF_PARSER_ONLY.patch
 
 ## Patch required for pdftex
-
+##
 EXTRA_DIST += xpdf-3.02-pdftex.patch
 
 ## Patch required for some systems
-
+##
 EXTRA_DIST += xpdf-3.02-time_h.patch
 
-## Patch required for some mingw32
-
+## Patch required for mingw32
+##
 EXTRA_DIST += xpdf-3.02-mingw32.patch
 

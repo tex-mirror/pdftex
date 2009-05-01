@@ -1,4 +1,4 @@
-# Public macros for the teTeX / TeX Live (TL) tree.
+# Public macros for the TeX Live (TL) tree.
 # Copyright (C) 1998 - 2008 Jin-Hwan Cho <chofchof@ktug.or.kr>
 # Copyright (C) 2008 - 2009 Peter Breitenlohner <tex-live@tug.org>
 #
@@ -15,7 +15,8 @@
 # of these truetype was introduced last (Dec 1997).
 AC_DEFUN([CHO_CHECK_KPSE_SUPPORT],
 [KPSE_CHECK_KPSE_FORMAT([truetype], ,
-                        [AC_MSG_ERROR([Required file formats not found in Kpathsea header files.
+                        [KPSE_MSG_ERROR([$1],
+                                        [Required file formats not found in Kpathsea header files.
 
 This version of $1 requires that kpathsea and its headers be available.
 If you are sure they are installed and in a standard place, maybe you need a
@@ -25,7 +26,8 @@ the file "kpathsea/kpathsea.h"
 
 ])])
 KPSE_CHECK_XBASENAME([],
-                     [AC_MSG_ERROR([This version of $1 requires xbasename in libkpathsea.])])
+                     [KPSE_MSG_ERROR([$1],
+                                     [This version of $1 requires xbasename in libkpathsea.])])
 ]) # CHO_CHECK_KPSE_SUPPORT
 
 # CHO_CHECK_KPSE_TDS_VERSION

@@ -1,4 +1,4 @@
-# Public macros for the teTeX / TeX Live (TL) tree.
+# Public macros for the TeX Live (TL) tree.
 # Copyright (C) 2002 Olaf Weber <olaf@infovore.xs4all.nl>
 # Copyright (C) 2009 Peter Breitenlohner <tex-live@tug.org>
 #
@@ -29,11 +29,10 @@ AC_DEFUN([KPSE_ENABLE_CXX_HACK],
 AC_DEFUN([KPSE_CXX_HACK],
 [AC_REQUIRE([AC_PROG_CXX])[]dnl
 AC_REQUIRE([KPSE_ENABLE_CXX_HACK])[]dnl
-cpp_link_hack=false
 if test "x$GXX:$enable_cxx_runtime_hack" = xyes:yes; then
   _KPSE_CXX_HACK
 fi
-if test "x$kpse_cv_cxx_flags" = xok; then
+if test "x$kpse_cv_cxx_hack" = xok; then
   CXXLD='$(top_builddir)/CXXLD.sh'
   CXX_HACK_DEPS=$CXXLD
   CXX_HACK_LIBS=$kpse_cv_cxx_flags
@@ -42,7 +41,7 @@ if test "x$kpse_cv_cxx_flags" = xok; then
 set -- $CXX \"\$[]@\" $CXX_HACK_LIBS
 echo \"\$[]0:\" \"\$[]@\"
 exec \"\$[]@\""
-  AC_CONFIG_FILES([CXXLD.sh:Makefile.in],
+  AC_CONFIG_FILES([CXXLD.sh:README],
                   [echo "$cxxld_sh" >CXXLD.sh; chmod +x CXXLD.sh],
                   [cxxld_sh='$cxxld_sh'])
 else

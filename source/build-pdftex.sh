@@ -76,7 +76,8 @@ OTHER_OPTS="\
     --without-system-teckit \
     --without-system-zlib \
     --without-system-t1lib \
-    --disable-shared    \
+    --without-graphite \
+    --disable-shared \
     --disable-largefile \
 "
 

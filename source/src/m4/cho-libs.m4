@@ -1,4 +1,4 @@
-# Public macros for the teTeX / TeX Live (TL) tree.
+# Public macros for the TeX Live (TL) tree.
 # Copyright (C) 1998 - 2008 Jin-Hwan Cho <chofchof@ktug.or.kr>
 # Copyright (C) 2008 - 2009 Peter Breitenlohner <tex-live@tug.org>
 #
@@ -107,7 +107,8 @@ AS_IF([test "x$cho_cv_have_freetype" = xyes],
       [AC_CHECK_FUNCS([FT_Init_FreeType],
                       [AC_DEFINE([HAVE_LIBFREETYPE], 1,
                                  [Define if you have libfreetype and its headers.])])],
-      [AC_MSG_ERROR([This version of $1 requires that FreeType2 and its headers be available.
+      [KPSE_MSG_ERROR([$1],
+                      [This version of $1 requires that FreeType2 and its headers be available.
 You can use the --with-freetype2-includes and/or --with-freetype2-libdir options
 to indicate the location of the installed freetype2 library and headers.])])
 ])# CHO_CHECK_LIBFREETYPE

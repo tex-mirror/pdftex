@@ -6,16 +6,16 @@ dnl   This file is free software; the copyright holder
 dnl   gives unlimited permission to copy and/or distribute it,
 dnl   with or without modifications, as long as this notice is preserved.
 dnl
-AC_INIT([TeX Live], [2009test-1.6], [tex-k@tug.org])
+AC_INIT([TeX Live], [2009-04-20], [tex-k@tug.org])
 AC_PREREQ([2.63])
 AC_CONFIG_SRCDIR([m4/kpse-pkgs.m4])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
-dnl ## --------------------------------------------------- ##
-dnl ## Setup of the teTeX / TeX Live (TL) infrastructure   ##
-dnl ##    done in ./, libs/, utils/, and texk/             ##
-dnl ## --------------------------------------------------- ##
+dnl ## ------------------------------------------- ##
+dnl ## Setup of the TeX Live (TL) infrastructure   ##
+dnl ##    done in ./, libs/, utils/, and texk/     ##
+dnl ## ------------------------------------------- ##
 dnl
 dnl 1. Define three lists of TeXk programs, utility programs, and
 dnl    TL libraries.  Hopefully these list occur nowhere else.
@@ -94,6 +94,9 @@ if test "x$syslib_status" = xno; then
   AC_MSG_ERROR([some requested system libraries failed])
 fi
 
+AS_IF([test "x$cross_compiling:$enable_xetex" = xyes:yes],
+      [AC_MSG_ERROR([Sorry, can not cross compile icu libraries required for XeTeX])])
+
 AM_CONDITIONAL([build_kpathsea],
                [test "x$need_kpathsea" = xyes && test "x$with_system_kpathsea" != xyes])
 
@@ -112,8 +115,10 @@ AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE_STRING:
 
    $msg_compiling for $host
-   prefix:               $prefix
-   enable_multiplatform: $enable_multiplatform
+   prefix:                    $prefix
+   enable_shared:             $enable_shared
+   enable_multiplatform:      $enable_multiplatform
+   enable_cxx_runtime_hack:   $enable_cxx_runtime_hack
 
 ** Next run `make' to configure and build each library and program.
 ])
