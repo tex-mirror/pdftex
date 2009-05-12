@@ -13174,7 +13174,26 @@ of \TeX\ between computers.
   if a=0 then #:=sw@+else if a=255 then #:=sw-alpha@+else abort;
   end
 
-@<Read box dimensions@>=
+@p function store_scaled_f(sq, z: scaled): scaled;
+var a, b, c, d, sw: scaled;
+alpha:integer;
+beta:1..16;
+begin
+  alpha:=16;
+  while z>=@'40000000 do
+    begin z:=z div 2; alpha:=alpha+alpha;
+  end;
+  beta:=256 div alpha; alpha:=alpha*z;
+  d:=sq mod 256; sq:=(sq-d) div 256;
+  c:=sq mod 256; sq:=(sq-c) div 256;
+  b:=sq mod 256; sq:=(sq-b) div 256;
+  a:=sq;
+  sw:=(((((d*z)div@'400)+(c*z))div@'400)+(b*z))div beta;
+  if a=0 then store_scaled_f:=sw@+else if a=255 then store_scaled_f:=sw-alpha@+else pdf_error("store_scaled_f", "vf scaling");
+end;
+
+
+@ @<Read box dimensions@>=
 begin @<Replace |z| by $|z|^\prime$ and compute $\alpha,\beta$@>;
 for k:=width_base[f] to lig_kern_base[f]-1 do
   store_scaled(font_info[k].sc);
@@ -17727,7 +17746,7 @@ var k: internal_font_number;
     cs: four_quarters;
 begin
     cs.b0 := vf_byte; cs.b1 := vf_byte; cs.b2 := vf_byte; cs.b3 := vf_byte;
-    fs := sqxfw(vf_read(4), font_size[f]);
+    fs := store_scaled_f(vf_read(4), font_size[f]);
     ds := vf_read(4) div @'20;
     tmp_b0 := vf_byte;
     tmp_b1 := vf_byte;
@@ -17839,14 +17858,14 @@ if cmd = long_char then begin
     cc := vf_read(4);
     if not is_valid_char(cc) then
         bad_vf("invalid character code");
-    tfm_width := sqxfw(vf_read(4), font_size[f]);
+    tfm_width := store_scaled_f(vf_read(4), font_size[f]);
 end
 else begin
     packet_length := cmd;
     cc := vf_byte;
     if not is_valid_char(cc) then
         bad_vf("invalid character code");
-    tfm_width := sqxfw(vf_read(3), font_size[f]);
+    tfm_width := store_scaled_f(vf_read(3), font_size[f]);
 end;
 if packet_length < 0 then
     bad_vf("negative packet length");
@@ -18050,7 +18069,7 @@ begin
     3:  if fw > @"800000 then
             fw := fw - @"1000000;
     endcases;
-    packet_scaled := sqxfw(fw, fs);
+    packet_scaled := store_scaled_f(fw, fs);
 end;
 
 procedure do_vf_packet(vf_f: internal_font_number; c: eight_bits); {typeset the

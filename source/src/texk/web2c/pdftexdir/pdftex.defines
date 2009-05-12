@@ -103,7 +103,6 @@ $Id$
 @define function packetbyte;
 @define procedure startpacket();
 @define procedure storepacket();
-@define function sqxfw();
 
 { functions from writefont.c }
 @define procedure dopdffont();
