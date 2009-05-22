@@ -8890,7 +8890,38 @@ if cur_cs<>undefined_primitive then begin
     p:=get_avail; info(p):=cs_token_flag+frozen_primitive;
     link(p):=loc; loc:=p; start:=p;
     end;
+  end
+else begin
+  print_err("Missing primitive name");
+  help2("The control sequence marked <to be read again> does not")@/
+    ("represent any known primitive.");
+  back_error;
   end;
+end
+
+@ This block deals with unexpandable \.{\\primitive} appearing at a spot where
+an integer or an internal values should have been found. It fetches the
+next token then resets |cur_cmd|, |cur_cs|, and |cur_tok|, based on the 
+primitive value of that token. No expansion takes place, because the
+next token may be all sorts of things. This could trigger further
+expansion creating new errors.
+
+@<Reset |cur_tok| for unexpandable primitives, goto restart @>=
+begin 
+get_token;
+cur_cs := prim_lookup(text(cur_cs));
+if cur_cs<>undefined_primitive then begin
+  cur_cmd := prim_eq_type(cur_cs);
+  cur_chr := prim_equiv(cur_cs);
+  cur_tok := (cur_cmd*@'400)+cur_chr;
+  end
+else begin
+  cur_cmd := relax;
+  cur_chr := 0;
+  cur_tok := cs_token_flag+frozen_relax;
+  cur_cs  := frozen_relax;
+  end;
+goto restart;
 end
 
 @ @<Complain about an undefined macro@>=
@@ -9541,13 +9572,13 @@ the internal quantity to be scanned; an error will be signalled if
 
 @p procedure scan_something_internal(@!level:small_number;@!negative:boolean);
   {fetch an internal parameter}
-label exit;
+label exit, restart;
 var m:halfword; {|chr_code| part of the operand token}
     n, k: integer; {accumulators}
 @!q:halfword; {general purpose index}
 @!i:four_quarters; {character info}
 @!p:0..nest_size; {index into |nest|}
-begin m:=cur_chr;
+begin restart: m:=cur_chr;
 case cur_cmd of
 def_code: @<Fetch a character code from some table@>;
 toks_register,assign_toks,def_family,set_font,def_font,letterspace_font,pdf_copy_font: @<Fetch a token list or
@@ -9567,6 +9598,8 @@ assign_font_dimen: @<Fetch a font dimension@>;
 assign_font_int: @<Fetch a font integer@>;
 register: @<Fetch a register@>;
 last_item: @<Fetch an item in the current node, if appropriate@>;
+ignore_spaces: {trap unexpandable primitives}
+  if cur_chr=1 then @<Reset |cur_tok| for unexpandable primitives, goto restart@>;
 othercases @<Complain that \.{\\the} can't do this; give zero result@>
 endcases;@/
 while cur_val_level>level do @<Convert \(c)|cur_val| to a lower level@>;
@@ -10055,7 +10088,7 @@ after the integer part of such a fraction has been scanned by |scan_int|,
 and that the decimal point has been backed up to be scanned again.
 
 @p procedure scan_int; {sets |cur_val| to an integer}
-label done;
+label done, restart;
 var negative:boolean; {should the answer be negated?}
 @!m:integer; {|@t$2^{31}$@> div radix|, the threshold of danger}
 @!d:small_number; {the digit just scanned}
@@ -10063,7 +10096,10 @@ var negative:boolean; {should the answer be negated?}
 @!OK_so_far:boolean; {has an error message been issued?}
 begin radix:=0; OK_so_far:=true;@/
 @<Get the next non-blank non-sign token; set |negative| appropriately@>;
+restart:
 if cur_tok=alpha_token then @<Scan an alphabetic character code into |cur_val|@>
+else if cur_tok=cs_token_flag+frozen_primitive then
+  @<Reset |cur_tok| for unexpandable primitives, goto restart@>
 else if (cur_cmd>=min_internal)and(cur_cmd<=max_internal) then
   scan_something_internal(int_val,false)
 else @<Scan a numeric constant@>;
