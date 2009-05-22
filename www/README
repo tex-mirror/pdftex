@@ -72,7 +72,7 @@ Peter Breitenlohner, Ricardo Sanchez Carmenes, Otfried Cheong, Thomas
 Esser, Hans Hagen, Hartmut Henkel, Taco Hoekwater, Pawel Jackowski, Pavel
 Janik, Tom Kacvinsky, Akira Kakuto, Reinhard Kotucha, Derek B. Noonburg,
 Heiko Oberdiek, Jiri Osoba, Fabrice Popineau, Sebastian Rahtz, Bernd
-Raichle, Tomas Rokicki, Leonard Rosenthol, Martin Schröder, Petr Sojka,
+Raichle, Tomas Rokicki, Leonard Rosenthol, Martin Schr?der, Petr Sojka,
 Ralf Utermann, Olaf Weber, Jiri Zlatuska.
 
 Some companies have supported the developement of pdfTeX: Adobe Systems
@@ -87,5 +87,4 @@ paragraph optimization is inspired by the work of Hermann Zapf.
 
 Please send bug reports, offers of help, etc. to  h a n t h e t h a n h @ g m a i l . c o m
 
-$Id$
 // vim: tw=75
