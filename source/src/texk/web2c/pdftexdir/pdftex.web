@@ -13211,7 +13211,7 @@ of \TeX\ between computers.
   end
 
 @p function store_scaled_f(sq, z: scaled): scaled;
-var a, b, c, d, sw: scaled;
+var a,b,c,d:eight_bits; sw:scaled;
 alpha:integer;
 beta:1..16;
 begin
@@ -13220,10 +13220,18 @@ begin
     begin z:=z div 2; alpha:=alpha+alpha;
   end;
   beta:=256 div alpha; alpha:=alpha*z;
-  d:=sq mod 256; sq:=(sq-d) div 256;
-  c:=sq mod 256; sq:=(sq-c) div 256;
-  b:=sq mod 256; sq:=(sq-b) div 256;
-  a:=sq;
+  if sq >= 0 then begin
+    d:=sq mod 256; sq:=sq div 256; {any "mod 256" not really needed, would typecast alone be safe?}
+    c:=sq mod 256; sq:=sq div 256;
+    b:=sq mod 256; sq:=sq div 256;
+    a:=sq mod 256;
+  end else begin
+    sq:=(sq+1073741824)+1073741824; {braces for optimizing compiler}
+    d:=sq mod 256; sq:=sq div 256;
+    c:=sq mod 256; sq:=sq div 256;
+    b:=sq mod 256; sq:=sq div 256;
+    a:=(sq+128) mod 256;
+  end;
   sw:=(((((d*z)div@'400)+(c*z))div@'400)+(b*z))div beta;
   if a=0 then store_scaled_f:=sw@+else if a=255 then store_scaled_f:=sw-alpha@+else pdf_error("store_scaled_f", "vf scaling");
 end;
@@ -17747,19 +17755,36 @@ begin
     vf_byte := i;
 end;
 
-function vf_read(k: integer): integer; {read |k| bytes as an integer from \.{VF} file}
+function vf_read_signed(k: integer): integer;
+{read |k| bytes as an signed integer from \.{VF} file}
 var i: integer;
 begin
     pdfassert((k > 0) and (k <= 4));
     i := vf_byte;
-    if (k = 4) and (i > 127) then
+    if i >= 128 then
         i := i - 256;
     decr(k);
     while k > 0 do begin
         i := i*256 + vf_byte;
         decr(k);
     end;
-    vf_read := i;
+    vf_read_signed := i;
+end;
+
+function vf_read_unsigned(k: integer): integer; 
+{read |k| bytes as an unsigned integer from \.{VF} file}
+var i: integer;
+begin
+    pdfassert((k > 0) and (k <= 4));
+    i := vf_byte;
+    if (k = 4) and (i >= 128) then
+        bad_vf("number too big");
+    decr(k);
+    while k > 0 do begin
+        i := i*256 + vf_byte;
+        decr(k);
+    end;
+    vf_read_unsigned := i;
 end;
 
 procedure vf_local_font_warning(f, k: internal_font_number; s: str_number);
@@ -17782,8 +17807,8 @@ var k: internal_font_number;
     cs: four_quarters;
 begin
     cs.b0 := vf_byte; cs.b1 := vf_byte; cs.b2 := vf_byte; cs.b3 := vf_byte;
-    fs := store_scaled_f(vf_read(4), font_size[f]);
-    ds := vf_read(4) div @'20;
+    fs := store_scaled_f(vf_read_signed(4), font_size[f]);
+    ds := vf_read_signed(4) div @'20;
     tmp_b0 := vf_byte;
     tmp_b1 := vf_byte;
     while tmp_b0 > 0 do begin
@@ -17865,7 +17890,7 @@ if ((tmp_b0 <> 0) or (tmp_b1 <> 0) or (tmp_b2 <> 0) or (tmp_b3 <> 0)) and
     print(font_name[f]);
     print(".vf ignored");
 end;
-if vf_read(4) div @'20 <> font_dsize[f] then begin
+if vf_read_signed(4) div @'20 <> font_dsize[f] then begin
     print_nl("design size mismatch in font ");
     print(font_name[f]);
     print(".vf ignored");
@@ -17877,7 +17902,7 @@ cmd := vf_byte;
 save_vf_nf := vf_nf;
 while (cmd >= fnt_def1) and (cmd <= fnt_def1 + 3) do begin
     allocvffnts;
-    vf_e_fnts[vf_nf] := vf_read(cmd - fnt_def1 + 1);
+    vf_e_fnts[vf_nf] := vf_read_unsigned(cmd - fnt_def1 + 1);
     vf_i_fnts[vf_nf] := vf_def_font(f);
     incr(vf_nf);
     cmd := vf_byte;
@@ -17890,24 +17915,24 @@ vf_local_font_num[f] := vf_nf - save_vf_nf;
 
 @ @<Build a character packet@>=
 if cmd = long_char then begin
-    packet_length := vf_read(4);
-    cc := vf_read(4);
+    packet_length := vf_read_unsigned(4);
+    cc := vf_read_unsigned(4);
     if not is_valid_char(cc) then
         bad_vf("invalid character code");
-    tfm_width := store_scaled_f(vf_read(4), font_size[f]);
+    tfm_width := store_scaled_f(vf_read_signed(4), font_size[f]);
 end
 else begin
     packet_length := cmd;
     cc := vf_byte;
     if not is_valid_char(cc) then
         bad_vf("invalid character code");
-    tfm_width := store_scaled_f(vf_read(3), font_size[f]);
+    tfm_width := store_scaled_f(vf_read_signed(3), font_size[f]);
 end;
 if packet_length < 0 then
     bad_vf("negative packet length");
 if packet_length > vf_max_packet_length then
     bad_vf("packet length too long");
-if abs(tfm_width - char_width(f)(char_info(f)(cc))) > 1 then begin
+if tfm_width <> char_width(f)(char_info(f)(cc)) then begin
     print_nl("character width mismatch in font ");
     print(font_name[f]);
     print(".vf ignored");
@@ -17943,7 +17968,7 @@ if (cmd >= set_char_0) and (cmd <= set_char_0 + 127) then
 else if ((fnt_num_0 <= cmd) and (cmd <= fnt_num_0 + 63)) or
         ((fnt1 <= cmd) and (cmd <= fnt1 + 3)) then begin
     if cmd >= fnt1 then begin
-        k := vf_read(cmd - fnt1 + 1);
+        k := vf_read_unsigned(cmd - fnt1 + 1);
         packet_length := packet_length - (cmd - fnt1 + 1);
     end
     else
@@ -17976,7 +18001,7 @@ four_cases(down1):  cmd_length := cmd - down1 + 1;
 four_cases(y1):     cmd_length := cmd - y1 + 1;
 four_cases(z1):     cmd_length := cmd - z1 + 1;
 four_cases(xxx1):  begin
-    cmd_length := vf_read(cmd - xxx1 + 1);
+    cmd_length := vf_read_unsigned(cmd - xxx1 + 1);
     packet_length := packet_length - (cmd - xxx1 + 1);
     if cmd_length > vf_max_packet_length then
         bad_vf("packet length too long");
@@ -18076,36 +18101,42 @@ vf_stack_ptr := 0;
 
 @ Some functions for processing character packets.
 
-@p function packet_read(k: integer): integer; {read |k| bytes as an integer from
-character packet}
+@p function packet_read_signed(k: integer): integer; 
+{read |k| bytes as a signed integer from character packet}
 var i: integer;
 begin
     pdfassert((k > 0) and (k <= 4));
     i := packet_byte;
-    if (k = 4) and (i > 127) then
+    if i >= 128 then
         i := i - 256;
     decr(k);
     while k > 0 do begin
         i := i*256 + packet_byte;
         decr(k);
     end;
-    packet_read := i;
+    packet_read_signed := i;
 end;
 
-function packet_scaled(k: integer; fs: scaled): scaled; {get |k| bytes from packet as a
-scaled}
-var fw: integer;
+function packet_read_unsigned(k: integer): integer;
+{read |k| bytes as an unsigned integer from character packet}
+var i: integer;
 begin
-    fw := packet_read(k);
-    case k of
-    1:  if fw > 127 then
-            fw := fw - 256;
-    2:  if fw > @"8000 then
-            fw := fw - @"10000;
-    3:  if fw > @"800000 then
-            fw := fw - @"1000000;
-    endcases;
-    packet_scaled := store_scaled_f(fw, fs);
+    pdfassert((k > 0) and (k <= 4));
+    i := packet_byte;
+    if (k = 4) and (i >= 128) then
+        bad_vf("number too big");
+    decr(k);
+    while k > 0 do begin
+        i := i*256 + packet_byte;
+        decr(k);
+    end;
+    packet_read_unsigned := i;
+end;
+
+function packet_scaled(k: integer; fs: scaled): scaled; 
+{get |k| bytes from packet as scaled}
+begin
+    packet_scaled := store_scaled_f(packet_read_signed(k), fs);
 end;
 
 procedure do_vf_packet(vf_f: internal_font_number; c: eight_bits); {typeset the
@@ -18197,11 +18228,11 @@ pop: begin
 end;
 four_cases(set1), four_cases(put1): begin
     if (set1 <= cmd) and (cmd <= set1 + 3) then begin
-        tmp_int := packet_read(cmd - set1 + 1);
+        tmp_int := packet_read_unsigned(cmd - set1 + 1);
         char_move := true;
     end
     else begin
-        tmp_int := packet_read(cmd - put1 + 1);
+        tmp_int := packet_read_unsigned(cmd - put1 + 1);
         char_move := false;
     end;
     if not is_valid_char(tmp_int) then begin
@@ -18245,7 +18276,7 @@ z0, four_cases(z1): begin
     cur_v := cur_v + z;
 end;
 four_cases(xxx1):  begin
-    tmp_int := packet_read(cmd - xxx1 + 1);
+    tmp_int := packet_read_unsigned(cmd - xxx1 + 1);
     str_room(tmp_int);
     while tmp_int > 0 do begin
         decr(tmp_int);
