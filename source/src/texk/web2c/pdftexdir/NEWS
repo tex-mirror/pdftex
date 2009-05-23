@@ -8,6 +8,8 @@
   - bugfix #606: "Forbidden ... while scanning ???"
   - bugfix #3253: Bug in Type1 font subsetting
   - bugfix #2090: enabling LFS breaks PDF inclusion on some systems (warning: not heavily-tested yet)
+  - bugfix #4288: character width mismatch in font XY.vf ignored
+  - bugfix #4289: \primitive\pdfoutput cannot be queried
   - various minor fixes
 
 --------------------------------------------------
