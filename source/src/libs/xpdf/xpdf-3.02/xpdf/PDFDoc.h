@@ -171,15 +171,13 @@ private:
   double pdfVersion;
   XRef *xref;
   Catalog *catalog;
-  GBool ok;
-  int errCode;
-/* Keep the size of the structure the same whether DISABLE_OUTLINE or
-   not, and put it last to try to find errors more quickly.  */
 #ifndef DISABLE_OUTLINE
   Outline *outline;
-#else
-  void *dummy;
 #endif
+
+
+  GBool ok;
+  int errCode;
 };
 
 #endif

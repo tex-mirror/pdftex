@@ -23,11 +23,22 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+
+#ifdef POPPLER_VERSION
+#define GString GooString
+#define xpdfVersion POPPLER_VERSION
+#include <dirent.h>
+#include <goo/GooString.h>
+#include <goo/gmem.h>
+#include <goo/gfile.h>
+#else
 #include <aconf.h>
 #include <assert.h>
 #include <GString.h>
 #include <gmem.h>
 #include <gfile.h>
+#endif
+
 #include "Object.h"
 #include "Stream.h"
 #include "Array.h"
@@ -138,6 +149,9 @@ int main(int argc, char *argv[])
                         (long unsigned) e->offset, e->gen,
                         (e->type == xrefEntryFree ? "f" : "n"));
             else {              // e->offset is the object number of the object stream
+#ifdef POPPLER_VERSION
+                fprintf(stderr, "warning: this version of pdftosrc doesn't support object stream (use pdftosrc from TeX Live if you need it)\n");
+#else
                 // e->gen is the local index inside that object stream
                 //int objStrOffset = xref->getEntry(e->offset)->offset;
                 Object tmpObj;
@@ -154,6 +168,7 @@ int main(int argc, char *argv[])
                                          localOffsets[e->gen]));
 //                         (long unsigned) (objStrOffset + objStr->getStart() + localOffsets[e->gen]));
                 tmpObj.free();
+#endif
             }
         }
     } else {

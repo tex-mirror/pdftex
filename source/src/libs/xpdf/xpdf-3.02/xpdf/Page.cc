@@ -420,9 +420,9 @@ void Page::processLinks(OutputDev *out, Catalog *catalog) {
   delete links;
 }
 
-#ifndef PDF_PARSER_ONLY
 void Page::getDefaultCTM(double *ctm, double hDPI, double vDPI,
 			 int rotate, GBool useMediaBox, GBool upsideDown) {
+#ifndef PDF_PARSER_ONLY
   GfxState *state;
   int i;
 
@@ -439,5 +439,5 @@ void Page::getDefaultCTM(double *ctm, double hDPI, double vDPI,
     ctm[i] = state->getCTM()[i];
   }
   delete state;
-}
 #endif
+}

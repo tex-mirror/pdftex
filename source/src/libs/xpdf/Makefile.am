@@ -26,9 +26,18 @@ ACLOCAL_AMFLAGS = -I ../../m4
 ## Thus nodist_* for all files in $(XPDF_TREE).
 EXTRA_DIST = $(XPDF_TREE)
 
-## in case of an SVN repository
+## Official patches as obtained from ftp://ftp.foolabs.com/pub/xpdf
+##
+EXTRA_DIST +=  $(XPDF_TREE)-foolabs
+
+## Actual patches applied to the original source tree
+##
+EXTRA_DIST +=  $(XPDF_TREE)-PATCHES
+
+# in case of an SVN repository
 dist-hook:
 	rm -rf `find $(distdir)/$(XPDF_TREE) -name .svn`
+	rm -f $(distdir)/$(XPDF_TREE)/install-sh
 
 SUBDIRS = goo fofi xpdf
 
@@ -97,28 +106,4 @@ xpdf_libxpdf_a_sources = \
 	$(XPDF_SRC)/Stream.cc \
 	$(XPDF_SRC)/UnicodeMap.cc \
 	$(XPDF_SRC)/XRef.cc
-
-## Patch for xpdf-3.02pl2
-##
-EXTRA_DIST += xpdf-3.02-pl2.patch
-
-## Patch for xpdf-3.02pl3
-##
-EXTRA_DIST += xpdf-3.02-pl3.patch
-
-## Patch required to build with -DPDF_PARSER_ONLY
-##
-EXTRA_DIST += xpdf-3.02-PDF_PARSER_ONLY.patch
-
-## Patch required for pdftex
-##
-EXTRA_DIST += xpdf-3.02-pdftex.patch
-
-## Patch required for some systems
-##
-EXTRA_DIST += xpdf-3.02-time_h.patch
-
-## Patch required for mingw32
-##
-EXTRA_DIST += xpdf-3.02-mingw32.patch
 

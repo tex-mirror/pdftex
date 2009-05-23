@@ -24,14 +24,13 @@ noinst_PROGRAMS =
 dist_man_MANS =
 nodist_man_MANS =
 check_PROGRAMS =
-dist_check_SCRIPTS =
 TESTS =
 EXTRA_LIBRARIES =
 EXTRA_DIST = PROJECTS cftests config.h cpascal.h help.h
 DISTCLEANFILES = $(EXTRA_LIBRARIES)
 CLEANFILES =
 
-## in case of an SVN repository
+# in case of an SVN repository
 dist-hook:
 	rm -rf `find $(distdir) -name .svn`
 
@@ -58,11 +57,11 @@ LDADD = $(proglib) $(KPATHSEA_LIBS)
 ## This does not work for the configure substitution  $(KPATHSEA_LIBS),
 ## thus we let $(proglib) artificially depend on $(KPATHSEA_LIBS).
 
-## Rebuild $(proglib)
+# Rebuild $(proglib)
 $(proglib): $(KPATHSEA_DEPEND) ${srcdir}/lib/*.c
 	cd lib && $(MAKE) $(AM_MAKEFLAGS)
 
-## Rebuild Web2C programs
+# Rebuild Web2C programs
 web2c/stamp-fixwrites: $(web2c_common) ${srcdir}/web2c/*.[chly]
 	cd web2c && $(MAKE) $(AM_MAKEFLAGS) stamp-fixwrites
 web2c/stamp-splitup: $(web2c_common) ${srcdir}/web2c/*.[chly]
@@ -101,6 +100,11 @@ otangle = WEBINPUTS=.:$(srcdir) $(buildenv) $(OTANGLE)
 ctangle = $(buildenv) $(CTANGLE)
 ctangleboot = $(buildenv) $(CTANGLEBOOT)
 tie = WEBINPUTS=.:$(srcdir) $(buildenv) $(TIE)
+
+## For trip, trap, and other tests
+DIFF = diff
+DIFFFLAGS =
+TESTS_ENVIRONMENT = DIFF='$(DIFF)' DIFFFLAGS='$(DIFFFLAGS)' LN_S='$(LN_S)' KPSEWHICH='$(KPSEWHICH)'
 
 ## The environment for making dumps.
 ## No need to specify TEXMF, as ../kpathsea/texmf.cnf should contain

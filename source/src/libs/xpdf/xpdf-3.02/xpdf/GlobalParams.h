@@ -5,42 +5,9 @@
 // Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
-
-/* ------------------------------------------------------------------------
-* Changed by Martin Schröder <martin@pdftex.org>
-* $Id: GlobalParams.h 421 2008-04-26 21:59:55Z oneiros $
-* Changelog:
-* ------------------------------------------------------------------------
-* r151 | ms | 2007-06-25 18:53:17 +0200 (Mo, 25 Jun 2007) | 3 lines
-* 
-* Merging xpdf 3.02 from HEAD into stable
-* svn merge -r149:150 --dry-run svn+ssh://svn/srv/svn/repos/pdftex/trunk/source/src/libs/xpdf .
-* 
-* ------------------------------------------------------------------------
-* r38 | ms | 2005-08-21 14:00:00 +0200 (So, 21 Aug 2005) | 2 lines
-* 
-* 1.30.1
-* 
-* ------------------------------------------------------------------------
-* r11 | ms | 2004-09-06 14:01:00 +0200 (Mo, 06 Sep 2004) | 2 lines
-* 
-* 1.20a
-* 
-* ------------------------------------------------------------------------
-* r6 | ms | 2003-10-06 14:01:00 +0200 (Mo, 06 Okt 2003) | 2 lines
-* 
-* released v1.11b
-* 
-* ------------------------------------------------------------------------
-* r4 | ms | 2003-10-05 14:00:00 +0200 (So, 05 Okt 2003) | 2 lines
-* 
-* Moved sources to src
-* 
-* ------------------------------------------------------------------------
-* r1 | ms | 2003-08-02 14:00:00 +0200 (Sa, 02 Aug 2003) | 1 line
-* 
-* 1.11a
-* ------------------------------------------------------------------------ */
+//  Modified for TeX Live by Peter Breitenlohner <tex-live@tug.org>
+//  See top-level ChangeLog for a list of all modifications
+//========================================================================
 
 #ifndef GLOBALPARAMS_H
 #define GLOBALPARAMS_H
@@ -159,7 +126,6 @@ enum ScreenType {
 
 //------------------------------------------------------------------------
 
-#ifndef PDF_PARSER_ONLY
 class KeyBinding {
 public:
 
@@ -223,28 +189,27 @@ public:
 #define xpdfKeyContextMainWin     (2 << 6)
 #define xpdfKeyContextScrLockOn   (1 << 8)
 #define xpdfKeyContextScrLockOff  (2 << 8)
-#endif
 
 //------------------------------------------------------------------------
 
 class GlobalParams {
 public:
 
+#ifdef PDF_PARSER_ONLY
+  // Initialize the global parameters  without reading a config file.
+  GlobalParams();
+#else
   // Initialize the global parameters by attempting to read a config
   // file.
   GlobalParams(char *cfgFileName);
-
-  // Initialize it without reading the config
-  GlobalParams();
+#endif
 
   ~GlobalParams();
 
   void setBaseDir(char *dir);
   void setupBaseFonts(char *dir);
 
-#ifndef PDF_PARSER_ONLY
   void parseLine(char *buf, GString *fileName, int line);
-#endif
 
   //----- accessors
 
@@ -299,9 +264,7 @@ public:
   GString *getMovieCommand() { return movieCommand; }
   GBool getMapNumericCharNames();
   GBool getMapUnknownCharNames();
-#ifndef PDF_PARSER_ONLY
   GList *getKeyBinding(int code, int mods, int context);
-#endif
   GBool getPrintCommands();
   GBool getErrQuiet();
 
@@ -360,9 +323,7 @@ public:
 
 private:
 
-#ifndef PDF_PARSER_ONLY
   void createDefaultKeyBindings();
-#endif
   void parseFile(GString *fileName, FILE *f);
   void parseNameToUnicode(GList *tokens, GString *fileName, int line);
   void parseCIDToUnicode(GList *tokens, GString *fileName, int line);
@@ -385,14 +346,12 @@ private:
   void parseFontDir(GList *tokens, GString *fileName, int line);
   void parseInitialZoom(GList *tokens, GString *fileName, int line);
   void parseScreenType(GList *tokens, GString *fileName, int line);
-#ifndef PDF_PARSER_ONLY
   void parseBind(GList *tokens, GString *fileName, int line);
   void parseUnbind(GList *tokens, GString *fileName, int line);
   GBool parseKey(GString *modKeyStr, GString *contextStr,
 		 int *code, int *mods, int *context,
 		 char *cmdName,
 		 GList *tokens, GString *fileName, int line);
-#endif
   void parseCommand(char *cmdName, GString **val,
 		    GList *tokens, GString *fileName, int line);
   void parseYesNo(char *cmdName, GBool *flag,
@@ -487,9 +446,7 @@ private:
   GString *movieCommand;	// command executed for movie annotations
   GBool mapNumericCharNames;	// map numeric char names (from font subsets)?
   GBool mapUnknownCharNames;	// map unknown char names?
-#ifndef PDF_PARSER_ONLY
   GList *keyBindings;		// key & mouse button bindings [KeyBinding]
-#endif
   GBool printCommands;		// print the drawing commands
   GBool errQuiet;		// suppress error messages?
 

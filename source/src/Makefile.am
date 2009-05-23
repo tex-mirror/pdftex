@@ -3,19 +3,24 @@
 ## Copyright (C) 2009 Peter Breitenlohner <tex-live@tug.org>
 ## You may freely use, modify and/or distribute this file.
 ##
-ACLOCAL_AMFLAGS = -I m4
+## Use 'aclocal --force' (for "computed m4_sinclude")
+##
+ACLOCAL_AMFLAGS = -I m4 --force
 
 ## speed up distcheck
 DISTCHECK_CONFIGURE_FLAGS = -C
 
 EXTRA_DIST = \
 	Build \
+	README.config \
 	README.cross \
 	README.layout \
 	build-aux/README.TL \
-	m4/README
+	build-aux/mkinstalldirs \
+	m4/README \
+	reautoconf
 
-## just in case a subdirectory has added directories
+# just in case a subdirectory has added directories
 dist-hook:
 	rm -rf `find $(distdir) -name .svn`
 
@@ -26,12 +31,15 @@ SUBDIRS =
 endif !build_kpathsea
 SUBDIRS += libs utils texk
 
-## This is the default target for the Build script in TeX Live.
-world: install-strip
+# This is the default target for the Build script in TeX Live.
+.PHONY: world
+# Run texlinks here since the binaries won't be there 
+# at install-data, and fmtutil.cnf won't be there at install-exec,
+# and there is no install-hook or install-local.
+world: all
+## Serialize 'make all' and 'make install-strip'.
+	$(MAKE) $(AM_MAKEFLAGS) install-strip
 ##
-## run texlinks here since the binaries won't be there 
-## at install-data, and fmtutil.cnf won't be there at install-exec,
-## and there is no hook or -local for install.
 	echo "top-level make $@: running texlinks ..."
 	cd texk/tetex && $(MAKE) $(AM_MAKEFLAGS) run-texlinks
 ##
