@@ -1,3 +1,70 @@
+2009-06-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* config.h: #include <stdarg.h>, not <kpathsea/c-vararg.h>.
+
+	* config.h, cpascal.h, texmfmp.h: drop P?C, P?H, use ANSI C
+	function declarations.
+
+2009-06-15  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: when Metafont is not built, use
+	'--without-mf-x-toolkit' and '--without-x' as default.
+
+2009-06-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* cpascal.h: #include "lib/lib.h" and move declarations for
+	lib/*.c to that new file.
+
+2009-06-04  Karl Berry  <karl@tug.org>
+
+	* tex.ch: do not announce file_line_error or parse_first_line
+	on terminal, log file is good enough.
+	* alephdir/comsrcspec.ch: no need for Alephk.
+	* luatexdir/luatex.ch: no need for LuaTeXk.
+	* pdftexdir/pdftex.ch: no need for pdfTeXk.	
+	* xetexdir/xetex.ch: no need for XeTeXk.
+
+2009-06-03  Karl Berry  <karl@tug.org>
+
+	* configure.ac (with_tex_banner): use echo|grep for check
+	instead of test -z ..., since we don't want to risk nested "quotes".
+
+2009-06-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Update version number to 2009.
+
+	* configure.ac, ac/web2c.ac (--with-tex-banner):
+	allow to specify the string appended to banner lines instead of
+	the current default 'Web2C 2009'.
+	This string must contain the current Web2C version number.
+
+2009-05-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac, ac/web2c.ac (enable_omfonts): allow to choose
+	between Web2C versions of ofm2opl&Co and symlinks to omfonts.
+
+2009-05-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* help.h (DVITOMPHELP): remove help for obsolete Web2C version.
+	* help.h (LUATANGLEHELP): sort in alphabetically.
+	* texmfmp-help.h (MPHELP): remove help for obsolete Web2C version.	
+
+2009-05-27  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac, ac/web2c.ac (enable_ipc): default is enabled.
+
+2009-05-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mp.ch, mp.web, mpdir/, mpware/: removed (old MetaPost).
+	* Makefile.am, configure.ac: removed old MetaPost and mpware.
+	* dvitomp.ch, dvitomp.test, dvitomp.web: removed.
+	* am/web.am: removed dvitomp.
+
+2009-05-23  Karl Berry  <karl@tug.org>
+
+	* tex.ch (pool_size): increase default to 200000, so pdftex -ini
+	can start up without texmf.cnf.  From Thanh.
+
 2009-05-19  Karl Berry  <karl@tug.org>
 
 	* tex.ch (max_font_max): increase to 9000.

@@ -5,17 +5,8 @@ dnl
 dnl   This file is free software; the copyright holder
 dnl   gives unlimited permission to copy and/or distribute it,
 dnl   with or without modifications, as long as this notice is preserved.
-dnl
 dnl --------------------------------------------------------
-dnl
-dnl Kpathsea package version:
-dnl   Starting development:
-dnl     kpse_devel_version = dev;
-dnl   Making releases:
-dnl     kpse_micro_version += 1;
-dnl     kpse_devel_version = ;
-dnl
-dnl Kpathsea shared library version:
+dnl Keep Kpathsea shared and package library versions the same:
 dnl   Only bug fixes:
 dnl     kpse_lib_micro += 1;
 dnl   Adding new interfaces (backwards compatible)
@@ -26,15 +17,14 @@ dnl     kpse_lib_major += 1;
 dnl     kpse_lib_minor = 0;
 dnl     kpse_lib_micro = 0;
 dnl
-m4_define([kpse_major_version], [3])[]dnl
-m4_define([kpse_minor_version], [5])[]dnl
-m4_define([kpse_micro_version], [7])[]dnl
-m4_define([kpse_devel_version], [dev])[]dnl
-m4_define([kpse_version], [kpse_major_version.kpse_minor_version.kpse_micro_version[]kpse_devel_version])[]dnl
+dnl   After a release, set kpse_lib_dev to "dev", to distinguish
+dnl   binaries built between releases.
 
 m4_define([kpse_lib_major], [5])[]dnl
 m4_define([kpse_lib_minor], [0])[]dnl
 m4_define([kpse_lib_micro], [0])[]dnl
+m4_define([kpse_lib_devel], [])[]dnl or "dev"
+m4_define([kpse_version], [kpse_lib_major.kpse_lib_minor.kpse_lib_micro[]kpse_lib_devel])[]dnl
 
 AC_INIT([Kpathsea], [kpse_version], [tex-k@tug.org])
 AC_PREREQ([2.63])
@@ -80,6 +70,10 @@ if test $kb_cv_func_getcwd_forks = yes; then
              failed to detect it.])
 fi
 fi
+
+KPSE_CHECK_WIN32
+AM_CONDITIONAL([WIN32], [test "x$kpse_cv_have_win32" != xno])
+AM_CONDITIONAL([MINGW32], [test "x$kpse_cv_have_win32" = xmingw32])
 
 dnl Write output here, instead of putting a zillion -D's on the command line.
 AC_CONFIG_HEADERS([c-auto.h:c-auto.in],

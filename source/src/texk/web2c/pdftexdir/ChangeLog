@@ -1,4 +1,29 @@
-2009-05-07  Norbert Preinig <preining@logic.at>
+2009-06-26  Han The Thanh <hanthethanh@gmail.com>
+
+        * pdftex.web: bugfix from Hartmut: fix \pdfobj file {foo} for files
+	          foo that don't end with '\n'
+
+
+2009-06-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* epdf.h, ttf2afm.c, writet1.c: 
+	removed #include <kpathsea/c-proto.h>.
+	* avlstuff.c, epdf.c: removed #include <kpathsea/c-proto.h> and
+	 #include <stdarg.h>.
+
+2009-06-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* avlstuff.c, epdf.c, ttf2afm.c, writet1.c: #include <stdarg.h>,
+	not <kpathsea/c-vararg.h>.
+
+2009-06-04  Karl Berry  <karl@tug.org>
+
+	* am/pdftex.am (pdftex_LDADD): add libpdftex.a here.
+	(pdftex_ldadd): remove it from here, so we do not try
+	to link pdftosrc with it.
+	Report from vvv, tlbuild mail 03 Jun 2009 21:45:00.
+
+2009-05-07  Norbert Preining <preining@logic.at>
 
 	* pdftosrc.cc: add warning that poppler version doesn't support
 	object streams.
@@ -7,7 +32,7 @@
 
 	* pdftoepdf.cc, pdftosrc.cc, utils.c: adapt for poppler.
 
-	patches from Norbert Preinig <preining@logic.at>
+	patches from Norbert Preining <preining@logic.at>
 
 2009-02-18  Peter Breitenlohner <peb@mppmu.mpg.de>
 

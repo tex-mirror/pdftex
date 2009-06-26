@@ -19,8 +19,7 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
 #include "ptexlib.h"
-#include <kpathsea/c-vararg.h>
-#include <kpathsea/c-proto.h>
+#include <stdarg.h>
 #include <string.h>
 
 #define t1_log(str)      tex_printf("%s",str)

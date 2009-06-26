@@ -9,11 +9,7 @@ INCLUDES = -I$(top_builddir)/.. $(KPATHSEA_INCLUDES)
 
 version = $(WEB2CVERSION)
 
-SUBDIRS = doc lib man mpware web2c . window
-if OMFONTS
-SUBDIRS += omegafonts
-endif OMFONTS
-SUBDIRS += otps
+SUBDIRS = doc lib man web2c . window omegafonts otps
 
 proglib = lib/lib.a
 
@@ -131,9 +127,6 @@ include $(srcdir)/am/cweb.am
 ## TeX and MF
 include $(srcdir)/am/texmf.am
 
-## old MetaPost
-include $(srcdir)/mpdir/am/mp.am
-
 ## MetaPost
 include $(srcdir)/mplibdir/am/mplib.am
 
@@ -180,5 +173,5 @@ EXTRA_DIST += fmtutil.in
 
 ## Eventually delete these files
 ##
-EXTRA_DIST += Makefile.in.orig configure.in.orig
+EXTRA_DIST += Makefile.in.orig configure.in.orig metapost.mk
 

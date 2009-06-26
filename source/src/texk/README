@@ -1,4 +1,4 @@
-$Id: README 13363 2009-05-22 00:09:24Z karl $
+$Id: README 13864 2009-06-21 23:28:40Z karl $
 Copyright 2006, 2007, 2008, 2009 TeX Users Group.
 You may freely use, modify and/or distribute this file.
 
@@ -42,14 +42,9 @@ dvidvi - ?
 
 dviljk - maintained here, by Joachim Schrod
 
-dvipdfm - checked 12apr09
-  http://gaspra.kettering.edu/dvipdfm/dvipdfm-0.13.2d.tar.gz
-  ftp://ftp.kettering.edu/pub/outgoing/mwicks/dvipdfm/dvipdfm-0.13.2d.tar.gz
-  (until dvipdfmx is a 100% replacement we cannot drop it.)
-
-dvipdfmx - checked 19may09
+dvipdfmx - checked 26may09
   http://project.ktug.or.kr/dvipdfmx/snapshot/latest/
-  http://project.ktug.or.kr/dvipdfmx/snapshot/latest/dvipdfmx-20090506.tar.gz
+  http://project.ktug.or.kr/dvipdfmx/snapshot/latest/dvipdfmx-20090522.tar.gz
   dvipdfmx@project.ktug.or.kr (ChoF, Hirata, Matthias)
 
 dvipng - checked 12apr09
@@ -61,23 +56,17 @@ dvipos - ?
 
 dvipsk - maintained here by Tom Rokicki, Karl Berry, Akira Kakuto, ...
 
-etc - random additional files
-
 gsftopk - from Paul Vojta's xdvi?
 
 kpathsea - maintained here by Karl Berry, Akira Kakuto, ...
 
 lacheck - ?
 
-lcdf-typetools - checked 13apr09
+lcdf-typetools - checked 15jun09
   http://www.lcdf.org/type/
-  http://www.lcdf.org/type/lcdf-typetools-2.78.tar.gz
+  http://www.lcdf.org/type/lcdf-typetools-2.79.tar.gz
 
-m4 - maintained here, part of our build
-
-make - maintained here, part of our build
-
-makeindexk - maintained here (but should it be?)
+makeindexk - maintained here, by us
 
 musixflx - ?
 
@@ -90,8 +79,7 @@ tex4htk
 
 texlive - maintained here, scripts
 
-ttf2pk - 
-  http://ctan.org/fonts/utilities/ttf2pk
+ttf2pk - maintained here, by us
 
 ttfdump - ?
 

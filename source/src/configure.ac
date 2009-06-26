@@ -6,7 +6,7 @@ dnl   This file is free software; the copyright holder
 dnl   gives unlimited permission to copy and/or distribute it,
 dnl   with or without modifications, as long as this notice is preserved.
 dnl
-AC_INIT([TeX Live], [2009-05-07], [tex-k@tug.org])
+AC_INIT([TeX Live], [2009-06-12], [tex-k@tug.org])
 AC_PREREQ([2.63])
 AC_CONFIG_SRCDIR([m4/kpse-pkgs.m4])
 AC_CONFIG_AUX_DIR([build-aux])
@@ -50,6 +50,14 @@ AC_PATH_XTRA
 
 AC_PROG_CXX
 
+AC_PROG_LN_S
+AC_ARG_WITH([ln-s],
+            AS_HELP_STRING([--without-ln-s],
+                           [do build even if `ln -s' does not work]))[]dnl
+if test "x$LN_S" != "xln -s" && test "x$with_ln_s" != xno; then
+  AC_MSG_ERROR([You could use `--without-ln-s' to build without working `ln -s'])
+fi
+
 if test "x$mandir" = 'x${datarootdir}/man'; then
   mandir='${prefix}/texmf/doc/man'
   ac_configure_args="$ac_configure_args '--mandir=$mandir'"  
@@ -85,14 +93,19 @@ fi
 
 dnl We check that all required system libraries are usable, and may
 dnl reduce frustration if anything is wrong by doing this first.
+dnl A native TeX Live build must not use any system libraries.
 KPSE_SAVE_FLAGS
 syslib_status=yes
+syslib_used=no
 KPSE_ALL_SYSTEM_FLAGS
 KPSE_FOR_PKGS([syslib],
 [m4_sinclude(m4_if(Kpse_Pkg, [kpathsea], [texk/],
                                          [libs/])Kpse_Pkg[/ac/]Kpse_Pkg[.ac])])[]dnl
 if test "x$syslib_status" = xno; then
   AC_MSG_ERROR([some requested system libraries failed])
+fi
+if test "x$syslib_used:$enable_native_texlive_build" = xyes:yes; then
+  AC_MSG_ERROR([you can not use system libraries for a native TeX Live build])
 fi
 KPSE_RESTORE_FLAGS
 

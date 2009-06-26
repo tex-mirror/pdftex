@@ -52,6 +52,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/kpse-common.m4 \
 	$(top_srcdir)/m4/kpse-setup.m4 \
 	$(top_srcdir)/m4/kpse-t1lib-flags.m4 \
 	$(top_srcdir)/m4/kpse-teckit-flags.m4 \
+	$(top_srcdir)/m4/kpse-warnings.m4 \
 	$(top_srcdir)/m4/kpse-web2c.m4 \
 	$(top_srcdir)/m4/kpse-xpdf-flags.m4 \
 	$(top_srcdir)/m4/kpse-zlib-flags.m4 \
@@ -78,7 +79,6 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/kpse-common.m4 \
 	$(top_srcdir)/texk/dvi2tty/ac/withenable.ac \
 	$(top_srcdir)/texk/dvidvi/ac/withenable.ac \
 	$(top_srcdir)/texk/dviljk/ac/withenable.ac \
-	$(top_srcdir)/texk/dvipdfm/ac/withenable.ac \
 	$(top_srcdir)/texk/dvipdfmx/ac/withenable.ac \
 	$(top_srcdir)/texk/dvipng/ac/withenable.ac \
 	$(top_srcdir)/texk/dvipng/ac/dvipng.ac \
@@ -250,6 +250,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+WARNING_CFLAGS = @WARNING_CFLAGS@
+WARNING_CXXFLAGS = @WARNING_CXXFLAGS@
 XMKMF = @XMKMF@
 X_CFLAGS = @X_CFLAGS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
@@ -813,7 +815,7 @@ dist-hook:
 # and there is no install-hook or install-local.
 world: all
 	$(MAKE) $(AM_MAKEFLAGS) install-strip
-	echo "top-level make $@: running texlinks ..."
+	@echo "top-level make $@: running texlinks in texk/tetex..."
 	cd texk/tetex && $(MAKE) $(AM_MAKEFLAGS) run-texlinks
 	@echo "make $@ done."
 

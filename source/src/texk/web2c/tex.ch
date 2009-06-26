@@ -836,12 +836,6 @@ end;
 if src_specials_p then begin
   wterm_ln(' Source specials enabled.')
 end;
-if file_line_error_style_p then begin
-  wterm_ln(' file:line:error style messages enabled.')
-end;
-if parse_first_line_p then begin
-  wterm_ln(' %&-line parsing enabled.')
-end;
 if translate_filename then begin
   wterm(' (');
   fputs(translate_filename, stdout);
@@ -4625,7 +4619,7 @@ begin @!{|start_here|}
     {increase high mem in \.{VIRTEX}}
   setup_bound_var (0)('extra_mem_bot')(extra_mem_bot);
     {increase low mem in \.{VIRTEX}}
-  setup_bound_var (100000)('pool_size')(pool_size);
+  setup_bound_var (200000)('pool_size')(pool_size);
   setup_bound_var (75000)('string_vacancies')(string_vacancies);
   setup_bound_var (5000)('pool_free')(pool_free); {min pool avail after fmt}
   setup_bound_var (15000)('max_strings')(max_strings);

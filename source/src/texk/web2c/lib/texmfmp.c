@@ -8,8 +8,8 @@
 #define	EXTERN /* Instantiate data from {tex,mf,mp}d.h here.  */
 
 /* This file is used to create texextra.c etc., with this line
-   changed to include texd.h, mfd.h, or mpd.h.  The ?d.h file is what
-   #defines TeX or MF or MP, which avoids the need for a special
+   changed to include texd.h or mfd.h.  The ?d.h file is what
+   #defines TeX or MF, which avoids the need for a special
    Makefile rule.  */
 #include "TEX-OR-MF-OR-MPd.h"
 
@@ -85,21 +85,6 @@
 #define VIR_PROGRAM "virmf"
 #define edit_var "MFEDIT"
 #endif /* MF */
-#ifdef MP
-#define BANNER "This is MetaPost, Version 1.005"
-#define COPYRIGHT_HOLDER "AT&T Bell Laboratories"
-#define AUTHOR "John Hobby.\nCurrent maintainer of MetaPost: Taco Hoekwater"
-#define PROGRAM_HELP MPHELP
-#define BUG_ADDRESS "tex-k@mail.tug.org"
-#define DUMP_VAR MPmemdefault
-#define DUMP_LENGTH_VAR memdefaultlength
-#define DUMP_OPTION "mem"
-#define DUMP_EXT ".mem"
-#define INPUT_FORMAT kpse_mp_format
-#define INI_PROGRAM "inimpost"
-#define VIR_PROGRAM "virmpost"
-#define edit_var "MPEDIT"
-#endif /* MP */
 
 /* Shell escape.
 
@@ -535,19 +520,19 @@ string default_translate_filename;
 MAYBE_STATIC char *last_source_name;
 static int last_lineno;
 MAYBE_STATIC boolean srcspecialsoption = false;
-MAYBE_STATIC void parse_src_specials_option P1H(const_string);
+MAYBE_STATIC void parse_src_specials_option (const_string);
 
 /* The main body of the WEB is transformed into this procedure.  */
-extern TEXDLL void mainbody P1H(void);
+extern TEXDLL void mainbody (void);
 
 /* Parsing a first %&-line in the input file. */
-static void parse_first_line P1H(const_string);
+static void parse_first_line (const_string);
 
 /* Parse option flags. */
-static void parse_options P2H(int, string *);
+static void parse_options (int, string *);
 
 /* Try to figure out if we have been given a filename. */
-static string get_input_file_name P1H(void);
+static string get_input_file_name (void);
 
 #if defined(Aleph)
 /* Declare this for Omega family, so they can parse the -8bit option,
@@ -558,11 +543,6 @@ static int eightbitp;
 
 #if defined(pdfTeX) || defined(luaTeX)
 char *ptexbanner;
-#endif
-
-#ifdef MP
-/* name of TeX program to pass to makempx */
-static string mpost_tex_program = "";
 #endif
 
 /* Get a true/false value for a variable from texmf.cnf and the environment. */
@@ -601,7 +581,7 @@ texmf_yesno(const_string var)
    happen in `topenin', then call the main body.  */
 
 void TEXDLL
-maininit P2C(int, ac, string *, av)
+maininit (int ac, string *av)
 {
   string main_input_file;
 
@@ -761,10 +741,6 @@ maininit P2C(int, ac, string *, av)
   kpse_set_program_enabled (kpse_base_format, MAKE_TEX_FMT_BY_DEFAULT,
                             kpse_src_compile);
 #endif /* MF */
-#ifdef MP
-  kpse_set_program_enabled (kpse_mem_format, MAKE_TEX_FMT_BY_DEFAULT,
-                            kpse_src_compile);
-#endif /* MP */
 #ifdef TeX
 #if defined (Aleph)
   kpse_set_program_enabled (kpse_ocp_format, MAKE_OMEGA_OCP_BY_DEFAULT,
@@ -794,7 +770,7 @@ maininit P2C(int, ac, string *, av)
    happen in `topenin', then call the main body.  */
 
 int
-main P2C(int, ac,  string *, av)
+main (int ac, string *av)
 {
 #ifdef __EMX__
   _wildcard (&ac, &av);
@@ -826,7 +802,7 @@ main P2C(int, ac,  string *, av)
    `last=first'.  */
 
 void
-topenin P1H(void)
+topenin (void)
 {
   int i;
 
@@ -938,7 +914,7 @@ static struct sockaddr *ipc_addr;
 static int ipc_addr_len;
 
 static int
-ipc_make_name P1H(void)
+ipc_make_name (void)
 {
   if (ipc_addr_len == 0) {
     string s = getenv ("HOME");
@@ -958,14 +934,14 @@ ipc_make_name P1H(void)
 static int sock = -1;
 
 static int
-ipc_is_open P1H(void)
+ipc_is_open (void)
 {
    return sock >= 0;
 }
 
 
 static void
-ipc_open_out P1H(void) {
+ipc_open_out (void) {
 #ifdef IPC_DEBUG
   fputs ("tex: Opening socket for IPC output ...\n", stderr);
 #endif
@@ -994,7 +970,7 @@ ipc_open_out P1H(void) {
 
 
 static void
-ipc_close_out P1H(void)
+ipc_close_out (void)
 {
 #ifdef IPC_DEBUG
   fputs ("tex: Closing output socket ...\n", stderr);
@@ -1007,7 +983,7 @@ ipc_close_out P1H(void)
 
 
 static void
-ipc_snd P3C(int, n,  int, is_eof,  char *, data)
+ipc_snd (int n, int is_eof, char *data)
 {
   struct
   {
@@ -1046,7 +1022,7 @@ ipc_snd P3C(int, n,  int, is_eof,  char *, data)
    too_big_char = biggest_char + 1 = 65536 (omstr.ch).*/
 
 void
-ipcpage P1C(int, is_eof)
+ipcpage (int is_eof)
 {
   static boolean begun = false;
   unsigned len = 0;
@@ -1091,7 +1067,7 @@ ipcpage P1C(int, is_eof)
 }
 #endif /* TeX && IPC */
 
-#if defined (TeX) || defined (MF) || defined (MP)
+#if defined (TeX) || defined (MF)
   /* TCX and Aleph&Co get along like sparks and gunpowder. */
 #if !defined(Aleph) && !defined(XeTeX) && !defined(luaTeX) 
 
@@ -1100,10 +1076,10 @@ ipcpage P1C(int, is_eof)
    can be parsed.  */
 
 static int
-tcx_get_num P4C(int, upb,
-                unsigned, line_count,
-                string, start,
-                string *, post)
+tcx_get_num (int upb,
+             unsigned line_count,
+             string start,
+             string *post)
 {
   int num = strtol (start, post, 0);
   assert (post && *post);
@@ -1134,7 +1110,7 @@ tcx_get_num P4C(int, upb,
 /* FIXME: A new format ought to be introduced for these files. */
 
 void
-readtcxfile P1H(void)
+readtcxfile (void)
 {
   string orig_filename;
   if (!find_suffix (translate_filename)) {
@@ -1195,11 +1171,11 @@ readtcxfile P1H(void)
   }
 }
 #endif /* !Aleph && !XeTeX && !luaTeX */
-#endif /* TeX || MF || MP [character translation] */
+#endif /* TeX || MF [character translation] */
 
 #ifdef XeTeX /* XeTeX handles this differently, and allows odd quotes within names */
 string
-normalize_quotes P2C(const_string, name, const_string, mesg)
+normalize_quotes (const_string name, const_string mesg)
 {
     int quote_char = 0;
     boolean must_quote = (strchr(name, ' ') != NULL);
@@ -1246,7 +1222,7 @@ normalize_quotes P2C(const_string, name, const_string, mesg)
 /* Normalize quoting of filename -- that is, only quote if there is a space,
    and always use the quote-name-quote style. */
 string
-normalize_quotes P2C(const_string, name, const_string, mesg)
+normalize_quotes (const_string name, const_string mesg)
 {
     boolean quoted = false;
     boolean must_quote = (strchr(name, ' ') != NULL);
@@ -1276,7 +1252,7 @@ normalize_quotes P2C(const_string, name, const_string, mesg)
 
 /* Getting the input filename. */
 string
-get_input_file_name P1H(void)
+get_input_file_name (void)
 {
   string input_file_name = NULL;
 
@@ -1359,7 +1335,7 @@ static struct option long_options[]
       { "synctex",                   1, 0, 0 },
 #endif
 #endif /* TeX */
-#if defined (TeX) || defined (MF) || defined (MP)
+#if defined (TeX) || defined (MF)
       { "file-line-error-style",     0, &filelineerrorstylep, 1 },
       { "no-file-line-error-style",  0, &filelineerrorstylep, -1 },
       /* Shorter option names for the above. */
@@ -1381,21 +1357,14 @@ static struct option long_options[]
       { "output-driver",          1, 0, 0 },
       { "papersize",              1, 0, 0 },
 #endif /* XeTeX */
-#endif /* TeX || MF || MP */
-#if defined (TeX) || defined (MF)
       { "mktex",                     1, 0, 0 },
       { "no-mktex",                  1, 0, 0 },
 #endif /* TeX or MF */
-#ifdef MP
-      { "T",                         0, &troffmode, 1 },
-      { "troff",                     0, &troffmode, 1 },
-      { "tex",                       1, 0, 0 },
-#endif /* MP */
       { 0, 0, 0, 0 } };
 
 
 static void
-parse_options P2C(int, argc,  string *, argv)
+parse_options (int argc, string *argv)
 {
   int g;   /* `getopt' return code.  */
   int option_index;
@@ -1510,7 +1479,7 @@ parse_options P2C(int, argc,  string *, argv)
       pdfdraftmodeoption = 1;
       pdfdraftmodevalue = 1;
 #endif /* pdfTeX */
-#if defined (TeX) || defined (MF) || defined (MP)
+#if defined (TeX) || defined (MF)
     } else if (ARGUMENT_IS ("translate-file")) {
       translate_filename = optarg;
     } else if (ARGUMENT_IS ("default-translate-file")) {
@@ -1519,19 +1488,12 @@ parse_options P2C(int, argc,  string *, argv)
     } else if (ARGUMENT_IS ("8bit")) {
       /* FIXME: print snippy message? Possibly also for above? */
 #endif /* !Aleph */
-#endif /* TeX || MF || MP */
-
-#if defined (TeX) || defined (MF)
     } else if (ARGUMENT_IS ("mktex")) {
       kpse_maketex_option (optarg, true);
 
     } else if (ARGUMENT_IS ("no-mktex")) {
       kpse_maketex_option (optarg, false);
 #endif /* TeX or MF */
-#if defined (MP)
-    } else if (ARGUMENT_IS ("tex")) {
-      mpost_tex_program = optarg;
-#endif /* MP */
     } else if (ARGUMENT_IS ("interaction")) {
         /* These numbers match @d's in *.ch */
       if (STREQ (optarg, "batchmode")) {
@@ -1571,7 +1533,7 @@ parse_options P2C(int, argc,  string *, argv)
 #if defined(TeX)
 #if ! defined (luaTeX)
 void 
-parse_src_specials_option P1C(const_string, opt_list)
+parse_src_specials_option (const_string opt_list)
 {
   char * toklist = xstrdup(opt_list);
   char * tok;
@@ -1629,7 +1591,7 @@ parse_src_specials_option P1C(const_string, opt_list)
    Also call kpse_reset_program_name to ensure the correct paths for the
    format are used.  */
 static void
-parse_first_line P1C(const_string, filename)
+parse_first_line (const_string filename)
 {
   FILE *f = filename ? fopen (filename, FOPEN_R_MODE) : NULL;
   if (f) {
@@ -1714,8 +1676,8 @@ static const_string ok_type_name[] = {
 };
 
 static boolean
-opennameok P4C(const_string, fname, const_string, check_var,
-               const_string, default_choice, ok_type, action)
+opennameok (const_string fname, const_string check_var,
+            const_string default_choice, ok_type action)
 {
   /* We distinguish three cases:
      'a' (any)        allows any file to be opened.
@@ -1798,13 +1760,13 @@ opennameok P4C(const_string, fname, const_string, check_var,
   return true;
 }
 
-boolean openinnameok P1C(const_string, fname)
+boolean openinnameok (const_string fname)
 {
     /* For input default to all. */
     return opennameok (fname, "openin_any", "a", ok_reading);
 }
 
-boolean openoutnameok P1C(const_string, fname)
+boolean openoutnameok (const_string fname)
 {
     /* For output, default to paranoid. */
     return opennameok (fname, "openout_any", "p", ok_writing);
@@ -1824,7 +1786,7 @@ static FILE *pipes [] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
                          NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 
 boolean
-open_in_or_pipe P3C(FILE **, f_ptr,  int, filefmt,  const_string, fopen_mode)
+open_in_or_pipe (FILE **f_ptr, int filefmt, const_string fopen_mode)
 {
     string fname = NULL;
     int i; /* iterator */
@@ -1863,7 +1825,7 @@ open_in_or_pipe P3C(FILE **, f_ptr,  int, filefmt,  const_string, fopen_mode)
 
 
 boolean
-open_out_or_pipe P2C(FILE **, f_ptr,  const_string, fopen_mode)
+open_out_or_pipe (FILE **f_ptr, const_string fopen_mode)
 {
     string fname;
     int i; /* iterator */
@@ -1909,7 +1871,7 @@ open_out_or_pipe P2C(FILE **, f_ptr,  const_string, fopen_mode)
 
 
 void
-close_file_or_pipe P1C(FILE *, f)
+close_file_or_pipe (FILE *f)
 {
   int i; /* iterator */
 
@@ -1947,7 +1909,7 @@ catch_interrupt (DWORD arg)
 }
 #else /* not WIN32 */
 static RETSIGTYPE
-catch_interrupt P1C (int, arg)
+catch_interrupt (int arg)
 {
   interrupt = 1;
 #ifdef OS2
@@ -1965,8 +1927,8 @@ catch_interrupt P1C (int, arg)
    good a place as any.  */
 
 void
-get_date_and_time P4C(integer *, minutes,  integer *, day,
-                      integer *, month,  integer *, year)
+get_date_and_time (integer *minutes,  integer *day,
+                   integer *month,  integer *year)
 {
   time_t myclock = time ((time_t *) 0);
   struct tm *tmptr = localtime (&myclock);
@@ -1997,7 +1959,7 @@ get_date_and_time P4C(integer *, minutes,  integer *, day,
 #ifdef WIN32
     SetConsoleCtrlHandler(catch_interrupt, TRUE);
 #else /* not WIN32 */
-    RETSIGTYPE (*old_handler) P1H(int);
+    RETSIGTYPE (*old_handler) (int);
     
     old_handler = signal (SIGINT, catch_interrupt);
     if (old_handler != SIG_DFL)
@@ -2011,7 +1973,7 @@ get_date_and_time P4C(integer *, minutes,  integer *, day,
  Getting a high resolution time.
  */
 void
-get_seconds_and_micros P2C(integer *, seconds,  integer *, micros)
+get_seconds_and_micros (integer *seconds,  integer *micros)
 {
 #if defined (HAVE_GETTIMEOFDAY)
   struct timeval tv;
@@ -2058,7 +2020,7 @@ getrandomseed()
 
 #ifndef XeTeX /* for XeTeX, we have a replacement function in XeTeX_ext.c */
 boolean
-input_line P1C(FILE *, f)
+input_line (FILE *f)
 {
   int i = EOF;
 
@@ -2114,10 +2076,10 @@ static const_string edit_value = EDITOR;
    actual filename starts; FNLENGTH is how long the filename is.  */
    
 void
-calledit P4C(packedASCIIcode *, filename,
-             poolpointer, fnstart,
-             integer, fnlength,
-             integer, linenumber)
+calledit (packedASCIIcode *filename,
+          poolpointer fnstart,
+          integer fnlength,
+          integer linenumber)
 {
   char *temp, *command;
   char c;
@@ -2222,7 +2184,7 @@ calledit P4C(packedASCIIcode *, filename,
    opposite-endianness of whatever they are now.  */
 
 static void
-swap_items P3C(char *, p,  int, nitems,  int, size)
+swap_items (char *p, int nitems, int size)
 {
   char temp;
 
@@ -2292,9 +2254,9 @@ swap_items P3C(char *, p,  int, nitems,  int, size)
 
 void
 #ifdef XeTeX
-do_dump P4C(char *, p,  int, item_size,  int, nitems,  gzFile, out_file)
+do_dump (char *p, int item_size, int nitems,  gzFile out_file)
 #else
-do_dump P4C(char *, p,  int, item_size,  int, nitems,  FILE *, out_file)
+do_dump (char *p, int item_size, int nitems,  FILE *out_file)
 #endif
 {
 #if !defined (WORDS_BIGENDIAN) && !defined (NO_DUMP_SHARE)
@@ -2324,9 +2286,9 @@ do_dump P4C(char *, p,  int, item_size,  int, nitems,  FILE *, out_file)
 
 void
 #ifdef XeTeX
-do_undump P4C(char *, p,  int, item_size,  int, nitems,  gzFile, in_file)
+do_undump (char *p, int item_size, int nitems, gzFile in_file)
 #else
-do_undump P4C(char *, p,  int, item_size,  int, nitems,  FILE *, in_file)
+do_undump (char *p, int item_size, int nitems, FILE *in_file)
 #endif
 {
 #ifdef XeTeX
@@ -2345,7 +2307,7 @@ do_undump P4C(char *, p,  int, item_size,  int, nitems,  FILE *, in_file)
    DFLT to *VAR.  */
 
 void
-setupboundvariable P3C(integer *, var,  const_string, var_name,  integer, dflt)
+setupboundvariable (integer *var, const_string var_name, integer dflt)
 {
   string expansion = kpse_var_value (var_name);
   *var = dflt;
@@ -2367,7 +2329,7 @@ setupboundvariable P3C(integer *, var,  const_string, var_name,  integer, dflt)
 }
 
 /* FIXME -- some (most?) of this can/should be moved to the Pascal/WEB side. */
-#if defined(TeX) || defined(MP) || defined(MF)
+#if defined(TeX) || defined(MF)
 #if !defined(pdfTeX) && !defined(luaTeX)
 static void
 checkpoolpointer (poolpointer poolptr, size_t len)
@@ -2378,8 +2340,6 @@ checkpoolpointer (poolpointer poolptr, size_t len)
     exit(1);
   }
 }
-
-#ifndef MP  /* MP has its own in mpdir/utils.c */
 
 #ifndef XeTeX	/* XeTeX uses this from XeTeX_mac.c */
 static
@@ -2422,7 +2382,6 @@ maketexstring(const_string s)
 
   return (makestring());
 }
-#endif /* !MP */
 #endif /* !pdfTeX */
 
 strnumber
@@ -2445,7 +2404,7 @@ getjobname(strnumber name)
 
 #if defined(TeX)
 int
-compare_paths P2C(const_string, p1, const_string, p2)
+compare_paths (const_string p1, const_string p2)
 {
   int ret;
   while (
@@ -2464,7 +2423,7 @@ compare_paths P2C(const_string, p1, const_string, p2)
 #ifdef XeTeX /* the string pool is UTF-16 but we want a UTF-8 string */
 
 string
-gettexstring P1C(strnumber, s)
+gettexstring (strnumber s)
 {
   unsigned bytesToWrite = 0;
   poolpointer len, i, j;
@@ -2509,7 +2468,7 @@ gettexstring P1C(strnumber, s)
 #else
 
 string
-gettexstring P1C(strnumber, s)
+gettexstring (strnumber s)
 {
   poolpointer len;
   string name;
@@ -2535,15 +2494,14 @@ gettexstring P1C(strnumber, s)
 #endif /* not XeTeX */
 
 boolean
-isnewsource P2C(strnumber, srcfilename, int, lineno)
+isnewsource (strnumber srcfilename, int lineno)
 {
   char *name = gettexstring(srcfilename);
   return (compare_paths(name, last_source_name) != 0 || lineno != last_lineno);
 }
 
 void
-remembersourceinfo P2C(strnumber, srcfilename,
-                                          int, lineno)
+remembersourceinfo (strnumber srcfilename, int lineno)
 {
   if (last_source_name)
        free(last_source_name);
@@ -2552,8 +2510,7 @@ remembersourceinfo P2C(strnumber, srcfilename,
 }
 
 poolpointer
-makesrcspecial P2C(strnumber, srcfilename,
-                                  int, lineno)
+makesrcspecial (strnumber srcfilename, int lineno)
 {
   poolpointer oldpoolptr = poolptr;
   char *filename = gettexstring(srcfilename);
@@ -2581,55 +2538,6 @@ makesrcspecial P2C(strnumber, srcfilename,
   return (oldpoolptr);
 }
 #endif
-
-#ifdef MP
-/* Invoke makempx (or troffmpx) to make sure there is an up-to-date
-   .mpx file for a given .mp file.  (Original from John Hobby 3/14/90)  */
-
-#include <kpathsea/concatn.h>
-
-#ifndef MPXCOMMAND
-#define MPXCOMMAND "makempx"
-#endif
-
-boolean
-callmakempx P2C(string, mpname,  string, mpxname)
-{
-  int ret;
-  string cnf_cmd = kpse_var_value ("MPXCOMMAND");
-  
-  if (cnf_cmd && STREQ (cnf_cmd, "0")) {
-    /* If they turned off this feature, just return success.  */
-    ret = 0;
-
-  } else {
-    /* We will invoke something. Compile-time default if nothing else.  */
-    string cmd;
-    string qmpname = normalize_quotes(mpname, "mpname");
-    string qmpxname = normalize_quotes(mpxname, "mpxname");
-    if (!cnf_cmd)
-      cnf_cmd = xstrdup (MPXCOMMAND);
-
-    if (troffmode)
-      cmd = concatn (cnf_cmd, " -troff ",
-                     qmpname, " ", qmpxname, NULL);
-    else if (mpost_tex_program && *mpost_tex_program)
-      cmd = concatn (cnf_cmd, " -tex=", mpost_tex_program, " ",
-                     qmpname, " ", qmpxname, NULL);
-    else
-      cmd = concatn (cnf_cmd, " -tex ", qmpname, " ", qmpxname, NULL);
-
-    /* Run it.  */
-    ret = system (cmd);
-    free (cmd);
-    free (qmpname);
-    free (qmpxname);
-  }
-
-  free (cnf_cmd);
-  return ret == 0;
-}
-#endif /* MP */
 
 /* Metafont/MetaPost fraction routines. Replaced either by assembler or C.
    The assembler syntax doesn't work on Solaris/x86.  */
@@ -2703,7 +2611,7 @@ connection with the use or performance of this software.
 #define TWEXP_28 (1.0/268435456.0)
 
 integer
-ztakefraction P2C(integer, p, integer, q)     /* Approximate p*q/2^28 */
+ztakefraction (integer p, integer q)     /* Approximate p*q/2^28 */
 {	register double d;
 	register integer i;
 	d = (double)p * (double)q * TWEXP_28;
@@ -2730,7 +2638,7 @@ ztakefraction P2C(integer, p, integer, q)     /* Approximate p*q/2^28 */
 }
 
 integer
-ztakescaled P2C(integer, p, integer, q)		/* Approximate p*q/2^16 */
+ztakescaled (integer p, integer q)		/* Approximate p*q/2^16 */
 {	register double d;
 	register integer i;
 	d = (double)p * (double)q * TWEXP_16;
@@ -2761,7 +2669,7 @@ ztakescaled P2C(integer, p, integer, q)		/* Approximate p*q/2^16 */
    and 8/1.  No pair of integers less than 2^31 has such a ratio.
 */
 integer
-zmakefraction P2C(integer, p, integer, q)	/* Approximate 2^28*p/q */
+zmakefraction (integer p, integer q)	/* Approximate 2^28*p/q */
 {	register double d;
 	register integer i;
 #ifdef DEBUG
@@ -2789,7 +2697,7 @@ zmakefraction P2C(integer, p, integer, q)	/* Approximate 2^28*p/q */
    and 2^15/1.  No pair of integers less than 2^31 has such a ratio.
 */
 integer
-zmakescaled P2C(integer, p, integer, q)		/* Approximate 2^16*p/q */
+zmakescaled (integer p, integer q)		/* Approximate 2^16*p/q */
 {	register double d;
 	register integer i;
 #ifdef DEBUG
@@ -2814,7 +2722,7 @@ zmakescaled P2C(integer, p, integer, q)		/* Approximate 2^16*p/q */
 
 #endif /* not FIXPT */
 #endif /* not assembler */
-#endif /* not TeX, i.e., MF or MP */
+#endif /* not TeX, i.e., MF */
 
 #ifdef MF
 /* On-line display routines for Metafont.  Here we use a dispatch table
@@ -2837,75 +2745,75 @@ zmakescaled P2C(integer, p, integer, q)		/* Approximate 2^16*p/q */
 #endif
 
 #ifdef AMIGAWIN
-extern int mf_amiga_initscreen P1H(void);
-extern void mf_amiga_updatescreen P1H(void);
-extern void mf_amiga_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_amiga_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_amiga_initscreen (void);
+extern void mf_amiga_updatescreen (void);
+extern void mf_amiga_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_amiga_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
 #ifdef EPSFWIN
-extern int mf_epsf_initscreen P1H(void);
-extern void mf_epsf_updatescreen P1H(void);
-extern void mf_epsf_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_epsf_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_epsf_initscreen (void);
+extern void mf_epsf_updatescreen (void);
+extern void mf_epsf_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_epsf_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
 #ifdef HP2627WIN
-extern int mf_hp2627_initscreen P1H(void);
-extern void mf_hp2627_updatescreen P1H(void);
-extern void mf_hp2627_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_hp2627_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_hp2627_initscreen (void);
+extern void mf_hp2627_updatescreen (void);
+extern void mf_hp2627_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_hp2627_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
 #ifdef MFTALKWIN
-extern int mf_mftalk_initscreen P1H(void);
-extern void mf_mftalk_updatescreen P1H(void);
-extern void mf_mftalk_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_mftalk_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_mftalk_initscreen (void);
+extern void mf_mftalk_updatescreen (void);
+extern void mf_mftalk_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_mftalk_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
 #ifdef NEXTWIN
-extern int mf_next_initscreen P1H(void);
-extern void mf_next_updatescreen P1H(void);
-extern void mf_next_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_next_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_next_initscreen (void);
+extern void mf_next_updatescreen (void);
+extern void mf_next_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_next_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
 #ifdef REGISWIN
-extern int mf_regis_initscreen P1H(void);
-extern void mf_regis_updatescreen P1H(void);
-extern void mf_regis_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_regis_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_regis_initscreen (void);
+extern void mf_regis_updatescreen (void);
+extern void mf_regis_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_regis_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
 #ifdef SUNWIN
-extern int mf_sun_initscreen P1H(void);
-extern void mf_sun_updatescreen P1H(void);
-extern void mf_sun_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_sun_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_sun_initscreen (void);
+extern void mf_sun_updatescreen (void);
+extern void mf_sun_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_sun_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
 #ifdef TEKTRONIXWIN
-extern int mf_tektronix_initscreen P1H(void);
-extern void mf_tektronix_updatescreen P1H(void);
-extern void mf_tektronix_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_tektronix_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_tektronix_initscreen (void);
+extern void mf_tektronix_updatescreen (void);
+extern void mf_tektronix_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_tektronix_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
 #ifdef UNITERMWIN
-extern int mf_uniterm_initscreen P1H(void);
-extern void mf_uniterm_updatescreen P1H(void);
-extern void mf_uniterm_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_uniterm_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_uniterm_initscreen (void);
+extern void mf_uniterm_updatescreen (void);
+extern void mf_uniterm_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_uniterm_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
 #ifdef WIN32WIN
-extern int mf_win32_initscreen P1H(void);
-extern void mf_win32_updatescreen P1H(void);
-extern void mf_win32_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_win32_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_win32_initscreen (void);
+extern void mf_win32_updatescreen (void);
+extern void mf_win32_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_win32_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
 #ifdef X11WIN
-extern int mf_x11_initscreen P1H(void);
-extern void mf_x11_updatescreen P1H(void);
-extern void mf_x11_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_x11_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_x11_initscreen (void);
+extern void mf_x11_updatescreen (void);
+extern void mf_x11_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_x11_paintrow (screenrow, pixelcolor, transspec, screencol);
 #endif
-extern int mf_trap_initscreen P1H(void);
-extern void mf_trap_updatescreen P1H(void);
-extern void mf_trap_blankrectangle P4H(screencol, screencol, screenrow, screenrow);
-extern void mf_trap_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
+extern int mf_trap_initscreen (void);
+extern void mf_trap_updatescreen (void);
+extern void mf_trap_blankrectangle (screencol, screencol, screenrow, screenrow);
+extern void mf_trap_paintrow (screenrow, pixelcolor, transspec, screencol);
 
 
 /* This variable, `mfwsw', contains the dispatch tables for each
@@ -2917,10 +2825,10 @@ extern void mf_trap_paintrow P4H(screenrow, pixelcolor, transspec, screencol);
 struct mfwin_sw
 {
   char *mfwsw_type;		/* Name of terminal a la TERMCAP.  */
-  int (*mfwsw_initscreen) P1H(void);
-  void (*mfwsw_updatescrn) P1H(void);
-  void (*mfwsw_blankrect) P4H(screencol, screencol, screenrow, screenrow);
-  void (*mfwsw_paintrow) P4H(screenrow, pixelcolor, transspec, screencol);
+  int (*mfwsw_initscreen) (void);
+  void (*mfwsw_updatescrn) (void);
+  void (*mfwsw_blankrect) (screencol, screencol, screenrow, screenrow);
+  void (*mfwsw_paintrow) (screenrow, pixelcolor, transspec, screencol);
 } mfwsw[] =
 {
 #ifdef AMIGAWIN
@@ -2992,7 +2900,7 @@ static struct mfwin_sw *mfwp;
 /* This returns true if we can do window operations, else false.  */
 
 boolean
-initscreen P1H(void)
+initscreen (void)
 {
   /* If MFTERM is set, use it.  */
   const_string tty_type = kpse_var_value ("MFTERM");
@@ -3058,7 +2966,7 @@ initscreen P1H(void)
 /* Make sure everything is visible.  */
 
 void
-updatescreen P1H(void)
+updatescreen (void)
 {
   if (mfwp->mfwsw_updatescrn)
     (*mfwp->mfwsw_updatescrn) ();
@@ -3069,8 +2977,8 @@ updatescreen P1H(void)
    the background color.  */
 
 void
-blankrectangle P4C(screencol, left, screencol, right,
-                   screenrow, top, screenrow, bottom)
+blankrectangle (screencol left, screencol right,
+                screenrow top, screenrow bottom)
 {
   if (mfwp->mfwsw_blankrect)
     (*mfwp->mfwsw_blankrect) (left, right, top, bottom);
@@ -3082,8 +2990,8 @@ blankrectangle P4C(screencol, left, screencol, right,
    switch colors.  This goes on for VECTOR_SIZE transitions.  */
 
 void
-paintrow P4C(screenrow, row, pixelcolor, init_color,
-             transspec, transition_vector, screencol, vector_size)
+paintrow (screenrow row, pixelcolor init_color,
+          transspec transition_vector, screencol vector_size)
 {
   if (mfwp->mfwsw_paintrow)
     (*mfwp->mfwsw_paintrow) (row, init_color, transition_vector, vector_size);

@@ -1,4 +1,4 @@
-$Id: README 12677 2009-04-09 09:33:51Z peter $
+$Id: README 13898 2009-06-22 23:38:25Z karl $
 Copyright 2004, 2006, 2007, 2008, 2009 TeX Users Group.
 You may freely use, modify and/or distribute this file.
 
@@ -62,19 +62,13 @@ Build information:
   i386-linux: Debian sarge, gcc 3.3.5, libc 2.3.2, Linux 2.6.9-67.0.4.ELsmp
     chroot /home/texlive/sarge; Build --with-xindy --with-clisp=...
     
-  i386-solaris: Solaris 10 11/06 s10x_u3wos_10 X86
-    system gcc (GCC) 3.4.3 (csl-sol210-3_4-branch+sol_rpath)
+  i386-solaris: Solaris 11
 
   powerpc-darwin: like i386-darwin
   
   powerpc-linux
-OS: gentoo GNU/Linux
-kernel 2.6.23
-gcc (GCC) 4.2.3 (Gentoo 4.2.3 p1.0)))
-bison (GNU Bison) 2.3)
-flex 2.5.35
-m4 (GNU M4) 1.4.11)
-GNU Make 3.81
+2.6.26-2-powerpc64 #1 SMP Fri May 29 00:38:20 UTC 2009 ppc64 GNU/Linux
+/lib/libc.so.6, GNU C Library (EGLIBC) stable release version 2.9
 
   sparc-solaris
 OS: Sun Solaris 8
