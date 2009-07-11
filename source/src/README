@@ -1,4 +1,4 @@
-$Id: README 13898 2009-06-22 23:38:25Z karl $
+$Id: README 14005 2009-06-29 15:14:06Z peter $
 Copyright 2004, 2006, 2007, 2008, 2009 TeX Users Group.
 You may freely use, modify and/or distribute this file.
 
@@ -17,14 +17,18 @@ Prerequisites:
   try setting the envvar TL_MAKE to what is needed.
 
 - GNU clisp and GNU libffcall, must be present for xindy.  See more
-  details in utils/README.  (Alternative: Build --without-xindy.)
+  details in utils/README.  (Alternative: Build --disable-xindy.)
 
 - libfontconfig (again both headers and library) must be present for
-  XeTeX, except on MacOSX.  (Alternative: Build --without-xetex.)
+  XeTeX and xdvipdfmx, except on MacOSX.  (Alternative:
+  Build --disable-xetex --disable-xdvipdfmx.)
 
 - X11 headers and libraries must be present for pdfopen and xdvi.
+  (Alternative: Build --without-x.)
 
-- Bison and Flex (or maybe equivalents) are needed for web2c.
+- If you modify any .y or .l source files, then Bison and Flex (or maybe
+  equivalents) are needed.  The distributed .c and .h files are generated
+  with bison-2.4.1 and flex-2.5.35.
 
 The binaries will be left in ./inst/bin/<stdplatform>.
 For TeX Live, ignore the other files and directories that end up in ./inst.
@@ -47,7 +51,7 @@ For unusual situations:
 (i.e., configure fails saying the compiler doesn't work), try:
 env LD_OPTIONS=-R/usr/local/lib ./Build
 
-- Running ./reautoconf here reruns autoconf as needed.  Use --help for more.
+- Running ./reautoconf here reruns auto-tools as needed.  Use --help for more.
 
 
 Build information:
@@ -80,7 +84,7 @@ GNU Make 3.81
   xe(la)tex and xdvipdfmx depend on fontconfig.
   Because Solaris 8 does not include fontconfig, we used fontconfig
   package (version 2.3.2) from http://www.blastwave.org/
-  (together with it's dependencies)
+  (together with its dependencies)
 
   sparc-linux
 OS: Debian GNU/Linux 3.1 (Sarge), kernel 2.4.27-2-sparc64
@@ -103,7 +107,7 @@ GNU Make 3.79.1
   ftp://ftp.software.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc/fontconfig/
 
   alpha-linux
-OS: Debian GNU/Linux 4.0 (Etch), kernel 2.4.34.6
+OS: Debian GNU/Linux 4.0 (Etch), kernel 2.6.18
 gcc (GCCC) 4.1.2 20061115 (prerelease) (Debian 4.1.1-21)
 bison (GNU Bison) 2.3
 flex 2.5.33
@@ -116,4 +120,7 @@ GNU Make 3.81
   - compiling of texk/web2c/pdftexdir/writezip.c is broken and triggers a 
     compiler error with the above gcc. Disabling optimization -O2 using
     Build --debug ... resolved this problem.
+  - compilation of clisp needs hand adding -lavcall -lcallback -ltrampoline 
+    -lvacall after the -lsigsegv
+  - asy compilation with --disable-gsl && make
 

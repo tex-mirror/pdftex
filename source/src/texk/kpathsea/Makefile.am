@@ -221,8 +221,12 @@ kpathsea.h: Makefile paths.h
 	echo '#include <kpathsea/c-auto.h>' >>$@
 	echo '#include <kpathsea/paths.h>' >>$@
 	(cd $(srcdir) && ls -1 *.h) \
-	  | grep -v '\(config\|paths\|kpathsea\|mingw32\|win32lib\)\.h' \
-	  | sed -e 's,^,#include <kpathsea/,' -e s',$$,>,' >>$@
+	| sed -e '/^config\.h/d' \
+	      -e '/^paths\.h/d' \
+	      -e '/^kpathsea\.h/d' \
+	      -e '/^mingw32\.h/d' \
+	      -e '/^win32lib\.h/d' \
+	      -e 's,^,#include <kpathsea/,' -e s',$$,>,' >>$@
 
 DISTCLEANFILES = paths.h stamp-paths kpathsea.h
 

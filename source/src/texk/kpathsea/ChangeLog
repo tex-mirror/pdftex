@@ -1,3 +1,24 @@
+2009-07-07  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (MAKEMPX): remove, this causes btex..etex to fail
+	in current mpost.
+
+2009-07-02  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (kpathsea.h): simplify, no more grep.
+
+2009-06-30  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (kpathsea.h): avoid GNU grep specific code.
+
+2009-06-30  Karl Berry  <karl@tug.org>
+
+	* variable.c (expand): make boolean, to return whether there
+	actually was a variable that got expanded.
+	(kpathsea_var_expand): if no variable was expanded, insert the
+	unexpanded $foo in the result, so we can read variable names with
+	dollar signs.  Bug report from Gerben Wierda.
+
 2009-06-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* version.h (new): header file for definitions in version.c.
