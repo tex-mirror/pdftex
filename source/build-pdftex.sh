@@ -77,6 +77,8 @@ OTHER_OPTS="\
     --without-system-zlib \
     --without-system-t1lib \
     --without-graphite \
+    --without-mf-x-toolkit \
+    --without-x \
     --disable-shared \
     --disable-largefile \
 "
