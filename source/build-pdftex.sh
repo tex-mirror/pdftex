@@ -88,6 +88,6 @@ rm -rf $buildDir && mkdir $buildDir && cd $buildDir
 
 export CONFIG_SHELL=/bin/bash
 $topDir/src/configure $DISABLED_PROGS $OTHER_OPTS "$@"
-make all 2>&1 | tee make.log
+make all 2>&1 | tee make.log || true
 
 ls -l $buildDir/texk/web2c/pdftex

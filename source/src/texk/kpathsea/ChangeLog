@@ -1,3 +1,54 @@
+2009-10-20  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (shell_escape): doc fixes to discourage shell_escape=p.
+
+2009-10-19  Manuel Pégourié-Gonnard <mpg@elzevir.fr>
+
+	* texmf.cnf: set shell_escape back to 'f': 'p' is broken on Unix.
+
+2009-10-15  Manuel Pégourié-Gonnard <mpg@elzevir.fr>
+
+	* texmf.cnf (shell_escape_commands): add repstopdf, a version of
+	epstopdf with restrictions intended to make it safer.
+	Remove bibtex & makeindex for now, they don't respect openout_any.
+
+2009-10-13  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (shell_escape_commands): remove the ps-to-pdf programs
+	for now, they don't respect openout_any.
+
+2009-10-09  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXDOC): omit now-unneeded man for texdoc (from mpg).
+
+2009-09-21  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (shell_escape_commands): remove pygmentize, as intended.
+
+2009-09-03  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c (find_format): remove dvipdfmx.cfg, since there is
+	no special path for it, and add texglyphlist.txt.
+
+2009-08-15  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (shell_escape_commands): remove many more,
+	mail from Heiko, 14 Aug 2009 07:58:02 et al.
+
+2009-07-23  Karl Berry  <karl@tug.org>
+
+	* mktexlsr: update help msg.
+
+	* texmf.cnf (shell_escape_commands): remove tex programs (too
+	dangerous?), add other indexing programs, change pdfcrop to
+	rpdfcrop, convert to imgconvert.
+
+2009-07-22  Taco Hoekwater <taco@metapost.org>
+
+	* texmf.cnf (sizes): fix some documentation strings for MetaPost,
+	which nowadays uses and needs just a handful of the array size
+	variables.
+	
 2009-07-07  Karl Berry  <karl@tug.org>
 
 	* texmf.cnf (MAKEMPX): remove, this causes btex..etex to fail

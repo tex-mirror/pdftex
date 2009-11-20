@@ -1,4 +1,5 @@
 2009-09-16  Han The Thanh <hanthethanh@gmail.com>
+
 	* writettf.c: patch for TTC from Liu Yubao <yubao.liu@gmail.com>
 
 2009-08-12  Karl Berry  <karl@tug.org>
@@ -15,7 +16,7 @@
 
 2009-06-26  Han The Thanh <hanthethanh@gmail.com>
 
-        * pdftex.web: bugfix from Hartmut: fix \pdfobj file {foo} for files
+	* pdftex.web: bugfix from Hartmut: fix \pdfobj file {foo} for files
 	          foo that don't end with '\n'
 
 
