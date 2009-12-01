@@ -89,5 +89,10 @@ rm -rf $buildDir && mkdir $buildDir && cd $buildDir
 export CONFIG_SHELL=/bin/bash
 $topDir/src/configure $DISABLED_PROGS $OTHER_OPTS "$@"
 make all 2>&1 | tee make.log || true
+set +x
+
+echo ""
+echo "The last errors about otangle.web/otangle.p are harmless and can be safely ignored."
+echo ""
 
 ls -l $buildDir/texk/web2c/pdftex
