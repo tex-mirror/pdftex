@@ -18,7 +18,8 @@
 #ifndef KPATHSEA_TYPES_H
 #define KPATHSEA_TYPES_H
 
-#define KPSE_COMPAT_API 1 
+/* Required until all programs use the new API, if ever.  */
+#define KPSE_COMPAT_API 1
 
 /* Booleans.  */
 /* NeXT wants to define their own boolean type.  */
@@ -86,24 +87,24 @@ typedef enum
   kpse_gf_format,
   kpse_pk_format,
   kpse_any_glyph_format,	/* ``any'' meaning gf or pk */
-  kpse_tfm_format, 
-  kpse_afm_format, 
-  kpse_base_format, 
-  kpse_bib_format, 
-  kpse_bst_format, 
+  kpse_tfm_format,
+  kpse_afm_format,
+  kpse_base_format,
+  kpse_bib_format,
+  kpse_bst_format,
   kpse_cnf_format,
   kpse_db_format,
   kpse_fmt_format,
   kpse_fontmap_format,
   kpse_mem_format,
-  kpse_mf_format, 
-  kpse_mfpool_format, 
-  kpse_mft_format, 
-  kpse_mp_format, 
-  kpse_mppool_format, 
+  kpse_mf_format,
+  kpse_mfpool_format,
+  kpse_mft_format,
+  kpse_mp_format,
+  kpse_mppool_format,
   kpse_mpsupport_format,
   kpse_ocp_format,
-  kpse_ofm_format, 
+  kpse_ofm_format,
   kpse_opl_format,
   kpse_otp_format,
   kpse_ovf_format,
@@ -115,7 +116,7 @@ typedef enum
   kpse_texsource_format,
   kpse_tex_ps_header_format,
   kpse_troff_font_format,
-  kpse_type1_format, 
+  kpse_type1_format,
   kpse_vf_format,
   kpse_dvips_config_format,
   kpse_ist_format,
@@ -194,7 +195,7 @@ typedef struct kpathsea_instance {
     hash_table_type cnf_hash;           /* used by read_all_cnf */
     boolean doing_cnf_init;             /* for kpse_cnf_get */
     /* from db.c */
-    hash_table_type db;                 /* The hash table for all the ls-R's.  */
+    hash_table_type db;                 /* The hash table for all ls-R's */
     hash_table_type alias_db;           /* The hash table for the aliases */
     str_list_type db_dir_list;          /* list of ls-R's */
     /* from debug.c */
@@ -206,18 +207,18 @@ typedef struct kpathsea_instance {
     unsigned cache_length;
     /* from fontmap.c */
     hash_table_type map;                /* the font mapping hash */
-    const_string map_path;              /* holds the format path for kpse_fontmap_format */
+    const_string map_path;              /* path for kpse_fontmap_format */
     /* from hash.c */
     /* Print the hash values as integers if this is nonzero.  */
     boolean debug_hash_lookup_int;
     /* from path-elt.c */
-    string elt;                         /* statically created buffer for return value of |element| */
+    string elt;                         /* static buffer for return value */
     unsigned elt_alloc;
-    const_string path;                  /* The path we're currently working on.  */
+    const_string path;                  /* path we're currently working on */
     /* from pathsearch.c */
     boolean followup_search;
     FILE *log_file;
-    boolean log_opened;                 /* Need to open the log file? */  
+    boolean log_opened;                 /* Need to open the log file? */
     /* from progname.c */
     string invocation_name;
     string invocation_short_name;
@@ -228,18 +229,18 @@ typedef struct kpathsea_instance {
     const_string fallback_font;
     /* If non-NULL, default list of fallback resolutions comes from this
      * instead of the compile-time value.  Set by dvipsk for the R config
-     * cmd.  *SIZES environment variables override/use as default.  
+     * cmd.  *SIZES environment variables override/use as default.
      */
     const_string fallback_resolutions_string;
     /* If non-NULL, check these if can't find (within a few percent of) the
-     * given resolution.  List must end with a zero element.  
+     * given resolution.  List must end with a zero element.
      */
     unsigned *fallback_resolutions;
     kpse_format_info_type format_info[kpse_last_format];
     /* from tex-make.c */
     /* We never throw away stdout, since that is supposed to be the filename
      *  found, if all is successful.  This variable controls whether stderr
-     *  is thrown away.  
+     *  is thrown away.
      */
     boolean make_tex_discard_errors;
     FILE *missfont;
@@ -252,7 +253,10 @@ typedef struct kpathsea_instance {
      * allows us to reclaim memory we allocated.
      */
     char **saved_env;       /* these keep track of changed items */
-    int saved_count;     
+    int saved_count;
+#if defined(WIN32) || defined(__MINGW32__) || defined(__CYGWIN__)
+    char **suffixlist;
+#endif /* WIN32 || __MINGW32__ || __CYGWIN__ */
 } kpathsea_instance;
 
 /* these come from kpathsea.c */
@@ -285,4 +289,3 @@ extern kpathsea kpse_def;
 #endif /* KPSE_COMPAT_API */
 
 #endif /* not KPATHSEA_TYPES_H */
- 

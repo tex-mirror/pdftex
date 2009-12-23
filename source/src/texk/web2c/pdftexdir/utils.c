@@ -19,9 +19,7 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
 #include "openbsd-compat.h"
-#ifdef HAVE_ASPRINTF            /* asprintf is not defined in openbsd-compat.h, but in stdio.h */
-#  include <stdio.h>
-#endif
+
 #include <sys/types.h>
 #ifdef WIN32
 #define EX_SOFTWARE EXIT_FAILURE
@@ -36,6 +34,7 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include <kpathsea/c-proto.h>
 #include <kpathsea/c-stat.h>
 #include <kpathsea/c-fopen.h>
+#include <kpathsea/version.h>
 #include <string.h>
 #include <time.h>
 #include <float.h>              /* for DBL_EPSILON */
@@ -61,9 +60,6 @@ strnumber last_tex_string;
 static char print_buf[PRINTF_BUF_SIZE];
 static char *jobname_cstr = NULL;
 static char *job_id_string = NULL;
-extern string ptexbanner;       /* from web2c/lib/texmfmp.c */
-extern string versionstring;    /* from web2c/lib/version.c */
-extern KPSEDLL string kpathsea_version_string;  /* from kpathsea/version.c */
 
 size_t last_ptr_index;          /* for use with alloc_array */
 

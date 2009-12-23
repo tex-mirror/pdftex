@@ -48,6 +48,7 @@ AC_REQUIRE([KPSE_GD_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_XPDF_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_GRAPHITE_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_TECKIT_SYSTEM_FLAGS])[]dnl
+AC_REQUIRE([KPSE_ICU_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_KPATHSEA_SYSTEM_FLAGS])[]dnl
 ]) # KPSE_ALL_SYSTEM_FLAGS
 
@@ -63,6 +64,7 @@ psutils
 t1utils
 tpic2pdftex
 vlna
+xindy-new
 xindy
 ])]) # KPSE_UTILS_PKGS
 
@@ -75,6 +77,7 @@ AC_DEFUN([KPSE_TEXK_PKGS],
 web2c
 afm2pl
 bibtex8
+bibtexu
 cjkutils
 detex
 devnag
@@ -86,6 +89,7 @@ dvipdfmx
 dvipng
 dvipos
 dvipsk
+dvisvgm
 gsftopk
 lacheck
 lcdf-typetools

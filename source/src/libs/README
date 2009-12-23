@@ -11,7 +11,26 @@ freetype 1.5 - ?
 
 freetype2 2.3.9 - http://savannah.nongnu.org/download/freetype/
 
+<<<<<<< .mine
+xpdf:
+  Original sources from:
+    http://www.foolabs.com/xpdf/xpdf-3.02.tar.gz
+    ftp://ftp.foolabs.com/pub/xpdf/xpdf-3.02.tar.gz
+  Applied three patches:
+    xpdf-3.02pl1.patch
+    xpdf-3.02pl2.patch
+    xpdf-3.02pl3.patch
+  Applied patch for PDF_PARSER_ONLY:
+    xpdf/xpdf-3.02-PDF_PARSER_ONLY.patch
+  Applied patch for pdftex:
+    xpdf/xpdf-3.02-pdftex.patch
+  Applied patch for djgpp:
+    xpdf/xpdf-3.02-time_h.patch
+  Applied patch for mingw32:
+    xpdf/xpdf-3.02-mingw32.patch
+=======
 gd 2.0.35 - http://www.libgd.org/releases/
+>>>>>>> .r12937
 
 graphite-engine - used by xetex, maintained here+upstream by Jonathan Kew
 

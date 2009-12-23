@@ -6,8 +6,8 @@ dnl   This file is free software; the copyright holder
 dnl   gives unlimited permission to copy and/or distribute it,
 dnl   with or without modifications, as long as this notice is preserved.
 dnl
-AC_INIT([TeX Live], [2009-10-10], [tex-k@tug.org])
-AC_PREREQ([2.63])
+AC_INIT([TeX Live], [2009-11-30], [tex-k@tug.org])
+AC_PREREQ([2.65])
 AC_CONFIG_SRCDIR([m4/kpse-pkgs.m4])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
@@ -38,13 +38,15 @@ dnl 5. For each library Lib in the list of TL libraries:
 dnl    sinclude libs/Lib/ac/withenable.ac
 dnl      usually providing the configure options --with-system-Lib,
 dnl        --with-Lib-includes=DIR, and --with-Lib-libdir=DIR
-dnl     for each required TL library SubLib (if any):
-dnl        disallow with_system_Lib=yes and with_system_SubLib=no
+dnl    for each required TL library SubLib (if any):
+dnl      disallow with_system_Lib=yes and with_system_SubLib=no
+dnl      if $need_Lib=yes then set need_SubLib=yes 
 dnl
 KPSE_SETUP([])
 
 dnl Common code for all programs using libkpathsea.
-KPSE_COMMON([TeX Live top-level])
+KPSE_COMMON([TeX Live top-level], [dist-xz])
+KPSE_CANONICAL_HOST
 
 AC_PATH_XTRA
 
@@ -109,31 +111,48 @@ if test "x$syslib_used:$enable_native_texlive_build" = xyes:yes; then
 fi
 KPSE_RESTORE_FLAGS
 
-AS_IF([test "x$cross_compiling:$enable_xetex" = xyes:yes],
-      [AC_MSG_ERROR([Sorry, can not cross compile icu libraries required for XeTeX])])
-
 AM_CONDITIONAL([build_kpathsea],
                [test "x$need_kpathsea" = xyes && test "x$with_system_kpathsea" != xyes])
 
-AC_CONFIG_SUBDIRS([texk/kpathsea libs utils texk])
+AC_CONFIG_SUBDIRS([auxdir/auxsub texk/kpathsea libs utils texk])
 
 AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
 
+dnl Most probably we need GNU make.
+if test -z "`${MAKE-make} -v 2>/dev/null | grep GNU`"; then
+  if test "x$enable_native_texlive_build" = xno; then
+    AC_MSG_WARN([Building TeX Live may require GNU make])
+  else
+    AC_MSG_ERROR([Building TeX Live requires GNU make])
+  fi
+fi
+
 AS_IF([test "x$cross_compiling" = xyes],
-      [AS_IF([test "x$build" = x],
-             [AC_MSG_ERROR([when cross-compiling you must specify both --host and --build.])])
-       msg_compiling="cross-compiling on $build"],
-      [msg_compiling="compiling"])
+      [msg_compiling="cross-compiling on $build_alias for $host_alias"],
+      [msg_compiling="compiling for $kpse_build_alias"])
+kpse_bld=`pwd`
+kpse_src=`cd "$srcdir" && pwd`
+msg_compiling="$msg_compiling
+      in $kpse_bld"
+test "x$srcdir" = x. || msg_compiling="$msg_compiling
+      from sources in $kpse_src"
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE_STRING:
 
-   $msg_compiling for $host
-   prefix:                    $prefix
-   enable_shared:             $enable_shared
-   enable_multiplatform:      $enable_multiplatform
-   enable_cxx_runtime_hack:   $enable_cxx_runtime_hack
+   $msg_compiling])
+case $kpse_bld$kpse_bld in
+  *' '*) AC_MSG_ERROR([Absolute source and/or build path with embedded spaces]);;
+esac
+AC_MSG_RESULT([
+   prefix:                       $prefix
+   enable_native_texlive_build:  $enable_native_texlive_build
+   enable_shared:                $enable_shared
+   enable_multiplatform:         $enable_multiplatform
+   enable_cxx_runtime_hack:      $enable_cxx_runtime_hack
+   enable_libtool_hack:          $enable_libtool_hack
+   enable_compiler_warnings:     $enable_compiler_warnings
 
 ** Next run `make' to configure and build each library and program.
 ])

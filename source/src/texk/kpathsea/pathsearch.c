@@ -1,6 +1,6 @@
 /* pathsearch.c: look up a filename in a path.
 
-   Copyright 1993, 1994, 1995, 1997, 2007 Karl Berry.
+   Copyright 1993, 1994, 1995, 1997, 2007, 2009 Karl Berry.
    Copyright 1997-2005 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
@@ -51,7 +51,7 @@ static void
 log_search (kpathsea kpse, str_list_type filenames)
 {
   
-  if (kpse->log_opened==false) {
+  if (kpse->log_opened == false) {
     /* Get name from either envvar or config file.  */
       string log_name = kpathsea_var_value (kpse, "TEXMFLOG");
     kpse->log_opened = true;
@@ -152,8 +152,8 @@ dir_list_search (kpathsea kpse, str_llist_type *dirs,  const_string name,
 }
 
 static str_list_type
-dir_list_search_list (kpathsea kpse, str_llist_type *dirs,  const_string* names,
-                         boolean search_all)
+dir_list_search_list (kpathsea kpse, str_llist_type *dirs, const_string* names,
+                      boolean search_all)
 {
   str_llist_elt_type *elt;
   str_list_type ret;
@@ -263,7 +263,8 @@ path_search (kpathsea kpse, const_string path,  string name,
     
     /* Try ls-R, unless we're searching for texmf.cnf.  Our caller
        (search), also tests first_search, and does the resetting.  */
-    found = kpse->followup_search ? kpathsea_db_search (kpse, name, elt, all) : NULL;
+    found = kpse->followup_search ? kpathsea_db_search (kpse, name, elt, all)
+                                  : NULL;
 
     /* Search the filesystem if (1) the path spec allows it, and either
          (2a) we are searching for texmf.cnf ; or
@@ -367,7 +368,7 @@ search (kpathsea kpse, const_string path,  const_string original_name,
 
   /* The very first search is for texmf.cnf.  We can't log that, since
      we want to allow setting TEXMFLOG in texmf.cnf.  */
-  if (kpse->followup_search==false) {
+  if (kpse->followup_search == false) {
     kpse->followup_search = true;
   } else {
     /* Record the filenames we found, if desired.  And wrap them in a
@@ -441,16 +442,15 @@ search_list (kpathsea kpse, const_string path,  const_string* names,
 
   /* First catch any absolute or explicit relative names. */
   for (namep = names; *namep; namep++) {
-      if (kpathsea_absolute_p(kpse, *namep, true)) {
-          if (kpathsea_readable_file(kpse, *namep)) {
-          str_list_add(&ret_list, xstrdup(*namep));
-          /* I know, I know... */
-          if (!all)
-              goto out;
-          }
-      } else {
-          all_absolute = false;
+    if (kpathsea_absolute_p (kpse, *namep, true)) {
+      if (kpathsea_readable_file (kpse, *namep)) {
+        str_list_add (&ret_list, xstrdup(*namep));
+        if (!all)
+          goto out;
       }
+    } else {
+      all_absolute = false;
+    }
   }
   /* Shortcut: if we were only given absolute/explicit relative names,
      we can skip the rest.  Typically, if one name is absolute, they
@@ -471,10 +471,11 @@ search_list (kpathsea kpse, const_string path,  const_string* names,
     }
 
     /* See elt-dirs.c for side effects of this function. */
-    kpathsea_normalize_path(kpse, elt);
+    kpathsea_normalize_path (kpse, elt);
 
     /* Try ls-R, unless we're searching for texmf.cnf. */
-    found = kpse->followup_search ? kpathsea_db_search_list(kpse, names, elt, all) : NULL;
+    found = kpse->followup_search
+            ? kpathsea_db_search_list (kpse, names, elt, all) : NULL;
 
     /* Search the filesystem if (1) the path spec allows it, and either
          (2a) we are searching for texmf.cnf ; or
@@ -513,7 +514,7 @@ search_list (kpathsea kpse, const_string path,  const_string* names,
       || (all && STR_LIST_LAST_ELT (ret_list) != NULL))
     str_list_add (&ret_list, NULL);
 
-  if (kpse->followup_search==false) {
+  if (kpse->followup_search == false) {
     kpse->followup_search = true;
   } else {
     /* Record the filenames we found, if desired.  And wrap them in a
@@ -554,11 +555,11 @@ kpathsea_path_search (kpathsea kpse, const_string path,  const_string name,
 /* Many inputs, return (more or less indeterminate) one matching string.  */
 
 string
-kpathsea_path_search_list (kpathsea kpse, const_string path,  const_string* names,
-                           boolean must_exist)
+kpathsea_path_search_list (kpathsea kpse, const_string path,
+                           const_string* names, boolean must_exist)
 {
-  string *ret_list
-      = kpathsea_path_search_list_generic (kpse, path, names, must_exist, false);
+  string *ret_list = kpathsea_path_search_list_generic (kpse, path, names,
+                                                        must_exist, false); 
   string ret = *ret_list;
   free (ret_list);
   return ret;
@@ -605,7 +606,8 @@ kpse_path_search (const_string path,  const_string name, boolean must_exist)
 }
 
 string
-kpse_path_search_list (const_string path,  const_string* names, boolean must_exist)
+kpse_path_search_list (const_string path,  const_string* names,
+                       boolean must_exist)
 {
     return kpathsea_path_search_list (kpse_def, path, names, must_exist);
 }
@@ -620,7 +622,8 @@ string *
 kpse_path_search_list_generic (const_string path,  const_string* names,
                                boolean must_exist,  boolean all)
 {
-  return kpathsea_path_search_list_generic (kpse_def, path, names, must_exist, all);
+  return kpathsea_path_search_list_generic (kpse_def, path, names,
+                                            must_exist, all);
 }    
 
 string *

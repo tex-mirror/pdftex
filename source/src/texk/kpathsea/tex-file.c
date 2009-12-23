@@ -22,6 +22,7 @@
 #include <kpathsea/c-pathch.h>
 #include <stdarg.h>
 #include <kpathsea/cnf.h>
+#include <kpathsea/absolute.h>
 #include <kpathsea/concatn.h>
 #include <kpathsea/default.h>
 #include <kpathsea/expand.h>
@@ -31,7 +32,7 @@
 #include <kpathsea/tex-file.h>
 #include <kpathsea/tex-make.h>
 #include <kpathsea/variable.h>
-
+#include <kpathsea/c-ctype.h>
 
 /* These are not in the structure
    because it's annoying to initialize lists in C.  */
@@ -143,7 +144,7 @@ kpathsea_init_fallback_resolutions (kpathsea kpse, string envvar)
 void
 kpse_init_fallback_resolutions ( string envvar)
 {
-    kpathsea_init_fallback_resolutions (kpse_def,  envvar);
+  kpathsea_init_fallback_resolutions (kpse_def,  envvar);
 }
 #endif
 
@@ -168,7 +169,7 @@ void
 kpse_set_program_enabled (kpse_file_format_type fmt,  
                           boolean value, kpse_src_type level)
 {
-    kpathsea_set_program_enabled(kpse_def, fmt, value, level);
+  kpathsea_set_program_enabled (kpse_def, fmt, value, level);
 }
 
 #endif
@@ -178,13 +179,12 @@ kpse_set_program_enabled (kpse_file_format_type fmt,
    as well have a common place.  */
 
 void
-kpathsea_maketex_option (kpathsea kpse, const_string fmtname,  boolean value)
+kpathsea_maketex_option (kpathsea kpse,  const_string fmtname,  boolean value)
 {
   kpse_file_format_type fmt = kpse_last_format;
   
   /* Trying to match up with the suffix lists unfortunately doesn't work
      well, since that would require initializing the formats.  */
-  /* FIXME: Currently the function silently ignores unrecognized arguments.*/
   if (FILESTRCASEEQ (fmtname, "pk")) {
     fmt = kpse_pk_format;
   } else if (FILESTRCASEEQ (fmtname, "mf")) {
@@ -199,9 +199,12 @@ kpathsea_maketex_option (kpathsea kpse, const_string fmtname,  boolean value)
     fmt = kpse_ofm_format;
   } else if (FILESTRCASEEQ (fmtname, "ocp")) {
     fmt = kpse_ocp_format;
+  } else {
+    fprintf (stderr, "\nkpathsea: Unknown mktex format: %s\n", fmtname);
   }
+
   if (fmt != kpse_last_format) {
-      kpathsea_set_program_enabled (kpse, fmt, value, kpse_src_cmdline);
+    kpathsea_set_program_enabled (kpse, fmt, value, kpse_src_cmdline);
   }
 }
 
@@ -209,19 +212,13 @@ kpathsea_maketex_option (kpathsea kpse, const_string fmtname,  boolean value)
 void
 kpse_maketex_option (const_string fmtname,  boolean value)
 {
-    kpathsea_maketex_option (kpse_def, fmtname,  value);
+  kpathsea_maketex_option (kpse_def, fmtname,  value);
 }
 #endif
 
 
-/* Macro subroutines for `init_path'.  TRY_ENV checks if an envvar ENAME
-   is set and non-null, and sets var to ENAME if so.  */
-#define TRY_ENV(ename) do { \
-  string evar = ename; \
-} while (0)
-
-/* And EXPAND_DEFAULT calls kpse_expand_default on try_path and the
-   present info->path.  */
+/* Macro subroutine for `init_path'.  EXPAND_DEFAULT calls
+   kpse_expand_default on try_path and the present info->path.  */
 #define EXPAND_DEFAULT(try_path, source_string)			\
   if (try_path) {						\
     info->raw_path = try_path;					\
@@ -236,7 +233,8 @@ kpse_maketex_option (const_string fmtname,  boolean value)
    `client_path' member must already be set upon entry.  */
 
 static void
-init_path (kpathsea kpse, kpse_format_info_type *info, const_string default_path, ...)
+init_path (kpathsea kpse, kpse_format_info_type *info,
+           const_string default_path, ...) 
 {
   string env_name;
   string env_value = NULL;
@@ -278,7 +276,7 @@ init_path (kpathsea kpse, kpse_format_info_type *info, const_string default_path
     /* If we are initializing the cnf path, don't try to get any
        values from the cnf files; that's infinite loop time.  */
     if (!info->cnf_path && info != &(kpse->format_info[kpse_cnf_format]))
-        info->cnf_path = kpathsea_cnf_get (kpse, env_name);
+      info->cnf_path = kpathsea_cnf_get (kpse, env_name);
       
     if (var && info->cnf_path)
       break;
@@ -331,9 +329,9 @@ kpathsea_set_suffixes (kpathsea kpse, kpse_file_format_type format,
   va_list ap;
 
   if (alternate) {
-      list = &(kpse->format_info[format].alt_suffix);
+    list = &(kpse->format_info[format].alt_suffix);
   } else {
-      list = &(kpse->format_info[format].suffix);
+    list = &(kpse->format_info[format].suffix);
   }
 
   va_start (ap, alternate);
@@ -364,7 +362,7 @@ kpse_set_suffixes (kpse_file_format_type format,
 #define FMT_INFO (kpse->format_info[format])
 /* Call kpse_set_add_suffixes.  */
 #define SUFFIXES(args) kpathsea_set_suffixes(kpse, format, false, args, NULL)
-#define ALT_SUFFIXES(args) kpathsea_set_suffixes(kpse, format, true, args, NULL)
+#define ALT_SUFFIXES(args) kpathsea_set_suffixes(kpse, format, true, args,NULL)
 
 /* Call `init_path', including appending the trailing NULL to the envvar
    list. Also initialize the fields not needed in setting the path.  */
@@ -381,12 +379,13 @@ kpse_set_suffixes (kpse_file_format_type format,
    name to 0 or 1.  */
 
 static void
-init_maketex (kpathsea kpse, kpse_file_format_type fmt, const_string dflt_prog, ...)
+init_maketex (kpathsea kpse, kpse_file_format_type fmt,
+              const_string dflt_prog, ...) 
 {
   kpse_format_info_type *f = &(kpse->format_info[fmt]);
   const_string prog = f->program ? f->program : dflt_prog; /* mktexpk */
-  string PROG = uppercasify (prog);             /* MKTEXPK */
-  string progval = kpathsea_var_value (kpse, PROG);       /* ENV/cnf{"MKTEXPK"} */
+  string PROG = uppercasify (prog);                  /* MKTEXPK */
+  string progval = kpathsea_var_value (kpse, PROG);  /* $ENV/cnf{"MKTEXPK"} */
   const_string arg;
   va_list ap;
 
@@ -395,7 +394,7 @@ init_maketex (kpathsea kpse, kpse_file_format_type fmt, const_string dflt_prog, 
 
   /* Set up the argument vector. */
   f->argc = 0;
-  f->argv = XTALLOC(2, const_string);
+  f->argv = XTALLOC (2, const_string);
   f->argv[f->argc++] = dflt_prog;
   va_start (ap, dflt_prog);
   while ((arg = va_arg (ap, string)) != NULL) {
@@ -409,7 +408,8 @@ init_maketex (kpathsea kpse, kpse_file_format_type fmt, const_string dflt_prog, 
   if (progval && *progval) {
     /* This might actually be from an environment variable value, but in
        that case, we'll have previously set it from kpse_init_prog.  */
-      kpathsea_set_program_enabled (kpse, fmt, *progval == '1', kpse_src_client_cnf);
+    kpathsea_set_program_enabled (kpse, fmt, *progval == '1',
+                                  kpse_src_client_cnf); 
   }
   
   free (PROG);
@@ -607,7 +607,8 @@ kpathsea_init_format (kpathsea kpse, kpse_file_format_type format)
       break;
     case kpse_ovf_format:
       INIT_FORMAT ("ovf", DEFAULT_OVFFONTS, OVF_ENVS);
-      SUFFIXES (".ovf");
+#define OVF_SUFFIXES ".ovf", ".vf"
+      SUFFIXES (OVF_SUFFIXES);
       FMT_INFO.suffix_search_only = true;
       FMT_INFO.binmode = true;
       break;
@@ -628,7 +629,7 @@ kpathsea_init_format (kpathsea kpse, kpse_file_format_type format)
       SUFFIXES (".tex");
       /* TeX files can have any obscure suffix in the world (or none at
          all).  Only check for the most common ones.  */
-#define ALT_TEX_SUFFIXES ".sty", ".cls", ".fd", ".aux", ".bbl", ".def", ".clo", ".ldf"
+#define ALT_TEX_SUFFIXES ".sty",".cls",".fd",".aux",".bbl",".def",".clo",".ldf"
       ALT_SUFFIXES (ALT_TEX_SUFFIXES);
       break;
     case kpse_tex_ps_header_format:
@@ -755,7 +756,7 @@ kpathsea_init_format (kpathsea kpse, kpse_file_format_type format)
       FMT_INFO.suffix_search_only = true;
       break;
     case kpse_fea_format:
-      INIT_FORMAT ("font feature files", DEFAULT_FONTFEATURES, FONTFEATURES_ENVS);
+      INIT_FORMAT("font feature files",DEFAULT_FONTFEATURES,FONTFEATURES_ENVS);
       SUFFIXES (".fea");
       FMT_INFO.suffix_search_only = true;
       break;
@@ -842,7 +843,7 @@ kpathsea_init_format (kpathsea kpse, kpse_file_format_type format)
 const_string
 kpse_init_format (kpse_file_format_type format)
 {
-    return kpathsea_init_format (kpse_def, format);
+  return kpathsea_init_format (kpse_def, format);
 }
 #endif
 
@@ -855,7 +856,8 @@ kpse_init_format (kpse_file_format_type format)
    the support working nonetheless.  */
 
 static void
-target_fontmaps (kpathsea kpse, const_string **target, unsigned *count, const_string name)
+target_fontmaps (kpathsea kpse, string **target, unsigned *count,
+                const_string name)
 {
   string *mapped_names = kpathsea_fontmap_lookup (kpse, name);
   
@@ -865,7 +867,7 @@ target_fontmaps (kpathsea kpse, const_string **target, unsigned *count, const_st
     while ((mapped_name = *mapped_names++) != NULL) {
       (*target)[(*count)] = xstrdup (mapped_name);
       (*count)++;
-      XRETALLOC ((*target), (*count)+1, const_string);
+      XRETALLOC ((*target), (*count)+1, string);
     }
   }
 }
@@ -875,21 +877,21 @@ target_fontmaps (kpathsea kpse, const_string **target, unsigned *count, const_st
    in TARGET, depending on the various other parameters.  */
 
 static void
-target_asis_name (kpathsea kpse, const_string **target, unsigned *count,
+target_asis_name (kpathsea kpse, string **target, unsigned *count,
     kpse_file_format_type format,
     const_string name, boolean use_fontmaps, boolean has_potential_suffix,
     string has_any_suffix)
 {
-    (void)has_any_suffix; /* -Wunused */
+  (void) has_any_suffix; /* -Wunused */
   /* Look for the name we've been given, provided non-suffix
      searches are allowed or the name already includes a suffix. */
   if (has_potential_suffix || !FMT_INFO.suffix_search_only) {
     (*target)[(*count)] = xstrdup (name);
     (*count)++;
-    XRETALLOC ((*target), (*count)+1, const_string);
+    XRETALLOC ((*target), (*count)+1, string);
 
     if (use_fontmaps) {
-        target_fontmaps (kpse, target, count, name);
+      target_fontmaps (kpse, target, count, name);
     }
   }
 }
@@ -900,7 +902,7 @@ target_asis_name (kpathsea kpse, const_string **target, unsigned *count,
    of the potential suffixes for FORMAT.  */
 
 static void
-target_suffixed_names (kpathsea kpse, const_string **target, unsigned *count,
+target_suffixed_names (kpathsea kpse, string **target, unsigned *count,
     kpse_file_format_type format,
     const_string name, boolean use_fontmaps, boolean has_potential_suffix)
 {
@@ -913,10 +915,10 @@ target_suffixed_names (kpathsea kpse, const_string **target, unsigned *count,
     string name_with_suffix = concat (name, *ext);
     (*target)[(*count)] = name_with_suffix;
     (*count)++;
-    XRETALLOC ((*target), (*count)+1, const_string);
+    XRETALLOC ((*target), (*count)+1, string);
     
     if (use_fontmaps) {
-        target_fontmaps (kpse, target, count, name_with_suffix);
+      target_fontmaps (kpse, target, count, name_with_suffix);
     }    
   }
 }
@@ -927,10 +929,11 @@ target_suffixed_names (kpathsea kpse, const_string **target, unsigned *count,
    thing for clients to call.  */
    
 string
-kpathsea_find_file (kpathsea kpse, const_string name,  kpse_file_format_type format,
-                    boolean must_exist)
+kpathsea_find_file (kpathsea kpse, const_string name,
+                    kpse_file_format_type format,  boolean must_exist)
 {
-  string *ret_list = kpathsea_find_file_generic (kpse, name, format, must_exist, false);
+  string *ret_list = kpathsea_find_file_generic (kpse, name, format,
+                                                 must_exist, false);
   string ret = *ret_list;
   free (ret_list);
   return ret;
@@ -941,7 +944,7 @@ string
 kpse_find_file (const_string name,  kpse_file_format_type format,
                 boolean must_exist)
 {
-    return kpathsea_find_file(kpse_def, name, format, must_exist);
+  return kpathsea_find_file(kpse_def, name, format, must_exist);
 }
 #endif
 
@@ -949,10 +952,10 @@ kpse_find_file (const_string name,  kpse_file_format_type format,
    hence we always return a NULL-terminated list.  */
 
 string *
-kpathsea_find_file_generic (kpathsea kpse, const_string name,  kpse_file_format_type format,
-                            boolean must_exist,  boolean all)
+kpathsea_find_file_generic (kpathsea kpse, const_string const_name,
+               kpse_file_format_type format,  boolean must_exist,  boolean all)
 {
-  const_string *target;
+  string *target, name;
   const_string *ext;
   unsigned count;
   unsigned name_len = 0;
@@ -967,19 +970,20 @@ kpathsea_find_file_generic (kpathsea kpse, const_string name,  kpse_file_format_
 
   /* NAME being NULL is a programming bug somewhere.  NAME can be empty,
      though; this happens with constructs like `\input\relax'.  */
-  assert (name);
+  assert (const_name);
   
   if (FMT_INFO.path == NULL)
     kpathsea_init_format (kpse, format);
 
   if (KPATHSEA_DEBUG_P (KPSE_DEBUG_SEARCH))
     DEBUGF3 ("kpse_find_file: searching for %s of type %s (from %s)\n",
-             name, FMT_INFO.type, FMT_INFO.path_source);
+             const_name, FMT_INFO.type, FMT_INFO.path_source);
 
   /* Do variable and tilde expansion. */
-  name = kpathsea_expand (kpse, name);
+  name = kpathsea_expand (kpse, const_name);
    
-  try_std_extension_first = kpathsea_var_value (kpse, "try_std_extension_first");
+  try_std_extension_first
+    = kpathsea_var_value (kpse, "try_std_extension_first"); 
   has_any_suffix = strrchr (name, '.');
   if (has_any_suffix) {
     string p = strchr (has_any_suffix, DIR_SEP);
@@ -1008,20 +1012,20 @@ kpathsea_find_file_generic (kpathsea kpse, const_string name,  kpse_file_format_
   /* Set up list of target names to search for, the order depending on
      try_std_extension_first.  */
   count = 0;
-  target = XTALLOC1 (const_string);
+  target = XTALLOC1 (string);
 
   if (has_any_suffix
       && (try_std_extension_first == NULL || *try_std_extension_first == 'f'
           || *try_std_extension_first == '0')) {
-      target_asis_name (kpse, &target, &count, format, name, use_fontmaps,
-                           has_potential_suffix, has_any_suffix);
-      target_suffixed_names (kpse, &target, &count, format, name, use_fontmaps,
+    target_asis_name (kpse, &target, &count, format, name, use_fontmaps,
+                      has_potential_suffix, has_any_suffix);
+    target_suffixed_names (kpse, &target, &count, format, name, use_fontmaps,
                            has_potential_suffix);
   } else {
-      target_suffixed_names (kpse, &target, &count, format, name, use_fontmaps,
+    target_suffixed_names (kpse, &target, &count, format, name, use_fontmaps,
                            has_potential_suffix);
-      target_asis_name (kpse, &target, &count, format, name, use_fontmaps,
-                           has_potential_suffix, has_any_suffix );
+    target_asis_name (kpse, &target, &count, format, name, use_fontmaps,
+                      has_potential_suffix, has_any_suffix);
   }
 
   /* Terminate list. */
@@ -1032,11 +1036,13 @@ kpathsea_find_file_generic (kpathsea kpse, const_string name,  kpse_file_format_
   }
 
   /* Search, trying to minimize disk-pounding.  */
-  ret = kpathsea_path_search_list_generic (kpse, FMT_INFO.path, target, false, all);
+  ret = kpathsea_path_search_list_generic (kpse, FMT_INFO.path,
+                                         (const_string*) target, false, all); 
+
   /* Do we need to pound the disk? */
   if (! *ret && must_exist) {
     for (count = 0; target[count]; count++)
-      free ((void *) target[count]);
+      free (target[count]);
     count = 0;
     /* We look for a subset of the previous set of names, so the
        target array is large enough.  In particular, we don't pound
@@ -1049,12 +1055,13 @@ kpathsea_find_file_generic (kpathsea kpse, const_string name,  kpse_file_format_
       target[count++] = xstrdup (name);
     }
     target[count] = NULL;
-    ret = kpathsea_path_search_list_generic (kpse, FMT_INFO.path, target, true, all);
+    ret = kpathsea_path_search_list_generic (kpse, FMT_INFO.path,
+                                           (const_string*) target, true, all); 
   }
   
   /* Free the list we created. */
   for (count = 0; target[count]; count++)
-    free ((void *) target[count]);
+    free (target[count]);
   free (target);
   
   /* If nothing was found, call mktex* to create a missing file.  Since
@@ -1067,7 +1074,7 @@ kpathsea_find_file_generic (kpathsea kpse, const_string name,  kpse_file_format_
     }
   }
 
-  free ((void *) name);
+  free (name);
 
   return ret;
 }
@@ -1077,7 +1084,224 @@ string *
 kpse_find_file_generic (const_string name,  kpse_file_format_type format,
                         boolean must_exist,  boolean all)
 {
-    return kpathsea_find_file_generic(kpse_def, name, format, must_exist, all);
+  return kpathsea_find_file_generic(kpse_def, name, format, must_exist, all);
+}
+#endif
+
+
+
+/* Return true if FNAME is acceptable to open for reading or writing.  */
+
+typedef enum ok_type {
+    ok_reading,
+    ok_writing
+} ok_type;
+
+static const_string ok_type_name[] = {
+    "reading from",
+    "writing to"
+};
+
+static boolean
+kpathsea_name_ok (kpathsea kpse, const_string fname, const_string check_var,
+		  const_string default_choice, ok_type action, boolean silent)
+{
+  /* We distinguish three cases:
+     'a' (any)        allows any file to be opened.
+     'r' (restricted) means disallowing special file names.
+     'p' (paranoid)   means being really paranoid: disallowing special file
+                      names and restricting output files to be in or below
+                      the working directory or $TEXMFOUTPUT, while input files
+                      must be below the current directory, $TEXMFOUTPUT, or
+                      (implicitly) in the system areas.
+     We default to "paranoid".  The error messages from TeX may be puzzling.
+     This function contains several return and goto statements, be careful.  */
+
+  const_string open_choice = kpathsea_var_value (kpse, check_var);
+
+  if (!open_choice)
+    open_choice = default_choice;
+
+  if (*open_choice == 'a' || *open_choice == 'y' || *open_choice == '1')
+    return true;
+
+#if defined (unix) && !defined (MSDOS)
+  {
+    /* Disallow .rhosts, .login, .ssh/, ..somefile, ..somedir/somefile,
+       etc.  But allow .tex (for base LaTeX).  */
+    const_string q;
+    const_string qq = fname;
+    while ((q = strchr (qq, '.'))) {            /* at each dot */
+      if ((q == fname || IS_DIR_SEP (*(q - 1))) /* start or / precedes dot? */
+          && !IS_DIR_SEP (*(q + 1))             /* ok if /./ */
+          && !(*(q + 1) == '.' && IS_DIR_SEP (*(q + 2))) /* ok  if /../ */
+          && !STREQ (q, ".tex")) {              /* specially allow .tex */
+        goto not_ok;
+      }
+      qq = q + 1;
+    }
+  }
+#else
+  /* Other OSs don't have special names? */
+#endif
+
+  if (*open_choice == 'r' || *open_choice == 'n' || *open_choice == '0')
+    return true;
+
+  /* Paranoia originally supplied by Charles Karney.  */
+  if (kpathsea_absolute_p (kpse, fname, false)) {
+    const_string texmfoutput = kpathsea_var_value (kpse, "TEXMFOUTPUT");
+    /* Absolute pathname is only OK if TEXMFOUTPUT is set, it's not empty,
+       fname begins the TEXMFOUTPUT, and is followed by / */
+    if (!texmfoutput || *texmfoutput == '\0'
+        || fname != strstr (fname, texmfoutput)
+        || !IS_DIR_SEP (fname[strlen (texmfoutput)]))
+      goto not_ok;
+  }
+  /* For all pathnames, we disallow "../" at the beginning or "/../"
+     anywhere.  */
+  if (fname[0] == '.' && fname[1] == '.' && IS_DIR_SEP(fname[2]))
+    goto not_ok;
+  else {
+    /* Check for "/../".  Since more than one character can be matched
+       by IS_DIR_SEP, we cannot use "/../" itself. */
+    const_string dotpair = strstr (fname, "..");
+    while (dotpair) {
+      /* If dotpair[2] == DIR_SEP, then dotpair[-1] is well-defined,
+         because the "../" case was handled above. */
+      if (IS_DIR_SEP (dotpair[2]) && IS_DIR_SEP (dotpair[-1]))
+        goto not_ok;
+      /* Continue after the dotpair. */
+      dotpair = strstr (dotpair+2, "..");
+    }
+  }
+
+  /* We passed all tests.  */
+  return true;
+
+ not_ok: /* Some test failed.  */
+  if (!silent)
+    fprintf (stderr, "\n%s: Not %s %s (%s = %s).\n",
+             kpse->invocation_name, ok_type_name[action], fname,
+             check_var, open_choice);
+  return false;
+}
+
+/* For input default to all. */
+
+boolean
+kpathsea_in_name_ok_silent (kpathsea kpse, const_string fname)
+{
+  return kpathsea_name_ok (kpse, fname, "openin_any", "a", ok_reading, true);
+}
+
+boolean
+kpathsea_in_name_ok (kpathsea kpse, const_string fname)
+{
+  return kpathsea_name_ok (kpse, fname, "openin_any", "a", ok_reading, false);
+}
+
+
+#if defined(WIN32) || defined(__MINGW32__) || defined(__CYGWIN__)
+static int
+Isspace (char c)
+{
+  return (c == ' ' || c == '\t');
+}
+
+static boolean
+executable_filep (kpathsea kpse, const_string fname, boolean silent)
+{
+    string p, q, base;
+    string *pp;
+
+/*  check openout_any */
+    p = kpathsea_var_value (kpse, "openout_any");
+    if (p && *p == 'p') {
+      free (p);
+/* get base name
+   we cannot use xbasename() for abnormal names.
+*/
+      base = xstrdup (fname);
+      p = strrchr (fname, '/');
+      if (p) {
+        p++;
+        strcpy (base, p);
+      }
+      p = strrchr (base, '\\');
+      if (p) {
+        p++;
+        strcpy (base, p);
+      }
+#if defined(__CYGWIN__)
+      for (p = base; *p; p++)
+        *p = TOLOWER (*p);
+      p = base; 
+#else
+      p = (char *) strlwr (base);
+#endif
+      for (q = p + strlen (p) - 1; 
+           (q >= p) && ((*q == '.') || (Isspace (*q))); q--) {
+        *q = '\0'; /* remove trailing '.' , ' ' and '\t' */
+      }
+      q = strrchr (p, '.'); /* get extension part */
+      pp = kpse->suffixlist;
+      if (pp && q) {
+        while (*pp) {
+          if (strchr (fname, ':') || !strcmp (q, *pp)) {
+            if (!silent)
+              fprintf (stderr, "\n%s: Forbidden to open for writing\n", fname);
+            free (base);
+            return true;
+          }
+          pp++;
+        }
+      }
+      free (base);
+    } else if (p) {
+      free (p);
+    }
+    return false;
+}
+#endif /* WIN32 || __MINGW32__ || __CYGWIN__ */
+
+static boolean
+kpathsea_out_name_ok_1 (kpathsea kpse, const_string fname, boolean silent)
+{
+#if defined(WIN32) || defined(__MINGW32__) || defined(__CYGWIN__)
+  /* Output of an executable file is restricted on Windows */
+  if (executable_filep (kpse, fname, silent))
+    return false;
+#endif /* WIN32 || __MINGW32__ || __CYGWIN__ */
+  /* For output, default to paranoid. */
+  return kpathsea_name_ok (kpse, fname, "openout_any", "p", ok_writing,silent);
+}
+
+boolean
+kpathsea_out_name_ok_silent (kpathsea kpse, const_string fname)
+{
+  return kpathsea_out_name_ok_1 (kpse, fname, true);
+}
+
+boolean
+kpathsea_out_name_ok (kpathsea kpse, const_string fname)
+{
+  return kpathsea_out_name_ok_1 (kpse, fname, false);
+}
+
+#if defined (KPSE_COMPAT_API)
+boolean
+kpse_in_name_ok (const_string fname)
+{
+  /* For input default to all. */
+  return kpathsea_in_name_ok (kpse_def, fname);
+}
+
+boolean
+kpse_out_name_ok (const_string fname)
+{
+  /* For output, default to paranoid. */
+  return kpathsea_out_name_ok (kpse_def, fname);
 }
 #endif
 
@@ -1087,7 +1311,8 @@ kpse_find_file_generic (const_string name,  kpse_file_format_type format,
    resulting file, or exit with an error message.  */
 
 FILE *
-kpathsea_open_file (kpathsea kpse, const_string name,  kpse_file_format_type type)
+kpathsea_open_file (kpathsea kpse, const_string name,
+                    kpse_file_format_type type)
 {
   string fullname = kpathsea_find_file (kpse, name, type, true);
   const_string mode = kpse->format_info[type].binmode
@@ -1099,7 +1324,7 @@ kpathsea_open_file (kpathsea kpse, const_string name,  kpse_file_format_type typ
       perror (fullname);
       exit (1);
     } else {
-      LIB_FATAL2 ("%s file `%s' not found", kpse->format_info[type].type, name);
+      LIB_FATAL2 ("%s file `%s' not found", kpse->format_info[type].type,name);
     }
   }
   
@@ -1124,6 +1349,7 @@ kpse_open_file (const_string name,  kpse_file_format_type type)
    This function is defined here, and not in progname.c, because it
    need format_info, and would cause all of tex-file to be pulled
    in by programs that do not need it. */
+
 void
 kpathsea_reset_program_name (kpathsea kpse, const_string progname)
 {
@@ -1168,6 +1394,6 @@ kpathsea_reset_program_name (kpathsea kpse, const_string progname)
 void
 kpse_reset_program_name (const_string progname)
 {
-    kpathsea_reset_program_name (kpse_def, progname);
+  kpathsea_reset_program_name (kpse_def, progname);
 }
 #endif

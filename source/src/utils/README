@@ -1,4 +1,4 @@
-$Id: README 15588 2009-10-02 20:54:28Z karl $
+$Id: README 16427 2009-12-16 22:26:41Z karl $
 Copyright 2005, 2006, 2007, 2008, 2009 TeX Users Group.
 You may freely use, modify and/or distribute this file.
 
@@ -32,13 +32,6 @@ tpic2pdftex
 
 vlna 1.2 - checked 26jun08
   ftp://math.feld.cvut.cz/pub/olsak/vlna
-
-xz 4.999.9beta - checked 28aug09
-  http://tukaani.org/xz/
-  not done as part of normal build, here to provide sources for the
-  binaries we distribute.  Also so we can provide exactly the same
-  version on all platforms; even if a newer version has been released,
-  it should not be used without discussion.
 
 
 xindy 2.3 - checked 24mar08
@@ -78,6 +71,7 @@ cd $clisp_basedir
 wget http://ftp.gnu.org/gnu/clisp/release/2.48/clisp-2.48.tar.gz
 gzip -dc clisp-2.48.tar.gz | tar xf -
 cd clisp-2.48
+# On FreeBSD/amd64, add --disable-mmap.
 ./configure --with-ffcall --with-libffcall-prefix=$clisp_toolsdir \
   --with-libsigsegv-prefix=$clisp_toolsdir --without-readline \
   $clisp_builddir \

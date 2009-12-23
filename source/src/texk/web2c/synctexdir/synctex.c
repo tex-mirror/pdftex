@@ -128,8 +128,6 @@ Latest Revision: Wed Jul  1 08:15:44 UTC 2009
 #       define SYNCTEX_FREE(x) free(x)
 #   endif
 
-EXTERN char *gettexstring(int n);
-
 /*  the macros defined below do the same job than their almost eponym
  *  counterparts of *tex.web, the memory access is sometimes more direct
  *  because *tex.web won't share its own constants the main purpose is to
@@ -250,6 +248,8 @@ EXTERN char *gettexstring(int n);
 
 #   include "synctex-TEX-OR-MF-OR-MP.h"
 
+#   include "synctex.h"
+
 #   if defined(__SyncTeX__)
 
 #   include <stdio.h>
@@ -357,9 +357,9 @@ void synctexabort(boolean log_opened)
 static inline int synctex_record_preamble(void);
 static inline int synctex_record_input(integer tag, char *name);
 
-static char *synctex_suffix = ".synctex";
-static char *synctex_suffix_gz = ".gz";
-static char *synctex_suffix_busy = "(busy)";
+static const char *synctex_suffix = ".synctex";
+static const char *synctex_suffix_gz = ".gz";
+static const char *synctex_suffix_busy = "(busy)";
 
 /*  synctex_dot_open ensures that the foo.synctex file is open.
  *  In case of problem, it definitely disables synchronization.

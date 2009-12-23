@@ -27,8 +27,8 @@ AC_DEFUN([KPSE_ENABLE_CXX_HACK],
 # by Libtool when linking progams (but not shared libraries).
 #
 AC_DEFUN([KPSE_CXX_HACK],
-[AC_REQUIRE([AC_PROG_CXX])[]dnl
-AC_REQUIRE([AC_CANONICAL_HOST])[]dnl
+[AC_REQUIRE([AC_CANONICAL_HOST])[]dnl
+AC_REQUIRE([AC_PROG_CXX])[]dnl
 AC_REQUIRE([KPSE_ENABLE_CXX_HACK])[]dnl
 if test "x$GXX:$enable_cxx_runtime_hack" = xyes:yes; then
   _KPSE_CXX_HACK
@@ -55,7 +55,7 @@ AC_SUBST([CXX_HACK_LIBS])
 
 # _KPSE_CXX_HACK()
 # ----------------
-# internal subroutine
+# Internal subroutine.
 m4_define([_KPSE_CXX_HACK], [
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([iostream])

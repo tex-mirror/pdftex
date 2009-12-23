@@ -1,6 +1,6 @@
 /* progname.c: the executable name we were invoked as; general initialization.
 
-   Copyright 1994, 1996, 1997, 2008 Karl Berry.
+   Copyright 1994, 1996, 1997, 2008, 2009 Karl Berry.
    Copyright 1998-2005 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
@@ -417,11 +417,64 @@ kpse_selfdir (const_string argv0)
 }
 #endif
 
-
 #endif /* not WIN32 */
 
+#if defined(WIN32) || defined(__MINGW32__) || defined(__CYGWIN__)
+
+/* Create a list of executable suffixes of files not to be written.  */
+#define EXE_SUFFIXES ".com;.exe;.bat;.cmd;.vbs;.vbe;.js;.jse;.wsf;.wsh;.ws;.tcl;.py;.pyw"
+
+static void
+mk_suffixlist (kpathsea kpse)
+{
+    char **p;
+    char *q, *r, *v;
+    int  n;
+
+#if defined(__CYGWIN__)
+    v = xstrdup (EXE_SUFFIXES);
+#else
+    v = getenv ("PATHEXT");
+    if (v) /* strlwr() exists also in MingW */
+      v = strlwr (xstrdup (v));
+    else
+      v = xstrdup (EXE_SUFFIXES);
+#endif
+
+    q = v;
+    n = 0;
+
+    while ((r = strchr (q, ';')) != NULL) {
+      n++;
+      r++;
+      q = r;
+    }
+    if (*q)
+      n++;
+    kpse->suffixlist = (char **) xmalloc ((n + 2) * sizeof (char *));
+    p = (char **)kpse->suffixlist;
+    *p = xstrdup (".dll");
+    p++;
+    q = v;
+    while ((r = strchr (q, ';')) != NULL) {
+      *r = '\0';
+      *p = xstrdup (q);
+      p++;
+      r++;
+      q = r;
+    }
+    if (*q) {
+      *p = xstrdup (q);
+      p++;
+    }
+    *p = NULL;
+    free (v);
+}
+#endif /* WIN32 || __MINGW32__ || __CYGWIN__ */
+
 void
-kpathsea_set_program_name (kpathsea kpse,  const_string argv0, const_string progname)
+kpathsea_set_program_name (kpathsea kpse,  const_string argv0,
+                           const_string progname)
 {
   string ext, sdir, sdir_parent, sdir_grandparent;
   string s = getenv ("KPATHSEA_DEBUG");
@@ -574,11 +627,16 @@ kpathsea_set_program_name (kpathsea kpse,  const_string argv0, const_string prog
   sdir_grandparent = xdirname (sdir_parent);
   kpathsea_xputenv (kpse, "SELFAUTOPARENT", sdir_grandparent);
 
+#if defined(WIN32) || defined(__MINGW32__) || defined(__CYGWIN__)
+  mk_suffixlist(kpse);
+#endif /* WIN32 || __MINGW32__ || __CYGWIN__ */
+
   free (sdir);
   free (sdir_parent);
   free (sdir_grandparent);
 
-  kpse->invocation_short_name = xstrdup((string)xbasename (kpse->invocation_name));
+  kpse->invocation_short_name
+    = xstrdup ((string) xbasename (kpse->invocation_name));
 
   if (progname) {
     kpse->program_name = xstrdup (progname);
@@ -619,13 +677,13 @@ kpathsea_set_program_name (kpathsea kpse,  const_string argv0, const_string prog
 void
 kpse_set_program_name (const_string argv0, const_string progname)
 {
-    kpathsea_set_program_name (kpse_def, argv0, progname);
+  kpathsea_set_program_name (kpse_def, argv0, progname);
 }
 
 void
 kpse_set_progname (const_string argv0)
 {
-    kpathsea_set_program_name (kpse_def, argv0, NULL);
+  kpathsea_set_program_name (kpse_def, argv0, NULL);
 }
 #endif
 
