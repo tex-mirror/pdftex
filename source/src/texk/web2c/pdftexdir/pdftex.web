@@ -35370,8 +35370,13 @@ special_node:special_out(p);
 language_node:do_nothing;
 pdf_save_pos_node:
   @<Save current position in DVI mode@>;
-othercases confusion("ext4")
-@:this can't happen ext4}{\quad ext4@>
+others: begin
+    if (pdftex_first_extension_code <= subtype(p)) and (subtype(p) <= pdftex_last_extension_code) then
+        pdf_error("ext4", "pdf node ended up in DVI mode")
+    else
+        confusion("ext4")
+        @:this can't happen ext4}{\quad ext4@>
+end;
 endcases;
 end;
 
