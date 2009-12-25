@@ -24,6 +24,20 @@ CFG_OPTS="\
     --without-system-xpdf \
 "
 
+# workaround to disable system libraries; --enable-native-texlive-build should do that but somehow it didn't
+DISABLE_SYSTEM_LIBS="\
+    --without-system-freetype2 \
+    --without-system-freetype \
+    --without-system-gd \
+    --without-system-graphite \
+    --without-system-icu \
+    --without-system-libpng \
+    --without-system-t1lib \
+    --without-system-teckit \
+    --without-system-zlib \
+"
+CFG_OPTS="$CFG_OPTS $DISABLE_SYSTEM_LIBS"
+
 buildDir=$(pwd)/build-pdftex
 rm -rf $buildDir && mkdir $buildDir && cd $buildDir
 
