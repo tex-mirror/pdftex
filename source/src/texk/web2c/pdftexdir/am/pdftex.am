@@ -1,6 +1,6 @@
 ## texk/web2c/pdftexdir/am/pdftex.am: Makefile fragment for pdfTeX.
 ##
-## Copyright (C) 2009 Peter Breitenlohner <tex-live@tug.org>
+## Copyright (C) 2009, 2010 Peter Breitenlohner <tex-live@tug.org>
 ## You may freely use, modify and/or distribute this file.
 
 pdftex_cppflags = $(ZLIB_INCLUDES) $(LIBPNG_INCLUDES) $(XPDF_INCLUDES)
@@ -35,6 +35,9 @@ pdftex_CXXFLAGS = $(WARNING_CXXFLAGS)
 pdftex_LDADD = libpdftex.a $(pdftex_ldadd) $(LDADD) $(ipc_socketlibs)
 
 pdftex_DEPENDENCIES = $(pdftex_dependencies) libpdftex.a
+
+# We must create libpdftex.a before building the pdftex_OBJECTS.
+$(pdftex_OBJECTS): libpdftex.a
 
 pdftex_c_h = pdftexini.c pdftex0.c pdftexcoerce.h pdftexd.h
 nodist_pdftex_SOURCES = $(pdftex_c_h) pdftex-pool.c pdftexextra.c pdftexdir/pdftexextra.h

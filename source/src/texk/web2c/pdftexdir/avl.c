@@ -216,6 +216,8 @@ void *avl_delete(struct avl_table *tree, const void *item)
     struct avl_node *p;         /* Traverses tree to find node to delete. */
     int cmp;                    /* Result of comparison between |item| and |p|. */
 
+    void *res;
+
     assert(tree != NULL && item != NULL);
 
     k = 0;
@@ -231,7 +233,7 @@ void *avl_delete(struct avl_table *tree, const void *item)
         if (p == NULL)
             return NULL;
     }
-    item = p->avl_data;
+    res = p->avl_data;
 
     if (p->avl_link[1] == NULL)
         pa[k - 1]->avl_link[da[k - 1]] = p->avl_link[0];
@@ -347,7 +349,7 @@ void *avl_delete(struct avl_table *tree, const void *item)
 
     tree->avl_count--;
     tree->avl_generation++;
-    return (void *) item;
+    return res;
 }
 
 /* Refreshes the stack of parent pointers in |trav|
@@ -656,8 +658,7 @@ struct avl_table *avl_copy(const struct avl_table *org, avl_copy_func * copy,
     int height = 0;
 
     struct avl_table *new;
-    const struct avl_node *x;
-    struct avl_node *y;
+    struct avl_node org_head, *x, *y;
 
     assert(org != NULL);
     new = avl_create(org->avl_compare, org->avl_param,
@@ -668,7 +669,8 @@ struct avl_table *avl_copy(const struct avl_table *org, avl_copy_func * copy,
     if (new->avl_count == 0)
         return new;
 
-    x = (const struct avl_node *) &org->avl_root;
+    org_head.avl_link[0] = (struct avl_node *) org->avl_root;
+    x = &org_head;
     y = (struct avl_node *) &new->avl_root;
     for (;;) {
         while (x->avl_link[0] != NULL) {
@@ -687,7 +689,7 @@ struct avl_table *avl_copy(const struct avl_table *org, avl_copy_func * copy,
                 return NULL;
             }
 
-            stack[height++] = (struct avl_node *) x;
+            stack[height++] = x;
             stack[height++] = y;
             x = x->avl_link[0];
             y = y->avl_link[0];
