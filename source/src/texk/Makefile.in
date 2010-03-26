@@ -63,6 +63,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../m4/kpse-common.m4 \
 	$(top_srcdir)/../m4/kpse-web2c.m4 \
 	$(top_srcdir)/../m4/kpse-xpdf-flags.m4 \
 	$(top_srcdir)/../m4/kpse-zlib-flags.m4 \
+	$(top_srcdir)/../m4/kpse-zziplib-flags.m4 \
 	$(top_srcdir)/../utils/dialog/ac/withenable.ac \
 	$(top_srcdir)/../utils/pdfopen/ac/withenable.ac \
 	$(top_srcdir)/../utils/ps2eps/ac/withenable.ac \
@@ -117,6 +118,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../m4/kpse-common.m4 \
 	$(top_srcdir)/../libs/icu/ac/withenable.ac \
 	$(top_srcdir)/../libs/teckit/ac/withenable.ac \
 	$(top_srcdir)/../libs/graphite/ac/withenable.ac \
+	$(top_srcdir)/../libs/zziplib/ac/withenable.ac \
 	$(top_srcdir)/../libs/xpdf/ac/withenable.ac \
 	$(top_srcdir)/../libs/gd/ac/withenable.ac \
 	$(top_srcdir)/../libs/freetype2/ac/withenable.ac \
@@ -273,6 +275,9 @@ ACLOCAL_AMFLAGS = -I ../m4 --force
 SUBDIRS = . $(SUBTEXK)
 DIST_SUBDIRS = $(DIST_SUBTEXK)
 CONFIG_AUX = ../subsubdir-conf.cmd
+
+# Common infrastructure for tests
+EXTRA_DIST = tests
 all: all-recursive
 
 .SUFFIXES:
@@ -787,6 +792,13 @@ subtexk: $(CONFIG_AUX)
 ../subsubdir-conf.cmd:
 	@echo "configure in ../auxdir/auxsub failed to create the file $@"
 	exit 1
+
+# Special target to run TRIP and TRAP tests and create diffs.
+.PHONY: triptrap
+triptrap: web2c/Makefile
+	cd web2c && $(MAKE) $(AM_MAKEFLAGS) $@
+web2c/Makefile:
+	$(MAKE) $(AM_MAKEFLAGS) DIST_SUBTEXK=web2c subtexk
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

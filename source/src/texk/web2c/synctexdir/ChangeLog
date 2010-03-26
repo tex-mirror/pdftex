@@ -1,3 +1,41 @@
+2010-01-22  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/synctex.am (synctex_CFLAGS): Enable compiler warnings.
+
+	Avoid compiler warnings:
+
+	* synctex_main.c: Define _ISOC99_SOURCE to get fmax() prototype
+	FIXME: Linux only?
+	* synctex_parser_utils.h: Move declaration of synctex_io_modes ...
+	* synctex_parser.c: ... to here.
+	* synctex_parser_utils.h: Declare synctex_suffix{,_gz} extern ...
+	* synctex_parser.c: ... and instantiate here.
+	* synctex_parser_utils.[ch]: Constify _synctex_last_path_component()
+	return type.
+	* synctex_parser.c (__synctex_scanner_t): Change type of struct
+	members buffer_{cur,start,end} from 'unsigned char *' to 'char *'
+	and remove the casts.
+	(_synctex_class_t synctex_class_*): Declare as non-const.
+	(_synctex_scan_named): Constify string param `name'.
+
+2010-01-10  Jérôme Laurens  <jerome.laurens@u-bourgogne.fr>
+
+	* synctex_parser.c: in the _synctex_smallest_container() function,
+			SYNCTEX_WIDTH is replaced with SYNCTEX_ABS_WIDTH
+            to take into account h boxes with negative width.
+            Solves a problem with amsmath's gather environment
+	* synctex_parser.c: enhancements in comments to better explain the code
+
+2009-12-30  Jérôme Laurens  <jerome.laurens@u-bourgogne.fr>
+
+	* synctex_parser_utils.c: in the _synctex_malloc() function,
+            memset() is used unconditionally (suggested by J. Kew).
+	* synctex_parser_utils.c: in the _synctex_error() function,
+            - all 3 instances of OutputDebugString() replaced with OutputDebugStringA()
+            such that unicode is ignored (also suggested by J. Kew).
+            - _WIN32 flag replaced by SYNCTEX_RECENT_WINDOWS because older windows systems
+            may have _WIN32 defined but no OutputDebugString().
+
 2009-12-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* synctex.c: Remove extern declaration of gettexstring(),

@@ -4643,7 +4643,7 @@ print(" (format="); print(job_name); print_char(" ");
 @d setup_bound_var(#)==bound_default:=#; setup_bound_var_end
 @d setup_bound_var_end(#)==bound_name:=#; setup_bound_var_end_end
 @d setup_bound_var_end_end(#)==
-  setup_bound_variable(addressof(#), bound_name, bound_default);
+  setup_bound_variable(addressof(#), bound_name, bound_default)
 
 @p procedure main_body;
 begin @!{|start_here|}
@@ -5108,7 +5108,7 @@ if j=18 then
       if runsystem_ret = -1 then print("quotation error in system command")
       else if runsystem_ret = 0 then print("disabled (restricted)")
       else if runsystem_ret = 1 then print("executed")
-      else if runsystem_ret = 2 then print("executed (allowed)")
+      else if runsystem_ret = 2 then print("executed safely (allowed)")
     end;
   end else begin
     print("disabled"); {|shellenabledp| false}

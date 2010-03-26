@@ -1,3 +1,249 @@
+2010-03-24  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmf.cnf (TEXMF_RESTRICTED_SCRIPTS): The make rules used to
+	create paths.h can't handle backslash-newline (FIXME?).
+
+2010-03-24  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXMFSCRIPTS): progname before engine, for consistency,
+	and because the former is more specific.
+	(TEXMF_RESTRICTED_SCRIPTS): new definition, for the w32 wrapper.
+
+	(TEXMFDBS): reorder in file to be next to TEXMF, to make the
+	relationship more apparent.  No change in definition.
+
+2010-03-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmf.cnf (ent_str_size, glob_str_size): New for size of
+	BibTeX (entry and global) strings.
+
+2010-03-19  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmf.cnf (BIBTEX_CSFILE): Default codepage and sort order
+	file for BibTeX8.
+	(max_strings): Also for BibTeX8 and BibTeX8U.
+
+2010-03-18  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXDOCS): remove .; better for texdoc not
+	to be confused by files randomly in the current directory.
+
+2010-03-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmf.cnf: Append '.mf' to Metafont specific parameters.
+	Add 'max_strings.bibtex', also for hash_size and hash_prime.
+
+2010-03-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmf.cnf: Append '.gftype' to GFtype specific parameters.
+	* progname.h: Remove kpse_set_progname from exported API.
+	Deprecated since 1998.  Kept in library for Versions 5.x.y.
+
+2010-03-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* xrealloc.c (xrealloc): Allocate 1 byte if passed size 0.
+	* xcalloc.c (xcalloc): Use 1 if passed nelem 0 or elsize 0.
+
+2010-03-05  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmf.cnf (line_length, max_rows, max_cols): GFtype parameters
+	settable at runtime (used to be fixed values in gftype.ch).
+
+2010-03-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmf.cnf (screen_width, screen_depth): Increase Metafont
+	screen size (used to be fixed values in mf.ch).
+
+2010-03-01  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TW_LIBPATH, TW_INIPATH): TeXworks config/settings.
+
+2010-02-26  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mingw32.c (dostounix_filename): Reactivate as extern KPSEDLL,
+	used for gsftopk.
+
+2010-02-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* dir.c (kpathsea_dir_p), tex-make.c (maketex): [WIN32]: Cast
+	the result of GetLastError() to int (may be or is DWORD).
+	* tex-make.c (kpathsea_make_tex) [WIN32]: Avoid initialized ret.
+	* mingw32.c (look_for_cmd): Declare suffixes and s as const.
+
+	* config.h [WIN32]: Ensure that __STDC__ is #defined.
+	#include <kpathsea/win32lib.h>, not <win32lib.h>.
+	Diffs from Akira, 11 Feb 2010 11:03:39.
+
+	* strstr.c (str): Add empty statement after label at the end of
+	a block.  From Javier Mugica, 23 Feb 2010 12:25:55.
+
+	* mingw32.c (win32_get_long_filename): Declare extern KPSEDLL.
+
+2010-02-20  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mingw32.c (win32_system): Declare as non-static, for web2c.
+	* mingw32.h (win32_system): Declare as extern KPSEDLL.
+
+	* c-proto.h, getopt.h (KPSE_DLL): Automatically #define for
+	native WIN32 but not for MinGW32.
+
+2010-02-18  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* absolute.c (kpathsea_absolute_p): Unused param.
+	* truncate.[ch] (kpse_truncate_filename): Removed.
+
+2010-02-15  Karl Berry  <karl@tug.org>
+
+	* tex-make.c [DJGPP]: change conditionals to __DJGPP__ for
+	consistency.
+
+	* progname.c (<kpathsea/mingw32.h>) [__MINGW32__]: remove
+	#include, it's redundant with kpathsea/config.h.
+	(<kpathsea/c-pathmx.h>) [__DJGPP__]: change conditional from DJGPP.
+	Suggestion from Javier Mugica, 13 Feb 2010 20:46:12.	
+
+2010-02-14  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* variable.c (kpathsea_var_value, expand): Treat strings
+	returned by getenv() and kpathsea_cnf_get() as const.
+	Replace kpathsea_var_expand() plus kpathsea_tilde_expand() by
+	kpathsea_expand() and include expand.h instead of tilde.h.
+
+	* tilde.[ch] (kpathsea_tilde_expand): Now used only in expand.c
+	by kpathsea_expand().  Declare string param as non-const.
+	(kpse_tilde_expand): Removed.
+
+	* hash.[ch]: Adjust comments and remove trailing whitespace.
+
+2010-02-13  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* xopendir.c [WIN32]: Define neither xopendir nor xclosedir.
+	* mingw32.[ch], progname.c: Remove set_home_warning().
+	From Akira.
+
+	* xopendir.[ch] (xopendir): Declare string param as const.
+	Declare prototypes if and only if functions are defined.
+
+	* kdefault.c, tex-file.h, xputenv.c:
+	Formatting, trailing whitespace.
+
+2010-02-12  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* dir.c (kpathsea_dir_p), elt-dirs.c (kpathsea_normalize_path),
+	pathsearch.c (log_search, search, search_list),
+	tex-file.c (kpathsea_find_file_generic):
+	Add '#ifdef KPSE_DEBUG' to allow compilation with '-DNO_DEBUG'.
+
+	* dir.c (kpathsea_dir_p): Replace kpse_normalize_path() by
+	kpathsea_normalize_path().
+
+2010-02-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* db.h (kpathsea_init_db, kpse_init_db, kpathsea_db_search,
+	kpse_db_search, kpathsea_db_search_list, kpse_db_search_list),
+	* fontmap.h (kpathsea_fontmap_lookup, kpse_fontmap_lookup),
+	* getopt.h (_getopt_internal),
+	* hash.h (hash_print, hash_free),
+	* mingw32.h (init_user_info, set_home_warning,
+	win32_get_long_filename, look_for_cmd, quote_args),
+	* pathsearch.h (kpathsea_filename_component,
+	kpse_filename_component, kpathsea_normalize_path,
+	kpse_normalize_path),
+	* str-list.h (str_list_init, str_list_concat, str_list_free,
+	* str_list_concat_elements, str_list_uniqify),
+	* str-llist.h (str_llist_add, str_llist_float),
+	* tex-file.h (kpathsea_init_fallback_resolutions,
+	kpse_init_fallback_resolutions),
+	* tilde.h (kpathsea_tilde_expand, kpse_tilde_expand),
+	* truncate.h (kpathsea_truncate_filename,
+	kpse_truncate_filename),
+	* xopendir.h (xopendir, xclosedir),
+	* xstat.h (xstat, xlstat): Declare prototypes only within
+	libkpathsea.
+
+2010-02-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mingw32.c (get_home_directory, _parse_root,
+	normalize_filename, dostounix_filename, unixtodos_filename,
+	crlf_to_lf, parse_cmdline, build_cmdline, win32_system):
+	Declare as static.
+	(dostounix_filename, crlf_to_lf): Drop unused functions.
+	(win32_system): Drop unused code for look_for_cmd() with 3 args.
+	* mingw32.h: Remove decl of get_home_directory(), add
+	quote_args(), use explicit 'extern'.
+	* tex-make.c (maketex): Drop nested extern decl of quote_args().	
+
+	* tex-make.h ({kpathsea,kpse}_make_tex),
+	str-list.h (str_list_add): need KPSEDLL (from Akira).
+
+2010-02-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mingw32.c (look_for_cmd): remove unused variable new_cmd,
+	declare p and q as const and remove cast.
+
+2010-02-07  Taco Hoekwater  <taco@elvenkind.com>
+
+	* mingw32.c (look_for_cmd): remove unused variable new,
+	clean up preprocessor conditionals.
+	Report by Hib Eris, tex-k 3 Feb 2010 12:11:42.
+
+2010-02-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (kpseinclude_HEADERS): Add win32lib.h.
+
+2010-02-01  Karl Berry  <karl@tug.org>
+
+	* strstr.c,
+	* strcasecmp.c,
+	* getopt.c,
+	* getopt.h, 
+	* getopt1.c: remove all redefinitions of const.
+
+2010-01-31  Javier Mugica  <javier@digi21.eu>
+
+	Support compilation with MSVC 7.1:
+	* config.h (win32lib.h) [_WIN32 && !__MINGW32__]: include.
+	(__STDC__) [WIN32]: do not define ourselves.
+	* getopt.h (__STDC__): do not define ourselves.  Instead, define
+	const.
+	* c-stat.h (oldnames.h) [WIN32]: is gone.	
+	* c-ctype.h (isascii): no oldnames.h here either.
+	* win32lib.h: reinstate.
+
+2010-01-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* xputenv.c (kpathsea_xputenv): Don't use value of XRETALLOC(),
+	XRETALLOC(addr, n, t) already assigns the new pointer to addr.
+
+2010-01-22  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* tex-make.c (maketex): Replace kpse_readable_file(fn) by
+	kpathsea_readable_file(kpse,fn) also for WIN32.
+
+2010-01-11  Taco Hoekwater <taco@metapost.org>
+
+	* types.h (kpse_clua_format): new type.
+	(kpse_def, kpse_def_inst): need KPSEDLL (from Akira).
+	* tex-file.c (CLUA_ENVS): new define.
+	(kpse_init_format): initialize it.
+	* texmf.cnf (CLUAINPUTS): new definition.
+	This implies using, e.g., bin/i386-linux/lib/luatex/lua/*.so
+	in TL.
+
+2010-01-05  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* tex-file.c: Add alt_suffix ".pl" for kpse_opl_format and
+	".vpl" for kpse_ovp_format (for C version of opl2ofm/ovp2ovf).
+
+2009-12-24  Karl Berry  <karl@tug.org>
+
+	* HIER, INSTALL, README.CONFIGURE: remove, stale.
+	* Makefile.am (EXTRA_DIST): change accordingly.
+	* README, PROJECTS,
+	access.c, readlink.c,
+	mktex.opt, mktexdir, mktexdir.opt, mktexmf, mktexnam,
+	mktexnam.opt, mktextfm, mktexupd: doc/email updates.
+
 2009-12-21  Karl Berry  <karl@tug.org>
 
 	* kpsewhich.c (find_format): had forgotten to increment the loop

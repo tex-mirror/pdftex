@@ -1,6 +1,6 @@
 /* progname.c: the executable name we were invoked as; general initialization.
 
-   Copyright 1994, 1996, 1997, 2008, 2009 Karl Berry.
+   Copyright 1994, 1996, 1997, 2008, 2009, 2010 Karl Berry.
    Copyright 1998-2005 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
@@ -24,12 +24,8 @@
 /* For kpse_reset_progname */
 #include <kpathsea/tex-file.h>
 
-#if defined (WIN32) || defined (DJGPP)
+#if defined (WIN32) || defined (__DJGPP__)
 #include <kpathsea/c-pathmx.h>
-#endif
-
-#ifdef __MINGW32__
-#include <kpathsea/mingw32.h>
 #endif
 
 #if defined(__i386_pc_gnu__)
@@ -492,11 +488,7 @@ kpathsea_set_program_name (kpathsea kpse,  const_string argv0,
 
 #if defined(WIN32)
   /* Set various info about user. Among many things,
-     ensure that HOME is set. If debug_paths is on, 
-     turn on some message if $HOME is not found. */
-  if (KPATHSEA_DEBUG_P (KPSE_DEBUG_PATHS)) {
-    set_home_warning();
-  }
+     ensure that HOME is set.  */
   init_user_info();
 
   /* redirect stderr to debug_output. Easier to send logfiles. */
@@ -679,6 +671,8 @@ kpse_set_program_name (const_string argv0, const_string progname)
 {
   kpathsea_set_program_name (kpse_def, argv0, progname);
 }
+
+/* DEPRECATED since 1998 -- To be removed in Version 6.0.0.  */
 
 void
 kpse_set_progname (const_string argv0)

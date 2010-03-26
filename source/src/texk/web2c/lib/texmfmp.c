@@ -55,7 +55,7 @@
 #define COPYRIGHT_HOLDER "D.E. Knuth"
 #define AUTHOR NULL
 #define PROGRAM_HELP TEXHELP
-#define BUG_ADDRESS "tex-k@mail.tug.org"
+#define BUG_ADDRESS "tex-k@tug.org"
 #define DUMP_VAR TEXformatdefault
 #define DUMP_LENGTH_VAR formatdefaultlength
 #define DUMP_OPTION "fmt"
@@ -71,7 +71,7 @@
 #define COPYRIGHT_HOLDER "D.E. Knuth"
 #define AUTHOR NULL
 #define PROGRAM_HELP MFHELP
-#define BUG_ADDRESS "tex-k@mail.tug.org"
+#define BUG_ADDRESS "tex-k@tug.org"
 #define DUMP_VAR MFbasedefault
 #define DUMP_LENGTH_VAR basedefaultlength
 #define DUMP_OPTION "base"
@@ -136,10 +136,11 @@
 static char **cmdlist = NULL;
 
 void 
-mk_shellcmdlist (char *v)
+mk_shellcmdlist (const char *v)
 {
   char **p;
-  char *q, *r;
+  const char *q, *r1;
+  char *r;
   int  n;
 
   q = v;
@@ -148,10 +149,10 @@ mk_shellcmdlist (char *v)
 /* analyze the variable shell_escape_commands = foo,bar,...
    spaces before and after (,) are not allowed. */
 
-  while ((r = strchr (q, ',')) != 0) {
+  while ((r1 = strchr (q, ',')) != 0) {
     n++;
-    r++;
-    q = r;
+    r1++;
+    q = r1;
   }
   if (*q)
     n++;
@@ -203,7 +204,7 @@ init_shell_escape (void)
     if (shellenabledp && restrictedshell == 1) {
       char *v2 = kpse_var_value ("shell_escape_commands");
       if (v2) {
-        mk_shellcmdlist (v2);
+        mk_shellcmdlist ((const char *)v2);
         free (v2);
       }
     }
@@ -414,7 +415,8 @@ shell_cmd_is_allowed (const char *cmd, char **safecmd, char **cmdname)
    0 if CMD is not allowed; given shellenabledp==1, this is because
       shell escapes are restricted and CMD is not allowed.
    1 if shell escapes are not restricted, hence any command is allowed.
-   2 if shell escapes are restricted and CMD is allowed.  */
+   2 if shell escapes are restricted and CMD is allowed (possibly after
+      quoting).  */
    
 int
 runsystem (const char *cmd)
@@ -615,7 +617,7 @@ maininit (int ac, string *av)
   synctexoption = SYNCTEX_NO_OPTION;
 #else
 # /* Omit warning for Aleph and non-TeX.  */
-# if defined(TeX) && !defined(Aleph)
+# if defined(TeX) && !defined(Aleph) && !defined(luaTeX)
 #  warning SyncTeX: -synctex command line option NOT available
 # endif
 #endif
@@ -882,6 +884,9 @@ topenin (void)
    incrementally.  Shamim Mohamed adapted it for Web2c.  */
 #if defined (TeX) && defined (IPC)
 
+#ifdef WIN32
+#include <winsock2.h>
+#else
 #include <sys/socket.h>
 #include <fcntl.h>
 #ifndef O_NONBLOCK /* POSIX */
@@ -895,6 +900,7 @@ what the fcntl? cannot implement IPC without equivalent for O_NONBLOCK.
 #endif /* no FNDELAY */
 #endif /* no O_NDELAY */
 #endif /* no O_NONBLOCK */
+#endif /* !WIN32 */
 
 #ifndef IPC_PIPE_NAME /* $HOME is prepended to this.  */
 #define IPC_PIPE_NAME "/.TeXview_Pipe"
@@ -945,6 +951,12 @@ ipc_is_open (void)
 
 static void
 ipc_open_out (void) {
+#ifdef WIN32
+  u_long mode = 1;
+#define SOCK_NONBLOCK(s) ioctlsocket (s, FIONBIO, &mode)
+#else
+#define SOCK_NONBLOCK(s) fcntl (s, F_SETFL, O_NONBLOCK)
+#endif
 #ifdef IPC_DEBUG
   fputs ("tex: Opening socket for IPC output ...\n", stderr);
 #endif
@@ -960,7 +972,7 @@ ipc_open_out (void) {
   sock = socket (PF_UNIX, SOCK_STREAM, 0);
   if (sock >= 0) {
     if (connect (sock, ipc_addr, ipc_addr_len) != 0
-        || fcntl (sock, F_SETFL, O_NONBLOCK) < 0) {
+        || SOCK_NONBLOCK (sock) < 0) {
       close (sock);
       sock = -1;
       return;
@@ -1442,7 +1454,11 @@ parse_options (int argc, string *argv)
         if (system (IPC_SERVER_CMD) == 0) {
           unsigned i;
           for (i = 0; i < 20 && !ipc_is_open (); i++) {
+#ifdef WIN32
+            Sleep (2000);
+#else
             sleep (2);
+#endif
             ipc_open_out ();
           }
         }
@@ -1789,7 +1805,7 @@ close_file_or_pipe (FILE *f)
    variable `interrupt'; then they will do everything needed.  */
 #ifdef WIN32
 /* Win32 doesn't set SIGINT ... */
-BOOL WINAPI
+static BOOL WINAPI
 catch_interrupt (DWORD arg)
 {
   switch (arg) {
@@ -2046,7 +2062,7 @@ calledit (packedASCIIcode *filename,
   *temp = 0;
 
   /* Execute the command.  */
-#ifdef WIN32
+#ifdef __MINGW32__
   /* Win32 reimplementation of the system() command
      provides opportunity to call it asynchronously */
   if (win32_system(command, true) != 0 )
@@ -2164,8 +2180,8 @@ do_dump (char *p, int item_size, int nitems,  FILE *out_file)
   if (fwrite (p, item_size, nitems, out_file) != nitems)
 #endif
     {
-      fprintf (stderr, "! Could not write %d %d-byte item(s).\n",
-               nitems, item_size);
+      fprintf (stderr, "! Could not write %d %d-byte item(s) to %s.\n",
+               nitems, item_size, nameoffile+1);
       uexit (1);
     }
 
@@ -2191,36 +2207,12 @@ do_undump (char *p, int item_size, int nitems, FILE *in_file)
 #else
   if (fread (p, item_size, nitems, in_file) != (size_t) nitems)
 #endif
-    FATAL2 ("Could not undump %d %d-byte item(s)", nitems, item_size);
+    FATAL3 ("Could not undump %d %d-byte item(s) from %s",
+            nitems, item_size, nameoffile+1);
 
 #if !defined (WORDS_BIGENDIAN) && !defined (NO_DUMP_SHARE)
   swap_items (p, nitems, item_size);
 #endif
-}
-
-/* Look up VAR_NAME in texmf.cnf; assign either the value found there or
-   DFLT to *VAR.  */
-
-void
-setupboundvariable (integer *var, const_string var_name, integer dflt)
-{
-  string expansion = kpse_var_value (var_name);
-  *var = dflt;
-
-  if (expansion) {
-    integer conf_val = atoi (expansion);
-    /* It's ok if the cnf file specifies 0 for extra_mem_{top,bot}, etc.
-       But negative numbers are always wrong.  */
-    if (conf_val < 0 || (conf_val == 0 && dflt > 0)) {
-      fprintf (stderr,
-               "%s: Bad value (%ld) in texmf.cnf for %s, keeping %ld.\n",
-               program_invocation_name,
-               (long) conf_val, var_name + 1, (long) dflt);
-    } else {
-      *var = conf_val; /* We'll make further checks later.  */
-    }
-    free (expansion);
-  }
 }
 
 /* FIXME -- some (most?) of this can/should be moved to the Pascal/WEB side. */
@@ -2362,6 +2354,9 @@ gettexstring (strnumber s)
 
 #else
 
+#ifdef luaTeX
+static
+#endif
 string
 gettexstring (strnumber s)
 {
@@ -2639,77 +2634,9 @@ zmakescaled (integer p, integer q)		/* Approximate 2^16*p/q */
 #undef X11WIN
 #endif
 
-#ifdef AMIGAWIN
-extern int mf_amiga_initscreen (void);
-extern void mf_amiga_updatescreen (void);
-extern void mf_amiga_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_amiga_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-#ifdef EPSFWIN
-extern int mf_epsf_initscreen (void);
-extern void mf_epsf_updatescreen (void);
-extern void mf_epsf_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_epsf_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-#ifdef HP2627WIN
-extern int mf_hp2627_initscreen (void);
-extern void mf_hp2627_updatescreen (void);
-extern void mf_hp2627_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_hp2627_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-#ifdef MFTALKWIN
-extern int mf_mftalk_initscreen (void);
-extern void mf_mftalk_updatescreen (void);
-extern void mf_mftalk_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_mftalk_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-#ifdef NEXTWIN
-extern int mf_next_initscreen (void);
-extern void mf_next_updatescreen (void);
-extern void mf_next_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_next_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-#ifdef REGISWIN
-extern int mf_regis_initscreen (void);
-extern void mf_regis_updatescreen (void);
-extern void mf_regis_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_regis_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-#ifdef SUNWIN
-extern int mf_sun_initscreen (void);
-extern void mf_sun_updatescreen (void);
-extern void mf_sun_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_sun_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-#ifdef TEKTRONIXWIN
-extern int mf_tektronix_initscreen (void);
-extern void mf_tektronix_updatescreen (void);
-extern void mf_tektronix_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_tektronix_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-#ifdef UNITERMWIN
-extern int mf_uniterm_initscreen (void);
-extern void mf_uniterm_updatescreen (void);
-extern void mf_uniterm_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_uniterm_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-#ifdef WIN32WIN
-extern int mf_win32_initscreen (void);
-extern void mf_win32_updatescreen (void);
-extern void mf_win32_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_win32_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-#ifdef X11WIN
-extern int mf_x11_initscreen (void);
-extern void mf_x11_updatescreen (void);
-extern void mf_x11_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_x11_paintrow (screenrow, pixelcolor, transspec, screencol);
-#endif
-extern int mf_trap_initscreen (void);
-extern void mf_trap_updatescreen (void);
-extern void mf_trap_blankrectangle (screencol, screencol, screenrow, screenrow);
-extern void mf_trap_paintrow (screenrow, pixelcolor, transspec, screencol);
-
+/* Prototypes for Metafont display routines: mf_XXX_initscreen,
+   mf_XXX_updatescreen, mf_XXX_blankrectangle, and mf_XXX_paintrow.  */
+#include <window/mfdisplay.h>
 
 /* This variable, `mfwsw', contains the dispatch tables for each
    terminal.  We map the Pascal calls to the routines `init_screen',

@@ -1,3 +1,26 @@
+2010-03-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* common.defines (BIBXRETALLOCSTRING): New procedure.
+
+2010-03-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* common.defines (BIBXRETALLOCNOSET): New procedure.
+	(kpsesetprogname): Removed.
+
+2010-03-05  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmf.defines: Moved setupboundvariable from here ...
+	* common.defines: ... to here for use in non-engine programs.
+	* common.defines (xcalloc, xcallocarray): Declare these.
+
+2010-02-18  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+        * common.defines (makesuffix, removesuffix): Remove these.
+
+2010-01-18  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* main.c: Remove unused extern declaration of yylen.
+
 2009-12-14  Karl Berry  <karl@tug.org>
 
 	* convert.bat: remove, obsolete.

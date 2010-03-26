@@ -1,6 +1,6 @@
 ## Makefile.am for the TeX Live subdirectory texk/kpathsea/
 ##
-## Copyright (C) 2009 Peter Breitenlohner <tex-live@tug.org>
+## Copyright (C) 2009, 2010 Peter Breitenlohner <tex-live@tug.org>
 ## You may freely use, modify and/or distribute this file.
 ##
 ACLOCAL_AMFLAGS = -I ../../m4
@@ -11,7 +11,7 @@ rebuild: all
 
 SUBDIRS = . doc man
 
-EXTRA_DIST = BUGS HIER PROJECTS README.CONFIGURE
+EXTRA_DIST = BUGS PROJECTS
 
 INCLUDES = -I$(top_builddir)/.. -I$(top_srcdir)/..
 AM_CFLAGS = $(WARNING_CFLAGS)
@@ -153,6 +153,7 @@ kpseinclude_HEADERS = \
 	types.h \
 	variable.h \
 	version.h \
+	win32lib.h \
 	xopendir.h \
 	xstat.h
 

@@ -1,6 +1,6 @@
 /* tex-make.c: run external programs to make TeX-related files.
 
-   Copyright 1993, 1994, 1995, 1996, 1997, 2008, 2009 Karl Berry.
+   Copyright 1993, 1994, 1995, 1996, 1997, 2008, 2009, 2010 Karl Berry.
    Copyright 1997, 1998, 2001-05 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
@@ -27,7 +27,7 @@
 #include <kpathsea/tex-make.h>
 #include <kpathsea/variable.h>
 
-#if !defined (AMIGA) && !(defined (MSDOS) && !defined(DJGPP)) && !defined (WIN32)
+#if !defined (AMIGA) && !(defined (MSDOS) && !defined(__DJGPP__)) && !defined (WIN32)
 #include <sys/wait.h>
 #endif
 
@@ -150,7 +150,7 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
    */
   unsigned len;
   string *s;
-  string ret;
+  string ret = NULL;
   string fn;
   
   if (!kpse->make_tex_discard_errors) {
@@ -174,7 +174,7 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
     ret = system(cmd) == 0 ? getenv ("LAST_FONT_CREATED"): NULL;
     free (cmd);
   }
-#elif defined (MSDOS) && !defined(DJGPP)
+#elif defined (MSDOS) && !defined(__DJGPP__)
 #error Implement new MSDOS mktex call interface here
 #elif defined (WIN32)
 
@@ -199,10 +199,8 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
 #else
     int num;
 #endif
-    extern char *quote_args(char **argv);
 
     if (look_for_cmd(args[0], &app_name) == FALSE) {
-      ret = NULL;
       goto error_exit;
     }
 
@@ -272,8 +270,8 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
                       &si,      /* pointer to STARTUPINFO */
                       &pi               /* pointer to PROCESS_INFORMATION */
                       ) == 0) {
-      LIB_FATAL2 ("kpathsea: CreateProcess() failed for `%s' (Error %x)\n",
-                  new_cmd, GetLastError()); 
+      LIB_FATAL2 ("kpathsea: CreateProcess() failed for `%s' (Error %d)\n",
+                  new_cmd, (int)(GetLastError())); 
     }
 
     CloseHandle(child_in);
@@ -290,7 +288,7 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
       if (num <= 0) {
         if (GetLastError() != ERROR_BROKEN_PIPE) {
           LIB_FATAL2 ("kpathsea: read() error code for `%s' (Error %d)",
-                      new_cmd, GetLastError()); 
+                      new_cmd, (int)(GetLastError())); 
           break;
         }
       } else {
@@ -306,7 +304,7 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
 
     if (WaitForSingleObject(pi.hProcess, INFINITE) != WAIT_OBJECT_0) {
       WARNING2 ("kpathsea: process termination wait failed: %s (Error %d)\n",
-                new_cmd, GetLastError());
+                new_cmd, (int)(GetLastError()));
     }
 
     CloseHandle(pi.hProcess);
@@ -323,7 +321,7 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
         len--;
       }
 
-      ret = len == 0 ? NULL : kpse_readable_file (fn);
+      ret = len == 0 ? NULL : kpathsea_readable_file (kpse, fn);
       if (!ret && len > 1) {
         WARNING2 ("kpathsea: %s output `%s' instead of a filename",
                   new_cmd, fn);
@@ -456,8 +454,6 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
       /* Free the name if we're not returning it.  */
       if (fn != ret)
         free (fn);
-    } else {
-      ret = NULL;
     }
   }
 #endif

@@ -1,6 +1,6 @@
 dnl Process this file with Autoconf to produce a configure script for Web2c.
 dnl
-dnl   Copyright (C) 2009 Peter Breitenlohner <tex-live@tug.org>
+dnl   Copyright (C) 2009, 2010 Peter Breitenlohner <tex-live@tug.org>
 dnl
 dnl   This file is free software; the copyright holder
 dnl   gives unlimited permission to copy and/or distribute it,
@@ -19,7 +19,7 @@ dnl get these features if you are willing to hack the sources. If not,
 dnl it'll take a good argument to convince me to invest the time to make
 dnl them configurable.
 dnl
-m4_define([web2_version], [2009])
+m4_define([web2_version], [2010/dev])
 AC_INIT([Web2C], web2_version(), [tex-k@tug.org])
 AC_PREREQ([2.65])
 dnl 
@@ -99,6 +99,8 @@ if test "x$kpse_cv_have_win32" = xno; then
   AC_SEARCH_LIBS([inet_aton], [resolv])
   LIBS=$kpse_save_LIBS
   AC_SEARCH_LIBS([nanosleep], [rt])
+  LIBS=$kpse_save_LIBS
+  AC_SEARCH_LIBS([dlopen], [dl])
   LIBS=$kpse_save_LIBS
   AS_CASE([$ac_cv_search_inet_aton],
           ["none required"], [],
@@ -235,6 +237,7 @@ KPSE_KPATHSEA_FLAGS
 KPSE_ZLIB_FLAGS
 KPSE_LIBPNG_FLAGS
 KPSE_XPDF_FLAGS
+KPSE_ZZIPLIB_FLAGS
 KPSE_GRAPHITE_FLAGS
 KPSE_FREETYPE2_FLAGS
 KPSE_TECKIT_FLAGS

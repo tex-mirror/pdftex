@@ -1,6 +1,6 @@
 ## Makefile.am for the TeX Live top-level
 ##
-## Copyright (C) 2009 Peter Breitenlohner <tex-live@tug.org>
+## Copyright (C) 2009, 2010 Peter Breitenlohner <tex-live@tug.org>
 ## You may freely use, modify and/or distribute this file.
 ##
 ## Use 'aclocal --force' (for "computed m4_sinclude")
@@ -42,9 +42,27 @@ DIST_SUBDIRS = auxdir/auxsub texk/kpathsea libs utils texk
 # and there is no install-hook or install-local.
 world: all
 ## Serialize 'make all' and 'make install-strip'.
+	@echo "top-level make $@: running install-strip..."
 	$(MAKE) $(AM_MAKEFLAGS) install-strip
 ##
 	@echo "top-level make $@: running texlinks in texk/tetex..."
 	cd texk/tetex && $(MAKE) $(AM_MAKEFLAGS) run-texlinks
 ##
+	@echo "top-level make $@: running $(check_target)..."
+	$(MAKE) $(AM_MAKEFLAGS) $(check_target)
+##
 	@echo "make $@ done."
+
+# Allow for skipping make check if needed.
+if cross_compiling
+check_target = skip
+else !cross_compiling
+check_target = check
+endif !cross_compiling
+skip:
+.PHONY: skip
+
+# Special target to run TRIP and TRAP tests and create diffs.
+.PHONY: triptrap
+triptrap:
+	cd texk && $(MAKE) $(AM_MAKEFLAGS) $@

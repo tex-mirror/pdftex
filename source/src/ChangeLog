@@ -1,3 +1,49 @@
+2010-03-24  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Build (TL_CONF_THREADS): Removed, now in libs/icu/configure.
+
+2010-03-05  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (triptrap): Run intermediate triptrap target in
+	 texk/, texk/web2c/Makefile might not yet exist.
+
+2010-03-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (triptrap): New target to run TRIP and TRAP tests.
+	Do not automatically run 'make check' when cross compiling.
+
+2010-03-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am, configure.ac: Do not automatically run tests as
+	part of 'make world' when cross compiling.
+
+2010-02-22  Karl Berry  <karl@tug.org>
+
+	* Build (TL_CONF_BANNER): 2010/dev.
+
+2010-02-20  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* m4/kpse-common.m4 (KPSE_COMMON): Use LT_INIT([win32-dll]).
+	* m4/kpse-gd-flags.m4 (KPSE_GD_FLAGS): Add -DNONDLL.
+
+2010-02-12  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* m4/kpse-kpathsea-flags.m4: Detect if libkpathsea was compiled
+	without debugging support and add '-DNODEBUG' if necessary.
+
+2010-02-02  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* m4/kpse-warnings.m4: Redefine compiler warning levels to
+	reduce the number of 'min' warnings.
+
+2009-12-24  Karl Berry  <karl@tug.org>
+
+	* Makefile.am (world): also run make check.
+	(check_target): new variable.
+	(skip): new target, to do nothing.
+
+	* Build (TL_CONF_BANNER): add /dev.
+
 2009-12-22  Karl Berry  <karl@tug.org>
 
 	* build-aux/ylwrap: update from current automake (no real changes).

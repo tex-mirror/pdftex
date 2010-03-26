@@ -1,6 +1,6 @@
 ## Makefile.am for the TeX Live subdirectory texk/web2c/
 ##
-## Copyright (C) 2009 Peter Breitenlohner <tex-live@tug.org>
+## Copyright (C) 2009, 2010 Peter Breitenlohner <tex-live@tug.org>
 ## You may freely use, modify and/or distribute this file.
 ##
 ACLOCAL_AMFLAGS = -I ../../m4 -I m4
@@ -33,6 +33,7 @@ EXTRA_LIBRARIES =
 EXTRA_DIST = PROJECTS cftests config.h cpascal.h help.h
 DISTCLEANFILES = $(EXTRA_LIBRARIES)
 CLEANFILES =
+TRIPTRAP =
 
 # in case of an SVN repository
 dist-hook:
@@ -88,6 +89,8 @@ $(proglib): ${srcdir}/lib/*.c
 @XPDF_RULE@
 ## Rebuild libopenbsd-compat
 @OBSDCOMPAT_RULE@
+## Rebuild libzzip
+@ZZIPLIB_RULE@
 ## Rebuild libgraphite
 @GRAPHITE_RULE@
 ## Rebuild libfreetype
@@ -115,6 +118,12 @@ o_tangle = WEBINPUTS=.:$(srcdir) $(SHELL) ./tangle-sh $@ $(OTANGLE)
 DIFF = diff
 DIFFFLAGS =
 TESTS_ENVIRONMENT = DIFF='$(DIFF)' DIFFFLAGS='$(DIFFFLAGS)' LN_S='$(LN_S)' KPSEWHICH='$(KPSEWHICH)'
+
+.PHONY: triptrap
+triptrap:
+	srcdir=$(srcdir) MAKE=$(MAKE) \
+	  $(SHELL) $(srcdir)/triptrap-sh $(TRIPTRAP)
+EXTRA_DIST += triptrap-sh
 
 # The environment for making dumps.
 # No need to specify TEXMF, as ../kpathsea/texmf.cnf should contain
@@ -160,7 +169,6 @@ include $(srcdir)/pdftexdir/am/pdftosrc.am
 include $(srcdir)/luatexdir/am/luatex.am
 include $(srcdir)/luatexdir/am/luatangle.am
 include $(srcdir)/luatexdir/am/liblua51.am
-include $(srcdir)/luatexdir/am/libzzip.am
 include $(srcdir)/luatexdir/am/luasocket.am
 include $(srcdir)/luatexdir/am/luamisc.am
 include $(srcdir)/luatexdir/am/luafontforge.am
@@ -185,10 +193,6 @@ include $(srcdir)/synctexdir/am/synctex.am
 
 ## libmd5
 include $(srcdir)/libmd5/am/md5.am
-
-## Not used
-##
-EXTRA_DIST += fmtutil.in
 
 ## Eventually delete these files
 ##

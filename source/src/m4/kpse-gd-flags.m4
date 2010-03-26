@@ -1,5 +1,5 @@
 # Public macros for the TeX Live (TL) tree.
-# Copyright (C) 2009 Peter Breitenlohner <tex-live@tug.org>
+# Copyright (C) 2009, 2010 Peter Breitenlohner <tex-live@tug.org>
 #
 # This file is free software; the copyright holder
 # gives unlimited permission to copy and/or distribute it,
@@ -18,7 +18,7 @@ AC_DEFUN([KPSE_GD_FLAGS],
 [AC_REQUIRE([KPSE_LIBPNG_FLAGS])[]dnl
 AC_REQUIRE([KPSE_FREETYPE2_FLAGS])[]dnl
 _KPSE_LIB_FLAGS([gd], [gd], [],
-                [-IBLD/libs/gd/include], [BLD/libs/gd/libgd.a], [],
+                [-IBLD/libs/gd/include -DNONDLL], [BLD/libs/gd/libgd.a], [],
                 [], [${top_builddir}/../../libs/gd/include/gd.h])[]dnl
 ]) # KPSE_GD_FLAGS
 

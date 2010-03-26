@@ -1,6 +1,6 @@
 /* tex-file.c: high-level file searching by format.
 
-   Copyright 1993, 1994, 1995, 1996, 1997, 2007, 2008, 2009 Karl Berry.
+   Copyright 1993, 1994, 1995, 1996, 1997, 2007, 2008, 2009, 2010 Karl Berry.
    Copyright 1998-2005 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
@@ -86,6 +86,7 @@
 #define LIG_ENVS "LIGFONTS", "TEXFONTS"
 #define TEXMFSCRIPTS_ENVS "TEXMFSCRIPTS"
 #define LUA_ENVS "LUAINPUTS"
+#define CLUA_ENVS "CLUAINPUTS"
 #define FONTFEATURES_ENVS "FONTFEATURES"
 #define FONTCIDMAPS_ENVS "FONTCIDMAPS"
 #define MLBIB_ENVS "MLBIBINPUTS", BIB_ENVS
@@ -598,6 +599,7 @@ kpathsea_init_format (kpathsea kpse, kpse_file_format_type format)
     case kpse_opl_format:
       INIT_FORMAT ("opl", DEFAULT_OPLFONTS, OPL_ENVS);
       SUFFIXES (".opl");
+      ALT_SUFFIXES (".pl");
       FMT_INFO.suffix_search_only = true;
       break;
     case kpse_otp_format:
@@ -615,6 +617,7 @@ kpathsea_init_format (kpathsea kpse, kpse_file_format_type format)
     case kpse_ovp_format:
       INIT_FORMAT ("ovp", DEFAULT_OVPFONTS, OVP_ENVS);
       SUFFIXES (".ovp");
+      ALT_SUFFIXES (".vpl");
       FMT_INFO.suffix_search_only = true;
       break;
     case kpse_pict_format:
@@ -776,6 +779,12 @@ kpathsea_init_format (kpathsea kpse, kpse_file_format_type format)
       INIT_FORMAT ("mlbst", DEFAULT_MLBSTINPUTS, MLBST_ENVS);
 #define MLBST_SUFFIXES ".mlbst", ".bst"
       SUFFIXES (MLBST_SUFFIXES);
+      FMT_INFO.suffix_search_only = true;
+      break;
+    case kpse_clua_format:
+      INIT_FORMAT ("clua", DEFAULT_CLUAINPUTS, CLUA_ENVS);
+#define CLUA_SUFFIXES ".dll", ".so"
+      SUFFIXES (CLUA_SUFFIXES);
       FMT_INFO.suffix_search_only = true;
       break;
     default:
@@ -975,9 +984,11 @@ kpathsea_find_file_generic (kpathsea kpse, const_string const_name,
   if (FMT_INFO.path == NULL)
     kpathsea_init_format (kpse, format);
 
+#ifdef KPSE_DEBUG
   if (KPATHSEA_DEBUG_P (KPSE_DEBUG_SEARCH))
     DEBUGF3 ("kpse_find_file: searching for %s of type %s (from %s)\n",
              const_name, FMT_INFO.type, FMT_INFO.path_source);
+#endif /* KPSE_DEBUG */
 
   /* Do variable and tilde expansion. */
   name = kpathsea_expand (kpse, const_name);
