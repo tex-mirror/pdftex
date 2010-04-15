@@ -440,6 +440,11 @@ static void copyFontResources(Object * obj)
         obj->dictGetValNF(i, &fontRef);
         if (fontRef->isRef())
             copyFont(obj->dictGetKey(i), &fontRef);
+        else if (fontRef->isDict()) {   // some programs generate pdf with embedded font object
+            copyName(obj->dictGetKey(i));
+            pdf_puts(" ");
+            copyObject(&fontRef);
+        }
         else
             pdftex_fail("PDF inclusion: invalid font in reference type <%s>",
                         fontRef->getTypeName());
