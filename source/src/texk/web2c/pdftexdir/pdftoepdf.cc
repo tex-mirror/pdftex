@@ -1034,6 +1034,8 @@ void write_epdf(void)
             Object contentsobj;
             copyStream((contents->arrayGet(i, &contentsobj))->getStream());
             contentsobj.free();
+            if (i < l - 1)
+                pdf_puts("\n"); // add a newline after each stream except the last
         }
         pdfendstream();
     } else {                    // the contents are optional, but we need to include an empty stream
