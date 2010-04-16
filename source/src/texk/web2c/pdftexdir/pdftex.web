@@ -33847,11 +33847,21 @@ procedure scale_image(n: integer);
 var x, y, xr, yr: integer; {size and resolution of image}
     w, h: scaled; {indeed size corresponds to image resolution}
     default_res: integer;
+    image: integer;
 begin
-    x := image_width(obj_ximage_data(n));
-    y := image_height(obj_ximage_data(n));
-    xr := image_x_res(obj_ximage_data(n));
-    yr := image_y_res(obj_ximage_data(n));
+    image := obj_ximage_data(n);
+    if (image_rotate(image) = 90) or (image_rotate(image) = 270) then begin
+        y := image_width(image);
+        x := image_height(image);
+        yr := image_x_res(image);
+        xr := image_y_res(image);
+    end else begin
+        x := image_width(image);
+        y := image_height(image);
+        xr := image_x_res(image);
+        yr := image_y_res(image);
+    end;
+
     if (xr > 65535) or (yr > 65535) then begin
         xr := 0;
         yr := 0;
@@ -33859,7 +33869,7 @@ begin
     end;
     if (x <= 0) or (y <= 0) or (xr < 0) or (yr < 0) then
         pdf_error("ext1", "invalid image dimensions");
-    if is_pdf_image(obj_ximage_data(n)) then begin
+    if is_pdf_image(image) then begin
         w := x;
         h := y;
     end
@@ -35979,8 +35989,17 @@ end;
 
 procedure out_image(p: pointer);
 var image, groupref: integer;
+    img_w, img_h: integer;
 begin
     image := obj_ximage_data(pdf_ximage_objnum(p));
+    if (image_rotate(image) = 90) or (image_rotate(image) = 270) then begin
+        img_h := image_width(image);
+        img_w := image_height(image);
+    end else begin
+        img_w := image_width(image);
+        img_h := image_height(image);
+    end;
+
     pdf_end_text;
     pdf_print_ln("q");
     if pdf_lookup_list(pdf_ximage_list, pdf_ximage_objnum(p)) = null then 
@@ -36003,18 +36022,18 @@ begin
     else begin
         if pdf_page_group_val<1 then pdf_page_group_val := image_group_ref (image);
         pdf_print_real(ext_xn_over_d(pdf_width(p),
-                       ten_pow[6], image_width(image)), 6);
+                       ten_pow[6], img_w), 6);
         pdf_print(" 0 0 ");
         pdf_print_real(ext_xn_over_d(pdf_height(p) + pdf_depth(p),
-                       ten_pow[6], image_height(image)), 6);
+                       ten_pow[6], img_h), 6);
         pdf_out(" ");
         pdf_print_bp(pdf_x(cur_h) -
                      ext_xn_over_d(pdf_width(p), epdf_orig_x(image),
-                                   image_width(image)));
+                                   img_w));
         pdf_out(" ");
         pdf_print_bp(pdf_y(cur_v) -
                      ext_xn_over_d(pdf_height(p) + pdf_depth(p), epdf_orig_y(image),
-                                   image_height(image)));
+                                   img_h));
     end;
     pdf_print_ln(" cm");
     pdf_print("/Im");
