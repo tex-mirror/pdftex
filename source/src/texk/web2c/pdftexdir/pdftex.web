@@ -11180,8 +11180,10 @@ end;
 pdf_page_ref_code: print_int(get_obj(obj_type_page, cur_val, false));
 left_margin_kern_code: begin
     p := list_ptr(box(cur_val));
-    if (p <> null) and (not is_char_node(p)) and
-       (type(p) = glue_node) and (subtype(p) = left_skip_code + 1) then
+    while (p <> null) and 
+          (cp_skipable(p) or 
+           ((not is_char_node(p)) and (type(p) = glue_node) and (subtype(p) = left_skip_code + 1))) 
+    do
        p := link(p);
     if (p <> null) and (not is_char_node(p)) and
        (type(p) = margin_kern_node) and (subtype(p) = left_side) then
@@ -11192,13 +11194,12 @@ left_margin_kern_code: begin
 end;
 right_margin_kern_code: begin
     q := list_ptr(box(cur_val));
-    p := null;
-    if q <> null then begin
-        p := prev_rightmost(q, null);
-        if (p <> null) and (not is_char_node(p)) and
-           (type(p) = glue_node) and (subtype(p) = right_skip_code + 1) then
-           p := prev_rightmost(q, p);
-    end;
+    p := prev_rightmost(q, null);
+    while (p <> null) and 
+          (cp_skipable(p) or 
+           ((not is_char_node(p)) and (type(p) = glue_node) and (subtype(p) = right_skip_code + 1)))
+    do
+        p := prev_rightmost(q, p);
     if (p <> null) and (not is_char_node(p)) and
        (type(p) = margin_kern_node) and (subtype(p) = right_side) then
         print_scaled(width(p))
