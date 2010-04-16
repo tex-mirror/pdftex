@@ -16837,6 +16837,7 @@ procedure scan_pdf_ext_toks; forward;
 @ @<Glob...@>=
 @!pdf_font_type: ^eight_bits; {the type of font}
 @!pdf_font_attr: ^str_number; {pointer to additional attributes}
+@!pdf_font_nobuiltin_tounicode: ^boolean; {disable generating ToUnicode for this font?}
 
 @ Here come some subroutines to deal with expanded fonts for HZ-algorithm.
 
@@ -33244,7 +33245,8 @@ stays the same.
 @d pdf_setmatrix_node          == pdftex_first_extension_code + 32
 @d pdf_save_node               == pdftex_first_extension_code + 33
 @d pdf_restore_node            == pdftex_first_extension_code + 34
-@d pdftex_last_extension_code  == pdftex_first_extension_code + 34
+@d pdf_nobuiltin_tounicode_code== pdftex_first_extension_code + 35
+@d pdftex_last_extension_code  == pdftex_first_extension_code + 35
 
 @<Put each...@>=
 primitive("openout",extension,open_node);@/
@@ -33329,6 +33331,8 @@ primitive("pdffontexpand",extension,pdf_font_expand_code);@/
 @!@:pdf_font_expand_}{\.{\\pdffontexpand} primitive@>
 primitive("pdfglyphtounicode",extension,pdf_glyph_to_unicode_code);@/
 @!@:pdf_glyph_to_unicode_}{\.{\\pdfglyphtounicode} primitive@>
+primitive("pdfnobuiltintounicode",extension,pdf_nobuiltin_tounicode_code);@/
+@!@:pdf_nobuiltin_tounicode_}{\.{\\pdfnobuiltintounicode} primitive@>
 
 @ The variable |write_loc| just introduced is used to provide an
 appropriate error message in case of ``runaway'' write texts.
@@ -33378,6 +33382,7 @@ extension: case chr_code of
   pdf_ximage_code: print_esc("pdfximage");
   reset_timer_code: print_esc("pdfresettimer");
   set_random_seed_code: print_esc("pdfsetrandomseed");
+  pdf_nobuiltin_tounicode_code: print_esc("pdfnobuiltintounicode");
   pdf_glyph_to_unicode_code: print_esc("pdfglyphtounicode");
   othercases print("[unknown extension!]")
   endcases;
@@ -33435,6 +33440,7 @@ begin case cur_chr of
   reset_timer_code: @<Implement \.{\\pdfresettimer}@>;
   set_random_seed_code: @<Implement \.{\\pdfsetrandomseed}@>;
   pdf_glyph_to_unicode_code: @<Implement \.{\\pdfglyphtounicode}@>;
+  pdf_nobuiltin_tounicode_code: @<Implement \.{\\pdfnobuiltintounicode}@>;
 othercases confusion("ext1")
 @:this can't happen ext1}{\quad ext1@>
 endcases;
@@ -34708,6 +34714,16 @@ end
 @ @<Implement \.{\\pdfglyphtounicode}@>=
 begin
     glyph_to_unicode;
+end
+
+@ @<Implement \.{\\pdfnobuiltintounicode}@>=
+begin
+    check_pdfoutput("\pdfnobuiltintounicode", true);
+    scan_font_ident;
+    k := cur_val;
+    if k = null_font then
+        pdf_error("font", "invalid font identifier");
+    pdf_font_nobuiltin_tounicode[k] := true;
 end
 
 @ The following function are needed for outputing article thread.
