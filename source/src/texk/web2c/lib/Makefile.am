@@ -10,6 +10,10 @@ AM_CFLAGS = $(WARNING_CFLAGS)
 @KPATHSEA_RULE@
 
 noinst_LIBRARIES = lib.a
+if PTEX
+noinst_LIBRARIES += libp.a
+endif PTEX
+EXTRA_LIBRARIES = libp.a
 
 ## We don't compile `texmfmp.c'; this file is converted into 'texextra.c'
 ## for TeX, 'mfextra.c' for Metafont, ...
@@ -31,7 +35,14 @@ lib_a_SOURCES = \
 	version.c \
 	zround.c
 
+## Replacements for pTeX.
+##
+libp_a_CPPFLAGS = -DPTEX $(ENCTEX_INCLUDES)
+libp_a_SOURCES = \
+	openclose.c \
+	printversion.c
+
 ## Not yet used
 ##
-EXTRA_DIST = alloca.c win32main.c
+EXTRA_DIST = alloca.c
 

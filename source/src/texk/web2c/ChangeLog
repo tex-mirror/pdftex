@@ -1,3 +1,118 @@
+2010-04-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: Require that 'int' has at least 4 bytes,
+	allowing to reduce the use of 'integer' in C and C++ code.
+
+2010-04-25  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* texmfmp.h: remove TEXDLL.
+	* config.h: still there is TEXDLL for safety.
+
+2010-04-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (INCLUDES): Remove '-I$(top_builddir)/..' and
+	'-I$(top_srcdir)/..'.
+
+2010-04-22  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pltotf.ch, vptovf.ch: Bug fix, from ptexdir/ppltotf.ch by
+	Ken Nakano <nakano@nextsolution.co.jp>.
+
+2010-04-21  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* bibtex.ch: Fix a small bug (duplicate entry) in bibtex.web.
+	(add_out_pool): Call buffer_overflow as often as needed.	
+
+2010-04-20  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmfmem.h, texmfmp-help.h: Remove luaTeX specific code.
+
+2010-04-19  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (sub_dirs): Removed, former ptexdir/lib/ is now
+	integrated into lib/.
+	* configure.ac (ptexdir/lib/Makefile.am): Removed.
+
+2010-04-18  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* help.h (PBIBTEXHELP, PDVITYPEHELP, PPLTOTFHELP, PTFTOPLHELP):
+	Moved from from ptexdir/ptexhelp.h.
+	* texmfmp-help.h (PTEXHELP): Moved from ptexdir/ptexextra.in.
+	* texmfmp.h [PTEX]: Define TEXMFPOOLNAME and TEXMFENGINENAME, and
+	#include "ptexdir/kanji.h".
+
+2010-04-15  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: Removed LT_LIB_DLLOAD, added check for dlfcn.h.
+	May require '-ldl' for dlopen() for luaTeX only (not everyone).
+
+2010-04-14  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (sub_dirs): New variable, such that ptexdir/lib/
+	for the pTeX programs is (re-)built early.
+
+2010-04-13  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* triptrap-sh [pTeX]: Generate ptrip.diffs.
+
+2010-04-11  Karl Berry  <karl@tug.org>
+
+	* ac/web2c.ac (kpse_tex_progs): add ptex.
+	* configure.ac (KPSE_PTEXENC_FLAGS): invoke new macro.
+	(AC_CONFIG_FILES): generate ptexdir/lib/Makefile
+	* Makefile.am: include $(srcdir)/ptexdir/am/ptex.am.
+	* lib/texmfmp.c [pTeX]: various pTeX conditionals.
+	* texmfmp-help.h [pTeX]: pTeX options.
+
+2010-04-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* tangle.ch: Check and correct module numbers.
+
+	* dvitype.ch, gftodvi.ch, gftopk.ch, gftype.ch, mf.ch, mft.ch,
+	pktogf.ch, pktype.ch, pltotf.ch, pooltype.ch, tangle.ch, tex.ch,
+	tftopl.ch, vftovp.ch, vptovf.ch, weave.ch: Remove trailing
+	whitespace.
+
+2010-04-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/cweb.am (cweave.c): Add dependency on cwebdir/prod.w.
+
+2010-04-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* dvicopy.ch (dvi_name): New global variable.
+	(dvi_length, dvi_move): Use dvi_name instead of 'dvicopy' as
+	last arg of xfseek() and xftell().
+	No random reading on stdin, may be not seekable.
+	* dvitype.ch (dvi_name): New global variable.
+	(dvi_length, move_to_byte): Use dvi_name instead of 'dvitype'
+	as last arg of xfseek() and xftell().
+	* gftopk.ch (gf_length, move_to_byte): Use gf_name instead of
+	'gftopk' as last arg of xfseek() and xftell().
+
+2010-04-06  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pktogf.ch: Check and correct module numbers.
+	Dynamically allocate and resize the row_counts array.
+
+2010-04-05  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* gftopk.ch: Check and correct module numbers.
+	Dynamically allocate and resize the row array.
+	Remove superfluous variable vpl_name.
+	Bug fix for GF file too short.
+
+2010-04-05  Taco Hoekwater  <taco@luatex.org>
+	    
+	* texmfmp.h: Removed #ifdef luaTeX code, now that luatex
+	no longer includes this file at all.
+	
+2010-04-04  Taco Hoekwater  <taco@luatex.org>
+
+	* configure.ac: Append LT_LIB_DLLOAD to the end,
+	needed for the current 0.60.0 luatex build system.
+	* Makefile.am: Comment out the luatexdir/am/luatangle.am line
+	* autoreconf
+	
 2010-03-24  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* configure.ac: Check if dlopen() requires `-ldl'.
@@ -836,7 +951,7 @@
 	* doc/web2c.texi (gftodvi invocation): talk a bit more about slant
 	fonts, pursuant to DEK's message to tex-k of 10 Jul 2005 18:38:11.
 
-2007-12-19  Martin Schröder <martin@oneiros.de>
+2007-12-19  Martin Schrer <martin@oneiros.de>
 
 	* tex.ch (ssup_max_strings): increase to 2097151
 		 (sup_main_memory): increase to 256000000
@@ -1762,7 +1877,7 @@
 
 	* tex.ch: Initialize source_filename_stack[0],
 	full_source_filename_stack[0] -- these can be read under some
-	circumstances.  Found by Krank Küster <frank@kuesterei.ch>.
+	circumstances.  Found by Krank Kter <frank@kuesterei.ch>.
 
 	* tex.ch: Correct printing of |src_specials| when weaving.
 
@@ -2617,7 +2732,7 @@
 
 	* dvitomp.ch: A checksum failure should result in a warning, but
 	not in a non-zero return code.  This was done correctly in one
-	location, wrong in another.  Reported by Berthold Höllmann.
+	location, wrong in another.  Reported by Berthold Hlmann.
 
 1999-05-30  Olaf Weber  <olaf@infovore.xs4all.nl>
 

@@ -19,20 +19,23 @@ CFG_OPTS="\
     --disable-largefile \
     --without-x \
     --disable-all-pkgs \
+    --disable-ptex \
     --enable-pdftex \
-    --without-system-xpdf \
 "
 
 ## workaround to disable system libraries; --enable-native-texlive-build should do that but somehow it didn't
 DISABLE_SYSTEM_LIBS="\
-    --without-system-freetype2 \
     --without-system-freetype \
+    --without-system-freetype2 \
     --without-system-gd \
     --without-system-graphite \
     --without-system-icu \
+    --without-system-kpathsea \
     --without-system-libpng \
+    --without-system-ptexenc \
     --without-system-t1lib \
     --without-system-teckit \
+    --without-system-xpdf \
     --without-system-zlib \
 "
 CFG_OPTS="$CFG_OPTS $DISABLE_SYSTEM_LIBS"

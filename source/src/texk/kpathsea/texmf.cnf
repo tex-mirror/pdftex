@@ -215,14 +215,14 @@ TEXINPUTS.pdfxmex       = .;$TEXMF/tex/{mex,plain,generic,}//
 TEXINPUTS.pdfxtex       = .;$TEXMF/tex/{plain,generic,}//
 
 % LuaTeX.
-TEXINPUTS.lualatex      = .;$TEXMF/tex/{lualatex,latex,generic,}//
+TEXINPUTS.lualatex      = .;$TEXMF/tex/{lualatex,latex,luatex,generic,}//
 TEXINPUTS.luatex        = .;$TEXMF/tex/{luatex,plain,generic,}//
-TEXINPUTS.pdflualatex   = .;$TEXMF/tex/{lualatex,latex,generic,}//
-TEXINPUTS.pdfluatex     = .;$TEXMF/tex/{luatex,plain,generic,}//
+TEXINPUTS.dvilualatex   = .;$TEXMF/tex/{lualatex,latex,luatex,generic,}//
+TEXINPUTS.dviluatex     = .;$TEXMF/tex/{luatex,plain,generic,}//
 
 % XeTeX.
-TEXINPUTS.xelatex       = .;$TEXMF/tex/{xelatex,latex,generic,}//
-TEXINPUTS.xeplain       = .;$TEXMF/tex/{xeplain,eplain,plain,generic,}//
+TEXINPUTS.xelatex       = .;$TEXMF/tex/{xelatex,latex,xetex,generic,}//
+TEXINPUTS.xeplain       = .;$TEXMF/tex/{xeplain,eplain,plain,xetex,generic,}//
 TEXINPUTS.xetex         = .;$TEXMF/tex/{xetex,plain,generic,}//
 
 % Omega / Aleph.
@@ -232,6 +232,14 @@ TEXINPUTS.eomega        = .;$TEXMF/tex/{plain,generic,}//
 TEXINPUTS.lambda        = .;$TEXMF/tex/{lambda,latex,generic,}//
 TEXINPUTS.lamed         = .;$TEXMF/tex/{lamed,lambda,latex,generic,}//
 TEXINPUTS.omega         = .;$TEXMF/tex/{plain,generic,}//
+
+% pTeX
+TEXINPUTS.ptex    = .;$TEXMF/{ptex/{plain,generic},tex/{plain,generic,}}//
+TEXINPUTS.platex  = .;$TEXMF/{ptex/platex,{p,}tex/latex,{p,}tex/generic,{p,}tex}//
+
+% pBibTeX bibliographies and style files
+BIBINPUTS.pbibtex = .;$TEXMF/{pbibtex,bibtex}/bib//
+BSTINPUTS.pbibtex = .;$TEXMF/{pbibtex,bibtex}/bst//
 
 % ConTeXt.
 TEXINPUTS.context       = .;$TEXMF/tex/{context,plain,generic,}//
@@ -527,7 +535,8 @@ shell_escape.tex = f
 % This is used by the Windows script wrapper for restricting searching
 % for the purportedly safe shell_escape_commands above to system
 % directories.
-TEXMF_RESTRICTED_SCRIPTS = {!!$TEXMFMAIN,!!$TEXMFLOCAL,!!$TEXMFDIST}/scripts/{$progname,$engine,}//
+TEXMF_RESTRICTED_SCRIPTS = \
+  {!!$TEXMFMAIN,!!$TEXMFLOCAL,!!$TEXMFDIST}/scripts/{$progname,$engine,}//
 
 % Allow TeX \openin, \openout, or \input on filenames starting with `.'
 % (e.g., .rhosts) or outside the current tree (e.g., /etc/passwd)?
@@ -700,6 +709,7 @@ glob_str_size = 5000
 max_strings.bibtex = 35307
 max_strings.bibtex8 = 35307
 max_strings.bibtexu = 35307
+max_strings.pbibtex = 35307
 
 % GFtype only.
 line_length.gftype = 500

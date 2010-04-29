@@ -57,6 +57,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../m4/kpse-common.m4 \
 	$(top_srcdir)/../m4/kpse-lt-hack.m4 \
 	$(top_srcdir)/../m4/kpse-options.m4 \
 	$(top_srcdir)/../m4/kpse-pkgs.m4 \
+	$(top_srcdir)/../m4/kpse-ptexenc-flags.m4 \
 	$(top_srcdir)/../m4/kpse-setup.m4 \
 	$(top_srcdir)/../m4/kpse-t1lib-flags.m4 \
 	$(top_srcdir)/../m4/kpse-teckit-flags.m4 \
@@ -101,6 +102,8 @@ am__aclocal_m4_deps = $(top_srcdir)/../m4/kpse-common.m4 \
 	$(top_srcdir)/../texk/lcdf-typetools/ac/withenable.ac \
 	$(top_srcdir)/../texk/lcdf-typetools/ac/lcdf-typetools.ac \
 	$(top_srcdir)/../texk/makeindexk/ac/withenable.ac \
+	$(top_srcdir)/../texk/makejvf/ac/withenable.ac \
+	$(top_srcdir)/../texk/mendexk/ac/withenable.ac \
 	$(top_srcdir)/../texk/musixflx/ac/withenable.ac \
 	$(top_srcdir)/../texk/ps2pkm/ac/withenable.ac \
 	$(top_srcdir)/../texk/seetexk/ac/withenable.ac \
@@ -113,8 +116,6 @@ am__aclocal_m4_deps = $(top_srcdir)/../m4/kpse-common.m4 \
 	$(top_srcdir)/../texk/xdvipdfmx/ac/withenable.ac \
 	$(top_srcdir)/../texk/tetex/ac/withenable.ac \
 	$(top_srcdir)/../texk/texlive/ac/withenable.ac \
-	$(top_srcdir)/../texk/kpathsea/ac/withenable.ac \
-	$(top_srcdir)/../texk/kpathsea/ac/web2c.ac \
 	$(top_srcdir)/../libs/icu/ac/withenable.ac \
 	$(top_srcdir)/../libs/teckit/ac/withenable.ac \
 	$(top_srcdir)/../libs/graphite/ac/withenable.ac \
@@ -127,6 +128,9 @@ am__aclocal_m4_deps = $(top_srcdir)/../m4/kpse-common.m4 \
 	$(top_srcdir)/../libs/obsdcompat/ac/withenable.ac \
 	$(top_srcdir)/../libs/libpng/ac/withenable.ac \
 	$(top_srcdir)/../libs/zlib/ac/withenable.ac \
+	$(top_srcdir)/../texk/ptexenc/ac/withenable.ac \
+	$(top_srcdir)/../texk/kpathsea/ac/withenable.ac \
+	$(top_srcdir)/../texk/kpathsea/ac/web2c.ac \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)

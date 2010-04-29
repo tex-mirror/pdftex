@@ -1,3 +1,38 @@
+2010-04-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* epdf.c, pdftoepdf.cc, writeenc.c: Change various function
+	params, return values, and struct members from integer to int.
+
+	Avoid duplicate function prototypes in different headers.
+	* epdf.c: Drop #include "inc-epdf.h".
+	* inc-extra.h (deleted): Move prototypes ...
+	* ptexlib.h: #include "pdftex-common.h", move some prototypes ...
+	* epdf.h: #include "pdftex-common.h" instead of "inc-epdf.h" and
+	"inc-extra.h", 	move some prototypes ...
+	* image.h: Move some prototypes ...
+	* pdftex-common.h (new): ... to here.
+	* am/libpdftex.am: Adjusted.
+
+2010-04-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Adapt to ../etexdir/etex.ch:
+	Fixed the error message for improper use of \protected,
+	reported by Heiko Oberdiek <heiko.oberdiek@googlemail.com>.
+
+2010-04-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* epdf.h: #include <c-auto.h> instead of <web2c/c-auto.h> etc.
+
+2010-04-22  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/pdftex.am (EXTRA_DIST): Add etexdir/etex.ch.
+	Use pdftexdir/etex.version instead of etexdir/etex.version.
+
+2010-04-20  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* ptexlib.h: Move extern declaration of ptexbanner to here
+	from ../lib/lib.h (instatiated in ../lib/texmfmp.c).
+
 2010-03-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* ttf2afm.c: Use kpse_set_program_name(argv[0], NULL) instead of

@@ -265,7 +265,7 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 KPSEVERSION = @KPSEVERSION@
-KPSE_LT_VERSNUM = @KPSE_LT_VERSNUM@
+KPSE_LT_VERSINFO = @KPSE_LT_VERSINFO@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
@@ -353,12 +353,13 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I ../../m4
 SUBDIRS = . doc man
 EXTRA_DIST = BUGS PROJECTS putenv.c strcasecmp.c strtol.c strstr.c \
-	mktex.cnf Makefile.in.orig common.ac.orig withenable.ac
+	bsnl.awk mktex.cnf Makefile.in.orig common.ac.orig \
+	withenable.ac
 INCLUDES = -I$(top_builddir)/.. -I$(top_srcdir)/..
 AM_CFLAGS = $(WARNING_CFLAGS)
 lib_LTLIBRARIES = libkpathsea.la
 libkpathsea_la_CPPFLAGS = -DMAKE_KPSE_DLL
-libkpathsea_la_LDFLAGS = -version-number $(KPSE_LT_VERSNUM)
+libkpathsea_la_LDFLAGS = -version-info $(KPSE_LT_VERSINFO)
 libkpathsea_la_LIBADD = $(LTLIBOBJS)
 BUILT_SOURCES = paths.h
 libkpathsea_la_SOURCES = tex-file.c absolute.c atou.c cnf.c concat.c \
@@ -1650,13 +1651,11 @@ rebuild: all
 
 $(libkpathsea_la_OBJECTS): paths.h kpathsea.h
 
-#
-#
-#
 paths.h: stamp-paths
-stamp-paths: texmf.cnf
+stamp-paths: texmf.cnf bsnl.awk
 	echo "/* paths.h: Generated from texmf.cnf. */" >paths.tmp
-	sed -e 's/%.*//' -e 's/^[ 	]*//' -e 's/[ 	]*$$//' $< \
+	awk -f $(srcdir)/bsnl.awk $(srcdir)/texmf.cnf \
+	| sed -e 's/%.*//' -e 's/^[ 	]*//' -e 's/[ 	]*$$//' \
 	| grep '^[ 	]*[A-Z0-9_]*[ 	=]' \
 	| sed '/^$$/d' \
 	| sed 's/^\([^ 	=]*\)[ 	]*=*[ 	]*\(.*\)/#ifndef DEFAULT_\1%#define DEFAULT_\1 "\2"%#endif/' \

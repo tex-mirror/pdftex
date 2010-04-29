@@ -1,4 +1,4 @@
-$Id: README 16892 2010-02-01 10:37:11Z peter $
+$Id: README 17641 2010-03-31 11:36:18Z peter $
 Public domain.  Originally created by Karl Berry, 2005.
 
 Libraries we compile for TeX Live.
@@ -18,7 +18,7 @@ gd 2.0.35 - http://www.libgd.org/releases/
 graphite 2.3.1 - the directory silgraphite-2.3.1/engine/ from
   http://sourceforge.net/projects/silgraphite/
 
-icu 4.2.1 - http://download.icu-project.org/files/icu4c/
+icu 4.4 - http://download.icu-project.org/files/icu4c/
   with modifications required for xetex, also used by bibtexu
 
 libpng 1.2.40 - http://www.libpng.org/ - used by many
