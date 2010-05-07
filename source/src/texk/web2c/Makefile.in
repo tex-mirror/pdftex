@@ -403,11 +403,11 @@ libpdftex_a_AR = $(AR) $(ARFLAGS)
 libpdftex_a_LIBADD =
 am__libpdftex_a_SOURCES_DIST = pdftexdir/avl.c pdftexdir/avl.h \
 	pdftexdir/avlstuff.c pdftexdir/avlstuff.h pdftexdir/epdf.c \
-	pdftexdir/epdf.h pdftexdir/image.h pdftexdir/mapfile.c \
-	pdftexdir/pdftex.h pdftexdir/pdftex-common.h \
-	pdftexdir/pdftoepdf.cc pdftexdir/pkin.c pdftexdir/ptexlib.h \
-	pdftexdir/ptexmac.h pdftexdir/subfont.c pdftexdir/tounicode.c \
-	pdftexdir/utils.c pdftexdir/vfpacket.c pdftexdir/writeenc.c \
+	pdftexdir/image.h pdftexdir/mapfile.c pdftexdir/pdftex.h \
+	pdftexdir/pdftex-common.h pdftexdir/pdftoepdf.cc \
+	pdftexdir/pkin.c pdftexdir/ptexlib.h pdftexdir/ptexmac.h \
+	pdftexdir/subfont.c pdftexdir/tounicode.c pdftexdir/utils.c \
+	pdftexdir/vfpacket.c pdftexdir/writeenc.c \
 	pdftexdir/writefont.c pdftexdir/writeimg.c \
 	pdftexdir/writejbig2.c pdftexdir/writejbig2.h \
 	pdftexdir/writejpg.c pdftexdir/writepng.c pdftexdir/writet1.c \
@@ -442,7 +442,7 @@ am__libxetex_a_SOURCES_DIST = xetexdir/MathTable.h \
 	xetexdir/XeTeXOTMath.h xetexdir/XeTeX_ext.c \
 	xetexdir/XeTeX_ext.h xetexdir/XeTeXswap.h xetexdir/cmaps.cpp \
 	xetexdir/cmaps.h xetexdir/sfnt.h xetexdir/trans.c \
-	xetexdir/trans.h xetexdir/hz.cpp xetexdir/xetex.h \
+	xetexdir/trans.h xetexdir/xetex.h \
 	xetexdir/XeTeXFontInst_Mac.cpp xetexdir/XeTeXFontInst_Mac.h \
 	xetexdir/XeTeX_mac.c xetexdir/XeTeXFontMgr_FC.cpp \
 	xetexdir/XeTeXFontMgr_FC.h xetexdir/XeTeX_pic.c \
@@ -473,8 +473,8 @@ am_libxetex_a_OBJECTS = libxetex_a-FontTableCache.$(OBJEXT) \
 	libxetex_a-XeTeXOTLayoutEngine.$(OBJEXT) \
 	libxetex_a-XeTeXOTMath.$(OBJEXT) \
 	libxetex_a-XeTeX_ext.$(OBJEXT) libxetex_a-cmaps.$(OBJEXT) \
-	libxetex_a-trans.$(OBJEXT) libxetex_a-hz.$(OBJEXT) \
-	$(am__objects_8) $(am__objects_9) $(am__objects_10)
+	libxetex_a-trans.$(OBJEXT) $(am__objects_8) $(am__objects_9) \
+	$(am__objects_10)
 libxetex_a_OBJECTS = $(am_libxetex_a_OBJECTS)
 libxetexmm_a_AR = $(AR) $(ARFLAGS)
 libxetexmm_a_LIBADD =
@@ -1229,6 +1229,9 @@ EXTRA_DIST = PROJECTS cftests config.h cpascal.h help.h triptrap-sh \
 	ptexdir/COPYRIGHT ptexdir/COPYRIGHT.jis ptexdir/ChangeLog \
 	ptexdir/Changes.txt ptexdir/INSTALL.txt ptexdir/README.txt \
 	tests/memdata1.bst tests/memdata2.bst tests/memdata3.bst \
+	ptexdir/tests/goth10.tfm ptexdir/tests/sample.dvi \
+	ptexdir/tests/min10.pl ptexdir/tests/min10.tfm \
+	ptexdir/tests/tmin10.pl ptexdir/tests/tmin10.tfm \
 	ptexdir/ptrip.diffs ptexdir/Files ptexdir/pbibtex.defines \
 	ptexdir/ptex.mk ptexdir/ptex-base.ch.orig \
 	ptexdir/ptex-include.ch ptexdir/ptexhelp.h ptexdir/reautoconf \
@@ -1410,23 +1413,24 @@ DISTCLEANFILES = $(EXTRA_LIBRARIES) tangle.c tangle.h tangle.p \
 	ptex.pool ptex-tangle ptexdir/ptex.version tests/xexampl.aux \
 	tests/xexampl.bbl tests/xexampl.blg tests/memtest* \
 	tests/xstory.dvityp tests/xpagenum.typ tests/xcmr10.tfm \
-	tests/xcmr10.pl ptrip.diffs $(nodist_pdftex_SOURCES) pdftex.ch \
-	pdftex-web2c pdftex.p pdftex.pool pdftex-tangle \
-	pdftexdir/pdftex.version pdftexdir/etex.version \
-	$(nodist_libluatex_a_SOURCES) $(nodist_xetex_SOURCES) \
-	xetex.web xetex-web2c xetex.p xetex.pool xetex-tangle \
-	xetexdir/etex.version xetexdir/xetex.version \
-	$(omegaware_programs:=.c) $(omegaware_programs:=.h) \
-	$(omegaware_programs:=.p) $(omegaware_programs:=-web2c) \
-	omegaware/tests/xlevel1.ofm omegaware/tests/xlevel1.opl \
-	ofont*vf omegaware/tests/xofont* omegaware/tests/Cherokee.tfm \
-	omegaware/tests/OCherokee.ofm omegaware/tests/OCherokee.opl \
-	omegaware/tests/OCherokee.ovf omegaware/tests/xCherokee.* \
-	omegaware/tests/xOCherokee.* cftest.p \
-	omegaware/tests/xrepeated.* omegaware/tests/specialhex.ofm \
-	omegaware/tests/specialhex.opl omegaware/tests/specialhex.ovf \
-	omegaware/tests/xspecialhex.* $(nodist_aleph_SOURCES) \
-	aleph.web aleph.ch aleph-web2c aleph.p aleph.pool aleph-tangle
+	tests/xcmr10.pl tests/xsample.typ tests/x*min10.* ptrip.diffs \
+	$(nodist_pdftex_SOURCES) pdftex.ch pdftex-web2c pdftex.p \
+	pdftex.pool pdftex-tangle pdftexdir/pdftex.version \
+	pdftexdir/etex.version $(nodist_libluatex_a_SOURCES) \
+	$(nodist_xetex_SOURCES) xetex.web xetex-web2c xetex.p \
+	xetex.pool xetex-tangle xetexdir/etex.version \
+	xetexdir/xetex.version $(omegaware_programs:=.c) \
+	$(omegaware_programs:=.h) $(omegaware_programs:=.p) \
+	$(omegaware_programs:=-web2c) omegaware/tests/xlevel1.ofm \
+	omegaware/tests/xlevel1.opl ofont*vf omegaware/tests/xofont* \
+	omegaware/tests/Cherokee.tfm omegaware/tests/OCherokee.ofm \
+	omegaware/tests/OCherokee.opl omegaware/tests/OCherokee.ovf \
+	omegaware/tests/xCherokee.* omegaware/tests/xOCherokee.* \
+	cftest.p omegaware/tests/xrepeated.* \
+	omegaware/tests/specialhex.ofm omegaware/tests/specialhex.opl \
+	omegaware/tests/specialhex.ovf omegaware/tests/xspecialhex.* \
+	$(nodist_aleph_SOURCES) aleph.web aleph.ch aleph-web2c aleph.p \
+	aleph.pool aleph-tangle
 CLEANFILES = 
 TRIPTRAP = $(am__append_6) $(am__append_9) $(am__append_15) \
 	$(am__append_19) $(am__append_24)
@@ -1627,7 +1631,8 @@ pweb_programs = pbibtex pdvitype ppltotf ptftopl
 ptex_tests = ptexdir/pbibtex.test ptexdir/pdvitype.test \
 	ptexdir/ppltotf.test ptexdir/ptftopl.test ptexdir/ptrip.test \
 	ptexdir/pbibtex-openout-test.pl \
-	ptexdir/pbibtex-longline-test.pl ptexdir/pbibtex-mem.test
+	ptexdir/pbibtex-longline-test.pl ptexdir/pbibtex-mem.test \
+	ptexdir/sample.test ptexdir/yokotate.test
 pproglib = lib/libp.a
 ptex_CPPFLAGS = $(ptex_cppflags)
 ptex_CFLAGS = $(WARNING_CFLAGS)
@@ -1701,11 +1706,11 @@ libpdftex_a_CFLAGS = $(WARNING_CFLAGS)
 libpdftex_a_CXXFLAGS = # $(WARNING_CXXFLAGS)
 libpdftex_a_SOURCES = pdftexdir/avl.c pdftexdir/avl.h \
 	pdftexdir/avlstuff.c pdftexdir/avlstuff.h pdftexdir/epdf.c \
-	pdftexdir/epdf.h pdftexdir/image.h pdftexdir/mapfile.c \
-	pdftexdir/pdftex.h pdftexdir/pdftex-common.h \
-	pdftexdir/pdftoepdf.cc pdftexdir/pkin.c pdftexdir/ptexlib.h \
-	pdftexdir/ptexmac.h pdftexdir/subfont.c pdftexdir/tounicode.c \
-	pdftexdir/utils.c pdftexdir/vfpacket.c pdftexdir/writeenc.c \
+	pdftexdir/image.h pdftexdir/mapfile.c pdftexdir/pdftex.h \
+	pdftexdir/pdftex-common.h pdftexdir/pdftoepdf.cc \
+	pdftexdir/pkin.c pdftexdir/ptexlib.h pdftexdir/ptexmac.h \
+	pdftexdir/subfont.c pdftexdir/tounicode.c pdftexdir/utils.c \
+	pdftexdir/vfpacket.c pdftexdir/writeenc.c \
 	pdftexdir/writefont.c pdftexdir/writeimg.c \
 	pdftexdir/writejbig2.c pdftexdir/writejbig2.h \
 	pdftexdir/writejpg.c pdftexdir/writepng.c pdftexdir/writet1.c \
@@ -2203,7 +2208,6 @@ xetex_web_srcs = \
 	$(xetex_ch_synctex) \
 	xetexdir/xetex.ch \
 	xetexdir/xetex-latex3.ch \
-	xetexdir/xetex-hz.ch \
 	$(xetex_post_ch_synctex)
 
 libxetex_a_CPPFLAGS = $(xetex_cppflags)
@@ -2221,8 +2225,8 @@ libxetex_a_SOURCES = xetexdir/MathTable.h xetexdir/FontTableCache.cpp \
 	xetexdir/XeTeXOTMath.h xetexdir/XeTeX_ext.c \
 	xetexdir/XeTeX_ext.h xetexdir/XeTeXswap.h xetexdir/cmaps.cpp \
 	xetexdir/cmaps.h xetexdir/sfnt.h xetexdir/trans.c \
-	xetexdir/trans.h xetexdir/hz.cpp xetexdir/xetex.h \
-	$(am__append_38) $(am__append_39) $(am__append_40)
+	xetexdir/trans.h xetexdir/xetex.h $(am__append_38) \
+	$(am__append_39) $(am__append_40)
 
 # We must create xetexd.h etc. before building the libxetex_a_OBJECTS.
 libxetex_prereq = xetexd.h $(xetex_dependencies)
@@ -3024,7 +3028,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxetex_a-XeTeX_pic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxetex_a-bmpimage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxetex_a-cmaps.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxetex_a-hz.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxetex_a-jpegimage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxetex_a-mfileio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxetex_a-numbers.Po@am__quote@
@@ -7796,20 +7799,6 @@ libxetex_a-cmaps.obj: xetexdir/cmaps.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='xetexdir/cmaps.cpp' object='libxetex_a-cmaps.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxetex_a_CPPFLAGS) $(CPPFLAGS) $(libxetex_a_CXXFLAGS) $(CXXFLAGS) -c -o libxetex_a-cmaps.obj `if test -f 'xetexdir/cmaps.cpp'; then $(CYGPATH_W) 'xetexdir/cmaps.cpp'; else $(CYGPATH_W) '$(srcdir)/xetexdir/cmaps.cpp'; fi`
-
-libxetex_a-hz.o: xetexdir/hz.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxetex_a_CPPFLAGS) $(CPPFLAGS) $(libxetex_a_CXXFLAGS) $(CXXFLAGS) -MT libxetex_a-hz.o -MD -MP -MF $(DEPDIR)/libxetex_a-hz.Tpo -c -o libxetex_a-hz.o `test -f 'xetexdir/hz.cpp' || echo '$(srcdir)/'`xetexdir/hz.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libxetex_a-hz.Tpo $(DEPDIR)/libxetex_a-hz.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='xetexdir/hz.cpp' object='libxetex_a-hz.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxetex_a_CPPFLAGS) $(CPPFLAGS) $(libxetex_a_CXXFLAGS) $(CXXFLAGS) -c -o libxetex_a-hz.o `test -f 'xetexdir/hz.cpp' || echo '$(srcdir)/'`xetexdir/hz.cpp
-
-libxetex_a-hz.obj: xetexdir/hz.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxetex_a_CPPFLAGS) $(CPPFLAGS) $(libxetex_a_CXXFLAGS) $(CXXFLAGS) -MT libxetex_a-hz.obj -MD -MP -MF $(DEPDIR)/libxetex_a-hz.Tpo -c -o libxetex_a-hz.obj `if test -f 'xetexdir/hz.cpp'; then $(CYGPATH_W) 'xetexdir/hz.cpp'; else $(CYGPATH_W) '$(srcdir)/xetexdir/hz.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libxetex_a-hz.Tpo $(DEPDIR)/libxetex_a-hz.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='xetexdir/hz.cpp' object='libxetex_a-hz.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxetex_a_CPPFLAGS) $(CPPFLAGS) $(libxetex_a_CXXFLAGS) $(CXXFLAGS) -c -o libxetex_a-hz.obj `if test -f 'xetexdir/hz.cpp'; then $(CYGPATH_W) 'xetexdir/hz.cpp'; else $(CYGPATH_W) '$(srcdir)/xetexdir/hz.cpp'; fi`
 
 libxetex_a-XeTeXFontInst_Mac.o: xetexdir/XeTeXFontInst_Mac.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxetex_a_CPPFLAGS) $(CPPFLAGS) $(libxetex_a_CXXFLAGS) $(CXXFLAGS) -MT libxetex_a-XeTeXFontInst_Mac.o -MD -MP -MF $(DEPDIR)/libxetex_a-XeTeXFontInst_Mac.Tpo -c -o libxetex_a-XeTeXFontInst_Mac.o `test -f 'xetexdir/XeTeXFontInst_Mac.cpp' || echo '$(srcdir)/'`xetexdir/XeTeXFontInst_Mac.cpp

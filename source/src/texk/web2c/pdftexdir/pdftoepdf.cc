@@ -1,5 +1,5 @@
 /*
-Copyright 1996-2007 Han The Thanh, <thanh@pdftex.org>
+Copyright 1996-2010 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -17,6 +17,12 @@ You should have received a copy of the GNU General Public License along
 with pdfTeX; if not, write to the Free Software Foundation, Inc., 51
 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+
+/* For MINGW32 <rpcndr.h> defines 'boolean' as 'unsigned char',
+   conflicting with the definition for Pascal's boolean as 'int'
+   in <kpathsea/types.h>.
+*/
+#define boolean MINGW32_boolean
 
 #include <stdlib.h>
 #include <math.h>
@@ -39,6 +45,7 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include <gfile.h>
 #include <assert.h>
 #endif
+
 #include "Object.h"
 #include "Stream.h"
 #include "Array.h"
@@ -52,10 +59,26 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "GlobalParams.h"
 #include "Error.h"
 
-#include "epdf.h"
+#undef boolean
 
 // This file is mostly C and not very much C++; it's just used to interface
 // the functions of xpdf, which happens to be written in C++.
+
+extern "C" {
+
+#include <openbsd-compat.h>
+
+#include <kpathsea/c-auto.h>
+#include <kpathsea/c-proto.h>
+#include <kpathsea/lib.h>
+
+#include <c-auto.h>             /* define SIZEOF_LONG */
+#include <config.h>             /* define type integer */
+
+#include <pdftexdir/ptexmac.h>
+#include <pdftexdir/pdftex-common.h>
+
+}
 
 // The prefix "PTEX" for the PDF keys is special to pdfTeX;
 // this has been registered with Adobe by Hans Hagen.
@@ -615,15 +638,15 @@ static void writeRefs()
             xref->fetch(r->ref.num, r->ref.gen, &obj1);
             if (r->type == objFont) {
                 assert(!obj1.isStream());
-                zpdfbeginobj(r->num, 2);        // \pdfobjcompresslevel = 2 is for this
+                pdfbeginobj(r->num, 2);         // \pdfobjcompresslevel = 2 is for this
                 copyFontDict(&obj1, r);
                 pdf_puts("\n");
                 pdfendobj();
             } else if (r->type != objFontDesc) {        // /FontDescriptor is written via write_fontdescriptor()
                 if (obj1.isStream())
-                    zpdfbeginobj(r->num, 0);
+                    pdfbeginobj(r->num, 0);
                 else
-                    zpdfbeginobj(r->num, 2);    // \pdfobjcompresslevel = 2 is for this
+                    pdfbeginobj(r->num, 2);     // \pdfobjcompresslevel = 2 is for this
                 copyObject(&obj1);
                 pdf_puts("\n");
                 pdfendobj();
@@ -648,7 +671,7 @@ static void writeEncodings()
             if ((s = ((Gfx8BitFont *) r->font)->getCharName(i)) != 0)
                 glyphNames[i] = s;
             else
-                glyphNames[i] = notdef;
+                glyphNames[i] = (char *) notdef;
         }
         epdf_write_enc(glyphNames, r->enc_objnum);
     }
@@ -759,7 +782,7 @@ read_pdf_info(char *image_name, char *page_name, int page_num,
         // get page by number
         if (page_num <= 0 || page_num > epdf_num_pages)
             pdftex_fail("PDF inclusion: required page does not exist <%i>",
-                        (int) epdf_num_pages);
+                        epdf_num_pages);
     }
     // get the required page
     page = pdf_doc->doc->getCatalog()->getPage(page_num);
@@ -837,7 +860,7 @@ void write_epdf(void)
     pdf_printf("/%s.FileName (%s)\n", pdfkeyprefix,
                convertStringToPDFString(pdf_doc->file_name,
                                         strlen(pdf_doc->file_name)));
-    pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, (int) epdf_selected_page);
+    pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, epdf_selected_page);
     pdf_doc->doc->getDocInfoNF(&info);
     if (info.isRef()) {
         // the info dict must be indirect (PDF Ref p. 61)

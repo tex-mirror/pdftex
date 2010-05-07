@@ -17,7 +17,6 @@ libpdftex_a_SOURCES = \
 	pdftexdir/avlstuff.c \
 	pdftexdir/avlstuff.h \
 	pdftexdir/epdf.c \
-	pdftexdir/epdf.h \
 	pdftexdir/image.h \
 	pdftexdir/mapfile.c \
 	pdftexdir/pdftex.h \
