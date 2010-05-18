@@ -75,6 +75,8 @@ KPSE_CHECK_WIN32
 AM_CONDITIONAL([WIN32], [test "x$kpse_cv_have_win32" != xno])
 AM_CONDITIONAL([MINGW32], [test "x$kpse_cv_have_win32" = xmingw32])
 
+AC_SUBST([LT_OBJDIR], ["$lt_cv_objdir"])
+
 dnl Write output here, instead of putting a zillion -D's on the command line.
 AC_CONFIG_HEADERS([c-auto.h:c-auto.in],
  [sed -e 's/^#define PACKAGE/#define KPSE_PACKAGE/' \
@@ -82,7 +84,7 @@ AC_CONFIG_HEADERS([c-auto.h:c-auto.in],
 
 AH_TOP([/* c-auto.h: defines for kpathsea, as determined by configure.
 
-   Copyright 1994-97, 2008, 2009 Karl Berry.
+   Copyright 1994-97, 2008, 2009, 2010 Karl Berry.
    Copyright 1997-99, 2002, 2005 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
