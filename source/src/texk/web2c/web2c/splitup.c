@@ -2,11 +2,11 @@
    and it produces several .c and .h files in the current directory
    as its output.
 
-   $Id: splitup.c 17953 2010-04-21 10:54:29Z peter $
+   $Id: splitup.c 18865 2010-06-10 13:18:47Z peter $
 
    Tim Morgan  September 19, 1987.  */
 
-#include "config.h"
+#include <w2c/config.h>
 #include <kpathsea/getopt.h>
 
 #if defined (FATAL)

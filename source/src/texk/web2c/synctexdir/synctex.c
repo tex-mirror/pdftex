@@ -272,6 +272,11 @@ Latest Revision: Wed Jul  1 08:15:44 UTC 2009
 #   define SYNCTEX_RULE_HT ruleht
 #   define SYNCTEX_RULE_DP ruledp
 
+/*  For non-GCC compilation.  */
+#   if !defined(__GNUC__) || (__GNUC__ < 2)
+#   define __attribute__(A)
+#   endif
+
 /*  In the header file below, TEX-OR-MF-OR-MP is replaced by the real name (tex, etex...)
  *  Some macros will be redefined and additional headers will be imported */
 #   include "synctex-TEX-OR-MF-OR-MP.h"

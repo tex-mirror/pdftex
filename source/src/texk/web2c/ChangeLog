@@ -1,3 +1,82 @@
+2010-07-06  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: Get version string from ../../version.ac.
+
+2010-06-13  Karl Berry  <karl@tug.org>
+
+	* doc/web2c.texi (mpost): mention .mps extension.
+
+2010-06-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* c-auto.h, config.h (removed): Obsolete, all mplibdir/ and
+	luatexdir/ files are now changed to directly #include
+	<w2c/c-auto.h> or <w2c/config.h>.
+
+2010-06-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (AM_CPPFLAGS, INCLUDES): Move $(KPATHSEA_INCLUDES).
+	* am/cweb.am (tie_CPPFLAGS): Add $(AM_CPPFLAGS).
+	* am/texmf.am (tex_CPPFLAGS, mf_CPPFLAGS): Add $(AM_CPPFLAGS).
+	(mf_nowin_CPPFLAGS): Use $(mf_CPPFLAGS).
+
+2010-06-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Reorganize web2c headers.
+	* config.h (deleted): Moved ...
+	* w2c/config.h (new): ... to here.
+	* configure.ac: Create w2c/c-auto.h instead of c-auto.h.
+	* c-auto.h (new): Temporary file including <w2c/c-auto.h>, to be
+	removed when all luatexdir/ files are changed to directly
+	include <w2c/c-auto.h>.
+	* config.h (new): Temporary file including <w2c/config.h>, to be
+	removed when all mplibdir/ and luatexdir/ files are changed to
+	directly include <w2c/config.h>.
+	* Makefile.am (EXTRA_DIST): Adjust.
+	* cpascal.h: #include <w2c/config.h> instead of "config.h".
+
+2010-06-04  Karl Berry  <karl@tug.org>
+
+	* configure.ac (web2_version): remove pretest for
+	TeX Live 2010 (pretest 2, maybe final).
+
+2010-05-31  Karl Berry  <karl@tug.org>
+
+	* configure.ac (AC_CHECK_FUNCS): remove stat64, since we are not
+	prepared for largefile support in general, and this gives a false
+	positive on AIX.  tlbuild mail from vvv, 27 May 2010 20:15:40.
+
+	* synctex.c [__attribute__]: #define __attribute__ away if it is
+	not defined.  tlbuild mail, 28 May 2010 14:34:53.
+
+2010-05-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* ac/web2c.ac, configure.ac: Use '--with-banner-add' instead of
+	'--with-tex-banner'.
+
+2010-05-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (EXTRA_DIST): Remove metapost.mk.
+	* am/texmf.am (EXTRA_DIST): Remove tmf-pool.h.
+	* metapost.mk, tmf-pool.h (removed): Obsolete.
+
+2010-05-24  Karl Berry  <karl@tug.org>
+
+	* tex.ch (sup_font_mem_size): increase from 4,000,000
+	to 147,483,647 (the last nine digits of 2^31 - 1).  It seems to me
+	this is merely an integer, so 2^31-1 itself should be safe, i.e.,
+	a 2 could be prepended, but I just didn't want to go that far.
+
+2010-05-21  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am: Fix the lib/libp.a rebuild rule.
+
+2010-05-19  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* cpascal.h (BIBXRETALLOCNOSET, BIBXRETALLOCSTRING): Cast size_t
+	to long for printing to avoid warnings on 64Bit systems.
+	* texmfmp.h (undumpcheckedthings, undumpuppercheckthings):
+	Cast high limit to unsigned long for printing.
+
 2010-05-18  Karl Berry  <karl@tug.org>
 
 	* configure.ac (web2_version): use /pretest ident.

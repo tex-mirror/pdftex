@@ -234,12 +234,12 @@ TEXINPUTS.lamed         = .;$TEXMF/tex/{lamed,lambda,latex,generic,}//
 TEXINPUTS.omega         = .;$TEXMF/tex/{plain,generic,}//
 
 % pTeX
-TEXINPUTS.ptex    = .;$TEXMF/{ptex/{plain,generic},tex/{plain,generic,}}//
-TEXINPUTS.platex  = .;$TEXMF/{ptex/platex,{p,}tex/latex,{p,}tex/generic,{p,}tex}//
+TEXINPUTS.ptex          = .;$TEXMF/tex/{ptex,ptexgeneric,plain,generic,}//
+TEXINPUTS.platex        = .;$TEXMF/tex/{platex,ptexgeneric,latex,generic,}//
 
 % pBibTeX bibliographies and style files
-BIBINPUTS.pbibtex = .;$TEXMF/{pbibtex,bibtex}/bib//
-BSTINPUTS.pbibtex = .;$TEXMF/{pbibtex,bibtex}/bst//
+BIBINPUTS.pbibtex       = .;$TEXMF/{pbibtex,bibtex}/bib//
+BSTINPUTS.pbibtex       = .;$TEXMF/{pbibtex,bibtex}/bst//
 
 % ConTeXt.
 TEXINPUTS.context       = .;$TEXMF/tex/{context,plain,generic,}//
@@ -431,7 +431,7 @@ TW_INIPATH = $TW_LIBPATH
 % Find scripts that are distributed/installed in the texmf tree.
 
 % Lua needs to look in TEXINPUTS for lua scripts distributed with packages.
-LUAINPUTS = .;$TEXMF/scripts/{$progname,$engine,}/lua//;$TEXINPUTS
+LUAINPUTS = .;$TEXMF/scripts/{$progname,$engine,}/{lua,}//;$TEXINPUTS
 
 % Lua needs to look for binary lua libraries distributed with packages.
 CLUAINPUTS = .;$SELFAUTOLOC/lib/{$progname,$engine,}/lua//
@@ -465,9 +465,9 @@ RUBYINPUTS   = .;$TEXMF/scripts/{$progname,$engine,}/ruby//
 %
 TEXMFCNF = {$SELFAUTOLOC,$SELFAUTODIR,$SELFAUTOPARENT}{,{/share,}/texmf{-local,}/web2c}
 
-# kpathsea 3.5.3 and later sets these at runtime. To avoid empty
-# expansions from binaries linked against an earlier version of the
-# library, we set $progname and $engine to something non-empty:
+% kpathsea 3.5.3 and later sets these at runtime. To avoid empty
+% expansions from binaries linked against an earlier version of the
+% library, we set $progname and $engine to something non-empty:
 progname = unsetprogname
 engine = unsetengine
 
@@ -498,13 +498,15 @@ try_std_extension_first = t
 % enable it for everything but bare tex.
 shell_escape = p
 
-% No spaces in this command list.  These programs either do not write
-% any output files, respect openout_any, or have hard-coded restrictions similar
-% or higher to openout_any=p.  And have no features (nor, to the best of our
-% knowledge, obvious security holes) to invoke arbitrary other programs.
+% No spaces in this command list.
 % 
-% Unfortunately we found too many problems with shell_escape=p, so it
-% should be treated as though it were just as dangerous as shell_escape=t.
+% The programs listed here are as safe as any we know: they either do
+% not write any output files, respect openout_any, or have hard-coded
+% restrictions similar or higher to openout_any=p.  They also have no
+% features to invoke arbitrary other programs, and no known exploitable
+% bugs.  All to the best of our knowledge.  They also have practical use
+% for being called from TeX.
+% 
 shell_escape_commands = \
 bibtex,bibtex8,\
 kpsewhich,\
@@ -634,7 +636,7 @@ extra_mem_top.context = 2000000
 extra_mem_bot.context = 4000000
 
 % Words of font info for TeX (total size of all TFM files, approximately).
-% Must be >= 20000 and <= 4000000 (without tex.ch changes).
+% Must be >= 20000 and <= 147483647 (without tex.ch changes).
 font_mem_size = 3000000
 
 % Total number of fonts. Must be >= 50 and <= 9000 (without tex.ch changes).
@@ -665,7 +667,7 @@ buf_size = 200000
 % for all known free hyphenation patterns to be loaded simultaneously
 % (as TeX Live does).
 %
-trie_size = 700000
+trie_size = 1000000
 
 hyph_size = 8191        % prime number of hyphenation exceptions, >610, <32767.
                         % http://primes.utm.edu/curios/page.php/8191.html
