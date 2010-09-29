@@ -141,6 +141,7 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 { functions from pdftex.web (thanks Taco for the trick) }
 @define function autoexpandvf();
+@define procedure domarkedcontent();
 
 { end of pdftex.defines }
 { vim: set syntax=web : }

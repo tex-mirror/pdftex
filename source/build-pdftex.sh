@@ -19,8 +19,8 @@ CFG_OPTS="\
     --disable-largefile \
     --without-x \
     --disable-all-pkgs \
-    --disable-ptex \
     --enable-pdftex \
+    --without-system-xpdf \
 "
 
 ## workaround to disable system libraries; --enable-native-texlive-build should do that but somehow it didn't
@@ -32,17 +32,17 @@ DISABLE_SYSTEM_LIBS="\
     --without-system-icu \
     --without-system-kpathsea \
     --without-system-libpng \
-    --without-system-ptexenc \
     --without-system-t1lib \
     --without-system-teckit \
-    --without-system-xpdf \
     --without-system-zlib \
+    --without-system-ptexenc \
 "
 CFG_OPTS="$CFG_OPTS $DISABLE_SYSTEM_LIBS"
 
 buildDir=$(pwd)/build-pdftex
 rm -rf $buildDir && mkdir $buildDir && cd $buildDir
 
+export CFLAGS="-g"
 export CONFIG_SHELL=/bin/bash
 $topDir/src/configure $CFG_OPTS "$@" 2>&1 | tee configure.log
 

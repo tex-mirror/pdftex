@@ -1,23 +1,23 @@
 pdfTeX
 ======
 
-INSTALL for pdfTeX 1.40.11
+INSTALL for pdfTeX 1.40.10
 ==========================
 
 Try the script build-pdftex.sh in this directory:
 
 ,--------
-| bash ./build-pdftex.sh
+| ./build-pdftex.sh
 `--------
 
-If it succeeds, you should end up with the file pdftex in
+If it succeeds, you should end up with the files pdftex and pdftex.pool in
 build-pdftex/texk/web2c
 
 If you want to build pdftex in a directory out of the src tree:
 
 ,--------
 | cd /tmp
-| bash /path/to/build-pdftex.sh
+| /path/to/build-pdftex.sh
 `--------
 
 This distribution is a stripped-down version of the TeXlive distribution.

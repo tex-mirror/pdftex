@@ -1274,7 +1274,10 @@ The link is object \the\pdflastlink.
 
 \pdfcatalog{                            % Catalog dictionary of PDF output.
     /PageMode /UseOutlines              %
-    /URI (http://www.fi.muni.cz/)       %
+    /URI <<
+        /S /URI
+        /URI (http://www.fi.muni.cz/)
+    >>
 % pdfscreen-like setting might look like:
 %     /PageMode /none
 %     /ViewerPreferences <<
@@ -1289,4 +1292,38 @@ openaction goto page 1 {/Fit}           % the action to be activated when
                                         % opening the document; this is the
                                         % same as <action spec> for links
                                         % and outlines
+
+
+%*****************************************************
+% some stuff added recently, while testing 1.40.8-beta
+%_____________________________________________________
+
+\vfil\eject
+
+%% truetype font
+\pdfmapline{=tahoma-texnansi <tahoma.ttf <q-texnansi-uni.enc}
+\font\f=tahoma-texnansi
+\leftline{\f This text is typeset using Tahoma}
+
+%% pdf inclusion: use encguide.pdf
+\newcount\countA
+\newcount\countB
+
+\def\includePDF#1{
+    \pdfximage{#1}%
+    \countA=\pdflastximagepages
+    \countB=1
+    \noindent
+    \loop
+        \pdfximage width 3cm page \the\countB {#1}%
+        \hbox{\pdfrefximage\pdflastximage}\space
+    \ifnum\countB<\countA
+        \advance\countB 1
+    \repeat
+}
+
+\includePDF{encguide.pdf}
+\vfil\eject
+\includePDF{microtype.pdf}
+
 \end

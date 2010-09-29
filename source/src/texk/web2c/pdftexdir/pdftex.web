@@ -294,7 +294,7 @@ known as `\eTeX'.
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
 @d pdftex_revision=="11" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.11' {current \pdfTeX\ version}
+@d pdftex_version_string=='-1.40.11+tagged-pdf' {current \pdfTeX\ version}
 @#
 @d pdfeTeX_banner=='This is pdfeTeX, Version 3.1415926',pdftex_version_string,eTeX_version_string
    {printed when \pdfeTeX\ starts}
@@ -5672,9 +5672,10 @@ that will be defined later.
 @d pdf_prepend_kern_code     = pdftex_first_integer_code + 22 {prepend kern before certain characters?}
 @d pdf_append_kern_code      = pdftex_first_integer_code + 23 {append kern before certain characters?}
 @d pdf_gen_tounicode_code    = pdftex_first_integer_code + 24 {generate ToUnicode for fonts?}
-@d pdf_draftmode_code        = pdftex_first_integer_code + 25 {switch on draftmode if positive}
-@d pdf_inclusion_copy_font_code     = pdftex_first_integer_code + 26 {generate ToUnicode for fonts?}
-@d pdf_int_pars=pdftex_first_integer_code + 27 {total number of \pdfTeX's integer parameters}
+@d pdf_reset_page_origin_code   = pdftex_first_integer_code + 25 {generate interword spaces?}
+@d pdf_draftmode_code           = pdftex_first_integer_code + 26 {switch on draftmode if positive}
+@d pdf_inclusion_copy_font_code = pdftex_first_integer_code + 27 {generate ToUnicode for fonts?}
+@d pdf_int_pars=pdftex_first_integer_code + 28 {total number of \pdfTeX's integer parameters}
 @#
 @d etex_int_base=pdf_int_pars {base for \eTeX's integer parameters}
 @d tracing_assigns_code=etex_int_base {show assignments}
@@ -5760,6 +5761,7 @@ that will be defined later.
 @d pdf_prepend_kern == int_par(pdf_prepend_kern_code)
 @d pdf_append_kern == int_par(pdf_append_kern_code)
 @d pdf_gen_tounicode == int_par(pdf_gen_tounicode_code)
+@d pdf_reset_page_origin == int_par(pdf_reset_page_origin_code)
 @d pdf_output           == int_par(pdf_output_code)
 @d pdf_compress_level   == int_par(pdf_compress_level_code)
 @d pdf_objcompresslevel == int_par(pdf_objcompresslevel_code)
@@ -5880,6 +5882,7 @@ pdf_adjust_interword_glue_code:    print_esc("pdfadjustinterwordglue");
 pdf_prepend_kern_code:    print_esc("pdfprependkern");
 pdf_append_kern_code:    print_esc("pdfappendkern");
 pdf_gen_tounicode_code:    print_esc("pdfgentounicode");
+pdf_reset_page_origin_code:    print_esc("pdfresetpageorigin");
 pdf_draftmode_code:        print_esc("pdfdraftmode");
 pdf_inclusion_copy_font_code:    print_esc("pdfinclusioncopyfonts");
 @/@<Cases for |print_param|@>@/
@@ -6055,6 +6058,8 @@ primitive("pdfappendkern",assign_int,int_base+pdf_append_kern_code);@/
 @!@:pdf_append_kern_}{\.{\\pdfappendkern} primitive@>
 primitive("pdfgentounicode",assign_int,int_base+pdf_gen_tounicode_code);@/
 @!@:pdf_gen_tounicode_}{\.{\\pdfgentounicode} primitive@>
+primitive("pdfresetpageorigin",assign_int,int_base+pdf_reset_page_origin_code);@/
+@!@:pdf_reset_page_origin_}{\.{\\pdfresetpageorigin} primitive@>
 primitive("pdfdraftmode",assign_int,int_base+pdf_draftmode_code);@/
 @!@:pdf_draftmode_}{\.{\\pdfdraftmode} primitive@>
 primitive("pdfinclusioncopyfonts",assign_int,int_base+pdf_inclusion_copy_font_code);@/
@@ -14946,6 +14951,7 @@ pdf_image_hicolor := 1;
 pdf_image_apply_gamma := 0;
 pdf_px_dimen := one_bp;
 pdf_draftmode := 0;
+pdf_reset_page_origin := 1;
 
 @ The subroutines define the corresponding macros so we can use them
 in C.
@@ -15036,6 +15042,8 @@ end;
 
 @ Helper for debugging purposes
 
+@d pdf_debug_on == true {change to |false| to suppress debugging info}
+
 @p procedure short_display_n(@!p, m:integer); {prints highlights of list |p|}
 var n:integer; {for replacement counts}
     i: integer;
@@ -15085,6 +15093,30 @@ while p>mem_min do
       return;
   end;
   update_terminal;
+end;
+
+procedure pdf_DEBUG(s: str_number);
+begin
+    if not pdf_debug_on then
+        return;
+    print_ln; print("DEBUG: "); print(s);
+    print_ln;
+end;
+
+procedure pdf_DEBUG_int(s: str_number; i: integer);
+begin
+    if not pdf_debug_on then
+        return;
+    print_ln; print("DEBUG: "); print(s); print_int(i);
+    print_ln;
+end;
+
+procedure pdf_DEBUG_str(s, s2: str_number);
+begin
+    if not pdf_debug_on then
+        return;
+    print_ln; print("DEBUG: "); print(s); print(s2);
+    print_ln;
 end;
 
 @ Sometimes it is neccesary to allocate memory for PDF output that cannot
@@ -15205,6 +15237,8 @@ end
 @!fixed_pdf_draftmode: integer; {fixed \\pdfdraftmode}
 @!fixed_pdf_draftmode_set: boolean; {|fixed_pdf_draftmode| has been set?}
 @!pdf_page_group_val: integer;
+@!pdf_mcid_counter: integer; {counter for MCID of structure elements}
+@!se_page_ref: integer; {page ref of first kid of the current SE}
 
 @ @<Set init...@>=
 pdf_gone := 0;
@@ -15359,6 +15393,8 @@ begin
     else
         pdf_stream_length := pdf_offset - pdf_save_offset;
     pdf_flush;
+    if pdf_last_byte = pdf_new_line_char then
+        decr(pdf_stream_length); {workaround for AR9 bug}
     if pdf_seek_write_length then
         write_stream_length(pdf_stream_length, pdf_stream_length_offset);
     pdf_seek_write_length := false;
@@ -15366,6 +15402,13 @@ begin
         pdf_out(pdf_new_line_char);
     pdf_print_ln("endstream");
     pdf_end_obj;
+
+{
+    pdf_begin_obj(pdf_last_stream_length, 1);
+    pdf_print_int_ln(pdf_stream_length);
+    pdf_end_obj;
+}
+
 end;
 
 @ Basic printing procedures for PDF output are very similiar to \TeX\ basic
@@ -15391,6 +15434,9 @@ begin
     pdf_print_nl;
 end
 
+@d pdf_last_byte_is_newline == {if the last byte in |pdf_buf| is |pdf_new_line_char|}
+    ((pdf_ptr > 0) and (pdf_buf[pdf_ptr - 1] = pdf_new_line_char))
+
 @<Declare procedures that need to be declared forward for \pdfTeX@>=
 procedure pdf_error(t, p: str_number);
 begin
@@ -15402,6 +15448,34 @@ begin
         print(")");
     end;
     print(": "); print(p);
+    succumb;
+end;
+
+procedure pdf_error_str(t, p, s: str_number);
+begin
+    normalize_selector;
+    print_err("pdfTeX error");
+    if t <> 0 then begin
+        print(" (");
+        print(t);
+        print(")");
+    end;
+    print(": "); print(p);
+    print(": "); print(s);
+    succumb;
+end;
+
+procedure pdf_error_int(t, p: str_number; i: integer);
+begin
+    normalize_selector;
+    print_err("pdfTeX error");
+    if t <> 0 then begin
+        print(" (");
+        print(t);
+        print(")");
+    end;
+    print(": "); print(p);
+    print_int(i);
     succumb;
 end;
 
@@ -15752,13 +15826,14 @@ DVI}
                           horizontal scaling factor}
 @!pdf_last_f: internal_font_number; {last font in PDF output page}
 @!pdf_last_fs: internal_font_number; {last font size in PDF output page}
-
+@!pdf_dummy_font: internal_font_number; {font used to insert artificial interword spaces}
 
 @ Following procedures implement low-level subroutines to convert \TeX{}
 internal structures to PDF page description.
 
 @p procedure pdf_set_origin(h, v: scaled); {set the origin to |h|, |v|}
 begin
+    pdfassert(not pdf_doing_text);
     if (abs(h - pdf_origin_h) >= min_bp_val) or
         (abs(v - pdf_origin_v) >= min_bp_val) then begin
         pdf_print("1 0 0 1 ");
@@ -15806,7 +15881,9 @@ procedure pdf_set_textmatrix(v, v_out: scaled; f: internal_font_number);
 {set the next starting point to |cur_h|, |cur_v|}
 var pdf_new_Tm_a: integer; {|a| value of the new text matrix}
 begin
-    pdf_out(" ");
+(*     pdf_out(" "); *)
+    if not pdf_last_byte_is_newline then
+        pdf_print_nl;
     if f = pdf_f then
         pdf_new_Tm_a := pdf_cur_Tm_a
     else if not pdf_font_auto_expand[f] then
@@ -15825,7 +15902,8 @@ begin
         pdf_print(" Tm");
         pdf_cur_Tm_a := pdf_new_Tm_a;
         pdfassert(pdf_cur_Tm_a > -1000);
-    end else begin
+    end else if (abs(cur_h - pdf_tj_start_h) >= min_bp_val) or (v_out <> 0) then {avoid printing '0 0 Td'}
+    begin
         pdf_print_bp(cur_h - pdf_tj_start_h); {works only for unexpanded fonts}
         pdf_h := pdf_tj_start_h + scaled_out;
         pdf_out(" ");
@@ -15949,7 +16027,10 @@ end;
 
 procedure pdf_begin_text; {begin a text section}
 begin
-    pdf_set_origin(0, cur_page_height);
+    if pdf_reset_page_origin > 0 then
+        pdf_set_origin(0, cur_page_height)
+    else
+        pdf_set_origin(cur_h, cur_v);
     pdf_print_ln("BT");
     pdf_doing_text := true;
     pdf_f := null_font;
@@ -15959,10 +16040,27 @@ begin
     pdf_cur_Tm_a := 0;
 end;
 
-@ @p
+procedure pdf_read_dummy_font;
+begin
+    if pdf_dummy_font = null_font then begin
+        pdf_dummy_font := read_font_info(null_cs, "dummy-space", "", one_bp);
+    end;
+end;
+
+procedure pdf_insert_interword_space;
+{insert an artificial interword space}
+begin
+    pdf_read_dummy_font;
+    pdf_set_font(pdf_dummy_font);
+    pdf_mark_char(pdf_dummy_font, 32);
+    pdf_print("( )Tj");
+end;
+
 procedure pdf_begin_string(f: internal_font_number); {begin to draw a string}
 var s_out, v, v_out: scaled;
     s: integer;
+    must_end_string: boolean;  {must we end the current string?}
+    must_insert_space: boolean;  {must we insert an interword space?}
 begin
     if not pdf_doing_text then
         pdf_begin_text;
@@ -15997,17 +16095,46 @@ begin
         v := 0;
         v_out := 0;
     end;
-    if (f <> pdf_f) or (v <> 0) or (abs(s) >= @'100000) then begin
+
+    must_insert_space := false;
+    must_end_string := false;
+
+{     print_nl("s_out = "); print_scaled(s_out); }
+{     print_nl("space(f) = "); print_scaled(space(f)); }
+{     print_nl("space_shrink(f) = "); print_scaled(space_shrink(f)); }
+{     print_nl("x_height(f) = "); print_scaled(x_height(f)); }
+{     print_nl("v = "); print_scaled(v); }
+{     print_nl("v_out = "); print_scaled(v_out); }
+
+    if gen_faked_interword_space and 
+        ((abs(v_out) > 2*x_height(f)) or 
+         (s_out > space(f) - space_shrink(f)) or
+         ((f <> pdf_f) and (v = 0))) then
+    begin
+        must_insert_space := true;
+    end;
+
+    if (f <> pdf_f) or (v <> 0) or (abs(s) >= @'100000) or must_insert_space then begin
+        must_end_string := true;
+    end;
+
+    if must_end_string then begin
         pdf_end_string;
+        if must_insert_space then begin
+            pdf_insert_interword_space; {this will change |pdf_f|}
+            pdf_set_font(f);
+        end;
         pdf_set_textmatrix(v, v_out, f);
         pdf_f := f;
         s := 0;
     end;
+
     if not pdf_doing_string then begin
         pdf_print(" [");
         if s = 0 then
             pdf_out("(");
     end;
+
     if s <> 0 then begin
         if pdf_doing_string then
             pdf_out(")");
@@ -16017,6 +16144,21 @@ begin
     end;
     pdf_doing_string := true;
 end;
+
+procedure pdf_insert_fake_space;
+var s: integer; {to save |gen_faked_interword_space|}
+begin
+    s := gen_faked_interword_space;
+    gen_faked_interword_space := 0; {to prevent inserting another fake space in |pdf_begin_string|}
+
+    pdf_read_dummy_font;
+    pdf_begin_string(pdf_dummy_font);
+    pdf_print(" ");
+    pdf_end_string_nl;
+
+    gen_faked_interword_space := s;
+end;
+
 
 procedure pdf_end_text; {end a text section}
 begin
@@ -16064,6 +16206,25 @@ begin
     pdf_print_ln("]");
 end;
 
+procedure pdf_sync_pos; {sync pdf pen position; code copied partly from |pdf_begin_string|}
+var v, v_out: scaled;
+begin
+    if pdf_doing_text then {use Td/Tm to move pen}
+    begin
+        if abs(cur_v - pdf_v) >= min_bp_val then begin
+            v := divide_scaled(pdf_v - cur_v, one_hundred_bp,
+                               fixed_decimal_digits + 2);
+            v_out := scaled_out;
+        end
+        else begin
+            v := 0;
+            v_out := 0;
+        end;
+        pdf_set_textmatrix(v, v_out, pdf_f);
+    end else {use cm to move pen}
+        pdf_set_origin(cur_h, cur_v);
+end;
+
 procedure literal(s: str_number; literal_mode: integer; warn: boolean);
 var j: pool_pointer; {current character code position}
 begin
@@ -16095,6 +16256,10 @@ begin
         pdf_end_text;
     direct_always:
         pdf_end_string_nl;
+    enclose: begin
+        pdf_end_string_nl;
+        pdf_sync_pos;
+    end;
     othercases confusion("literal1")
     endcases;
     while j<str_start[s+1] do begin
@@ -16120,7 +16285,7 @@ the same type.
 end;
 
 @ The first field contains information representing identifier of this object.
-It is usally a number for most of object types, but it may be a string number
+It is usually a number for most of object types, but it may be a string number
 for named destination or named thread.
 
 The second field of |obj_entry| contains link to the next
@@ -16160,7 +16325,11 @@ well.
 @d obj_type_xform               == 7 {index of linked list of XObject forms}
 @d obj_type_ximage              == 8 {index of linked list of XObject image}
 @d obj_type_thread              == 9 {index of linked list of num article threads}
-@d head_tab_max                 == obj_type_thread {max index of |head_tab|}
+@d obj_type_struct_elem         == 10 {index of linked list of structure elements}
+@d obj_type_parent_elem         == 11 {index of linked list of parent elements}
+@d head_tab_max                 == obj_type_parent_elem {max index of |head_tab|}
+
+@d obj_page_created == obj_aux
 
 @# {max number of kids for balanced trees}
 @d pages_tree_kids_max     == 6 {max number of kids of Pages tree node}
@@ -16183,7 +16352,7 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d pdf_height(#)           == mem[# + 2].sc
 @d pdf_depth(#)            == mem[# + 3].sc
 
-@# {data structure for \.{\\pdfliteral}}
+@# {data structure for \.{\\pdfliteral}; node size = 2}
 @d pdf_literal_data(#)     == link(#+1) {data}
 @d pdf_literal_mode(#)     == info(#+1) {mode of resetting the text matrix
                               while writing data to the page stream}
@@ -16192,6 +16361,7 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d direct_page             == 1 {end text (ET) if needed, but don't change the CTM}
 @d direct_always           == 2 {don't end text, don't change the CTM}
 @d scan_special            == 3 {look into special text}
+@d enclose                 == 4 {like |direct_always|, but end current string and sync pos}
 
 @# {data structure for \.{\\pdfcolorstack}}
 @d pdf_colorstack_node_size == 3
@@ -16263,12 +16433,14 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @# {data structure of annotations; words 1..4 represent the coordinates of
     the annotation}
 @d obj_annot_ptr           == obj_aux {pointer to corresponding whatsit node}
-@d pdf_annot_node_size     == 7 {size of whatsit node representing annotation}
+@d pdf_annot_node_size     == 8 {size of whatsit node representing annotation}
 @d pdf_annot_data(#)       == info(# + 5) {raw data of general annotations}
 @d pdf_link_attr(#)        == info(# + 5) {attributes of link annotations}
 @d pdf_link_action(#)      == link(# + 5) {pointer to action structure}
 @d pdf_annot_objnum(#)     == mem[# + 6].int {object number of corresponding object}
 @d pdf_link_objnum(#)      == mem[# + 6].int {object number of corresponding object}
+@d pdf_annot_marked(#)     == info(# + 7) {is this annotation marked?}
+@d pdf_link_marked(#)      == info(# + 7) {is this link annotation marked?}
 
 @# {types of actions}
 @d pdf_action_page         == 0 {GoTo action}
@@ -16357,6 +16529,43 @@ so we can use this field for both}
 @# {data structure of snap compensation node}
 @d snapy_comp_ratio(#)       == mem[# + 1].int
 
+@# {data structure for marked content nodes}
+@d pdf_mc_node_size         == 5
+@d pdf_mc_parent(#)         == mem[# + 1].int   {parent id: -1 = no parent}
+@d pdf_mc_data(#)           == info(# + 2)      {MC data; token list}
+@d pdf_mc_attr(#)           == link(# + 2)      {MC attr; token list}
+@d pdf_mc_endtext(#)        == info(# + 3)      {end text section before writting MC data?}
+@d pdf_mc_prio(#)           == link(# + 3)      {priority for sorting between siblings}
+@d pdf_mc_is_link_elem(#)   == info(# + 4)      {is this a link element?}
+@d pdf_mc_link_objr(#)      == link(# + 4)      {object ref of link}
+
+@# {data structure for struct element nodes}
+@d pdf_se_node_size         == 3
+@d pdf_se_id(#)             == info(# + 1)  {self id}
+@d pdf_se_parent(#)         == link(# + 1)  {parent id}
+@d pdf_se_attr(#)           == info(# + 2)  {SE attr}
+@d pdf_se_prio(#)           == link(# + 2)  {SE priority}
+
+@# {data structure for kids of a SE in |pdf_mem|; the type
+    |pdfmem_se_kid_type| determines the next fields}
+@d pdfmem_se_kid_size       == 6
+@d pdfmem_se_kid_type(#)    == pdf_mem[# + 0] {|se_kid_se| or |se_kid_mc|}
+@d se_kid_se                == 1
+@d se_kid_mc                == 2
+@d pdfmem_se_kid_next(#)    == pdf_mem[# + 1] {link to next kid}
+@d pdfmem_se_kid_objref(#)  == pdf_mem[# + 2] {obj ref when kid is SE}
+@d pdfmem_se_kid_mc_id(#)   == pdf_mem[# + 2] {page ref when kid is MC}
+@d pdfmem_se_kid_mc_page(#) == pdf_mem[# + 3] {MICD written to page content when kid is MC}
+@d pdfmem_se_kid_prio(#)    == pdf_mem[# + 4] {priority}
+@d pdfmem_se_kid_link_objr(#)== pdf_mem[# + 5] {object ref of link}
+
+@d obj_se_id                == obj_info
+@d obj_se_ptr               == obj_aux {pointer to |pdf_mem| where data of a MC object is kept}
+@d pdfmem_se_size           == 3 {size of memory in |pdf_mem| which |obj_se_ptr| points to}
+@d obj_se_parent(#)         == pdf_mem[obj_se_ptr(#) + 0] {obj ref of parent}
+@d obj_se_kids(#)           == pdf_mem[obj_se_ptr(#) + 1] {kids list; a kid can be either MC or SE}
+@d obj_se_attr(#)           == pdf_mem[obj_se_ptr(#) + 2]
+
 @<Constants...@>=
 @!inf_obj_tab_size = 1000; {min size of the cross-reference table for PDF output}
 @!sup_obj_tab_size = 8388607; {max size of the cross-reference table for PDF output}
@@ -16400,6 +16609,7 @@ pdf_box_spec_crop   := 2;
 pdf_box_spec_bleed  := 3;
 pdf_box_spec_trim   := 4;
 pdf_box_spec_art    := 5;
+pdf_dummy_font      := null_font;
 
 @ Here we implement subroutines for work with objects and related things.
 Some of them are used in former parts too, so we need to declare them
@@ -16566,7 +16776,7 @@ begin
     pdf_os_prepare_obj(i, pdf_os_level);
     if not pdf_os_mode then begin
         pdf_print_int(i);
-        pdf_print(" 0 obj ");
+        pdf_print_ln(" 0 obj");
     end else if pdf_compress_level = 0 then begin
         pdf_print("% "); {debugging help}
         pdf_print_int(i);
@@ -16587,8 +16797,11 @@ begin
         pdf_print_ln(">>");
         if pdf_os_objidx = pdf_os_max_objs - 1 then
             pdf_os_write_objstream;
-    end else
-        pdf_print_ln(">> endobj");
+    end else begin
+        pdf_print_ln(">>");
+        pdf_end_obj;
+    end;
+        
 end;
 
 @ Write out an accumulated object stream.
@@ -18426,6 +18639,13 @@ ligature_node: @<Make node |p| look like a |char_node| and |goto reswitch|@>;
 @/@<Cases of |hlist_out| that arise in mixed direction text only@>@;
 othercases do_nothing
 endcases;@/
+if type(p) = margin_kern_node then begin
+    if subtype(p) =  right_side then
+        pdf_DEBUG_int("right margin kern:", width(p))
+    else
+        pdf_DEBUG_int("left margin kern:", width(p));
+    cur_h:=cur_h+width(p);
+end;
 goto next_p;
 fin_rule: @<(\pdfTeX) Output a rule in an hlist@>;
 move_past: cur_h:=cur_h+rule_wd;
@@ -18741,6 +18961,7 @@ fix_pdfoutput;
 temp_ptr:=p;
 prepare_mag;
 pdf_last_resources := pdf_new_objnum;
+pdf_mcid_counter := 0;
 @<Reset resource lists@>;
 if not shipping_page then begin
     pdf_xform_width := width(p);
@@ -18780,6 +19001,7 @@ pdf_image_procset := 0
 
 @ @<Reset PDF mark lists@>=
 pdf_annot_list := null;
+pdf_parent_elem_list := null;
 pdf_link_list := null;
 pdf_dest_list := null;
 pdf_bead_list := null;
@@ -18819,6 +19041,8 @@ pdf_begin_stream;
 if shipping_page then begin
     @<Adjust transformation matrix for the magnification ratio@>;
 end;
+if pdf_reset_page_origin = 0 then
+    pdf_set_origin(0, cur_page_height);
 pdfshipoutbegin(shipping_page);
 if shipping_page then
     pdf_out_colorstack_startpage;
@@ -18890,6 +19114,7 @@ flush_list(pdf_ximage_list)
 
 @ @<Flush PDF mark lists@>=
 flush_list(pdf_annot_list);
+flush_list(pdf_parent_elem_list);
 flush_list(pdf_link_list);
 flush_list(pdf_dest_list);
 flush_list(pdf_bead_list)
@@ -18970,7 +19195,15 @@ if pdf_page_group_val > 0 then begin
     pdf_page_group_val := -1;
 end;
 @<Generate array of annotations or beads in page@>;
+@<Write /StructParents if needed@>;
 pdf_end_dict
+
+@ @d struct_element_present == (head_tab[obj_type_struct_elem] <> 0)
+@<Write /StructParents if needed@>=
+if struct_element_present then begin
+    pdf_print("/StructParents ");
+    pdf_print_int_ln(total_pages - 1);
+end;
 
 @ @<Generate parent pages object@>=
 if total_pages mod pages_tree_kids_max = 1 then begin
@@ -19135,6 +19368,7 @@ pdf_origin_v := cur_page_height;
 @<Write out PDF annotations@>;
 @<Write out PDF link annotations@>;
 @<Write out PDF mark destinations@>;
+@<Write out PDF parent elements@>;
 @<Write out PDF bead rectangle specifications@>
 
 @ @<Write out PDF annotations@>=
@@ -19149,6 +19383,23 @@ if pdf_annot_list <> null then begin
         pdf_end_dict;
         k := link(k);
     end;
+end
+
+@ @<Write out PDF parent elements@>=
+if struct_element_present then begin
+    pdf_create_obj(obj_type_parent_elem, total_pages);
+    pdf_parent_elem := obj_ptr;
+    k := pdf_parent_elem_list;
+    pdf_begin_obj(pdf_parent_elem, 1);
+    pdf_out("[");
+    k := pdf_parent_elem_list;
+    while k <> null do begin
+        pdf_print_int(info(k));
+        pdf_print_ln(" 0 R");
+        k := link(k);
+    end;
+    pdf_print_ln("]");
+    pdf_end_obj;
 end
 
 @ @<Write out PDF link annotations@>=
@@ -19491,6 +19742,20 @@ begin
         sort_dest_names(i, r);
 end;
 
+procedure reverse_obj_list(t: integer); {reverse the linked list starting at |head_tab[t]|}
+var i, k, l: integer;
+begin
+    k := head_tab[t];
+    l := 0;
+    repeat
+        i := obj_link(k);
+        obj_link(k) := l;
+        l := k;
+        k := i;
+    until k = 0;
+    head_tab[t] := l;
+end;
+
 @  Now the finish of PDF output file. At this moment all Page objects
 are already written completely to PDF output file.
 
@@ -19588,25 +19853,9 @@ end;
 head_tab[obj_type_page] := k
 
 @ @<Reverse the linked list of Page and Pages objects@>=
-k := head_tab[obj_type_page];
-l := 0;
-repeat
-    i := obj_link(k);
-    obj_link(k) := l;
-    l := k;
-    k := i;
-until k = 0;
-head_tab[obj_type_page] := l;
-k := head_tab[obj_type_pages];
-pages_tail := k;
-l := 0;
-repeat
-    i := obj_link(k);
-    obj_link(k) := l;
-    l := k;
-    k := i;
-until k = 0;
-head_tab[obj_type_pages] := l
+reverse_obj_list(obj_type_page);
+pages_tail := head_tab[obj_type_pages];
+reverse_obj_list(obj_type_pages)
 
 @ @<Output fonts definition@>=
 for k := font_base + 1 to font_ptr do
@@ -19831,7 +20080,120 @@ if pdf_catalog_toks <> null then begin
 end;
 if pdf_catalog_openaction <> 0 then
     pdf_indirect_ln("OpenAction", pdf_catalog_openaction);
-pdf_end_dict
+if head_tab[obj_type_struct_elem] <> 0 then {at least one SE obj was created}
+begin
+    @<Check the PDF structure tree@>; {this will set |pdf_struct_tree_root|}
+    pdf_indirect_ln("StructTreeRoot", pdf_struct_tree_root);
+    pdf_print_ln("/MarkInfo << /Marked true >>");
+    pdf_end_dict;
+    @<Output the PDF structure tree@>;
+end else
+    pdf_end_dict
+
+@ @<Check the PDF structure tree@>=
+k := head_tab[obj_type_struct_elem];
+while k <> 0 do begin
+{     pdf_DEBUG_int("id =", obj_se_id(k)); }
+{     if (obj_se_attr(k) <> 0) then pdf_DEBUG_str("attr = ", obj_se_attr(k)); }
+
+    {check for orphan; only the root node can have parent unset, ie no parent}
+    if (obj_se_parent(k) = 0) and (obj_se_id(k) <> 0) then
+        {pdf_error_int("ext4", "SE node has no parent, SE id: ", obj_se_id(k));}
+        pdf_warning("ext4", "SE node has no parent", true, true);
+
+    {check for node without kids}
+{     if obj_se_kids(k) = 0 then  }
+{         pdf_error_int("ext4", "SE node with no kids, SE id: ", obj_se_id(k)); }
+
+    {set obj ref of StructTreeRoot}
+    if obj_se_id(k) = 0 then begin
+        pdfassert(pdf_struct_tree_root = 0);
+        pdf_struct_tree_root := k;
+    end;
+    k := obj_link(k);
+end
+
+@ @<Output the PDF structure tree@>=
+{write the StructElem objects}
+k := head_tab[obj_type_struct_elem];
+while k <> 0 do begin
+    {skip the root node}
+    if obj_se_id(k) <> 0 then begin
+        pdf_begin_dict(k, 1);
+        pdf_print_se_kids(k); {this will set |se_page_ref| too}
+        {print page ref of first kid if needed}
+        if se_page_ref <> 0 then
+            pdf_indirect_ln("Pg", se_page_ref);
+        {print parent; if parent = 0 => direct child of StructTreeRoot}
+        if obj_se_parent(k) = 0 then
+            pdf_indirect_ln("P", pdf_struct_tree_root)
+        else
+            pdf_indirect_ln("P", obj_se_parent(k));
+        if obj_se_attr(k) <> 0 then
+            pdf_print_ln(obj_se_attr(k));
+        pdf_end_dict;
+    end;
+    k := obj_link(k);
+end;
+
+{write the OBJR objects if any}
+if pdf_mc_list_objr <> null then begin
+    k := pdf_mc_list_objr;
+    while k <> null do begin
+        i := info(k); {objnum of OBJR}
+        pdf_begin_dict(i, 1);
+        pdf_print_ln("/Type /OBJR");
+        pdf_indirect_ln("Obj", obj_aux(i));
+        pdf_end_dict;
+        k := link(k);
+    end;
+end;
+{write the Parent tree}
+pdf_parent_tree := pdf_new_objnum;
+pdf_begin_dict(pdf_parent_tree, 1);
+pdf_print_ln("/Nums [");
+i := 0;
+reverse_obj_list(obj_type_parent_elem);
+k := head_tab[obj_type_parent_elem];
+while k <> 0 do begin
+    pdf_print_int(i);
+    pdf_out(" ");
+    pdf_print_int(k);
+    pdf_print_ln(" 0 R");
+    k := obj_link(k);
+    incr(i);
+end;
+pdf_print_ln("]");
+pdf_end_dict;
+{write the array of direct kids of StructTreeRoot}
+a := pdf_new_objnum;
+pdf_begin_obj(a, 1);
+pdf_print_ln("[");
+reverse_obj_list(obj_type_struct_elem);
+k := head_tab[obj_type_struct_elem];
+while k <> 0 do begin
+    if obj_se_parent(k) = pdf_struct_tree_root then begin
+        pdf_print_int(k);
+        pdf_print_ln(" 0 R");
+    end;
+    k := obj_link(k);
+end;
+pdf_print_ln("]");
+pdf_end_obj;
+{write the StructTreeRoot object}
+pdf_begin_dict(pdf_struct_tree_root, 1);
+pdf_print_ln("/Type /StructTreeRoot");
+if pdf_struct_tree_root_toks <> null then begin
+    k := tokens_to_string(pdf_struct_tree_root_toks);
+    if length(k) > 0 then
+        pdf_print_ln(k);
+    flush_str(k);
+    delete_toks(pdf_struct_tree_root_toks);
+end;
+pdf_indirect_ln("K", a);
+pdf_indirect_ln("ParentTree", pdf_parent_tree);
+pdf_end_dict;
+
 
 @ If the same keys in a dictionary are given several times, then it is not
 defined which value is choosen by an application.  Therefore the keys
@@ -31109,7 +31471,7 @@ exit:end;
 begin print_err("You can't use a prefix with `");
 @.You can't use a prefix with x@>
 print_cmd_chr(cur_cmd,cur_chr); print_char("'");
-help1("I'll pretend you didn't say \long or \outer or \global or \protected.");
+help1("I'll pretend you didn't say \long or \outer or \global.");
 back_error; return;
 end
 
@@ -31119,12 +31481,12 @@ if a>=8 then
   end
 else j:=0;
 if (cur_cmd<>def)and((a mod 4<>0)or(j<>0)) then
-  begin print_err("You can't use `"); print_esc("long"); print("' or `");
-  print_esc("outer"); print("' or `");
+  begin print_err("You can't use `"); print_esc("long"); print("', `");
+  print_esc("outer"); print("', or `");
   print_esc("protected"); print("' with `");
 @.You can't use \\long...@>
   print_cmd_chr(cur_cmd,cur_chr); print_char("'");
-  help1("I'll pretend you didn't say \long or \outer or \protected here.");
+  help1("I'll pretend you didn't say \long, \outer, or \protected here.");
   error;
   end
 
@@ -33217,44 +33579,53 @@ stays the same.
 
 @d immediate_code=4 {command modifier for \.{\\immediate}}
 @d set_language_code=5 {command modifier for \.{\\setlanguage}}
-@d pdftex_first_extension_code = 6
-@d pdf_literal_node            == pdftex_first_extension_code + 0
-@d pdf_obj_code                == pdftex_first_extension_code + 1
-@d pdf_refobj_node             == pdftex_first_extension_code + 2
-@d pdf_xform_code              == pdftex_first_extension_code + 3
-@d pdf_refxform_node           == pdftex_first_extension_code + 4
-@d pdf_ximage_code             == pdftex_first_extension_code + 5
-@d pdf_refximage_node          == pdftex_first_extension_code + 6
-@d pdf_annot_node              == pdftex_first_extension_code + 7
-@d pdf_start_link_node         == pdftex_first_extension_code + 8
-@d pdf_end_link_node           == pdftex_first_extension_code + 9
-@d pdf_outline_code            == pdftex_first_extension_code + 10
-@d pdf_dest_node               == pdftex_first_extension_code + 11
-@d pdf_thread_node             == pdftex_first_extension_code + 12
-@d pdf_start_thread_node       == pdftex_first_extension_code + 13
-@d pdf_end_thread_node         == pdftex_first_extension_code + 14
-@d pdf_save_pos_node           == pdftex_first_extension_code + 15
-@d pdf_info_code               == pdftex_first_extension_code + 16
-@d pdf_catalog_code            == pdftex_first_extension_code + 17
-@d pdf_names_code              == pdftex_first_extension_code + 18
-@d pdf_font_attr_code          == pdftex_first_extension_code + 19
-@d pdf_include_chars_code      == pdftex_first_extension_code + 20
-@d pdf_map_file_code           == pdftex_first_extension_code + 21
-@d pdf_map_line_code           == pdftex_first_extension_code + 22
-@d pdf_trailer_code            == pdftex_first_extension_code + 23
-@d reset_timer_code            == pdftex_first_extension_code + 24
-@d pdf_font_expand_code        == pdftex_first_extension_code + 25
-@d set_random_seed_code        == pdftex_first_extension_code + 26
-@d pdf_snap_ref_point_node     == pdftex_first_extension_code + 27
-@d pdf_snapy_node              == pdftex_first_extension_code + 28
-@d pdf_snapy_comp_node         == pdftex_first_extension_code + 29
-@d pdf_glyph_to_unicode_code   == pdftex_first_extension_code + 30
-@d pdf_colorstack_node         == pdftex_first_extension_code + 31
-@d pdf_setmatrix_node          == pdftex_first_extension_code + 32
-@d pdf_save_node               == pdftex_first_extension_code + 33
-@d pdf_restore_node            == pdftex_first_extension_code + 34
-@d pdf_nobuiltin_tounicode_code== pdftex_first_extension_code + 35
-@d pdftex_last_extension_code  == pdftex_first_extension_code + 35
+@d pdftex_first_extension_code      = 6
+@d pdf_literal_node                 == pdftex_first_extension_code + 0
+@d pdf_obj_code                     == pdftex_first_extension_code + 1
+@d pdf_refobj_node                  == pdftex_first_extension_code + 2
+@d pdf_xform_code                   == pdftex_first_extension_code + 3
+@d pdf_refxform_node                == pdftex_first_extension_code + 4
+@d pdf_ximage_code                  == pdftex_first_extension_code + 5
+@d pdf_refximage_node               == pdftex_first_extension_code + 6
+@d pdf_annot_node                   == pdftex_first_extension_code + 7
+@d pdf_start_link_node              == pdftex_first_extension_code + 8
+@d pdf_end_link_node                == pdftex_first_extension_code + 9
+@d pdf_outline_code                 == pdftex_first_extension_code + 10
+@d pdf_dest_node                    == pdftex_first_extension_code + 11
+@d pdf_thread_node                  == pdftex_first_extension_code + 12
+@d pdf_start_thread_node            == pdftex_first_extension_code + 13
+@d pdf_end_thread_node              == pdftex_first_extension_code + 14
+@d pdf_save_pos_node                == pdftex_first_extension_code + 15
+@d pdf_info_code                    == pdftex_first_extension_code + 16
+@d pdf_catalog_code                 == pdftex_first_extension_code + 17
+@d pdf_names_code                   == pdftex_first_extension_code + 18
+@d pdf_font_attr_code               == pdftex_first_extension_code + 19
+@d pdf_include_chars_code           == pdftex_first_extension_code + 20
+@d pdf_map_file_code                == pdftex_first_extension_code + 21
+@d pdf_map_line_code                == pdftex_first_extension_code + 22
+@d pdf_trailer_code                 == pdftex_first_extension_code + 23
+@d reset_timer_code                 == pdftex_first_extension_code + 24
+@d pdf_font_expand_code             == pdftex_first_extension_code + 25
+@d set_random_seed_code             == pdftex_first_extension_code + 26
+@d pdf_snap_ref_point_node          == pdftex_first_extension_code + 27
+@d pdf_snapy_node                   == pdftex_first_extension_code + 28
+@d pdf_snapy_comp_node              == pdftex_first_extension_code + 29
+@d pdf_glyph_to_unicode_code        == pdftex_first_extension_code + 30
+@d pdf_colorstack_node              == pdftex_first_extension_code + 31
+@d pdf_setmatrix_node               == pdftex_first_extension_code + 32
+@d pdf_save_node                    == pdftex_first_extension_code + 33
+@d pdf_restore_node                 == pdftex_first_extension_code + 34
+@d pdf_nobuiltin_tounicode_code     == pdftex_first_extension_code + 35
+@d pdf_start_marked_content_node    == pdftex_first_extension_code + 36
+@d pdf_end_marked_content_node      == pdftex_first_extension_code + 37
+@d pdf_start_page_stream_node       == pdftex_first_extension_code + 38
+@d pdf_end_page_stream_node         == pdftex_first_extension_code + 39
+@d pdf_struct_elem_node             == pdftex_first_extension_code + 40
+@d pdf_interword_space_on_node      == pdftex_first_extension_code + 41
+@d pdf_interword_space_off_node     == pdftex_first_extension_code + 42
+@d pdf_fake_space_node              == pdftex_first_extension_code + 43
+@d pdf_struct_tree_root_code        == pdftex_first_extension_code + 44
+@d pdftex_last_extension_code       == pdftex_first_extension_code + 44
 
 @<Put each...@>=
 primitive("openout",extension,open_node);@/
@@ -33341,6 +33712,24 @@ primitive("pdfglyphtounicode",extension,pdf_glyph_to_unicode_code);@/
 @!@:pdf_glyph_to_unicode_}{\.{\\pdfglyphtounicode} primitive@>
 primitive("pdfnobuiltintounicode",extension,pdf_nobuiltin_tounicode_code);@/
 @!@:pdf_nobuiltin_tounicode_}{\.{\\pdfnobuiltintounicode} primitive@>
+primitive("pdfstartmarkedcontent",extension,pdf_start_marked_content_node);@/
+@!@:pdf_start_marked_content_}{\.{\\pdfstartmarkedcontent} primitive@>
+primitive("pdfendmarkedcontent",extension,pdf_end_marked_content_node);@/
+@!@:pdf_end_marked_content_}{\.{\\pdfendmarkedcontent} primitive@>
+primitive("pdfstartpagestream",extension,pdf_start_page_stream_node);@/
+@!@:pdf_start_page_stream_}{\.{\\pdfstartpagestream} primitive@>
+primitive("pdfendpagestream",extension,pdf_end_page_stream_node);@/
+@!@:pdf_end_page_stream_}{\.{\\pdfendpagestream} primitive@>
+primitive("pdfstructelem",extension,pdf_struct_elem_node);@/
+@!@:pdf_struct_elem_}{\.{\\pdfstructelem} primitive@>
+primitive("pdfinterwordspaceon",extension,pdf_interword_space_on_node);@/
+@!@:pdf_interword_space_on_}{\.{\\pdfinterwordspaceon} primitive@>
+primitive("pdfinterwordspaceoff",extension,pdf_interword_space_off_node);@/
+@!@:pdf_interword_space_off_}{\.{\\pdfinterwordspaceoff} primitive@>
+primitive("pdffakespace",extension,pdf_fake_space_node);@/
+@!@:pdf_fake_space_}{\.{\\pdffakespace} primitive@>
+primitive("pdfstructtreeroot",extension,pdf_struct_tree_root_code);@/
+@!@:pdf_struct_tree_root_}{\.{\\pdfstructtreeroot} primitive@>
 
 @ The variable |write_loc| just introduced is used to provide an
 appropriate error message in case of ``runaway'' write texts.
@@ -33392,6 +33781,15 @@ extension: case chr_code of
   set_random_seed_code: print_esc("pdfsetrandomseed");
   pdf_nobuiltin_tounicode_code: print_esc("pdfnobuiltintounicode");
   pdf_glyph_to_unicode_code: print_esc("pdfglyphtounicode");
+  pdf_start_marked_content_node: print_esc("pdfstartmarkedcontent");
+  pdf_end_marked_content_node: print_esc("pdfendmarkedcontent");
+  pdf_start_page_stream_node: print_esc("pdfstartpagestream");
+  pdf_end_page_stream_node: print_esc("pdfendpagestream");
+  pdf_struct_elem_node: print_esc("pdfstructelem");
+  pdf_interword_space_on_node: print_esc("pdfinterwordspaceon");
+  pdf_interword_space_off_node: print_esc("pdfinterwordspaceoff");
+  pdf_fake_space_node: print_esc("pdffakespace");
+  pdf_struct_tree_root_code: print_esc("pdfstructtreeroot");
   othercases print("[unknown extension!]")
   endcases;
 
@@ -33406,6 +33804,7 @@ any_mode(extension):do_extension;
 procedure do_extension;
 var i,@!j,@!k:integer; {all-purpose integers}
 @!p,@!q,@!r:pointer; {all-purpose pointers}
+@!l,@!m:integer; {added for tagged pdf}
 begin case cur_chr of
   open_node:@<Implement \.{\\openout}@>;
   write_node:@<Implement \.{\\write}@>;
@@ -33449,6 +33848,15 @@ begin case cur_chr of
   set_random_seed_code: @<Implement \.{\\pdfsetrandomseed}@>;
   pdf_glyph_to_unicode_code: @<Implement \.{\\pdfglyphtounicode}@>;
   pdf_nobuiltin_tounicode_code: @<Implement \.{\\pdfnobuiltintounicode}@>;
+  pdf_start_marked_content_node: @<Implement \.{\\pdfstartmarkedcontent}@>;
+  pdf_end_marked_content_node: @<Implement \.{\\pdfendmarkedcontent}@>;
+  pdf_start_page_stream_node: @<Implement \.{\\pdfstartpagestream}@>;
+  pdf_end_page_stream_node: @<Implement \.{\\pdfendpagestream}@>;
+  pdf_struct_elem_node: @<Implement \.{\\pdfstructelem}@>;
+  pdf_interword_space_on_node: @<Implement \.{\\pdfinterwordspaceon}@>;
+  pdf_interword_space_off_node: @<Implement \.{\\pdfinterwordspaceoff}@>;
+  pdf_fake_space_node: @<Implement \.{\\pdffakespace}@>;
+  pdf_struct_tree_root_code: @<Implement \.{\\pdfstructtreeroot}@>;
 othercases confusion("ext1")
 @:this can't happen ext1}{\quad ext1@>
 endcases;
@@ -33601,6 +34009,8 @@ begin
         pdf_literal_mode(tail) := direct_always
     else if scan_keyword("page") then
         pdf_literal_mode(tail) := direct_page
+    else if scan_keyword("enclose") then
+        pdf_literal_mode(tail) := enclose
     else
         pdf_literal_mode(tail) := set_origin;
     scan_pdf_ext_toks;
@@ -34260,6 +34670,13 @@ begin
             k := pdf_new_objnum;
         new_annot_whatsit(pdf_annot_node, pdf_annot_node_size);
         pdf_annot_objnum(tail) := k;
+
+        {marked link}
+        if scan_keyword("marked") then
+            pdf_annot_marked(tail) := 1
+        else
+            pdf_annot_marked(tail) := 0;
+
         scan_pdf_ext_toks;
         pdf_annot_data(tail) := def_ref;
         pdf_last_annot := k;
@@ -34744,6 +35161,133 @@ begin
     pdf_font_nobuiltin_tounicode[k] := true;
 end
 
+@ @<Implement \.{\\pdfstartmarkedcontent}@>=
+begin
+    check_pdfoutput("\pdfstartmarkedcontent", true);
+    new_whatsit(pdf_start_marked_content_node, pdf_mc_node_size);
+
+    {scan attr}
+    if scan_keyword("attr") then begin
+        scan_pdf_ext_toks;
+        pdf_mc_attr(tail) := def_ref;
+    end else
+        pdf_mc_attr(tail) := null;
+
+    {scan priority}
+    if scan_keyword("prio") then begin
+        scan_int;
+        pdf_mc_prio(tail) := cur_val;
+    end else
+        pdf_mc_prio(tail) := 0;
+
+    {scan noendtext}
+    if scan_keyword("noendtext") then
+        pdf_mc_endtext(tail) := 0
+    else
+        pdf_mc_endtext(tail) := 1;
+
+    {scan link element}
+    pdf_mc_link_objr(tail) := 0;
+    if scan_keyword("link") then
+        pdf_mc_is_link_elem(tail) := 1
+    else
+        pdf_mc_is_link_elem(tail) := 0;
+
+    {scan parent id}
+    scan_int;
+    if (cur_val < -1) or (cur_val = 0) then
+        pdf_error("ext1", "invalid parent id");
+    if cur_val > max_halfword then
+        pdf_error("ext1", "parent id too big");
+    pdf_mc_parent(tail) := cur_val;
+
+    {scan data}
+    scan_pdf_ext_toks;
+    pdf_mc_data(tail) := def_ref;
+end
+
+
+@ @<Implement \.{\\pdfendmarkedcontent}@>=
+begin
+    check_pdfoutput("\pdfendmarkedcontent", true);
+    new_whatsit(pdf_end_marked_content_node, small_node_size);
+end
+
+@ @<Implement \.{\\pdfstartpagestream}@>=
+begin
+    check_pdfoutput("\pdfstartpagestream", true);
+    new_whatsit(pdf_start_page_stream_node, small_node_size);
+end
+
+@ @<Implement \.{\\pdfendpagestream}@>=
+begin
+    check_pdfoutput("\pdfendpagestream", true);
+    new_whatsit(pdf_end_page_stream_node, small_node_size);
+end
+
+@ @<Implement \.{\\pdfstructelem}@>=
+begin
+    check_pdfoutput("\pdfstructelem", true);
+    new_whatsit(pdf_struct_elem_node, pdf_se_node_size);
+
+    {scan attr}
+    if scan_keyword("attr") then begin
+        scan_pdf_ext_toks;
+        pdf_se_attr(tail) := def_ref;
+    end else
+        pdf_se_attr(tail) := null;
+
+    {scan priority}
+    if scan_keyword("prio") then begin
+        scan_int;
+        pdf_se_prio(tail) := cur_val;
+    end else
+        pdf_se_prio(tail) := 0;
+
+    {scan parent id}
+    scan_int;
+    if cur_val < 0 then
+        pdf_error("ext1", "parent id must be non-negative");
+    if cur_val > max_halfword then
+        pdf_error("ext1", "parent id too big");
+    pdf_se_parent(tail) := cur_val;
+
+    {scan self id}
+    scan_int;
+    if cur_val <= 0 then
+        pdf_error("ext1", "id must be positive");
+    if cur_val > max_halfword then
+        pdf_error("ext1", "id too big");
+    pdf_se_id(tail) := cur_val;
+end
+
+@ @<Implement \.{\\pdfinterwordspaceon}@>=
+begin
+    check_pdfoutput("\pdfinterwordspaceon", true);
+    new_whatsit(pdf_interword_space_on_node, small_node_size);
+end
+
+@ @<Implement \.{\\pdfinterwordspaceoff}@>=
+begin
+    check_pdfoutput("\pdfinterwordspaceoff", true);
+    new_whatsit(pdf_interword_space_off_node, small_node_size);
+end
+
+@ @<Implement \.{\\pdffakespace}@>=
+begin
+    check_pdfoutput("\pdffakespace", true);
+    new_whatsit(pdf_fake_space_node, small_node_size);
+end
+
+@ @<Implement \.{\\pdfstructtreeroot}@>=
+begin
+    check_pdfoutput("\pdfstructtreeroot", false);
+    scan_pdf_ext_toks;
+    if pdf_output > 0 then
+        pdf_struct_tree_root_toks := 
+            concat_tokens(pdf_struct_tree_root_toks, def_ref);
+end
+
 @ The following function are needed for outputing article thread.
 
 @<Declare procedures needed in |do_ext...@>=
@@ -34830,6 +35374,135 @@ begin
     until a = b;
 end;
 
+function cmp_se_kids(a, b: integer): boolean; 
+{return (a < b)}
+begin
+    cmp_se_kids := pdfmem_se_kid_prio(a) <= pdfmem_se_kid_prio(b);
+end;
+
+function merge_se_kids(a, b: integer): integer;
+{ref: http://www.blursoft.com/blog/2006/11/mergesort-linked-lists-c/}
+{merge 2 sorted se kids lists; a and b are pointer to pdfmem}
+var first: integer;
+begin
+    if a = 0 then begin
+        merge_se_kids := b;
+        return;
+    end;
+
+    if b = 0 then begin
+        merge_se_kids := a;
+        return;
+    end;
+
+    if cmp_se_kids(a, b) then begin
+        first := a;
+        pdfmem_se_kid_next(first) := merge_se_kids(pdfmem_se_kid_next(a), b);
+    end else begin
+        first := b;
+        pdfmem_se_kid_next(first) := merge_se_kids(a, pdfmem_se_kid_next(b));
+    end;
+    merge_se_kids := first;
+end;
+
+function sort_se_kids(k: integer): integer;
+var mid, last: integer;
+begin
+    if (k = 0) or (pdfmem_se_kid_next(k) = 0) then begin
+        sort_se_kids := k;
+        return;
+    end;
+
+    mid := k;
+    last := pdfmem_se_kid_next(k);
+
+    while (last <> 0) and (pdfmem_se_kid_next(last) <> 0) do begin
+        mid := pdfmem_se_kid_next(mid);
+        last := pdfmem_se_kid_next(pdfmem_se_kid_next(last));
+    end;
+
+    last := mid;
+    mid := pdfmem_se_kid_next(mid);
+    pdfmem_se_kid_next(last) := 0;
+    sort_se_kids := merge_se_kids(sort_se_kids(k), sort_se_kids(mid));
+end;
+
+procedure pdf_print_se_kids(se: integer); {print kids list of a SE obj}
+var i, j, l: integer;
+    objr: integer;
+    run: boolean;
+begin
+    pdfassert(se <> 0);
+    se_page_ref := 0;
+
+    {if there are no kids, nothing to do!}
+    if obj_se_kids(se) = 0 then
+        return;
+
+    {reverse the kids list}
+    i := obj_se_kids(se);
+    l := 0;
+    while i <> 0 do begin
+        j := pdfmem_se_kid_next(i);
+        pdfmem_se_kid_next(i) := l;
+        l := i;
+        i := j;
+    end;
+    obj_se_kids(se) := l;
+
+    {set |se_page_ref| to page ref of first MC}
+    i := obj_se_kids(se);
+    run := true;
+    while run do begin
+        if pdfmem_se_kid_type(i) = se_kid_mc then begin
+            se_page_ref := pdfmem_se_kid_mc_page(i);
+            run := false;
+        end;
+        i := pdfmem_se_kid_next(i);
+        if i = 0 then
+            run := false;
+    end;
+
+    {sort the kids list by priority}
+    obj_se_kids(se) := sort_se_kids(obj_se_kids(se));
+
+    {output kids list; if page ref of a MC kid differs from se_page_ref => 
+     write page ref too}
+    pdf_print_ln("/K [");
+    i := obj_se_kids(se);
+    while i <> 0 do begin
+        if pdfmem_se_kid_type(i) = se_kid_mc then {MC kid}
+        begin
+            if pdfmem_se_kid_mc_page(i) = se_page_ref then
+                pdf_print_int_ln(pdfmem_se_kid_mc_id(i))    {print MC seq number only}
+            else begin                                      {print MC ref}
+                pdf_print_ln("<</Type /MCR");
+                pdf_indirect_ln("Pg", pdfmem_se_kid_mc_page(i));
+                pdf_print("/MCID "); pdf_print_int_ln(pdfmem_se_kid_mc_id(i));
+                pdf_print_ln(">>");
+            end;
+
+            {handle marked link element}
+            pdf_DEBUG_int("i = ", i);
+            pdf_DEBUG_int("pdfmem_se_kid_link_objr(i) = ", pdfmem_se_kid_link_objr(i));
+            if pdfmem_se_kid_link_objr(i) <> 0 then begin
+                objr := pdf_new_objnum;
+                obj_aux(objr) := pdfmem_se_kid_link_objr(i);
+                pdf_print_int(objr);
+                pdf_print_ln(" 0 R");
+                pdf_append_list(objr)(pdf_mc_list_objr);
+            end;
+        end else    {SE kid}
+        begin
+            pdfassert(pdfmem_se_kid_type(i) = se_kid_se);
+            pdf_print_int(pdfmem_se_kid_objref(i));
+            pdf_print_ln(" 0 R");
+        end;
+        i := pdfmem_se_kid_next(i);
+    end;
+    pdf_print_ln("]");
+end;
+
 @ @<Display <rule spec> for whatsit node created by \pdfTeX@>=
 print("(");
 print_rule_dimen(pdf_height(p));
@@ -34878,6 +35551,8 @@ pdf_literal_node: begin
         print(" page");
     direct_always:
         print(" direct");
+    enclose:
+        print(" enclose");
     othercases confusion("literal2")
     endcases;
     print_mark(pdf_literal_data(p));
@@ -34943,6 +35618,8 @@ end;
 pdf_annot_node: begin
     print_esc("pdfannot");
     @<Display <rule spec> for whatsit node created by \pdfTeX@>;
+    if pdf_annot_marked(p) > 0 then 
+        print(" marked");
     print_mark(pdf_annot_data(p));
 end;
 pdf_start_link_node: begin
@@ -34956,41 +35633,40 @@ pdf_start_link_node: begin
     if pdf_action_type(pdf_link_action(p)) = pdf_action_user then begin
         print(" user");
         print_mark(pdf_action_user_tokens(pdf_link_action(p)));
-    end
-    else begin
-        if pdf_action_file(pdf_link_action(p)) <> null then begin
-            print(" file");
-            print_mark(pdf_action_file(pdf_link_action(p)));
+        return;
+    end;
+    if pdf_action_file(pdf_link_action(p)) <> null then begin
+        print(" file");
+        print_mark(pdf_action_file(pdf_link_action(p)));
+    end;
+    case pdf_action_type(pdf_link_action(p)) of
+    pdf_action_goto: begin
+        if pdf_action_named_id(pdf_link_action(p)) > 0 then begin
+            print(" goto name");
+            print_mark(pdf_action_id(pdf_link_action(p)));
+        end
+        else begin
+            print(" goto num");
+            print_int(pdf_action_id(pdf_link_action(p)))
         end;
-        case pdf_action_type(pdf_link_action(p)) of
-        pdf_action_goto: begin
-            if pdf_action_named_id(pdf_link_action(p)) > 0 then begin
-                print(" goto name");
-                print_mark(pdf_action_id(pdf_link_action(p)));
-            end
-            else begin
-                print(" goto num");
-                print_int(pdf_action_id(pdf_link_action(p)))
-            end;
-        end;
-        pdf_action_page: begin
-            print(" page");
+    end;
+    pdf_action_page: begin
+        print(" page");
+        print_int(pdf_action_id(pdf_link_action(p)));
+        print_mark(pdf_action_page_tokens(pdf_link_action(p)));
+    end;
+    pdf_action_thread: begin
+        if pdf_action_named_id(pdf_link_action(p)) > 0 then begin
+            print(" thread name");
+            print_mark(pdf_action_id(pdf_link_action(p)));
+        end
+        else begin
+            print(" thread num");
             print_int(pdf_action_id(pdf_link_action(p)));
-            print_mark(pdf_action_page_tokens(pdf_link_action(p)));
         end;
-        pdf_action_thread: begin
-            if pdf_action_named_id(pdf_link_action(p)) > 0 then begin
-                print(" thread name");
-                print_mark(pdf_action_id(pdf_link_action(p)));
-            end
-            else begin
-                print(" thread num");
-                print_int(pdf_action_id(pdf_link_action(p)));
-            end;
-        end;
-        othercases pdf_error("displaying", "unknown action type");
-        endcases;
-    end
+    end;
+    othercases pdf_error("displaying", "unknown action type");
+    endcases;
 end;
 pdf_end_link_node: print_esc("pdfendlink");
 pdf_dest_node: begin
@@ -35062,6 +35738,42 @@ pdf_snapy_comp_node: begin
     print_char(" ");
     print_int(snapy_comp_ratio(p));
 end;
+pdf_start_marked_content_node: begin
+    print_esc("pdfstartmarkedcontent");
+    if pdf_mc_attr(p) <> null then begin
+        print(" attr");
+        print_mark(pdf_mc_attr(p));
+    end;
+    if pdf_mc_prio(p) > 0 then begin
+        print(" prio ");
+        print_int(pdf_mc_prio(p))
+    end;
+    if pdf_mc_endtext(p) > 0 then
+        print(" endtext");
+    if pdf_mc_is_link_elem(p) > 0 then
+        print(" linkelement");
+    print(" parent");
+    print_int(pdf_mc_parent(p));
+    print_char(" ");
+    print_mark(pdf_mc_data(p));
+end;
+pdf_end_marked_content_node: print_esc("pdfendmarkedcontent");
+pdf_start_page_stream_node: print_esc("pdfstartpagestream");
+pdf_end_page_stream_node: print_esc("pdfendpagestream");
+pdf_struct_elem_node: begin
+    print_esc("pdfstructelem");
+    if pdf_se_attr(p) <> null then begin
+        print(" attr");
+        print_mark(pdf_se_attr(p));
+    end;
+    print(" parent");
+    print_int(pdf_se_parent(p));
+    print_char(" ");
+    print_int(pdf_se_id(p));
+end;
+pdf_interword_space_on_node: print_esc("pdfinterwordspaceon");
+pdf_interword_space_off_node: print_esc("pdfinterwordspaceoff");
+pdf_fake_space_node: print_esc("pdffakespace");
 othercases print("whatsit?")
 endcases
 
@@ -35163,6 +35875,31 @@ pdf_snapy_node: begin
 end;
 pdf_snapy_comp_node:
     r := get_node(small_node_size);
+pdf_start_marked_content_node: begin
+    r := get_node(pdf_mc_node_size);
+    if pdf_mc_attr(p) <> null then
+        add_token_ref(pdf_mc_attr(p));
+    add_token_ref(pdf_mc_data(p));
+    words := pdf_mc_node_size;
+end;
+pdf_end_marked_content_node:
+    r := get_node(small_node_size);
+pdf_start_page_stream_node:
+    r := get_node(small_node_size);
+pdf_end_page_stream_node:
+    r := get_node(small_node_size);
+pdf_struct_elem_node: begin
+    r := get_node(pdf_se_node_size);
+    if pdf_se_attr(p) <> null then
+        add_token_ref(pdf_se_attr(p));
+    words := pdf_se_node_size;
+end;
+pdf_interword_space_on_node:
+    r := get_node(small_node_size);
+pdf_interword_space_off_node:
+    r := get_node(small_node_size);
+pdf_fake_space_node:
+    r := get_node(small_node_size);
 othercases confusion("ext2")
 @:this can't happen ext2}{\quad ext2@>
 endcases
@@ -35238,6 +35975,29 @@ pdf_snapy_node: begin
     free_node(p, snap_node_size);
 end;
 pdf_snapy_comp_node:
+    free_node(p, small_node_size);
+pdf_start_marked_content_node: begin
+    if pdf_mc_attr(p) <> null then
+        delete_token_ref(pdf_mc_attr(p));
+    delete_token_ref(pdf_mc_data(p));
+    free_node(p, pdf_mc_node_size);
+end;
+pdf_end_marked_content_node:
+    free_node(p, small_node_size);
+pdf_start_page_stream_node:
+    free_node(p, small_node_size);
+pdf_end_page_stream_node:
+    free_node(p, small_node_size);
+pdf_struct_elem_node: begin
+    if pdf_se_attr(p) <> null then
+        delete_token_ref(pdf_se_attr(p));
+    free_node(p, pdf_se_node_size);
+end;
+pdf_interword_space_on_node:
+    free_node(p, small_node_size);
+pdf_interword_space_off_node:
+    free_node(p, small_node_size);
+pdf_fake_space_node:
     free_node(p, small_node_size);
 othercases confusion("ext3")
 @:this can't happen ext3}{\quad ext3@>
@@ -35537,6 +36297,7 @@ thread}
 @!pdf_last_thread_named_id: boolean; {is identifier of the last thread named}
 @!pdf_thread_level: integer; {depth of nesting of box containing the last thread}
 @!pdf_annot_list: pointer; {list of annotations in the current page}
+@!pdf_parent_elem_list: pointer; {list of structure elements in the current page}
 @!pdf_link_list: pointer; {list of link annotations in the current page}
 @!pdf_dest_list: pointer; {list of destinations in the current page}
 @!pdf_bead_list: pointer; {list of thread beads in the current page}
@@ -35549,6 +36310,7 @@ thread}
 @!pdf_xform_height,
 @!pdf_xform_depth: scaled; {dimension of the current form}
 @!pdf_info_toks: pointer; {additional keys of Info dictionary}
+@!pdf_struct_tree_root_toks: pointer; {additional keys of StructTreeRoot dictionary}
 @!pdf_catalog_toks: pointer; {additional keys of Catalog dictionary}
 @!pdf_catalog_openaction: integer;
 @!pdf_names_toks: pointer; {additional keys of Names dictionary}
@@ -35558,6 +36320,10 @@ thread}
 @!pk_dpi: integer; {PK pixel density value from \.{texmf.cnf}}
 @!image_orig_x, image_orig_y: integer; {origin of cropped PDF images}
 @!pdf_trailer_toks: pointer; {additional keys of Trailer dictionary}
+@!pdf_struct_tree_root: integer; {object number of /StructTreeRoot}
+@!pdf_parent_tree: integer; {object number of /ParentTree}
+@!pdf_parent_elem: integer; {parent elements for current page}
+@!gen_faked_interword_space: boolean; {flag to turn on/off faked interword spaces}
 
 @ @<Set init...@>=
 pdf_first_outline:= 0;
@@ -35568,10 +36334,13 @@ pdf_xform_count := 0;
 pdf_ximage_count := 0;
 pdf_dest_names_ptr := 0;
 pdf_info_toks := null;
+pdf_struct_tree_root_toks := null;
 pdf_catalog_toks := null;
 pdf_names_toks := null;
 pdf_catalog_openaction := 0;
 pdf_trailer_toks := null;
+pdf_struct_tree_root := 0;
+gen_faked_interword_space := false;
 
 @ The following procedures are needed for outputing whatsit nodes for
 \pdfTeX{}.
@@ -35686,6 +36455,7 @@ begin
 end;
 
 procedure do_annot(p, parent_box: pointer; x, y: scaled);
+var mc_node: pointer;
 begin
     if not is_shipping_page then
         pdf_error("ext4", "annotations cannot be inside an XForm");
@@ -35695,6 +36465,22 @@ begin
         pdf_annot_objnum(p) := pdf_new_objnum;
     set_rect_dimens(p, parent_box, x, y,
                     pdf_width(p), pdf_height(p), pdf_depth(p), 0);
+
+    {handle MC link element}
+    if pdf_annot_marked(p) > 0 then begin
+    {we expect that |pdf_mc_last_marked_link_element| has been set}
+        pdf_DEBUG("marked link");
+        if pdf_mc_last_marked_link_element <> null then begin
+            mc_node := pdf_mc_last_marked_link_element;
+            pdf_mc_link_objr(mc_node) :=  pdf_annot_objnum(p);
+            pdf_mc_is_link_elem(mc_node) := 0;
+            pdf_mc_last_marked_link_element := null;
+            do_marked_content(mc_node, false);
+        end else begin
+            pdf_error("ext4", "pdf_mc_last_marked_link_element not set");
+        end;
+    end;
+
     obj_annot_ptr(pdf_annot_objnum(p)) := p;
     pdf_append_list(pdf_annot_objnum(p))(pdf_annot_list);
     set_obj_scheduled(pdf_annot_objnum(p));
@@ -36195,6 +36981,212 @@ begin
     @}
 end;
 
+@ Subroutines needed for tagged PDF
+
+@d pdf_mc_stack_top == pdf_mc_stack[pdf_mc_stack_ptr]
+
+@ @<Constants...@>=
+@!pdf_max_mc_level = 10; {maximum depth of MC nesting}
+
+@ @<Types...@>=
+@!pdf_mc_stack_record = record
+    mc_node: pointer;   {hold a copy of the corresponding |pdf_start_marked_content_node|}
+    {we have only 1 field so it's not really necessary to define a record;
+     however let's keep it similar to the link annot stack;
+     later we might want to add further fields}
+end;
+
+@ @<Glob...@>=
+@!pdf_mc_stack: array[1..pdf_max_mc_level] of pdf_mc_stack_record;
+@!pdf_mc_stack_ptr: small_number;
+@!pdf_mc_last_marked_link_element: pointer; {last node of type marked link elements}
+@!pdf_mc_list_objr: pointer; {this list holds all the OBJR created during |pdf_print_se_kids()|}
+
+@ @<Set init...@>=
+pdf_mc_stack_ptr := 0;
+pdf_mc_last_marked_link_element := null;
+pdf_mc_list_objr := null;
+
+@ @<Declare procedures needed in |pdf_hlist_out|, |pdf_vlist_out|@>=
+procedure push_mc_node(p: pointer);
+begin
+    if pdf_mc_stack_ptr >= pdf_max_mc_level then
+        overflow("pdf marked-content stack size", pdf_max_mc_level);
+    pdfassert((type(p) = whatsit_node) and (subtype(p) = pdf_start_marked_content_node));
+    incr(pdf_mc_stack_ptr);
+    pdf_mc_stack_top.mc_node := copy_node_list(p);
+end;
+
+procedure pop_mc_node;
+begin
+    if pdf_mc_stack_ptr <= 0 then
+        pdf_error("ext4", "cannot pop from an empty marked-content stack (missing \pdfendmarkedcontent?)");
+    flush_node_list(pdf_mc_stack_top.mc_node);
+    decr(pdf_mc_stack_ptr);
+end;
+
+procedure init_obj_se_data(k: integer); {init data for an obj SE}
+begin
+    obj_se_ptr(k) := pdf_get_mem(pdfmem_se_size);
+    obj_se_parent(k) := 0;
+    obj_se_kids(k) := 0;
+    obj_se_attr(k) := 0;
+end;
+
+function create_se_kid_mem(t: integer): integer; {allocate mem in |pdf_mem|
+for |pdfmem_se_kid_node|}
+var r: integer;
+begin
+    r := pdf_get_mem(pdfmem_se_kid_size);
+    pdfmem_se_kid_type(r) := t;
+    pdfmem_se_kid_next(r) := 0;
+    pdfmem_se_kid_mc_id(r) := 0;    {alias |pdfmem_se_kid_objref|}
+    pdfmem_se_kid_mc_page(r) := 0;
+    pdfmem_se_kid_link_objr(r) := 0;
+    create_se_kid_mem := r;
+    pdf_DEBUG_int("create_se_kid_mem() = ", r); 
+end;
+
+procedure do_marked_content(p: pointer; pending: boolean); 
+{output |pdf_start_marked_content_node|; if |pending| is true then this is a
+node from the MC stack}
+var i, j, k: integer;
+begin
+    if not is_shipping_page then
+        pdf_error("ext4", "structure element cannot be inside an XForm");
+
+    {if this is a link element, postpone processing this node until the next annotation}
+    if pdf_mc_is_link_elem(p) > 0 then begin
+        if pdf_mc_last_marked_link_element <> null then
+            pdf_error("ext4", "invalid value of pdf_mc_last_marked_link_element");
+        pdf_mc_last_marked_link_element := p;
+        return;
+    end;
+
+    pdf_end_string_nl;
+
+    {if we are not in a text section, always force endtext so that the
+     corresponding end_marked_content will work properly}
+    if (not pending) and (not pdf_doing_text) and (pdf_mc_endtext(p) = 0) then
+        pdf_mc_endtext(p) := 1;
+
+    {end the current text section if needed}
+    if pending or (pdf_mc_endtext(p) > 0) then
+        pdf_end_text;
+
+    {sync pos before writting data, to avoid pen position afterward}
+    pdf_sync_pos;
+
+    if pdf_mc_parent(p) <> -1 then {parent given => add this MC to StructTree}
+    begin
+        {get parent obj, which is a SE}
+        k := get_obj(obj_type_struct_elem, pdf_mc_parent(p), false);
+        if obj_se_ptr(k) = 0 then {this is a freshly created object}
+            init_obj_se_data(k);
+
+        {save relevant data in |pdf_mem| for building StructTree later}
+        i := create_se_kid_mem(se_kid_mc);
+        pdfmem_se_kid_mc_id(i) := pdf_mcid_counter;
+        pdfmem_se_kid_mc_page(i) := pdf_last_page;
+        pdfmem_se_kid_prio(i) := pdf_mc_prio(p);
+        pdfmem_se_kid_link_objr(i) := pdf_mc_link_objr(p);
+        pdf_DEBUG_int("i = ", i);
+        pdf_DEBUG_int("pdfmem_se_kid_link_objr(i) = ", pdfmem_se_kid_link_objr(i));
+
+        {insert |i| to kids list of |k|}
+        pdfmem_se_kid_next(i) := obj_se_kids(k); {if |k| has no kids yet then this is 0 => still ok}
+        obj_se_kids(k) := i;
+
+        {add |k| to parent elements list of the current page}
+        pdf_append_list(k)(pdf_parent_elem_list);
+    end;
+
+    {print MC data}
+    pdf_print("/");
+    pdf_print_toks(pdf_mc_data(p));
+    pdf_print(" <<");
+    if pdf_mc_parent(p) <> -1 then begin
+        pdf_print("/MCID ");
+        pdf_print_int(pdf_mcid_counter);
+        incr(pdf_mcid_counter);
+    end;
+    if pdf_mc_attr(p) <> null then begin
+        pdf_print(" ");
+        pdf_print_toks_ln(pdf_mc_attr(p));
+    end;
+    pdf_print_ln(">>BDC");
+
+    {push this node to the MC stack}
+    if not pending then
+        push_mc_node(p);
+end;
+
+procedure end_marked_content(p: pointer; pending: boolean); 
+{output |pdf_end_marked_content_node|; NB: we don't make use of |p|}
+begin
+    pdf_end_string_nl;
+    if pending or (pdf_mc_endtext(pdf_mc_stack_top.mc_node) > 0) then
+        pdf_end_text;
+    pdf_print_ln("EMC");
+
+    if not pending then
+        pop_mc_node;
+end;
+
+procedure do_start_page_stream(p: pointer);
+{copy all pending MC in MC stack to new page}
+var i: integer;
+begin
+    pdf_end_text;
+    for i := 1 to pdf_mc_stack_ptr do
+        do_marked_content(pdf_mc_stack[i].mc_node, true);
+end;
+
+procedure do_end_page_stream(p: pointer);
+{end all pending MC in MC stack}
+var i: integer;
+begin
+    pdf_end_text;
+    for i := 1 to pdf_mc_stack_ptr do begin
+        end_marked_content(null, true); {any pointer will do}
+    end;
+end;
+
+procedure do_struct_elem(p: pointer); 
+{create SE node corresponding to |p|; nothing is written out to PDF contents stream}
+var k, l, m: integer;
+begin
+    {find and create the actual node if needed, obj ref -> |k|}
+    k := find_obj(obj_type_struct_elem, pdf_se_id(p), false);
+    if k <> 0 then {|k| was created before; check if it's a forward ref}
+    begin
+        if obj_se_parent(k) > 0 then {|k| is not a forward ref}
+            pdf_error("ext1", "duplicate SE id not allowed");
+        if pdf_se_attr(p) <> null then {set attr for forward ref here}
+            obj_se_attr(k) := tokens_to_string(pdf_se_attr(p));
+    end else {create the actual node; can be either leaf or branch node}
+    begin
+        pdf_create_obj(obj_type_struct_elem, pdf_se_id(p));
+        k := obj_ptr;
+        init_obj_se_data(k);
+        if pdf_se_attr(p) <> null then
+            obj_se_attr(k) := tokens_to_string(pdf_se_attr(p));
+    end;
+
+    {get the parent SE, obj ref -> |l|}
+    l := get_obj(obj_type_struct_elem, pdf_se_parent(p), false);
+    if obj_se_ptr(l) = 0 then {this is a freshly created obj}
+        init_obj_se_data(l);
+    obj_se_parent(k) := l;
+
+    {insert |k| to kids list of |l|}
+    m := create_se_kid_mem(se_kid_se);
+    pdfmem_se_kid_objref(m) := k;
+    pdfmem_se_kid_prio(m) := pdf_se_prio(p);
+    pdfmem_se_kid_next(m) := obj_se_kids(l);
+    obj_se_kids(l) := m;
+end;
+
 @ @<Move down without outputting leaders@>=
 begin g:=glue_ptr(p); rule_ht:=width(g)-cur_g;
 if g_sign<>normal then
@@ -36256,6 +37248,22 @@ pdf_snapy_comp_node:
     do_snapy_comp(p, this_box);
 pdf_snapy_node:
     do_snapy(p);
+pdf_start_marked_content_node:
+    do_marked_content(p, false);
+pdf_end_marked_content_node:
+    end_marked_content(p, false);
+pdf_start_page_stream_node:
+    do_start_page_stream(p);
+pdf_end_page_stream_node:
+    do_end_page_stream(p);
+pdf_struct_elem_node:
+    do_struct_elem(p);
+pdf_interword_space_on_node:
+    gen_faked_interword_space := true;
+pdf_interword_space_off_node:
+    gen_faked_interword_space := false;
+pdf_fake_space_node:
+    pdf_insert_fake_space;
 othercases out_what(p);
 endcases
 
@@ -36331,6 +37339,22 @@ pdf_snap_ref_point_node:
     @<Save current position to |pdf_snapx_refpos|, |pdf_snapy_refpos|@>;
 pdf_snapy_comp_node,
 pdf_snapy_node: do_nothing; {snapy nodes do nothing in hlist}
+pdf_start_marked_content_node:
+    do_marked_content(p, false);
+pdf_end_marked_content_node:
+    end_marked_content(p, false);
+pdf_start_page_stream_node:
+    do_start_page_stream(p);
+pdf_end_page_stream_node:
+    do_end_page_stream(p);
+pdf_struct_elem_node:
+    do_struct_elem(p);
+pdf_interword_space_on_node:
+    gen_faked_interword_space := true;
+pdf_interword_space_off_node:
+    gen_faked_interword_space := false;
+pdf_fake_space_node:
+    pdf_insert_fake_space;
 othercases out_what(p);
 endcases
 
