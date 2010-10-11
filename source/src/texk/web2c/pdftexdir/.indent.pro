@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: .indent.pro 13717 2008-09-30 10:12:17Z mschroeder $ */
 --k-and-r-style
 --blank-lines-after-procedures
 --line-length 80

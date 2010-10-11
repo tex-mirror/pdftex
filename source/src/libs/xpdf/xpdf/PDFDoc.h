@@ -212,13 +212,13 @@ private:
   double pdfVersion;
   XRef *xref;
   Catalog *catalog;
-#ifndef DISABLE_OUTLINE
-  Outline *outline;
-#endif
-
-
   GBool ok;
   int errCode;
+#ifndef DISABLE_OUTLINE
+  Outline *outline;
+#else
+  void *dummy;
+#endif
 };
 
 #endif

@@ -1,5 +1,6 @@
 /*
 Copyright 1996-2008 Han The Thanh, <thanh@pdftex.org>
+Copyright 2007-2009 Martin Schröder, <martin@oneiros.de>
 
 This file is part of pdfTeX.
 
@@ -661,8 +662,8 @@ static p_PDFRectangle *get_pagebox(p_Page * page, integer pagebox_spec)
     return page->getMediaBox(); // to make the compiler happy
 }
 
-// Helper for read_pdf_info
-void read_layer_infos(PdfDocument * pdf_doc)
+// Helper for write_epdf
+void read_layer_infos_old(PdfDocument * pdf_doc)
 {
     p_Object ocProperties, catDict;
 
@@ -672,10 +673,11 @@ void read_layer_infos(PdfDocument * pdf_doc)
     pdf_doc->xref->getCatalog(&catDict);
     catDict.dictLookup("OCProperties", &ocProperties);
     if (ocProperties.isDict()) {
-        p_Object ocgs, ref, ocg, ocgName;
-        int i, l, new_number;
+        p_Object ocgs;
         ocProperties.dictLookup("OCGs", &ocgs);
         if (ocgs.isArray()) {
+            p_Object ref, ocg, ocgName;
+            int i, l, new_number;
             set_pdf_includelayers(ocgs.arrayGetLength());
             for (i = 0, l = ocgs.arrayGetLength(); i < l; ++i) {
                 ocgs.arrayGetNF(i, &ref);
@@ -704,10 +706,83 @@ void read_layer_infos(PdfDocument * pdf_doc)
                     pdftex_fail("Element in OCGs array is not a reference");
                 }
             }
+        } else if (ocgs.isNull()) {
+            pdftex_warn("OCGs is missing");
         } else {
             pdftex_fail("OCGs is not an array");
         }
     }
+}
+
+/* write out the reference to our generated /Properties if needed */
+void copyProperties(pdf_layer_info * layers)
+{
+    if (layers != NULL && layers->number_of_layers > 0) {
+        pdf_printf("/Properties %i 0 R\n", layers->ref);
+    }
+}
+
+/* copies the info from /Properties about the OCGs into a layer_info struct
+ * (which is returned) and inserts the properties and ocgs into their object
+ * lists.
+ */
+pdf_layer_info *get_layer_infos(p_Page * page, PdfDocument * pdf_doc)
+{
+    pdf_layer_info *layer_info = NULL;
+    if (page->getResourceDict() != NULL) {
+        p_Object properties;
+        page->getResourceDict()->lookup("Properties", &properties);
+        if (!properties.isNull()) {
+            if (properties.isDict()) {
+                p_Object ref, ocg, ocgType, ocgName;
+                char *key;
+                int i, num_properties;
+                pdf_layer *layer;       // just a shortcut for layer_info->layers[layer_info->number_of_layers - 1]
+                layer_info = xtalloc(1, pdf_layer_info);
+                add_properties(layer_info);
+                layer_info->number_of_layers = 0;
+                layer_info->ref = pdfnewobjnum();
+                layer_info->layers = xtalloc(num_properties =
+                                             properties.getDict()->getLength(),
+                                             pdf_layer);
+                // collect info about the OCGs
+                for (i = 0; i < num_properties; i++) {
+                    properties.getDict()->lookup(key =
+                                                 properties.getDict()->
+                                                 getKey(i), &ocg);
+                    if (ocg.isDict()) {
+                        ocg.getDict()->lookup("Type", &ocgType);
+                        if (!ocgType.isNull()) {
+                            // check the type; we ignore OCMDs etc.
+                            if (strcmp(ocgType.getName(), "OCG") == 0) {
+                                layer_info->number_of_layers++;
+                                layer =
+                                    &layer_info->layers[layer_info->
+                                                        number_of_layers - 1];
+                                layer->key = key;
+                                ocg.getDict()->lookup("Name", &ocgName);
+                                if (ocgName.isString()) {
+                                    layer->name =
+                                        ocgName.getString()->getCString();
+                                } else {
+                                    pdftex_fail
+                                        ("pdf inclusion: /Name is not a string in OCG");
+                                }
+                                layer->ref = pdfnewobjnum();
+                                //addOther(ref.getRef());     // make sure the object is copied
+                                add_ocg(layer);
+                            }   // if (strcmp(ocgType.getName(), "OCG") == 0)
+                        }
+                    } else {
+                        pdftex_fail("pdf inclusion: OCG is not a dictionary");
+                    }           // if (ocg.isDict())
+                }               // for (i = 0; i < num_properties; i++)
+            } else {
+                pdftex_fail("pdf inclusion: /Properties is not a dictionary");
+            }                   // if (properties.isDict())
+        }                       // if (!p.isNull())
+    }                           // if (resources != NULL)
+    return layer_info;
 }
 
 // Reads various information about the PDF and sets it up for later inclusion.
@@ -838,6 +913,8 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
 
     pdf_doc->xref = pdf_doc->doc->getXRef();
 
+    epdf_layers = get_layer_infos(page, pdf_doc);
+
     return page_num;
 }
 
@@ -845,7 +922,7 @@ read_pdf_info(char *image_name, char *page_name, integer page_num,
 // Here the included PDF is copied, so most errors that can happen during PDF
 // inclusion will arise here.
 
-void write_epdf(void)
+void write_epdf(pdf_layer_info * layers)
 {
     p_Page *page;
     PdfObject contents, obj1, obj2;
@@ -1002,12 +1079,14 @@ void write_epdf(void)
                 copyFontResources(&obj2);
             else if (strcmp("ProcSet", key) == 0)
                 copyProcSet(&obj2);
+            else if (strcmp("Properties", key) == 0)
+                copyProperties(layers);
             else
                 copyOtherResources(&obj2, key);
         }
         pdf_puts(">>\n");
     }
-    read_layer_infos(pdf_doc);
+    read_layer_infos_old(pdf_doc);
     // write the page contents
     page->getContents(&contents);
     if (contents->isStream()) {

@@ -32,6 +32,8 @@ extern "C" {
 
     typedef const char *const_string;   /* including kpathsea/types.h doesn't work on some systems */
 
+#include <kpathsea/lib.h>       /* define P?H macros */
+
 #define KPATHSEA_CONFIG_H       /* avoid including other kpathsea header files */
     /* from web2c/config.h */
 
@@ -47,6 +49,8 @@ extern "C" {
 
 #include "openbsd-compat.h"
 
+#include "image.h"
+
 /* #-define pdfbufsize      pdfbufmax */
 
     extern float epdf_width;
@@ -58,6 +62,7 @@ extern "C" {
     extern integer epdf_page_box;
     extern void *epdf_doc;
     extern void *epdf_xref;
+    extern pdf_layer_info *epdf_layers;
     extern integer epdf_lastGroupObjectNum;
 
     extern integer pdfboxspecmedia;
@@ -83,8 +88,6 @@ extern "C" {
     extern integer get_fontfile(struct fm_entry *);
     extern integer get_fontname(struct fm_entry *);
     extern integer pdfnewobjnum(void);
-    extern integer read_pdf_info(char *, char *, integer, integer, integer,
-                                 integer);
     extern void embed_whole_font(struct fd_entry *);
     extern void epdf_check_mem(void);
     extern void epdf_delete(void);
@@ -102,12 +105,8 @@ extern "C" {
     extern void pdftex_warn(const char *fmt, ...);
     __attribute__ ((format(printf, 1, 2)))
     extern void tex_printf(const char *, ...);
-    extern void write_epdf(void);
     extern void write_additional_epdf_objects(void);
-//    extern void zpdfbegindict(integer, bool);
     extern void zpdfbeginobj(integer, bool);
-//    extern void zpdfcreateobj(integer, integer);
-//    extern void zpdfnewdict(integer, integer, bool);
     extern void zpdfosgetosbuf(integer);
 
 /* epdf.c */
@@ -127,6 +126,8 @@ extern "C" {
     extern void pdflayernames_append_name(string name);
     extern void pdflayer_object_numbers_init();
     extern void pdflayer_object_numbers_append(int obj_number);
+    extern void add_properties(pdf_layer_info * layers);
+    extern void add_ocg(pdf_layer * layer);
 
 /* config.c */
     extern integer cfgpar(integer);

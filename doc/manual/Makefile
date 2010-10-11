@@ -80,6 +80,7 @@ zip:	$(distnopdf)
 
 clean:
 	texutil --purge
+	- rm -f pdftex-t.pdf
 
 allclean:
 	- rm -f pdftex-a.pdf pdftex-l.pdf pdftex-s.pdf

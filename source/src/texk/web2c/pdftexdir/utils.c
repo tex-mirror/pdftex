@@ -1,5 +1,6 @@
 /*
 Copyright (c) 1996-2008 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 2008-2009 Martin Schröder, <martin@oneiros.de>
 
 This file is part of pdfTeX.
 pdfTeX is free software; you can redistribute it and/or modify
@@ -36,6 +37,7 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "ptexlib.h"
 #include "png.h"
 #include "pdflib.h"
+#include "image.h"
 
 static const char _svn_version[] =
     "$Id$ $URL$";
@@ -2205,6 +2207,199 @@ integer outputpagestree()
     pdfdopageundivert(0, 0);    /* concatenate all diversions into diversion 0 */
     d = get_divert_list(0);     /* get diversion 0 */
     return output_pages_list(d->first);
+}
+
+/**********************************************************************/
+/* Layers */
+/* We manage a list of /Properties and a list of /OCG and write the objects out */
+
+static struct avl_table *properties_list = NULL;
+static struct avl_table *ocg_list = NULL;
+
+typedef struct properties_list_entry_ {
+    pdf_layer_info *layers;
+} properties_list_entry;
+
+typedef struct ocg_list_entry_ {
+    pdf_layer *layer;
+} ocg_list_entry;
+
+static int comp_properties_list_entry(const void *pa, const void *pb, void *p)
+{
+    if (((const properties_list_entry *) pa)->layers->ref >
+        ((const properties_list_entry *) pb)->layers->ref)
+        return 1;
+    if (((const properties_list_entry *) pa)->layers->ref <
+        ((const properties_list_entry *) pb)->layers->ref)
+        return -1;
+    return 0;
+}
+
+static int comp_ocg_list_entry(const void *pa, const void *pb, void *p)
+{
+    if (((const ocg_list_entry *) pa)->layer->ref >
+        ((const ocg_list_entry *) pb)->layer->ref)
+        return 1;
+    if (((const ocg_list_entry *) pa)->layer->ref <
+        ((const ocg_list_entry *) pb)->layer->ref)
+        return -1;
+    return 0;
+}
+
+static void ensure_properties_list()
+{
+    if (properties_list == NULL) {
+        properties_list =
+            avl_create(comp_properties_list_entry, NULL, &avl_xallocator);
+        assert(properties_list != NULL);
+    }
+}
+
+static void ensure_ocg_list()
+{
+    if (ocg_list == NULL) {
+        ocg_list = avl_create(comp_ocg_list_entry, NULL, &avl_xallocator);
+        assert(ocg_list != NULL);
+    }
+}
+
+void add_properties(pdf_layer_info * layers)
+{
+    properties_list_entry *p, tmp;
+    void **aa;
+    ensure_properties_list();
+    tmp.layers = layers;
+    p = (properties_list_entry *) avl_find(properties_list, &tmp);
+    if (p == NULL) {
+        p = xtalloc(1, properties_list_entry);
+        p->layers = layers;
+        aa = avl_probe(properties_list, p);
+        assert(aa != NULL);
+    }
+}
+
+void add_ocg(pdf_layer * layer)
+{
+    ocg_list_entry *o, tmp;
+    void **aa;
+    ensure_ocg_list();
+    tmp.layer = layer;
+    o = (ocg_list_entry *) avl_find(ocg_list, &tmp);
+    if (o == NULL) {
+        o = xtalloc(1, ocg_list_entry);
+        o->layer = layer;
+        aa = avl_probe(ocg_list, o);
+        assert(aa != NULL);
+    }
+}
+
+void writeproperties()
+{
+    struct avl_traverser t;
+    properties_list_entry *p;
+    int i;
+    if (properties_list != NULL) {
+        avl_t_init(&t, properties_list);
+        for (p = avl_t_first(&t, properties_list); p != NULL;
+             p = avl_t_next(&t)) {
+            pdfbegindict(p->layers->ref, 1);
+            for (i = 0; i < p->layers->number_of_layers; i++) {
+                pdf_printf("/%s %d 0 R\n", p->layers->layers[i].key,
+                           p->layers->layers[i].ref);
+            }
+            pdfenddict();
+        }
+    }
+}
+
+void writeocgs()
+{
+    struct avl_traverser t;
+    ocg_list_entry *o;
+    if (ocg_list != NULL) {
+        avl_t_init(&t, ocg_list);
+        for (o = avl_t_first(&t, ocg_list); o != NULL; o = avl_t_next(&t)) {
+            /* FIXME: Using pdf_os_level=1 produces a corrupt PDF when object
+             * streams are enabled */
+            pdfbegindict(o->layer->ref, 0);
+            pdf_printf("/Type /OCG\n/Name (%s)\n", o->layer->name);
+            pdfenddict();
+        }
+    }
+}
+
+integer pdfocgnumbersget(integer obj)
+{
+    pdf_image_struct *p;
+    integer n = 0;
+
+    if (ispdfimage(obj)) {
+        p = pdf_ptr(obj);
+        if (p->layers != NULL) {
+            n = p->layers->number_of_layers;
+        }
+    }
+
+    return n;
+}
+
+void pdfocggetname(integer obj, integer ocgnum)
+{
+    pdf_image_struct *p;
+    size_t len;
+
+    p = pdf_ptr(obj);
+    assert(p->layers != NULL);
+    assert(ocgnum < p->layers->number_of_layers);
+
+    /* put name on top of string pool and update poolptr */
+    len = strlen(p->layers->layers[ocgnum].name);
+
+    if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
+        poolptr = poolsize;
+        /* error by str_toks that calls str_room(1) */
+        return;
+    }
+
+    memcpy(&strpool[poolptr], p->layers->layers[ocgnum].name, len);
+    poolptr += len;
+}
+
+integer pdfocggetobjnumber(integer obj, integer ocgnum)
+{
+    pdf_image_struct *p;
+    p = pdf_ptr(obj);
+    assert(p->layers != NULL);
+    assert(ocgnum < p->layers->number_of_layers);
+    return p->layers->layers[ocgnum].ref;
+}
+
+void pdfocgmerge(integer obj, integer ocgnum, integer ref_new)
+{
+    pdf_image_struct *p;
+    p = pdf_ptr(obj);
+    assert(p->layers != NULL);
+    assert(ocgnum < p->layers->number_of_layers);
+    p->layers->layers[ocgnum].ref = ref_new;
+}
+
+/**********************************************************************/
+/* xref_offset_width */
+integer calcxrefoffsetwidth(longinteger obj_offset)
+{
+    integer ret;
+    if ((sizeof(longinteger) > 4) && (obj_offset > 0xFFFFFF)
+        && (obj_offset > (longinteger) 0xFFFFFFFF))
+        ret = 5;
+    else if (obj_offset > 0xFFFFFF)
+        ret = 4;
+    else if (obj_offset > 0xFFFF)
+        ret = 3;
+    else if (obj_offset > 0xFF)
+        ret = 2;
+    else
+        ret = 1;
+    return ret;
 }
 
 // vim: ts=4

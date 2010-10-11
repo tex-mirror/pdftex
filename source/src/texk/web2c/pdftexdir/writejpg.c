@@ -144,6 +144,7 @@ void read_jpg_info(integer img)
             img_yres(img) = img_xres(img);
         }
     }
+    /* fprintf(stderr, "res: x:%d, y:%d\n", img_xres(img), img_yres(img)); */
     xfseek(jpg_ptr(img)->file, 0, SEEK_SET, cur_file_name);
     while (1) {
         if (feof(jpg_ptr(img)->file))

@@ -166,7 +166,7 @@ extern size_t last_ptr_index;
 
 /* loadpdftexpool.c */
 
-int loadpoolstrings (integer spare_size) ;
+int loadpoolstrings(integer spare_size);
 
 /* pdftexlib function prototypes */
 
@@ -281,6 +281,13 @@ extern void pdfdopageundivert(integer, integer);
 extern void insertpageintopagestree(integer, integer);
 extern void insertpageintopagestree(integer, integer);
 extern integer outputpagestree();
+extern void writeproperties();
+extern void writeocgs();
+extern integer pdfocgnumbersget(integer);
+extern void pdfocggetname(integer, integer);
+extern integer pdfocggetobjnumber(integer, integer);
+extern void pdfocgmerge(integer, integer, integer);
+extern integer calcxrefoffsetwidth(longinteger);
 
 /* vfpacket.c */
 extern integer newvfpacket(internalfontnumber);
@@ -290,6 +297,10 @@ extern eightbits packetbyte(void);
 extern void poppacketstate(void);
 extern void pushpacketstate(void);
 extern void vf_free(void);
+#  define SIGNED_QUAD scaled
+#  define fixword integer
+extern SIGNED_QUAD sqxfw(SIGNED_QUAD sq, fixword fw);
+
 
 /* writeenc.c */
 extern fe_entry *get_fe_entry(char *);

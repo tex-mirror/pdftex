@@ -97,12 +97,20 @@ $Id$
 @define function pdfdopagedivert();
 @define procedure pdfdopageundivert();
 @define function outputpagestree;
+@define procedure writeproperties;
+@define procedure writeocgs;
+@define function pdfocgnumbersget();
+@define procedure pdfocggetname();
+@define function pdfocggetobjnumber();
+@define procedure pdfocgmerge();
+@define function calcxrefoffsetwidth();
 
 { functions from vfpacket.c }
 @define function newvfpacket();
 @define function packetbyte;
 @define procedure startpacket();
 @define procedure storepacket();
+@define function sqxfw();
 
 { functions from writefont.c }
 @define procedure dopdffont();

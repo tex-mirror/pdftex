@@ -88,6 +88,8 @@ fi
 dnl ##### Back to C for the library tests.
 AC_LANG_C
 
+AC_SYS_LARGEFILE
+
 dnl ##### Write the makefiles.
 AC_CONFIG_FILES([Makefile])
 KPSE_CONFIG_FILES([xpdf/Makefile goo/Makefile fofi/Makefile])

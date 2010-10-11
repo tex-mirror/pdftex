@@ -1,0 +1,11 @@
+This is a branch of pdfTeX 1.50 (i.e. trunk) in use at QuinScape. 
+
+Its main improvements against 1.50 are
+- proven code for merging optional content of included pdfs
+- proven code for Large File Support (at least on Linux i386 and amd64)
+- assorted bugfixes
+- partly improved documentation
+
+The code is relased AS IS; use at your own risk.
+
+Comments are welcome: martin@pdftex.org

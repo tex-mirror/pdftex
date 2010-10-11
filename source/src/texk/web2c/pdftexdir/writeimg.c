@@ -1,5 +1,6 @@
 /*
 Copyright (c) 1996-2008 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 2009 Martin Schröder, <martin@oneiros.de>
 
 This file is part of pdfTeX.
 
@@ -29,7 +30,11 @@ static const char _svn_version[] =
 #define bp2int(p)    round(p*(onehundredbp/100.0))
 
 /* define image_ptr, image_array & image_limit */
-define_array(image);
+/* define_array(image); */
+
+/* avoid use of size_t */
+image_entry *image_ptr, *image_array = NULL;
+integer image_limit;
 
 float epdf_width;
 float epdf_height;
@@ -39,6 +44,7 @@ integer epdf_selected_page;
 integer epdf_num_pages;
 integer epdf_page_box;
 void *epdf_doc;
+pdf_layer_info *epdf_layers;
 integer epdf_lastGroupObjectNum;
 
 static integer new_image_entry(void)
@@ -314,6 +320,7 @@ integer readimage(strnumber s, integer page_num, strnumber page_name,
         pdf_ptr(img)->orig_y = bp2int(epdf_orig_y);
         pdf_ptr(img)->selected_page = page_num;
         pdf_ptr(img)->doc = epdf_doc;
+        pdf_ptr(img)->layers = epdf_layers;
         img_group_ref(img) = epdf_lastGroupObjectNum;
         break;
     case IMAGE_TYPE_PNG:
@@ -363,7 +370,7 @@ void writeimage(integer img)
         epdf_selected_page = pdf_ptr(img)->selected_page;
         epdf_page_box = pdf_ptr(img)->page_box;
         epdf_lastGroupObjectNum = img_group_ref(img);
-        write_epdf();
+        write_epdf(pdf_ptr(img)->layers);
         break;
     default:
         pdftex_fail("unknown type of image");
@@ -429,10 +436,10 @@ void img_free()
  * does not matter. 
  */
 
-#define dumpsizet   generic_dump
+/* #define dumpsizet   generic_dump */
 #define dumpinteger generic_dump
 
-#define undumpsizet   generic_undump
+/* #define undumpsizet   generic_undump */
 #define undumpinteger generic_undump
 
 /* (un)dumping a string means dumping the allocation size, followed
@@ -469,7 +476,7 @@ void dumpimagemeta()
 {
     int cur_image, img;
 
-    dumpsizet(image_limit);
+    dumpinteger(image_limit);
     cur_image = (image_ptr - image_array);
     dumpinteger(cur_image);
 
@@ -503,7 +510,7 @@ void undumpimagemeta(integer pdfversion, integer pdfinclusionerrorlevel)
 {
     int cur_image, img;
 
-    undumpsizet(image_limit);
+    undumpinteger(image_limit);
 
     image_array = xtalloc(image_limit, image_entry);
     undumpinteger(cur_image);
@@ -543,6 +550,8 @@ void undumpimagemeta(integer pdfversion, integer pdfinclusionerrorlevel)
             pdf_ptr(img)->orig_x = bp2int(epdf_orig_x);
             pdf_ptr(img)->orig_y = bp2int(epdf_orig_y);
             pdf_ptr(img)->doc = epdf_doc;
+            pdf_ptr(img)->layers = epdf_layers;
+            img_group_ref(img) = epdf_lastGroupObjectNum;
             break;
         case IMAGE_TYPE_PNG:
             img_pages(img) = 1;

@@ -21,17 +21,26 @@ fi
 # Options:
 #       --make      : only make, no make distclean; configure
 #       --parallel  : make -j 2 -l 3.0
+#				--dontstrip	: don't strip(1) the binaries
 ONLY_MAKE=FALSE
 JOBS_IF_PARALLEL=2
 MAX_LOAD_IF_PARALLEL=3.0
+DOSTRIP=TRUE
 while [ "$1" != "" ] ; do
   if [ "$1" = "--make" ] ;
   then ONLY_MAKE=TRUE ;
   elif [ "$1" = "--parallel" ] ;
   then MAKE="$MAKE -j $JOBS_IF_PARALLEL -l $MAX_LOAD_IF_PARALLEL" ;
+  elif [ "$1" = "--dontstrip" ] ;
+  then DOSTRIP=FALSE ;
   fi ;
   shift ;
 done
+#
+# LFS und optimieren
+CFLAGS="`getconf LFS_CFLAGS` -g3 -O3 -Wall -Wno-write-strings -Wno-char-subscripts"
+CXXFLAGS="$CFLAGS"
+export CFLAGS CXXFLAGS
 #
 STRIP=strip
 B=build
@@ -108,8 +117,11 @@ fi
 (cd texk/web2c; $MAKE ../kpathsea/libkpathsea.la) || exit 1
 (cd texk/web2c/lib; $MAKE) || exit 1
 (cd texk/web2c; $MAKE pdftexbin) || exit 1
-# strip them
-(cd texk/web2c; $STRIP pdf*tex pdftosrc ttf2afm)
+if [ "$DOSTRIP" = "TRUE" ]
+then
+	# strip them
+	(cd texk/web2c; $STRIP pdf*tex pdftosrc ttf2afm)
+fi
 # go back
 cd ..
 # show the results
