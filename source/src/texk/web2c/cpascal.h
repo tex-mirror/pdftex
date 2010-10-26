@@ -295,4 +295,12 @@ extern void recorder_record_output P1H(const_string);
 /* version.c */
 extern string versionstring;
 
+/* Apparently POSIX 2008 has getline and glibc 2.9.90 exports it.
+   tangle, weave, et al. use that symbol; try to define it away so
+   something that a standard won't usurp.  */
+#ifdef getline
+#undef getline
+#endif
+#define getline web2c_getline
+
 #endif /* not CPASCAL_H */
