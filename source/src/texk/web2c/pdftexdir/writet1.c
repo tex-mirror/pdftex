@@ -1,22 +1,18 @@
 /*
-Copyright (c) 1996-2007 Han The Thanh, <thanh@pdftex.org>
+Copyright (c) 1996-2007, 2009-2010 Han The Thanh <thanh@pdftex.org>
 
-This file is part of pdfTeX.
-
-pdfTeX is free software; you can redistribute it and/or modify
+This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
-pdfTeX is distributed in the hope that it will be useful,
+This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with pdfTeX; if not, write to the Free Software Foundation, Inc., 51
-Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see  <http://www.gnu.org/licenses/>.  */
 
 #include "ptexlib.h"
 #include <stdarg.h>
@@ -225,8 +221,7 @@ static void enc_getline(void)
     do {
         c = enc_getchar();
         append_char_to_buf(c, p, enc_line, ENC_BUF_SIZE);
-    }
-    while (c != 10);
+    } while (c != 10);
     append_eol(p, enc_line, ENC_BUF_SIZE);
     if (p - enc_line < 2 || *enc_line == '%')
         goto restart;
@@ -1004,8 +999,9 @@ static void cs_store(boolean is_subr)
     memcpy(t1_buf_array, t1_line_array + cs_start - 4,
            (unsigned) (t1_cslen + 4));
     /* copy the end of cs data to t1_buf_array */
-    for (p = t1_line_array + cs_start + t1_cslen, t1_buf_ptr =
-         t1_buf_array + t1_cslen + 4; *p != 10; *t1_buf_ptr++ = *p++);
+    for (p = t1_line_array + cs_start + t1_cslen,
+           t1_buf_ptr = t1_buf_array + t1_cslen + 4;
+         *p != 10; *t1_buf_ptr++ = *p++);
     *t1_buf_ptr++ = 10;
     if (is_subr && cs_token_pair == NULL)
         cs_token_pair = check_cs_token_pair();
@@ -1079,8 +1075,8 @@ static void cc_init(void)
     set_cc(CS_CALLSUBR, false, 1, false);
     set_cc(CS_RETURN, false, 0, false);
     /*
-       set_cc(CS_ESCAPE,          false,  0, false);
-     */
+       set_cc(CS_ESCAPE, false, 0, false);
+    */
     set_cc(CS_HSBW, true, 2, true);
     set_cc(CS_ENDCHAR, false, 0, true);
     set_cc(CS_RMOVETO, true, 2, true);
@@ -1282,8 +1278,8 @@ static void cs_mark(const char *cs_name, int subr)
         }
     }
     if (cs_name == NULL && last_cmd != CS_RETURN) {
-        pdftex_warn("last command in subr `%i' is not a RETURN; " 
-                    "I will add it now but please consider fixing the font", 
+        pdftex_warn("last command in subr `%i' is not a RETURN; "
+                    "I will add it now but please consider fixing the font",
                     (int) subr);
         append_cs_return(ptr);
     }
@@ -1407,7 +1403,7 @@ static void cs_init(void)
     subr_max = subr_size = subr_size_pos = 0;
 }
 
-static void init_cs_entry(cs_entry * cs)
+static void init_cs_entry(cs_entry *cs)
 {
     cs->data = NULL;
     cs->name = NULL;
@@ -1527,11 +1523,11 @@ static void t1_flush_cs(boolean is_subr)
     t1_line_ptr = eol(t1_line_array);
     t1_putline();
 
-    /* create return_cs to replace unsused subr's */
+    /* create return_cs to replace unused subr's */
     if (is_subr) {
         cr = 4330;
         cs_len = 0;
-        /* at this point we have t1_lenIV >= 0; 
+        /* at this point we have t1_lenIV >= 0;
          * a negative value would be caught in t1_scan_param() */
         return_cs = xtalloc(t1_lenIV + 1, byte);
         for (cs_len = 0, r = return_cs; cs_len < t1_lenIV; cs_len++, r++)
@@ -1691,7 +1687,7 @@ static void t1_subset_end(void)
     get_length3();
 }
 
-void writet1(fd_entry * fd)
+void writet1(fd_entry *fd)
 {
     fd_cur = fd;                /* fd_cur is global inside writet1.c */
     assert(fd_cur->fm != NULL);
