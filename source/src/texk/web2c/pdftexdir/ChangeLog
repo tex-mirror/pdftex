@@ -1,3 +1,7 @@
+2010-11-14  Karl Berry  <karl@gnu.org>
+
+	* writet1.c: endless formatting tweaks.
+
 2010-11-11  Karl Berry  <karl@gnu.org>
 
 	* writet1.c: formatting changes only, to reduce useless diffs

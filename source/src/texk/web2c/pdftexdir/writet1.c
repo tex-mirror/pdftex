@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1996-2007, 2009-2010 Han The Thanh <thanh@pdftex.org>
+Copyright 1996-2007, 2009-2010 Han The Thanh <thanh@pdftex.org>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ along with this program.  If not, see  <http://www.gnu.org/licenses/>.  */
 #define enc_eof()        feof(enc_file)
 
 #define valid_code(c)    (c >= 0 && c < 256)
-#define fixedcontent     false
+#define fixedcontent     false /* false for pdfTeX, true for dvips */
 
 static const char *standard_glyph_names[256] = {
     /* 0x00 */
@@ -249,7 +249,7 @@ char **load_enc_file(char *enc_name)
     if (*enc_line != '/' || (r = strchr(enc_line, '[')) == NULL) {
         remove_eol(r, enc_line);
         pdftex_fail
-            ("invalid encoding vector (a name or `[' missing): `%s'", enc_line);
+           ("invalid encoding vector (a name or `[' missing): `%s'", enc_line);
     }
     names_count = 0;
     r++;                        /* skip '[' */
@@ -260,7 +260,7 @@ char **load_enc_file(char *enc_name)
                  *r != ' ' && *r != 10 && *r != ']' && *r != '/'; *p++ = *r++);
             *p = 0;
             skip(r, ' ');
-            if (names_count > 256)
+            if (names_count > 255)
                 pdftex_fail("encoding vector contains more than 256 names");
             if (strcmp(buf, notdef) != 0)
                 glyph_names[names_count] = xstrdup(buf);
@@ -272,8 +272,7 @@ char **load_enc_file(char *enc_name)
             else {
                 remove_eol(r, enc_line);
                 pdftex_fail
-                    ("invalid encoding vector: a name or `] def' expected: `%s'",
-                     enc_line);
+       ("invalid encoding vector: a name or `] def' expected: `%s'", enc_line);
             }
         }
         enc_getline();
@@ -432,7 +431,7 @@ static void t1_getline(void)
         goto exit;
     while (!t1_eof()) {
         if (t1_in_eexec == 1)
-            c = edecrypt(c);
+            c = edecrypt((byte)c);
         alloc_array(t1_line, 1, T1_BUF_SIZE);
         append_char_to_buf(c, t1_line_ptr, t1_line_array, t1_line_limit);
         if (t1_in_eexec == 0 && eexec_scan >= 0 && eexec_scan < eexec_len) {
@@ -452,7 +451,7 @@ static void t1_getline(void)
             cs_start = t1_line_ptr - t1_line_array;     /* cs_start is an index now */
             alloc_array(t1_line, l, T1_BUF_SIZE);
             while (l-- > 0)
-                *t1_line_ptr++ = edecrypt(t1_getbyte());
+                *t1_line_ptr++ = edecrypt((byte)t1_getbyte());
         }
         c = t1_getbyte();
     }
@@ -529,7 +528,7 @@ static void t1_check_block_len(boolean decrypt)
         return;
     c = t1_getbyte();
     if (decrypt)
-        c = edecrypt(c);
+        c = edecrypt((byte)c);
     l = t1_block_length;
     if (!(l == 0 && (c == 10 || c == 13))) {
         pdftex_fail("%i bytes more than expected", l + 1);
@@ -545,7 +544,7 @@ static void t1_start_eexec(void)
     if (!t1_pfa)
         t1_check_block_len(false);
     for (t1_line_ptr = t1_line_array, i = 0; i < 4; i++) {
-        edecrypt(t1_getbyte());
+        edecrypt((byte)t1_getbyte());
         *t1_line_ptr++ = 0;
     }
     t1_eexec_encrypt = true;
@@ -562,7 +561,7 @@ static void t1_stop_eexec(void)
     if (!t1_pfa)
         t1_check_block_len(true);
     else {
-        c = edecrypt(t1_getbyte());
+        c = edecrypt((byte)t1_getbyte());
         if (!(c == 10 || c == 13)) {
             if (last_hexbyte == 0)
                 t1_puts("00");
@@ -832,14 +831,12 @@ static char **t1_builtin_enc(void)
                 counter++;
             }
             if (*r != 10 && *r != '%') {
-                if (str_prefix(r, "] def")
-                    || str_prefix(r, "] readonly def"))
+                if (str_prefix(r, "] def") || str_prefix(r, "] readonly def"))
                     break;
                 else {
                     remove_eol(r, t1_line_array);
                     pdftex_fail
-                        ("a name or `] def' or `] readonly def' expected: `%s'",
-                         t1_line_array);
+       ("a name or `] def' or `] readonly def' expected: `%s'", t1_line_array);
                 }
             }
             t1_getline();
@@ -874,10 +871,9 @@ static char **t1_builtin_enc(void)
             /*
                check for `dup dup <from> <size> getinterval <to> exch putinterval'
              */
-            else if (sscanf
-                     (p, "dup dup %i %i getinterval %i exch putinterval",
-                      &a, &c, &b) == 3 && valid_code(a) && valid_code(b)
-                     && valid_code(c)) {
+            else if (sscanf(p, "dup dup %i %i getinterval %i exch putinterval",
+                            &a, &c, &b) == 3
+                     && valid_code(a) && valid_code(b) && valid_code(c)) {
                 for (i = 0; i < c; i++)
                     copy_glyph_names(glyph_names, a + i, b + i);
                 p = strstr(p, " putinterval") + strlen(" putinterval");
@@ -933,28 +929,24 @@ static void t1_include(void)
         t1_getline();
         t1_scan_param();
         t1_putline();
-    }
-    while (t1_in_eexec == 0);
+    } while (t1_in_eexec == 0);
     t1_start_eexec();
     do {
         t1_getline();
         t1_scan_param();
         t1_putline();
-    }
-    while (!(t1_charstrings() || t1_subrs()));
+    } while (!(t1_charstrings() || t1_subrs()));
     t1_cs = true;
     do {
         t1_getline();
         t1_putline();
-    }
-    while (!t1_end_eexec());
+    } while (!t1_end_eexec());
     t1_stop_eexec();
     if (fixedcontent) {         /* copy 512 zeros (not needed for PDF) */
         do {
             t1_getline();
             t1_putline();
-        }
-        while (!t1_cleartomark());
+        } while (!t1_cleartomark());
         t1_check_end();         /* write "{restore}if" if found */
     }
     get_length3();
@@ -1076,7 +1068,7 @@ static void cc_init(void)
     set_cc(CS_RETURN, false, 0, false);
     /*
        set_cc(CS_ESCAPE, false, 0, false);
-    */
+     */
     set_cc(CS_HSBW, true, 2, true);
     set_cc(CS_ENDCHAR, false, 0, true);
     set_cc(CS_RMOVETO, true, 2, true);
@@ -1388,8 +1380,7 @@ static void t1_subset_ascii_part(void)
         t1_scan_param();
         if (!t1_prefix("/UniqueID"))    /* ignore UniqueID for subsetted fonts */
             t1_putline();
-    }
-    while (t1_in_eexec == 0);
+    } while (t1_in_eexec == 0);
 }
 
 static void cs_init(void)
@@ -1539,8 +1530,8 @@ static void t1_flush_cs(boolean is_subr)
     for (ptr = tab; ptr < end_tab; ptr++) {
         if (ptr->used) {
             if (is_subr)
-                sprintf(t1_line_array, "dup %i %u", (int) (ptr - tab),
-                        ptr->cslen);
+                sprintf(t1_line_array, "dup %lu %u",
+                        (unsigned long) (ptr - tab), ptr->cslen);
             else
                 sprintf(t1_line_array, "/%s %u", ptr->name, ptr->cslen);
             p = strend(t1_line_array);
@@ -1550,8 +1541,8 @@ static void t1_flush_cs(boolean is_subr)
         } else {
             /* replace unsused subr's by return_cs */
             if (is_subr) {
-                sprintf(t1_line_array, "dup %i %u%s ", (int) (ptr - tab),
-                        cs_len, cs_token_pair[0]);
+                sprintf(t1_line_array, "dup %lu %u%s ",
+                        (unsigned long) (ptr - tab), cs_len, cs_token_pair[0]);
                 p = strend(t1_line_array);
                 memcpy(p, return_cs, cs_len);
                 t1_line_ptr = p + cs_len;
@@ -1610,7 +1601,7 @@ static void t1_check_unusual_charstring(void)
     char *p = strstr(t1_line_array, charstringname) + strlen(charstringname);
     int i;
     /* if no number follows "/CharStrings", let's read the next line */
-    if (sscanf(p, "%i", &i) != 1) { 
+    if (sscanf(p, "%i", &i) != 1) {
         strcpy(t1_buf_array, t1_line_array);
         t1_getline();
         strcat(t1_buf_array, t1_line_array);
