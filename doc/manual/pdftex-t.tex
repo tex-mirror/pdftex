@@ -1,12 +1,12 @@
 % interface=english modes=letter,screen output=pdftex
 % vim: tw=79
 
-% $Id: pdftex-t.tex,v 1.675 2007/01/25 10:37:13 hhenkel Exp $
+% $Id$
 
 % The number of lines on the titlepage depends on the kind of
 % \PDF\ code that \PDFTEX\ generates.
 
-\setvariables[pdftex][titlepagelines=55] % 55 should be ok for non-rc* version
+\setvariables[pdftex][titlepagelines=61]
 
 %D We use a multi purpose style (using modes) that enable us
 %D to generate an A4, letter and screen version.
@@ -61,9 +61,9 @@
     July\or August\or September\or October\or November\or December\else ERROR\fi}
 }
 
-\rcsscan $Id: pdftex-t.tex,v 1.675 2007/01/25 10:37:13 hhenkel Exp $
+\rcsscan $Id$
 
-\def\currentpdftex{1.40.0}
+\def\currentpdftex{1.40.11}
 
 %***********************************************************************
 
@@ -79,7 +79,7 @@
 \abbreviation [ASCII]      {ascii}      {American Standard Code for Information Interchange}
 \abbreviation [CMACTEX]    {CMac\TeX}   {\MAC\ \WEBC\ distribution}
 \abbreviation [CONTEXT]    {\ConTeXt}   {general purpose macro package}
-\abbreviation [CTAN]       {CTAN}       {global \TEX\ archive server}
+\abbreviation [CTAN]       {ctan}       {global \TEX\ archive server}
 %\abbreviation [DJGPP]      {djgpp}      {DJ Delorie's \GNU\ Programming Platform}
 \abbreviation [DVI]        {dvi}        {native \TEX\ Device Independent file format}
 \abbreviation [ENCTEX]     {enc\TeX}    {enc\TeX\ extension to \TEX}
@@ -100,10 +100,10 @@
 \abbreviation [MDFIVE]     {md5}        {MD5 message-digest algorithm}
 \abbreviation [METAFONT]   {\MetaFont}  {graphic programming environment, bitmap output}
 \abbreviation [METAPOST]   {\MetaPost}  {graphic programming environment, vector output}
-\abbreviation [MIKTEX]     {MikTeX}     {\WIN\ distribution}
-\abbreviation [MLTEX]      {ML\TeX}     {ML\TeX\ extension to \TEX}
+\abbreviation [MIKTEX]     {MiK\TeX}    {\WIN\ distribution}
+\abbreviation [MLTEX]      {ml\TeX}     {ML\TeX\ extension to \TEX}
 \abbreviation [MPTOPDF]    {mptopdf}    {\METAPOST\ to \PDF\ conversion tool}
-\abbreviation [MSDOS]      {MS-DOS}     {Microsoft DOS platform (Intel)}
+\abbreviation [MSDOS]      {ms-dos}     {Microsoft DOS platform (Intel)}
 \abbreviation [PDFETEX]    {pdfe\TeX}   {\ETEX\ extension producing \PDF\ output}
 \abbreviation [PDFLATEX]   {pdf\LaTeX}  {\TEX\ extension producing \PDF\ output (\LATEX\ format loaded)}
 \abbreviation [PDFTEX]     {pdf\TeX}    {\TEX\ extension producing \PDF\ output}
@@ -126,7 +126,7 @@
 \abbreviation [TEXINFO]    {Texinfo}    {generate typeset documentation from info pages}
 \abbreviation [TEXUTIL]    {\TeX util}  {\CONTEXT\ utility tool}
 \abbreviation [TEX]        {\TeX}       {typographic language and program}
-\abbreviation [TEXLIVE]    {\TeX\ Live} {\TeX-Live distribution (multiple platform)}
+\abbreviation [TEXLIVE]    {\TeX\ Live} {\TeX\ Live distribution (multiple platform)}
 \abbreviation [TFM]        {tfm}        {\TEX\ Font Metrics}
 \abbreviation [TIF]        {tiff}       {Tagged Interchange File format}
 \abbreviation [TUG]        {tug}        {\TEX\ Users Group}
@@ -134,7 +134,7 @@
 \abbreviation [URL]        {url}        {Uniform Resource Locator}
 \abbreviation [WEBC]       {Web2c}      {official multi||platform \WEB\ environment}
 \abbreviation [WEB]        {web}        {literate programming environment}
-\abbreviation [WIN]        {Win32}      {Microsoft Windows platform}
+\abbreviation [WIN]        {Windows}    {Microsoft Windows platform}
 \abbreviation [XEMTEX]     {XEm\TeX}    {\WIN\ \WEBC\ distribution}
 \abbreviation [ZIP]        {zip}        {compressed file format}
 
@@ -147,13 +147,11 @@
 
 \useURL [ptex_org]      [http://www.pdftex.org] % links to ptex_examples
 \useURL [ptex_ctan]     [ctan:systems/pdftex]
-%\useURL [ptex_devel]    [http://pdftex.sarovar.org/current/]
-\useURL [ptex_sarovar]  [http://sarovar.org/projects/pdftex/]
-%\useURL [ptex_examples] [http://www.tug.org/applications/pdftex/]
+\useURL [ptex_devel]    [http://foundry.supelec.fr/gf/project/pdftex]
 \useURL [tex_showcase]  [http://www.tug.org/texshowcase]
 
-\useURL [tetex]         [http://www.tug.org/teTeX/]
-\useURL [texlive]       [http://www.tug.org/tex-live/]
+\useURL [tetex]         [http://tug.org/teTeX/]
+\useURL [texlive]       [http://tug.org/texlive/]
 \useURL [ctan_systems]  [ctan:systems]
 \useURL [win32]         [ctan:systems/win32]
 %\useURL [amiga]         [ctan:systems/amiga/amiweb2c/]
@@ -163,7 +161,7 @@
 \useURL [andreas]    [mailto:andreas.scherer@pobox.com]
 \useURL [christian]  [mailto:cschenk@berlin.snafu.de]
 \useURL [context]    [http://www.pragma-ade.com]
-\useURL [pdfreference] [http://www.adobe.com/devnet/pdf/pdf_reference.html]
+\useURL [pdfreference] [http://www.adobe.com/products/postscript/pdfs/PLRM.pdf]
 
 % where the bug reports should go:
 \useURL [ptex_bugs]  [mailto:pdftex@tug.org]                                  [] [pdftex@tug.org]
@@ -172,8 +170,7 @@
 
 \useURL [sebastian]  [mailto:s.rahtz@elsevier.co.uk]                          [] [s.rahtz@elsevier.co.uk]
 \useURL [sebastian]  [mailto:sebastian.rahtz@computing-services.oxford.ac.uk] [] [sebastian.rahtz@computing-services.oxford.ac.uk]
-\useURL [thanh]      [mailto:thanh@informatics.muni.cz]                       [] [thanh@informatics.muni.cz]
-\useURL [thanh]      [mailto:hanthethanh@myrealbox.com]                       [] [hanthethanh@myrealbox.com]
+\useURL [thanh]      [mailto:hanthethanh@gmail.com]                           [] [hanthethanh@gmail.com]
 \useURL [martin]     [mailto:martin@pdftex.org]                               [] [martin@pdftex.org]
 \useURL [hans]       [mailto:pragma@wxs.nl]                                   [] [pragma@wxs.nl]
 \useURL [hartmut]    [mailto:hartmut_henkel@gmx.de]                           [] [hartmut\_henkel@gmx.de]
@@ -704,18 +701,18 @@ This manual revision (\rcsrevision) tries to keep track with the recent
 \PDFTEX\ development up to version \currentpdftex. Main text updates
 were done regarding the new configuration scheme, font mapping, and new
 or updated primitives.  The primary repository for the manual and its
-sources is at \from[ptex_sarovar].  Copies in \PDF\ format can also be
-found at the CTAN network in directory \from[ptex_ctan].
+sources is at \from[ptex_devel].  Copies in \PDF\ format can also be
+found on \CTAN\ in \from[ptex_ctan].
 
-Thanks to Karl Berry for proof reading and submitting a~long changes
-list. New errors might have slipped in afterwards by the editor.
+Thanks to the many people who have contributed to the manual.
+New errors might have slipped in afterwards by the editor.
 Please send questions or suggestions by email to \from[ptex_bugs].
 
 %***********************************************************************
 
 \subsection{Legal Notice}
 
-Copyright \copyright\ 1996||2007  \THANH.
+Copyright \copyright\ 1996||2010  \THANH.
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
 or any later version published by the Free Software Foundation;
@@ -860,17 +857,15 @@ that section, we will describe how to get started with \PDFTEX.
 \section{Getting started}
 
 This section describes the steps needed to get \PDFTEX\ running on
-a~system where \PDFTEX\ is not yet installed. Nowadays virtually all \TEX\
-distributions have \PDFTEX\ as a~component, such as \TEXLIVE, \TETEX,
-\XEMTEX, \MIKTEX, \PROTEXT, and \CMACTEX. The ready to run \TEXLIVE\
-distribution comes with \PDFTEX\ versions for many \UNIX, \WIN, and
-\MACOSX\ systems; more information can be found at \from[texlive]. \TETEX\
-by Thomas Esser is a~source distribution with an automated compilation
-process for \UNIX\ systems; see \from[tetex]. For \WIN\ systems there
-are also three separate distributions that contain \PDFTEX, all in
-\from[win32]: \XEMTEX\ by Fabrice Popineau, \MIKTEX\ by Christian Schenk,
-and \PROTEXT\ (based on \MIKTEX) by Thomas Feuerstack. So when you use
-any of these distributions, you don't need to bother with the \PDFTEX\
+a~system where \PDFTEX\ is not yet installed. Nowadays virtually all
+\TEX\ distributions have \PDFTEX\ as a~component, such as \TEXLIVE,
+\TETEX, \XEMTEX, \MIKTEX, \PROTEXT, and \CMACTEX. The ready to run
+\TEXLIVE\ distribution comes with \PDFTEX\ versions for many \UNIX,
+\WIN, and \MACOSX\ systems; more information can be found at
+\from[texlive].  There are also \WIN-specific distributions which
+contain \PDFTEX, under \from[win32]: \MIKTEX\ by Christian Schenk, and
+\PROTEXT\ (based on \MIKTEX) by Thomas Feuerstack. When you use any
+of these distributions, you don't need to bother with the \PDFTEX\
 installation procedure in the next sections.
 
 If there is no precompiled \PDFTEX\ binary for your system, or the version
@@ -887,10 +882,9 @@ is \WEBC||specific.
 
 The latest sources of \PDFTEX\ are currently distributed for compilation
 on \UNIX\ systems (including Linux), and \WIN\ systems (Windows 95,
-98, NT, 2000, XP).  The primary location where one can fetch the latest
-released code is at the developers' homepage \from[ptex_sarovar], where
-you also find bug tracking information, and the manual sources. Download
-the \PDFTEX\ archive from there.
+98, NT, 2000, XP).  The primary home page is \from[ptex_org], where
+you also find bug tracking information.  Development sources are at
+\from[ptex_devel].
 
 The \PDFTEX\ sources can also be found at their canonical place in
 the CTAN network, \from[ptex_ctan].
@@ -2120,7 +2114,7 @@ definitions and syntax rules follow after the list of primitives.
 %%S pdfTeX documentation file pdftex-t.tex by script syntaxform.awk.
 %%S Used convention for syntax rules is borrowed from `TeXbook naruby'
 %%S by Petr Olsak.
-%%S $Id: pdftex-t.tex,v 1.675 2007/01/25 10:37:13 hhenkel Exp $
+%%S $Id$
 %%S NL
 %%S integer registers:
 
@@ -4954,7 +4948,7 @@ manual.
 
 \section{Abbreviations}
 
-In this document we used a~few abbreviations. For convenience we mention
+In this document we use numerous abbreviations. For convenience we mention
 their meaning here.
 
 \placelistofabbreviations

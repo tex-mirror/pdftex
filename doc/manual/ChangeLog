@@ -1,0 +1,13 @@
+2010-11-14  Karl Berry  <karl@gnu.org>
+
+	* All files: expand keywords again, so the manual appears
+	updated, among other things.
+
+	* Makefile (pdftexversion): 1.40.11 now.
+	(pdftex-t.txt): set GREP_OPTIONS=--text.
+	
+	* pdftex-i.tex: add \pdfmapline for contnav, somehow omitted
+	from TL for years now.
+	
+	* pdftex-t.tex: update intro information about distributions,
+        etc., to be somewhat more accurate.

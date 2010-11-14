@@ -1,4 +1,4 @@
-#$Id: syntaxform.awk,v 1.13 2006/02/10 21:27:48 hhenkel Exp $
+#$Id$
 # pdftex-t.tex --> pdftex-syntax.txt
 # requires gawk due to gensub() function
 

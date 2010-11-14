@@ -1,3 +1,5 @@
+$Id$
+
 1. List of pdfTeX documentation files
 =====================================
 
@@ -47,14 +49,10 @@ Execute file makefiles.cmd.
 
 3.1 Generating pdftex-syntax.txt from pdftex-t.tex
 --------------------------------------------------
-
 pdftex-t.tex --> (awk -f syntaxform.awk) --> pdftex-syntax.txt
 
 
 3.2 Generating title page of manual
 -----------------------------------
-
 pdftex-w.tex --> (pdfetex) --> pdftex-w.pdf
   --> (expand, fmt, grep) --> pdftex-t.txt
-
-$Id: README,v 1.23 2006/12/22 23:38:29 hhenkel Exp $

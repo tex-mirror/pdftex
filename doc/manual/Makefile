@@ -1,8 +1,8 @@
-# $Id: Makefile,v 1.89 2007/01/25 07:18:57 hhenkel Exp $
+# $Id$
 #
 # Makefile for pdfTeX documentation
 
-pdftexversion=1.40.0
+pdftexversion=1.40.11
 mandir=manual
 distdate=`date +%y%m%d`
 distrev=`awk '/Id:/{print $$4; exit}' $(mandir)/pdftex-t.tex`
@@ -48,7 +48,7 @@ pdftex-t.txt:	pdftex-w.pdf Makefile
 	cat $< \
 	| expand \
 	| fmt -s -w36 \
-	| grep . \
+	| env GREP_OPTIONS=--text grep . \
 	| expand \
 	| cat > $@
 
