@@ -23,16 +23,16 @@ all:	pdftex-a.pdf \
 
 booklet:	pdftex-b.pdf pdftex-b-e.pdf pdftex-b-o.pdf
 
-pdftex-a.pdf:	pdftex-t.tex pdftex-t.txt
+pdftex-a.pdf a:	pdftex-t.tex pdftex-t.txt
 	texexec --result=$@ $<
 
-pdftex-l.pdf:	pdftex-t.tex pdftex-t.txt
+pdftex-l.pdf l:	pdftex-t.tex pdftex-t.txt
 	texexec --mode=letter --result=$@ $<
 
-pdftex-s.pdf:	pdftex-t.tex pdftex-i.tex
+pdftex-s.pdf s:	pdftex-t.tex pdftex-i.tex
 	texexec --mode=screen --result=$@ $<
 
-pdftex-b.pdf:	pdftex-a.pdf
+pdftex-b.pdf b:	pdftex-a.pdf
 	texexec --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
 	--result=$@ $<
 

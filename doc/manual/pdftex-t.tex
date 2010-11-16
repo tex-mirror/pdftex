@@ -1089,7 +1089,7 @@ even without setting any parameters.
 \NC \type{\pdfuniqueresname}       \NC integer   \NC      0 \NC                      \NC\NR
 \NC \type{\pdfprotrudechars}       \NC integer   \NC      0 \NC                      \NC\NR
 \NC \type{\pdfgentounicode}        \NC integer   \NC      0 \NC                      \NC\NR
-\NC \type{\pdfminorversion}        \NC integer   \NC      5 \NC \PDF\ 1.5            \NC\NR
+\NC \type{\pdfminorversion}        \NC integer   \NC      4 \NC \PDF\ 1.4            \NC\NR
 \NC \type{\pdfpagebox}             \NC integer   \NC      0 \NC                      \NC\NR
 \NC \type{\pdfforcepagebox}        \NC integer   \NC      0 \NC                      \NC\NR
 \NC \type{\pdfinclusionerrorlevel} \NC integer   \NC      0 \NC                      \NC\NR
@@ -2720,18 +2720,6 @@ new Didot (1\,nd~=~0.375\,mm) and the new Cicero (1\,nc~=~12\,nd)
 }
 
 \Syntax {
-\Tex {\pdfsnaprefpoint}
-}
-
-\Syntax {
-\Tex {\pdfsnapy} \Optional{\Literal{plus} \Something{dimen}} \Optional{\Literal{minus} \Something{dimen}}
-}
-
-\Syntax {
-\Tex {\pdfsnapycomp} \Something{integer}
-}
-
-\Syntax {
 \Tex {\pdfprimitive} \Something{control sequence}
 }
 
@@ -3083,6 +3071,10 @@ should put it at the very start of your files. The command has been introduced
 in \PDFTEX\ 1.30.0 as a~shortened synonym of \type{\pdfoptionpdfminorversion}
 command, that is obsolete by now.
 
+Distributions alter the default value here; for example, \TEXLIVE\ 2010
+sets \type{\pdfminorversion=5} when its formats are built, so object
+compression can be enabled (described below).
+
 \pdftexprimitive {\Syntax {\Tex {\pdfcompresslevel} \Whatever{integer}}}
 
 \bookmark{\type{\pdfcompresslevel}}
@@ -3117,7 +3109,7 @@ disabled by value~0 (default). Enabling requires that also
 \type{\pdfminorversion}~$>$~4. If \type{\pdfobjcompresslevel}~$>$~0,
 but \type{\pdfminorversion}~$<$~5, a~warning is given and object stream
 writing is disabled. The \type{\pdfobjcompresslevel} value is clipped
-to the range 0..3. Using values outside this range is not recommended
+to the range $0..3$. Using values outside this range is not recommended
 (for future extension).
 
 The \type{\pdfobjcompresslevel} settings have the following effects:
@@ -3134,13 +3126,13 @@ are to be used, currently \type{\pdfobjcompresslevel=2} is recommended,
 and set so in some distributions.
 
 \description{Caveat:} \PDF\ files generated with object streams enabled
-can't be read with (old) \PDF\ viewers that don't understand \PDF-1.5
-files. For widest distribution and unknown audience, don't activate
-object stream writing. The \PDF-1.5 standard describes also a~hybrid
-object compression mode that gives some backward compatibility, but this
-is currently not implemented, as \PDF-1.5 seems to be rather quickly
-adopted by modern \PDF\ viewers. Also not implemented is the optional
-\type{/Extends} key.
+can't be read with (sufficiently old) \PDF\ viewers that don't
+understand \PDF-1.5 files. For widest distribution and unknown audience,
+don't activate object stream writing. The \PDF-1.5 standard describes
+also a~hybrid object compression mode that gives some backward
+compatibility, but this is currently not implemented, as \PDF-1.5 was
+rather quickly adopted by modern \PDF\ viewers. Also not implemented is
+the optional \type{/Extends} key.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfdecimaldigits} \Whatever{integer}}}
 
@@ -3959,65 +3951,6 @@ including the first one, unless \type{\pdffirstlineheight} is specified.
 \bookmark{\type{\pdfeachlinedepth}}
 
 Like the preceding parameter, but for depth.
-
-\pdftexprimitive{\Syntax {\Tex {\pdfsnaprefpoint}}}
-
-\bookmark{\type{\pdfsnaprefpoint}}
-
-Version 1.30 of \PDFTEX\ introduced three new primitives to support grid
-typesetting. They work in \PDF\ mode only.
-This primitive inserts a~whatsit node that represents a~reference point
-for the grid.
-
-\pdftexprimitive{\Syntax {\Tex {\pdfsnapy} \Something{dimen}
-  \Optional{\Literal{plus} \Something{dimen}} \Optional{\Literal{minus} \Something{dimen}}}}
-
-\bookmark{\type{\pdfsnapy}}
-
-This inserts a~whatsit node (meaningful in the main vertical list only) which,
-if read when a~page is shipped out, moves the drawing pen to the nearest point
-located at a~distance to the reference point that is a~multiple of the first
-\Something{dimen}. This happens if and only if this nearest point is below
-or above the current point by a~distance of at most the \type{plus} part or
-the \type{minus} part respectively. (So, despite the syntax, this primitive
-doesn't work like a glue.)
-
-\pdftexprimitive{\Syntax {\Tex {\pdfsnapycomp} \Something{integer}}}
-
-\bookmark{\type{\pdfsnapycomp}}
-
-This inserts a~whatsit node that will account for (\type{integer}/1000)\%
-of the vertical move needed by the previous command to snap to the grid.
-
-For those primitives to make any sense at all, the reference point must be
-added to all pages at a~fixed position, e.g. in a~header or at the top of
-the shipped box. The following is a~very simple example with plain \TEX,
-illustrating the addition of space around a~figure to snap the text that
-follows to the grid:
-
-\starttyping
-\baselineskip=12pt \topskip=12pt
-\output{%
-  \shipout\vbox{%
-    \pdfsnaprefpoint
-    \box255
-  }%
-}
-
-First paragraph...
-
-\pdfsnapycomp500
-% Some code for a figure here
-\pdfsnap 12pt plus 10pt minus 2pt
-
-Second paragraph...
-\stoptyping
-
-In this example, \type{\topskip} is set to the same value as \type{\baselineskip}
-to avoid extra calculations. If the figure is, say, 30\,pt in height, and
-the first paragraph is three||line high, then we're 66\,pt away from the reference
-point at the beginning of the second paragraph, and 6\,pt must be added to be at
-a~multiple of 12\,pt; hence, a~3\,pt move is made before and after the figure.
 
 %***********************************************************************
 
