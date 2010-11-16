@@ -1,3 +1,11 @@
+2010-11-16  Karl Berry  <karl@gnu.org>
+
+	* pdftex-t.tex: a couple more abbreviations, English, etc.
+
+2010-11-15  Paul Isambert  <zappathustra@free.fr>
+
+        * pdftex-t.tex: more primitives.
+
 2010-11-14  Karl Berry  <karl@gnu.org>
 
 	* All files: expand keywords again, so the manual appears
