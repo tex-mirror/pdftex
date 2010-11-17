@@ -1,3 +1,8 @@
+2010-11-17  Karl Berry  <karl@gnu.org>
+
+	* pdftex.web (pdf_out_colorstack): othercases confusion.
+	Report from peb, change from Heiko.
+
 2010-11-14  Karl Berry  <karl@gnu.org>
 
 	* writet1.c: endless formatting tweaks.
