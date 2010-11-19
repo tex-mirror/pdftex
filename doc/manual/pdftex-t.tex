@@ -119,7 +119,7 @@
 \abbreviation [PROTEXT]    {pro\TeX t}  {\WIN\ \WEBC\ distribution based on \MIKTEX}
 \abbreviation [PS]         {ps}         {PostScript}
 \abbreviation [POSTSCRIPT] {PostScript} {PostScript}
-\abbreviation [PSTOPDF]    {PStoPDF}    {PostScript to \PDF\ converter (on top of GhostScript)}
+\abbreviation [PSTOPDF]    {PStoPDF}    {PostScript to \PDF\ converter (on top of \GHOSTSCRIPT)}
 \abbreviation [RGB]        {rgb}        {Red Green Blue color specification}
 \abbreviation [TCX]        {tcx}        {\TEX\ Character Translation}
 \abbreviation [TDS]        {tds}        {\TEX\ Directory Standard}
@@ -408,7 +408,7 @@
    openaction=firstpage,
    title=the pdfTeX users manual,
    author={H\`an Th\^e Th\`anh, Sebastian Rahtz, Hans Hagen, Hartmut Henkel,
-   Pawe\l\ Jackowski, Martin Schröder}]
+   Pawe\l\ Jackowski, Martin Schr\"oder}]
 
 \setupinteractionscreen % still needed?
 
@@ -1016,7 +1016,7 @@ and \type{.pfb}).  These outline (vector) fonts are to be preferred over
 bitmap \PK\ fonts. In most cases Type~1 fonts are used and this variable
 tells \PDFTEX\ where to find them.
 
-\PathDescription {TTFONTS, OPENTYPEFONTS} Search paths for TrueType
+\PathDescription {TTFONTS,\hfil\break \hbox{OPENTYPEFONTS}} Search paths for TrueType
 (\type{.ttf}) and OpenType (\type{.otf}) font files.  Like Type~1 fonts,
 TrueType and OpenType fonts are also outlines.
 
@@ -1062,7 +1062,7 @@ still be overridden during a~\PDFTEX\ run by using the same primitives.
 This new configuration concept is a~more unified approach, as it avoids
 the configuration file with a~special format.
 
-A~list of \PDFTEX\ primitives relevant for setting up the \PDFTEX\ engine
+A~list of \PDFTEX\ primitives relevant to setting up the \PDFTEX\ engine
 is given in \in{table}[tbl:configparms]. All primitives are described in
 detail within later sections. \in{Figure}[in:pdftexconfig] shows a~recent
 configuration file (\type{pdftexconfig.tex}) in \TEX\ format, using the
@@ -1135,7 +1135,7 @@ even without setting any parameters.
 Independent of whether such a~configuration file is read or not, the
 first action in a~\PDFTEX\ run is that the program reads the global \WEBC\
 configuration file (\filename{texmf.cnf}), which is common to all programs
-in the \WEB2C\ system. This file mainly defines file search paths, the
+in the \WEBC\ system. This file mainly defines file search paths, the
 memory layout (\eg\ pool and hash size), and other general parameters.
 
 %***********************************************************************
@@ -4198,7 +4198,7 @@ formats. Starting from \PDFTEX\ 1.11 one may also decide in the \PDF\
 image case, which page box of the image is to be treated as a~final
 bounding box. If \Something{pdf box spec} is present, it overrides the
 default behaviour specified by the \type{\pdfpagebox} parameter, and is
-overriden by the (obsolete) \type{\pdfforcepagebox} parameter. This
+overridden by the (obsolete) \type{\pdfforcepagebox} parameter. This
 option is irrelevant for non||\PDF\ inclusions.
 
 Starting from \PDFTEX\ 1.21, \type{\pdfximage} command supports
@@ -4285,8 +4285,8 @@ clipped to the range 0..65535\,[dpi].
 
 Currently this parameter is used particularly for calculating the
 dimensions of \JPEG\ images in \EXIF\ format (unless at least one
-dimension is stated explicitely); the resolution values coming with \EXIF\
-files are currently ignored.
+dimension is stated explicitly); the resolution values coming with
+\EXIF\ files are currently ignored.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfpagebox} \Whatever{integer}}}
 
@@ -5028,31 +5028,96 @@ and end at the same group level. \introduced{1.40.0}
 
 \subsection{Miscellaneous}
 
-\pdftexprimitive {\Syntax {\Tex {\vadjust}
-  \Optional{\Something{pre spec}} \Something{filler}
-  \Lbrace \Something{vertical mode material} \Rbrace }}
+\pdftexprimitive {\Syntax {\tex {ifincsname} \Whatever{expandable}}}
 
-\bookmark{\type{\vadjust}}
+\bookmark{\tex{ifincsname}}
 
-The \type{\vadjust} implementation of \PDFTEX\ adds an optional
-qualifier \Something{pre spec} (which is the string \type{pre}) to
-the original \TEX\ primitive with the same name. As long as there is
-no \type{pre} given, \type{\vadjust} behaves exactly as the original
-(see the \TEX book, p.~281); it appends an adjustment item created
-from \Something{vertical mode material} to the current list {\em after}
-the line in which \type{\vadjust} appears. However with the qualifier
-\type{pre}, the adjustment item is put {\em before} the line in which
-\type{\vadjust pre} appears.
+This conditional is true if evaluated inside \type{\csname ... \endcsname},
+and false otherwise.
 
-\pdftexprimitive {\Syntax {\Tex {\quitvmode}}}
 
-\bookmark{\type{\quitvmode}}
+\pdftexprimitive {\Syntax {\tex {ifpdfprimitive} \Something{control sequence} \Whatever{expandable}}}
 
-The primitive instructs \PDFTEX\ to quit the vertical mode and start typesetting
-a~paragraph. \type{\quitvmode} has the same effect as \type{\leavevmode} definition
-from \type{plain} macro package. Note however, that \type{\leavevmode} may conflict
-with \type{\everypar} tokens list. No such risk while using \type{\quitvmode} instead.
-\introduced{1.21a}
+\bookmark{\tex{ifpdfprimitive}}
+
+This condition checks if the following control sequence has its primitive
+meaning. If it has, \type{\ifpdfprimitive} returns true. In any other case
+(redefined, made \type{\undefined}, has never been primitive) false is returned.
+\introduced{1.40.0}
+
+
+\pdftexprimitive {\Syntax {\Tex {\pdfcreationdate} \Whatever{expandable}}}
+
+\bookmark{\type{\pdfcreationdate}}
+
+Expands to the date string \PDFTEX\ uses in the info dictionary of the
+document, \eg\ for this file {\tt\pdfcreationdate}. \introduced{1.30.0}
+
+
+\pdftexprimitive {\Syntax {\tex {pdfdraftmode} \Whatever{integer}}}
+
+\bookmark{\type{\pdfdraftmode}}
+
+When set to 1 (or switched on by the commandline switch \type{-draftmode}) \PDFTEX\
+doesn't write the output pdf and doesn't actually read any images but does
+everything else (including writing auxiliary files), thus speeding up
+compilations when you know you need an extra run but don't care about the
+output, e.g. just to get the \BIBTEX\ references right.
+\introduced{1.40.0}
+
+
+\pdftexprimitive {\Syntax {\Tex{\pdfinsertht} \Something{integer} \Whatever{expandable}}}
+
+\bookmark{\type{\pdfinsertht}}
+
+If \type{integer} is the number of an insertion class, this command
+returns the height of the corresponding box at the current time.
+For instance, the following returns \type{12pt} in plain \TEX:
+
+\starttyping
+Abc\footnote*{Whatever.}\par
+\pdfinsertht\footins
+\stoptyping
+
+
+\pdftexprimitive {\Syntax {\Tex {\pdflastxpos}} \Whatever{read||only
+integer}}
+
+\bookmark{\type{\pdflastxpos}}
+
+This primitive returns an integer number representing the absolute $x$
+coordinate of the last point marked by \type{\pdfsavepos}. The unit is
+`scaled points' (sp).
+
+
+\pdftexprimitive {\Syntax {\Tex {\pdflastypos}} \Whatever{read||only
+integer}}
+
+\bookmark{\type{\pdflastypos}}
+
+This primitive works analogously to \type{\pdflastxpos}, only returning
+the $y$ coordinate.
+
+
+\pdftexprimitive {\Syntax {\tex {pdfprimitive} \Something{control sequence}}}
+
+\bookmark{\type{\pdfprimitive}}
+
+This command executes the primitive meaning of the following control sequence,
+if it has been redefined or made undefined. If the following control sequence is
+undefined and never was a~primitive, nothing happens and no error is raised.
+If the control sequence was initially expandable, \type{\pdfprimitive}
+expands either. Otherwise \type{\pdfprimitive} doesn't expand. \introduced{1.40.0}
+
+
+\pdftexprimitive {\Syntax {\Tex {\pdfretval} \Whatever{read||only
+integer}}}
+
+\bookmark{\type{\pdfretval}}
+
+Set to $-1$ if \type{\pdfobj} ignores an invalid object number.  Perhaps
+this will be used to store the error status of other primitives in the
+future.
 
 
 \pdftexprimitive {\Syntax {\Tex {\pdfsavepos}}}
@@ -5070,62 +5135,6 @@ runs are required to utilize these primitives. Starting with
 \PDFTEX\ 1.40.0, this mechanism can be used also while running
 in \DVI\ mode.
 
-\pdftexprimitive {\Syntax {\Tex {\pdflastxpos}} \Whatever{read||only
-integer}}
-
-\bookmark{\type{\pdflastxpos}}
-
-This primitive returns an integer number representing the absolute $x$
-coordinate of the last point marked by \type{\pdfsavepos}. The unit is
-`scaled points' (sp).
-
-\pdftexprimitive {\Syntax {\Tex {\pdflastypos}} \Whatever{read||only
-integer}}
-
-\bookmark{\type{\pdflastypos}}
-
-This primitive works similarly to \type{\pdflastxpos}, only it returns
-the $y$ coordinate.
-
-\pdftexprimitive {\Syntax {\Tex {\pdftexversion} \Whatever{read||only integer}}}
-
-\bookmark{\type{\pdftexversion}}
-\def\versplit#1#2#3{#1.#2#3}
-
-Returns the version of \PDFTEX\ multiplied by 100, \eg\ for \PDFTEX\
-version \expandafter\versplit\the\pdftexversion.\pdftexrevision\ used to
-produce this document, it returns {\tt \number\pdftexversion}.
-
-\pdftexprimitive {\Syntax {\Tex {\pdftexrevision} \Whatever{expandable}}}
-
-\bookmark{\type{\pdftexrevision}}
-
-Returns the revision number of \PDFTEX, \eg\ for \PDFTEX\ version
-\expandafter\versplit\the\pdftexversion.\pdftexrevision\ used to produce
-this document, it returns the number {\tt \pdftexrevision}.
-
-\pdftexprimitive {\Syntax {\Tex {\pdftexbanner} \Whatever{expandable}}}
-
-\bookmark{\type{\pdftexbanner}}
-
-Returns the \PDFTEX\ banner message, \eg\ for the version used here:
-{\tt \pdftexbanner}. \introduced{1.20a}
-
-\pdftexprimitive {\Syntax {\Tex {\pdfcreationdate} \Whatever{expandable}}}
-
-\bookmark{\type{\pdfcreationdate}}
-
-Expands to the date string \PDFTEX\ uses in the info dictionary of the
-document, \eg\ for this file {\tt\pdfcreationdate}. \introduced{1.30.0}
-
-\pdftexprimitive {\Syntax {\Tex {\pdfretval} \Whatever{read||only
-integer}}}
-
-\bookmark{\type{\pdfretval}}
-
-Set to $-1$ if \type{\pdfobj} ignores an invalid object number.  Perhaps
-this will be used to store the error status of other primitives in the
-future.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfshellescape} \Whatever{read||only
 integer}}}
@@ -5137,56 +5146,61 @@ restricted, and 0 otherwise.  (\type{\write18} was
 \ifnum\pdfshellescape=0\relax not \fi enabled when this manual was
 typeset.)  \introduced{1.30.0}
 
-\pdftexprimitive {\Syntax {\tex {ifpdfprimitive} \Something{control sequence} \Whatever{expandable}}}
 
-\bookmark{\tex{ifpdfprimitive}}
+\pdftexprimitive {\Syntax {\Tex {\pdftexbanner} \Whatever{expandable}}}
 
-This condition checks if the following control sequence has its primitive
-meaning. If it has, \type{\ifpdfprimitive} returns true. In any other case
-(redefined, made \type{\undefined}, has never been primitive) false is returned.
-\introduced{1.40.0}
+\bookmark{\type{\pdftexbanner}}
+
+Returns the \PDFTEX\ banner message, \eg\ for the version used here:
+{\tt \pdftexbanner}. \introduced{1.20a}
 
 
-\pdftexprimitive {\Syntax {\tex {pdfprimitive} \Something{control sequence}}}
+\pdftexprimitive {\Syntax {\Tex {\pdftexrevision} \Whatever{expandable}}}
 
-\bookmark{\type{\pdfprimitive}}
+\bookmark{\type{\pdftexrevision}}
 
-This command executes the primitive meaning of the following control sequence,
-if it has been redefined or made undefined. If the following control sequence is
-undefined and never was a~primitive, nothing happens and no error is raised.
-If the control sequence was initially expandable, \type{\pdfprimitive}
-expands either. Otherwise \type{\pdfprimitive} doesn't expand. \introduced{1.40.0}
+\def\versplit#1#2#3{#1.#2#3}
 
-\pdftexprimitive {\Syntax {\tex {ifincsname} \Whatever{expandable}}}
+Returns the revision number of \PDFTEX, \eg\ for \PDFTEX\ version
+\expandafter\versplit\the\pdftexversion.\pdftexrevision\ (used to produce
+this document), it returns the number {\tt \pdftexrevision}.
 
-\bookmark{\tex{ifincsname}}
 
-This conditional is true if evaluated inside \type{\csname ... \endcsname},
-and false otherwise.
+\pdftexprimitive {\Syntax {\Tex {\pdftexversion} \Whatever{read||only integer}}}
 
-\pdftexprimitive {\Syntax {\tex {pdfdraftmode} \Whatever{integer}}}
+\bookmark{\type{\pdftexversion}}
 
-\bookmark{\type{\pdfdraftmode}}
+Returns the version of \PDFTEX\ multiplied by 100, \eg\ for \PDFTEX\
+version \expandafter\versplit\the\pdftexversion.\pdftexrevision\ used to
+produce this document, it returns {\tt \number\pdftexversion}.
 
-When set to 1 (or switched on by the commandline switch \type{-draftmode}) \PDFTEX\
-doesn't write the output pdf and doesn't actually read any images but does
-everything else (including writing auxiliary files), thus speeding up
-compilations when you know you need an extra run but don't care about the
-output, e.g. just to get the \BIBTEX\ references right.
-\introduced{1.40.0}
 
-\pdftexprimitive {\Syntax {\Tex{\pdfinsertht} \Something{integer} \Whatever{expandable}}}
+\pdftexprimitive {\Syntax {\Tex {\quitvmode}}}
 
-\bookmark{\type{\pdfinsertht}}
+\bookmark{\type{\quitvmode}}
 
-If \type{integer} is the number of an insertion class, this command
-returns the height of the corresponding box at the current time.
-For instance, the following returns \type{12pt} in plain \TEX:
+The primitive instructs \PDFTEX\ to quit the vertical mode and start typesetting
+a~paragraph. \type{\quitvmode} has the same effect as \type{\leavevmode} definition
+from \type{plain} macro package. Note however, that \type{\leavevmode} may conflict
+with \type{\everypar} tokens list. No such risk while using \type{\quitvmode} instead.
+\introduced{1.21a}
 
-\starttyping
-Abc\footnote*{Whatever.}\par
-\pdfinsertht\footins
-\stoptyping
+
+\pdftexprimitive {\Syntax {\Tex {\vadjust}
+  \Optional{\Something{pre spec}} \Something{filler}
+  \Lbrace \Something{vertical mode material} \Rbrace }}
+
+\bookmark{\type{\vadjust}}
+
+The \type{\vadjust} implementation of \PDFTEX\ adds an optional
+qualifier \Something{pre spec} (which is the string \type{pre}) to
+the original \TEX\ primitive with the same name. As long as there is
+no \type{pre} given, \type{\vadjust} behaves exactly as the original
+(see the \TEX book, p.~281); it appends an adjustment item created
+from \Something{vertical mode material} to the current list {\em after}
+the line in which \type{\vadjust} appears. However with the qualifier
+\type{pre}, the adjustment item is put {\em before} the line in which
+\type{\vadjust pre} appears.
 
 %***********************************************************************
 
