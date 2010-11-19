@@ -2565,6 +2565,10 @@ new Didot (1\,nd~=~0.375\,mm) and the new Cicero (1\,nc~=~12\,nd)
 }
 
 \Syntax {
+\Tex {\pdfretval} \Whatever{read||only integer}
+}
+
+\Syntax {
 \Tex {\pdfshellescape} \Whatever{read||only integer}
 }
 
@@ -5080,7 +5084,7 @@ integer}}
 
 \bookmark{\type{\pdflastypos}}
 
-This primitive works similar to \type{\pdflastxpos}, only it returns
+This primitive works similarly to \type{\pdflastxpos}, only it returns
 the $y$ coordinate.
 
 \pdftexprimitive {\Syntax {\Tex {\pdftexversion} \Whatever{read||only integer}}}
@@ -5114,15 +5118,24 @@ Returns the \PDFTEX\ banner message, \eg\ for the version used here:
 Expands to the date string \PDFTEX\ uses in the info dictionary of the
 document, \eg\ for this file {\tt\pdfcreationdate}. \introduced{1.30.0}
 
+\pdftexprimitive {\Syntax {\Tex {\pdfretval} \Whatever{read||only
+integer}}}
+
+\bookmark{\type{\pdfretval}}
+
+Set to $-1$ if \type{\pdfobj} ignores an invalid object number.  Perhaps
+this will be used to store the error status of other primitives in the
+future.
+
 \pdftexprimitive {\Syntax {\Tex {\pdfshellescape} \Whatever{read||only
 integer}}}
 
 \bookmark{\type{\pdfshellescape}}
 
-This primitive is~1 if \type{\write18} is enabled, 2 if it is restricted, and 0 otherwise.
-\type{\write18} was \ifnum\pdfshellescape=0\relax not \fi enabled when this
-manual was typeset.
-\introduced{1.30.0}
+This primitive is~1 if \type{\write18} is enabled, 2 if it is
+restricted, and 0 otherwise.  (\type{\write18} was
+\ifnum\pdfshellescape=0\relax not \fi enabled when this manual was
+typeset.)  \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\tex {ifpdfprimitive} \Something{control sequence} \Whatever{expandable}}}
 
