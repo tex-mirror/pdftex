@@ -1,5 +1,14 @@
 2010-11-19  Karl Berry  <karl@gnu.org>
 
+	* pdftex-t.tex: use \tex{foo} instead of \type{\foo} for bookmarks,
+	so we get the \'s.
+	Remove section about truetype details that became a TUB paper,
+	to avoid duplication.
+
+	* pdftex-w.tex (\pdfobjcompresslevel): must set to 0 explicitly.
+	Noticed by Paul I.
+	* pdftex-t.tex (titlepagelines): consequent update.
+
 	* pdftex-t.tex: alphabetize misc new primitives list; typos.
 
 2010-11-18  Karl Berry  <karl@gnu.org>
