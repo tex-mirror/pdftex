@@ -189,7 +189,8 @@
 
 % hyphenates
 
-\def\Something#1{\Sugar{\mathematics{\langle}\prewordbreak{#1}\prewordbreak\mathematics{\rangle}}}
+\def\Something#1{\Sugar{\mathematics{\langle}\prewordbreak
+                        {#1}\prewordbreak\mathematics{\rangle}}}
 
 % introduced
 \def\introduced#1{The primitive was introduced in \PDFTEX\ #1.}
@@ -1003,9 +1004,9 @@ and \type{.pfb}).  These outline (vector) fonts are to be preferred over
 bitmap \PK\ fonts. In most cases Type~1 fonts are used and this variable
 tells \PDFTEX\ where to find them.
 
-\PathDescription {TTFONTS,\hfil\break \hbox{OPENTYPEFONTS}} Search paths for TrueType
-(\type{.ttf}) and OpenType (\type{.otf}) font files.  Like Type~1 fonts,
-TrueType and OpenType fonts are also outlines.
+\PathDescription {TTFONTS,\hfil\break \hbox{OPENTYPEFONTS}} Search paths
+for TrueType (\type{.ttf}) and OpenType (\type{.otf}) font files.  Like
+Type~1 fonts, TrueType and OpenType fonts are also outlines.
 
 \PathDescription {PKFONTS} Search path for packed (bitmap) font
 (\type{.pk}) files.
@@ -2799,13 +2800,13 @@ compression can be enabled (described below).
 \bookmark{\tex{pdfcompresslevel}}
 
 This integer parameter specifies the level of {\em stream} compression
-(text, in||line graphics, and embedded \PNG\ images (only if they are
-un- and re||compressed during the embedding process); all done by the
-\type{zlib} library). Zero means no compression, 1~means fastest, 9~means
-best, 2..8 means something in between. A~value outside this range will
-be adjusted to the nearest meaningful value. This parameter is read
-each time \PDFTEX\ starts a~stream. Setting \type{\pdfcompresslevel=0}
-is great for \PDF\ stream debugging.
+(text, inline graphics, and embedded \PNG\ images (only if they are un-
+and re-compressed during the embedding process); all done by the
+\type{zlib} library). Zero means no compression, 1~means fastest,
+9~means best, 2..8 means something in between. A~value outside this
+range will be adjusted to the nearest meaningful value. This parameter
+is read each time \PDFTEX\ starts a~stream. Setting
+\type{\pdfcompresslevel=0} is great for \PDF\ stream debugging.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfobjcompresslevel} \Whatever{integer}}}
 
@@ -2947,16 +2948,16 @@ and \type{/Keywords}.
 
 \type{/CreationDate} and \type{/ModDate} are expressed in the form
 \type{D:YYYYMMDDhhmmssTZ..}, where \type{YYYY} is the year, \type{MM} is
-the month, \type{DD} is the day, hh is the hour, \type{mm} is the minutes,
-\type{ss} is the seconds, and \type{TZ..} is an optional string denoting
-the time zone. An example of this format is shown below.  For details
-please refer to the \PDFReference.
+the month, \type{DD} is the day, hh is the hour, \type{mm} is the
+minutes, \type{ss} is the seconds, and \type{TZ..} is an optional string
+denoting the time zone. An example of this format is shown below.  For
+details please refer to the \PDFReference.
 
-Multiple appearances of \type{\pdfinfo} will be concatenated. In general, if
-a~key is given more than once, one may expect that the first appearance will be used.
-Be aware however, that this behaviour is viewer dependent. Except expansion,
-\PDFTEX\ does not perform any further operations on \Something{general text} provided
-by the user.
+Multiple appearances of \type{\pdfinfo} will be concatenated. In
+general, if a~key is given more than once, one may expect that the first
+appearance will be used.  Be aware however, that this behaviour is
+viewer dependent. Except expansion, \PDFTEX\ does not perform any
+further operations on \Something{general text} provided by the user.
 
 An example of the use of \type{\pdfinfo} is:
 
@@ -3268,10 +3269,12 @@ for more details.
 \bookmark{\tex{letterspacefont}}
 
 This primitive creates an instance of \Something{font} with the widths
-of all glyphs increased by \Something{integer} thousandths of an~em (as set in \Something{font}).
-The effect is letter spacing, but the glyphs are actually larger (sidebearings are increased), so a~single
-glyph will take more space. For instance, the following creates a~font \type{\lsfont}
-whose glyphs are all 1.2\,pt larger than those of \type{\normalfont}:
+of all glyphs increased by \Something{integer} thousandths of an em (as
+set in \Something{font}).  The effect is letter spacing, but the glyphs
+are actually larger (sidebearings are increased), so a single glyph will
+take more space. For instance, the following creates a font
+\type{\lsfont} whose glyphs are all 1.2\,pt larger than those of
+\type{\normalfont}:
 
 \starttyping
 \font\normalfont=myfont at 12pt
@@ -3286,15 +3289,16 @@ devised (in our example, a~\type{myfont+100ls} font), as with font expansion.
 
 \bookmark{\tex{pdfcopyfont}}
 
-This primitive defines \Something{control sequence} as a~synonym for \Something{font}.
+This primitive defines \Something{control sequence} as a~synonym for
+\Something{font}.
 
 \pdftexprimitive {\Syntax {\Tex {\pdffontattr} \Something{font} \Something{general text}}}
 
 \bookmark{\tex{pdffontattr}}
 
 This primitive inserts the \Something{general text} to the \type {/Font}
-dictionary. The text must conform to the specifications as laid down in the
-\PDFReference, otherwise the document can be invalid.
+dictionary. The text must conform to the specifications as laid down in
+the \PDFReference, otherwise the document can be invalid.
 
 \pdftexprimitive {\Syntax {\Tex {\pdffontname} \Something{font} \Whatever
 {expandable}}}
@@ -3535,11 +3539,12 @@ value is \type{no_tag}, \type{1} if \type{lig_tag} is set, \type{2} if
 
 \pdftexprimitive {\Syntax {\Tex {\pdfgentounicode} \Whatever{integer}}}
 
-If set to \type{1} when the job ends, a~mapping from glyph names to Unicode characters
-will be created for the fonts used in the documents (such a~mapping is called a~CMap),
-to allow \PDF\ readers to extract text content (e.g. for searching). Most fonts
-use standard names for characters, so the mapping is generally automatic and shouldn't
-be set manually. Otherwise, the following command must be used.
+If set to \type{1} when the job ends, a~mapping from glyph names to
+Unicode characters will be created for the fonts used in the documents
+(such a~mapping is called a~CMap), to allow \PDF\ readers to extract
+text content (e.g. for searching). Most fonts use standard names for
+characters, so the mapping is generally automatic and shouldn't be set
+manually. Otherwise, the following command must be used.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfglyphtounicode} \Something{general text} \Something{general text}}}
 
@@ -3551,7 +3556,8 @@ numeric values denoting characters. For instance:
 \pdfglyphtounicode{ff}{0066066}
 \stoptyping
 
-maps the \type{ff} ligature to a~pair of \type{f}'s (whose code is \type{U+0066}).
+\noindent maps the \type{ff} ligature to a~pair of \type{f}'s (whose
+code is \type{U+0066}).
 
 %***********************************************************************
 
@@ -3679,16 +3685,16 @@ Like the preceding parameter, but for depth.
 
 \bookmark{\tex{pdfobj}}
 
-This command creates a~raw \PDF\ object that is written to the \PDF\ file as
-\type{1 0 obj} \unknown\ \type{endobj}. The object is written to \PDF\ output as
-provided by the user. When \Something{object type spec} is not given, \PDFTEX\
-does not any longer create a~dictionary object with contents \Something{general text},
-as it was in the past.
+This command creates a~raw \PDF\ object that is written to the \PDF\
+file as \type{1 0 obj} \unknown\ \type{endobj}. The object is written to
+\PDF\ output as provided by the user. When \Something{object type spec}
+is not given, \PDFTEX\ no longer creates a~dictionary object with
+contents \Something{general text}, as it did in the past.
 
-When however \Something{object type spec} is given as \Something{attr spec}
-\Literal{stream}, the object will be created as a~stream with contents
-\Something{general text} and additional attributes in \Something{attr
-spec}\unkern.
+When, however, \Something{object type spec} is given as \Something{attr
+spec} \Literal{stream}, the object will be created as a~stream with
+contents \Something{general text} and additional attributes in
+\Something{attr spec}\unkern.
 
 When \Something{object type spec} is given as \Something{attr spec}
 \Literal{file}, then the \Something{general text} will be treated as a~file
@@ -3762,11 +3768,11 @@ a~page. The contents are added to the attributes of the current page.
 
 \bookmark{\tex{pdfpageref}}
 
-This primitive expands to the number of the page object that contains the
-dictionary for page \Something{page number}. If the page \Something{page
-number} does not exist, a~warning will be issued, a~fresh unused \PDF\
-object will be generated, and \type{\pdfpageref} will expand to that
-object number.
+This primitive expands to the number of the page object that contains
+the dictionary for page \Something{page number}. If the page
+\Something{page number} does not exist, a~warning will be issued,
+a~fresh unused \PDF\ object will be generated, and \type{\pdfpageref}
+will expand to that object number.
 
 \Eg, if the dictionary for page~5 of the \TEX\ document is contained in
 \PDF\ object no.~18, \tex{pdfpageref5} expands to the number 18.
@@ -3840,9 +3846,9 @@ depends on visuals that show up on user request, but are hidden otherwise.
 
 In \PDF\ files produced by \PDFTEX\ one can recognize a~form Xobject by
 the prefix~\type{/Fm} followed by a~number, for instance \type{/Fm2}.
-For a~given form XObject number, this primitive expands to the number
-in the corresponding form XObject name. \Eg, if \type{/Fm2} corresponds
-to some form XObject with object number 7, the \type{\pdfxformname7}
+For a~given form XObject number, this primitive expands to the number in
+the corresponding form XObject name. \Eg, if \type{/Fm2} corresponds to
+some form XObject with object number 7, the \type{\pdfxformname7}
 expands to the number~\type{2}. \introduced{1.30.0}
 
 %***********************************************************************
@@ -3867,20 +3873,22 @@ are bitmap graphics and for manipulating them similar commands are provided.
 \bookmark{\tex{pdfximage}}
 
 This command creates an image object. The dimensions of the image can be
-controlled via \Something{rule spec}\unkern. The default values are zero for depth
-and \quote {running} for height and width. If all of them are given, the
-image will be scaled to fit the specified values. If some (but not
-all) are given, the rest will be set to a~value corresponding to the
-remaining ones so as to make the image size to yield the same proportion of
-$width : (height+depth)$ as the original image size, where depth is treated
-as zero. If none are given then the image will take its natural size.
+controlled via \Something{rule spec}\unkern. The default values are zero
+for depth and \quote {running} for height and width. If all of them are
+given, the image will be scaled to fit the specified values. If some
+(but not all) are given, the rest will be set to a~value corresponding
+to the remaining ones so as to make the image size to yield the same
+proportion of $width : (height+depth)$ as the original image size, where
+depth is treated as zero. If none are given then the image will take its
+natural size.
 
 An image inserted at its natural size often has a~resolution of \type
-{\pdfimageresolution} (see below) given in dots per inch in the output file,
-but some images may contain data specifying the image resolution, and in such
-a~case the image will be scaled to the correct resolution. The dimensions of
-an image can be accessed by enclosing the \type{\pdfrefximage} command to
-a~box and checking the dimensions of the box:
+{\pdfimageresolution} (see below) given in dots per inch in the output
+file, but some images may contain data specifying the image resolution,
+and in such a~case the image will be scaled to the correct
+resolution. The dimensions of an image can be accessed by enclosing the
+\type{\pdfrefximage} command to a box and checking the dimensions of the
+box:
 
 \starttyping
 \setbox0=\hbox{\pdfximage{somefile.png}\pdfrefximage\pdflastximage}
@@ -3948,8 +3956,9 @@ The number of the most recently created XObject image is accessible via \type
 
 \bookmark{\tex{pdfximagebbox}}
 
-The dimensions of the bounding box of a~\PDF\ image loaded with \type{\pdfximage}
-are stored in a~table. This primitive returns those dimensions as follows:
+The dimensions of the bounding box of a \PDF\ image loaded with
+\type{\pdfximage} are stored in a table. This primitive returns those
+dimensions as follows:
 
 \starttyping
 \pdfximage{afile.pdf}
@@ -3964,8 +3973,8 @@ integer}}}
 
 \bookmark{\tex{pdflastximagecolordepth}}
 
-The color depth (\type{1} for 1||bit images, \type{2} for 2||bit images, and so on)
-of the last image accessed with \type{\pdfximage}.
+The color depth (\type{1} for 1-bit images, \type{2} for 2-bit images,
+and so on) of the last image accessed with \type{\pdfximage}.
 
 \pdftexprimitive {\Syntax {\Tex {\pdflastximagepages} \Whatever{read||only
 integer}}}
@@ -4008,11 +4017,12 @@ dimension is stated explicitly); the resolution values coming with
 
 \bookmark{\tex{pdfpagebox}}
 
-When \PDF\ files are included, the command \type{\pdfximage} allows the selection
-of which \PDF\ page box to use in the optional field \Something{image attr
-spec}\unkern. If the option isn't present, the page box defaults to the value
-of \type{\pdfpagebox} as follows: (1) media box, (2) crop box, (3) bleed box,
-(4) trim box, and (5) artbox.
+When \PDF\ files are included, the command \type{\pdfximage} allows the
+selection of which \PDF\ page box to use in the optional field
+\Something{image attr spec}\unkern. If the option isn't present, the
+page box defaults to the value of \type{\pdfpagebox} as follows:
+(1)~media box, (2)~crop box, (3)~bleed box, (4)~trim box, and
+(5)~artbox.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfforcepagebox} \Whatever{integer}}}
 
@@ -4027,10 +4037,10 @@ of \type{\pdfpagebox} as follows: (1) media box, (2) crop box, (3) bleed box,
 %  previous versions of pdfTeX.
 %    The page box specified at \pdfximage can be globally overridden with the
 %  config parameter always_use_pdfpagebox and the command
-%  \pdfoptionalwaysusepdfpagebox <integer>, where 0 is the default (use whatever
-%  is specified with \pdfximage), 1 is media, 2 is crop, 3 is bleed, 4 is trim
-%  and 5 is artbox. This can only be set once per object, i.\,e.\ the value used at
-%  \pdfximage is remembered.
+%  \pdfoptionalwaysusepdfpagebox <integer>, where 0 is the default (use
+%  whatever is specified with \pdfximage), 1 is media, 2 is crop, 3 is
+%  bleed, 4 is trim and 5 is artbox. This can only be set once per
+%  object, i.\,e.\ the value used at \pdfximage is remembered.
 %    See the PDF Reference for an explanation of the boxes.
 
 
@@ -4047,9 +4057,9 @@ being more logical).
 \bookmark{\tex{pdfinclusionerrorlevel}}
 
 This controls the behaviour of \PDFTEX\ when a~\PDF\ file is included
-that has a~newer version than the one specified by this primitive:
-If it is set to~0, \pdfTeX\ gives only a~warning; if it's~1, \pdfTeX\
-raises an error. The command has been introduced in \PDFTEX\ 1.30.0 as
+that has a~newer version than the one specified by this primitive: If it
+is set to~0, \pdfTeX\ gives only a~warning; if it's~1, \pdfTeX\ raises
+an error. The command has been introduced in \PDFTEX\ 1.30.0 as
 a~shortened synonym of \type{\pdfoptionpdfinclusionerrorlevel}, that is
 now obsolete.
 
@@ -4058,15 +4068,15 @@ now obsolete.
 \bookmark{\tex{pdfimagehicolor}}
 
 This primitive, when set to~1, enables embedding of \PNG\ images with
-16~bit wide color channels at their full color resolution. As such
-an embedding mode is defined only from \PDF\ version~1.5 onwards,
-the \type{\pdfimagehicolor} functionality is automatically disabled
-in \PDFTEX\ if \type{\pdfminorversion}~$<$~5; then each 16~bit
-color channel is reduced to a~width of 8~bit by stripping the lower 8~bits
-before embedding. The same stripping happens when \type{\pdfimagehicolor}
-is set to~0. For \type{\pdfminorversion}~$\ge$~5 the default
-value of \type{\pdfimagehicolor} is~1. If specified, the parameter
-must appear before any data is written to the \PDF\ output.
+16~bit wide color channels at their full color resolution. As such an
+embedding mode is defined only from \PDF\ version~1.5 onwards, the
+\type{\pdfimagehicolor} functionality is automatically disabled in
+\PDFTEX\ if \type{\pdfminorversion}~$<$~5; then each 16~bit color
+channel is reduced to a~width of 8~bit by stripping the lower 8~bits
+before embedding. The same stripping happens when
+\type{\pdfimagehicolor} is set to~0. For \type{\pdfminorversion}~$\ge$~5
+the default value of \type{\pdfimagehicolor} is~1. If specified, the
+parameter must appear before any data is written to the \PDF\ output.
 \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfimageapplygamma} \Whatever{integer}}}
@@ -4076,10 +4086,9 @@ must appear before any data is written to the \PDF\ output.
 This primitive, when set to~1, enables gamma correction while embedding
 \PNG\ images, taking the values of the primitives \type {\pdfgamma} as
 well as the gamma value embedded in the \PNG\ image into account. When
-\type{\pdfimageapplygamma} is set to~0, no gamma correction is performed.
-If specified, the parameter must appear before any data is written to the
-\PDF\ output.
-\introduced{1.30.0}
+\type{\pdfimageapplygamma} is set to~0, no gamma correction is
+performed.  If specified, the parameter must appear before any data is
+written to the \PDF\ output.  \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfgamma} \Whatever{integer}}}
 
@@ -4178,14 +4187,15 @@ primitives.
 
 \bookmark{\tex{pdfannot}}
 
-This command appends a~whatsit node corresponding to an annotation to the
-list being built. The dimensions of the annotation can be controlled via the
-\Something{rule spec}. The default values are running for all width, height
-and depth. When an annotation is written out, running dimensions will take
-the corresponding values from the box containing the whatsit node
-representing the annotation. The \Something{general text} is inserted as raw
-\PDF\ code to the contents of annotation. The annotation is written out only
-if the corresponding whatsit node is searched at shipout time.
+This command appends a~whatsit node corresponding to an annotation to
+the list being built. The dimensions of the annotation can be controlled
+via the \Something{rule spec}. The default values are running for all
+width, height and depth. When an annotation is written out, running
+dimensions will take the corresponding values from the box containing
+the whatsit node representing the annotation. The \Something{general
+text} is inserted as raw \PDF\ code to the contents of annotation. The
+annotation is written out only if the corresponding whatsit node is
+searched at shipout time.
 
 \pdftexprimitive {\Syntax {\Tex {\pdflastannot} \Whatever{read||only
 integer}}}
@@ -4211,11 +4221,11 @@ speed.
 
 \bookmark{\tex{pdfdest}}
 
-This primitive appends a~whatsit node which establishes a~destination for
-links and bookmark outlines; the link is identified by either a~number or
-a~symbolic name, and the way the viewer is to display the page must be
-specified in \Something{dest type}\unkern, which must be one of those mentioned in
-\in{table}[appearance].
+This primitive appends a~whatsit node which establishes a~destination
+for links and bookmark outlines; the link is identified by either
+a number or a symbolic name, and the way the viewer is to display the
+page must be specified in \Something{dest type}\unkern, which must be
+one of those mentioned in \in{table}[appearance].
 
 \startbuffer
 \starttabulate[|l|l|]
@@ -4253,16 +4263,17 @@ spec}} \Optional{\Something{attr spec}} \Something{action spec}}}
 
 \bookmark{\tex{pdfstartlink}}
 
-This primitive is used along with \type{\pdfendlink} and appends a~whatsit
-node corresponding to the start of a~hyperlink. The whatsit node representing
-the end of the hyperlink is created by \type{\pdfendlink}. The dimensions of
-the link are handled in the similar way as in \type{\pdfannot}. Both \type
-{\pdfstartlink} and \type{\pdfendlink} must be in the same level of box
-nesting. A~hyperlink with running width can be multi||line or even
-multi||page, in which case all horizontal boxes with the same nesting level
-as the boxes containing \type{\pdfstartlink} and \type{\pdfendlink} will be
-treated as part of the hyperlink. The hyperlink is written out only if the
-corresponding whatsit node is searched at shipout time.
+This primitive is used along with \type{\pdfendlink} and appends
+a~whatsit node corresponding to the start of a~hyperlink. The whatsit
+node representing the end of the hyperlink is created by
+\type{\pdfendlink}. The dimensions of the link are handled in the
+similar way as in \type{\pdfannot}. Both \type {\pdfstartlink} and
+\type{\pdfendlink} must be in the same level of box nesting. A~hyperlink
+with running width can be multi||line or even multi||page, in which case
+all horizontal boxes with the same nesting level as the boxes containing
+\type{\pdfstartlink} and \type{\pdfendlink} will be treated as part of
+the hyperlink. The hyperlink is written out only if the corresponding
+whatsit node is searched at shipout time.
 
 Additional attributes, which are explained in great detail in the
 \PDFReference, can be given via \Something{attr spec}\unkern. Typically,
@@ -4286,11 +4297,12 @@ a~\URL, like \typ {/S /URI /URI (http://www.tug.org/)}, or a~named action like
 {numid} and \Something{nameid} specify the destination identifier (see
 below). The \Something{page spec} specifies the page number of the
 destination, in this case the zoom factor is given by \Something{general
-text}\unkern. A~destination can be performed in another \PDF\ file by specifying
-\Something{file spec}\unkern, in which case \Something{newwindow spec} specifies
-whether the file should be opened in a~new window. A~\Something{file spec}
-can be either a~\type{(string)} or a~\type{<<dictionary>>}. The default
-behaviour of the \Something{newwindow spec} depends on the browser setting.
+text}\unkern. A~destination can be performed in another \PDF\ file by
+specifying \Something{file spec}\unkern, in which case
+\Something{newwindow spec} specifies whether the file should be opened
+in a~new window. A~\Something{file spec} can be either a~\type{(string)}
+or a~\type{<<dictionary>>}. The default behaviour of the
+\Something{newwindow spec} depends on the browser setting.
 
  A~\Something{thread-action spec} performs an article thread reading. The
 thread identifier is similar to the destination identifier. A~thread can be
@@ -4387,7 +4399,7 @@ This ends an article thread started before by \type{\pdfstartthread}.
 
 \bookmark{\tex{pdfthreadmargin}}
 
-Specifies a~margin to be added to the dimensions of a~bead within
+Specifies a~margin to be added to the dimensions of a bead within
 an article thread.
 
 %***********************************************************************
@@ -4427,13 +4439,15 @@ this within a~\type{BT ET} block.
 
 \bookmark{\tex{special}}
 
-This is equivalent to \Syntax{\Tex{\pdfliteral} \Lbrace \Something{text} \Rbrace}.
+This is equivalent to \Syntax{\Tex{\pdfliteral} \Lbrace \Something{text}
+\Rbrace}.
 
 \pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:direct:} \Something{text} \Rbrace}}
 
 \bookmark{\tex{special\ direct}}
 
-This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{direct} \Lbrace \Something{text} \Rbrace}.
+This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{direct} \Lbrace
+\Something{text} \Rbrace}.
 
 \pdftexprimitive {\Syntax {\Tex {\special} \Lbrace\unkern\type{pdf:page:} \Something{text} \Rbrace}}
 
@@ -4492,9 +4506,9 @@ a~hexadecimal number and returns an \ASCII\ character of this code.
 
 \bookmark{\tex{pdfstrcmp}}
 
-This command compares two strings and expands to \type{0} if the strings are equal,
-to \type{-1} if the first string ranks before the second, and to \type{1} otherwise.
-\introduced{1.30.0}
+This command compares two strings and expands to \type{0} if the strings
+are equal, to \type{-1} if the first string ranks before the second, and
+to \type{1} otherwise.  \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfmatch} \Optional{\Literal{icase}} \Optional{\Literal{subcount} \Something{integer}}
 \Something{general text} \Something{general text} \Whatever{expandable}}}
@@ -4503,11 +4517,11 @@ to \type{-1} if the first string ranks before the second, and to \type{1} otherw
 
 This command implements pattern matching (using the syntax of \POSIX\
 regular expressions). The first \Something{general text} is a~pattern,
-the second is a~string, and the command expands to \type{-1} if the pattern
-is invalid, to \type{0} if no match is found, and to \type{1} if a~match is
-found. With the \type{icase} option, the matching is case||insensitive.
-The \type{subcount} option sets the size of the table storing found (sub)patterns.
-\introduced{1.30.0}
+the second is a~string, and the command expands to \type{-1} if the
+pattern is invalid, to \type{0} if no match is found, and to \type{1} if
+a~match is found. With the \type{icase} option, the matching is
+case-insensitive.  The \type{subcount} option sets the size of the table
+storing found (sub)patterns.  \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdflastmatch} \Something{integer} \Whatever{expandable}}}
 
@@ -4550,9 +4564,10 @@ hexadecimal format (same as \type{\pdfescapehex}).
 
 \bookmark{\tex{ifpdfabsnum}}
 
-The primitive works as normal \type{\ifnum} condition check, except that it compares
-absolute values of numbers. Although it seems to be a~trivial shortcut for a~couple of
-\type{\ifnum x<0} tests, as a~primitive it is more friendly in usage and works a~bit faster.
+This primitive works like the standard \type{\ifnum} condition check,
+except that it compares absolute values of numbers. Although it seems to
+be a trivial shortcut for a~couple of \type{\ifnum x<0} tests, as a
+primitive it is more friendly in usage and works a bit faster.
 \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\ifpdfabsdim} \Whatever{expandable}}}
@@ -4692,12 +4707,13 @@ as for \Tex{\pdfliteral} primitive. \introduced{1.40.0}
 
 \bookmark{\tex{pdfcolorstack}}
 
-The command operates on the stack of a given number. If \Something{stack action}
-is \Literal{push} keyword, the new value provided as \Something{general text}
-is inserted into the top of the graphic stack and becomes the current stack
-value. If followed by \Literal{pop}, the top value is removed from the stack
-and the new top value becomes the current. \Literal{set} keyword replaces the
-current value with \Something{general text} without changing the stack size.
+The command operates on the stack of a given number. If \Something{stack
+action} is \Literal{push} keyword, the new value provided as
+\Something{general text} is inserted into the top of the graphic stack
+and becomes the current stack value. If followed by \Literal{pop}, the
+top value is removed from the stack and the new top value becomes the
+current. \Literal{set} keyword replaces the current value with
+\Something{general text} without changing the stack size.
 \Literal{current} keyword instructs just to use the current stack value
 without modifying the stack at all. \introduced{1.40.0}
 
@@ -4715,21 +4731,22 @@ problem with three new primitives.
 
 \bookmark{\tex{pdfsetmatrix}}
 
-Afine transformations are normally expressed with six numbers. First four
-(no unit) values defining scaling, rotating and skewing, plus two extra
-dimensions for shifting. Since the translation is handled by \TeX\ itself,
-\Tex{\pdfsetmatrix} primitive expects as an argument a string containing
-just first four numbers of the transformation separated by a space and assumes two
-position coordinates to be 0. In example, \type{\pdfsetmatrix{0.87 -0.5 0.5 0.87}}
-rotates the current space by 30 degrees, inserting \type{0.87 -0.5 0.5 0.87 0 0 cm}
-into the content stream. \introduced{1.40.0}
+Afine transformations are normally expressed with six numbers. First
+four (no unit) values defining scaling, rotating and skewing, plus two
+extra dimensions for shifting. Since the translation is handled by \TeX\
+itself, \Tex{\pdfsetmatrix} primitive expects as an argument a string
+containing just the first four numbers of the transformation separated
+by a space and assumes two position coordinates to be~0. In example,
+\type{\pdfsetmatrix{0.87 -0.5 0.5 0.87}} rotates the current space by 30
+degrees, inserting \type{0.87 -0.5 0.5 0.87 0 0 cm} into the content
+stream. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfsave}}}
 
 \bookmark{\tex{pdfsave}}
 
-The command saves the current transformation by inserting \type{q} operator into the
-content stream. \introduced{1.40.0}
+The command saves the current transformation by inserting \type{q}
+operator into the content stream. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfrestore}}}
 
@@ -4756,10 +4773,10 @@ and false otherwise.
 
 \bookmark{\tex{ifpdfprimitive}}
 
-This condition checks if the following control sequence has its primitive
-meaning. If it has, \type{\ifpdfprimitive} returns true. In any other case
-(redefined, made \type{\undefined}, has never been primitive) false is returned.
-\introduced{1.40.0}
+This condition checks if the following control sequence has its
+primitive meaning. If it has, \type{\ifpdfprimitive} returns true. In
+any other case (redefined, made \type{\undefined}, has never been
+primitive) false is returned.  \introduced{1.40.0}
 
 
 \pdftexprimitive {\Syntax {\Tex {\pdfcreationdate} \Whatever{expandable}}}
@@ -4774,12 +4791,12 @@ document, \eg\ for this file {\tt\pdfcreationdate}. \introduced{1.30.0}
 
 \bookmark{\tex{pdfdraftmode}}
 
-When set to 1 (or switched on by the commandline switch \type{-draftmode}) \PDFTEX\
-doesn't write the output pdf and doesn't actually read any images but does
-everything else (including writing auxiliary files), thus speeding up
-compilations when you know you need an extra run but don't care about the
-output, e.g. just to get the \BIBTEX\ references right.
-\introduced{1.40.0}
+When set to 1 (or set by the command-line switch \type{-draftmode})
+\PDFTEX\ doesn't write the output pdf and doesn't actually read any
+images but does everything else (including writing auxiliary files),
+thus speeding up compilations when you know you need an extra run but
+don't care about the output, e.g. just to get the \BIBTEX\ references
+right.  \introduced{1.40.0}
 
 
 \pdftexprimitive {\Syntax {\Tex{\pdfinsertht} \Something{integer} \Whatever{expandable}}}
@@ -4819,11 +4836,12 @@ the $y$ coordinate.
 
 \bookmark{\tex{pdfprimitive}}
 
-This command executes the primitive meaning of the following control sequence,
-if it has been redefined or made undefined. If the following control sequence is
-undefined and never was a~primitive, nothing happens and no error is raised.
-If the control sequence was initially expandable, \type{\pdfprimitive}
-expands either. Otherwise \type{\pdfprimitive} doesn't expand. \introduced{1.40.0}
+This command executes the primitive meaning of the following control
+sequence, if it has been redefined or made undefined. If the following
+control sequence is undefined and never was a primitive, nothing happens
+and no error is raised.  If the control sequence was initially
+expandable, \type{\pdfprimitive} expands either. Otherwise
+\type{\pdfprimitive} doesn't expand. \introduced{1.40.0}
 
 
 \pdftexprimitive {\Syntax {\Tex {\pdfretval} \Whatever{read||only

@@ -1,3 +1,7 @@
+2010-11-22  Karl Berry  <karl@gnu.org>
+
+	* pdftex-t.tex: avoid text lines >=80 chars.
+
 2010-11-22  Paul Isambert  <zappathustra@free.fr>
 
         * pdftex-t.tex: fixes for \Something instead of \type
