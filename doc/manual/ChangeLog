@@ -1,6 +1,7 @@
 2010-11-22  Karl Berry  <karl@gnu.org>
 
-	* pdftex-t.tex: Fix \pdfobj example, PDF reference, other tweaks.
+	* pdftex-t.tex: Fix \pdfobj example, PDF reference url,
+	MacTeX much more current than CMacTeX, etc.
 	From Paul I.
 
 	* pdftex-t.tex: avoid text lines >=80 chars.
