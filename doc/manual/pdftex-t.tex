@@ -3269,7 +3269,7 @@ for more details.
 
 This primitive creates an instance of \Something{font} with the widths
 of all glyphs increased by \Something{integer} thousandths of an~em (as set in \Something{font}).
-The effect is letter spacing, but the glyphs are actually larger, so a~single
+The effect is letter spacing, but the glyphs are actually larger (sidebearings are increased), so a~single
 glyph will take more space. For instance, the following creates a~font \type{\lsfont}
 whose glyphs are all 1.2\,pt larger than those of \type{\normalfont}:
 
@@ -3529,7 +3529,7 @@ clears all tags, \type{-6} clears \type{ext_tag} and \type{list_tag},
 \type{-2} clears \type{list_tag}, \type{-1} clears \type{lig_tag},
 and \type{0} or larger does nothing. Changes are irreversible and global.
 
-Conversely, when queried, the primitive return \type{0} if the tag's
+Conversely, when queried, the primitive returns \type{0} if the tag's
 value is \type{no_tag}, \type{1} if \type{lig_tag} is set, \type{2} if
 \type{list_tag} is set or \type{4} (not~3) if \type{ext_tag} is set.
 
@@ -3547,7 +3547,7 @@ The first argument is the name of a~glyph, the second is a~string of Unicode
 numeric values denoting characters. For instance:
 
 \starttyping
-\pdfgentounicode1
+\pdfgentounicode=1
 \pdfglyphtounicode{ff}{0066066}
 \stoptyping
 
@@ -3955,8 +3955,8 @@ are stored in a~table. This primitive returns those dimensions as follows:
 \pdfximage{afile.pdf}
 \pdfximagebbox\pdflastximage 1 % Returns lower-left x
 \pdfximagebbox\pdflastximage 2 % Returns lower-left y
-\pdfximagebbox\pdflastximage 3 % Returns upper-left x
-\pdfximagebbox\pdflastximage 4 % Returns upper-left y
+\pdfximagebbox\pdflastximage 3 % Returns upper-right x
+\pdfximagebbox\pdflastximage 4 % Returns upper-right y
 \stoptyping
 
 \pdftexprimitive {\Syntax {\Tex {\pdflastximagecolordepth} \Whatever{read||only
@@ -4786,7 +4786,7 @@ output, e.g. just to get the \BIBTEX\ references right.
 
 \bookmark{\tex{pdfinsertht}}
 
-If \type{integer} is the number of an insertion class, this command
+If \Something{integer} is the number of an insertion class, this command
 returns the height of the corresponding box at the current time.
 For instance, the following returns \type{12pt} in plain \TEX:
 

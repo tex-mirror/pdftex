@@ -1,3 +1,7 @@
+2010-11-22  Paul Isambert  <zappathustra@free.fr>
+
+        * pdftex-t.tex: fixes for \Something instead of \type
+
 2010-11-19  Karl Berry  <karl@gnu.org>
 
 	* pdftex-t.tex: use \tex{foo} instead of \type{\foo} for bookmarks,
