@@ -774,7 +774,7 @@ can be compressed, where the level of compression can be set with
 page). Let's take a closer look at this stream in object~3. Often
 (but not in our example) there is a transformation matrix, six numbers
 followed by \type{cm}. As in \POSTSCRIPT, the operator comes after the
-operands. Between \type{BT} and \type{ET} comes the text. a font is
+operands. Between \type{BT} and \type{ET} comes the text. A font is
 selected by a \type{Tf} operator, which is given a font resource name
 \type{/F..} and the font size. The actual text goes into \type{()}
 bracket pairs so that it creates a \POSTSCRIPT\ string. The numbers
@@ -813,9 +813,9 @@ the Minion font). So you never really know how it looks exactly at the
 viewer side unless you embed every font.
 
 In this simple file we don't specify in what way the file should be opened,
-for instance full screen or clipped. a closer look at the page object no.~2
+for instance full screen or clipped. A closer look at the page object no.~2
 (\typ{/Type /Page}) shows that a mediabox (\typ{/MediaBox}) is part of the
-page description. a mediabox acts like the (high-resolution) bounding box
+page description. A mediabox acts like the (high-resolution) bounding box
 in a \POSTSCRIPT\ file. \PDFTEX\ users can add dictionary stuff to page
 objects by the \type{\pdfpageattr} primitive.
 
@@ -1192,7 +1192,7 @@ Format generation is enabled by the \type{-ini} option. The default mode
 the option \type{-output-format} to \type{dvi} or \type{pdf}, or by
 setting the \type{\pdfoutput} parameter. The format file then inherits
 this setting, so that a later call to \PDFTEX\ with this format starts
-in the preselected mode (which still can be overrun then). a format
+in the preselected mode (which still can be overrun then). A format
 file can be read in only by the engine that has generated it; a format
 incompatible with an engine leads to a fatal error.
 
@@ -1225,7 +1225,7 @@ pdftex -ini -jobname=pdfelatex *pdflatex.ini
 pdftex -ini -jobname=pdfelatex -etex pdflatex.ini
 \stoptyping
 
-In \CONTEXT\ the generation depends on the interface used. a format using the
+In \CONTEXT\ the generation depends on the interface used. A format using the
 English user interface is generated with
 
 \starttyping
@@ -1564,7 +1564,7 @@ to zero.
 All characters in a {\em fixed||width} font have the same width, while
 characters in a proportional font have different widths. Characters in a {\em
 serif font} have short strokes drawn at an angle on the top and bottom of
-character stems, while sans serif fonts do not have such strokes. a {\em
+character stems, while sans serif fonts do not have such strokes. A {\em
 symbolic font} contains symbols rather than letters and numbers. Characters
 in a {\em script font} resemble cursive handwriting. An {\em all||cap} font,
 which is typically used for display purposes such as titles or headlines,
@@ -2761,7 +2761,7 @@ situation.
 \bookmark{\tex{pdfoutput}}
 
 This parameter specifies whether the output format should be \DVI\ or
-\PDF. a positive value means \PDF\ output, otherwise (default 0) one gets
+\PDF. A positive value means \PDF\ output, otherwise (default 0) one gets
 \DVI\ output.  This primitive is the only one that must be set to produce
 \PDF\ output (unless the commandline option \type{-output-format=pdf}
 is used); all other primitives are optional.  This parameter cannot be
@@ -2770,7 +2770,7 @@ we want \PDF\ output, we have to set \type{\pdfoutput} before \PDFTEX\
 ships out the first page.
 
 When \PDFTEX\ starts complaining about specials, one can be rather sure
-that a macro package is not aware of the \PDF\ mode. a simple way of
+that a macro package is not aware of the \PDF\ mode. A simple way of
 making macros aware of \PDFTEX\ in \PDF\ or \DVI\ mode is:
 
 \starttyping
@@ -2811,7 +2811,7 @@ This integer parameter specifies the level of {\em stream} compression
 (text, inline graphics, and embedded \PNG\ images (only if they are un-
 and re-compressed during the embedding process); all done by the
 \type{zlib} library). Zero means no compression, 1~means fastest,
-9~means best, 2..8 means something in between. a value outside this
+9~means best, 2..8 means something in between. A value outside this
 range will be adjusted to the nearest meaningful value. This parameter
 is read each time \PDFTEX\ starts a stream. Setting
 \type{\pdfcompresslevel=0} is great for \PDF\ stream debugging.
@@ -2868,7 +2868,7 @@ the optional \type{/Extends} key.
 
 This integer parameter specifies the numeric accuracy of real coordinates as written
 to the \PDF\ file. It gives the maximal number of decimal digits after the
-decimal point. Valid values are in range 0..4. a higher value means
+decimal point. Valid values are in range 0..4. A higher value means
 more precise output, but also results in a larger file size and more
 time to display or print. In most cases the optimal value is~2. This
 parameter does not influence the precision of numbers used in raw \PDF\ code,
@@ -2885,7 +2885,7 @@ limit the accuracy to two digits by typing: \type{\twodigitMPoutput}.
 \bookmark{\tex{pdfhorigin}}
 
 This parameter can be used to set the horizontal offset the output box
-from the top left corner of the page. a value of 1~inch corresponds to the
+from the top left corner of the page. A value of 1~inch corresponds to the
 normal \TEX\ offset. This parameter is read when \PDFTEX\ starts shipping
 out a page to the \PDF\ output.
 
@@ -3865,7 +3865,7 @@ expands to the number~\type{2}. \introduced{1.30.0}
 
 \PDF\ provides a mechanism for embedding graphic and textual objects: form
 XObjects.  In \PDFTEX\ this mechanism is accessed by means of \type{\pdfxform},
-\type{\pdflastxform} and \type{\pdfrefxform}. a special kind of XObjects
+\type{\pdflastxform} and \type{\pdfrefxform}. A special kind of XObjects
 are bitmap graphics and for manipulating them similar commands are provided.
 
 \pdftexprimitive {\Syntax {
@@ -4276,7 +4276,7 @@ a whatsit node corresponding to the start of a hyperlink. The whatsit
 node representing the end of the hyperlink is created by
 \type{\pdfendlink}. The dimensions of the link are handled in the
 similar way as in \type{\pdfannot}. Both \type {\pdfstartlink} and
-\type{\pdfendlink} must be in the same level of box nesting. a hyperlink
+\type{\pdfendlink} must be in the same level of box nesting. A hyperlink
 with running width can be multi||line or even multi||page, in which case
 all horizontal boxes with the same nesting level as the boxes containing
 \type{\pdfstartlink} and \type{\pdfendlink} will be treated as part of
@@ -4297,7 +4297,7 @@ annotations do {\em not} obey transformations issued by \type
 
 The \Something{action spec} specifies the action that should be performed
 when the hyperlink is activated while the \Something{user-action spec}
-performs a user||defined action. a typical use of the latter is to specify
+performs a user||defined action. A typical use of the latter is to specify
 a \URL, like \typ {/S /URI /URI (http://www.tug.org/)}, or a named action like
 \typ {/S /Named /N /NextPage}.
 
@@ -4305,15 +4305,15 @@ a \URL, like \typ {/S /URI /URI (http://www.tug.org/)}, or a named action like
 {numid} and \Something{nameid} specify the destination identifier (see
 below). The \Something{page spec} specifies the page number of the
 destination, in this case the zoom factor is given by \Something{general
-text}\unkern. a destination can be performed in another \PDF\ file by
+text}\unkern. A destination can be performed in another \PDF\ file by
 specifying \Something{file spec}\unkern, in which case
 \Something{newwindow spec} specifies whether the file should be opened
-in a new window. a \Something{file spec} can be either a \type{(string)}
+in a new window. A \Something{file spec} can be either a \type{(string)}
 or a \type{<<dictionary>>}. The default behaviour of the
 \Something{newwindow spec} depends on the browser setting.
 
  a \Something{thread-action spec} performs an article thread reading. The
-thread identifier is similar to the destination identifier. a thread can be
+thread identifier is similar to the destination identifier. A thread can be
 performed in another \PDF\ file by specifying a \Something{file spec}\unkern.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfendlink}}}
@@ -4970,7 +4970,7 @@ a value corresponding to the wanted box type.
 To get the right BoundingBox from a \EPS\ file, before converting to \PDF,
 it is necessary to transform the \EPS\ file so that the start point is
 at the (0,0)~coordinate and the page size is set exactly corresponding
-to the BoundingBox. a \PERL\ script (\EPSTOPDF) for this purpose has been
+to the BoundingBox. A \PERL\ script (\EPSTOPDF) for this purpose has been
 written. The \TEXUTIL\ utility script and the \PSTOPDF\ program that comes
 with \GHOSTSCRIPT\ can so a similar job. (Concerning this conversion,
 they can handle complete directories, remove some garbage from files,
@@ -5008,7 +5008,7 @@ images like scanned line and text documents, but for these it has
 typically a much higher compression ratio than the other two pixel
 image formats. The \JBIGTWO\ format is part of the \PDF\ standard since
 version 1.5; native \JBIGTWO\ image inclusion is available in \PDFTEX\
-since version 1.40.0. a \JBIGTWO\ file might contain many images, which
+since version 1.40.0. A \JBIGTWO\ file might contain many images, which
 gives an even better compression ratio than with a single image per file,
 as \JBIGTWO\ encoders can exploit similarities between bit patterns over
 several images. Encoders for \JBIGTWO\ can operate in lossy as well as
@@ -5319,7 +5319,7 @@ Sections then there are none.
 
 The {\bf ``Cover Texts''} are certain short passages of text that are listed,
 as Front-Cover Texts or Back-Cover Texts, in the notice that says that
-the Document is released under this License. a Front-Cover Text may
+the Document is released under this License. A Front-Cover Text may
 be at most 5 words, and a Back-Cover Text may be at most 25 words.
 
  a {\bf ``Transparent''} copy of the Document means a machine-readable copy,
@@ -5329,11 +5329,11 @@ straightforwardly with generic text editors or (for images composed of
 pixels) generic paint programs or (for drawings) some widely available
 drawing editor, and that is suitable for input to text formatters or
 for automatic translation to a variety of formats suitable for input
-to text formatters. a copy made in an otherwise Transparent file
+to text formatters. A copy made in an otherwise Transparent file
 format whose markup, or absence of markup, has been arranged to thwart
 or discourage subsequent modification by \PDF\ viewers is not Transparent.
 An image format is not Transparent if used for any substantial amount
-of text. a copy that is not ``Transparent'' is called {\bf ``Opaque''}.
+of text. A copy that is not ``Transparent'' is called {\bf ``Opaque''}.
 
 Examples of suitable formats for Transparent copies include plain
 ASCII without markup, Texinfo input format, LaTeX input format, SGML
