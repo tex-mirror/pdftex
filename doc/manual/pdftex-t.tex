@@ -1502,7 +1502,7 @@ copied from the embedded \PDF\ file, but instead a local font is opened,
 and all needed glyphs will be taken from the Type~1 font file that is
 mentioned in the map line (see {\em fontfile} below). By this collecting
 mechanism Type~1 glyphs can be shared between several embedded \PDF\
-files and with text that is typeset by \pdfTeX, which helps keeping the
+files and with text that is typeset by \PDFTEX, which helps keeping the
 resulting \PDF\ file size small, if many files with similar Type~1(C)
 fonts are embedded. Replacing Type1 fonts from embedded \PDF\ files
 requires that also a Type1 font file name is in the {\em fontfile} field
@@ -4066,7 +4066,7 @@ being more logical).
 
 This controls the behaviour of \PDFTEX\ when a \PDF\ file is included
 that has a newer version than the one specified by this primitive: If it
-is set to~0, \pdfTeX\ gives only a warning; if it's~1, \pdfTeX\ raises
+is set to~0, \PDFTEX\ gives only a warning; if it's~1, \PDFTEX\ raises
 an error. The command has been introduced in \PDFTEX\ 1.30.0 as
 a shortened synonym of \type{\pdfoptionpdfinclusionerrorlevel}, that is
 now obsolete.
