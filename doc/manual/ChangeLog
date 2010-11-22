@@ -1,7 +1,11 @@
 2010-11-22  Karl Berry  <karl@gnu.org>
 
+	* pdftex-t.tex: Fix \pdfobj example, PDF reference, other tweaks.
+	From Paul I.
+
 	* pdftex-t.tex: avoid text lines >=80 chars.
 	No need for ~ after a and an in English.
+	* pdftex-w.tex: make consistent with pdftex-t.tex.
 
 2010-11-22  Paul Isambert  <zappathustra@free.fr>
 
