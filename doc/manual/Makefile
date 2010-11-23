@@ -7,14 +7,11 @@ mandir=manual
 distdate=`date +%y%m%d`
 distrev=`awk '/Id:/{print $$4; exit}' $(mandir)/pdftex-t.tex`
 
-distall=pdftex-w.tex pdftex-t.txt pdftex-t.tex \
-	pdftex-i.tex syntaxform.awk Makefile makefiles.cmd \
-	pdftex-a.pdf pdftex-l.pdf pdftex-s.pdf \
-	pdftex-syntax.txt README Changelog
+distall=$(distnopdf) pdftex-a.pdf pdftex-l.pdf pdftex-s.pdf
 
 distnopdf=pdftex-w.tex pdftex-t.txt pdftex-t.tex \
 	pdftex-i.tex syntaxform.awk Makefile makefiles.cmd \
-	pdftex-syntax.txt README Changelog
+	pdftex-syntax.txt README ChangeLog
 
 all:	pdftex-a.pdf \
 	pdftex-l.pdf \

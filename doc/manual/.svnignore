@@ -1,0 +1,10 @@
+*.log
+*.pdf
+*.tui
+*.tuo
+*.tmp
+mpgraph.mp
+pdftex-syntax.txt
+pdftex-t-mpgraph.mp
+pdftex-t.txt
+qstex-manual

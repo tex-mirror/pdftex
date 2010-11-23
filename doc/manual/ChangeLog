@@ -1,5 +1,8 @@
 2010-11-22  Karl Berry  <karl@gnu.org>
 
+	* Makefile (distall): use $(distnopdf) instead of duplicating file
+	list.
+
 	* pdftex-t.tex: Fix \pdfobj example, PDF reference url,
 	MacTeX much more current than CMacTeX, etc.
 	From Paul I.
