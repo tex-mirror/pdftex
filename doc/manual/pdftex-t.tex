@@ -2812,7 +2812,7 @@ This integer parameter specifies the level of {\em stream} compression
 (text, inline graphics, and embedded \PNG\ images (only if they are un-
 and re-compressed during the embedding process); all done by the
 \type{zlib} library). Zero means no compression, 1~means fastest,
-9~means best, 2..8 means something in between. A value outside this
+9~means best, $2..8$ means something in between. A value outside this
 range will be adjusted to the nearest meaningful value. This parameter
 is read each time \PDFTEX\ starts a stream. Setting
 \type{\pdfcompresslevel=0} is great for \PDF\ stream debugging.
@@ -2867,16 +2867,17 @@ the optional \type{/Extends} key.
 
 \bookmark{\tex{pdfdecimaldigits}}
 
-This integer parameter specifies the numeric accuracy of real coordinates as written
-to the \PDF\ file. It gives the maximal number of decimal digits after the
-decimal point. Valid values are in range 0..4. A higher value means
-more precise output, but also results in a larger file size and more
-time to display or print. In most cases the optimal value is~2. This
-parameter does not influence the precision of numbers used in raw \PDF\ code,
-like that used in \type{\pdfliteral} and annotation action specifications;
-also multiplication items (\eg\ scaling factors)
-are not affected and are always output with best precision.
-This parameter is read when \PDFTEX\ writes a real number to the \PDF\ output.
+This integer parameter specifies the numeric accuracy of real
+coordinates as written to the \PDF\ file. It gives the maximal number of
+decimal digits after the decimal point. Valid values are in range
+$0..4$. A higher value means more precise output, but also results in a
+larger file size and more time to display or print. In most cases the
+optimal value is~2. This parameter does not influence the precision of
+numbers used in raw \PDF\ code, like that used in \type{\pdfliteral} and
+annotation action specifications; also multiplication items (\eg\
+scaling factors) are not affected and are always output with best
+precision.  This parameter is read when \PDFTEX\ writes a real number to
+the \PDF\ output.
 
 When including huge \METAPOST\ images using \filename {supp-pdf.tex}, one can
 limit the accuracy to two digits by typing: \type{\twodigitMPoutput}.
@@ -3156,15 +3157,15 @@ for the \type{\pdffontexpand} primitive, unless this is given with the
 
 \bookmark{\tex{efcode}}
 
-We didn't yet tell the whole story. One can imagine that some glyphs
-are visually more sensitive to stretching or shrinking than others. Then
-the \type{\efcode} primitive can be used to influence the expandability
-of individual glyphs within a given font, as a factor to the expansion
+We didn't yet tell the whole story. One can imagine that some glyphs are
+visually more sensitive to stretching or shrinking than others. Then the
+\type{\efcode} primitive can be used to influence the expandability of
+individual glyphs within a given font, as a factor to the expansion
 setting from the \type{\pdffontexpand} primitive. The syntax is similar
 to \type{\sfcode} (but with the \Something{font} required), and it
 defaults to~1000, meaning 100\,\% expandability. The given integer value
-is clipped to the range 0..1000, corresponding to a usable expandability
-range of 0..100\,\%. Example:
+is clipped to the range $0..1000$, corresponding to a usable
+expandability range of 0..100\,\%. Example:
 
 \starttyping
 \efcode\somefont`A=800
@@ -3202,8 +3203,8 @@ zero||width character, for which protrusion is activated.
 The amount that a character from a given font may shift into the right
 margin (`character protrusion') is set by the primitive \type {\rpcode}.
 The protrusion distance is the integer value given to \type {\rpcode},
-multiplied with 0.001\,em from the current font. The given integer
-value is clipped to the range $-$1000..1000, corresponding to a usable
+multiplied with 0.001\,em from the current font. The given integer value
+is clipped to the range $-1000..1000$, corresponding to a usable
 protrusion range of $-$1\,em..1\,em. Example:
 
 \starttyping
@@ -3226,7 +3227,7 @@ master's thesis.
 
 This is similar to \type{\rpcode}, but affects the amount by which
 characters may protrude into the left margin. Also here the given integer
-value is clipped to the range $-$1000..1000.
+value is clipped to the range $-1000..1000$.
 
 \pdftexprimitive {\Syntax {\Tex {\leftmarginkern} \Something{box number} \Whatever{expandable}}}
 
@@ -4052,14 +4053,13 @@ page box defaults to the value of \type{\pdfpagebox} as follows:
 %  object, i.\,e.\ the value used at \pdfximage is remembered.
 %    See the PDF Reference for an explanation of the boxes.
 
-
 The integer primitive \type{\pdfforcepagebox} allows to globally
-override the choice of the page box used with \type{\pdfximage}. It takes
-the same values as \type{\pdfpagebox}. The command is
-available starting from \PDFTEX\ 1.30.0, as a shortened synonym of obsolete
-\type{\pdfoptionalwaysusepdfpagebox} instruction... and is itself considered
-obsolete (a mixture of \type{\pdfpagebox} and \Something{image attr spec}
-being more logical).
+override the choice of the page box used with \type{\pdfximage}. It
+takes the same values as \type{\pdfpagebox}. The command is available
+starting from \PDFTEX\ 1.30.0, as a shortened synonym of obsolete
+\type{\pdfoptionalwaysusepdfpagebox} instruction, but is itself
+now considered obsolete --- a mixture of \type{\pdfpagebox} and
+\Something{image attr spec} is better.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfinclusionerrorlevel} \Whatever{integer}}}
 
