@@ -81,6 +81,7 @@ TEXMFSYSCONFIG = $SELFAUTOPARENT/texmf-config
 
 % User texmf trees are allowed as follows.
 % This used to be HOMETEXMF.
+% ~ expands to %USERPROFILE% on Window, $HOME otherwise.
 TEXMFHOME = ~/texmf
 
 % TEXMFVAR, where texconfig stores variable runtime data.
@@ -88,7 +89,7 @@ TEXMFHOME = ~/texmf
 % For sharing this tree with $TEXMFMAIN:
 %   TEXMFVAR = $TEXMFMAIN
 % For using a separate tree:
-%   TEXMFVAR = ~/.texmf-var  # teTeX 3.0 default
+%   TEXMFVAR = ~/.texmf-var  % teTeX 3.0 default
 TEXMFVAR = ~/.texlive2010/texmf-var
 
 % TEXMFCONFIG, where texconfig stores configuration data.
@@ -96,7 +97,7 @@ TEXMFVAR = ~/.texlive2010/texmf-var
 % For sharing this tree with $TEXMFMAIN:
 %   TEXMFCONFIG = $TEXMFMAIN
 % For using a separate tree:
-%   TEXMFCONFIG = ~/.texmf-config  # teTeX 3.0 default
+%   TEXMFCONFIG = ~/.texmf-config  % teTeX 3.0 default
 % For using a separate tree:
 %   TEXMFCONFIG = $SELFAUTOPARENT/texmf-config
 TEXMFCONFIG = ~/.texlive2010/texmf-config
@@ -345,10 +346,10 @@ T1FONTS = .;$TEXMF/fonts/type1//;$OSFONTDIR//
 AFMFONTS = .;$TEXMF/fonts/afm//;$OSFONTDIR//
 
 % TrueType outline fonts.
-TTFONTS = .;$TEXMF/fonts/truetype//;$OSFONTDIR//
+TTFONTS = .;$TEXMF/fonts/{truetype,opentype}//;$OSFONTDIR//
 
 % Opentype outline fonts.
-OPENTYPEFONTS = .;$TEXMF/fonts/opentype//;$OSFONTDIR//
+OPENTYPEFONTS = .;$TEXMF/fonts/{opentype,truetype}//;$OSFONTDIR//
 
 % Type 42 outline fonts.
 T42FONTS = .;$TEXMF/fonts/type42//
@@ -427,6 +428,10 @@ TEX4HTINPUTS = .;$TEXMF/tex4ht/base//;$TEXMF/tex4ht/ht-fonts/{$TEX4HTFONTSET}//
 % TeXworks editor configuration and settings
 TW_LIBPATH = $TEXMFCONFIG/texworks
 TW_INIPATH = $TW_LIBPATH
+
+% For security, do not look in . for dvipdfmx.cfg, since the D option
+% would allow command execution.
+DVIPDFMXINPUTS = $TEXMF/dvipdfmx
 
 % Find scripts that are distributed/installed in the texmf tree.
 
