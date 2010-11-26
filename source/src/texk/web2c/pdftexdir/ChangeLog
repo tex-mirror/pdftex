@@ -1,3 +1,13 @@
+2010-11-26  Thanh Han The  <thanh@river-valley.org>
+
+        * writet1.c (t1_check_unusual_charstring): switch EOL to space
+        before appending.
+
+2010-11-26  Heiko Oberdiek  <heiko.oberdiek@googlemail.com>
+
+        * pdftex.web (Display the whatsit...): avoid erroneous return.
+        http://sarovar.org/tracker/?func=detail&group_id=106&aid=4317&atid=493
+
 2010-11-17  Karl Berry  <karl@gnu.org>
 
 	* pdftex.web (pdf_out_colorstack): othercases confusion.
