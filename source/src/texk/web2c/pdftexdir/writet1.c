@@ -793,10 +793,9 @@ static char **t1_builtin_enc(void)
                     glyph_names[i] = xstrdup(standard_glyph_names[i]);
             }
             return glyph_names;
-        } else
-            pdftex_fail
-                ("cannot subset font (unknown predefined encoding `%s')",
-                 t1_buf_array);
+        }
+        pdftex_fail("cannot subset font (unknown predefined encoding `%s')",
+                    t1_buf_array);
     }
     /* At this moment "/Encoding" is the prefix of t1_line_array, and the encoding is
      * not a predefined encoding.
@@ -1599,7 +1598,6 @@ static void t1_mark_glyphs(void)
 static void t1_check_unusual_charstring(void)
 {
     char *p = strstr(t1_line_array, charstringname) + strlen(charstringname);
-    char *q;
     int i;
     /* if no number follows "/CharStrings", let's read the next line */
     if (sscanf(p, "%i", &i) != 1) {
