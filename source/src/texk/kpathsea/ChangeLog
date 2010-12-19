@@ -1,3 +1,27 @@
+2010-12-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* tex-make.c (maketex): Factor out common WIN32 & Unix code.
+	[WIN32]: Avoid compiler warnings.
+
+2010-12-01  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* tex-make.c (maketex): [WIN32] spawnvp(_P_NOWAIT, ...) and pipe.
+
+2010-11-29  Karl Berry  <karl@tug.org>
+
+	* doc/kpathsea.texi (Brace expansion): no longer derived from Bash.
+
+2010-11-27  Taco Hoekwater  <taco@elvenkind.com>
+
+	* db.c (kpathsea_db_search_list): one return list for everything,
+	else kpsewhich --all plain returns nothing, even though
+	kpsewhich plain works.  Report from Paul Isambert,
+	25 Nov 2010 19:09:21.
+
+2010-11-27  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.test: test this.
+
 2010-11-18  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* tex-glyph.c (try_format): Drop unused params fontname and dpi;
