@@ -16044,6 +16044,7 @@ procedure pdf_read_dummy_font;
 begin
     if pdf_dummy_font = null_font then begin
         pdf_dummy_font := read_font_info(null_cs, "dummy-space", "", one_bp);
+        pdf_mark_char(pdf_dummy_font, 32);
     end;
 end;
 
@@ -16052,7 +16053,6 @@ procedure pdf_insert_interword_space;
 begin
     pdf_read_dummy_font;
     pdf_set_font(pdf_dummy_font);
-    pdf_mark_char(pdf_dummy_font, 32);
     pdf_print("( )Tj");
 end;
 
@@ -19200,10 +19200,8 @@ pdf_end_dict
 
 @ @d struct_element_present == (head_tab[obj_type_struct_elem] <> 0)
 @<Write /StructParents if needed@>=
-if struct_element_present then begin
-    pdf_print("/StructParents ");
-    pdf_print_int_ln(total_pages - 1);
-end;
+if struct_element_present then
+    write_structparents(true);
 
 @ @<Generate parent pages object@>=
 if total_pages mod pages_tree_kids_max = 1 then begin
@@ -19295,6 +19293,15 @@ begin
     flush_node_list(p);
 end;
 
+procedure write_structparents(plural: boolean); {write StructParents entry}
+begin
+    if plural then
+        pdf_print("/StructParents ")
+    else
+        pdf_print("/StructParent ");
+    pdf_print_int_ln(total_pages - 1);
+end;
+
 @ @<Write out pending raw objects@>=
 if pdf_obj_list <> null then begin
     k := pdf_obj_list;
@@ -19380,6 +19387,8 @@ if pdf_annot_list <> null then begin
         pdf_print_ln("/Type /Annot");
         pdf_print_toks_ln(pdf_annot_data(i));
         pdf_rectangle(pdf_left(i), pdf_top(i), pdf_right(i), pdf_bottom(i));
+        if pdf_annot_marked(i) > 0 then
+            write_structparents(false);
         pdf_end_dict;
         k := link(k);
     end;
