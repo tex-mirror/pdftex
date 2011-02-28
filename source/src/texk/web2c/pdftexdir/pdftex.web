@@ -16326,8 +16326,7 @@ well.
 @d obj_type_ximage              == 8 {index of linked list of XObject image}
 @d obj_type_thread              == 9 {index of linked list of num article threads}
 @d obj_type_struct_elem         == 10 {index of linked list of structure elements}
-@d obj_type_parent_elem         == 11 {index of linked list of parent elements}
-@d head_tab_max                 == obj_type_parent_elem {max index of |head_tab|}
+@d head_tab_max                 == obj_type_struct_elem {max index of |head_tab|}
 
 @d obj_page_created == obj_aux
 
@@ -16439,8 +16438,8 @@ destination |pdf_left| and |pdf_top| are used for some types of destinations}
 @d pdf_link_action(#)      == link(# + 5) {pointer to action structure}
 @d pdf_annot_objnum(#)     == mem[# + 6].int {object number of corresponding object}
 @d pdf_link_objnum(#)      == mem[# + 6].int {object number of corresponding object}
-@d pdf_annot_marked(#)     == info(# + 7) {is this annotation marked?}
-@d pdf_link_marked(#)      == info(# + 7) {is this link annotation marked?}
+@d pdf_annot_parent(#)     == mem[# + 7].int {logical parent of this annotation; first set to parent id, later set to StructParent value}
+
 
 @# {types of actions}
 @d pdf_action_page         == 0 {GoTo action}
@@ -16536,8 +16535,6 @@ so we can use this field for both}
 @d pdf_mc_attr(#)           == link(# + 2)      {MC attr; token list}
 @d pdf_mc_endtext(#)        == info(# + 3)      {end text section before writting MC data?}
 @d pdf_mc_prio(#)           == link(# + 3)      {priority for sorting between siblings}
-@d pdf_mc_is_link_elem(#)   == info(# + 4)      {is this a link element?}
-@d pdf_mc_link_objr(#)      == link(# + 4)      {object ref of link}
 
 @# {data structure for struct element nodes}
 @d pdf_se_node_size         == 3
@@ -16548,16 +16545,16 @@ so we can use this field for both}
 
 @# {data structure for kids of a SE in |pdf_mem|; the type
     |pdfmem_se_kid_type| determines the next fields}
-@d pdfmem_se_kid_size       == 6
-@d pdfmem_se_kid_type(#)    == pdf_mem[# + 0] {|se_kid_se| or |se_kid_mc|}
+@d pdfmem_se_kid_size       == 5
+@d pdfmem_se_kid_type(#)    == pdf_mem[# + 0] {|se_kid_se| or |se_kid_mc| or |se_kid_annot|}
 @d se_kid_se                == 1
 @d se_kid_mc                == 2
+@d se_kid_annot             == 3
 @d pdfmem_se_kid_next(#)    == pdf_mem[# + 1] {link to next kid}
-@d pdfmem_se_kid_objref(#)  == pdf_mem[# + 2] {obj ref when kid is SE}
+@d pdfmem_se_kid_objref(#)  == pdf_mem[# + 2] {obj ref when kid is SE or annot}
 @d pdfmem_se_kid_mc_id(#)   == pdf_mem[# + 2] {page ref when kid is MC}
 @d pdfmem_se_kid_mc_page(#) == pdf_mem[# + 3] {MICD written to page content when kid is MC}
 @d pdfmem_se_kid_prio(#)    == pdf_mem[# + 4] {priority}
-@d pdfmem_se_kid_link_objr(#)== pdf_mem[# + 5] {object ref of link}
 
 @d obj_se_id                == obj_info
 @d obj_se_ptr               == obj_aux {pointer to |pdf_mem| where data of a MC object is kept}
@@ -19198,10 +19195,17 @@ end;
 @<Write /StructParents if needed@>;
 pdf_end_dict
 
-@ @d struct_element_present == (head_tab[obj_type_struct_elem] <> 0)
+@ @d struct_element_present == (pdf_parent_elem_list <> null)
+
 @<Write /StructParents if needed@>=
-if struct_element_present then
-    write_structparents(true);
+if struct_element_present then begin
+    pdf_create_obj(obj_type_others, pdf_parent_tree_counter);
+    pdf_parent_elem := obj_ptr;
+    pdf_print("/StructParents ");
+    pdf_print_int_ln(pdf_parent_tree_counter);
+    incr(pdf_parent_tree_counter);
+    pdf_append_list(pdf_parent_elem)(pdf_parent_tree_list);
+end;
 
 @ @<Generate parent pages object@>=
 if total_pages mod pages_tree_kids_max = 1 then begin
@@ -19293,15 +19297,6 @@ begin
     flush_node_list(p);
 end;
 
-procedure write_structparents(plural: boolean); {write StructParents entry}
-begin
-    if plural then
-        pdf_print("/StructParents ")
-    else
-        pdf_print("/StructParent ");
-    pdf_print_int_ln(total_pages - 1);
-end;
-
 @ @<Write out pending raw objects@>=
 if pdf_obj_list <> null then begin
     k := pdf_obj_list;
@@ -19387,8 +19382,10 @@ if pdf_annot_list <> null then begin
         pdf_print_ln("/Type /Annot");
         pdf_print_toks_ln(pdf_annot_data(i));
         pdf_rectangle(pdf_left(i), pdf_top(i), pdf_right(i), pdf_bottom(i));
-        if pdf_annot_marked(i) > 0 then
-            write_structparents(false);
+        if pdf_annot_parent(i) >= 0 then begin
+            pdf_print("/StructParent ");
+            pdf_print_int_ln(pdf_annot_parent(i));
+        end;
         pdf_end_dict;
         k := link(k);
     end;
@@ -19396,12 +19393,9 @@ end
 
 @ @<Write out PDF parent elements@>=
 if struct_element_present then begin
-    pdf_create_obj(obj_type_parent_elem, total_pages);
-    pdf_parent_elem := obj_ptr;
-    k := pdf_parent_elem_list;
     pdf_begin_obj(pdf_parent_elem, 1);
-    pdf_out("[");
     k := pdf_parent_elem_list;
+    pdf_out("[");
     while k <> null do begin
         pdf_print_int(info(k));
         pdf_print_ln(" 0 R");
@@ -20161,17 +20155,38 @@ end;
 pdf_parent_tree := pdf_new_objnum;
 pdf_begin_dict(pdf_parent_tree, 1);
 pdf_print_ln("/Nums [");
+{reverse list}
+k := pdf_parent_tree_list;
+l := null;
+while k <> null do begin
+    pdf_DEBUG_int("info(k) = ", info(k));
+    i := link(k);
+    link(k) := l;
+    l := k;
+    k := i;
+end;
+pdf_parent_tree_list := l;
+{write list}
 i := 0;
-reverse_obj_list(obj_type_parent_elem);
-k := head_tab[obj_type_parent_elem];
-while k <> 0 do begin
+k := pdf_parent_tree_list;
+while k <> null do begin
     pdf_print_int(i);
     pdf_out(" ");
-    pdf_print_int(k);
+    pdf_print_int(info(k));
     pdf_print_ln(" 0 R");
-    k := obj_link(k);
+    k := link(k);
     incr(i);
 end;
+{ reverse_obj_list(obj_type_parent_elem); }
+{ k := head_tab[obj_type_parent_elem]; }
+{ while k <> 0 do begin }
+{     pdf_print_int(i); }
+{     pdf_out(" "); }
+{     pdf_print_int(k); }
+{     pdf_print_ln(" 0 R"); }
+{     k := obj_link(k); }
+{     incr(i); }
+{ end; }
 pdf_print_ln("]");
 pdf_end_dict;
 {write the array of direct kids of StructTreeRoot}
@@ -34680,11 +34695,12 @@ begin
         new_annot_whatsit(pdf_annot_node, pdf_annot_node_size);
         pdf_annot_objnum(tail) := k;
 
-        {marked link}
-        if scan_keyword("marked") then
-            pdf_annot_marked(tail) := 1
-        else
-            pdf_annot_marked(tail) := 0;
+        {parent for tagged annotation}
+        if scan_keyword("parent") then begin
+            scan_int;
+            pdf_annot_parent(tail) := cur_val;
+        end else
+            pdf_annot_parent(tail) := -1;
 
         scan_pdf_ext_toks;
         pdf_annot_data(tail) := def_ref;
@@ -35195,13 +35211,6 @@ begin
     else
         pdf_mc_endtext(tail) := 1;
 
-    {scan link element}
-    pdf_mc_link_objr(tail) := 0;
-    if scan_keyword("link") then
-        pdf_mc_is_link_elem(tail) := 1
-    else
-        pdf_mc_is_link_elem(tail) := 0;
-
     {scan parent id}
     scan_int;
     if (cur_val < -1) or (cur_val = 0) then
@@ -35480,8 +35489,9 @@ begin
     pdf_print_ln("/K [");
     i := obj_se_kids(se);
     while i <> 0 do begin
-        if pdfmem_se_kid_type(i) = se_kid_mc then {MC kid}
-        begin
+        pdf_DEBUG_int("pdfmem_se_kid_type(i) = ", pdfmem_se_kid_type(i));
+        case pdfmem_se_kid_type(i) of
+        se_kid_mc: begin
             if pdfmem_se_kid_mc_page(i) = se_page_ref then
                 pdf_print_int_ln(pdfmem_se_kid_mc_id(i))    {print MC seq number only}
             else begin                                      {print MC ref}
@@ -35490,23 +35500,17 @@ begin
                 pdf_print("/MCID "); pdf_print_int_ln(pdfmem_se_kid_mc_id(i));
                 pdf_print_ln(">>");
             end;
+        end;
 
-            {handle marked link element}
-            pdf_DEBUG_int("i = ", i);
-            pdf_DEBUG_int("pdfmem_se_kid_link_objr(i) = ", pdfmem_se_kid_link_objr(i));
-            if pdfmem_se_kid_link_objr(i) <> 0 then begin
-                objr := pdf_new_objnum;
-                obj_aux(objr) := pdfmem_se_kid_link_objr(i);
-                pdf_print_int(objr);
-                pdf_print_ln(" 0 R");
-                pdf_append_list(objr)(pdf_mc_list_objr);
-            end;
-        end else    {SE kid}
-        begin
-            pdfassert(pdfmem_se_kid_type(i) = se_kid_se);
+        se_kid_se,
+        se_kid_annot: begin
             pdf_print_int(pdfmem_se_kid_objref(i));
             pdf_print_ln(" 0 R");
         end;
+
+        othercases confusion("SE kid type");
+        endcases;
+
         i := pdfmem_se_kid_next(i);
     end;
     pdf_print_ln("]");
@@ -35627,8 +35631,10 @@ end;
 pdf_annot_node: begin
     print_esc("pdfannot");
     @<Display <rule spec> for whatsit node created by \pdfTeX@>;
-    if pdf_annot_marked(p) > 0 then 
-        print(" marked");
+    if pdf_annot_parent(p) >= 0 then begin
+        print(" parent");
+        print_int(pdf_annot_parent(p));
+    end;
     print_mark(pdf_annot_data(p));
 end;
 pdf_start_link_node: begin
@@ -35759,8 +35765,6 @@ pdf_start_marked_content_node: begin
     end;
     if pdf_mc_endtext(p) > 0 then
         print(" endtext");
-    if pdf_mc_is_link_elem(p) > 0 then
-        print(" linkelement");
     print(" parent");
     print_int(pdf_mc_parent(p));
     print_char(" ");
@@ -36331,6 +36335,7 @@ thread}
 @!pdf_trailer_toks: pointer; {additional keys of Trailer dictionary}
 @!pdf_struct_tree_root: integer; {object number of /StructTreeRoot}
 @!pdf_parent_tree: integer; {object number of /ParentTree}
+@!pdf_parent_tree_counter: integer; {last index of ParentTree}
 @!pdf_parent_elem: integer; {parent elements for current page}
 @!gen_faked_interword_space: boolean; {flag to turn on/off faked interword spaces}
 
@@ -36349,6 +36354,7 @@ pdf_names_toks := null;
 pdf_catalog_openaction := 0;
 pdf_trailer_toks := null;
 pdf_struct_tree_root := 0;
+pdf_parent_tree_counter := 0;
 gen_faked_interword_space := false;
 
 @ The following procedures are needed for outputing whatsit nodes for
@@ -36463,6 +36469,85 @@ begin
     pdf_bottom(p) := pdf_bottom(p) + margin;
 end;
 
+procedure init_obj_se_data(k: integer); {init data for an obj SE}
+begin
+    obj_se_ptr(k) := pdf_get_mem(pdfmem_se_size);
+    obj_se_parent(k) := 0;
+    obj_se_kids(k) := 0;
+    obj_se_attr(k) := 0;
+end;
+
+function create_se_kid_mem(t: integer): integer; {allocate mem in |pdf_mem|
+for |pdfmem_se_kid_node|}
+var r: integer;
+begin
+    r := pdf_get_mem(pdfmem_se_kid_size);
+    pdfmem_se_kid_type(r) := t;
+    pdfmem_se_kid_next(r) := 0;
+    pdfmem_se_kid_mc_id(r) := 0;    {alias |pdfmem_se_kid_objref|}
+    pdfmem_se_kid_mc_page(r) := 0;
+    create_se_kid_mem := r;
+    pdf_DEBUG_int("create_se_kid_mem() = ", r); 
+end;
+
+procedure add_SE_kid(p: pointer); {get parent of |p|, establish linking between |p| and parent}
+{|p| is a |pdf_start_marked_content_node| or |pdf_annot_node|}
+var i, k, parent_id: integer;
+    objr: integer;
+begin
+    pdfassert(type(p) = whatsit_node);
+    {get parent obj, which is a SE}
+    case subtype(p) of 
+    pdf_start_marked_content_node: begin
+        k := get_obj(obj_type_struct_elem, pdf_mc_parent(p), false);
+        if obj_se_ptr(k) = 0 then {this is a freshly created object}
+            init_obj_se_data(k);
+
+        {save relevant data in |pdf_mem| for building StructTree later}
+        i := create_se_kid_mem(se_kid_mc);
+        pdfmem_se_kid_mc_id(i) := pdf_mcid_counter;
+        pdfmem_se_kid_mc_page(i) := pdf_last_page;
+        pdfmem_se_kid_prio(i) := pdf_mc_prio(p);
+{         pdfmem_se_kid_link_objr(i) := pdf_mc_link_objr(p); }
+{         pdf_DEBUG_int("i = ", i); }
+{         pdf_DEBUG_int("pdfmem_se_kid_link_objr(i) = ", pdfmem_se_kid_link_objr(i)); }
+
+        {insert |i| to kids list of |k|}
+        pdfmem_se_kid_next(i) := obj_se_kids(k); {if |k| has no kids yet then this is 0 => still ok}
+        obj_se_kids(k) := i;
+
+        {add |k| to parent elements list of the current page}
+        pdf_append_list(k)(pdf_parent_elem_list);
+        pdf_DEBUG_int("add_SE_kid(): pdf_start_marked_content_node, k =", k);
+    end;
+
+    pdf_annot_node: begin
+        k := get_obj(obj_type_struct_elem, pdf_annot_parent(p), false);
+        if obj_se_ptr(k) = 0 then {this is a freshly created object}
+            init_obj_se_data(k);
+
+        {save relevant data in |pdf_mem| for building StructTree later}
+        i := create_se_kid_mem(se_kid_annot);
+        objr := pdf_new_objnum;
+        obj_aux(objr) := pdf_annot_objnum(p);
+        pdfmem_se_kid_objref(i) := objr;
+        pdf_append_list(objr)(pdf_mc_list_objr);
+
+        {insert |i| to kids list of |k|}
+        pdfmem_se_kid_next(i) := obj_se_kids(k); {if |k| has no kids yet then this is 0 => still ok}
+        obj_se_kids(k) := i;
+
+        {add parent to ParentTree; NB: don't create a new object, since it's the parent itself}
+        pdf_append_list(k)(pdf_parent_tree_list);
+        pdf_annot_parent(p) := pdf_parent_tree_counter; {here we use |pdf_annot_parent| to save StructParent}
+        incr(pdf_parent_tree_counter);
+        pdf_DEBUG_int("add_SE_kid(): pdf_annot_node, k =", k);
+    end;
+    othercases confusion("add_SE_kid()");
+    endcases;
+end;
+
+
 procedure do_annot(p, parent_box: pointer; x, y: scaled);
 var mc_node: pointer;
 begin
@@ -36475,20 +36560,19 @@ begin
     set_rect_dimens(p, parent_box, x, y,
                     pdf_width(p), pdf_height(p), pdf_depth(p), 0);
 
-    {handle MC link element}
-    if pdf_annot_marked(p) > 0 then begin
-    {we expect that |pdf_mc_last_marked_link_element| has been set}
-        pdf_DEBUG("marked link");
-        if pdf_mc_last_marked_link_element <> null then begin
-            mc_node := pdf_mc_last_marked_link_element;
-            pdf_mc_link_objr(mc_node) :=  pdf_annot_objnum(p);
-            pdf_mc_is_link_elem(mc_node) := 0;
-            pdf_mc_last_marked_link_element := null;
-            do_marked_content(mc_node, false);
-        end else begin
-            pdf_error("ext4", "pdf_mc_last_marked_link_element not set");
-        end;
-    end;
+    {handle parent for tagged annotation}
+    if pdf_annot_parent(p) >= 0 then  {parent given => add this annot to kid list of its parent}
+        add_SE_kid(p);
+{         pdf_DEBUG("marked link"); }
+{         if pdf_mc_last_marked_link_element <> null then begin }
+{             mc_node := pdf_mc_last_marked_link_element; }
+{             pdf_mc_link_objr(mc_node) :=  pdf_annot_objnum(p); }
+{             pdf_mc_is_link_elem(mc_node) := 0; }
+{             pdf_mc_last_marked_link_element := null; }
+{             do_marked_content(mc_node, false, true); }
+{         end else begin }
+{             pdf_error("ext4", "pdf_mc_last_marked_link_element not set"); }
+{         end; }
 
     obj_annot_ptr(pdf_annot_objnum(p)) := p;
     pdf_append_list(pdf_annot_objnum(p))(pdf_annot_list);
@@ -37010,11 +37094,13 @@ end;
 @!pdf_mc_stack_ptr: small_number;
 @!pdf_mc_last_marked_link_element: pointer; {last node of type marked link elements}
 @!pdf_mc_list_objr: pointer; {this list holds all the OBJR created during |pdf_print_se_kids()|}
+@!pdf_parent_tree_list: pointer; {this list holds objects for ParentTree num tree}
 
 @ @<Set init...@>=
 pdf_mc_stack_ptr := 0;
 pdf_mc_last_marked_link_element := null;
 pdf_mc_list_objr := null;
+pdf_parent_tree_list := null;
 
 @ @<Declare procedures needed in |pdf_hlist_out|, |pdf_vlist_out|@>=
 procedure push_mc_node(p: pointer);
@@ -37034,43 +37120,12 @@ begin
     decr(pdf_mc_stack_ptr);
 end;
 
-procedure init_obj_se_data(k: integer); {init data for an obj SE}
-begin
-    obj_se_ptr(k) := pdf_get_mem(pdfmem_se_size);
-    obj_se_parent(k) := 0;
-    obj_se_kids(k) := 0;
-    obj_se_attr(k) := 0;
-end;
-
-function create_se_kid_mem(t: integer): integer; {allocate mem in |pdf_mem|
-for |pdfmem_se_kid_node|}
-var r: integer;
-begin
-    r := pdf_get_mem(pdfmem_se_kid_size);
-    pdfmem_se_kid_type(r) := t;
-    pdfmem_se_kid_next(r) := 0;
-    pdfmem_se_kid_mc_id(r) := 0;    {alias |pdfmem_se_kid_objref|}
-    pdfmem_se_kid_mc_page(r) := 0;
-    pdfmem_se_kid_link_objr(r) := 0;
-    create_se_kid_mem := r;
-    pdf_DEBUG_int("create_se_kid_mem() = ", r); 
-end;
-
 procedure do_marked_content(p: pointer; pending: boolean); 
-{output |pdf_start_marked_content_node|; if |pending| is true then this is a
-node from the MC stack}
-var i, j, k: integer;
+{output |pdf_start_marked_content_node|; 
+if |pending| is true then this is a node from the MC stack}
 begin
     if not is_shipping_page then
         pdf_error("ext4", "structure element cannot be inside an XForm");
-
-    {if this is a link element, postpone processing this node until the next annotation}
-    if pdf_mc_is_link_elem(p) > 0 then begin
-        if pdf_mc_last_marked_link_element <> null then
-            pdf_error("ext4", "invalid value of pdf_mc_last_marked_link_element");
-        pdf_mc_last_marked_link_element := p;
-        return;
-    end;
 
     pdf_end_string_nl;
 
@@ -37086,29 +37141,8 @@ begin
     {sync pos before writting data, to avoid pen position afterward}
     pdf_sync_pos;
 
-    if pdf_mc_parent(p) <> -1 then {parent given => add this MC to StructTree}
-    begin
-        {get parent obj, which is a SE}
-        k := get_obj(obj_type_struct_elem, pdf_mc_parent(p), false);
-        if obj_se_ptr(k) = 0 then {this is a freshly created object}
-            init_obj_se_data(k);
-
-        {save relevant data in |pdf_mem| for building StructTree later}
-        i := create_se_kid_mem(se_kid_mc);
-        pdfmem_se_kid_mc_id(i) := pdf_mcid_counter;
-        pdfmem_se_kid_mc_page(i) := pdf_last_page;
-        pdfmem_se_kid_prio(i) := pdf_mc_prio(p);
-        pdfmem_se_kid_link_objr(i) := pdf_mc_link_objr(p);
-        pdf_DEBUG_int("i = ", i);
-        pdf_DEBUG_int("pdfmem_se_kid_link_objr(i) = ", pdfmem_se_kid_link_objr(i));
-
-        {insert |i| to kids list of |k|}
-        pdfmem_se_kid_next(i) := obj_se_kids(k); {if |k| has no kids yet then this is 0 => still ok}
-        obj_se_kids(k) := i;
-
-        {add |k| to parent elements list of the current page}
-        pdf_append_list(k)(pdf_parent_elem_list);
-    end;
+    if pdf_mc_parent(p) <> -1 then {parent given => add this MC to kid list of its parent}
+        add_SE_kid(p);
 
     {print MC data}
     pdf_print("/");
@@ -37165,6 +37199,7 @@ procedure do_struct_elem(p: pointer);
 {create SE node corresponding to |p|; nothing is written out to PDF contents stream}
 var k, l, m: integer;
 begin
+    pdf_DEBUG_str("do_struct_elem()", "");
     {find and create the actual node if needed, obj ref -> |k|}
     k := find_obj(obj_type_struct_elem, pdf_se_id(p), false);
     if k <> 0 then {|k| was created before; check if it's a forward ref}
