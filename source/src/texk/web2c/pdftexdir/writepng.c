@@ -62,7 +62,7 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 #endif
 
-static int transparent_page_group = -1;
+static int transparent_page_group = 0;
 
 void read_png_info(integer img)
 {
@@ -134,10 +134,10 @@ void read_png_info(integer img)
         /* png with alpha channel in device colours; we have to add a Page
          * Group to make Adobe happy, so we have to create a dummy group object
          */
-        if (transparent_page_group < 1) {
+        if (transparent_page_group == 0) {
             transparent_page_group = pdfnewobjnum();
         }
-        if (pdfpagegroupval < 1) {
+        if (pdfpagegroupval == 0) {
             pdfpagegroupval = transparent_page_group;
         }
         img_group_ref(img) = pdfpagegroupval;
@@ -534,7 +534,7 @@ static boolean transparent_page_group_was_written = false;
 static void write_additional_png_objects(void)
 {
     if (last_png_needs_page_group) {
-        if (!transparent_page_group_was_written && transparent_page_group > 1) {
+        if (!transparent_page_group_was_written && transparent_page_group > 0) {
             // create new group object
             transparent_page_group_was_written = true;
             pdfbeginobj(transparent_page_group, 2);
