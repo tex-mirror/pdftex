@@ -1,4 +1,4 @@
-$Id: README 20645 2010-12-03 09:05:05Z peter $
+$Id: README 20965 2011-01-07 15:22:43Z peter $
 Public domain.  Originally created by Karl Berry, 2005.
 
 Libraries we compile for TeX Live.
@@ -34,4 +34,4 @@ xpdf 3.02pl4 - http://www.foolabs.com/xpdf/
 
 zlib 1.2.5 - http://www.zlib.net/ - used by many
 
-zziplib 0.13.59 - http://zziplib.sourceforge.net/ - used by luatex
+zziplib 0.13.60 - http://zziplib.sourceforge.net/ - used by luatex

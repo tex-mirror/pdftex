@@ -1,3 +1,38 @@
+2011-01-31  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* writepng.c: Remove png-1.2 cruft.
+
+2011-01-31  Thomas Klausner  <tk@giga.or.at>
+
+	* writepng.c: Fix to build with png-1.5 (and avoid `deprecated'
+	warnings with png-1.4). The transformations part is removed on
+	recommendation by John Bowler (a png developer).
+
+2011-01-14  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Adapt to ../etexdir/etex.ch:
+	Mention \protected in error and help messages only when in
+	in extended mode.
+
+2011-01-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.mak, pdftex.mk (removed): Obsolete.
+
+2011-01-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/pdftex.am (pdftex_ch_srcs): Added enctex.ch.
+
+2011-01-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftexextra.in: Renamed ...
+	* pdftexextra.h: ... into this; #include {e,pdf}tex_version.h
+	for {E,PDF}TEX_VERSION.
+
+	* pdftexextra.c (new): #include <pdftexd.h> and <lib/texmfmp.c>.
+
+	* am/pdftex.am: pdftexextra.[ch] are now distributed;
+	create {e,pdf}tex_version.h instead of {e,pdf}tex.version. 
+
 2010-12-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* writet1.c: Drop unreachable code (after pdftex_fail).

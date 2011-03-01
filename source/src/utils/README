@@ -1,4 +1,4 @@
-$Id: README 20752 2010-12-15 13:26:28Z peter $
+$Id: README 21469 2011-02-19 16:27:36Z vvv $
 Public domain.  Originally written 2005 by Karl Berry.
 
 Extra utilities we (optionally) compile for TeX Live.
@@ -12,7 +12,7 @@ asymptote 2.02 - checked 12jul10
 chktex 1.6.4 - checked 3may10
   http://baruch.ev-en.org/proj/chktex/chktex-1.6.4.tar.gz
 
-dialog 1.1-20100428 - checked 26oct10
+dialog 1.1-20110118 - checked 19jan11
   ftp://invisible-island.net/dialog/dialog.tar.gz
 
 ps2eps 1.68 - checked 15dec10
@@ -64,9 +64,9 @@ clisp_builddir=$clisp_basedir/clisp-build
 mkdir $clisp_toolsdir
 
 cd $clisp_basedir
-wget http://ftp.gnu.org/gnu/libsigsegv/libsigsegv-2.8.tar.gz
-gzip -dc libsigsegv-2.8.tar.gz | tar xf -
-cd libsigsegv-2.8
+wget http://ftp.gnu.org/gnu/libsigsegv/libsigsegv-2.9.tar.gz
+gzip -dc libsigsegv-2.9.tar.gz | tar xf -
+cd libsigsegv-2.9
 ./configure --prefix=$clisp_toolsdir && make && make check && make install
 
 # you may need this hack on 64-bit systems
@@ -74,9 +74,9 @@ cd libsigsegv-2.8
 ln -s lib $clisp_toolsdir/lib64
 
 cd $clisp_basedir
-wget http://ftp.gnu.org/gnu/clisp/release/2.48/clisp-2.48.tar.gz
-gzip -dc clisp-2.48.tar.gz | tar xf -
-cd clisp-2.48
+wget http://ftp.gnu.org/gnu/clisp/release/2.49/clisp-2.49.tar.gz
+gzip -dc clisp-2.49.tar.gz | tar xf -
+cd clisp-2.49
 # On FreeBSD/amd64, add --disable-mmap.
 ./configure --with-libsigsegv-prefix=$clisp_toolsdir --without-readline \
   --disable-nls \

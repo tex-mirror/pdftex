@@ -37,6 +37,7 @@ DISABLE_SYSTEM_LIBS="\
     --without-system-teckit \
     --without-system-xpdf \
     --without-system-zlib \
+    --without-system-zziplib \
 "
 CFG_OPTS="$CFG_OPTS $DISABLE_SYSTEM_LIBS"
 

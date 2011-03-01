@@ -1,5 +1,7 @@
-This is ../../../../texk/kpathsea/doc/kpathsea.info, produced by
-makeinfo version 4.13 from ../../../../texk/kpathsea/doc/kpathsea.texi.
+This is
+/Users/thanh/pdftex/src/pdftex-supelec-stable/source/src/texk/kpathsea/doc/kpathsea.info,
+produced by makeinfo version 4.13 from
+/Users/thanh/pdftex/src/pdftex-supelec-stable/source/src/texk/kpathsea/doc/kpathsea.texi.
 
 This file documents the Kpathsea library for path searching.
 
@@ -40,7 +42,7 @@ Kpathsea library
 
 This manual documents how to install and use the Kpathsea library for
 filename lookup.  It corresponds to version 6.0.0, released in
-April 2010.
+November 2010.
 
 * Menu:
 
@@ -61,7 +63,7 @@ File: kpathsea.info,  Node: Introduction,  Next: Installation,  Prev: Top,  Up: 
 **************
 
 This manual corresponds to version 6.0.0 of the Kpathsea library,
-released in April 2010.
+released in November 2010.
 
    The library's fundamental purpose is to return a filename from a
 list of directories specified by the user, similar to what shells do
@@ -1063,8 +1065,8 @@ also be passed:
      Sets the Metafont mode to NAME.
 
 `--bdpi NUM'
-     Sets the the "base dpi" for the font.  This must match the mode
-     being used.
+     Sets the "base dpi" for the font.  This must match the mode being
+     used.
 
 `--mag STRING'
      A "magstep" string suitable for the Metafont `mag' variable.  This
@@ -1237,166 +1239,27 @@ File: kpathsea.info,  Node: unixtex.ftp,  Next: Reporting bugs,  Prev: TeX direc
 2.5 `unixtex.ftp': Obtaining TeX
 ================================
 
-This is `ftp://ftp.tug.org/tex/unixtex.ftp', last updated 26 December
-2003.  Also available as `http://www.tug.org/unixtex.ftp'.  The IP
-address is currently `[130.225.2.178]'.  It is also in Kpathsea source
-distributions as `etc/unixtex.ftp' (although the network version is
-usually newer).  Mail <tex-k@tug.org> with comments or questions.
+This is `ftp://ftp.tug.org/tex/unixtex.ftp', last updated 13 June 2010.
+Also available as `http://www.tug.org/unixtex.ftp'.  Email
+<tex-k@tug.org> with comments or questions.
 
-   Following are general instructions for Unix or other sites who wish
-to acquire the Web2c distribution, (plain) TeX, LaTeX (2e), BibTeX,
-Metafont, MetaPost, DVI processors for the X window system, PostScript,
-the PCL language in the HP LaserJet, and related programs.  They are
-oriented towards building from the original sources, though some
-information on alternative packages is included in the last section.
-See also `http://www.tug.org/web2c/', the Web2c and Kpathsea home page.
+   The principal free TeX distribution for Unix-like systems is TeX
+Live, on the web at `http://tug.org/texlive'.  The pages there describe
+many ways to acquire TeX, over the Internet or on physical media, both
+the sources and precompiled binaries for many systems, either
+standalone or as part of various operating system distributions.
 
-   Please note that the Web2c distribution is a bare-bones distribution
-in source form, and building a complete installation from it is a
-non-trivial matter.  For most uses, it is a better idea to install a
-distribution with pre-packaged binaries for your platform.  The
-principal example of such a distribution is TeX Live
-(`http://www.tug.org/texlive/'), which is based on the Web2c sources.
+   Web2C, Kpathsea, Dvips, and Dviljk are no longer released as a
+separate packages.  Their sources are now maintained as part of TeX
+Live.
 
-   Please consider joining the TeX Users Group (TUG) or another user
-group of your choice to help support the maintenance and development of
-the programs you retrieve.  See `http://www.tug.org/join.html' for
-information and the membership registration form, and
-`http://www.tug.org/usergroups.html' for a listing of all user groups.
-
-   For actual installation instructions after obtaining the necessary
-sources, see *note Installation::.  A copy is in the distribution file
-`kpathsea/INSTALL'.
-
-* Menu:
-
-* Electronic distribution::  CTAN and so forth.
-* CD-ROM distribution::
-* Other TeX packages::
-
-
-File: kpathsea.info,  Node: Electronic distribution,  Next: CD-ROM distribution,  Up: unixtex.ftp
-
-2.5.1 Electronic distribution
------------------------------
-
-In many places we refer to CTAN:.  This is _both_ a host name and a
-directory name.  Here are the primary locations:
-
-     `ftp://ctan.tug.org/tex-archive/'    (Vermont, USA)
-     `ftp://ftp.dante.de/tex-archive/'    (Germany)
-     `ftp://ftp.tex.ac.uk/tex-archive/'   (England)
-
-CTAN has many mirrors worldwide; see the top-level file
-`README.mirrors' from one of the sites above or see
-`http://www.tug.org/CTAN.sites'.
-
-   You can also access CTAN via the World Wide Web, electronic mail, or
-NFS.  The same `README.mirrors' file explains how.
-
-   You will need to retrieve some or all of the following archives,
-depending on your needs (don't forget to set binary mode for file
-transfers):
-
-`CTAN:/systems/web2c/web.tar.gz'
-     The original WEB source files, written primarily by Don Knuth.
-     Required unless you already have this `web' version.  (The WEB
-     sources change irregularly with respect to Web2c itself.)  Unpacks
-     into `web2c-VERSION'.
-
-`CTAN:/systems/web2c/web2c.tar.gz'
-     The Web2c system.  Required.  Also unpacks into `web2c-VERSION'.
-
-`CTAN:/systems/web2c/web2c-etex.tar.gz'
-     Additions to the Web2c system for building e-TeX.  Optional.
-     Unpacks into `web2c-VERSION'.
-
-`CTAN:/systems/web2c/etexlib.tar.gz'
-     Additions to the texmf tree needed to build e-TeX.  Optional.
-     Unpacks into `texmf/'.
-
-`CTAN:/systems/web2c/etexdoc.tar.gz'
-     Documentation for e-TeX as an addition to the texmf tree.
-     Optional.  Unpacks into `texmf/'.
-
-`CTAN:/systems/web2c/web2c-omega.tar.gz'
-     Additions to the Web2c system for building Omega.  Optional.
-     Unpacks into `web2c-VERSION'.
-
-`CTAN:/systems/web2c/omegalib.tar.gz'
-     Additions to the texmf tree needed to build Omega.  Optional.
-     Unpacks into `texmf/'.
-
-`CTAN:/systems/web2c/omegadoc.tar.gz'
-     Documentation for Omega as an addition to the texmf tree.
-     Optional.  Unpacks into `texmf/'.
-
-`CTAN:/systems/web2c/web2c-pdftex.tar.gz'
-     Additions to the Web2c system for building pdfTeX.  Optional.
-     Unpacks into `web2c-VERSION'.
-
-`CTAN:/systems/web2c/pdftexlib.tar.gz'
-     Additions to the texmf tree needed to build pdfTeX.  Optional.
-     Unpacks into `texmf/'.
-
-`CTAN:/dviware/xdvik/xdvik.tar.gz'
-     X window system DVI previewer.  Unpacks into `xdvik-VERSION'.
-     Optional.
-
-   Additional drivers, macro files, and other support are needed to
-build a working system.  These are available in teTeX.
-
-   All that said, the originating host for the software above is
-`ftp.tug.org'.  You can retrieve these distributions (but not much
-else) from the `tex/' directory on that host.
-
-
-File: kpathsea.info,  Node: CD-ROM distribution,  Next: Other TeX packages,  Prev: Electronic distribution,  Up: unixtex.ftp
-
-2.5.2 CD-ROM distribution
--------------------------
-
-Numerous organizations distribute various TeX CD-ROM's (and DVD's):
-
-   * Virtually all the TeX user groups collaborate to produce the `TeX
-     Live' distribution once a year; see `http://www.tug.org/texlive/'
-     for more information.
-
-   * The Free Software Foundation's `Source Code CD-ROM' contains the
-     minimal TeX source distribution described in the previous section
-     (i.e., enough to print GNU documentation); email <gnu@gnu.org>.
-
-   * Most GNU/Linux distributions include some TeX package based on TeX
-     Live.
-
-   If you know of additional TeX distributions to add to this list,
-please inform <tex-k@tug.org>.
-
-
-File: kpathsea.info,  Node: Other TeX packages,  Prev: CD-ROM distribution,  Up: unixtex.ftp
-
-2.5.3 Other TeX packages
-------------------------
-
-Many other TeX implementations are available in `CTAN:/systems',
-including ready-to-run distributions for Unix, Amiga, Acorn, VMS,
-Macintosh, DOS, and Windows (in various forms).  Although Web2c has
-support in the source code for many operating systems, and in fact some
-of the other distributions are based on it, it's unlikely to work as
-distributed on anything but Unix.  (Please contribute improvements!)
-
-   The principal user-oriented Unix distribution based on Web2c is the
-teTeX distribution.  It includes complete sources, and runs on all
-modern Unix variants, including Linux. It contains many TeX-related
-programs besides those in the core Web2c.
-
-   The host labrea.stanford.edu is the original source for the files
+   The host ftp.cs.stanford.edu is the original source for the files
 for which Donald Knuth is directly responsible: `tex.web', `plain.tex',
 etc. However, unless you want to build your TeX library tree ab initio,
-it is more reliable and less work to retrieve these files as part of
-the above packages. In any case, labrea is not the canonical source for
-anything except what was created by Stanford TeX project, so do not
-rely on all the files available at that ftp site being up-to-date.
+it is more reliable and less work to retrieve these files as part of a
+larger package. In any case, that ftp site is not the canonical source
+for anything except what was created as part of Stanford TeX project,
+so do not rely on the other files available there being up-to-date.
 
 
 File: kpathsea.info,  Node: Reporting bugs,  Prev: unixtex.ftp,  Up: Installation
@@ -2157,7 +2020,13 @@ single character `0' (zero, not oh).
 helpful to look at the distributed `texmf.cnf', which uses or at least
 mentions most features.  The format of `texmf.cnf' files follows:
 
-   * Comments start with `%' and continue to the end of the line.
+   * Comments start with `%', either at the beginning of a line or
+     preceded by whitespace, and continue to the end of the line.  That
+     is, as with most shells, a `%' in the "middle" of a value does not
+     start a comment.  Examples:
+
+          % this is a comment
+          var = a%b  % but the value of var will be "a%b".
 
    * Blank lines are ignored.
 
@@ -2176,8 +2045,9 @@ mentions most features.  The format of `texmf.cnf' files follows:
 
    * If `.PROGNAME' is present, the definition only applies if the
      program that is running is named (i.e., the last component of
-     `argv[0]' is) PROGNAME or `PROGNAME.exe'.  This allows different
-     flavors of TeX to have different search paths, for example.
+     `argv[0]' is) PROGNAME or `PROGNAME.{exe,bat,cmd,...}'.  Most
+     notably, this allows different flavors of TeX to have different
+     search paths.
 
    * VALUE may contain any characters except `%' and `@'.  (These
      restrictions are only necessary because of the processing done on
@@ -2186,7 +2056,7 @@ mentions most features.  The format of `texmf.cnf' files follows:
      not available on the right-hand side; instead, you must use an
      additional variable (see below for example).  A `;' in VALUE is
      translated to `:' if running under Unix; this is useful to write a
-     single `texmf.cnf' which can be used under both Unix and NT.
+     single `texmf.cnf' which can be used under both Unix and Windows.
 
    * All definitions are read before anything is expanded, so you can
      use variables before they are defined (like Make, unlike most other
@@ -2202,13 +2072,12 @@ Here is a configuration file fragment illustrating most of these points:
      TEXINPUTS.latex2e = $latex2e_inputs
      TEXINPUTS.latex = $latex2e_inputs
 
-   Although this format has obvious similarities to Bourne shell
-scripts--change the comment character to `#', disallow spaces around
-the `=', and get rid of the `.NAME' convention, and it could be run
-through the shell.  But there seemed little advantage to doing this,
-since all the information would have to passed back to Kpathsea and
-parsed there anyway, since the `sh' process couldn't affect its
-parent's environment.
+   This format has obvious similarities to Bourne shell scripts--change
+the comment character to `#', disallow spaces around the `=', and get
+rid of the `.NAME' convention, and it could be run through the shell.
+However, there seemed little advantage in this, since all the
+information would have to passed back to Kpathsea and parsed there
+anyway, since the `sh' process couldn't affect its parent's environment.
 
    The implementation of all this is in `kpathsea/cnf.c'.
 
@@ -2370,13 +2239,11 @@ to `xA1y:xB1y:xA2y:xB2y'.
    This feature can be used to implement multiple TeX hierarchies, by
 assigning a brace list to `$TEXMF', as mentioned in `texmf.in'.
 
-   You can also use the path separator in stead of the comma.  The last
+   You can also use the path separator instead of the comma.  The last
 example could have been written `x{A:B}{1:2}y'.
 
    Brace expansion is implemented in the source file
-`kpathsea/expand.c'.  It is a modification of the Bash sources, and is
-thus covered by the GNU General Public License, rather than the Library
-General Public License that covers the rest of Kpathsea.
+`kpathsea/expand.c'.
 
 
 File: kpathsea.info,  Node: KPSE_DOT expansion,  Next: Subdirectory expansion,  Prev: Brace expansion,  Up: Path expansion
@@ -3729,8 +3596,8 @@ Index
                                                               (line  17)
 * --enable options:                      configure options.   (line  16)
 * --enable-maintainer-mode:              configure options.   (line  34)
-* --enable-shared <1>:                   Shared library.      (line   6)
-* --enable-shared:                       configure options.   (line  27)
+* --enable-shared <1>:                   configure options.   (line  27)
+* --enable-shared:                       Shared library.      (line   6)
 * --engine=NAME:                         Path searching options.
                                                               (line  22)
 * --expand-braces=STRING:                Auxiliary tasks.     (line  16)
@@ -3848,7 +3715,7 @@ Index
 * .pk:                                   Supported file formats.
                                                               (line 154)
 * .pool:                                 Supported file formats.
-                                                              (line  99)
+                                                              (line 123)
 * .pro:                                  Supported file formats.
                                                               (line 160)
 * .rhosts, writable by TeX:              Security.            (line  10)
@@ -3884,14 +3751,13 @@ Index
 * : may not be ::                        Searching overview.  (line  13)
 * :: expansion:                          Default expansion.   (line   6)
 * @VAR@ substitutions:                   Running configure.   (line   6)
-* \, line continuation in texmf.cnf:     Config files.        (line  31)
+* \, line continuation in texmf.cnf:     Config files.        (line  37)
 * \openin:                               Searching overview.  (line  31)
 * \special, suppressing warnings about:  Suppressing warnings.
                                                               (line  31)
 * absolute filenames:                    Searching overview.  (line  52)
 * ac_include, Autoconf extension:        Running configure.   (line   6)
 * access warnings:                       Searching overview.  (line  56)
-* Acorn TeX implementations:             Other TeX packages.  (line   6)
 * AFMFONTS:                              Supported file formats.
                                                               (line  20)
 * AFS:                                   Installing files.    (line  32)
@@ -3906,7 +3772,6 @@ Index
 * alphabetical order, not:               Subdirectory expansion.
                                                               (line   6)
 * Amiga support:                         Custom installation. (line  19)
-* Amiga TeX implementations:             Other TeX packages.  (line   6)
 * Andrew File System, installing with:   Installing files.    (line  32)
 * announcement mailing list:             Mailing lists.       (line   6)
 * ANSI C:                                TeX or Metafont failing.
@@ -3926,26 +3791,22 @@ Index
 * automounter, and configuration:        configure scenarios. (line  29)
 * automounter, and ls-R:                 ls-R.                (line  40)
 * auxiliary tasks:                       Auxiliary tasks.     (line   6)
-* Babel <1>:                             Running make.        (line  51)
-* Babel:                                 Kpathsea application distributions.
+* Babel <1>:                             Kpathsea application distributions.
                                                               (line  28)
+* Babel:                                 Running make.        (line  51)
 * Bach, Johann Sebastian:                Default expansion.   (line  41)
-* backbone of CTAN:                      Electronic distribution.
-                                                              (line   6)
-* backslash-newline:                     Config files.        (line  31)
+* backslash-newline:                     Config files.        (line  37)
 * bash, recommended for running configure: configure shells.  (line   6)
 * basic glyph lookup:                    Basic glyph lookup.  (line   6)
 * Berry, Karl:                           History.             (line  12)
 * BIBINPUTS:                             Supported file formats.
                                                               (line  28)
-* binary mode, for file transfers:       Electronic distribution.
-                                                              (line  20)
-* blank lines, in texmf.cnf:             Config files.        (line  29)
+* blank lines, in texmf.cnf:             Config files.        (line  35)
 * brace expansion:                       Brace expansion.     (line   6)
 * BSD universe:                          Running make.        (line  44)
 * bsh, ok with configure:                configure shells.    (line  14)
 * BSTINPUTS:                             Supported file formats.
-                                                              (line  32)
+                                                              (line 115)
 * bug address:                           Reporting bugs.      (line   8)
 * bug checklist:                         Bug checklist.       (line   6)
 * bug mailing list:                      Mailing lists.       (line   6)
@@ -3962,7 +3823,6 @@ Index
                                                               (line   6)
 * cc, compiling with:                    configure environment.
                                                               (line  11)
-* CD-ROM distributions:                  CD-ROM distribution. (line   6)
 * CFLAGS:                                configure environment.
                                                               (line  14)
 * ChangeLog entry:                       Bug checklist.       (line  55)
@@ -3976,7 +3836,7 @@ Index
                                                               (line  36)
 * cmr10, as fallback font:               Fallback font.       (line  15)
 * cmr10.vf:                              Searching overview.  (line  31)
-* cnf.c:                                 Config files.        (line  80)
+* cnf.c:                                 Config files.        (line  86)
 * cnf.h:                                 Programming with config files.
                                                               (line  23)
 * code sharing:                          Shared library.      (line   9)
@@ -4019,7 +3879,7 @@ Index
 * configuration compiler options:        configure environment.
                                                               (line  23)
 * configuration file, source for path:   Path sources.        (line  17)
-* configuration files as shell scripts.: Config files.        (line  72)
+* configuration files as shell scripts.: Config files.        (line  79)
 * configuration of mktex scripts:        mktex configuration. (line   6)
 * configuration of optional features:    configure options.   (line  16)
 * configure error from sed:              Empty Makefiles.     (line   6)
@@ -4027,15 +3887,11 @@ Index
 * configure options for mktex scripts:   mktex configuration. (line  12)
 * configure, running:                    Running configure.   (line   6)
 * context diff:                          Bug checklist.       (line  55)
-* continuation character:                Config files.        (line  31)
+* continuation character:                Config files.        (line  37)
 * core dumps, reporting:                 Bug checklist.       (line  61)
 * CPPFLAGS:                              configure environment.
                                                               (line  22)
 * crashes, reporting:                    Bug checklist.       (line  61)
-* CTAN, defined:                         Electronic distribution.
-                                                              (line   6)
-* CTAN.sites:                            Electronic distribution.
-                                                              (line  13)
 * custom installation:                   Custom installation. (line   6)
 * CWEBINPUTS:                            Supported file formats.
                                                               (line  43)
@@ -4079,9 +3935,6 @@ Index
                                                               (line   6)
 * distributions, not compiling:          Kpathsea application distributions.
                                                               (line   6)
-* distributions, on CD-ROM:              CD-ROM distribution. (line   6)
-* distributions, via ftp:                Electronic distribution.
-                                                              (line   6)
 * dlclose:                               dlopen.              (line   6)
 * dlopen:                                dlopen.              (line   6)
 * dlsym:                                 dlopen.              (line   6)
@@ -4090,7 +3943,6 @@ Index
                                                               (line 173)
 * DOS compatible names:                  mktex configuration. (line  69)
 * DOS support:                           Custom installation. (line  19)
-* DOS TeX implementations:               Other TeX packages.  (line   6)
 * dosnames:                              mktex configuration. (line  68)
 * dot files:                             ls-R.                (line  33)
 * doubled colons:                        Default expansion.   (line   6)
@@ -4113,8 +3965,6 @@ Index
 * EC fonts, and dynamic source creation: mktex scripts.       (line   6)
 * elt-dirs.c:                            Subdirectory expansion.
                                                               (line  41)
-* email CTAN access:                     Electronic distribution.
-                                                              (line  17)
 * enabling mktex scripts:                mktex configuration. (line   6)
 * ENCFONTS:                              Supported file formats.
                                                               (line  51)
@@ -4191,12 +4041,9 @@ Index
                                                               (line 224)
 * fopen, redefined:                      Debugging.           (line  54)
 * format of external database:           Database format.     (line   6)
-* Free Software Foundation:              CD-ROM distribution. (line  12)
 * FreeBSD configure error:               Empty Makefiles.     (line   6)
 * FreeBSD shells and configure:          configure shells.    (line  19)
-* FSF Source Code CD-ROM:                CD-ROM distribution. (line  12)
-* ftp retrieval:                         Electronic distribution.
-                                                              (line   6)
+* ftp.cs.stanford.edu:                   unixtex.ftp.         (line  20)
 * ftp.tug.org:                           unixtex.ftp.         (line   6)
 * fundamental purpose of Kpathsea:       Introduction.        (line   6)
 * gcc, compiling with:                   configure environment.
@@ -4231,7 +4078,7 @@ Index
 * HOME, as ~ expansion:                  Tilde expansion.     (line   6)
 * HP-UX, compiling on:                   TeX or Metafont failing.
                                                               (line  30)
-* identifiers, characters valid in:      Config files.        (line  41)
+* identifiers, characters valid in:      Config files.        (line  47)
 * illegal pointer combination warnings:  Pointer combination warnings.
                                                               (line   6)
 * include fontmap directive:             Fontmap.             (line  33)
@@ -4260,10 +4107,7 @@ Index
 * kdebug::                               Debugging.           (line 105)
 * kdefault.c:                            Default expansion.   (line  48)
 * Knuth, Donald E.:                      History.             (line   6)
-* Knuth, Donald E., archive of programs by: Other TeX packages.
-                                                              (line  18)
-* Knuth, Donald E., original author:     Electronic distribution.
-                                                              (line  25)
+* Knuth, Donald E., archive of programs by: unixtex.ftp.      (line  20)
 * Korn shell, losing with configure:     configure shells.    (line  14)
 * kpathsae_var_value:                    Programming with config files.
                                                               (line  10)
@@ -4277,8 +4121,8 @@ Index
                                                               (line  23)
 * KPATHSEA_DEBUG <1>:                    Calling sequence.    (line  28)
 * KPATHSEA_DEBUG:                        Debugging.           (line  18)
-* kpathsea_find_file <1>:                Calling sequence.    (line  62)
-* kpathsea_find_file:                    File lookup.         (line  37)
+* kpathsea_find_file <1>:                File lookup.         (line  37)
+* kpathsea_find_file:                    Calling sequence.    (line  62)
 * kpathsea_find_glyph:                   Glyph lookup.        (line  26)
 * kpathsea_finish:                       Calling sequence.    (line 107)
 * kpathsea_in_name_ok:                   Calling sequence.    (line 102)
@@ -4310,7 +4154,6 @@ Index
 * kpsewhich:                             Invoking kpsewhich.  (line   6)
 * Kpsewhich, and debugging:              Debugging.           (line  31)
 * ksh, losing with configure:            configure shells.    (line  14)
-* labrea.stanford.edu:                   Other TeX packages.  (line  18)
 * LaserJet drive:                        Kpathsea application distributions.
                                                               (line  13)
 * last-resort font:                      Fallback font.       (line   6)
@@ -4336,7 +4179,6 @@ Index
 * lines, reading arbitrary-length:       Calling sequence.    (line 112)
 * Linux File System Standard:            mktex configuration. (line 114)
 * Linux shells and configure:            configure shells.    (line  19)
-* Linux, using Web2c:                    CD-ROM distribution. (line  16)
 * lndir for building symlink trees:      configure scenarios. (line  18)
 * loader options:                        configure environment.
                                                               (line  39)
@@ -4354,7 +4196,6 @@ Index
 * ls-R database file:                    ls-R.                (line   6)
 * ls-R, simplest build:                  ls-R.                (line  18)
 * Mach10 configure error:                Empty Makefiles.     (line   6)
-* Macintosh TeX implementations:         Other TeX packages.  (line   6)
 * MacKenzie, David <1>:                  Subdirectory expansion.
                                                               (line  22)
 * MacKenzie, David:                      History.             (line  45)
@@ -4387,8 +4228,6 @@ Index
                                                               (line  99)
 * MFTINPUTS:                             Supported file formats.
                                                               (line 103)
-* mirrors, FTP:                          Electronic distribution.
-                                                              (line  13)
 * MISCFONTS:                             Supported file formats.
                                                               (line 107)
 * mismatched checksum warnings:          Suppressing warnings.
@@ -4446,8 +4285,6 @@ Index
 * NeXT, lacking X11:                     Kpathsea application distributions.
                                                               (line   6)
 * NFS and ls-R:                          ls-R.                (line  40)
-* NFS CTAN access:                       Electronic distribution.
-                                                              (line  17)
 * nomfdrivers:                           mktex configuration. (line  93)
 * nomode:                                mktex configuration. (line  98)
 * non-English typesetting:               Kpathsea application distributions.
@@ -4458,9 +4295,6 @@ Index
 * null pointers, dereferencing:          Bug checklist.       (line  61)
 * numeric debugging values:              Debugging.           (line  34)
 * obtaining TeX:                         unixtex.ftp.         (line   6)
-* obtaining Web2c by ftp:                Electronic distribution.
-                                                              (line   6)
-* obtaining Web2c on CD-ROM:             CD-ROM distribution. (line   6)
 * OCPINPUTS:                             Supported file formats.
                                                               (line 127)
 * OFMFONTS:                              Supported file formats.
@@ -4477,7 +4311,6 @@ Index
 * options for debugging:                 Debugging.           (line   6)
 * options to configure:                  configure options.   (line  16)
 * OS/2 support:                          Custom installation. (line  19)
-* other TeX distributions:               Other TeX packages.  (line   6)
 * OTPINPUTS:                             Supported file formats.
                                                               (line 141)
 * overview of path searching:            Searching overview.  (line   6)
@@ -4533,7 +4366,6 @@ Index
 * PostScript fonts, additional:          Simple installation. (line  60)
 * precompiled executables, instead of installation: Simple installation.
                                                               (line   6)
-* precompiled Unix binaries:             Other TeX packages.  (line  13)
 * preprocessor options:                  configure environment.
                                                               (line  32)
 * preprocessor options, additional:      Running make.        (line  24)
@@ -4563,8 +4395,6 @@ Index
                                                               (line  26)
 * reading arbitrary-length lines:        Calling sequence.    (line 112)
 * README.CONFIGURE:                      Running configure.   (line  15)
-* README.mirrors:                        Electronic distribution.
-                                                              (line  13)
 * recording successful searches:         Logging.             (line   6)
 * relative filenames:                    Searching overview.  (line  52)
 * relative filenames in ls-R:            Installing files.    (line  40)
@@ -4574,7 +4404,7 @@ Index
                                                               (line  17)
 * resolutions, last-resort:              Fallback font.       (line   6)
 * retrieving TeX:                        unixtex.ftp.         (line   6)
-* right-hand side of variable assignments: Config files.      (line  49)
+* right-hand side of variable assignments: Config files.      (line  56)
 * Rokicki, Tom:                          History.             (line  12)
 * root user:                             Tilde expansion.     (line  19)
 * runtime configuration files:           Config files.        (line   6)
@@ -4600,7 +4430,7 @@ Index
                                                               (line 164)
 * sh5, ok with configure:                configure shells.    (line  25)
 * shared library, making:                Shared library.      (line   6)
-* shell scripts as configuration files:  Config files.        (line  72)
+* shell scripts as configuration files:  Config files.        (line  79)
 * shell variables:                       Variable expansion.  (line  17)
 * shell_escape, example for code:        Programming with config files.
                                                               (line  10)
@@ -4668,12 +4498,10 @@ Index
 * testing, post-installation:            Installation testing.
                                                               (line   6)
 * tests, simple:                         Simple installation. (line  79)
-* teTeX:                                 Other TeX packages.  (line  13)
 * TeX directory structure <1>:           TeX directory structure.
                                                               (line   6)
 * TeX directory structure:               Default path features.
                                                               (line  41)
-* TeX distributions besides Web2c:       Other TeX packages.  (line   6)
 * TeX environment variables:             Supported file formats.
                                                               (line   6)
 * TeX failures:                          TeX or Metafont failing.
@@ -4682,7 +4510,6 @@ Index
 * TeX glyph lookup:                      Glyph lookup.        (line   6)
 * TeX help mailing list:                 Mailing lists.       (line  25)
 * TeX hierarchy, one:                    configure scenarios. (line  13)
-* TeX Live CD-ROM:                       CD-ROM distribution. (line   8)
 * TeX support:                           TeX support.         (line   6)
 * TeX Users Group:                       Introduction.        (line  39)
 * tex-file.c:                            File lookup.         (line  37)
@@ -4693,11 +4520,12 @@ Index
                                                               (line  24)
 * tex-k-request@tug.org:                 Mailing lists.       (line   7)
 * tex-k@tug.org (bug address):           Reporting bugs.      (line   8)
-* TEX_HUSH <1>:                          Suppressing warnings.
+* tex.web:                               unixtex.ftp.         (line  20)
+* TEX_HUSH <1>:                          Searching overview.  (line  56)
+* TEX_HUSH:                              Suppressing warnings.
                                                               (line   6)
-* TEX_HUSH:                              Searching overview.  (line  56)
 * TEXBIB:                                Supported file formats.
-                                                              (line  28)
+                                                              (line 111)
 * TEXCONFIG:                             Supported file formats.
                                                               (line  47)
 * TEXDOCS:                               Supported file formats.
@@ -4705,7 +4533,7 @@ Index
 * TEXFONTMAPS:                           Supported file formats.
                                                               (line  84)
 * TEXFONTS:                              Supported file formats.
-                                                              (line  65)
+                                                              (line 207)
 * texfonts.map:                          Fontmap.             (line   6)
 * TEXFORMATS:                            Supported file formats.
                                                               (line  54)
@@ -4730,14 +4558,14 @@ Index
                                                               (line   6)
 * texmf.sed:                             Default path generation.
                                                               (line  17)
-* TEXMFCNF <1>:                          Supported file formats.
+* TEXMFCNF <1>:                          Config files.        (line   6)
+* TEXMFCNF:                              Supported file formats.
                                                               (line  39)
-* TEXMFCNF:                              Config files.        (line   6)
-* TEXMFDBS <1>:                          Supported file formats.
+* TEXMFDBS <1>:                          ls-R.                (line   6)
+* TEXMFDBS:                              Supported file formats.
                                                               (line  81)
-* TEXMFDBS:                              ls-R.                (line   6)
 * TEXMFINI:                              Supported file formats.
-                                                              (line  24)
+                                                              (line  87)
 * TEXMFLOG:                              Logging.             (line  10)
 * TEXMFOUTPUT:                           mktex script names.  (line  40)
 * TEXMFSCRIPTS:                          Supported file formats.
@@ -4751,7 +4579,7 @@ Index
 * TEXPOOL:                               Supported file formats.
                                                               (line 183)
 * TEXPSHEADERS:                          Supported file formats.
-                                                              (line 160)
+                                                              (line 199)
 * TEXSIZES:                              Fallback font.       (line   6)
 * TEXSOURCES:                            Supported file formats.
                                                               (line 176)
@@ -4773,7 +4601,7 @@ Index
 * TTFONTS:                               Supported file formats.
                                                               (line 196)
 * tug.org:                               unixtex.ftp.         (line   6)
-* typeface directory, omitting:          mktex configuration. (line 106)
+* typeface directory, omitting:          mktex configuration. (line 109)
 * ucbinclude, avoiding:                  Running make.        (line  44)
 * Ultrix shells and configure:           configure shells.    (line  25)
 * unable to find files:                  Unable to find files.
@@ -4808,7 +4636,6 @@ Index
 * VFFONTS:                               Supported file formats.
                                                               (line 207)
 * VMS support:                           Custom installation. (line  19)
-* VMS TeX implementations:               Other TeX packages.  (line   6)
 * Vojta, Paul:                           History.             (line  30)
 * Walsh, Norman:                         History.             (line  57)
 * warning about unusable ls-R:           ls-R.                (line  45)
@@ -4826,10 +4653,7 @@ Index
                                                               (line 211)
 * whitespace, in fontmap files:          Fontmap.             (line  28)
 * whitespace, not ignored on continuation lines: Config files.
-                                                              (line  31)
-* Windows TeX implementations:           Other TeX packages.  (line   6)
-* World Wide Web CTAN access:            Electronic distribution.
-                                                              (line  17)
+                                                              (line  37)
 * www.tug.org:                           unixtex.ftp.         (line   6)
 * X11 previewer:                         Kpathsea application distributions.
                                                               (line  25)
@@ -4856,86 +4680,83 @@ Index
 
 
 Tag Table:
-Node: Top1615
-Node: Introduction2259
-Node: History4082
-Node: Installation8174
-Node: Simple installation8964
-Node: Custom installation12547
-Node: Disk space13721
-Node: Kpathsea application distributions14605
-Node: Changing search paths15720
-Node: Default path features16902
-Node: Default path generation18985
-Node: Running configure20428
-Node: configure shells21479
-Node: configure options22531
-Node: configure environment24038
-Node: configure scenarios25840
-Node: Shared library27426
-Node: Running make28440
-Node: Installing files30487
-Node: Cleaning up32434
-Node: Filename database generation33482
-Node: mktex scripts34049
-Node: mktex configuration35326
-Node: mktex script names41145
-Node: mktex script arguments42536
-Node: Installation testing43426
-Node: Security43790
-Node: TeX directory structure46357
-Node: unixtex.ftp50779
-Node: Electronic distribution52789
-Node: CD-ROM distribution55554
-Node: Other TeX packages56369
-Node: Reporting bugs57665
-Node: Bug checklist58400
-Node: Mailing lists62097
-Node: Debugging63306
-Node: Logging68384
-Node: Common problems70254
-Node: Unable to find files71085
-Node: Slow path searching73496
-Node: Unable to generate fonts74873
-Node: TeX or Metafont failing77382
-Node: Empty Makefiles79261
-Node: XtStrings80498
-Node: dlopen81334
-Node: ShellWidgetClass82152
-Node: Pointer combination warnings83784
-Node: Path searching84173
-Node: Searching overview84820
-Node: Path sources88216
-Node: Config files89287
-Node: Path expansion92932
-Node: Default expansion93881
-Node: Variable expansion95951
-Node: Tilde expansion97354
-Node: Brace expansion98334
-Node: KPSE_DOT expansion99439
-Node: Subdirectory expansion99952
-Node: Filename database102303
-Node: ls-R103357
-Node: Filename aliases106251
-Node: Database format107429
-Node: Invoking kpsewhich108442
-Node: Path searching options109388
-Node: Specially-recognized files117552
-Node: Auxiliary tasks118908
-Node: Standard options120733
-Node: TeX support121089
-Node: Supported file formats122380
-Node: File lookup129897
-Node: Glyph lookup131646
-Node: Basic glyph lookup132770
-Node: Fontmap133649
-Node: Fallback font136266
-Node: Suppressing warnings137179
-Node: Programming138284
-Node: Programming overview138797
-Node: Calling sequence141491
-Node: Program-specific files148014
-Node: Programming with config files149037
-Node: Index150349
+Node: Top1705
+Node: Introduction2352
+Node: History4178
+Node: Installation8270
+Node: Simple installation9060
+Node: Custom installation12643
+Node: Disk space13817
+Node: Kpathsea application distributions14701
+Node: Changing search paths15816
+Node: Default path features16998
+Node: Default path generation19081
+Node: Running configure20524
+Node: configure shells21575
+Node: configure options22627
+Node: configure environment24134
+Node: configure scenarios25936
+Node: Shared library27522
+Node: Running make28536
+Node: Installing files30583
+Node: Cleaning up32530
+Node: Filename database generation33578
+Node: mktex scripts34145
+Node: mktex configuration35422
+Node: mktex script names41241
+Node: mktex script arguments42632
+Node: Installation testing43518
+Node: Security43882
+Node: TeX directory structure46449
+Node: unixtex.ftp50871
+Node: Reporting bugs52205
+Node: Bug checklist52940
+Node: Mailing lists56637
+Node: Debugging57846
+Node: Logging62924
+Node: Common problems64794
+Node: Unable to find files65625
+Node: Slow path searching68036
+Node: Unable to generate fonts69413
+Node: TeX or Metafont failing71922
+Node: Empty Makefiles73801
+Node: XtStrings75038
+Node: dlopen75874
+Node: ShellWidgetClass76692
+Node: Pointer combination warnings78324
+Node: Path searching78713
+Node: Searching overview79360
+Node: Path sources82756
+Node: Config files83827
+Node: Path expansion87754
+Node: Default expansion88703
+Node: Variable expansion90773
+Node: Tilde expansion92176
+Node: Brace expansion93156
+Node: KPSE_DOT expansion94081
+Node: Subdirectory expansion94594
+Node: Filename database96945
+Node: ls-R97999
+Node: Filename aliases100893
+Node: Database format102071
+Node: Invoking kpsewhich103084
+Node: Path searching options104030
+Node: Specially-recognized files112194
+Node: Auxiliary tasks113550
+Node: Standard options115375
+Node: TeX support115731
+Node: Supported file formats117022
+Node: File lookup124539
+Node: Glyph lookup126288
+Node: Basic glyph lookup127412
+Node: Fontmap128291
+Node: Fallback font130908
+Node: Suppressing warnings131821
+Node: Programming132926
+Node: Programming overview133439
+Node: Calling sequence136133
+Node: Program-specific files142656
+Node: Programming with config files143679
+Node: Index144991
 
 End Tag Table

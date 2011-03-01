@@ -1,3 +1,43 @@
+2011-02-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.in.orig, common.ac.orig, withenable.ac: Remove
+	ancient files.
+	* Makefile.am (EXTRA_DIST): Adapt.
+
+2011-02-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* man/Makefile.am: Use ../am/man1_links.am for manpage links.
+
+2011-02-02  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXMFROOT): new variable, $SELFAUTOPARENT by default,
+	to minimize redistributors' patches with a new Perl updmap.
+
+2011-01-06  Karl Berry  <karl@tug.org>
+
+	* tex-file.c (LUA_SUFFIXES): add .tlu,
+	luatex mail from t34www, 6 Jan 2011 22:04:45.
+
+2011-01-01  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXLIVE_WINDOWS_TRY_EXTERNAL_PERL): doc fixes.
+
+2010-12-27  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (install-exec-hook): Check symlink creation.
+	* man/Makefile.am (install-data-hook): The same.
+
+2010-12-24  Karl Berry  <karl@tug.org>
+
+	* Makefile.am (stamp-paths): ensure that grep is not completely
+	broken, e.g., from GREP_OPTIONS, in which case we'd generate a
+	useless paths.h.
+
+2010-12-18  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am [WIN32]: Skip mktex{lsr,mf,pk,tfm} shell scripts
+	and texhash->mktexlsr symlink.
+
 2010-12-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* tex-make.c (maketex): Factor out common WIN32 & Unix code.
