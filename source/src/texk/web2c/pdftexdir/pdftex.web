@@ -20155,17 +20155,6 @@ end;
 pdf_parent_tree := pdf_new_objnum;
 pdf_begin_dict(pdf_parent_tree, 1);
 pdf_print_ln("/Nums [");
-{reverse list}
-k := pdf_parent_tree_list;
-l := null;
-while k <> null do begin
-    pdf_DEBUG_int("info(k) = ", info(k));
-    i := link(k);
-    link(k) := l;
-    l := k;
-    k := i;
-end;
-pdf_parent_tree_list := l;
 {write list}
 i := 0;
 k := pdf_parent_tree_list;
