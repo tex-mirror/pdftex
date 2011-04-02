@@ -1,3 +1,8 @@
+2011-04-01  Karl Berry  <karl@gnu.org>
+
+	* pdftex-t.tex: Explain \pdfnormaldeviate a bit more fully.
+	Tweak wording of nearby entries.
+
 2010-11-22  Karl Berry  <karl@gnu.org>
 
 	* Makefile (distall): use $(distnopdf) instead of duplicating file

@@ -4573,54 +4573,56 @@ hexadecimal format (same as \type{\pdfescapehex}).
 
 \bookmark{\tex{ifpdfabsnum}}
 
-This primitive works like the standard \type{\ifnum} condition check,
-except that it compares absolute values of numbers. Although it seems to
-be a trivial shortcut for a couple of \type{\ifnum x<0} tests, as a
-primitive it is more friendly in usage and works a bit faster.
+This conditional works like the standard \type{\ifnum}, except that it
+compares absolute values of numbers. Although it seems to be a trivial
+shortcut for a couple of \type{\ifnum x<0} tests, as a primitive it is
+considerably more friendly in usage and works a bit faster.
 \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\ifpdfabsdim} \Whatever{expandable}}}
 
 \bookmark{\tex{ifpdfabsdim}}
 
-Like \type{\ifpdfabsnum}, the primitive works as normal \type{\ifdim} condition check, except
-that it compares absolute values of dimensions. \introduced{1.40.0}
+Analogous to \type{\ifpdfabsnum}, this conditional works like
+\type{\ifdim}, except that it compares absolute values of
+dimensions. \introduced{1.40.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfuniformdeviate} \Something{number} \Whatever{expandable}}}
 
 \bookmark{\tex{pdfuniformdeviate}}
 
-The commands generates a uniformly distributed random integer value between
-0 (inclusive) and \Something{number} (exclusive). This primitive expands to
-a list of tokens. \introduced{1.30.0}
+Generate a uniformly-distributed random integer value between 0
+(inclusive) and \Something{number} (exclusive). This primitive expands
+to a list of tokens. \introduced{1.30.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfnormaldeviate} \Whatever{expandable}}}
 
 \bookmark{\tex{pdfnormaldeviate}}
 
-%MS Hopefully the random number doesn't influce the length of this paragraph;
-%MS otherwise texexec could loop :-)
-The commands generates a random integer value with a mean of 0 and a unit
-of 65\,536, \eg\ $\pdfnormaldeviate$. This primitive expands to a list of
-tokens. \introduced{1.30.0}
+Generate a normally-distributed random integer with a mean of~0 and
+standard deviation 65\,536.  That is, about 68\% of the time, the result
+will be between $-65536$ and $65536$ (one standard deviation away from
+the mean).  About 95\% of results will be within two standard
+deviations, and 99.7\% within three.  This primitive expands to a list
+of tokens. \introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfrandomseed}} \Whatever{read||only
 integer}}
 
 \bookmark{\tex{pdfrandomseed}}
 
-You can use \type{\the\pdfrandomseed} to query the current seed value, so
-you can \eg\ write the value to the log file.
-The initial value of the seed is derived from the system time, and is not
-more than 1\,000\,999\,999 (this ensures that the value can be used with
-commands like \type{\count}). \introduced{1.30.0}
+You can use \type{\the\pdfrandomseed} to query the current seed value,
+so you can \eg\ write the value to the log file.  The initial value of
+the seed is derived from the system time, and is not more than
+1\,000\,999\,999 (this ensures that the value can be used with commands
+like \type{\count}). \introduced{1.30.0}
 
 \pdftexprimitive{\Syntax {\Tex {\pdfsetrandomseed} \Something{number}}}
 
 \bookmark{\tex{pdfsetrandomseed}}
 
-This sets the random seed (\type{\pdfrandomseed}) to a specific value,
-allowing you to re-play sequences of semi-randoms at a later moment.
+Set the random seed (\type{\pdfrandomseed}) to a specific value,
+allowing you to replay sequences of semi-randoms at a later moment.
 \introduced{1.30.0}
 
 %***********************************************************************
@@ -4632,19 +4634,19 @@ integer}}
 
 \bookmark{\tex{pdfelapsedtime}}
 
-The command returns a number that represents the time elapsed from the
-moment of run start. The elapsed time is returned in `scaled seconds', that
-means seconds divided by 65536, \eg\ \PDFTEX\ has run for \the\pdfelapsedtime\
-`scaled seconds' when this paragraph was typeset. Obviously, the command will
-never return a value greater than the highest number available in \TeX: if
-the time exceeds 32767 seconds, the constant value $2^{31}-1$ will be returned.
-\introduced{1.30.0}
+Return a number that represents the time elapsed from the moment of the
+start of the run. The elapsed time is returned in `scaled seconds',
+meaning seconds divided by 65536, \eg\ \PDFTEX\ has run for
+\the\pdfelapsedtime\ `scaled seconds' when this paragraph was
+typeset. Of course, the command will never return a value greater than
+the highest number available in \TeX: if the time exceeds 32767 seconds,
+the constant value $2^{31}-1$ will be returned.  \introduced{1.30.0}
 
 \pdftexprimitive{\type{\pdfresettimer}}
 
 \bookmark{\tex{pdfresettimer}}
 
-The command resets the internal timer so that \type{\pdfelapsedtime}
+Reset the internal timer so that \type{\pdfelapsedtime}
 starts returning micro||time from~0 again. \introduced{1.30.0}
 
 %***********************************************************************
