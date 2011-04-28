@@ -1,3 +1,46 @@
+2011-04-16  Taco Hoekwater  <taco@luatex.org>
+
+	* synctex.c: Rename flags member output => output_p to avoid
+	conflict with macro defined for MinGW32.
+
+2011-04-16  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* synctex-luatex.h (new): moved from ../luatexdir/utils to here.
+
+	* synctex.c (synctexstartinput): When SYNCTEX_GET_CURRENT_NAME()
+	returns "", don't assign "texput" which might later get freed
+	but rather xrealloc and strcpy.
+
+2011-04-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* synctex-e-mem.ch0: Adapt to ../etexdir/etex.ch.
+
+2011-03-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/synctex.am: Use AM_CFLAGS instead of synctex_CFLAGS.
+
+2011-03-14  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* synctex.c: Instead of sed-substituting TEX-OR-MF-OR-MP in
+	#include "synctex-TEX-OR-MF-OR-MP.h", #include SYNCTEX_ENGINE_H
+	and add -DSYNCTEX_ENGINE_H=\"synctex-tex.h\" to CPPFLAGS for TeX
+	and similarly for e-TeX, pdfTeX, and XeTeX.
+	* am/synctex.am: Adapt.
+
+2011-03-12  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Avoid compiler warnings (redo changes from 2010-01-22).
+
+	* synctex_parser_utils.h: Declare synctex_suffix{,_gz} extern ...
+	* synctex_parser.c: ... and instantiate here.
+	* synctex_parser_utils.[ch]: Constify _synctex_last_path_component()
+	return type.
+	* synctex_parser.c (__synctex_scanner_t): Change type of struct
+	members buffer_{cur,start,end} from 'unsigned char *' to 'char *'
+	and remove the casts.
+	(_synctex_class_t synctex_class_*): Declare as non-const.
+	(_synctex_scan_named): Constify string param `name'.
+
 2010-06-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	Reorganize web2c headers.

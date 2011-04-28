@@ -1,3 +1,27 @@
+2011-04-28  Karl Berry  <karl@tug.org>
+
+	* printversion.c (printversionandexit): 2011
+
+2011-04-27  Karl Berry  <karl@tug.org>
+
+	* texmfmp.c (initscreen): do not mention mfw, which is no more.
+	Suggestion from Reinhard Kotucha, tex-k mail 21 Jul 2010 11:40:36.
+
+2011-04-19  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Avoid 'differ in signedness' warnings.
+	texmfmp.c (input_line): Caat input_line2() arg2 to 'char *'.
+
+2011-03-07  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* setupvar.c (setupboundvariable): `program_invocation_name' has
+	been renamed into `kpse_invocation_name'.
+
+2011-03-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmfmp.c (calledit): [__MINGW32__] Drop win32_system() and
+	use system() as for all other systems.
+
 2010-06-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	Reorganize web2c headers.

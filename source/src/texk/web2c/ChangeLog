@@ -1,3 +1,51 @@
+2011-04-28  Karl Berry  <karl@tug.org>
+
+	* doc/web2c.texi (Common options): caveats about the -recorder
+	.fls file name not following the .log in unusual usage.
+	Philipp Stephani, 21 Sep 2010 16:28:58, and my reply 28apr11.
+
+2011-04-19  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Avoid 'differ in signedness' warnings.
+	* cpascal.h: Define ucharcast().
+
+	* bibtex.ch (pds_type): Do not declare as unsigned.
+	(pre_define): Apply ucharcast() to xord[] index.
+
+	* dvicopy.ch (comment): Do not declare as unsigned.
+	(do_pre): Apply ucharcast() to xord[] index.
+
+	* gftodvi.ch (start_gf): Do not declare arg_buffer as unsigned
+	and apply ucharcast() to xord[] index.
+
+	* mf.ch (MF_base_default): Do not declare as unsigned.
+	(pack_buffered_name): Apply ucharcast() to xord[] index.
+	(storebasefile, loadbasefile): cast base_engine to string.
+
+	* tex.ch (TEX_format_default): Do not declare as unsigned.
+	(pack_buffered_name): Apply ucharcast() to xord[] index.
+	(storefmtfile, loadfmtfile): Cast format_engine to string.
+
+2011-03-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: LuaTeX needs poppler at least 0.12, no reason
+	to test for PDFDoc::getPDF*Version(). HAVE_GETPDFMAJORVERSION
+	would yield a conflict for pdfTeX using xpdf or poppler 0.10.
+
+2011-04-04  Karl Berry  <karl@tug.org>
+
+	* doc/ref.txi: add urls for TUGboat.
+
+2011-03-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/texmf.am: Install symbolic links initex->tex and inimf->mf
+	or equivalent MinGW wrappers.
+
+	* am/bootstrap.am: Use AM_CFLAGS instead of ctangle_CFLAGS.
+	* am/cweb.am: Use AM_CFLAGS instead of *_CFLAGS.
+	* am/texmf.am: Use AM_CFLAGS instead of *_CFLAGS.
+	* libmd5/am/md5.am: Use AM_CFLAGS instead of *_CFLAGS.
+
 2011-02-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* Makefile.in.orig, configure.in.orig: Remove ancient files.

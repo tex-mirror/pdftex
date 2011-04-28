@@ -1,3 +1,51 @@
+2011-04-07  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex.ch: Version 2.3, dated April 7, 2011.
+	* etrip/etrip.tex, etrip/etripin.log, etrip/etrip.log,
+	etrip/etrip.fot, etrip/etrip.typ, etrip/etrip.diffs: Adapted.
+
+2011-04-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex.ch: Remove  remove_end_M and insert_end_M (now unused).
+
+2011-03-31  Hironori Kitagawa  <h_kitagawa2001@yahoo.co.jp>
+
+	* etex.ch: TeX formatting.
+
+2011-03-30  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex.ch: Further reduce e-pTeX interferences.
+
+2011-03-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex.ch: Rename box_lrstat into box_lr and define to also work
+	for min_quarterword<0.
+
+2011-03-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/etex.am: Use AM_CFLAGS instead of etex_CFLAGS.
+
+2011-03-27  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex.ch: Reformulate @<Fetch an item in the current node...@>,
+	begin_box, and delete_last to fix a bug in \lastpenalty & Co;
+	further reduce e-pTeX interferences.
+
+2011-03-24  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex.ch: Reformulate begin_box and delete_last to reduce
+	interferences between e-TeX and pTeX.
+
+2011-03-22  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex.ch: Reformulate @<Fetch an item in the current node...@>
+	to reduce interferences between e-TeX and pTeX.
+
+2011-03-18  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex.ch: Define and use the Web macros box_lrstat and
+	set_box_lrstat to reduce interferences between e-TeX and pTeX.
+
 2011-01-17  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* am/etex.am (etrip.diffs): Use $(triptrap_diffs).

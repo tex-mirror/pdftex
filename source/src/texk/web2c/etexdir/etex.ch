@@ -3,33 +3,7 @@
 % to be applied to tex.web in order to define the
 % e-TeX program.
  
-% Note: This file defines etex.web in terms of changes to be applied to
-% tex.web; in terms of a program such as TIE (or equivalent), directories
-% may vary:
-%
-%	tex.web			)
-%	   +			)   =>   tie -m ...   =>   etex.web
-%	etexdir/etex.ch		)
-%
-% In addition, this file is used to define pdfetex.web, a combination
-% of e-TeX and pdfTeX as follows:
-%
-%	tex.web			)
-%	   +			)
-%	etexdir/etex.ch		)
-%	   +			)
-%	pdfetexdir/pdfetex.ch1	)   =>   tie -m ...   =>   pdfetex.web
-%	   +			)
-%	pdftexdir/pdftex.ch	)
-%	   +			)
-%	pdfetexdir/pdfetex.ch2	)
-%
-% where the two (small) files pdfetexdir/pdfetex.ch[12] take care of
-% interferences between e-Tex changes (etexdir/etex.ch) and pdfTeX changes
-% (pdftexdir/pdftex.ch). Consequently, changes in these files have to be
-% coordinated.
-
-% e-TeX is copyright (C) 1999-2010 by P. Breitenlohner (1994,98 by the NTS
+% e-TeX is copyright (C) 1999-2011 by P. Breitenlohner (1994,98 by the NTS
 % team); all rights are reserved. Copying of this file is authorized only if
 % (1) you are P. Breitenlohner, or if (2) you make absolutely no changes to
 % your copy. (Programs such as TIE allow the application of several change
@@ -55,7 +29,7 @@
 % TeX is a trademark of the American Mathematical Society.
 % METAFONT is a trademark of Addison-Wesley Publishing Company.
 @y
-% e-TeX is copyright (C) 1999-2010 by P. Breitenlohner (1994,98 by the NTS
+% e-TeX is copyright (C) 1999-2011 by P. Breitenlohner (1994,98 by the NTS
 % team); all rights are reserved. Copying of this file is authorized only if
 % (1) you are P. Breitenlohner, or if (2) you make absolutely no changes to
 % your copy. (Programs such as TIE allow the application of several change
@@ -115,12 +89,15 @@
 %                 direction typesetting;
 %             fixed a bug in the revised glue rounding code, detected by
 %                 Tigran Aivazian <tigran@@aivazian.fsnet.co.uk>, Oct 2004.
-% Version 2.3 development was started in Feb 2008; released in Mon Year.
+% Version 2.3 development was started in Feb 2008; released in Apr 2011.
 %             fixed a bug in hyph_code handling (\savinghyphcodes)
 %                 reported by Vladimir Volovich <vvv@@vsu.ru>, Feb 2008.
 %             fixed the error messages for improper use of \protected,
-%                 reported by Heiko Oberdiek 
+%                 reported by Heiko Oberdiek
 %                 <heiko.oberdiek@@googlemail.com>, May 2010.
+%             some rearrangements to reduce interferences between
+%                 e-TeX and pTeX, in part suggested by Hironori Kitagawa
+%                 <h_kitagawa2001@@yahoo.co.jp>, Mar 2011.
 
 % Although considerable effort has been expended to make the e-TeX program
 % correct and reliable, no warranty is implied; the author disclaims any
@@ -206,8 +183,8 @@ known as `\eTeX'.
 @d banner=='This is TeX, Version 3.1415926' {printed when \TeX\ starts}
 @y
 @d eTeX_version=2 { \.{\\eTeXversion} }
-@d eTeX_revision==".2" { \.{\\eTeXrevision} }
-@d eTeX_version_string=='-2.2' {current \eTeX\ version}
+@d eTeX_revision==".3" { \.{\\eTeXrevision} }
+@d eTeX_version_string=='-2.3' {current \eTeX\ version}
 @#
 @d eTeX_banner=='This is e-TeX, Version 3.1415926',eTeX_version_string
   {printed when \eTeX\ starts}
@@ -238,6 +215,13 @@ scalar types; there are no `\&{var}' parameters, except in the case of files
 @d not_found2=47 {like |not_found|, when there's more than two}
 @d not_found3=48 {like |not_found|, when there's more than three}
 @d not_found4=49 {like |not_found|, when there's more than four}
+@z
+%---------------------------------------
+@x [10] m.135 l.2895 - e-TeX TeXXeT
+|fil|, |fill|, or |filll|). The |subtype| field is not used.
+@y
+|fil|, |fill|, or |filll|). The |subtype| field is not used in \TeX.
+In \eTeX\ the |subtype| field records the box direction mode |box_lr|.
 @z
 %---------------------------------------
 @x [10] m.141 l.2980 - e-TeX marks
@@ -1106,7 +1090,8 @@ var m:halfword; {|chr_code| part of the operand token}
 @y
 label exit;
 var m:halfword; {|chr_code| part of the operand token}
-@!q:halfword; {general purpose index}
+@!q,@!r:pointer; {general purpose indices}
+@!tx:pointer; {effective tail node}
 @!i:four_quarters; {character info}
 @z
 %---------------------------------------
@@ -1194,11 +1179,38 @@ begin if m>par_shape_loc then @<Fetch a penalties array element@>
 else if par_shape_ptr=null then cur_val:=0
 @z
 %---------------------------------------
-@x [26] m.424 l.8505 - e-TeX TeXXeT
-implemented. The reference count for \.{\\lastskip} will be updated later.
+@x [26] m.424 l.8504 - e-TeX \lastnodetype
+@ Here is where \.{\\lastpenalty}, \.{\\lastkern}, and \.{\\lastskip} are
 @y
-implemented. The reference count for \.{\\lastskip} will be updated later.
-A final \.{\\endM} node is temporarily removed.
+@ Here is where \.{\\lastpenalty}, \.{\\lastkern}, \.{\\lastskip}, and
+\.{\\lastnodetype} are
+@z
+%---------------------------------------
+@x [26] m.424 l.8508 - e-TeX TeXXeT
+legal in similar contexts.
+@y
+legal in similar contexts.
+
+The macro |find_effective_tail_eTeX| sets |tx| to the last non-\.{\\endM}
+node of the current list.
+@z
+%---------------------------------------
+@x [26] m.424 l.8510 - e-TeX TeXXeT
+@<Fetch an item in the current node...@>=
+@y
+@d find_effective_tail_eTeX==
+tx:=tail;
+if not is_char_node(tx) then
+  if (type(tx)=math_node)and(subtype(tx)=end_M_code) then
+    begin r:=head;
+    repeat q:=r; r:=link(q);
+    until r=tx;
+    tx:=q;
+    end
+@#
+@d find_effective_tail==find_effective_tail_eTeX
+
+@<Fetch an item in the current node...@>=
 @z
 %---------------------------------------
 @x [26] m.424 l.8511 - e-TeX basic
@@ -1227,38 +1239,35 @@ if m>=input_line_no_code then
 %---------------------------------------
 @x [26] m.424 l.8517 - e-TeX last_node_type
   cur_val_level:=cur_chr;
+  if not is_char_node(tail)and(mode<>0) then
+    case cur_chr of
+    int_val: if type(tail)=penalty_node then cur_val:=penalty(tail);
+    dimen_val: if type(tail)=kern_node then cur_val:=width(tail);
+    glue_val: if type(tail)=glue_node then
+      begin cur_val:=glue_ptr(tail);
+      if subtype(tail)=mu_glue then cur_val_level:=mu_val;
+      end;
+    end {there are no other cases}
+  else if (mode=vmode)and(tail=head) then
 @y
+  find_effective_tail;
   if cur_chr=last_node_type_code then
     begin cur_val_level:=int_val;
-    if (tail=head)or(mode=0) then cur_val:=-1;
+    if (tx=head)or(mode=0) then cur_val:=-1;
     end
   else cur_val_level:=cur_chr;
-@z
-%---------------------------------------
-@x [26] m.424 l.8519 - e-TeX TeXXeT
+  if not is_char_node(tx)and(mode<>0) then
     case cur_chr of
-@y
-    begin if (type(tail)=math_node)and(subtype(tail)=end_M_code) then
-      remove_end_M;
-    case cur_chr of
-@z
-%---------------------------------------
-@x [26] m.424 l.8525 - e-TeX last_node_type
+    int_val: if type(tx)=penalty_node then cur_val:=penalty(tx);
+    dimen_val: if type(tx)=kern_node then cur_val:=width(tx);
+    glue_val: if type(tx)=glue_node then
+      begin cur_val:=glue_ptr(tx);
+      if subtype(tx)=mu_glue then cur_val_level:=mu_val;
       end;
-@y
-      end;
-    last_node_type_code:
-      if (type(tail)<>math_node)or(subtype(tail)<>end_M_code) then
-        if type(tail)<=unset_node then cur_val:=type(tail)+1
-        else cur_val:=unset_node+2;
-@z
-%---------------------------------------
-@x [26] m.424 l.8526 - e-TeX TeXXeT
+    last_node_type_code: if type(tx)<=unset_node then cur_val:=type(tx)+1
+      else cur_val:=unset_node+2;
     end {there are no other cases}
-@y
-    end; {there are no other cases}
-    if LR_temp<>null then insert_end_M;
-    end
+  else if (mode=vmode)and(tx=head) then
 @z
 %---------------------------------------
 @x [26] m.424 l.8531 - e-TeX last_node_type
@@ -1524,9 +1533,12 @@ changes; the subtype of an an |hlist_node| inside R-text is changed to
 @x [32] m.616 l.12259 - e-TeX TeXXeT
 @d synch_h==if cur_h<>dvi_h then
 @y
-@d reversed=min_quarterword+1 {subtype for an |hlist_node| whose hlist
-  has been reversed}
-@d dlist=min_quarterword+2 {subtype for an |hlist_node| from display math mode}
+@d reversed=1 {subtype for an |hlist_node| whose hlist has been reversed}
+@d dlist=2 {subtype for an |hlist_node| from display math mode}
+@d box_lr(#) == (qo(subtype(#))) {direction mode of a box}
+@d set_box_lr(#) ==  subtype(#):=set_box_lr_end
+@d set_box_lr_end(#) == qi(#)
+@#
 @d left_to_right=0
 @d right_to_left=1
 @d reflected==1-cur_dir {the opposite of |cur_dir|}
@@ -1775,14 +1787,14 @@ until cur_cmd<>spacer;
   begin type(q):=hlist_node; width(q):=width(p);
 @y
   begin type(q):=hlist_node; width(q):=width(p);
-  if nest[nest_ptr-1].mode_field=mmode then subtype(q):=dlist; {for |ship_out|}
+  if nest[nest_ptr-1].mode_field=mmode then set_box_lr(q)(dlist); {for |ship_out|}
 @z
 %---------------------------------------
 @x [37] m.808 l.15886 - e-TeX TeXXeT
 n:=span_count(r); t:=width(s); w:=t; u:=hold_head;
 @y
 n:=span_count(r); t:=width(s); w:=t; u:=hold_head;
-subtype(r):=min_quarterword; {for |ship_out|}
+set_box_lr(r)(0); {for |ship_out|}
 @z
 %---------------------------------------
 @x [38] m.814 l.16009 - e-TeX penalties
@@ -2302,6 +2314,15 @@ else sa_def_box;
 end
 @z
 %---------------------------------------
+@x [47] m.1079 l.20920 begin_box - e-TeX TeXXeT
+@!m:quarterword; {the length of a replacement list}
+@y
+@!r:pointer; {running behind |p|}
+@!fm:boolean; {a final \.{\\beginM} \.{\\endM} node pair?}
+@!tx:pointer; {effective tail node}
+@!m:quarterword; {the length of a replacement list}
+@z
+%---------------------------------------
 @x [47] m.1079 l.20922 begin_box - e-TeX sparse arrays
 @!n:eight_bits; {a box number}
 begin case cur_chr of
@@ -2318,23 +2339,63 @@ box_code: begin scan_register_num; fetch_box(cur_box);
 copy_code: begin scan_register_num; fetch_box(q); cur_box:=copy_node_list(q);
 @z
 %---------------------------------------
-@x [47] m.1080 l.20938 - e-TeX TeXXeT
-since |head| is a one-word node.
+@x [47] m.1080 l.20940 - e-TeX TeXXeT
+@<If the current list ends with a box node, delete it...@>=
 @y
-since |head| is a one-word node.
-A final \.{\\endM} node is temporarily removed.
+@d fetch_effective_tail_eTeX(#)== {extract |tx|,
+  drop \.{\\beginM} \.{\\endM} pair}
+q:=head; p:=null;
+repeat r:=p; p:=q; fm:=false;
+if not is_char_node(q) then
+  if type(q)=disc_node then
+    begin for m:=1 to replace_count(q) do p:=link(p);
+    if p=tx then #;
+    end
+  else if (type(q)=math_node)and(subtype(q)=begin_M_code) then fm:=true;
+q:=link(p);
+until q=tx; {found |r|$\to$|p|$\to$|q=tx|}
+q:=link(tx); link(p):=q; link(tx):=null;
+if q=null then if fm then confusion("tail1")
+@:this can't happen tail1}{\quad tail1@>
+  else tail:=p
+else if fm then {|r|$\to$|p=begin_M|$\to$|q=end_M|}
+  begin tail:=r; link(r):=null; flush_node_list(p);@+end
+@#
+@d check_effective_tail(#)==find_effective_tail_eTeX
+@d fetch_effective_tail==fetch_effective_tail_eTeX
+
+@<If the current list ends with a box node, delete it...@>=
 @z
 %---------------------------------------
-@x [47] m.1080 l.20951 - e-TeX TeXXeT
+@x [47] m.1080 l.20950 - e-TeX TeXXeT
+else  begin if not is_char_node(tail) then
     if (type(tail)=hlist_node)or(type(tail)=vlist_node) then
       @<Remove the last box, unless it's part of a discretionary@>;
+  end;
 @y
-    begin if (type(tail)=math_node)and(subtype(tail)=end_M_code) then
-      remove_end_M;
-    if (type(tail)=hlist_node)or(type(tail)=vlist_node) then
+else  begin check_effective_tail(goto done);
+  if not is_char_node(tx) then
+    if (type(tx)=hlist_node)or(type(tx)=vlist_node) then
       @<Remove the last box, unless it's part of a discretionary@>;
-    if LR_temp<>null then insert_end_M;
-    end;
+  done:end;
+@z
+%---------------------------------------
+@x [47] m.1081 l.20957 - e-TeX TeXXeT
+begin q:=head;
+repeat p:=q;
+if not is_char_node(q) then if type(q)=disc_node then
+  begin for m:=1 to replace_count(q) do p:=link(p);
+  if p=tail then goto done;
+  end;
+q:=link(p);
+until q=tail;
+cur_box:=tail; shift_amount(cur_box):=0;
+tail:=p; link(p):=null;
+done:end
+@y
+begin fetch_effective_tail(goto done);
+cur_box:=tx; shift_amount(cur_box):=0;
+end
 @z
 %---------------------------------------
 @x [47] m.1082 l.20972 - e-TeX sparse arrays
@@ -2363,28 +2424,31 @@ p:=scan_toks(false,true); p:=get_node(small_node_size);
 mark_class(p):=c;
 @z
 %---------------------------------------
-@x [47] m.1105 l.21240 - e-TeX TeXXeT
-will be deleted, if present.
+@x [47] m.1105 l.21246 delete_last - e-TeX TeXXeT
+@!m:quarterword; {the length of a replacement list}
 @y
-will be deleted, if present.
-A final \.{\\endM} node is temporarily removed.
+@!r:pointer; {running behind |p|}
+@!fm:boolean; {a final \.{\\beginM} \.{\\endM} node pair?}
+@!tx:pointer; {effective tail node}
+@!m:quarterword; {the length of a replacement list}
 @z
 %---------------------------------------
 @x [47] m.1105 l.21250 delete_last - e-TeX TeXXeT
 else  begin if not is_char_node(tail) then if type(tail)=cur_chr then
+    begin q:=head;
+    repeat p:=q;
+    if not is_char_node(q) then if type(q)=disc_node then
+      begin for m:=1 to replace_count(q) do p:=link(p);
+      if p=tail then return;
+      end;
+    q:=link(p);
+    until q=tail;
+    link(p):=null; flush_node_list(tail); tail:=p;
 @y
-else  begin if not is_char_node(tail) then
-  begin if (type(tail)=math_node)and(subtype(tail)=end_M_code) then
-    remove_end_M;
-  if type(tail)=cur_chr then
-@z
-%---------------------------------------
-@x [47] m.1105 l.21261 delete_last - e-TeX TeXXeT
-  end;
-@y
-  if LR_temp<>null then insert_end_M;
-  end;
-  end;
+else  begin check_effective_tail(return);
+  if not is_char_node(tx) then if type(tx)=cur_chr then
+    begin fetch_effective_tail(return);
+    flush_node_list(tx);
 @z
 %---------------------------------------
 @x [47] m.1108 l.21299 - e-TeX saved_items
@@ -2569,7 +2633,7 @@ begin danger:=false;
   mlist_to_hlist; a:=hpack(link(temp_head),natural);
 @y
   mlist_to_hlist; a:=hpack(link(temp_head),natural);
-  subtype(a):=dlist;
+  set_box_lr(a)(dlist);
 @z
 %---------------------------------------
 @x [48] m.1194 l.22397 after_math - e-TeX TeXXeT
@@ -2596,7 +2660,7 @@ resume_after_display
 @x [48] m.1202 l.22541 - e-TeX TeXXeT
 d:=half(z-w);
 @y
-subtype(b):=dlist;
+set_box_lr(b)(dlist);
 d:=half(z-w);
 @z
 %---------------------------------------
@@ -3785,7 +3849,7 @@ else
 in right-to-left text.
 
 @<Display if this box is never to be reversed@>=
-if (type(p)=hlist_node)and(subtype(p)=dlist) then print(", display")
+if (type(p)=hlist_node)and(box_lr(p)=dlist) then print(", display")
 
 @ A number of routines are based on a stack of one-word nodes whose
 |info| fields contain |end_M_code|, |end_L_code|, or |end_R_code|.  The
@@ -3806,13 +3870,12 @@ and |ship_out|, or might be local to |post_line_break|.
   end
 
 @<Glob...@>=
-@!LR_temp:pointer; {holds a temporarily removed \.{\\endM} node}
 @!LR_ptr:pointer; {stack of LR codes for |hpack|, |ship_out|, and |init_math|}
 @!LR_problems:integer; {counts missing begins and ends}
 @!cur_dir:small_number; {current text direction}
 
 @ @<Set init...@>=
-LR_temp:=null; LR_ptr:=null; LR_problems:=0; cur_dir:=left_to_right;
+LR_ptr:=null; LR_problems:=0; cur_dir:=left_to_right;
 
 @ @<Insert LR nodes at the beg...@>=
 begin q:=link(temp_head);
@@ -3852,37 +3915,6 @@ if LR_ptr<>null then
   link(s):=q;
   end
 
-@ Special \.{\\beginM} and \.{\\endM} nodes are inserted in cases where
-math nodes are discarded during line breaking or end up in different
-lines.  When the current lists ends with an \.{\\endM} node that node is
-temporarily removed and later reinserted when the last node is to be
-inspected or removed.  A final \.{\\endM} preceded by a |char_node| will
-not be removed.
-
-@<Declare \eTeX\ procedures for sc...@>=
-procedure remove_end_M;
-var @!p:pointer; {runs through the current list}
-begin p:=head;
-while link(p)<>tail do p:=link(p);
-if not is_char_node(p) then
-  begin LR_temp:=tail; link(p):=null; tail:=p;
-  end;
-end;
-
-@ @<Declare \eTeX\ procedures for sc...@>=
-procedure insert_end_M;
-label done;
-var @!p:pointer; {runs through the current list}
-begin if not is_char_node(tail) then
- if (type(tail)=math_node)and(subtype(tail)=begin_M_code) then
-  begin free_node(LR_temp,small_node_size); p:=head;
-  while link(p)<>tail do p:=link(p);
-  free_node(tail,small_node_size); link(p):=null; tail:=p; goto done;
-  end;
-link(tail):=LR_temp; tail:=LR_temp;
-done: LR_temp:=null;
-end;
-
 @ @<Initialize the LR stack@>=
 put_LR(before) {this will never match}
 
@@ -3918,19 +3950,19 @@ end
 @ @<Initialize |hlist_out| for mixed...@>=
 if eTeX_ex then
   begin @<Initialize the LR stack@>;
-  if subtype(this_box)=dlist then
+  if box_lr(this_box)=dlist then
     if cur_dir=right_to_left then
       begin cur_dir:=left_to_right; cur_h:=cur_h-width(this_box);
       end
-    else subtype(this_box):=min_quarterword;
-  if (cur_dir=right_to_left)and(subtype(this_box)<>reversed) then
+    else set_box_lr(this_box)(0);
+  if (cur_dir=right_to_left)and(box_lr(this_box)<>reversed) then
     @<Reverse the complete hlist and set the subtype to |reversed|@>;
   end
 
 @ @<Finish |hlist_out| for mixed...@>=
 if eTeX_ex then
   begin @<Check for LR anomalies at the end of |hlist_out|@>;
-  if subtype(this_box)=dlist then cur_dir:=right_to_left;
+  if box_lr(this_box)=dlist then cur_dir:=right_to_left;
   end
 
 @ @<Handle a math node in |hlist_out|@>=
@@ -3991,7 +4023,7 @@ append the reversed list, and set the width of the kern node.
 @<Reverse the complete hlist...@>=
 begin save_h:=cur_h; temp_ptr:=p; p:=new_kern(0); link(prev_p):=p;
 cur_h:=0; link(p):=reverse(this_box,null,cur_g,cur_glue); width(p):=-cur_h;
-cur_h:=save_h; subtype(this_box):=reversed;
+cur_h:=save_h; set_box_lr(this_box)(reversed);
 end
 
 @ We detach the remainder of the hlist, replace the math node by
@@ -4342,7 +4374,7 @@ if j<>null then
   begin b:=copy_node_list(j); height(b):=height(p); depth(b):=depth(p);
   s:=s-shift_amount(b); d:=d+s; e:=e+width(b)-z-s;
   end;
-if subtype(p)=dlist then q:=p {display or equation number}
+if box_lr(p)=dlist then q:=p {display or equation number}
 else  begin {display and equation number}
   r:=list_ptr(p); free_node(p,box_node_size);
   if r=null then confusion("LR4");

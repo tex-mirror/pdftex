@@ -1,6 +1,6 @@
 dnl Process this file with Autoconf to produce a configure script for Web2c.
 dnl
-dnl   Copyright (C) 2009, 2010 Peter Breitenlohner <tex-live@tug.org>
+dnl   Copyright (C) 2009 - 2011 Peter Breitenlohner <tex-live@tug.org>
 dnl
 dnl   This file is free software; the copyright holder
 dnl   gives unlimited permission to copy and/or distribute it,
@@ -37,6 +37,8 @@ dnl Common code for all programs using libkpathsea.
 KPSE_COMMON([web2c programs])
 KPSE_CANONICAL_HOST
 
+AM_CONDITIONAL([cross], [test "x$cross_compiling" = xyes])
+
 AC_PROG_CXX
 AC_PROG_OBJCXX
 KPSE_CXX_HACK
@@ -56,9 +58,12 @@ dnl For tests
 AC_CHECK_PROGS([KPSEWHICH], [kpsewhich], [false])
 
 KPSE_ASM_UNDERSCORE
+KPSE_CHECK_WIN32
 
 AS_CASE([$with_editor],
-        [''|yes|no], [with_editor='vi +%d %s'])
+        [''|yes|no], [AS_IF([test "x$kpse_cv_have_win32" = xno],
+                            [with_editor="vi +%d '%s'"],
+                            [with_editor='texworks --position=%d \"%s\"'])])
 AC_DEFINE_UNQUOTED([EDITOR], ["$with_editor"],
                    [web2c: Default editor for interactive `e' option.])
 
@@ -75,7 +80,6 @@ AS_CASE([$enable_ipc],
         [yes|no], [],
             [enable_ipc=yes])
 
-KPSE_CHECK_WIN32
 AM_CONDITIONAL([WIN32], [test "x$kpse_cv_have_win32" != xno])
 AM_CONDITIONAL([MINGW32], [test "x$kpse_cv_have_win32" = xmingw32])
 
@@ -249,6 +253,7 @@ KPSE_PTEXENC_FLAGS
 KPSE_ZLIB_FLAGS
 KPSE_LIBPNG_FLAGS
 KPSE_XPDF_FLAGS
+KPSE_POPPLER_FLAGS
 KPSE_ZZIPLIB_FLAGS
 KPSE_GRAPHITE_FLAGS
 KPSE_FREETYPE2_FLAGS

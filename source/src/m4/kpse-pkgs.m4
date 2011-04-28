@@ -31,6 +31,7 @@ teckit
 graphite
 zziplib
 xpdf
+poppler
 gd
 freetype2
 freetype
@@ -60,6 +61,7 @@ AC_REQUIRE([KPSE_FREETYPE_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_FREETYPE2_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_GD_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_XPDF_SYSTEM_FLAGS])[]dnl
+AC_REQUIRE([KPSE_POPPLER_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_ZZIPLIB_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_GRAPHITE_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_TECKIT_SYSTEM_FLAGS])[]dnl
@@ -71,6 +73,7 @@ AC_REQUIRE([KPSE_ICU_SYSTEM_FLAGS])[]dnl
 # Define the list of utility sub-packages, i.e., subdirs 'utils/*'.
 AC_DEFUN([KPSE_UTILS_PKGS],
 [m4_define([kpse_utils_pkgs], [
+biber
 chktex
 dialog
 ps2eps

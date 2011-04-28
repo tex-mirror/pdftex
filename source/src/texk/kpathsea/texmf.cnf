@@ -4,8 +4,8 @@
 % If you modify this original file, YOUR CHANGES WILL BE LOST when it is
 % updated.  Instead, put your changes -- and only your changes, not an
 % entire copy of the full texmf.cnf! -- in ../../texmf.cnf.  That is, if
-% this file is installed in /some/path/to/texlive/2010/texmf/web2c/texmf.cnf,
-% add your custom settings to /some/path/to/texlive/2010/texmf.cnf.
+% this file is installed in /some/path/to/texlive/2011/texmf/web2c/texmf.cnf,
+% add your custom settings to /some/path/to/texlive/2011/texmf.cnf.
 % 
 % What follows is a super-summary of what this .cnf file can
 % contain. Please read the Kpathsea manual for more information.
@@ -45,11 +45,14 @@
 % This is the parent directory of our several trees, i.e.,
 % /usr/local/texlive/YYYY in the original TeX Live distribution.
 %
+% All trees must be organized according to the TeX Directory Structure
+% (http://tug.org/tds), or files may not be found.
+%
 % Redistributors will probably want $SELFAUTODIR/share, i.e., /usr/share.
 TEXMFROOT = $SELFAUTOPARENT
 
 % The tree containing runtime files related to the specific
-% distribution and version:
+% distribution and version.
 TEXMFMAIN = $TEXMFROOT/texmf
 
 % The main tree of packages, distribution-agnostic:
@@ -64,17 +67,17 @@ TEXMFSYSVAR = $TEXMFROOT/texmf-var
 % TEXMFSYSCONFIG, where *-sys store configuration data.
 TEXMFSYSCONFIG = $TEXMFROOT/texmf-config
 
-% Per-user texmf trees.  To define more than one per-user tree, set this
-% to a list of directories in braces, as described above.
-% (This used to be HOMETEXMF.)
-% ~ expands to %USERPROFILE% on Window, $HOME otherwise.
+% Per-user texmf tree(s) -- organized per the TDS, as usual.  To define
+% more than one per-user tree, set this to a list of directories in
+% braces, as described above.  (This used to be HOMETEXMF.)  ~ expands
+% to %USERPROFILE% on Window, $HOME otherwise.
 TEXMFHOME = ~/texmf
 
 % TEXMFVAR, where texconfig/updmap/fmtutil store cached runtime data.
-TEXMFVAR = ~/.texlive2010/texmf-var
+TEXMFVAR = ~/.texlive2011/texmf-var
 
 % TEXMFCONFIG, where texconfig/updmap/fmtutil store configuration data.
-TEXMFCONFIG = ~/.texlive2010/texmf-config
+TEXMFCONFIG = ~/.texlive2011/texmf-config
 
 % List all the texmf trees.
 %
@@ -205,18 +208,22 @@ TEXINPUTS.lambda        = .;$TEXMF/tex/{lambda,latex,generic,}//
 TEXINPUTS.lamed         = .;$TEXMF/tex/{lamed,lambda,latex,generic,}//
 TEXINPUTS.omega         = .;$TEXMF/tex/{plain,generic,}//
 
-% pTeX
+% p(La)TeX.
 TEXINPUTS.ptex          = .;$TEXMF/tex/{ptex,ptexgeneric,plain,generic,}//
 TEXINPUTS.platex        = .;$TEXMF/tex/{platex,ptexgeneric,latex,generic,}//
 
-% pBibTeX bibliographies and style files
+% ep(La)TeX.
+TEXINPUTS.eptex         = .;$TEXMF/tex/{ptex,ptexgeneric,plain,generic,}//
+TEXINPUTS.eplatex       = .;$TEXMF/tex/{platex,ptexgeneric,latex,generic,}//
+
+% pBibTeX bibliographies and style files.
 BIBINPUTS.pbibtex       = .;$TEXMF/{pbibtex,bibtex}/bib//
 BSTINPUTS.pbibtex       = .;$TEXMF/{pbibtex,bibtex}/bst//
 
 % ConTeXt.
 TEXINPUTS.context       = .;$TEXMF/tex/{context,plain,generic,}//
 
-% jadetex
+% jadetex.
 TEXINPUTS.jadetex       = .;$TEXMF/tex/{jadetex,latex,generic,}//
 TEXINPUTS.pdfjadetex    = .;$TEXMF/tex/{jadetex,latex,generic,}//
 
@@ -573,7 +580,8 @@ TEX = etex
 % interactive `e' option.  %d is replaced by the line number and %s by
 % the current filename.  The default is specified at compile-time, and
 % we let that stay in place since different platforms like different values.
-%TEXEDIT = vi +%d "%s"
+%TEXEDIT = vi +%d '%s'                    % default for Unix
+%TEXEDIT = texworks --position=+%d "%s"   % default for Windows
 %MFEDIT = ${TEXEDIT}
 %MPEDIT = ${TEXEDIT}
 

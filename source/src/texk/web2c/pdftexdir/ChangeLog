@@ -1,3 +1,25 @@
+2011-04-07  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Adapted to e-TeX Version 2.3.
+
+2011-04-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Adapt to ../etexdir/etex.ch: simplify e-pTeX.
+
+	* am/pdftex.am (etex_version.h): Derive from pdftex.web instead
+	of ../etexdir/etex.ch.
+
+2011-03-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/libpdftex.am: Use AM_CFLAGS instead of libpdftex_a_CFLAGS.
+	* am/pdftex.am: Use AM_CFLAGS instead of pdftex_CFLAGS.
+	* am/ttf2afm.am: Use AM_CFLAGS instead of ttf2afm_CFLAGS.
+
+2011-03-07  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* utils.c (pdftex_fail, pdftex_warn): `program_invocation_name'
+	has been renamed into `kpse_invocation_name'.
+
 2011-01-31  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* writepng.c: Remove png-1.2 cruft.

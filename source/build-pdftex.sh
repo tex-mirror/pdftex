@@ -36,6 +36,7 @@ DISABLE_SYSTEM_LIBS="\
     --without-system-t1lib \
     --without-system-teckit \
     --without-system-xpdf \
+    --without-system-poppler \
     --without-system-zlib \
     --without-system-zziplib \
 "

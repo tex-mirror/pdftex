@@ -1,3 +1,63 @@
+2011-04-28  Karl Berry  <karl@tug.org>
+
+	* kpsewhich.c (try_suffix): new fn, checking entire string for
+	format names.
+	(TRY_SUFFIX): change macro to just call the fn.
+	Report from Philipp Stephani, tex-live mail 25 Apr 2011 16:38:47.
+	
+	* NEWS,
+	* kpsewhich.c (read_command_line),
+	* doc/kpathsea.texi,
+	* texmf.cnf: 2011.
+
+2011-04-14  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: Update version number 6.0.1dev => 6.0.1.
+
+2011-04-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmf.cnf (TEXEDIT): Document Unix and Windows defaults.
+
+	* tex-file.c (executable_filep): Avoid using strcpy() for
+	overlapping strings.
+
+2011-03-22  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXINPUTS.eptex, TEXINPUTS.eplatex): define,
+	same as .p(la)tex.  From Akira.
+
+2011-03-07  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* types.h: Rename the variables program_invocation_name and
+	program_invocation_short_name into kpse_invocation_name and
+	kpse_invocation_short_name repectively, (1) in order to avoid
+	conflicts with /usr/include/sys/errno.h from Cygwin, and (2)
+	because they are not the same as those from the GNU C library.
+
+	Problem reported by Ken Brown <kbrow1i@gmail.com>.
+
+2011-03-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* lib.h, xftell.c (xftell): Change return type from unsigned to
+	signed and use ftell() instead of ftello().
+
+2011-03-01  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf: be more explicit that all trees, including TEXMFHOME,
+	must follow the TDS.
+
+2011-03-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mingw32.[ch]: Drop win32_system(); this was a workaround for a
+	bug in system() under Win9x.
+
+2011-03-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* man/{kpsewhich,mktexlsr,mktexmf,mktexpk,mktextfm}.man: Drop
+	useless '.rb' macros.
+	* man/{kpseaccess,kpsereadlink,kpsestat}.man: The same.
+	Also remove `additional' from `following additional options'.
+
 2011-02-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* Makefile.in.orig, common.ac.orig, withenable.ac: Remove
@@ -69,7 +129,7 @@
 
 2010-11-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
-	Update version number to 6.0.1dev.
+	* configure.ac: Update version number to 6.0.1dev.
 
 2010-11-10  Mathias Kende  <mathias@kende.fr>
 

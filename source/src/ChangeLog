@@ -1,3 +1,27 @@
+2011-04-14  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am, configure.ac: Conditional cross_compiling => cross
+	as in libs/icu, texk/dvipng, and texk/web2c.
+
+	* version.ac: Switch 2011/dev => 2011.
+
+2011-04-12  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* tardate.ac: Switch to 2011-04-12.
+
+2011-04-09  Karl Berry  <karl@tug.org>
+
+	* Build (MACOSX_DEPLOYMENT_TARGET): no longer needed per koch.
+
+2011-03-07  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* m4/kpse-common.m4 (KPSE_COMMON): Remove check for
+	program_invocation_name.
+
+2011-03-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* tardate.ac: Switch to 2011-03-03.
+
 2011-02-16  Karl Berry  <karl@tug.org>
 
 	* Build: include uname -a in log, mention log if failure.
