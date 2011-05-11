@@ -1,4 +1,4 @@
-$Id: README 22225 2011-04-27 22:42:51Z karl $
+$Id: README 22293 2011-05-03 13:54:23Z peter $
 Public domain.  Originally created by Karl Berry, 2005.
 
 Libraries we compile for TeX Live.
@@ -41,7 +41,7 @@ t1lib 5.1.2 - checked 25apr11
 teckit 2.5.1 - checked 25apr11
   http://scripts.sil.org/svn-view/teckit/
 
-xpdf 3.02pl4 - http://www.foolabs.com/xpdf/
+xpdf 3.02pl5 - http://www.foolabs.com/xpdf/
   with modifications for pdftex and xetex
 
 zlib 1.2.5 - checked 25apr11

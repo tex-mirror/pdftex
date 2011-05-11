@@ -1,6 +1,28 @@
+2011-05-11  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* texmfmp.c: add a function generic_synctex_get_current_name()
+	in order to get full path names for SyncTeX.
+
+2011-05-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmfmp.c (ipc_open_out): Avoid to #define SOCK_NONBLOCK which
+	conflicts with newer GNU C library headers.
+
+2011-05-04  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* openclose.c (recorder_change_filename): on windows, an opened file
+	cannot be renamed.
+
+2011-05-02  Karl Berry  <karl@tug.org>
+
+	* openclose.c (recorder_change_filename): take output_directory
+	into account.  Report/patch from 
+	Philipp Stephani, 30 Apr 2011 16:11:53,
+	http://tracker.luatex.org/view.php?id=615
+
 2011-04-28  Karl Berry  <karl@tug.org>
 
-	* printversion.c (printversionandexit): 2011
+	* printversion.c (printversionandexit): it is 2011.
 
 2011-04-27  Karl Berry  <karl@tug.org>
 

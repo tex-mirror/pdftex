@@ -1,3 +1,41 @@
+2011-05-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* writepng.c: Fix for 16bit images in pdf 1.4 (8bit) mode,
+	from Hartmut Henkel.  Expand the png_* macros introduced for
+	libpng-1.2.x => 1.4.x => 1.5.x.
+
+2011-05-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* writepng.c: Fixes for libpng 1.5.2 copied/adapted from luaTeX.
+
+2011-05-05  Karl Berry  <karl@tug.org>
+
+	* pdftex.web (pdfTeX_banner): etex version before pdftex version.
+	(pdftex_revision, pdftex_version_string): bump to 12.
+	* pdftexextra.h (BANNER): change redundantly-specified banner
+	again and again.
+	(These changes approved by Thanh.)
+
+2011-05-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web, tex.ch0: Remove pdfeTeX_banner, no more pdfeTeX.
+
+2011-05-02  Akira Kakuto <kakuto@fuk.kindai.ac.jp>  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Append eTeX_version_string to pdfTeX_banner.
+
+2011-05-02  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Avoid "deprecated conversion from string constant to 'char*'"
+	warnings from g++-4.4.
+	Unfortunately both xpdf and poppler declare lots of function
+	parameters as 'char *' that should actually be 'const char *'.
+	Compiling just the parts required for TeX Live with g++-4.4
+	yields >10000 such warnings for each of xpdf and poppler.
+
+	* pdftoepdf.cc, pdftosrc.cc: Cast string constants to 'char *'
+	in order to avoid more such warnings when compiling pdfTeX.
+
 2011-04-29  Karl Berry  <karl@tug.org>
 
 	* all files: update copyright notices.

@@ -1,4 +1,4 @@
-$Id: README 22225 2011-04-27 22:42:51Z karl $
+$Id: README 22266 2011-05-01 16:20:48Z preining $
 Public domain.  Originally written 2005 by Karl Berry.
 
 For a high-level overview of building TeX Live, see
@@ -112,6 +112,5 @@ GNU Make 3.81
   - compiling of texk/web2c/pdftexdir/writezip.c is broken and triggers a 
     compiler error with the above gcc. Disabling optimization -O2 using
     Build --debug ... resolved this problem.
-  - compilation of clisp needs hand adding -lavcall -lcallback -ltrampoline 
-    -lvacall after the -lsigsegv
+  - compilation of clisp needs --disable-mmap
   - asy compilation with --disable-gsl && make

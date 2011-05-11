@@ -1,3 +1,19 @@
+2011-05-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* osx-strip: Removed.
+	* configure.ac: Remove osx-strip.
+
+2011-05-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* osx-strip: New shell script to strip Mac OS X binaries.
+	* configure.ac: Use osx-strip for Mac OS X.
+
+2011-05-05  Karl Berry  <karl@tug.org>
+
+	* man/pktype.man: output is always to stdout.
+	
+	* doc/web2c.texi (Common option): -jobname can override recorder name.
+
 2011-04-28  Karl Berry  <karl@tug.org>
 
 	* doc/web2c.texi (Common options): caveats about the -recorder
