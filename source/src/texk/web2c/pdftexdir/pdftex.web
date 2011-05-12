@@ -16552,8 +16552,8 @@ so we can use this field for both}
 @d se_kid_annot             == 3
 @d pdfmem_se_kid_next(#)    == pdf_mem[# + 1] {link to next kid}
 @d pdfmem_se_kid_objref(#)  == pdf_mem[# + 2] {obj ref when kid is SE or annot}
-@d pdfmem_se_kid_mc_id(#)   == pdf_mem[# + 2] {page ref when kid is MC}
-@d pdfmem_se_kid_mc_page(#) == pdf_mem[# + 3] {MICD written to page content when kid is MC}
+@d pdfmem_se_kid_mc_id(#)   == pdf_mem[# + 2] {MICD written to page content when kid is MC}
+@d pdfmem_se_kid_mc_page(#) == pdf_mem[# + 3] {page ref when kid is MC}
 @d pdfmem_se_kid_prio(#)    == pdf_mem[# + 4] {priority}
 
 @d obj_se_id                == obj_info
@@ -20147,6 +20147,7 @@ if pdf_mc_list_objr <> null then begin
         pdf_begin_dict(i, 1);
         pdf_print_ln("/Type /OBJR");
         pdf_indirect_ln("Obj", obj_aux(i));
+        pdf_indirect_ln("Pg", obj_info(i));
         pdf_end_dict;
         k := link(k);
     end;
@@ -36519,6 +36520,7 @@ begin
         i := create_se_kid_mem(se_kid_annot);
         objr := pdf_new_objnum;
         obj_aux(objr) := pdf_annot_objnum(p);
+        obj_info(objr) := pdf_last_page; {for "Pg" entry}
         pdfmem_se_kid_objref(i) := objr;
         pdf_append_list(objr)(pdf_mc_list_objr);
 
