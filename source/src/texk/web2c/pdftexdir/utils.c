@@ -165,12 +165,11 @@ void pdf_puts(const char *s)
     pdfroom(strlen(s) + 1);
     while (*s)
         pdfbuf[pdfptr++] = *s++;
-    pdflastbyte = s[-1];
 }
 
 void pdf_newline(void)
 {
-    if (pdflastbyte != '\n')
+    if (!pdflastbyteisnewline())
         pdf_puts("\n");
 }
 

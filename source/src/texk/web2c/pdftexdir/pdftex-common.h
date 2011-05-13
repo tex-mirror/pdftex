@@ -46,7 +46,6 @@ extern integer poolptr;
 extern eightbits *pdfbuf;
 extern integer pdfbufsize;
 extern boolean pdfosmode;
-extern eightbits pdflastbyte;
 extern integer fixedinclusioncopyfont;
 
 /* pdftexcoerce.h - generated from pdftex.web */

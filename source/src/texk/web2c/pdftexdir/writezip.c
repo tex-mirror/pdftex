@@ -65,7 +65,6 @@ void writezip(boolean finish)
     for (;;) {
         if (c_stream.avail_out == 0) {
             pdfgone += xfwrite(zipbuf, 1, ZIP_BUF_SIZE, pdffile);
-            pdflastbyte = zipbuf[ZIP_BUF_SIZE - 1];     /* not needed */
             c_stream.next_out = (Bytef *) zipbuf;
             c_stream.avail_out = ZIP_BUF_SIZE;
         }
@@ -80,7 +79,6 @@ void writezip(boolean finish)
         if (c_stream.avail_out < ZIP_BUF_SIZE) {        /* at least one byte has been output */
             pdfgone +=
                 xfwrite(zipbuf, 1, ZIP_BUF_SIZE - c_stream.avail_out, pdffile);
-            pdflastbyte = zipbuf[ZIP_BUF_SIZE - c_stream.avail_out - 1];
         }
         xfflush(pdffile);
     }

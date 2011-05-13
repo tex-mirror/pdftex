@@ -366,7 +366,6 @@ static void copyStream(Stream * str)
         pdfout(c);
         c2 = c;
     }
-    pdflastbyte = c2;
 }
 
 static void copyProcSet(Object * obj)
