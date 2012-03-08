@@ -3,9 +3,9 @@ Copyright (c) 2008, 2009, 2010 , 2011 jerome DOT laurens AT u-bourgogne DOT fr
 
 This file is part of the SyncTeX package.
 
-Latest Revision: Fri Mar 11 07:39:12 UTC 2011
+Latest Revision: Tue Jun 14 08:23:30 UTC 2011
 
-Version: 1.13
+Version: 1.17
 
 See synctex_parser_readme.txt for more details
 
@@ -141,22 +141,57 @@ void _synctex_strip_last_path_extension(char * string) {
 	}
 }
 
+synctex_bool_t synctex_ignore_leading_dot_slash_in_path(const char ** name_ref)
+{
+    if (SYNCTEX_IS_DOT((*name_ref)[0]) && SYNCTEX_IS_PATH_SEPARATOR((*name_ref)[1])) {
+        do {
+            (*name_ref) += 2;
+            while (SYNCTEX_IS_PATH_SEPARATOR((*name_ref)[1])) {
+                ++(*name_ref);
+            }
+        } while(SYNCTEX_IS_DOT((*name_ref)[0]) && SYNCTEX_IS_PATH_SEPARATOR((*name_ref)[1]));
+        return synctex_YES;
+    }
+    return synctex_NO;
+}
+
+/*  The base name is necessary to deal with the 2011 file naming convention...
+ *  path is a '\0' terminated string
+ *  The return value is the trailing part of the argument,
+ *  just following the first occurrence of the regexp pattern "[^|/|\].[\|/]+".*/
+const char * _synctex_base_name(const char *path) {
+    const char * ptr = path;
+    do {
+        if (synctex_ignore_leading_dot_slash_in_path(&ptr)) {
+            return ptr;
+        }
+        do {
+            if (!*(++ptr)) {
+                return path;
+            }
+        } while (!SYNCTEX_IS_PATH_SEPARATOR(*ptr));
+    } while (*(++ptr));
+    return path;
+}
+
 /*  Compare two file names, windows is sometimes case insensitive... */
 synctex_bool_t _synctex_is_equivalent_file_name(const char *lhs, const char *rhs) {
-#	if SYNCTEX_WINDOWS
-    /*  On Windows, filename should be compared case insensitive.
-	 *  The characters '/' and '\' are both valid path separators.
-	 *  There will be a very serious problem concerning UTF8 because
-	 *  not all the characters must be toupper...
-	 *  I would like to have URL's instead of filenames. */
+    /*  Remove the leading regex '(\./+)*' in both rhs and lhs */
+    synctex_ignore_leading_dot_slash_in_path(&lhs);
+    synctex_ignore_leading_dot_slash_in_path(&rhs);
 next_character:
-	if(SYNCTEX_IS_PATH_SEPARATOR(*lhs)) {/*  lhs points to a path separator */
-		if(!SYNCTEX_IS_PATH_SEPARATOR(*rhs)) {/*  but not rhs */
+	if (SYNCTEX_IS_PATH_SEPARATOR(*lhs)) {/*  lhs points to a path separator */
+		if (!SYNCTEX_IS_PATH_SEPARATOR(*rhs)) {/*  but not rhs */
 			return synctex_NO;
 		}
-	} else if(SYNCTEX_IS_PATH_SEPARATOR(*rhs)) {/*  rhs points to a path separator but not lhs */
+        ++lhs;
+        ++rhs;
+        synctex_ignore_leading_dot_slash_in_path(&lhs);
+        synctex_ignore_leading_dot_slash_in_path(&rhs);
+        goto next_character;
+	} else if (SYNCTEX_IS_PATH_SEPARATOR(*rhs)) {/*  rhs points to a path separator but not lhs */
 		return synctex_NO;
-	} else if(toupper(*lhs) != toupper(*rhs)){/*  uppercase do not match */
+	} else if (SYNCTEX_ARE_PATH_CHARACTERS_EQUAL(*lhs,*rhs)){/*  uppercase do not match */
 		return synctex_NO;
 	} else if (!*lhs) {/*  lhs is at the end of the string */
 		return *rhs ? synctex_NO : synctex_YES;
@@ -166,9 +201,6 @@ next_character:
 	++lhs;
 	++rhs;
 	goto next_character;
-#	else
-    return 0 == strcmp(lhs,rhs)?synctex_YES:synctex_NO;
-#	endif
 }
 
 synctex_bool_t _synctex_path_is_absolute(const char * name) {
@@ -460,6 +492,6 @@ int _synctex_get_name(const char * output, const char * build_directory, char **
 
 const char * _synctex_get_io_mode_name(synctex_io_mode_t io_mode) {
     static const char * synctex_io_modes[4] = {"r","rb","a","ab"}; 
-    unsigned index = (io_mode & synctex_io_gz_mask) + 2 * (io_mode & synctex_io_append_mask);
+    unsigned index = ((io_mode & synctex_io_gz_mask)?1:0) + ((io_mode & synctex_io_append_mask)?2:0);// bug pointed out by Jose Alliste
     return synctex_io_modes[index];
 }

@@ -152,7 +152,7 @@ extern string strstr (const_string haystack, const_string needle);
 
 /* If NAME has a suffix, return a pointer to its first character (i.e.,
    the one after the `.'); otherwise, return NULL.  */
-extern KPSEDLL string find_suffix (const_string name);
+extern KPSEDLL const_string find_suffix (const_string name);
 
 /* Return NAME with any suffix removed.  */
 extern KPSEDLL string remove_suffix (const_string name);
@@ -186,9 +186,9 @@ extern KPSEDLL void xputenv_int (const_string var, int value);
 extern KPSEDLL string xgetcwd (void);
 
 /* Returns true if FN is a directory or a symlink to a directory.  */
-extern KPSEDLL boolean kpathsea_dir_p (kpathsea kpse, const_string fn);
+extern KPSEDLL boolean kpathsea_dir_p (kpathsea kpse, string fn);
 #if defined (KPSE_COMPAT_API)
-extern KPSEDLL boolean dir_p (const_string fn);
+extern KPSEDLL boolean dir_p (string fn);
 #endif
 
 /* If FN is a readable directory, return the number of links it has.

@@ -1,3 +1,18 @@
+2011-12-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/script_links.am: Replace ${prefix} => $(datarootdir).
+
+2011-09-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* ../build-aux/relpath: New shell script to compute relative
+	path for linked scripts.
+	* am/script_links.am: Use relpath, mainly for distros.
+
+2011-05-30  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/bin_links.am: New Makefile fragment for symlinks within
+	$(bindir).
+
 2011-04-20  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* am/script_links.am: Add support for lua scripts; reorganize.

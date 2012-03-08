@@ -1,3 +1,65 @@
+2012-01-18  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* writejbig2.c (getstreamlen): Change type to `off_t'.
+	Use LONGINTEGER_TYPE and LONGINTEGER_PRId for printing.
+
+2012-01-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Consistent support for large JBIG2 files.
+	* writejbig2.c: Change type of various struct members, local
+	variables and findstreamstart() from `long' or `unsigned long'
+	to `off_t'.  Do not use xfseek and xfseeko for the same file.
+
+2011-12-16  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Change type of pdf_ptr: longinteger => integer.
+	* pdftex-common.h: Change type of pdfptr accordingly.
+
+2011-12-15  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* utils.c (getfiledump): Drop `off_t' cast from arg2 of fseek().
+	* ttf2afm.c, writettf.c: Typo in comment.
+
+2011-12-12  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* writejbig2.h (removed): Declarations moved ...
+	* writejbig2.c: ... to here.  Declare most functions as static.
+	* am/libpdftex.am (libpdftex_a_SOURCES): Remove writejbig2.h.
+
+2011-10-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftosrc.cc: Always use new logic for Object Streams
+	(for xpdf without patch-40-objectStream-support-for-pdftosrc).
+
+2011-09-30  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* wprob.test: New shell script to test for uninitialized line.
+	* am/pdftex.am: Add the new test.	
+
+2011-09-30  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftosrc.test: Shell script for a new test.
+	* tests/test-{13,15}.{pdf,xref} (new): Test input and expected
+	output (from Hartmut Henkel <hartmut_henkel@gmx,de>).
+	* am/pdftosrc.am: Adjust.
+
+2011-07-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftoepdf.cc, pdftosrc.cc: #include <assert.h> for both xpdf
+	and poppler.
+
+2011-07-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftosrc.cc: Rewrite the Object Stream handling for poppler
+	(or xpdf without patch-40-objectStream-support-for-pdftosrc).
+
+	* pdftoepdf.cc: Replace `#ifdef HAVE_GETPDFMAJORVERSION' by
+	'#ifdef POPPLER_VERSION' for poppler >= 0.12.
+
+2011-05-12  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* writepng.c: #define PNG_FP_1 for libpng < 1.5.0.
+
 2011-05-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* writepng.c: Fix for 16bit images in pdf 1.4 (8bit) mode,

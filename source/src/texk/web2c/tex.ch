@@ -936,8 +936,8 @@ noreturn procedure confusion(@!s:str_number);
 
 % [8.110] Make it easy to change constants.  Do not increase
 % max_quarterword without changing the memoryword structure in `texmfmem.h'.
-% If you set min_quarterword or min_halfword to a non-zero value, you have
-% to remove the definitions of qi/qo, hi/ho in this change file!
+% If you set min_quarterword to a non-zero value, you have to remove the
+% definitions of qi/qo in this change file!
 @x [8.110] l.2405 - increase |max_halfword|
 @d min_quarterword=0 {smallest allowable value in a |quarterword|}
 @d max_quarterword=255 {largest allowable value in a |quarterword|}
@@ -950,7 +950,15 @@ noreturn procedure confusion(@!s:str_number);
 @d max_halfword==@"FFFFFFF {largest allowable value in a |halfword|}
 @z
 
-@x [8.111] l.2422 - max_font_max
+@x [8.111] l.2435 - min_halfword and max_halfword
+if (mem_min<min_halfword)or(mem_max>=max_halfword)or@|
+  (mem_bot-mem_min>max_halfword+1) then bad:=14;
+@y
+if (mem_bot-sup_main_memory<min_halfword)or@|
+  (mem_top+sup_main_memory>=max_halfword) then bad:=14;
+@z
+
+@x [8.111] l.2437 - max_font_max
 if (font_base<min_quarterword)or(font_max>max_quarterword) then bad:=15;
 if font_max>font_base+256 then bad:=16;
 @y
@@ -958,7 +966,7 @@ if (max_font_max<min_halfword)or(max_font_max>max_halfword) then bad:=15;
 if font_max>font_base+max_font_max then bad:=16;
 @z
 
-@x [8.112] l.2435 - Efficiency.
+@x [8.112] l.2450 - Efficiency.
 macros are simplified in the obvious way when |min_quarterword=0|.
 @^inner loop@>@^system dependencies@>
 
@@ -974,6 +982,11 @@ macros are simplified in the obvious way when |min_quarterword=0|.
 macros are simplified in the obvious way when |min_quarterword=0|.
 So they have been simplified here in the obvious way.
 @^inner loop@>@^system dependencies@>
+
+The \.{WEB} source for \TeX\ defines |hi(#)==#+min_halfword| which can be
+simplified when |min_halfword=0|.  The Web2C implemetation of \TeX\ can use
+|hi(#)==#| together with |min_halfword<0| as long as |max_halfword| is
+sufficiently large.
 
 @d qi(#)==# {to put an |eight_bits| item into a quarterword}
 @d qo(#)==# {to take an |eight_bits| item from a quarterword}
@@ -2454,6 +2467,37 @@ the bytes in one shot.  Much better even than writing four
 bytes at a time.
 @z
 
+@x [32.601] l.11911 - check dvi file size
+each time, we use the macro |dvi_out|.
+@y
+each time, we use the macro |dvi_out|.
+
+The length of |dvi_file| should not exceed |@"7FFFFFFF|; we set |cur_s:=-2|
+to prevent further \.{DVI} output causing infinite recursion.
+@z
+
+@x [32.601] l.11918 - dvi_swap: check dvi file size
+begin if dvi_limit=dvi_buf_size then
+@y
+begin if dvi_ptr>(@"7FFFFFFF-dvi_offset) then
+  begin cur_s:=-2;
+  fatal_error("dvi length exceeds ""7FFFFFFF");
+@.dvi length exceeds...@>
+  end;
+if dvi_limit=dvi_buf_size then
+@z
+
+@x [32.602] l.11932 -  empty the last bytes: check dvi file size
+if dvi_ptr>0 then write_dvi(0,dvi_ptr-1)
+@y
+if dvi_ptr>(@"7FFFFFFF-dvi_offset) then
+  begin cur_s:=-2;
+  fatal_error("dvi length exceeds ""7FFFFFFF");
+@.dvi length exceeds...@>
+  end;
+if dvi_ptr>0 then write_dvi(0,dvi_ptr-1)
+@z
+
 @x [32.602] l.11944 - Allow for outputting more than 256 fonts.
 begin dvi_out(fnt_def1);
 dvi_out(f-font_base-1);@/
@@ -2560,6 +2604,11 @@ if ipc_on>0 then
     flush_dvi;
     dvi_gone:=dvi_gone+half_buf;
     end;
+  if dvi_ptr>(@"7FFFFFFF-dvi_offset) then
+    begin cur_s:=-2;
+    fatal_error("dvi length exceeds ""7FFFFFFF");
+@.dvi length exceeds...@>
+    end;
   if dvi_ptr>0 then
     begin write_dvi(0, dvi_ptr-1);
     flush_dvi;
@@ -2571,7 +2620,14 @@ if ipc_on>0 then
 endif ('IPC');
 @z
 
-@x [32.642] l.12742 - Use dvi_offset instead of dvi_buf_size with IPC stuff.
+@x [32.645] l.12766 - check dvi file size
+else  begin dvi_out(post); {beginning of the postamble}
+@y
+else if cur_s<>-2 then
+  begin dvi_out(post); {beginning of the postamble}
+@z
+
+@x [32.645] l.12775 - Use dvi_offset instead of dvi_buf_size with IPC stuff.
   k:=4+((dvi_buf_size-dvi_ptr) mod 4); {the number of 223's}
 @y
 ifdef ('IPC')
@@ -2582,13 +2638,13 @@ ifndef ('IPC')
 endifn ('IPC')
 @z
 
-@x [32.642] l.12773 - use print_file_name
+@x [32.645] l.12780 - use print_file_name
   print_nl("Output written on "); slow_print(output_file_name);
 @y
   print_nl("Output written on "); print_file_name(0, output_file_name, 0);
 @z
 
-@x [32.642] l.12750 - i18n fix
+@x [32.645] l.12782 - i18n fix
   print(" ("); print_int(total_pages); print(" page");
   if total_pages<>1 then print_char("s");
 @y
@@ -4042,12 +4098,10 @@ undump(batch_mode)(error_stop_mode)(interaction);
 if interaction_option<>unspecified_mode then interaction:=interaction_option;
 @z
 
-% [50.1327] As with TFM files, `eof' here means `have we previously
-% encountered the end-of-file', not `are we at the end of the file'.
-@x [50.1327] l.24120 - dumping/undumping, replace eof() by feof()
+@x [50.1327] l.24172 - Test for end-of-file already done by undump.
 if (x<>69069)or eof(fmt_file) then goto bad_fmt
 @y
-if (x<>69069)or feof(fmt_file) then goto bad_fmt
+if x<>69069 then goto bad_fmt
 @z
 
 % Eliminate probably wrong word `preloaded' from format_idents.
@@ -4532,7 +4586,7 @@ begin
   else begin
     print_nl (""); print (full_source_filename_stack[level]); print (":");
     if level=in_open then print_int (line)
-    else print_int (line_stack[index+1-(in_open-level)]);
+    else print_int (line_stack[level+1]);
     print (": ");
   end;
 end;
@@ -4585,11 +4639,11 @@ else begin
 end;
 
 
-@* \[54/web2c-string] The string recycling routines.  \TeX{} uses 2
-upto 4 {\it new\/} strings when scanning a filename in an \.{\\input},
-\.{\\openin}, or \.{\\openout} operation.  These strings are normally
-lost because the reference to them are not saved after finishing the
-operation.  |search_string| searches through the string pool for the
+@* \[54/web2c-string] The string recycling routines.
+\TeX{} uses 2 upto 4 {\it new\/} strings when scanning a filename in an
+\.{\\input}, \.{\\openin}, or \.{\\openout} operation.  These strings are
+normally lost because the reference to them are not saved after finishing
+the operation.  |search_string| searches through the string pool for the
 given string and returns either 0 or the found string number.
 
 @<Declare additional routines for string recycling@>=
