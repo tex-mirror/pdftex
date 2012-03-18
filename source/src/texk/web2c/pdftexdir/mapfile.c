@@ -179,6 +179,7 @@ int avl_do_entry(fm_entry * fm, int mode)
     fm_entry *p;
     void *a;
     void **aa;
+    boolean suppress_warn = (getpdfsuppresswarningdupmap() > 0);
 
     /* handle tfm_name link */
 
@@ -187,9 +188,10 @@ int avl_do_entry(fm_entry * fm, int mode)
         if (p != NULL) {
             switch (mode) {
             case FM_DUPIGNORE:
-                pdftex_warn
-                    ("fontmap entry for `%s' already exists, duplicates ignored",
-                     fm->tfm_name);
+                if (!suppress_warn)
+                    pdftex_warn
+                        ("fontmap entry for `%s' already exists, duplicates ignored",
+                         fm->tfm_name);
                 goto exit;
                 break;
             case FM_REPLACE:
