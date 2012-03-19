@@ -1108,8 +1108,7 @@ static void ttf_reindex_glyphs(void)
         /* scan form `index123' */
         n = -1;
         sscanf(e->name, GLYPH_PREFIX_INDEX "%i%n", &index, &n);
-
-        if (ttf_index_form(e->name)) {
+        if (n == strlen(e->name)) {
             if (index >= glyphs_count) {
                 pdftex_warn("`%s' out of valid range [0..%i)",
                             e->name, glyphs_count);
