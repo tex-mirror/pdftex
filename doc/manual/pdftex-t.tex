@@ -63,14 +63,14 @@
 
 \svnscan $Id$
 
-\def\currentpdftex{1.40.11}
+\def\currentpdftex{1.40.13}
 
 %***********************************************************************
 
 \def\eTeX{{$\varepsilon$}-\kern-.125em\TeX}
 \def\eg{e.\,g.}
 \def\Eg{E.\,g.}
-\def\PDFReference{PDF Reference} % PDF with capital letters
+\def\PDFReference{{\sl PDF Reference}} % PDF with capital letters
 
 \abbreviation [AFM]        {afm}        {Adobe Font Metrics}
 %\abbreviation [AMIGA]      {Amiga}      {Amiga hardware platform}
@@ -617,7 +617,7 @@
     \pdfoutput=1
     \pdfcompresslevel=0
     \pdfobjcompresslevel=0
-    \pdfmapline{ptmr8r Times-Roman <8r.enc}
+    \pdfmapline{ptmr8r Times-Roman 2 <8r.enc}
     \font\tenrm=ptmr8r
     \tenrm
     Welcome to pdf\TeX!
@@ -710,7 +710,7 @@ Please send questions or suggestions by email to \from[ptex_bugs].
 
 \subsection{Legal Notice}
 
-Copyright \copyright\ 1996||2010  \THANH.
+Copyright \copyright\ 1996||2012  \THANH.
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
 or any later version published by the Free Software Foundation;
@@ -927,8 +927,8 @@ The next step is to put the freshly compiled \filename{pdftex},
 pool file \filename{pdftex.pool} into their proper places within
 the \TDS\ structure of the \TEX\ system. Put the binary files
 into the binary directory (\eg\ for a typical \TEXLIVE\ system)
-\filename{/usr/local/texlive/2010/bin/x86_64-linux}, and the pool file
-into \filename{/usr/local/texlive/2010/texmf/web2c}.
+\filename{/usr/local/texlive/\rcsyear/bin/x86_64-linux}, and the pool file
+into \filename{/usr/local/texlive/\rcsyear/texmf/web2c}.
 
 Don't forget to do a \filename{texconfig-sys init} afterwards, so that
 all formats are regenerated system-wide with the fresh \filename{pdftex}
@@ -1484,7 +1484,6 @@ and {\em fontfile}, however the first three fields must be given in
 fixed order.
 
 \startdescription {tfmname}
-
 sets the name of the \TFM\ file for a font --- the name \TEX\ sees.
 This name must always
 be given.
@@ -1492,7 +1491,6 @@ be given.
 \stopdescription
 
 \startdescription {basename}
-
 sets the (\POSTSCRIPT) base font name, which has two uses:
 
 First, when a \PDF\ file is embedded by \type{\pdfximage}, the
@@ -1521,7 +1519,6 @@ strictly speaking it's optional).
 \stopdescription
 
 \startdescription {fontflags}
-
 specify some characteristics of the font. The following description of
 these flags is taken, with slight modification, from the \PDFReference\
 (the section on font descriptor flags). Viewers can adapt their rendering
@@ -1593,15 +1590,14 @@ features of bold characters may be thickened at small text sizes.
 If the {\em fontflags} field is not given, \PDFTEX\ treats it as being~4,
 a symbolic font. If you do not know the correct value, it is best not
 to specify it at all, as specifying a bad value of font flags may cause
-troubles in viewers. On the other hand this option is not absolutely
+trouble in viewers. On the other hand this option is not absolutely
 useless because it provides backward compatibility with older map files
 (see the {\em fontfile} description below).
 
 \stopdescription
 
 \startdescription {special}
-
-instructions can be used to manipulate fonts similar to the way
+specifies instructions to manipulate fonts similar to the way
 \type{dvips} does. Currently only the keywords \type{SlantFont}
 and \type{ExtendFont} are interpreted, other instructions (as
 \type{ReEncodeFont} with parameters, see {\em encoding} below) are
@@ -1612,7 +1608,6 @@ instruction must be enclosed by double quotes \type{"}.
 \stopdescription
 
 \startdescription {encodingfile}
-
 specifies the name of the file containing the external encoding vector
 to be used for the font. The encoding file must have name extension
 \type{.enc}, and the full file name including this extension must be given
@@ -1626,7 +1621,6 @@ and it is {\em required} when subsetting a TrueType font.
 \stopdescription
 
 \startdescription {fontfile}
-
 sets the name of the font file to be embedded into the \PDF\ output for a
 given \TeX\ font (the {\em tfmname}~$\longleftrightarrow$~{\em fontfile}
 mapping is the most prominent use of the \filename{pdftex.map} file).
@@ -2005,6 +1999,14 @@ new Didot (1\,nd~=~0.375\,mm) and the new Cicero (1\,nc~=~12\,nd)
 
 \Syntax {
 \Tex {\pdfdraftmode} \Whatever{integer}
+}
+
+\Syntax {
+\Tex {\pdfsuppresswarningdupdest} \Whatever{integer}
+}
+
+\Syntax {
+\Tex {\pdfsuppresswarningdupmap} \Whatever{integer}
 }
 
 \stoppacked
@@ -3458,6 +3460,7 @@ token list for the \type{-ini} run, \eg:
 This would always read the file \type{myspecial.map} after the default
 \type{pdftex.map} file.
 
+
 \pdftexprimitive {\Syntax {\Tex {\pdfmapline} \Something{map spec}}}
 
 \bookmark{\tex{pdfmapline}}
@@ -3478,6 +3481,20 @@ before finally putting it into a map file.
 \type{\pdfmapline {}} like \type{\pdfmapfile {}} blocks reading
 of the default map file, if it comes early enough in the \TeX\
 input. \introduced{1.20a}
+
+
+\pdftexprimitive {\Syntax {\Tex {\pdfsuppresswarningdupmap}
+\Whatever{integer}}}
+
+\bookmark{\tex{pdfsuppresswarningdupmap}}
+
+Ordinarily, \PDFTEX\ gives a warning when a duplicate map entry for a
+given font is read, whatever the mechanism.  However, sometimes it is
+useful to include map information within the document, using
+\type{\pdfmapfile} or \type{\pdfmapline}, even for fonts that happen to
+be installed on the system.  Then seeing the warnings on every run is
+just noise, and can be suppressed by setting this parameter to a
+positive number.  \introduced{1.40.13}
 
 \pdftexprimitive {\Syntax {\Tex {\pdftracingfonts} \Whatever{integer}}}
 
@@ -4347,6 +4364,18 @@ a hyperlink and is read when a page containing hyperlinks is shipped out.
 \bookmark{\tex{pdfdestmargin}}
 
 Margin added to the dimensions of the rectangle around the destinations.
+
+\pdftexprimitive {\Syntax {\Tex {\pdfsuppresswarningdupdest}
+\Whatever{integer}}}
+
+\bookmark{\tex{pdfsuppresswarningdupdest}}
+
+Ordinarily, \PDFTEX\ gives a warning when the same destination is used
+more than once.  However, due to problematic macro packages, sometimes a
+document may end up producing the warning through no fault of its own,
+and fixing the macros may well not be trivial.  Then seeing the warnings
+on every run is just noise, and can be suppressed by setting this
+parameter to a positive number.  \introduced{1.40.13}
 
 %***********************************************************************
 

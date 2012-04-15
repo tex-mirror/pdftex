@@ -1,3 +1,16 @@
+2012-04-15  Karl Berry  <karl@gnu.org>
+
+	* pdftex-t.tex: update copyright and other years.
+	(\currentpdftex): bump to 1.40.13 (missed this last year).
+	(\PDFReference): italics looks nicer, I think.
+	(Setting up fonts): description is written better to start on same
+	line as item name.  Also avoids bad page break after item name.
+	(\pdfsuppresswarningdupdest, \pdfsuppresswarningdupmap): doc.
+
+	* Makefile (pdftexversion): get from \currentpdftex (also missed).
+
+	* pdftex-w.tex: use flags (2=serif) to avoid warnings.
+
 2011-04-01  Karl Berry  <karl@gnu.org>
 
 	* pdftex-t.tex: Explain \pdfnormaldeviate a bit more fully.
