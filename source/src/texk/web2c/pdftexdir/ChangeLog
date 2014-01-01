@@ -1,3 +1,7 @@
+2014-01-01  Karl Berry  <karl@gnu.org>
+
+	* All source files: update copyright years to include 2014.
+
 2013-09-15  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
 
 	* writet1.c (t1_subset_ascii_part): Remove UniqueID in subsets.
