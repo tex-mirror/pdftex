@@ -17,11 +17,14 @@ You should have received a copy of the GNU General Public License along
 with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* For MINGW32 <rpcndr.h> defines 'boolean' as 'unsigned char',
-   conflicting with the definition for Pascal's boolean as 'int'
-   in <kpathsea/types.h>.
+/* Do this early in order to avoid a conflict between
+   MINGW32 <rpcndr.h> defining 'boolean' as 'unsigned char' and
+   <kpathsea/types.h> defining Pascal's boolean as 'int'.
 */
-#define boolean MINGW32_boolean
+extern "C" {
+#include <w2c/config.h>
+#include <kpathsea/lib.h>
+}
 
 #include <stdlib.h>
 #include <math.h>
@@ -58,25 +61,12 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "GlobalParams.h"
 #include "Error.h"
 
-#undef boolean
-
 // This file is mostly C and not very much C++; it's just used to interface
 // the functions of xpdf, which happens to be written in C++.
 
 extern "C" {
-
-#include <openbsd-compat.h>
-
-#include <kpathsea/c-auto.h>
-#include <kpathsea/c-proto.h>
-#include <kpathsea/lib.h>
-
-#include <w2c/c-auto.h>         /* define SIZEOF_LONG */
-#include <w2c/config.h>         /* define type integer */
-
 #include <pdftexdir/ptexmac.h>
 #include <pdftexdir/pdftex-common.h>
-
 }
 
 // The prefix "PTEX" for the PDF keys is special to pdfTeX;
@@ -295,6 +285,11 @@ static int getNewObjectNumber(Ref ref)
         }
         pdftex_fail("Object not yet copied: %i %i", ref.num, ref.gen);
     }
+#ifdef _MSC_VER
+    /* Never reached, but without __attribute__((noreturn)) for pdftex_fail()
+       MSVC 5.0 requires an int return value.  */
+    return -60000;
+#endif
 }
 
 static void copyObject(Object *);
@@ -609,8 +604,7 @@ static void copyObject(Object * obj)
         pdf_puts(">>\n");
         pdf_puts("stream\n");
         copyStream(obj->getStream()->getUndecodedStream());
-        pdf_newline();
-        pdf_puts("endstream");  // can't simply write pdfendstream()
+        pdf_puts("\nendstream");
     } else if (obj->isRef()) {
         ref = obj->getRef();
         if (ref.num == 0) {
@@ -668,7 +662,7 @@ static void writeEncodings()
             if ((s = ((Gfx8BitFont *) r->font)->getCharName(i)) != 0)
                 glyphNames[i] = s;
             else
-                glyphNames[i] = (char *) notdef;
+                glyphNames[i] = notdef;
         }
         epdf_write_enc(glyphNames, r->enc_objnum);
     }
@@ -811,6 +805,8 @@ read_pdf_info(char *image_name, char *page_name, int page_num,
         epdf_has_page_group = 1;    // only flag that page group is present;
                                     // the actual object number will be
                                     // generated in pdftex.web
+    else
+        epdf_has_page_group = 0;    // no page group present
 
     pdf_doc->xref = pdf_doc->doc->getXRef();
     return page_num;
@@ -941,6 +937,8 @@ void write_epdf(void)
         if (pdfpagegroupval == 0) { 
             // another pdf with page group was included earlier on the same page;
             // copy the Group entry as is
+            pdftex_warn
+                ("PDF inclusion: multiple pdfs with page group included in a single page");
             pdf_newline();
             pdf_puts("/Group ");
             copyObject(&dictObj);

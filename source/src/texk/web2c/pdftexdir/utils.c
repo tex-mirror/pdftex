@@ -17,19 +17,10 @@ You should have received a copy of the GNU General Public License along
 with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "openbsd-compat.h"
-
+#include <w2c/config.h>		/* for large file support */
 #include <sys/types.h>
-#ifdef WIN32
-#define EX_SOFTWARE EXIT_FAILURE
-#else
-#include <sysexits.h>
-#endif
-#ifdef __MINGW32__
-#include <regex/regex.h>
-#else
 #include <regex.h>
-#endif
+#include <kpathsea/config.h>
 #include <kpathsea/c-proto.h>
 #include <kpathsea/c-stat.h>
 #include <kpathsea/c-fopen.h>
@@ -257,7 +248,7 @@ void pdftex_fail(const char *fmt, ...)
         println();
         abort();
     } else {
-        exit(EX_SOFTWARE);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -285,33 +276,6 @@ void garbagewarning(void)
 {
     pdftex_warn("dangling objects discarded, no output file produced.");
     removepdffile();
-}
-
-char *makecstring(integer s)
-{
-    static char *cstrbuf = NULL;
-    char *p;
-    static int allocsize;
-    int allocgrow, i, l = strstart[s + 1] - strstart[s];
-    check_buf(l + 1, MAX_CSTRING_LEN);
-    if (cstrbuf == NULL) {
-        allocsize = l + 1;
-        cstrbuf = xmallocarray(char, allocsize);
-    } else if (l + 1 > allocsize) {
-        allocgrow = allocsize * 0.2;
-        if (l + 1 - allocgrow > allocsize)
-            allocsize = l + 1;
-        else if (allocsize < MAX_CSTRING_LEN - allocgrow)
-            allocsize += allocgrow;
-        else
-            allocsize = MAX_CSTRING_LEN;
-        cstrbuf = xreallocarray(cstrbuf, char, allocsize);
-    }
-    p = cstrbuf;
-    for (i = 0; i < l; i++)
-        *p++ = strpool[i + strstart[s]];
-    *p = 0;
-    return cstrbuf;
 }
 
 void setjobid(int year, int month, int day, int time)
@@ -418,13 +382,13 @@ int xputc(int c, FILE * stream)
     return i;
 }
 
-void writestreamlength(integer length, longinteger offset)
+void writestreamlength(longinteger length, longinteger offset)
 {
     if (jobname_cstr == NULL)
         jobname_cstr = xstrdup(makecstring(jobname));
     if (fixedpdfdraftmode == 0) {
         xfseeko(pdffile, (off_t) offset, SEEK_SET, jobname_cstr);
-        fprintf(pdffile, "%li", (long int) length);
+        fprintf(pdffile, "%" LONGINTEGER_PRI "i", (LONGINTEGER_TYPE) length);
         xfseeko(pdffile, (off_t) pdfoffset(), SEEK_SET, jobname_cstr);
     }
 }
@@ -776,6 +740,17 @@ void printID(strnumber filename)
     /* get the file name */
     if (getcwd(pwd, sizeof(pwd)) == NULL)
         pdftex_fail("getcwd() failed (%s), path too long?", strerror(errno));
+#ifdef WIN32
+    {
+        char *p;
+        for (p = pwd; *p; p++) {
+            if (*p == '\\')
+                *p = '/';
+            else if (IS_KANJI(p))
+                p++;
+        }
+    }
+#endif
     file_name = makecstring(filename);
     md5_append(&state, (const md5_byte_t *) pwd, strlen(pwd));
     md5_append(&state, (const md5_byte_t *) "/", 1);
@@ -837,68 +812,6 @@ void printID(strnumber filename)
   Solaris 2.5).
 */
 
-static time_t start_time = 0;
-#define TIME_STR_SIZE 30
-static char start_time_str[TIME_STR_SIZE];
-static char time_str[TIME_STR_SIZE];
-    /* minimum size for time_str is 24: "D:YYYYmmddHHMMSS+HH'MM'" */
-
-static void makepdftime(time_t t, char *time_str)
-{
-
-    struct tm lt, gmt;
-    size_t size;
-    int i, off, off_hours, off_mins;
-
-    /* get the time */
-    lt = *localtime(&t);
-    size = strftime(time_str, TIME_STR_SIZE, "D:%Y%m%d%H%M%S", &lt);
-    /* expected format: "YYYYmmddHHMMSS" */
-    if (size == 0) {
-        /* unexpected, contents of time_str is undefined */
-        time_str[0] = '\0';
-        return;
-    }
-
-    /* correction for seconds: %S can be in range 00..61,
-       the PDF reference expects 00..59,
-       therefore we map "60" and "61" to "59" */
-    if (time_str[14] == '6') {
-        time_str[14] = '5';
-        time_str[15] = '9';
-        time_str[16] = '\0';    /* for safety */
-    }
-
-    /* get the time zone offset */
-    gmt = *gmtime(&t);
-
-    /* this calculation method was found in exim's tod.c */
-    off = 60 * (lt.tm_hour - gmt.tm_hour) + lt.tm_min - gmt.tm_min;
-    if (lt.tm_year != gmt.tm_year) {
-        off += (lt.tm_year > gmt.tm_year) ? 1440 : -1440;
-    } else if (lt.tm_yday != gmt.tm_yday) {
-        off += (lt.tm_yday > gmt.tm_yday) ? 1440 : -1440;
-    }
-
-    if (off == 0) {
-        time_str[size++] = 'Z';
-        time_str[size] = 0;
-    } else {
-        off_hours = off / 60;
-        off_mins = abs(off - off_hours * 60);
-        i = snprintf(&time_str[size], 9, "%+03d'%02d'", off_hours, off_mins);
-        check_nprintf(i, 9);
-    }
-}
-
-void initstarttime(void)
-{
-    if (start_time == 0) {
-        start_time = time((time_t *) NULL);
-        makepdftime(start_time, start_time_str);
-    }
-}
-
 void printcreationdate(void)
 {
     initstarttime();
@@ -909,86 +822,6 @@ void printmoddate(void)
 {
     initstarttime();
     pdf_printf("/ModDate (%s)\n", start_time_str);
-}
-
-void getcreationdate(void)
-{
-    /* put creation date on top of string pool and update poolptr */
-    size_t len = strlen(start_time_str);
-
-    initstarttime();
-
-    if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
-        poolptr = poolsize;
-        /* error by str_toks that calls str_room(1) */
-        return;
-    }
-
-    memcpy(&strpool[poolptr], start_time_str, len);
-    poolptr += len;
-}
-
-void getfilemoddate(strnumber s)
-{
-    struct stat file_data;
-
-    char *file_name = kpse_find_tex(makecfilename(s));
-    if (file_name == NULL) {
-        return;                 /* empty string */
-    }
-
-    recorder_record_input(file_name);
-    /* get file status */
-    if (stat(file_name, &file_data) == 0) {
-        size_t len;
-
-        makepdftime(file_data.st_mtime, time_str);
-        len = strlen(time_str);
-        if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
-            poolptr = poolsize;
-            /* error by str_toks that calls str_room(1) */
-        } else {
-            memcpy(&strpool[poolptr], time_str, len);
-            poolptr += len;
-        }
-    }
-    /* else { errno contains error code } */
-
-    xfree(file_name);
-}
-
-void getfilesize(strnumber s)
-{
-    struct stat file_data;
-    int i;
-
-    char *file_name = kpse_find_tex(makecfilename(s));
-    if (file_name == NULL) {
-        return;                 /* empty string */
-    }
-
-    recorder_record_input(file_name);
-    /* get file status */
-    if (stat(file_name, &file_data) == 0) {
-        size_t len;
-        char buf[20];
-
-        /* st_size has type off_t */
-        i = snprintf(buf, sizeof(buf),
-                     "%lu", (long unsigned int) file_data.st_size);
-        check_nprintf(i, sizeof(buf));
-        len = strlen(buf);
-        if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
-            poolptr = poolsize;
-            /* error by str_toks that calls str_room(1) */
-        } else {
-            memcpy(&strpool[poolptr], buf, len);
-            poolptr += len;
-        }
-    }
-    /* else { errno contains error code } */
-
-    xfree(file_name);
 }
 
 #define DIGEST_SIZE 16
@@ -1186,29 +1019,6 @@ void getmatch(int i)
     strpool[poolptr++] = '>';
 }
 
-
-/* makecfilename
-  input/ouput same as makecstring:
-    input: string number
-    output: C string with quotes removed.
-    That means, file names that are legal on some operation systems
-    cannot any more be used since pdfTeX version 1.30.4.
-*/
-char *makecfilename(strnumber s)
-{
-    char *name = makecstring(s);
-    char *p = name;
-    char *q = name;
-
-    while (*p) {
-        if (*p != '"')
-            *q++ = *p;
-        p++;
-    }
-    *q = '\0';
-    return name;
-}
-
 /* function strips trailing zeros in string with numbers; */
 /* leading zeros are not stripped (as in real life) */
 char *stripzeros(char *a)
@@ -1280,10 +1090,20 @@ char *stripzeros(char *a)
 
 void initversionstring(char **versions)
 {
-    (void) asprintf(versions,
+    const_string fmt =
                     "Compiled with libpng %s; using libpng %s\n"
                     "Compiled with zlib %s; using zlib %s\n"
-                    "Compiled with %s version %s\n",
+                    "Compiled with %s version %s\n";
+    size_t len = strlen(fmt)
+                    + strlen(PNG_LIBPNG_VER_STRING) + strlen(png_libpng_ver)
+                    + strlen(ZLIB_VERSION) + strlen(zlib_version)
+                    + strlen(xpdfString) + strlen(xpdfVersion)
+                    + 1;
+
+    /* len will be more than enough, because of the placeholder chars in fmt
+       that get replaced by the arguments.  */
+    *versions = xmalloc(len);
+    sprintf(*versions, fmt,
                     PNG_LIBPNG_VER_STRING, png_libpng_ver,
                     ZLIB_VERSION, zlib_version, xpdfString, xpdfVersion);
 }

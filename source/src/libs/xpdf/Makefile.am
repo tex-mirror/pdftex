@@ -1,6 +1,6 @@
 ## Proxy Makefile.am to build xpdf for TeX Live.
 ##
-##   Copyright (C) 2009-2011 Peter Breitenlohner <tex-live@tug.org>
+##   Copyright (C) 2009-2013 Peter Breitenlohner <tex-live@tug.org>
 ##
 ##   This file is free software; the copyright holder
 ##   gives unlimited permission to copy and/or distribute it,
@@ -19,15 +19,8 @@
 ##
 ACLOCAL_AMFLAGS = -I ../../m4
 
-# Rebuild
-.PHONY: rebuild
-rebuild: all
-
 ## We want to re-distribute the whole original xpdf source tree.
 ##
-## With current automake (1.10.2) 'make distcheck' fails when
-## DISTFILES contains a directory and files in that directory.
-## Thus nodist_* for all files in $(XPDF_TREE).
 EXTRA_DIST = $(XPDF_TREE)
 
 ## Official patches as obtained from ftp://ftp.foolabs.com/pub/xpdf
@@ -41,18 +34,19 @@ EXTRA_DIST += $(XPDF_TREE)-PATCHES
 
 # in case of an SVN repository
 dist-hook:
-	rm -rf `find $(distdir) -name .svn`
+	rm -rf `find $(distdir) -name .svn -o -name .deps -o -name .dirstamp -o -name '*.$(OBJEXT)'`
 	rm -f $(distdir)/$(XPDF_TREE)/install-sh
 
-SUBDIRS = goo fofi splash xpdf
+SUBDIRS = . goo fofi splash xpdf
 
 GOO_SRC = $(top_srcdir)/$(XPDF_TREE)/goo
 FOFI_SRC = $(top_srcdir)/$(XPDF_TREE)/fofi
-SPLAHS_SRC = $(top_srcdir)/$(XPDF_TREE)/splash
+SPLASH_SRC = $(top_srcdir)/$(XPDF_TREE)/splash
 XPDF_SRC = $(top_srcdir)/$(XPDF_TREE)/xpdf
 
-INCLUDES = -Igoo -Ifofi -Isplash -Ixpdf -I$(GOO_SRC) -I$(FOFI_SRC) -I$(SPLAHS_SRC) -I$(XPDF_SRC)
-AM_CPPFLAGS = -DPDF_PARSER_ONLY
+AM_CPPFLAGS = -Igoo -Ifofi -Isplash -Ixpdf
+AM_CPPFLAGS += -I$(GOO_SRC) -I$(FOFI_SRC) -I$(SPLASH_SRC) -I$(XPDF_SRC)
+AM_CPPFLAGS += -DPDF_PARSER_ONLY
 AM_CFLAGS = $(WARNING_CFLAGS)
 AM_CXXFLAGS = $(NO_WARN_CXXFLAGS)
 
@@ -64,55 +58,61 @@ nodist_libxpdf_a_SOURCES = \
 	$(xpdf_libxpdf_a_sources)
 
 goo_libGoo_a_sources = \
-	$(GOO_SRC)/FixedPoint.cc \
-	$(GOO_SRC)/GHash.cc \
-	$(GOO_SRC)/GList.cc \
-	$(GOO_SRC)/GString.cc \
-	$(GOO_SRC)/gmem.cc \
-	$(GOO_SRC)/gmempp.cc \
-	$(GOO_SRC)/gfile.cc
+	@XPDF_TREE@/goo/FixedPoint.cc \
+	@XPDF_TREE@/goo/GHash.cc \
+	@XPDF_TREE@/goo/GList.cc \
+	@XPDF_TREE@/goo/GString.cc \
+	@XPDF_TREE@/goo/gmem.cc \
+	@XPDF_TREE@/goo/gmempp.cc \
+	@XPDF_TREE@/goo/gfile.cc
 
 fofi_libfofi_a_sources = \
-	$(FOFI_SRC)/FoFiBase.cc \
-	$(FOFI_SRC)/FoFiEncodings.cc \
-	$(FOFI_SRC)/FoFiIdentifier.cc \
-	$(FOFI_SRC)/FoFiTrueType.cc \
-	$(FOFI_SRC)/FoFiType1.cc \
-	$(FOFI_SRC)/FoFiType1C.cc
+	@XPDF_TREE@/fofi/FoFiBase.cc \
+	@XPDF_TREE@/fofi/FoFiEncodings.cc \
+	@XPDF_TREE@/fofi/FoFiIdentifier.cc \
+	@XPDF_TREE@/fofi/FoFiTrueType.cc \
+	@XPDF_TREE@/fofi/FoFiType1.cc \
+	@XPDF_TREE@/fofi/FoFiType1C.cc
 
 xpdf_libxpdf_a_sources = \
-	$(XPDF_SRC)/Array.cc \
-	$(XPDF_SRC)/BuiltinFont.cc \
-	$(XPDF_SRC)/BuiltinFontTables.cc \
-	$(XPDF_SRC)/CMap.cc \
-	$(XPDF_SRC)/Catalog.cc \
-	$(XPDF_SRC)/CharCodeToUnicode.cc \
-	$(XPDF_SRC)/Decrypt.cc \
-	$(XPDF_SRC)/Dict.cc \
-	$(XPDF_SRC)/Error.cc \
-	$(XPDF_SRC)/FontEncodingTables.cc \
-	$(XPDF_SRC)/Function.cc \
-	$(XPDF_SRC)/GfxFont.cc \
-	$(XPDF_SRC)/GfxState.cc \
-	$(XPDF_SRC)/GlobalParams.cc \
-	$(XPDF_SRC)/JArithmeticDecoder.cc \
-	$(XPDF_SRC)/JBIG2Stream.cc \
-	$(XPDF_SRC)/JPXStream.cc \
-	$(XPDF_SRC)/Lexer.cc \
-	$(XPDF_SRC)/Link.cc \
-	$(XPDF_SRC)/NameToCharCode.cc \
-	$(XPDF_SRC)/Object.cc \
-	$(XPDF_SRC)/OptionalContent.cc \
-	$(XPDF_SRC)/Outline.cc \
-	$(XPDF_SRC)/OutputDev.cc \
-	$(XPDF_SRC)/PDFDoc.cc \
-	$(XPDF_SRC)/PDFDocEncoding.cc \
-	$(XPDF_SRC)/PSOutputDev.cc \
-	$(XPDF_SRC)/PSTokenizer.cc \
-	$(XPDF_SRC)/Page.cc \
-	$(XPDF_SRC)/Parser.cc \
-	$(XPDF_SRC)/SecurityHandler.cc \
-	$(XPDF_SRC)/Stream.cc \
-	$(XPDF_SRC)/UnicodeMap.cc \
-	$(XPDF_SRC)/XRef.cc
+	@XPDF_TREE@/xpdf/Array.cc \
+	@XPDF_TREE@/xpdf/BuiltinFont.cc \
+	@XPDF_TREE@/xpdf/BuiltinFontTables.cc \
+	@XPDF_TREE@/xpdf/CMap.cc \
+	@XPDF_TREE@/xpdf/Catalog.cc \
+	@XPDF_TREE@/xpdf/CharCodeToUnicode.cc \
+	@XPDF_TREE@/xpdf/Decrypt.cc \
+	@XPDF_TREE@/xpdf/Dict.cc \
+	@XPDF_TREE@/xpdf/Error.cc \
+	@XPDF_TREE@/xpdf/FontEncodingTables.cc \
+	@XPDF_TREE@/xpdf/Function.cc \
+	@XPDF_TREE@/xpdf/GfxFont.cc \
+	@XPDF_TREE@/xpdf/GfxState.cc \
+	@XPDF_TREE@/xpdf/GlobalParams.cc \
+	@XPDF_TREE@/xpdf/JArithmeticDecoder.cc \
+	@XPDF_TREE@/xpdf/JBIG2Stream.cc \
+	@XPDF_TREE@/xpdf/JPXStream.cc \
+	@XPDF_TREE@/xpdf/Lexer.cc \
+	@XPDF_TREE@/xpdf/Link.cc \
+	@XPDF_TREE@/xpdf/NameToCharCode.cc \
+	@XPDF_TREE@/xpdf/Object.cc \
+	@XPDF_TREE@/xpdf/OptionalContent.cc \
+	@XPDF_TREE@/xpdf/Outline.cc \
+	@XPDF_TREE@/xpdf/OutputDev.cc \
+	@XPDF_TREE@/xpdf/PDFDoc.cc \
+	@XPDF_TREE@/xpdf/PDFDocEncoding.cc \
+	@XPDF_TREE@/xpdf/PSTokenizer.cc \
+	@XPDF_TREE@/xpdf/Page.cc \
+	@XPDF_TREE@/xpdf/Parser.cc \
+	@XPDF_TREE@/xpdf/SecurityHandler.cc \
+	@XPDF_TREE@/xpdf/Stream.cc \
+	@XPDF_TREE@/xpdf/UnicodeMap.cc \
+	@XPDF_TREE@/xpdf/XRef.cc
+
+# Rebuild
+rebuild_prereq =
+rebuild_target = all
+CLEANFILES =
+
+include $(srcdir)/../../am/rebuild.am
 

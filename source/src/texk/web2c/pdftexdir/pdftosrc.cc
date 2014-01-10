@@ -16,6 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+extern "C" {
+#include <w2c/config.h>
+}
 
 #include <stdlib.h>
 #include <stddef.h>
@@ -134,7 +137,11 @@ int main(int argc, char *argv[])
         exit(1);
     }
     if (extract_xref_table) {
+#ifdef POPPLER_VERSION
+        int size = xref->getNumObjects();
+#else
         int size = xref->getSize();
+#endif
         int i;
         for (i = 0; i < size; i++) {
             if (xref->getEntry(i)->offset == 0xffffffff)

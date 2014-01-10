@@ -1,6 +1,6 @@
 /* tex-make.c: run external programs to make TeX-related files.
 
-   Copyright 1993, 1994, 1995, 1996, 1997, 2008, 2009, 2010, 2011 Karl Berry.
+   Copyright 1993, 1994, 1995, 1996, 1997, 2008-2013 Karl Berry.
    Copyright 1997, 1998, 2001-05 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
@@ -383,8 +383,8 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
 
       ret = len == 0 ? NULL : kpathsea_readable_file (kpse, fn);
       if (!ret && len > 1) {
-        WARNING2("kpathsea: %s output `%s' instead of a filename",
-                 args[0], fn);
+        WARNING2 ("kpathsea: %s output `%s' instead of a filename",
+                  args[0], fn);
       }
 
       /* Free the name if we're not returning it.  */
@@ -403,6 +403,7 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
 }
 
 
+
 /* Create BASE in FORMAT and return the generated filename, or
    return NULL.  */
 
@@ -436,7 +437,7 @@ kpathsea_make_tex (kpathsea kpse, kpse_file_format_type format,
      * No doubt some possibilities were overlooked.
      */
     if (base[0] == '-' /* || IS_DIR_SEP(base[0])  */) {
-      fprintf(stderr, "kpathsea: Invalid fontname `%s', starts with '%c'\n",
+      fprintf(stderr, "kpathsea:make_tex: Invalid fontname `%s', starts with '%c'\n",
               base, base[0]);
       return NULL;
     }
@@ -448,7 +449,7 @@ kpathsea_make_tex (kpathsea kpse, kpse_file_format_type format,
           && base[i] != '.'
           && !IS_DIR_SEP(base[i]))
       {
-        fprintf(stderr, "kpathsea: Invalid fontname `%s', contains '%c'\n",
+        fprintf(stderr, "kpathsea:make_tex: Invalid fontname `%s', contains '%c'\n",
                 base, base[i]);
         return NULL;
       }

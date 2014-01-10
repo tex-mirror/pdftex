@@ -1,13 +1,271 @@
-2014-01-01  Karl Berry  <karl@gnu.org>
+2014-01-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftoepdf.cc (copyObject): Always write "\nendstream" for
+	PDF/A-1b compliance.
+
+2014-01-02  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* writepng.c: Allow libpng >= 1.6.3 to read images with
+	incorrect CMF bytes.
+
+2014-01-01  Karl Berry  <karl@tug.org>
 
 	* All source files: update copyright years to include 2014.
 
-2013-09-15  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+2013-12-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web (pdf_end_stream): Always write "\nendstream" for
+	PDF/A-1b compliance.
+
+2013-12-17  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Always write "\n" after "obj" and before "endobj".
+	Suggested by Vincent Immler (http://sarovar.org/tracker/#4341).
+
+2013-12-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Update to e-TeX Version 2.6 [2013-11-21].
+	* etex_version.h, pdftex.web: Enable hyphenation of text between
+	\beginL and \endL or between \beginR and \endR.
+
+2013-09-27  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
 
 	* writet1.c (t1_subset_ascii_part): Remove UniqueID in subsets.
 	Report from Christian Zietz (czietz/gmx/net),
 	tex-k 01 Sep 2013 11:25:47 and previous.
-	(Imported from dvipsk by karl.)
+	(Imported from dvipsk.)
+
+2013-08-02  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* ttf2afm.test, tests/postV[37].{afm.ttf}: New test and data.
+	* am/ttf2afm.am: Add the new test.
+
+2013-07-30  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* ttf2afm.c, writettf.c: Treat unknown 'post' table versions
+	(found in some broken fonts) as 3.0, i.e., no Glyph names.
+
+2013-07-12  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/pdftex.am, tests/pdfimage.tex: Add a .pdf image.
+
+2013-07-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdfimage.test, tests/pdfimage.tex: New test and data.
+	* am/pdftex.am: Add the new test.
+
+2013-06-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mapfile.c: First #include <w2c/config.h> via "ptexlib.h".
+	* pdftosrc.cc: First #include <w2c/config.h>.
+
+2013-06-12  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Update to e-pTeX and e-upTeX 130605 from Hironori Kitagawa.
+	* ptexlib.h (initstarttime, makecstring, makecfilename,
+	getcreationdate, getfilemoddate, getfilesize): Move declarations
+	of functions also used by e-(u)pTeX from here to ../texmfmp.h.
+	* utils.c (initstarttime, makecstring, makecfilename,
+	getcreationdate, getfilemoddate, getfilesize): Move definition
+	of these functions from here to ../lib/texmfmp.c.
+
+2013-04-22  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* pdftex.web: pdftex_revision = "14"
+
+2013-04-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: 1.40.13 ---> 1.40.14 for TL 2013.
+
+2013-03-06  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Typos.
+
+2013-03-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/pdftex.am: Better rules for {pdf,e}tex_version.h.
+
+2013-02-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Adapt to e-TeX 2.5.
+
+2013-02-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* etex_version.h: New file extracted from pdftex.web.
+	* am/pdftex.am, pdftexextra.h: Adjust.
+
+2013-01-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* utils.c: Include <w2c/config.h> first for large file support.
+
+2013-01-24  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* wprob.test: Avoid spurious failure of parallel-tests.
+	* am/pdftex.am: Renamed wprob.{tex,log} => pwprob.{tex,log}.
+
+2013-01-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* macnames.c, pdftex-common.h, pdftoepdf.cc, ttf2afm.c,
+	writet1.c: Change 'const char notdef[]' -> 'char notdef[]' and
+	remove casts (const char *) -> (char *).
+
+	* mapfile.c (dummy_fm_entry): Delare const_fm_entry as non-const
+	and remove the cast.
+
+	* utils.c (writestreamlength): Cast length for printing.
+
+2012-12-16  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/pdftex.am (pdftex_version.h): Enable silent rules.
+
+2012-11-05  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Change program name into PDFTEX (not ETEX).
+	* pdftex.ch: Remove the contents of ../tex-binpool.ch.
+	* am/pdftex.am (pdftex_ch_srcs): Add tex-binpool.ch.
+
+2012-10-19  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* pdftoepdf.cc: In MSVC 5.0 getNewObjectNumber() requires an int
+	return value.
+
+2012-10-18  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftoepdf.cc: #include <w2c/config.h> early to avoid problems
+	with the definition of boolean in <rpcndr.h> for MINGW32.
+
+2012-10-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	The openbsd compat library is no longer used.
+	* pdftoepdf.cc, ptexlib.h, utils.c:
+	Drop #include "openbsd-compat.h".
+	* am/pdftex.am, am/pdftosrc.am: Remove OBSDCOMPAT_*.
+
+2012-10-02  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Avoid (most) MinGW compiler warnings from regex code.
+	* regcomp.c, regexec.c: ANSI C function definitions.
+	* regcomp.c (init_dfa): Declare codeset_name as const.
+	* regex_internal.c (re_string_reconstruct, re_dfa_add_node):
+	Avoid unused variables (for !RE_ENABLE_I18N).
+	* regexec.c (regexec, re_search_stub, prune_impossible_nodes):
+	Avoid unused variables (for !_LIBC or !RE_ENABLE_I18N).
+	(re_search_2_stub): Avoid cast const => non-const.
+
+2012-09-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* utils.c [WIN32] (printID): Convert file names '\\' -> '/'.
+
+2012-08-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* ttf2afm.c: Drop '#include <libgen.h>', we use xbasename().
+	* ptexmac.h: Avoid C++ style comment.
+
+2012-08-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* ptexmac.h: Drop unused definition of M_PI & Co.
+
+2012-08-08  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* ptexlib.h: extern void writestreamlength(longinteger, longinteger);
+	for largefile. 
+	extern void storepacket(internalfontnumber, integer, strnumber); to
+	avoid a compiler warning.
+	* utils.c: void writestreamlength(longinteger length, longinteger offset)
+	for largefile.
+	* vfpacket.c: void storepacket(internalfontnumber f, integer c, strnumber s)
+	to avoid a compiler warning.
+
+2012-08-03  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* pdftex.web: Update eTeX_revision and eTeX_version_string.
+
+2012-08-02  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Adapt to e-TeX Version 2.5.
+	* am/pdftex.am: Clarify *tex_version.h dependencies.
+
+2012-07-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* utils.c (initversionstring): Avoid using asprintf().
+
+2012-07-19  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* am/pdftex.am: Distribute pdftex_version.h.
+	* pdftexextra.h: Use ../etexdir/etex_version.h.
+
+2012-07-19  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* writejbig2.c: Use LONGINTEGER_PRI instead of LONGINTEGER_PRId.
+
+2012-07-15  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* ttf2afm.c: Pass program name string to kpse_set_program_name.
+
+2012-07-15  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* pdftexextra.c: Must #define DLLPROC before reading pdftexd.h.
+
+2012-07-14  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* utils.c: Use EXIT_FAILURE instead of EX_SOFTWARE.
+
+2012-07-13  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* writejbig2.c: Cast xfseeko() arg2 to avoid MSVC warning.
+
+2012-06-30  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftexextra.c [W32TeX]: #define DLLPROC for pdftex.dll.
+
+2012-06-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* utils.c [__MINGW32__]: #include <regex.h> as for Unix instead
+	of <regex/regex.h>.
+	* am/libpdftex.am (libpdftex_a_CPPFLAGS): Change accordingly.
+
+2012-06-21  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftosrc.cc: Use XRef::getNumObjects instead of XRef::getSize,
+	required for poppler >= 0.19.0.
+
+2012-05-20  Thanh Han The  <thanh@river-valley.org>
+
+	* pdftex.defines (get/setimagegroupref): these replace imagegroupref.
+	* ptexlib.h: likewise.
+	* writeimg.c: define them, and check for page group
+	without object number.
+	* pdftex.web: change calls.
+	* pdftoepdf.cc: more page-group changes.
+	This is all related to http://bugs.debian.org/672951.
+
+2012-05-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Adapted to e-TeX Version 2.4.
+
+2012-04-15  Karl Berry  <karl@tug.org>
+
+	* pdftex.web (pdftex_revision, pdftex_version_string)
+
+2012-04-12  Thanh Han The  <thanh@river-valley.org>
+
+	* ttf2afm.c (print_str): new macro, replacing function.
+	(escape_eol): new fn, replacing print_str, now returning a string.
+
+	* writettf.c (ttf_reindex_glyphs): use %n to sscanf forms
+	uniABCD and index123. 
+
+	* mapfile.c (suppress_warn): way to avoid dup warnings.
+	
+	* pdftex.web (pdf_suppress_warning_dup_dest_code,
+	pdf_suppress_warning_dup_dest_code): new primitives
+	\pdfsuppresswarningdupdest and \pdfsuppresswarningdupmap.
+	(get_pdf_suppress_warning_dup_map): new fn.
+	(warn_dest_dup): check pdf_suppress_warning_dup_dest.
+
+2012-04-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* pdftex.web: Fixed a typo in TeX text (for e-TeX).
 
 2012-01-18  Peter Breitenlohner  <peb@mppmu.mpg.de>
 

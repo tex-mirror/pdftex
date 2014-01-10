@@ -1,6 +1,6 @@
 /* pathsearch.h: mostly-generic path searching.
 
-   Copyright 1993, 1994, 1996, 1997, 2007, 2008, 2009, 2011 Karl Berry.
+   Copyright 1993, 1994, 1996, 1997, 2007, 2008, 2009, 2011, 2012 Karl Berry.
    Copyright 1999-2005 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
@@ -22,6 +22,10 @@
 #include <kpathsea/c-proto.h>
 #include <kpathsea/str-llist.h>
 #include <kpathsea/types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* The naming of all these functions is rather scattered and
    inconsistent, but they grew over time, and we don't want to change
@@ -82,14 +86,6 @@ extern str_llist_type *kpathsea_element_dirs (kpathsea kpse,
 extern KPSEDLL string kpathsea_path_search
   (kpathsea kpse, const_string path, const_string name, boolean must_exist);
 
-#ifdef MAKE_KPSE_DLL /* libkpathsea internal only */
-
-/* Like `kpathsea_path_search', except look for a list of NAMES.  */
-extern string kpathsea_path_search_list
-  (kpathsea kpse, const_string path, const_string* names, boolean must_exist);
-
-#endif /* MAKE_KPSE_DLL */
-
 /* Like `kpathsea_path_search' with MUST_EXIST true, but always return all
    matches in a NULL-terminated list.  */
 extern KPSEDLL string *kpathsea_all_path_search
@@ -100,11 +96,7 @@ extern KPSEDLL string *kpathsea_all_path_search
 /* Search for any of the NAMES in PATH, and allow specifying both
    MUST_EXIST and ALL.  */
 extern string *kpathsea_path_search_list_generic (kpathsea kpse,
-   const_string path, const_string* names, boolean must_exist, boolean all);
-
-/* Search for any of NAMES, with MUST_EXIST and ALL true.  */
-extern string *kpathsea_all_path_search_list
-  (kpathsea kpse, const_string path, const_string* names);
+   const_string path, string* names, boolean must_exist, boolean all);
 
 #endif /* MAKE_KPSE_DLL */
 
@@ -115,6 +107,10 @@ extern KPSEDLL string kpse_path_search
 extern KPSEDLL string *kpse_all_path_search
   (const_string path, const_string name);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* not KPATHSEA_PATHSEARCH_H */

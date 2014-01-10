@@ -43,15 +43,12 @@ recorder_start(void)
        default name.  Throw in the pid so at least parallel builds might
        work (Debian bug 575731).  */
     string cwd;
-    pid_t pid = getpid();
     char pid_str[MAX_INT_LENGTH];
-    sprintf (pid_str, "%ld", (long) pid);
-    
-    recorder_name = xmalloc(strlen(kpse_program_name)
-                                    + strlen (pid_str) + 5);
-    strcpy(recorder_name, kpse_program_name);
-    strcat(recorder_name, pid_str);
-    strcat(recorder_name, ".fls");
+
+    /* Windows (MSVC) seems to have no pid_t, so instead of storing the
+       value returned by getpid() we immediately consume it.  */
+    sprintf (pid_str, "%ld", (long) getpid());
+    recorder_name = concat3(kpse_program_name, pid_str, ".fls");
     
     /* If an output directory was specified, use it instead of cwd.  */
     if (output_directory) {
@@ -60,7 +57,11 @@ recorder_start(void)
       recorder_name = temp;
     }
     
+#if defined(WIN32)
+    recorder_file = fsyscp_xfopen(recorder_name, FOPEN_W_MODE);
+#else
     recorder_file = xfopen(recorder_name, FOPEN_W_MODE);
+#endif
     
     cwd = xgetcwd();
     fprintf(recorder_file, "PWD %s\n", cwd);
@@ -104,7 +105,7 @@ recorder_change_filename (string new_name)
 
    /* reopen the recorder file by FOPEN_A_MODE. */
 #if defined(WIN32)
-   recorder_file = fopen (recorder_name, FOPEN_A_MODE);
+   recorder_file = fsyscp_xfopen (recorder_name, FOPEN_A_MODE);
 #endif
 
    if (temp)
@@ -168,7 +169,11 @@ open_input (FILE **f_ptr, int filefmt, const_string fopen_mode)
        them from there.  We only look for the name as-is.  */
     if (output_directory && !kpse_absolute_p (nameoffile+1, false)) {
         fname = concat3 (output_directory, DIR_SEP_STRING, nameoffile + 1);
+#if defined(WIN32)
+        *f_ptr = fsyscp_fopen (fname, fopen_mode);
+#else
         *f_ptr = fopen (fname, fopen_mode);
+#endif
         if (*f_ptr) {
             free (nameoffile);
             namelength = strlen (fname);
@@ -185,7 +190,11 @@ open_input (FILE **f_ptr, int filefmt, const_string fopen_mode)
         /* A negative FILEFMT means don't use a path.  */
         if (filefmt < 0) {
             /* no_file_path, for BibTeX .aux files and MetaPost things.  */
+#if defined(WIN32)
+            *f_ptr = fsyscp_fopen(nameoffile + 1, fopen_mode);
+#else
             *f_ptr = fopen(nameoffile + 1, fopen_mode);
+#endif
             /* FIXME... fullnameoffile = xstrdup(nameoffile + 1); */
         } else {
             /* The only exception to `must_exist' being true is \openin, for
@@ -230,7 +239,11 @@ open_input (FILE **f_ptr, int filefmt, const_string fopen_mode)
                     *f_ptr = nkf_open (nameoffile + 1, fopen_mode);
                 } else
 #endif
+#if defined(WIN32)
+                *f_ptr = fsyscp_xfopen (nameoffile + 1, fopen_mode);
+#else
                 *f_ptr = xfopen (nameoffile + 1, fopen_mode);
+#endif
             }
         }
     }
@@ -278,7 +291,11 @@ open_output (FILE **f_ptr, const_string fopen_mode)
     }
 
     /* Is the filename openable as given?  */
+#if defined(WIN32)
+    *f_ptr = fsyscp_fopen (fname, fopen_mode);
+#else
     *f_ptr = fopen (fname, fopen_mode);
+#endif
 
     if (!*f_ptr) {
         /* Can't open as given.  Try the envvar.  */

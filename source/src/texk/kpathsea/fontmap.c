@@ -1,7 +1,7 @@
 /* fontmap.c: read files for additional font names.
 
+   Copyright 1993, 1994, 1995, 1996, 1997, 2008, 2011-2013 Karl Berry.
    Copyright 2001, 2002, 2005 Olaf Weber.
-   Copyright 1993, 1994, 1995, 1996, 1997, 2008, 2011 Karl Berry.
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -107,7 +107,7 @@ map_file_parse (kpathsea kpse, const_string map_filename)
 
       if (STREQ (filename, "include")) {
         if (alias == NULL) {
-          WARNING2 ("%s:%u: Filename argument for include directive missing",
+  WARNING2 ("kpathsea: %s:%u: Filename argument for include directive missing",
                     map_filename, map_lineno);
         } else {
           string include_fname = kpathsea_path_search (kpse,
@@ -117,7 +117,7 @@ map_file_parse (kpathsea kpse, const_string map_filename)
             if (include_fname != alias)
               free (include_fname);
           } else {
-            WARNING3 ("%s:%u: Can't find fontname include file `%s'",
+            WARNING3 ("kpathsea: %s:%u: Can't find fontname include file `%s'",
                       map_filename, map_lineno, alias);
           }
           free (alias);
@@ -126,7 +126,7 @@ map_file_parse (kpathsea kpse, const_string map_filename)
 
       /* But if we have a filename and no alias, something's wrong.  */
       } else if (alias == NULL) {
-        WARNING3 ("%s:%u: Fontname alias missing for filename `%s'",
+        WARNING3 ("kpathsea: %s:%u: Fontname alias missing for filename `%s'",
                   map_filename, map_lineno, filename);
         free (filename);
 
@@ -177,14 +177,14 @@ kpathsea_fontmap_lookup (kpathsea kpse, const_string key)
     read_all_maps (kpse);
   }
 
-  ret = (const_string *) hash_lookup (kpse->map, key);
+  ret = hash_lookup (kpse->map, key);
   if (!ret) {
     /* OK, the original KEY didn't work.  Let's check for the KEY without
        an extension -- perhaps they gave foobar.tfm, but the mapping only
        defines `foobar'.  */
     if (suffix) {
       string base_key = remove_suffix (key);
-      ret = (const_string *) hash_lookup (kpse->map, base_key);
+      ret = hash_lookup (kpse->map, base_key);
       free (base_key);
     }
   }

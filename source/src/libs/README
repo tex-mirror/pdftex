@@ -1,52 +1,61 @@
-$Id: README 25482 2012-02-23 10:27:56Z peter $
+$Id: README 32555 2014-01-03 10:18:48Z peter $
 Public domain.  Originally created by Karl Berry, 2005.
 
 Libraries we compile for TeX Live.
 
-All libraries except obsdcompat use the original source tree with all
-modifications maintained as patches and use a proxy build system, either
+All libraries use the original source tree with all modifications
+maintained as patches and use a proxy build system, either
 bypassing or using the original one.
 
 See also comments in ../texk/README.
 
-freetype 1.5 - ?
+cairo 1.12.16 - checked 10sep13
+  http://cairographics.org/releases/
 
-freetype2 2.4.8 - checked 23feb12
+freetype2 2.5.2 - checked 9dec13
   http://savannah.nongnu.org/download/freetype/
 
-gd 2.0.35 - unchecked 25apr11, site down
-  http://www.libgd.org/releases/
-  http://www.boutell.com/gd/
-  https://bitbucket.org/pierrejoye/gd-libgd/overview
+gd 2.1.0 - checked 26jun13
+  https://bitbucket.org/libgd/gd-libgd/downloads/
 
-graphite 2.3.1 - checked 25apr11
-  the directory silgraphite-2.3.1/engine/ from
-  http://sourceforge.net/projects/silgraphite/files/silgraphite/
+graphite2 1.2.4 - checked 2dec13
+  http://sourceforge.net/projects/silgraphite/files/graphite2/
 
-icu 4.8.1 - http://download.icu-project.org/files/icu4c/
-  with modifications required for xetex, also used by bibtexu
+harfbuzz 0.9.25 - checked 5dec13
+  http://www.freedesktop.org/software/harfbuzz/release/
 
-libpng 1.5.9 - checked 23feb12
+icu 52.1 (release) - checked 10oct13
+  http://download.icu-project.org/files/icu4c/
+
+libpng 1.6.8 - checked 2jan14
   http://www.libpng.org/ - used by many
   http://www.libpng.org/pub/png/pngcode.html
 
-obsdcompat - used by pdftex and luatex
+lua 5.2.3 - checked 7dec13
+  http://www.lua.org/ftp/
 
-poppler 0.18.4 - checked 23feb12
+paper 1.1.24+nmu2 - checked 24oct13
+  ftp://ftp.de.debian.org/debian/pool/main/libp/libpaper/
+
+pixman 0.32.4 - checked 18nov13
+  http://cairographics.org/releases/
+
+poppler 0.25.1 - checked 3jan14
   http://poppler.freedesktop.org/ - used by luatex and xetex
 
-t1lib 5.1.2 - checked 25apr11
-  (apparently unmaintained)
-  ftp://sunsite.unc.edu/pub/Linux/libs/graphics/
+potrace 1.11 - checked 12apr13
+  http://potrace.sourceforge.net
 
-teckit 2.5.1 - checked 25apr11
-  http://scripts.sil.org/svn-view/teckit/
+teckit 2.5.3 - checked 17mar12
+  http://scripts.sil.org/svn-public/teckit/TRUNK
+  (svn r1250 2012-03-14 19:45:41 UTC).
 
-xpdf 3.03 - ftp://ftp.foolabs.com/pub/xpdf/
+xpdf 3.03 - checked 10may12
+  ftp://ftp.foolabs.com/pub/xpdf/
   with modifications for pdftex
 
-zlib 1.2.6 - checked 10feb12
+zlib 1.2.8 - checked 18may13
   http://www.zlib.net/ - used by many
 
-zziplib 0.13.60 - checked 25apr11
+zziplib 0.13.62 - checked 12mar12
   http://zziplib.sourceforge.net/ - used by luatex

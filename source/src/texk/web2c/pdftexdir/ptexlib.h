@@ -35,8 +35,6 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* avl */
 #  include "avlstuff.h"
 
-#  include "openbsd-compat.h"
-
 /* pdftexlib type declarations */
 typedef struct {
     const char *pdfname;
@@ -199,7 +197,6 @@ extern integer write_tounicode(char **, const char *, const char *);
 
 /* utils.c */
 extern boolean str_eq_cstr(strnumber, char *);
-extern char *makecstring(integer);
 extern int xfflush(FILE *);
 extern int xgetc(FILE *);
 extern int xputc(int, FILE *);
@@ -212,10 +209,9 @@ extern void fb_flush(void);
 extern void fb_putchar(eightbits b);
 extern void fb_seek(integer);
 extern void libpdffinish(void);
-extern char *makecfilename(strnumber s);
 extern void make_subset_tag(fd_entry *);
 extern void setjobid(int, int, int, int);
-extern void writestreamlength(integer, longinteger);
+extern void writestreamlength(longinteger, longinteger);
 extern void printID(strnumber);
 extern void printcreationdate(void);
 extern void printmoddate(void);
@@ -223,15 +219,11 @@ extern void escapename(poolpointer in);
 extern void escapestring(poolpointer in);
 extern void escapehex(poolpointer in);
 extern void unescapehex(poolpointer in);
-extern void getcreationdate(void);
-extern void getfilemoddate(strnumber s);
-extern void getfilesize(strnumber s);
 extern void getmd5sum(strnumber s, boolean file);
 extern void getfiledump(strnumber s, int offset, int length);
 extern void matchstrings(strnumber s, strnumber t, int subcount, boolean icase);
 extern void getmatch(int i);
 extern void makepdftexbanner(void);
-extern void initstarttime(void);
 extern void removepdffile(void);
 extern void garbagewarning(void);
 extern void initversionstring(char **versions);
@@ -259,7 +251,7 @@ extern void allocvffnts(void);
 
 /* vfpacket.c */
 extern integer newvfpacket(internalfontnumber);
-extern void storepacket(internalfontnumber, eightbits, strnumber);
+extern void storepacket(internalfontnumber, integer, strnumber);
 extern void startpacket(internalfontnumber, eightbits);
 extern eightbits packetbyte(void);
 extern void poppacketstate(void);
@@ -294,7 +286,8 @@ extern integer imagewidth(integer);
 extern integer imagexres(integer);
 extern integer imageyres(integer);
 extern integer imagecolordepth(integer);
-extern integer imagegroupref(integer);
+extern integer getimagegroupref(integer);
+extern void setimagegroupref(integer,integer);
 extern integer readimage(strnumber, integer, strnumber, integer, integer,
                          integer, integer);
 extern void deleteimage(integer);

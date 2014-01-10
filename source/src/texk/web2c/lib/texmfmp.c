@@ -127,6 +127,10 @@
 char *generic_synctex_get_current_name (void)
 {
   char *pwdbuf, *ret;
+  if (!fullnameoffile) {
+    ret = xstrdup("");
+    return ret;
+  }
   if (kpse_absolute_p(fullnameoffile, false)) {
      return xstrdup(fullnameoffile);
   }
@@ -200,52 +204,39 @@ Isspace (char c)
 
 static char **cmdlist = NULL;
 
-void 
-mk_shellcmdlist (const char *v)
+static void 
+mk_shellcmdlist (char *v)
 {
   char **p;
-  const char *q, *r1;
-  char *r;
-  int  n;
+  char *q, *r;
+  size_t n;
 
   q = v;
-  n = 0;
+  n = 1;
 
 /* analyze the variable shell_escape_commands = foo,bar,...
    spaces before and after (,) are not allowed. */
 
-  while ((r1 = strchr (q, ',')) != 0) {
+  while ((r = strchr (q, ',')) != 0) {
     n++;
-    r1++;
-    q = r1;
+    q = r + 1;
   }
   if (*q)
     n++;
-  cmdlist = xmalloc ((n + 1) * sizeof (char *));
+  cmdlist = xmalloc (n * sizeof (char *));
   p = cmdlist;
   q = v;
   while ((r = strchr (q, ',')) != 0) {
     *r = '\0';
-    *p = xmalloc (strlen (q) + 1);
-    strcpy (*p, q);
-    *r = ',';
-    r++;
-    q = r;
-    p++;
+    *p++ = xstrdup (q);
+    q = r + 1;
   }
-  if (*q) {
-    *p = xmalloc (strlen (q) + 1);
-    strcpy (*p, q);
-    p++;
-    *p = NULL;
-  } else
-    *p = NULL;
+  if (*q)
+    *p++ = xstrdup (q);
+  *p = NULL;
 }
 
-/* Called from maininit.  Not static because also called from
-   luatexdir/lua/luainit.c.  */
-
-void
+static void
 init_shell_escape (void)
 {
   if (shellenabledp < 0) {  /* --no-shell-escape on cmd line */
@@ -269,7 +260,7 @@ init_shell_escape (void)
     if (shellenabledp && restrictedshell == 1) {
       char *v2 = kpse_var_value ("shell_escape_commands");
       if (v2) {
-        mk_shellcmdlist ((const char *)v2);
+        mk_shellcmdlist (v2);
         free (v2);
       }
     }
@@ -303,7 +294,7 @@ char_needs_quote (int c)
    should get executed.  And we set CMDNAME to its first word; this is
    what is checked against the shell_escape_commands list.  */
 
-int
+static int
 shell_cmd_is_allowed (const char *cmd, char **safecmd, char **cmdname)
 {
   char **p;
@@ -448,9 +439,17 @@ shell_cmd_is_allowed (const char *cmd, char **safecmd, char **cmdname)
     {
       char *p, *q, *r;
       p = *safecmd;
-      if (!(IS_DIR_SEP (p[0]) && IS_DIR_SEP (p[1])) &&
-          !(p[1] == ':' && IS_DIR_SEP (p[2]))) { 
-        p = (char *) kpse_var_value ("SELFAUTOLOC");
+      if (strlen (p) > 2 && p[1] == ':' && !IS_DIR_SEP (p[2])) {
+          q = xmalloc (strlen (p) + 2);
+          q[0] = p[0];
+          q[1] = p[1];
+          q[2] = '/';
+          q[3] = '\0';
+          strcat (q, (p + 2));
+          free (*safecmd);
+          *safecmd = q;
+      } else if (!IS_DIR_SEP (p[0]) && !(p[1] == ':' && IS_DIR_SEP (p[2]))) { 
+        p = kpse_var_value ("SELFAUTOLOC");
         if (p) {
           r = *safecmd;
           while (*r && !Isspace(*r))
@@ -617,6 +616,11 @@ texmf_yesno(const_string var)
 const char *ptexbanner = BANNER;
 #endif
 
+#ifdef WIN32
+static string
+normalize_quotes (const_string name, const_string mesg);
+#endif
+
 /* The entry point: set up for reading the command line, which will
    happen in `topenin', then call the main body.  */
 
@@ -624,7 +628,9 @@ void
 maininit (int ac, string *av)
 {
   string main_input_file;
-
+#if (IS_upTeX || defined(XeTeX)) && defined(WIN32)
+  string enc;
+#endif
   /* Save to pass along to topenin.  */
   argc = ac;
   argv = av;
@@ -649,13 +655,24 @@ maininit (int ac, string *av)
 
 #if IS_pTeX
   kpse_set_program_name (argv[0], NULL);
-  initdefaultkanji ();
+  initkanji ();
+#endif
+#if defined(XeTeX) && defined(WIN32)
+  kpse_set_program_name (argv[0], NULL);
+#endif
+#if (IS_upTeX || defined(XeTeX)) && defined(WIN32)
+  enc = kpse_var_value("command_line_encoding");
+  get_command_line_args_utf8(enc, &argc, &argv);
 #endif
 
   /* If the user says --help or --version, we need to notice early.  And
      since we want the --ini option, have to do it before getting into
      the web (which would read the base file, etc.).  */
+#if (IS_upTeX || defined(XeTeX)) && defined(WIN32)
+  parse_options (argc, argv);
+#else
   parse_options (ac, av);
+#endif
 
 #if IS_pTeX
   /* In pTeX and friends, texmf.cnf is not recorded in the case of --recorder,
@@ -675,7 +692,7 @@ maininit (int ac, string *av)
   /* Do this early so we can inspect kpse_invocation_name and
      kpse_program_name below, and because we have to do this before
      any path searching.  */
-#if IS_pTeX
+#if IS_pTeX || (defined(XeTeX) && defined(WIN32))
   if (user_progname)
     kpse_reset_program_name (user_progname);
 #else
@@ -691,6 +708,47 @@ maininit (int ac, string *av)
   
   /* Were we given a simple filename? */
   main_input_file = get_input_file_name();
+
+#ifdef WIN32
+  if (main_input_file == NULL) {
+    string name;
+    boolean quoted;
+
+    name = argv[argc-1];
+    if (name && name[0] != '-' && name[0] != '&' && name[0] != '\\') {
+      if (strlen (name) > 2 && isalpha (name[0]) && name[1] == ':' &&
+          name[2] == '\\') {
+        string pp;
+        for (pp = name; *pp; pp++) {
+          if (IS_KANJI (pp))
+            pp++;
+          else if (*pp == '\\')
+            *pp = '/';
+        }
+      }
+#ifdef XeTeX
+      name = normalize_quotes(argv[argc-1], "argument");
+      main_input_file = kpse_find_file(argv[argc-1], INPUT_FORMAT, false);
+      argv[argc-1] = name;
+#else
+      name = normalize_quotes(argv[argc-1], "argument");
+      quoted = (name[0] == '"');
+      if (quoted) {
+        /* Overwrite last quote and skip first quote. */
+        name[strlen(name)-1] = '\0';
+        name++;
+      }
+      main_input_file = kpse_find_file(name, INPUT_FORMAT, false);
+      if (quoted) {
+        /* Undo modifications */
+        name[strlen(name)] = '"';
+        name--;
+      }
+      argv[argc-1] = name;
+#endif
+    }
+  }
+#endif
 
   /* Second chance to activate file:line:error style messages, this
      time from texmf.cnf. */
@@ -824,7 +882,7 @@ maininit (int ac, string *av)
    happen in `topenin', then call the main body.  */
 
 int
-#if defined(WIN32) && defined(DLLPROC)
+#if defined(WIN32) && !defined(__MINGW32__) && defined(DLLPROC)
 DLLPROC (int ac, string *av)
 #else
 main (int ac, string *av)
@@ -1302,7 +1360,7 @@ readtcxfile (void)
 #endif /* TeX || MF [character translation] */
 
 #ifdef XeTeX /* XeTeX handles this differently, and allows odd quotes within names */
-string
+static string
 normalize_quotes (const_string name, const_string mesg)
 {
     int quote_char = 0;
@@ -1349,7 +1407,7 @@ normalize_quotes (const_string name, const_string mesg)
 #else
 /* Normalize quoting of filename -- that is, only quote if there is a space,
    and always use the quote-name-quote style. */
-string
+static string
 normalize_quotes (const_string name, const_string mesg)
 {
     boolean quoted = false;
@@ -1592,7 +1650,7 @@ parse_options (int argc, string *argv)
           unsigned i;
           for (i = 0; i < 20 && !ipc_is_open (); i++) {
 #ifdef WIN32
-            Sleep (2000);
+            Sleep (100); /* 2000ms is too long for a simple w32 example */
 #else
             sleep (2);
 #endif
@@ -1853,7 +1911,7 @@ open_in_or_pipe (FILE **f_ptr, int filefmt, const_string fopen_mode)
       fname = xmalloc(strlen((const_string)(nameoffile+1))+1);
       strcpy(fname,(const_string)(nameoffile+1));
       recorder_record_input (fname + 1);
-      *f_ptr = runpopen(fname+1,"rb");
+      *f_ptr = runpopen(fname+1,"r");
       free(fname);
       for (i=0; i<NUM_PIPES; i++) {
         if (pipes[i]==NULL) {
@@ -1862,7 +1920,7 @@ open_in_or_pipe (FILE **f_ptr, int filefmt, const_string fopen_mode)
         }
       }
       if (*f_ptr)
-        setvbuf (*f_ptr,NULL,_IOLBF,0);
+        setvbuf (*f_ptr,NULL,_IONBF,0);
 #ifdef WIN32
       Poptr = *f_ptr;
 #endif
@@ -1873,6 +1931,48 @@ open_in_or_pipe (FILE **f_ptr, int filefmt, const_string fopen_mode)
     return open_input(f_ptr,filefmt,fopen_mode) ;
 }
 
+#ifdef XeTeX
+boolean
+u_open_in_or_pipe(unicodefile* f, integer filefmt, const_string fopen_mode, integer mode, integer encodingData)
+{
+    string fname = NULL;
+    int i; /* iterator */
+
+    /* opening a read pipe is straightforward, only have to
+       skip past the pipe symbol in the file name. filename
+       quoting is assumed to happen elsewhere (it does :-)) */
+
+    if (shellenabledp && *(nameoffile+1) == '|') {
+      /* the user requested a pipe */
+      *f = malloc(sizeof(UFILE));
+      (*f)->encodingMode = (mode == AUTO) ? UTF8 : mode;
+      (*f)->conversionData = 0;
+      (*f)->savedChar = -1;
+      (*f)->skipNextLF = 0;
+      (*f)->f = NULL;
+      fname = xmalloc(strlen((const_string)(nameoffile+1))+1);
+      strcpy(fname,(const_string)(nameoffile+1));
+      recorder_record_input (fname + 1);
+      (*f)->f = runpopen(fname+1,"r");
+      free(fname);
+      for (i=0; i<NUM_PIPES; i++) {
+        if (pipes[i]==NULL) {
+          pipes[i] = (*f)->f;
+          break;
+        }
+      }
+      if ((*f)->f)
+        setvbuf ((*f)->f,NULL,_IONBF,0);
+#ifdef WIN32
+      Poptr = (*f)->f;
+#endif
+
+      return (*f)->f != NULL;
+    }
+
+    return u_open_in(f, filefmt, fopen_mode, mode, encodingData);
+}
+#endif
 
 boolean
 open_out_or_pipe (FILE **f_ptr, const_string fopen_mode)
@@ -1895,10 +1995,10 @@ open_out_or_pipe (FILE **f_ptr, const_string fopen_mode)
            is better to be prepared */
         if (STREQ((fname+strlen(fname)-4),".tex"))
           *(fname+strlen(fname)-4) = 0;
-        *f_ptr = runpopen(fname+1,"wb");
+        *f_ptr = runpopen(fname+1,"w");
         *(fname+strlen(fname)) = '.';
       } else {
-        *f_ptr = runpopen(fname+1,"wb");
+        *f_ptr = runpopen(fname+1,"w");
       }
       recorder_record_output (fname + 1);
       free(fname);
@@ -1911,7 +2011,7 @@ open_out_or_pipe (FILE **f_ptr, const_string fopen_mode)
       }
 
       if (*f_ptr)
-        setvbuf(*f_ptr,NULL,_IOLBF,0);
+        setvbuf(*f_ptr,NULL,_IONBF,0);
 
       return *f_ptr != NULL;
     }
@@ -2023,6 +2123,7 @@ get_date_and_time (integer *minutes,  integer *day,
   }
 }
 
+#if defined(pdfTeX)
 /*
  Getting a high resolution time.
  */
@@ -2045,27 +2146,7 @@ get_seconds_and_micros (integer *seconds,  integer *micros)
   *micros  = 0;
 #endif
 }
-
-/*
-  Generating a better seed numbers
-  */
-integer
-getrandomseed(void)
-{
-#if defined (HAVE_GETTIMEOFDAY)
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  return (tv.tv_usec + 1000000 * tv.tv_usec);
-#elif defined (HAVE_FTIME)
-  struct timeb tb;
-  ftime(&tb);
-  return (tb.millitm + 1000 * tb.time);
-#else
-  time_t myclock = time ((time_t*)NULL);
-  struct tm *tmptr = localtime(&myclock);
-  return (tmptr->tm_sec + 60*(tmptr->tm_min + 60*tmptr->tm_hour));
 #endif
-}
 
 /* Read a line of input as efficiently as possible while still looking
    like Pascal.  We set `last' to `first' and return `false' if we get
@@ -2080,7 +2161,7 @@ input_line (FILE *f)
 
   /* Recognize either LF or CR as a line terminator.  */
 #if IS_pTeX
-  last = input_line2(f, (char *)buffer, first, bufsize, &i);
+  last = input_line2(f, (unsigned char *)buffer, first, bufsize, &i);
 #else
 #ifdef WIN32
   if (f != Poptr && fileno (f) != fileno (stdin)) {
@@ -2089,13 +2170,13 @@ input_line (FILE *f)
     if (position == 0L) {  /* Detect and skip Byte order marks.  */
       int k1 = getc (f);
 
-      if (k1 == EOF || k1 == '\r' || k1 == '\n')
-        fseek (f, -1L , SEEK_CUR);
+      if (k1 != 0xff && k1 != 0xfe && k1 != 0xef)
+        rewind (f);
       else {
         int k2 = getc (f);
 
-        if (k2 == EOF || k2 == '\r' || k2 == '\n')
-          fseek (f, -2L , SEEK_CUR);
+        if (k2 != 0xff && k2 != 0xfe && k2 != 0xbb)
+          rewind (f);
         else if ((k1 == 0xff && k2 == 0xfe) || /* UTF-16(LE) */
                  (k1 == 0xfe && k2 == 0xff))   /* UTF-16(BE) */
           ;
@@ -2105,7 +2186,7 @@ input_line (FILE *f)
           if (k1 == 0xef && k2 == 0xbb && k3 == 0xbf) /* UTF-8 */
             ;
           else
-            fseek (f, -3L, SEEK_CUR);
+            rewind (f);
         }
       }
     }
@@ -2658,7 +2739,257 @@ makesrcspecial (strnumber srcfilename, int lineno)
 
   return (oldpoolptr);
 }
-#endif
+
+/* pdfTeX routines also used for e-pTeX and e-upTeX */
+#if defined (pdfTeX) || defined (epTeX) || defined (eupTeX)
+
+#include <kpathsea/c-stat.h>
+
+#define check_nprintf(size_get, size_want) \
+    if ((unsigned)(size_get) >= (unsigned)(size_want)) \
+        pdftex_fail ("snprintf failed: file %s, line %d", __FILE__, __LINE__);
+#  define check_buf(size, buf_size)                         \
+    if ((unsigned)(size) > (unsigned)(buf_size))            \
+        pdftex_fail("buffer overflow at file %s, line %d", __FILE__,  __LINE__ )
+#  define xfree(p)            do { if (p != NULL) free(p); p = NULL; } while (0)
+#  define MAX_CSTRING_LEN     1024 * 1024
+
+#if !defined (pdfTeX)
+#  define PRINTF_BUF_SIZE     1024
+static char print_buf[PRINTF_BUF_SIZE];
+
+/* Helper for pdftex_fail. */
+static void safe_print(const char *str)
+{
+    const char *c;
+    for (c = str; *c; ++c)
+        print(*c);
+}
+/* pdftex_fail may be called when a buffer overflow has happened/is
+   happening, therefore may not call mktexstring.  However, with the
+   current implementation it appears that error messages are misleading,
+   possibly because pool overflows are detected too late.
+
+   The output format of this fuction must be the same as pdf_error in
+   pdftex.web! */
+__attribute__ ((noreturn, format(printf, 1, 2)))
+void pdftex_fail(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    println();
+    safe_print("!error: ");
+    vsnprintf(print_buf, PRINTF_BUF_SIZE, fmt, args);
+    safe_print(print_buf);
+    va_end(args);
+    println();
+    safe_print(" ==> Fatal error occurred, output file will be damaged!");
+    println();
+    if (kpathsea_debug) {
+        safe_print("kpathsea_debug enabled, calling abort()...");
+        println();
+        abort();
+    } else {
+        exit(EXIT_FAILURE);
+    }
+}
+#endif /* not pdfTeX */
+
+static time_t start_time = 0;
+#define TIME_STR_SIZE 30
+char start_time_str[TIME_STR_SIZE];
+static char time_str[TIME_STR_SIZE];
+    /* minimum size for time_str is 24: "D:YYYYmmddHHMMSS+HH'MM'" */
+
+static void makepdftime(time_t t, char *time_str)
+{
+
+    struct tm lt, gmt;
+    size_t size;
+    int i, off, off_hours, off_mins;
+
+    /* get the time */
+    lt = *localtime(&t);
+    size = strftime(time_str, TIME_STR_SIZE, "D:%Y%m%d%H%M%S", &lt);
+    /* expected format: "YYYYmmddHHMMSS" */
+    if (size == 0) {
+        /* unexpected, contents of time_str is undefined */
+        time_str[0] = '\0';
+        return;
+    }
+
+    /* correction for seconds: %S can be in range 00..61,
+       the PDF reference expects 00..59,
+       therefore we map "60" and "61" to "59" */
+    if (time_str[14] == '6') {
+        time_str[14] = '5';
+        time_str[15] = '9';
+        time_str[16] = '\0';    /* for safety */
+    }
+
+    /* get the time zone offset */
+    gmt = *gmtime(&t);
+
+    /* this calculation method was found in exim's tod.c */
+    off = 60 * (lt.tm_hour - gmt.tm_hour) + lt.tm_min - gmt.tm_min;
+    if (lt.tm_year != gmt.tm_year) {
+        off += (lt.tm_year > gmt.tm_year) ? 1440 : -1440;
+    } else if (lt.tm_yday != gmt.tm_yday) {
+        off += (lt.tm_yday > gmt.tm_yday) ? 1440 : -1440;
+    }
+
+    if (off == 0) {
+        time_str[size++] = 'Z';
+        time_str[size] = 0;
+    } else {
+        off_hours = off / 60;
+        off_mins = abs(off - off_hours * 60);
+        i = snprintf(&time_str[size], 9, "%+03d'%02d'", off_hours, off_mins);
+        check_nprintf(i, 9);
+    }
+}
+
+void initstarttime(void)
+{
+    if (start_time == 0) {
+        start_time = time((time_t *) NULL);
+        makepdftime(start_time, start_time_str);
+    }
+}
+
+char *makecstring(integer s)
+{
+    static char *cstrbuf = NULL;
+    char *p;
+    static int allocsize;
+    int allocgrow, i, l = strstart[s + 1] - strstart[s];
+    check_buf(l + 1, MAX_CSTRING_LEN);
+    if (cstrbuf == NULL) {
+        allocsize = l + 1;
+        cstrbuf = xmallocarray(char, allocsize);
+    } else if (l + 1 > allocsize) {
+        allocgrow = allocsize * 0.2;
+        if (l + 1 - allocgrow > allocsize)
+            allocsize = l + 1;
+        else if (allocsize < MAX_CSTRING_LEN - allocgrow)
+            allocsize += allocgrow;
+        else
+            allocsize = MAX_CSTRING_LEN;
+        cstrbuf = xreallocarray(cstrbuf, char, allocsize);
+    }
+    p = cstrbuf;
+    for (i = 0; i < l; i++)
+        *p++ = strpool[i + strstart[s]];
+    *p = 0;
+    return cstrbuf;
+}
+
+/* makecfilename
+  input/ouput same as makecstring:
+    input: string number
+    output: C string with quotes removed.
+    That means, file names that are legal on some operation systems
+    cannot any more be used since pdfTeX version 1.30.4.
+*/
+char *makecfilename(integer s)
+{
+    char *name = makecstring(s);
+    char *p = name;
+    char *q = name;
+
+    while (*p) {
+        if (*p != '"')
+            *q++ = *p;
+        p++;
+    }
+    *q = '\0';
+    return name;
+}
+
+void getcreationdate(void)
+{
+    size_t len;
+    initstarttime();
+    /* put creation date on top of string pool and update poolptr */
+    len = strlen(start_time_str);
+
+    /* In e-pTeX, "init len => call initstarttime()" (as pdftexdir/utils.c)
+       yields  unintentional output. */
+
+    if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
+        poolptr = poolsize;
+        /* error by str_toks that calls str_room(1) */
+        return;
+    }
+
+    memcpy(&strpool[poolptr], start_time_str, len);
+    poolptr += len;
+}
+
+void getfilemoddate(integer s)
+{
+    struct stat file_data;
+
+    char *file_name = kpse_find_tex(makecfilename(s));
+    if (file_name == NULL) {
+        return;                 /* empty string */
+    }
+
+    recorder_record_input(file_name);
+    /* get file status */
+    if (stat(file_name, &file_data) == 0) {
+        size_t len;
+
+        makepdftime(file_data.st_mtime, time_str);
+        len = strlen(time_str);
+        if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
+            poolptr = poolsize;
+            /* error by str_toks that calls str_room(1) */
+        } else {
+            memcpy(&strpool[poolptr], time_str, len);
+            poolptr += len;
+        }
+    }
+    /* else { errno contains error code } */
+
+    xfree(file_name);
+}
+
+void getfilesize(integer s)
+{
+    struct stat file_data;
+    int i;
+
+    char *file_name = kpse_find_tex(makecfilename(s));
+    if (file_name == NULL) {
+        return;                 /* empty string */
+    }
+
+    recorder_record_input(file_name);
+    /* get file status */
+    if (stat(file_name, &file_data) == 0) {
+        size_t len;
+        char buf[20];
+
+        /* st_size has type off_t */
+        i = snprintf(buf, sizeof(buf),
+                     "%lu", (long unsigned int) file_data.st_size);
+        check_nprintf(i, sizeof(buf));
+        len = strlen(buf);
+        if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
+            poolptr = poolsize;
+            /* error by str_toks that calls str_room(1) */
+        } else {
+            memcpy(&strpool[poolptr], buf, len);
+            poolptr += len;
+        }
+    }
+    /* else { errno contains error code } */
+
+    xfree(file_name);
+}
+#endif /* e-pTeX or e-upTeX */
+#endif /* TeX */
 
 /* Metafont/MetaPost fraction routines. Replaced either by assembler or C.
    The assembler syntax doesn't work on Solaris/x86.  */

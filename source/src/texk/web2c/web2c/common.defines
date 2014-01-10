@@ -107,6 +107,7 @@
 @define function chartostring ();
 @define function chr ();
 @define function cmdline ();
+@define function conststringcast ();
 @define function eof ();
 @define function eoln ();
 @define function extendfilename ();
@@ -133,18 +134,20 @@
 @define function kpsevarvalue ();
 @define function inputint ();
 @define function intcast ();
+@define function int64cast ();
 @define function isprint ();
 @define function makebinaryfile ();
+@define function makesuffix ();
 @define function odd ();
 @define function ord ();
 @define function round ();
 @define function strcmp ();
 @define function stringcast ();
-@define function conststringcast ();
 @define function strlen ();
 @define function strtol ();
 @define function trunc ();
 @define function ucharcast ();
+@define function ustringcast ();
 @define function xcalloc ();
 @define function xcallocarray ();
 @define function xftell ();
@@ -205,6 +208,7 @@
 @define type char = 0..255;
 @define type getoptstruct;
 @define type integer;
+@define type integer64;
 @define type longinteger;
 @define type memoryword; {for gftodvi, TeX, and Metafont}
 @define type pointertobyte;

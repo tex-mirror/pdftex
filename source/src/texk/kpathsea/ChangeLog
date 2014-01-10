@@ -1,3 +1,427 @@
+2014-01-08  TANAKA Takuji  <KXD02663@nifty.ne.jp>
+
+	* knj.c: Allow encoding name "" for non-utf8 command line.
+	Warn if unknown encoding. (Windows only)
+
+2014-01-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* knj.c: Keep non-utf8 command line.  Avoid compiler warnings.
+
+2014-01-01  TANAKA Takuji  <KXD02663@nifty.ne.jp>
+
+	* knj.c, knj.h: Use cast for ASCII string conversion
+	from char to wchar_t. (Windows only)
+
+2013-12-31  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* knj.h: Remove #include <kpathsea/types.h> because Visual Studio 2010
+	cannot compile Kpathsea.
+
+2013-12-31  TANAKA Takuji  <KXD02663@nifty.ne.jp>
+
+	* knj.c, knj.h: Add new functions fsyscp_fopen() and
+	get_command_line_args_utf8() (Windows only)
+	* progname.c: Refine initialization for KANJI (Windows only)
+
+2013-12-03  TANAKA Takuji  <KXD02663@nifty.ne.jp>
+
+	* elt-dirs.c, knj.c, knj.h, progname.c, readable.c: Support KANJI
+	file name in (e)upTeX and XeTeX on Windows.
+
+2013-09-22  Karl Berry  <karl@tug.org>
+
+	* mktexlsr: output normal msgs to stdout, not stderr.
+	Suggestion from Scott Kostyshak, tex-live mail 29 Jun 2013 04:42:10.
+
+2013-08-17  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac (AH_TOP): Simplify the generation of c-auto.h.
+
+2013-08-14  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c, mingw32.c (texlive_gs_init()): Fix a bug. 'n' and 'f' can
+	be drive letters.
+
+2013-08-12  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c, mingw32.c (texlive_gs_init()): Do nothing if
+	TEXLIVE_WINDOWS_EXTERNAL_GS is defined and its value is not
+	'0', 'n', or 'f'.
+
+2013-08-07  Karl Berry  <karl@tug.org>
+
+	* line.c (read_line): only at EOF if loc==0, i.e., do not ignore a
+	non-terminated last "line" of a file; distressingly common on Windows.
+	* Makefile.am (TESTS): add cnfnewline.test;
+	move all *.test to tests/ subdir.
+	(EXTRA_DIST): add tests/cnfnewline/texmf.cnf, a file without a
+	final newline.
+
+	* kpsewhich.test: also check that we can read the environment
+	variable that we set.
+
+2013-07-07  TANAKA Takuji  <KXD02663@nifty.ne.jp>
+
+	* knj.c and progname.c: Generalize the method to avoid the 0x5c problem
+	in path names to the cases CP936 (simplified Chinese) and CP950
+	(traditional Chinese) on Windows system.
+
+2013-07-06  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am: Use ../../am/rebuild.am.
+
+2013-07-05  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am, man/Makefile.am:
+	Moved Makefile fragments to ../../am/.
+
+2013-07-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* c-memstr.h: Drop mapping of BSD => SYSV/ANSI string functions.
+
+2013-06-25  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (guess_input_kanji_encoding): config variable,
+	off by default.  Per Akira.
+
+2013-06-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* config.h: Remove definition of EXEEXT, comes from c-auto.h.
+
+2013-06-25  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* config.h: define EXEEXT if DOSISH is defined.
+
+	* win32lib.c: Unify two win32lib.c's in w32 sources.
+
+	* progname.c, texmf.cnf: Define SELFAUTOGRANDPARENT to give a
+	robust TEXMFLOCAL.
+
+2013-06-16  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: New conditional have_EXEEXT.
+	* Makefile.am (libkpathsea_la_CPPFLAGS): Define EXEEXT for
+	systems with a non-vanishing executable extension.
+	* progname.[ch]: New function kpse_program_basename().
+	* version.ac: Update version number 6.1.1 => 6.2.0dev.
+
+	Adapt kpathsea headers to C++.
+	* absolute.h, cnf.h, concatn.h, config.h, debug.h, expand.h,
+	hash.h, knj.h, lib.h, line.h, magstep.h, mingw32.h,
+	pathsearch.h, proginit.h, progname.h, readable.h, str-list.h,
+	str-llist.h, tex-file.h, tex-glyph.h, tex-hush.h, tex-make.h,
+	types.h, variable.h, version.h, win32lib.h: When compiling C++
+	surround all declarations by 'extern "C" {' ... '}'.
+
+2013-06-15  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* cnf.c, kpsewhich.c: Drop redundant <kpathsea/progname.h>
+	(in <kpathsea/config.h>).
+
+2013-06-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* xrealloc.c: Drop redundant extern (in <kpathsea/config.h>).
+
+2013-06-05  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (*_la_LDFLAGS): Add -bindir for MinGW DLL.
+
+	* win32lib.h.mugica (removed): Unused and unmaintained.
+	* Makefile.am: Adapt.
+
+2013-05-30  Karl Berry  <karl@tug.org>
+	
+	* Version 6.1.1 for TeX Live 2013.
+
+2013-04-15  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXINPUTS.lamed): there is no lamed directory and
+	never has been, as far as I can tell, so don't look in it.
+
+	* texmf.cnf (TEXMFCACHE): new variable for lualatex font cache;
+	same value as ConTeXt MkIV's variable of the same name in
+	texmfcnf.lua.
+
+2013-04-10  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXMFCNF): still look in texmf/ subdirs after all;
+	needed for non-TL ConTeXt and likely others.  Report from
+	Mojca/Hans.
+
+2013-04-05  Karl Berry  <karl@tug.org>
+
+	* other files: 2013 in copyright year list.
+
+	* kpsewhich.c,
+	* NEWS,
+	* version.ac: 6.1.1 and 2013 to prepare for TL'13 pretest.
+
+	* texmf.cnf (TEXMFCNF): likewise prepare to use texmf-dist instead
+	of texmf.  From Akira.
+
+2013-04-03  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXMFMAIN): make it the same as $TEXMFDIST,
+	and do not use it.  That is, as of TL 2013, everything will be in
+	texmf-dist, not split between texmf and texmf-dist.  See the
+	thread including
+	http://tug.org/mailman/htdig/tex-live/2013-January/032888.html.
+	
+	Also change 2012 to 2013.
+
+2013-03-26  Karl Berry  <karl@tug.org>
+
+	* tex-make.c (kpathsea_make_tex): specify fn name in warnings
+	about invalid fontnames.
+
+2013-03-14  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (save_size): increase to 100000 (from 50000),
+	for perldoc-all.texi (http://www.gnu.org/software/perl/manual).
+
+2013-02-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (web2cdir): Change texmf => texmf-dist.
+
+2013-01-30  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: Use KPSE_COND_MINGW32.
+
+2013-01-29  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* progname.c, types.h, win32lib.c, win32lib.h: Simplify win32_popen.
+
+2012-12-16  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (kpathsea.h): Enable silent rules.
+
+2012-12-13  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Resolve remaining const related problems.
+	* db.[ch] (kpathsea_db_search_list): Make arg3 non-const.
+	* pathsearch.[ch] (kpathsea_path_search_list_generic,
+	dir_list_search_list): Make arg3 non-const.
+	* tex-file.c: Remove casts 'string*' => 'const_string*'.
+	* readable.[ch] (kpathsea_readable_file): Make arg non-const.
+	Include code to truncate too-long filename components.
+
+	* truncate.[ch] (kpathsea_truncate_filename): Files removed.
+	* Makefile.am: Drop truncate.c and truncate.h.
+
+2012-12-12  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Somewhat disentangle path search functions.
+	* db.c (kpathsea_init_db):
+	Directly call kpathsea_path_search_list_generic()
+	instead of the kpathsea_all_path_search_list() wrapper.
+	* pathsearch.c: Rename the static function search_list() into
+	the non-static kpathsea_path_search_list_generic() and drop
+	the former kpathsea_path_search_list_generic() wrapper.
+	* pathsearch.[ch]: Drop the now unused *_path_search_list().
+
+2012-12-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Resolve some const related problems.
+	* str-list.[ch]: Add cstr_list_type and cstr_list_add() for
+	const strings.  Define [c]str_list_init() as static inline.
+	* kpathsea.c: Move definition of KPATHSEA_CAN_FREE from here ...
+	* hash.h: ... to here.
+	* hash.[ch]: Define hash_free() only if KPATHSEA_CAN_FREE!=0.
+	(hash_lookup): Change return type 'string*' => 'const_string*'.
+	* cnf.[ch] (kpathsea_cnf_get, kpse_cnf_get):
+	Change return type 'string*' => 'const_string*'.
+	* dir.c (kpathsea_dir_links): Adapt.
+	* rm-suffix.c (remove_suffix): Adapt.
+	* db.c, fontmap.c: Remove casts 'string*' => 'const_string*'.	
+
+2012-12-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mingw32.c: Remove look_for_cmd().
+
+2012-12-10  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c: remove look_for_cmd().
+
+2012-12-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mingw32.c (look_for_cmd): Do not compute unused value.
+	* win32lib.c (look_for_cmd, kpathsea_win32_popen): Same.
+
+2012-11-28  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* texmf.cnf: Increase main_memory, font_mem_size, hash_extra,
+	and pool_size.
+
+2012-11-20  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am: Avoid use of deprecated INCLUDES.
+
+2012-10-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mingw32.c: use stat in static int is_dir ().
+
+2012-10-02  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c: use stat in static int is_dir ().
+
+2012-10-01  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c: remove _osver since it is obsolete.
+
+2012-09-28  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.h: remove definition of mkdir.
+	* c-proto.h: introduce NO_KPSE_DLL as in getopt.h.
+
+2012-08-11  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* c-std.h: Define M_PI if not defined by <math.h> (old MSVC).
+
+2012-08-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am: Use ../am/bin_links.am.
+
+2012-08-02  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.h: remove definition of pipe.
+
+2012-08-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: Bail out for a badly broken snprintf()
+        (hopefully this will not happen).
+	Check if we need (v)snprintf wrapper functions.
+	* config.h: If needed, declare (v)snprintf wrapper functions.
+	* progname.c (kpathsea_set_program_name): Check snprintf sanity.
+
+2012-07-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: Add AC_CHECK_SIZEOF([long]).
+	* types.h: #include <inttypes.h> and <stdint.h> if they exist.
+	If necessary #define PRId64 & Co.
+
+2012-07-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* getopt.c [WIN32 && ! __CYGWIN__]: Use __CYGWIN__ instead of
+	__CYGWIN32__ which is deprecated and may be removed.
+	Mail from Ken Brown <kbrow1i@gmail.com>, Tue, 24 Jul 2012.
+
+2012-07-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mingw32.h (win32_popen): Static inline wrapper for _popen()
+	to use always binary mode.
+
+2012-07-23  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c: rewrite kpathsea_win32_popen to use always binary
+	mode.
+
+2012-07-13  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (libkpathsea_la_SOURCES): Skip compilation of
+	xfseeko.c and xftello.c for MSVC.
+	* win32lib.h: Drop xfseeko() and xftello() prototypes, they will
+	subsequently be defined in lib.h.
+
+2012-07-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* version.ac: Update version number 6.1.0 => 6.1.1dev.
+
+2012-05-29  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c: rewrite win32_system.
+
+2012-05-22  Karl Berry  <karl@tug.org>
+
+	* mktexmf: test $name for csso12*, not $rootname.
+	From Debian via Norbert, 21 May 2012 10:11:08.
+
+2012-05-16  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* cnf.[ch]: Add KPSEDLL to kpathsea_cnf_get(), and reintroduce
+	kpse_cnf_get().
+	* Makefile.am: Do install cnf.h.
+
+2012-05-06  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (rebuild): Depend on 'all-am' instead of 'all' to
+	avoid an infinite loop.
+
+2012-05-05  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* win32lib.[ch]: Copyright 2012.
+
+2012-05-05  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c: rewrite xftell64 for W32.
+
+2012-05-04  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c: rewrite xftell64 and xfseek64 for W32.
+
+2012-04-30  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c: further rewrite win32_system().
+
+2012-04-23  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (rebuild): Touch libkpathsea.la to avoid an
+	infinite loop when only mingw32.h or win32lib.h is changed.
+
+2012-04-23  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.h, win32lib.c: rewrite win32_system().
+
+2012-04-17  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* texmf.cnf: erase "ptexgeneric".
+
+2012-04-16  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXMFCNF): spell out every directory explicitly,
+	so we can include $SELFAUTOPARENT/../texmf-local/web2c.
+
+2012-04-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* cnf.[ch]: Drop KPSEDLL from kpathsea_cnf_get(), and remove
+	kpse_cnf_get().
+	* db.h: Drop KPSEDLL from kpathsea_db_insert().
+	* Makefile.am: Do not install cnf.h.
+	* mingw32.h: Add a copyright statement.
+
+	* configure.ac: Subst tex_live_version from ../../version.ac
+	as WEB2CVERSION for WIN32 programs.
+
+2012-04-09  Karl Berry  <karl@tug.org>
+
+	* getopt.h (getopt) [!__cplusplus]: do not declare when compiling
+	with C++, since g++ 4.7.0 introduced an incompatible declaration.
+	http://bugs.debian.org/667392
+
+	* c-std.h (popen, pclose) [!VMS]: remove these decls to avoid
+	conflicts, hoping they are now always in the system libraries.
+	http://bugs.debian.org/64524
+
+2012-04-07  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (glob_str_size): increase from 5000 to 20000 per Akira,
+	06 Apr 2012 10:25:18.
+
+2012-04-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* c-unistd.h: Declare getopt() (via  <kpathsea/getopt.h>) only
+	for Mingw and Cygwin; for other systems using the GNU C library
+	g++-4.7 might choke on incompatible exception specifications.
+
+2012-03-11  Karl Berry  <karl@tug.org>
+
+	* *.c: prepend kpathsea: to warnings.
+
+2012-03-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	Avoid 'the address of XXX will always evaluate as true' warnings.
+	* lib.h (STREQ): Test '(s) != NULL' instead of '(s)'.
+	Gcc >=4.3 produces identical code but -Wall yields no warning.
+
 2012-03-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* c-unistd.h: Declare getopt() (via  <kpathsea/getopt.h>) but

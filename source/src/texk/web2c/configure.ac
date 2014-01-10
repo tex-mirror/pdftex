@@ -1,6 +1,6 @@
 dnl Process this file with Autoconf to produce a configure script for Web2c.
 dnl
-dnl   Copyright (C) 2009-2012 Peter Breitenlohner <tex-live@tug.org>
+dnl   Copyright (C) 2009-2014 Peter Breitenlohner <tex-live@tug.org>
 dnl
 dnl   This file is free software; the copyright holder
 dnl   gives unlimited permission to copy and/or distribute it,
@@ -28,7 +28,7 @@ dnl to build part of the distribution may not have any given program.
 dnl Even cpascal.h isn't guaranteed, but then nothing is, really ...
 AC_CONFIG_SRCDIR([cpascal.h])
 AC_CONFIG_AUX_DIR([../../build-aux])
-AC_CONFIG_MACRO_DIR([../../m4])
+AC_CONFIG_MACRO_DIRS([../../m4 m4])
 
 WEB2CVERSION=tex_live_version()
 AC_SUBST([WEB2CVERSION])
@@ -58,7 +58,14 @@ dnl For tests
 AC_CHECK_PROGS([KPSEWHICH], [kpsewhich], [false])
 
 KPSE_ASM_UNDERSCORE
-KPSE_CHECK_WIN32
+KPSE_COND_MINGW32
+KPSE_WIN32_CALL
+
+# A compilation variable for doing a TL build so we can
+# adjust the luatex banner, maybe others.
+AS_IF([test "x$enable_native_texlive_build" = xyes],
+      [AC_DEFINE([NATIVE_TEXLIVE_BUILD], 1,
+                 [Define to 1 if building binaries for TeX Live, else 0.])])
 
 AS_CASE([$with_editor],
         [''|yes|no], [AS_IF([test "x$kpse_cv_have_win32" = xno],
@@ -80,9 +87,6 @@ AS_CASE([$enable_ipc],
         [yes|no], [],
             [enable_ipc=yes])
 
-AM_CONDITIONAL([WIN32], [test "x$kpse_cv_have_win32" != xno])
-AM_CONDITIONAL([MINGW32], [test "x$kpse_cv_have_win32" = xmingw32])
-
 KPSE_CHECK_SOCKET_LIBS
 AS_CASE([$ac_cv_search_connect],
         ["none required"], [],
@@ -93,27 +97,29 @@ if test "x$enable_ipc" = xyes; then
    ipc_socketlibs=$socketlibs
    AC_DEFINE([IPC], 1, [tex: Define to enable --ipc.])
 fi
+
 # We may need additional libraries for luaTeX.
 # On Solaris -lnsl for gethostbyname(), -lrt for nanosleep(),
 # and maybe -lresolv for inet_aton().
 lua_socketlibs=$socketlibs
+kpse_save_LIBS=$LIBS
+KPSE_LUA52_DEFINES
+LIBS=$kpse_save_LIBS
 if test "x$kpse_cv_have_win32" = xno; then
-  kpse_save_LIBS=$LIBS
   AC_SEARCH_LIBS([gethostbyname], [nsl])
+  AC_SEARCH_LIBS([hstrerror], [resolv])
   AC_SEARCH_LIBS([inet_aton], [resolv])
   LIBS=$kpse_save_LIBS
   AC_SEARCH_LIBS([nanosleep], [rt])
   LIBS=$kpse_save_LIBS
-  AC_SEARCH_LIBS([dlopen], [dl])
-  if test "x$ac_cv_search_dlopen" != xno; then
-    AC_CHECK_HEADERS([dlfcn.h])
-    if test "x$ac_cv_header_dlfcn_h" = xyes; then
-      if test "x$ac_cv_search_dlopen" != "xnone required"; then
-        lua_socketlibs="$lua_socketlibs $ac_cv_search_dlopen"
-      fi
-    fi
-  fi
-  LIBS=$kpse_save_LIBS
+  AS_CASE([$ac_cv_header_dlfcn_h],
+          [yes], [AS_CASE([$ac_cv_search_dlopen],
+                          [no*], [],
+                          [lua_socketlibs="$lua_socketlibs $ac_cv_search_dlopen"])])
+  AS_CASE([$ac_cv_search_hstrerror],
+          ["none required"], [],
+          [no], [WEB2C_DISABLE([luatex], [no hstrerror()])],
+              [lua_socketlibs="$lua_socketlibs $ac_cv_search_hstrerror"])
   AS_CASE([$ac_cv_search_inet_aton],
           ["none required"], [],
           [no], [WEB2C_DISABLE([luatex], [no inet_aton()])],
@@ -126,16 +132,20 @@ if test "x$kpse_cv_have_win32" = xno; then
           ["none required"], [],
           [no], [WEB2C_DISABLE([luatex], [no nanosleep()])],
               [lua_socketlibs="$lua_socketlibs $ac_cv_search_nanosleep"])
+else
+  AC_CHECK_LIB([ws2_32], [main],
+               [lua_socketlibs="$socketlibs -lws2_32"],
+               [WEB2C_DISABLE([luatex], [no getaddrinfo()])])
 fi
+AM_CONDITIONAL([USE_DLOPEN], [test "x$ac_cv_header_dlfcn_h" = xyes])
 AC_SUBST([lua_socketlibs])
 AC_SUBST([ipc_socketlibs])
 
-KPSE_CHECK_FRAMEWORK([Carbon], [ATSUStyle style])
+KPSE_CHECK_FRAMEWORK([ApplicationServices], [CTFontRef font])
 KPSE_FONTCONFIG_FLAGS
-AS_IF([test "x$kpse_cv_have_Carbon:$kpse_cv_have_fontconfig" = xno:no],
-      [WEB2C_DISABLE([xetex], [neither Carbon framework nor fontconfig library])])
-AM_CONDITIONAL([XETEX_MACOSX], [test "x$kpse_cv_have_Carbon" = xyes])
-AM_CONDITIONAL([XETEX_GRAPHITE], [test "x$with_graphite" != xno])
+AS_IF([test "x$kpse_cv_have_ApplicationServices:$kpse_cv_have_fontconfig" = xno:no],
+      [WEB2C_DISABLE([xetex], [neither ApplicationServices framework nor fontconfig library])])
+AM_CONDITIONAL([XETEX_MACOSX], [test "x$kpse_cv_have_ApplicationServices" = xyes])
 
 dnl Generate *TEX and ALEPH conditionals.
 m4_foreach([Kpse_Prog], [kpse_tex_progs],
@@ -159,11 +169,11 @@ AM_CONDITIONAL([MFN], [test "x$enable_mf_nowin" != xno])
 test "x$enable_mf" = xno || enable_mf=yes
 AS_CASE([$with_mf_x_toolkit],
         [yes|no], [],
-        [''], [with_mf_x_toolkit=$enable_mf],
+        [''], [with_mf_x_toolkit=no],
         [y|ye], [with_mf_x_toolkit=yes],
         [n], [with_mf_x_toolkit=no],
-            [AC_MSG_WARN([unknown --with-mf-x-toolkit argument \`$with_mf_x_toolkit'; using yes.])
-             with_mf_x_toolkit=yes])
+            [AC_MSG_WARN([unknown --with-mf-x-toolkit argument \`$with_mf_x_toolkit'; using no.])
+             with_mf_x_toolkit=no])
 test "x$with_x_toolkit" = xyes && with_x=yes
 test "x$with_x" = xno && with_x_toolkit=no
 : ${with_x=$enable_mf} # tell PATH_XTRA to use X for Metafont, if not specified.
@@ -250,10 +260,11 @@ if test $ac_cv_sizeof_int -lt 4; then
 fi
 AC_CHECK_SIZEOF([long])
 AC_SEARCH_LIBS([pow], [m])
-AC_CHECK_FUNCS([access atoi fmax ftime gettimeofday mkdtemp setlocale snprintf strerror strlcat strlcpy])
+AC_CHECK_FUNCS([access atoi fmax ftime gettimeofday mkdtemp setlocale strerror strlcat strlcpy strndup])
+AC_CHECK_DECLS([strndup])
 AC_CHECK_HEADERS([errno.h langinfo.h locale.h sys/time.h sys/timeb.h sys/wait.h time.h])
 AC_TYPE_LONG_DOUBLE
-AC_TYPE_LONG_LONG_INT
+AC_HEADER_STDBOOL
 
 dnl sharable format files.
 AC_C_BIGENDIAN
@@ -264,62 +275,24 @@ AC_TYPE_SIGNAL
 KPSE_KPATHSEA_FLAGS
 KPSE_PTEXENC_FLAGS
 KPSE_ZLIB_FLAGS
+KPSE_LUA52_FLAGS
 KPSE_LIBPNG_FLAGS
-KPSE_XPDF_FLAGS
-KPSE_POPPLER_FLAGS
-test "x$kpse_cv_have_win32" = xno || POPPLER_LIBS="$POPPLER_LIBS -lgdi32"
-KPSE_ZZIPLIB_FLAGS
-KPSE_GRAPHITE_FLAGS
 KPSE_FREETYPE2_FLAGS
+KPSE_PIXMAN_FLAGS
+KPSE_CAIRO_FLAGS
+KPSE_POPPLER_FLAGS
+KPSE_XPDF_FLAGS
+KPSE_ZZIPLIB_FLAGS
 KPSE_TECKIT_FLAGS
-KPSE_ICU_XETEX_FLAGS([icule])
-KPSE_OBSDCOMPAT_FLAGS
+KPSE_ICU_FLAGS
+KPSE_HARFBUZZ_FLAGS
+KPSE_GRAPHITE2_FLAGS
 
 # Check size of off_t (using <kpathsea/config.h>)
 KPSE_ADD_FLAGS([kpathsea])
 AC_CHECK_SIZEOF([off_t], , AC_INCLUDES_DEFAULT
 [#include <kpathsea/config.h>])
 
-# Checks for xpdf poppler features.
-KPSE_ADD_FLAGS([poppler])
-AC_LANG_PUSH([C++])
-AC_CACHE_CHECK([for Annot::decRefCnt],
-               [kpse_cv_have_Annot_decRefCnt],
-               [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <goo/GooString.h>
-#include <Object.h>
-#include <Array.h>
-#include <Annot.h>]],
-                                                   [[Annot *an; an->decRefCnt();]])],
-                                  [kpse_cv_have_Annot_decRefCnt=yes],
-                                  [kpse_cv_have_Annot_decRefCnt=no])])
-AS_IF([test "x$kpse_cv_have_Annot_decRefCnt" = xyes],
-      [AC_DEFINE([HAVE_ANNOTDECREFCNT], 1,
-                 [Define to 1 if class `Annot' has the `decRefCnt' member.])])
-AC_CACHE_CHECK([for class AnnotBorderStyle],
-               [kpse_cv_have_AnnotBorderStyle],
-               [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <goo/GooString.h>
-#include <Object.h>
-#include <Array.h>
-#include <Annot.h>]],
-                                                   [[AnnotBorderStyle *an;]])],
-                                  [kpse_cv_have_AnnotBorderStyle=yes],
-                                  [kpse_cv_have_AnnotBorderStyle=no])])
-AS_IF([test "x$kpse_cv_have_AnnotBorderStyle" = xyes],
-      [AC_DEFINE([HAVE_ANNOTBORDERSTYLE], 1,
-                 [Define to 1 if we have the class `AnnotBorderStyle'.])])
-AC_CACHE_CHECK([for class EmbFile in Catalog.h],
-               [kpse_cv_have_EmbFile_in_Catalog_h],
-               [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <goo/GooString.h>
-#include <Object.h>
-#include <Array.h>
-#include <Catalog.h>]],
-                                                   [[EmbFile *ef;]])],
-                                  [kpse_cv_have_EmbFile_in_Catalog_h=yes],
-                                  [kpse_cv_have_EmbFile_in_Catalog_h=no])])
-AS_IF([test "x$kpse_cv_have_EmbFile_in_Catalog_h" = xyes],
-      [AC_DEFINE([EMBFILE_IN_CATALOG_H], 1,
-                 [Define to 1 for the class `EmbFile' in <Catalog.h>.])])
-AC_LANG_POP([C++])
 KPSE_RESTORE_FLAGS
 
 dnl Write output here, instead of putting a zillion -D's on the command line.
@@ -330,7 +303,7 @@ AC_CONFIG_HEADERS([w2c/c-auto.h:c-auto.in],
 
 AH_TOP([/* w2c/c-auto.h: defines for web2c, as determined by configure.
 
-   Copyright 1994-97, 2008, 2009, 2010 Karl Berry.
+   Copyright 1994-97, 2008-2012 Karl Berry.
    Copyright 1997-99, 2002, 2005 Olaf Weber.
 
    This program is free software: you can redistribute it and/or modify
@@ -413,6 +386,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile lib/Makefile man/Makefile
 AC_CONFIG_FILES([web2c-sh], [chmod +x web2c-sh])
 AC_CONFIG_FILES([tangle-sh], [chmod +x tangle-sh])
 AC_CONFIG_FILES([ctangleboot-sh], [chmod +x ctangleboot-sh])
+AC_CONFIG_FILES([silent-sh], [chmod +x silent-sh])
 
 dnl The subdirectory web2c must be configured for the build system.
 dnl When cross compiling, can not share the cache file with the subdirectory!

@@ -33,9 +33,6 @@
 #include "getdestdir.h"
 #include "mktexupd.h"
 
-#define WINWEB2CVERSION "Web2C-2011"
-#define WINKPSEVERSION  " Kpathsea-6.0.1"
-
 #define LLBUF 1024
 #define LBUF  512
 #define SBUF  256
@@ -118,8 +115,8 @@ skipchar(char **p)
 static void
 version (void)
 {
-  fprintf (stderr, "%s, (C version 1.5 --ak 2006-2011)\n", progname);
-  fprintf (stderr, WINWEB2CVERSION WINKPSEVERSION "\n");
+  fprintf (stderr, "%s, (C version 1.5 --ak 2006-2012)\n", progname);
+  fprintf (stderr, WEB2C_KPSE_VERSION "\n");
 }
 
 static void
@@ -777,7 +774,7 @@ main (int ac, char **av)
     fprintf (stderr, "%s %s\n", execfile, cmd);
     strcpy(fullbin, texbindir);
     strcat(fullbin, execfile);
-    (void) spawnlp (P_WAIT, fullbin, execfile, cmd, NULL);
+    (void) spawnlp (_P_WAIT, fullbin, execfile, cmd, NULL);
 
     sprintf (cmd, "%s.%sgf", name, dpi);
 
@@ -799,7 +796,7 @@ main (int ac, char **av)
     fprintf (stderr, "%s %s %s\n", execfile, cmd, pkname);
     strcpy(fullbin, texbindir);
     strcat(fullbin, execfile);
-    (void) spawnlp (P_WAIT, fullbin, execfile, cmd, pkname, NULL);
+    (void) spawnlp (_P_WAIT, fullbin, execfile, cmd, pkname, NULL);
 
     if (_access (pkname, 0) != 0) {
       tpkerr ("Failed to make pk from gf.");
@@ -1118,7 +1115,7 @@ skip flag
     fprintf (stderr, "%s %s\n", execfile, cmd);
     strcpy(fullbin, texbindir);
     strcat(fullbin, execfile);
-    (void) spawnlp (P_WAIT, fullbin, execfile, cmd, NULL);
+    (void) spawnlp (_P_WAIT, fullbin, execfile, cmd, NULL);
 
     if (_access (pkname, 0) != 0) {
       tpkerr ("ps2pk failed to make pk font.");
@@ -1141,7 +1138,7 @@ skip flag
   fprintf (stderr, "%s %s %s\n", execfile, name, dpi);
   strcpy(fullbin, texbindir);
   strcat(fullbin, execfile);
-  (void) spawnlp (P_WAIT, fullbin, execfile, name, dpi, NULL);
+  (void) spawnlp (_P_WAIT, fullbin, execfile, name, dpi, NULL);
 
   if (_access (pkname, 0) != 0) {
     tpkerr ("gsftopk cannot be used.");
@@ -1151,7 +1148,7 @@ skip flag
     fprintf (stderr, "%s -q %s %s\n", execfile, name, dpi);
     strcpy(fullbin, texbindir);
     strcat(fullbin, execfile);
-    (void) spawnlp (P_WAIT, fullbin, execfile, "-q", name, dpi, NULL);
+    (void) spawnlp (_P_WAIT, fullbin, execfile, "-q", name, dpi, NULL);
 
     if (_access (pkname, 0) != 0) {
       tpkerr ("ttf2pk failed.");
@@ -1161,7 +1158,7 @@ skip flag
       fprintf (stderr, "%s -q -p %s %s\n", execfile, name, dpi);
       strcpy(fullbin, texbindir);
       strcat(fullbin, execfile);
-      (void) spawnlp (P_WAIT, fullbin, execfile, "-q -p", name, dpi, NULL);
+      (void) spawnlp (_P_WAIT, fullbin, execfile, "-q -p", name, dpi, NULL);
 
       sprintf (cmd, "%s.%sgf", name, dpi);
       if (_access (cmd, 0) != 0) {
@@ -1175,7 +1172,7 @@ skip flag
       fprintf (stderr, "%s %s %s\n", execfile, cmd, pkname);
       strcpy(fullbin, texbindir);
       strcat(fullbin, execfile);
-      (void) spawnlp (P_WAIT, fullbin, execfile, cmd, pkname, NULL);
+      (void) spawnlp (_P_WAIT, fullbin, execfile, cmd, pkname, NULL);
 
       if (_access (pkname, 0) != 0) {
         tpkerr ("All trials failed.");

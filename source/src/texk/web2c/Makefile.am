@@ -1,16 +1,12 @@
 ## Makefile.am for the TeX Live subdirectory texk/web2c/
 ##
-## Copyright (C) 2009-2011 Peter Breitenlohner <tex-live@tug.org>
+## Copyright (C) 2009-2013 Peter Breitenlohner <tex-live@tug.org>
 ## You may freely use, modify and/or distribute this file.
 ##
-ACLOCAL_AMFLAGS = -I ../../m4 -I m4
-
-INCLUDES =
 AM_CPPFLAGS = $(KPATHSEA_INCLUDES)
 ## Not yet for C, C++, and ObjC++ (too many warnings or not yet implemented)
 AM_CFLAGS = $(WARNING_CFLAGS)
 AM_CXXFLAGS = ## $(WARNING_CXXFLAGS)
-## Not yet for ObjC++ (not yet implemented)
 AM_OBJCXXFLAGS = ## $(WARNING_OBJCXXFLAGS)
 
 version = $(WEB2CVERSION)
@@ -37,16 +33,18 @@ bin_links =
 install_exe_links =
 uninstall_exe_links =
 
-# in case of an SVN repository
 dist-hook:
-	rm -rf `find $(distdir) -name .svn`
+	cd "$(distdir)" && rm -rf $(NEVER_DIST)
+
+## in case of an SVN repository
+NEVER_DIST = `find . -name .svn`
 
 ## The sh script that does the conversion.
-web2c = $(SHELL) ./web2c-sh $@
+web2c = AM_V_P=$(AM_V_P) $(SHELL) ./web2c-sh $@
 
 ## We put this in the web2c directory because it runs on the build system, it
 ## is separate from (and simpler than) the actual web-to-C conversion programs.
-makecpool = web2c/makecpool
+makecpool = $(AM_V_GEN)web2c/makecpool
 
 # Additional dependencies:
 web2c_common = web2c/convert web2c/common.defines
@@ -83,46 +81,66 @@ $(proglib): ${srcdir}/lib/*.c
 	cd lib && $(MAKE) $(AM_MAKEFLAGS) lib.a
 ## Rebuild libkpathsea
 @KPATHSEA_RULE@
+## Rebuild libptexenc
+@PTEXENC_RULE@
 ## Rebuild libz
 @ZLIB_RULE@
+## Rebuild liblua52
+@LUA52_RULE@
 ## Rebuild libpng
 @LIBPNG_RULE@
+## Rebuild libfreetype
+@FREETYPE2_RULE@
+## Rebuild libpixman
+@PIXMAN_RULE@
+## Rebuild libcairo
+@CAIRO_RULE@
 ## Rebuild libxpdf & Co
 @XPDF_RULE@
 ## Rebuild poppler
 @POPPLER_RULE@
-## Rebuild libopenbsd-compat
-@OBSDCOMPAT_RULE@
 ## Rebuild libzzip
 @ZZIPLIB_RULE@
-## Rebuild libgraphite
-@GRAPHITE_RULE@
-## Rebuild libfreetype
-@FREETYPE2_RULE@
 ## Rebuild libTEXkit
 @TECKIT_RULE@
 ## Rebuild libsicuxxx
 @ICU_RULE@
+## Rebuild libharfbuzz
+@HARFBUZZ_RULE@
+## Rebuild libgraphite2
+@GRAPHITE2_RULE@
 
 # The environment for building.
 buildenv = TEXMFCNF=$(srcdir)/../kpathsea
 
 # Calling tangle & Co.
-tangle = WEBINPUTS=.:$(srcdir) $(buildenv) $(TANGLE)
-tangleboot = WEBINPUTS=.:$(srcdir) $(buildenv) $(TANGLEBOOT)
-otangle = WEBINPUTS=.:$(srcdir) $(buildenv) $(OTANGLE)
+tangle = $(tangle_silent)WEBINPUTS=.:$(srcdir) $(buildenv) $(TANGLE)
+tangleboot = $(tangle_silent)WEBINPUTS=.:$(srcdir) $(buildenv) $(TANGLEBOOT)
+tangle_silent = $(tangle_silent_@AM_V@)
+tangle_silent_ = $(tangle_silent_@AM_DEFAULT_V@)
+tangle_silent_0 = @echo "  TANGLE  " $@; $(SHELL) ./silent-sh $@ #
+tangle_silent_1 =
+#
 ctangle = $(buildenv) $(CTANGLE)
-tie = WEBINPUTS=.:$(srcdir) $(buildenv) $(TIE)
+ctangle_silent = $(ctangle_silent_@AM_V@)
+ctangle_silent_ = $(ctangle_silent_@AM_DEFAULT_V@)
+ctangle_silent_0 = @echo "  CTANGLE " $@; $(SHELL) ./silent-sh $@ #
+ctangle_silent_1 =
+#
+tie = $(tie_silent)WEBINPUTS=.:$(srcdir) $(buildenv) $(TIE)
+tie_silent = $(tie_silent_@AM_V@)
+tie_silent_ = $(tie_silent_@AM_DEFAULT_V@)
+tie_silent_0 = @echo "  TIE     " $@; $(SHELL) ./silent-sh $@ #
+tie_silent_1 =
 
 # Calling tangle & Co. via tangle-sh (several output files)
-texmf_tangle = WEBINPUTS=.:$(srcdir) $(SHELL) ./tangle-sh $@ $(TANGLE)
-o_tangle = WEBINPUTS=.:$(srcdir) $(SHELL) ./tangle-sh $@ $(OTANGLE)
+texmf_tangle = WEBINPUTS=.:$(srcdir) AM_V_P=$(AM_V_P) $(SHELL) ./tangle-sh $@ $(TANGLE)
 
 # For trip, trap, and other tests
 DIFF = diff
 DIFFFLAGS =
-TESTS_ENVIRONMENT = DIFF='$(DIFF)' DIFFFLAGS='$(DIFFFLAGS)' LN_S='$(LN_S)' KPSEWHICH='$(KPSEWHICH)'
-triptrap_diffs = srcdir=$(srcdir) MAKE=$(MAKE) $(SHELL) $(srcdir)/triptrap-sh
+TESTS_ENVIRONMENT = abs_srcdir=$(abs_srcdir) DIFF='$(DIFF)' DIFFFLAGS='$(DIFFFLAGS)' LN_S='$(LN_S)' KPSEWHICH='$(KPSEWHICH)'
+triptrap_diffs = $(AM_V_GEN)srcdir=$(srcdir) abs_srcdir=$(abs_srcdir) MAKE=$(MAKE) $(SHELL) $(srcdir)/triptrap-sh
 
 .PHONY: triptrap
 triptrap:
@@ -180,18 +198,17 @@ include $(srcdir)/uptexdir/am/uptex.am
 include $(srcdir)/euptexdir/am/euptex.am
 
 ## pdfTeX
-include $(srcdir)/pdftexdir/am/pdftex.am
 include $(srcdir)/pdftexdir/am/libpdftex.am
+include $(srcdir)/pdftexdir/am/pdftex.am
 include $(srcdir)/pdftexdir/am/ttf2afm.am
 include $(srcdir)/pdftexdir/am/pdftosrc.am
 
 ## luaTeX
-include $(srcdir)/luatexdir/am/luatex.am
-include $(srcdir)/luatexdir/am/liblua51.am
 include $(srcdir)/luatexdir/am/luasocket.am
 include $(srcdir)/luatexdir/am/luamisc.am
 include $(srcdir)/luatexdir/am/luafontforge.am
 include $(srcdir)/luatexdir/am/libluatex.am
+include $(srcdir)/luatexdir/am/luatex.am
 include $(srcdir)/luatexdir/am/txt2zlib.am
 
 ## XeTeX
@@ -215,7 +232,7 @@ include $(srcdir)/synctexdir/am/synctex.am
 include $(srcdir)/libmd5/am/md5.am
 
 ## Symlinks within $(bindir)
-include $(srcdir)/../am/bin_links.am
+include $(srcdir)/../../am/bin_links.am
 install-exec-hook: install-bin-links $(install_exe_links)
 uninstall-hook: uninstall-bin-links $(uninstall_exe_links)
 

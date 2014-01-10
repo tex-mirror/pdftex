@@ -38,14 +38,15 @@ extern void kpathsea_init_db (kpathsea kpse);
 extern str_list_type *kpathsea_db_search (kpathsea kpse, const_string name,
                                           const_string path_elt, boolean all);
 
+/* Note: NAMES[i] is not modified.  */
 extern str_list_type *kpathsea_db_search_list (kpathsea kpse,
-                                               const_string* names,
+                                               string* names,
                                                const_string  path_elt,
                                                boolean all);
 
 /* Insert the filename FNAME into the database.
-   Called by mktexpk et al.  */
-extern KPSEDLL void kpathsea_db_insert (kpathsea kpse, const_string fname);
+   Called by mktex() in tex-make.c.  */
+extern void kpathsea_db_insert (kpathsea kpse, const_string fname);
 
 #endif /* MAKE_KPSE_DLL */
 

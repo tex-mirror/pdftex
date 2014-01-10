@@ -1,6 +1,6 @@
 ## texk/web2c/etexdir/am/etex.am: Makefile fragment for e-TeX.
 ##
-## Copyright (C) 2009-2011 Peter Breitenlohner <tex-live@tug.org>
+## Copyright (C) 2009-2013 Peter Breitenlohner <tex-live@tug.org>
 ## You may freely use, modify and/or distribute this file.
 
 ## e-TeX
@@ -17,8 +17,8 @@ etex_LDADD = $(LDADD) $(ipc_socketlibs)
 
 # e-TeX C sources
 etex_c_h = etexini.c etex0.c etexcoerce.h etexd.h
-nodist_etex_SOURCES = $(etex_c_h) etex-pool.c etexdir/etex_version.h
-dist_etex_SOURCES = etexdir/etexextra.c etexdir/etexextra.h
+nodist_etex_SOURCES = $(etex_c_h) etex-pool.c
+dist_etex_SOURCES = etexdir/etexextra.c etexdir/etexextra.h etexdir/etex_version.h
 
 # We must create etexd.h and etexdir/etex_version.h before building the etex_OBJECTS.
 etex_prereq = etexd.h etexdir/etex_version.h
@@ -39,9 +39,8 @@ etex-tangle: tangle$(EXEEXT) etex.web etex.ch tangle-sh
 	@$(texmf_tangle) etex etex
 
 # Extract etex version
-etexdir/etex_version.h: etexdir/etex.ch
-	$(MKDIR_P) etexdir
-	grep '^@d eTeX_version_string==' $(srcdir)/etexdir/etex.ch \
+$(srcdir)/etexdir/etex_version.h: @MAINTAINER_MODE_TRUE@ etexdir/etex.ch
+	$(AM_V_GEN)grep '^@d eTeX_version_string==' $(srcdir)/etexdir/etex.ch \
 	  | sed "s/^.*'-/#define ETEX_VERSION \"/;s/'.*$$/\"/" >$@
 
 # Generate etex.web
@@ -70,8 +69,6 @@ DISTCLEANFILES += $(nodist_etex_SOURCES) etex.web etex.ch etex-web2c \
 
 EXTRA_DIST += \
 	etexdir/ChangeLog \
-	etexdir/INSTALL \
-	etexdir/README \
 	etexdir/etex_gen.tex
 
 # e-TeX Tests
@@ -88,22 +85,15 @@ TRIPTRAP_CLEAN += etrip-clean
 endif ETEX
 DISTCLEANFILES += etrip.diffs
 
-# wprob.test
+## wprob.test
 EXTRA_DIST += tests/wprob.tex
-DISTCLEANFILES += wprob.log wprob.tex
-# etrip.test
+DISTCLEANFILES += ewprob.log ewprob.tex
+## etrip.test
 etrip.diffs: etex$(EXEEXT)
 	$(triptrap_diffs) $@
 .PHONY: etrip-clean
 etrip-clean:
-	rm -f trip.tfm trip.pl trip.tex trip.fmt ctripin.fot ctripin.log
-	rm -f ctrip.fot ctrip.log trip.dvi ctrip.typ
-	rm -f xtripin.fot xtripin.log
-	rm -f xtrip.fot xtrip.log xtrip.typ
-	rm -f etrip.tfm etrip.pl etrip.tex etrip.fmt etripin.fot etripin.log
-	rm -f etrip.fot etrip.log etrip.dvi etrip.out etrip.typ
-	rm -f tripos.tex 8terminal.tex
-	rm -rf tfm
+	rm -rf etripdir
 
 ## Test data
 ##

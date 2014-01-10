@@ -1,3 +1,20 @@
+/* mingw32.h: declarations for mingw32.
+
+   Copyright 2009-2012 Taco Hoekwater <taco@luatex.org>.
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with this library; if not, see <http://www.gnu.org/licenses/>.  */
+
 #ifndef _MINGW32_H_
 #define _MINGW32_H_
 
@@ -32,6 +49,10 @@
 #define MAX_PIPES 128
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef MAKE_KPSE_DLL /* libkpathsea internal only */
 
 extern void init_user_info (void);
@@ -42,5 +63,23 @@ extern char *quote_args(char **);
 
 extern KPSEDLL BOOL win32_get_long_filename (char *, char *, int);
 extern KPSEDLL void texlive_gs_init(void);
+
+static inline FILE *
+win32_popen (const char *command, const char *fmode)
+{
+  char mode[3];
+
+  /* We always use binary mode */
+  mode[0] = fmode[0];
+  mode[1] = 'b';
+  mode[2] = '\0';
+
+  return _popen (command, mode);
+}
+#define popen(cmd, mode) win32_popen(cmd, mode)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -109,6 +109,15 @@
 %             some rearrangements to reduce interferences between
 %                 e-TeX and pTeX, in part suggested by Hironori Kitagawa
 %                 <h_kitagawa2001@@yahoo.co.jp>, Mar 2011.
+% Version 2.4 fixed an uninitialized line number bug, released in May 2012.
+% Version 2.5 development was started in Aug 2012; released in Feb 2013.
+%             better tracing of font definitions, reported by
+%                 Bruno Le Floch <blflatex@@gmail.com>, Jul 2012.
+% Version 2.6 development was started in Mar 2013; released in ??? 201?.
+%             enable hyphenation of text between \beginL and \endL or
+%                 between \beginR and \endR, problem reported by
+%                 Vafa Khalighi <vafalgk@@gmail.com>, Nov 2013.
+%             better handling of right-to-left text -- to be done.
 
 % Although considerable effort has been expended to make the e-TeX program
 % correct and reliable, no warranty is implied; the author disclaims any
@@ -289,15 +298,15 @@ helping to determine whether a particular implementation deserves to be
 known as `\eTeX'.
 
 @d eTeX_version=2 { \.{\\eTeXversion} }
-@d eTeX_revision==".3" { \.{\\eTeXrevision} }
-@d eTeX_version_string=='-2.3' {current \eTeX\ version}
+@d eTeX_revision==".6" { \.{\\eTeXrevision} }
+@d eTeX_version_string=='-2.6' {current \eTeX\ version}
 @#
 @d eTeX_banner=='This is e-TeX, Version 3.1415926',eTeX_version_string
   {printed when \eTeX\ starts}
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
-@d pdftex_revision=="13" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.13' {current \pdfTeX\ version}
+@d pdftex_revision=="14" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='-1.40.14' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.1415926',eTeX_version_string,pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -306,7 +315,7 @@ known as `\eTeX'.
 @#
 @d banner==pdfTeX_banner
 @#
-@d TEX==ETEX {change program name into |ETEX|}
+@d TEX==PDFTEX {change program name into |PDFTEX|}
 @#
 @d TeXXeT_code=0 {the \TeXXeT\ feature is optional}
 @#
@@ -15394,8 +15403,7 @@ begin
     if pdf_seek_write_length then
         write_stream_length(pdf_stream_length, pdf_stream_length_offset);
     pdf_seek_write_length := false;
-    if pdf_last_byte <> pdf_new_line_char then
-        pdf_out(pdf_new_line_char);
+    pdf_out(pdf_new_line_char);
     pdf_print_ln("endstream");
     pdf_end_obj;
 end;
@@ -16598,7 +16606,7 @@ begin
     pdf_os_prepare_obj(i, pdf_os_level);
     if not pdf_os_mode then begin
         pdf_print_int(i);
-        pdf_print(" 0 obj ");
+        pdf_print_ln(" 0 obj");
     end else if pdf_compress_level = 0 then begin
         pdf_print("% "); {debugging help}
         pdf_print_int(i);
@@ -16619,8 +16627,10 @@ begin
         pdf_print_ln(">>");
         if pdf_os_objidx = pdf_os_max_objs - 1 then
             pdf_os_write_objstream;
-    end else
-        pdf_print_ln(">> endobj");
+    end else begin
+        pdf_print_ln(">>");
+        pdf_print_ln("endobj");
+    end;
 end;
 
 @ Write out an accumulated object stream.
@@ -19895,7 +19905,7 @@ procedure pdf_print_info; {print info object}
 var s: str_number;
     creator_given, producer_given, creationdate_given, moddate_given, trapped_given: boolean;
 begin
-    pdf_new_dict(obj_type_others, 0, 3); {keep Info readable unless explicitely forced}
+    pdf_new_dict(obj_type_others, 0, 3); {keep Info readable unless explicitly forced}
     creator_given:=false;
     producer_given:=false;
     creationdate_given:=false;
@@ -25110,7 +25120,7 @@ ligature_node: begin f:=font(lig_char(cur_p));
   end;
   end;
 disc_node: @<Try to break after a discretionary fragment, then |goto done5|@>;
-math_node: begin if subtype(cur_p)<L_code then auto_breaking:=end_LR(cur_p);
+math_node: begin if subtype(cur_p)<L_code then auto_breaking:=odd(subtype(cur_p));
   kern_break;
   end;
 penalty_node: try_break(penalty(cur_p),unhyphenated);
@@ -25650,7 +25660,8 @@ A sequence of characters will be considered for hyphenation only if it
 belongs to a ``potentially hyphenatable part'' of the current paragraph.
 This is a sequence of nodes $p_0p_1\ldots p_m$ where $p_0$ is a glue node,
 $p_1\ldots p_{m-1}$ are either character or ligature or whatsit or
-implicit kern nodes, and $p_m$ is a glue or penalty or insertion or adjust
+implicit kern or text direction nodes, and $p_m$ is a glue or penalty or
+insertion or adjust
 or mark or whatsit or explicit kern node.  (Therefore hyphenation is
 disabled by boxes, math formulas, and discretionary nodes already inserted
 by the user.) The ligature nodes among $p_1\ldots p_{m-1}$ are effectively
@@ -25754,6 +25765,7 @@ loop@+  begin if is_char_node(s) then
     else begin q:=lig_ptr(s); c:=qo(character(q)); hf:=font(q);
       end
   else if (type(s)=kern_node)and(subtype(s)=normal) then goto continue
+  else if (type(s)=math_node)and(subtype(s)>=L_code) then goto continue
   else if type(s)=whatsit_node then
     begin @<Advance \(p)past a whatsit node in the \(p)pre-hyphenation loop@>;
     goto continue;
@@ -25822,6 +25834,7 @@ loop@+  begin if not(is_char_node(s)) then
     kern_node: if subtype(s)<>normal then goto done4;
     whatsit_node,glue_node,penalty_node,ins_node,adjust_node,mark_node:
       goto done4;
+    math_node: if subtype(s)>=L_code then goto done4@+else goto done1;
     othercases goto done1
     endcases;
   s:=link(s);
@@ -31881,7 +31894,7 @@ define(u,set_font,null_font); scan_optional_equals; scan_file_name;
 @<If this font has already been loaded, set |f| to the internal
   font number and |goto common_ending|@>;
 f:=read_font_info(u,cur_name,cur_area,s);
-common_ending: equiv(u):=f; eqtb[font_id_base+f]:=eqtb[u]; font_id_text(f):=t;
+common_ending: define(u,set_font,f); eqtb[font_id_base+f]:=eqtb[u]; font_id_text(f):=t;
 end;
 
 @ @<Scan the font size specification@>=
@@ -36063,7 +36076,7 @@ begin
         pdf_append_list(pdf_ximage_objnum(p))(pdf_ximage_list);
     if not is_pdf_image(image) then begin
         if is_png_image(image) then begin
-            groupref := image_group_ref(image);
+            groupref := get_image_group_ref(image);
             if (groupref > 0) and (pdf_page_group_val = 0) then 
                 pdf_page_group_val := groupref;
         end;
@@ -36078,9 +36091,14 @@ begin
     end
     else begin
         {for pdf images we generate the page group object number here}
-        groupref := image_group_ref(image); {this is only a flag whether page group is present}
-        if (groupref > 0) and (pdf_page_group_val = 0) then begin
-            pdf_page_group_val := pdf_new_objnum;
+        groupref := get_image_group_ref(image); {0: no group, -1: to be generated; >0: already written}
+        if (groupref <> 0) and (pdf_page_group_val = 0) then begin
+            if groupref = -1 then begin
+                pdf_page_group_val := pdf_new_objnum;
+                set_image_group_ref(image, pdf_page_group_val);
+            end
+            else { groupref > 0 }
+                pdf_page_group_val := groupref;
         end;
         pdf_print_real(ext_xn_over_d(pdf_width(p),
                        ten_pow[6], img_w), 6);
@@ -37058,7 +37076,7 @@ MacKay in {\sl TUGboat\/} {\bf 8}, 14--25, 1987.
 In order to avoid confusion with \TeXeT\ the present implementation of
 mixed direction typesetting is called \TeXXeT.  It differs from \TeXeT\
 in several important aspects:  (1)~Right-to-left text is reversed
-explicitely by the |ship_out| routine and is written to a normal \.{DVI}
+explicitly by the |ship_out| routine and is written to a normal \.{DVI}
 file without any |begin_reflect| or |end_reflect| commands; (2)~a
 |math_node| is (ab)used instead of a |whatsit_node| to record the
 \.{\\beginL}, \.{\\endL}, \.{\\beginR}, and \.{\\endR} text direction
@@ -38279,7 +38297,7 @@ f:=cur_val
 procedure@?scan_normal_glue; forward;@t\2@>@/
 procedure@?scan_mu_glue; forward;@t\2@>
 
-@ Here we declare to trivial procedures in order to avoid mutually
+@ Here we declare two trivial procedures in order to avoid mutually
 recursive procedures with parameters.
 
 @<Declare procedures needed for expressions@>=

@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License along
 with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
 #include "ptexlib.h"
 #include <kpathsea/c-auto.h>
 #include <kpathsea/c-memstr.h>
+#include <math.h>
 #include <string.h>
 
 #define FM_BUF_SIZE     1024
@@ -109,8 +109,8 @@ static void delete_ff_entry(ff_entry * ff)
 
 static fm_entry *dummy_fm_entry(void)
 {
-    static const fm_entry const_fm_entry;
-    return (fm_entry *) & const_fm_entry;
+    static fm_entry const_fm_entry;
+    return & const_fm_entry;
 }
 
 /**********************************************************************/

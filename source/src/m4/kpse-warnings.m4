@@ -1,5 +1,5 @@
 # Public macros for the TeX Live (TL) tree.
-# Copyright (C) 2009-2012 Peter Breitenlohner <tex-live@tug.org>
+# Copyright (C) 2009-2013 Peter Breitenlohner <tex-live@tug.org>
 #
 # This file is free software; the copyright holders
 # give unlimited permission to copy and/or distribute it,
@@ -7,7 +7,7 @@
 
 # KPSE_COMPILER_WARNINGS
 # ----------------------
-# Set up compiler warnings for C and C++.
+# Set up compiler warnings for (Objective) C and (Objective) C++.
 # This macro determines and substitutes WARNING_CFLAGS for the C compiler
 # and, if applicable, WARNING_CXXFLAGS for the C++ compiler. To activate
 # them a Makefile.am must use them, e.g., in AM_CFLAGS or AM_CXXFLAGS.
@@ -17,19 +17,23 @@ dnl arrange that AC_PROG_CC uses _KPSE_WARNING_CFLAGS etc.
 AC_PROVIDE_IFELSE([AC_PROG_CC],
                   [_KPSE_WARNING_CFLAGS],
                   [m4_define([AC_PROG_CC],
-                             m4_defn([AC_PROG_CC])[_KPSE_WARNING_CFLAGS])])
+                             m4_defn([AC_PROG_CC])[_KPSE_WARNING_CFLAGS
+])])
 AC_PROVIDE_IFELSE([AC_PROG_CXX],
                   [_KPSE_WARNING_CXXFLAGS],
                   [m4_define([AC_PROG_CXX],
-                             m4_defn([AC_PROG_CXX])[_KPSE_WARNING_CXXFLAGS])])
+                             m4_defn([AC_PROG_CXX])[_KPSE_WARNING_CXXFLAGS
+])])
 AC_PROVIDE_IFELSE([AC_PROG_OBJC],
                   [_KPSE_WARNING_OBJCFLAGS],
                   [m4_define([AC_PROG_OBJC],
-                             m4_defn([AC_PROG_OBJC])[_KPSE_WARNING_OBJCFLAGS])])
+                             m4_defn([AC_PROG_OBJC])[_KPSE_WARNING_OBJCFLAGS
+])])
 AC_PROVIDE_IFELSE([AC_PROG_OBJCXX],
                   [_KPSE_WARNING_OBJCXXFLAGS],
                   [m4_define([AC_PROG_OBJCXX],
-                             m4_defn([AC_PROG_OBJCXX])[_KPSE_WARNING_OBJCXXFLAGS])])
+                             m4_defn([AC_PROG_OBJCXX])[_KPSE_WARNING_OBJCXXFLAGS
+])])
 ]) # KPSE_COMPILER_WARNINGS
 
 # _KPSE_COMPILER_WARNINGS_OPTION

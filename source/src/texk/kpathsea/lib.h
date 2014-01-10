@@ -1,6 +1,7 @@
 /* lib.h: declarations for common, low-level routines in kpathsea.
 
-   Copyright 1992, 1993, 1994, 1995, 1996, 2008, 2009, 2010, 2011 Karl Berry.
+   Copyright 1992, 1993, 1994, 1995, 1996, 2008, 2009, 2010, 2011,
+             2012 Karl Berry.
    Copyright 1999, 2000, 2003, 2005 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
@@ -22,6 +23,10 @@
 #include <kpathsea/c-proto.h>
 #include <kpathsea/systypes.h>
 #include <kpathsea/types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Define common sorts of messages.  */
 
@@ -94,7 +99,7 @@
 
 
 /* I find this easier to read.  */
-#define STREQ(s1, s2) ((s1) && (s2) && (strcmp (s1, s2) == 0))
+#define STREQ(s1, s2) (((s1) != NULL) && ((s2) != NULL) && (strcmp (s1, s2) == 0))
 #define STRNEQ(s1, s2, n) ((s1) && (s2) && (strncmp (s1, s2, n) == 0))
 
 /* Support for FAT/ISO-9660 filesystems.  Theoretically this should be
@@ -219,5 +224,9 @@ extern KPSEDLL address xcalloc (size_t nelem, size_t elsize);
 #define XTALLOC(n, t) ((t *) xmalloc ((n) * sizeof (t)))
 #define XTALLOC1(t) XTALLOC (1, t)
 #define XRETALLOC(addr, n, t) ((addr) = (t *) xrealloc (addr, (n) * sizeof(t)))
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* not KPATHSEA_LIB_H */

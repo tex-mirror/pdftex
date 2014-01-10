@@ -1,26 +1,25 @@
 ## Makefile.am for the TeX Live subdirectory texk/kpathsea/
 ##
-## Copyright (C) 2009-2011 Peter Breitenlohner <tex-live@tug.org>
+## Copyright (C) 2009-2013 Peter Breitenlohner <tex-live@tug.org>
 ## You may freely use, modify and/or distribute this file.
 ##
 ACLOCAL_AMFLAGS = -I ../../m4
-
-# Rebuild
-.PHONY: rebuild
-rebuild: all
 
 SUBDIRS = . doc man
 
 EXTRA_DIST = BUGS PROJECTS
 
-INCLUDES = -I$(top_builddir)/.. -I$(top_srcdir)/..
+AM_CPPFLAGS = -I$(top_builddir)/.. -I$(top_srcdir)/..
 AM_CFLAGS = $(WARNING_CFLAGS)
 
 lib_LTLIBRARIES = libkpathsea.la
 
-libkpathsea_la_CPPFLAGS = -DMAKE_KPSE_DLL
+libkpathsea_la_CPPFLAGS = $(AM_CPPFLAGS) -DMAKE_KPSE_DLL
+if have_EXEEXT
+libkpathsea_la_CPPFLAGS += -DEXEEXT=\"$(EXEEXT)\"
+endif have_EXEEXT
 
-libkpathsea_la_LDFLAGS = -no-undefined -version-info $(KPSE_LT_VERSINFO)
+libkpathsea_la_LDFLAGS = -bindir @bindir@ -no-undefined -version-info $(KPSE_LT_VERSINFO)
 
 libkpathsea_la_LIBADD = $(LTLIBOBJS)
 
@@ -46,8 +45,6 @@ libkpathsea_la_SOURCES = \
 	find-suffix.c \
 	fn.c \
 	fontmap.c \
-	getopt.c \
-	getopt1.c \
 	hash.c \
 	kdefault.c \
 	kpathsea.c \
@@ -66,7 +63,6 @@ libkpathsea_la_SOURCES = \
 	tex-hush.c \
 	tex-make.c \
 	tilde.c \
-	truncate.c \
 	uppercasify.c \
 	variable.c \
 	version.c \
@@ -75,9 +71,7 @@ libkpathsea_la_SOURCES = \
 	xdirname.c \
 	xfopen.c \
 	xfseek.c \
-	xfseeko.c \
 	xftell.c \
-	xftello.c \
 	xgetcwd.c \
 	xmalloc.c \
 	xopendir.c \
@@ -86,15 +80,30 @@ libkpathsea_la_SOURCES = \
 	xstat.c \
 	xstrdup.c
 
+if !MINGW32
+libkpathsea_la_SOURCES += \
+	getopt.c \
+	getopt1.c
+endif !MINGW32
+
 if WIN32
 if MINGW32
-libkpathsea_la_SOURCES += mingw32.c
+libkpathsea_la_SOURCES += \
+	mingw32.c \
+	xfseeko.c \
+	xftello.c
 else !MINGW32
-libkpathsea_la_SOURCES += win32lib.c
+libkpathsea_la_SOURCES += \
+	win32lib.c
 endif !MINGW32
-libkpathsea_la_SOURCES += knj.c
+libkpathsea_la_SOURCES += \
+	knj.c
 SUBDIRS += win32
-endif WIN32
+else !WIN32
+libkpathsea_la_SOURCES += \
+	xfseeko.c \
+	xftello.c
+endif !WIN32
 
 $(libkpathsea_la_OBJECTS): paths.h kpathsea.h
 
@@ -167,7 +176,6 @@ noinst_HEADERS = \
 	fn.h \
 	fontmap.h \
 	tilde.h \
-	truncate.h \
 	xopendir.h \
 	xstat.h
 
@@ -198,13 +206,25 @@ stamp-paths: texmf.cnf bsnl.awk cnf-to-paths.awk
 	rm -f paths.tmp
 	date >$@
 
-kpathsea.h: Makefile paths.h
-	rm -f $@
-	echo '/* This is a generated file */' >$@
-	echo '/* collecting all public kpathsea headers. */' >>$@
-	for f in config.h c-auto.h paths.h $(normal_headers); do \
-	  echo "#include <kpathsea/$$f>" >>$@; \
-	done
+## Similarly we don't want to rewrite kpathsea.h when only Makefile has
+## been remade but kpathsea.h remains the same.
+##
+kpathsea.h: stamp-kpathsea
+stamp-kpathsea: Makefile paths.h
+	$(AM_V_GEN)rm -f $@; \
+	( echo '/* This is a generated file */'; \
+	  echo '/* collecting all public kpathsea headers. */'; \
+	  for f in config.h c-auto.h paths.h $(normal_headers); do \
+	    echo "#include <kpathsea/$$f>"; \
+	  done ) >kpathsea.tmp
+	@if cmp -s kpathsea.h kpathsea.tmp 2>/dev/null; then \
+	  echo "kpathsea.h is unchanged"; \
+	else \
+	  echo "cp kpathsea.tmp kpathsea.h"; \
+	  cp kpathsea.tmp kpathsea.h; \
+	fi
+	rm -f kpathsea.tmp
+	date >$@
 
 EXTRA_DIST += bsnl.awk cnf-to-paths.awk
 
@@ -221,14 +241,14 @@ kpsewhich_LDADD = libkpathsea.la
 
 EXTRA_PROGRAMS = progname-test xdirtest
 
-progname_test_CPPFLAGS = -DMAKE_KPSE_DLL -DTEST
+progname_test_CPPFLAGS = $(AM_CPPFLAGS) -DMAKE_KPSE_DLL -DTEST
 progname_test_SOURCES = progname.c
 progname_test_LDADD = libkpathsea.la
 
 xdirtest_LDADD = libkpathsea.la
 
 ## The scripts and their data
-web2cdir = $(datarootdir)/texmf/web2c
+web2cdir = $(datarootdir)/texmf-dist/web2c
 
 dist_web2c_SCRIPTS = mktexdir mktexnam mktexupd
 
@@ -238,11 +258,7 @@ dist_noinst_SCRIPTS = mktexlsr mktexmf mktexpk mktextfm
 
 dist_noinst_DATA = texmf.cnf
 
-# Symlinks within $(bindir): FILE:LINK indicates LINK->FILE
-bin_links = \
-	mktexlsr:texhash
-
-install-exec-hook:
+install-exec-local: installdirs-am
 if !WIN32
 	@for f in $(dist_noinst_SCRIPTS); do \
 	  if grep "original $$f --" "$(DESTDIR)$(bindir)/$$f" >/dev/null 2>&1 \
@@ -251,17 +267,9 @@ if !WIN32
 	    $(INSTALL_SCRIPT) "$(srcdir)/$$f" "$(DESTDIR)$(bindir)/$$f"; \
 	  else :; fi; \
 	done
-	@cd $(DESTDIR)$(bindir) && \
-	  for s in $(bin_links); do \
-	    link=`echo $$s | sed 's,.*:,,'`; \
-	    file=`echo $$s | sed 's,:.*,,'`; \
-	    rm -f $$link; \
-	    echo "creating link '$$link' -> '$$file'"; \
-	    $(LN_S) $$file $$link || exit 1; \
-	  done
 endif !WIN32
 
-install-data-hook:
+install-data-local: installdirs-am
 	@for f in $(dist_noinst_DATA); do \
 	  if grep "original $$f --" "$(DESTDIR)$(web2cdir)/$$f" >/dev/null 2>&1 \
 	      || test ! -r "$(DESTDIR)$(web2cdir)/$$f"; then \
@@ -270,17 +278,13 @@ install-data-hook:
 	  else :; fi; \
 	done
 
-uninstall-hook:
+uninstall-local:
 if !WIN32
 	@for f in $(dist_noinst_SCRIPTS); do \
 	  if grep "original $$f --" "$(DESTDIR)$(bindir)/$$f" >/dev/null 2>&1; then \
 	    echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
 	    rm -f "$(DESTDIR)$(bindir)/$$f"; \
 	  else :; fi; \
-	done
-	@for s in $(bin_links); do \
-	  link=`echo $$s | sed 's,.*:,,'`; \
-	  rm -f $(DESTDIR)$(bindir)/$$link; \
 	done
 endif !WIN32
 	@for f in $(dist_noinst_DATA); do \
@@ -290,12 +294,29 @@ endif !WIN32
 	  else :; fi; \
 	done
 
+bin_links = mktexlsr:texhash
+
+include $(top_srcdir)/../../am/bin_links.am
+
+install-exec-hook: install-bin-links
+
+uninstall-hook: uninstall-bin-links
+
 ## The tests
-TESTS = kpseaccess.test kpsereadlink.test kpsestat.test kpsewhich.test
+TESTS  = tests/cnfnewline.test tests/kpseaccess.test
+TESTS += tests/kpsereadlink.test tests/kpsestat.test tests/kpsewhich.test
 TESTS_ENVIRONMENT = LN_S='$(LN_S)' LT_OBJDIR='$(LT_OBJDIR)'
 EXTRA_DIST += $(TESTS)
+EXTRA_DIST += tests/cnfnewline/texmf.cnf
+
+# Rebuild
+rebuild_prereq =
+rebuild_target = all-am
+CLEANFILES =
+
+include $(srcdir)/../../am/rebuild.am
 
 ## Not used
 ##
-EXTRA_DIST += mktex.cnf win32lib.h.mugica
+EXTRA_DIST += mktex.cnf
 

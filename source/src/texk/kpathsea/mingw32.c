@@ -1,6 +1,6 @@
 /* mingw32.c: bits and pieces for mingw32
 
-   Copyright 2009-2011 Taco Hoekwater <taco@luatex.org>.
+   Copyright 2009-2013 Taco Hoekwater <taco@luatex.org>.
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,7 @@
 #include <kpathsea/lib.h>
 #include <kpathsea/concatn.h>
 #include <kpathsea/variable.h>
+#include <kpathsea/c-stat.h>
 #include <shlobj.h>
 #include <errno.h>
 
@@ -385,123 +386,13 @@ win32_get_long_filename (char * name, char * buf, int size)
   return TRUE;
 }
 
-/*
-  This does make sense only under WIN32.
-  Functions:
-    - look_for_cmd() : locates an executable file
-  */
-
-/*
-  This part looks for the real location of the program invoked
-  by cmd. If it can find the program, that's good. Else
-  command processor is invoked.
-*/
-
-BOOL
-look_for_cmd(const char *cmd, char **app)
-{
-  char *env_path;
-  const char *p, *q;
-  char pname[MAXPATHLEN], *fp;
-  const char *suffixes[] = { ".bat", ".cmd", ".com", ".exe", NULL };
-  const char **s;
-  char *app_name;
-
-  BOOL go_on;
-
-  *app = NULL;
-  app_name = NULL;
-
-  /* We should look for the application name along the PATH,
-     and decide to prepend "%COMSPEC% /c " or not to the command line.
-     Do nothing for the moment. */
-
-  /* Another way to do that would be to try CreateProcess first without
-     invoking cmd, and look at the error code. If it fails because of
-     command not found, try to prepend "cmd /c" to the cmd line.
-  */
-
-  /* Look for the application name */
-  for (p = cmd; *p && isspace(*p); p++);
-  if (*p == '"') {
-    q = ++p;
-    while(*p && *p != '"') p++;
-    if (*p == '\0') {
-      fprintf(stderr, "Look_for_cmd: malformed command (\" not terminated)\n");
-      return FALSE;
-    }
-  }
-  else
-    for (q = p; *p && !isspace(*p); p++);
-  /* q points to the beginning of appname, p to the last + 1 char */
-  if ((app_name = malloc(p - q + 1)) == NULL) {
-    fprintf(stderr, "Look_for_cmd: malloc(app_name) failed.\n");
-    return FALSE;
-  }
-  strncpy(app_name, q, p - q );
-  app_name[p - q] = '\0';
-  pname[0] = '\0';
-#ifdef TRACE
-  fprintf(stderr, "popen: app_name = %s\n", app_name);
-#endif
-
-  {
-    char *tmp = getenv("PATH");
-    env_path = xmalloc(strlen(tmp) + 3);
-    strcpy(env_path, ".;");
-    strcat(env_path, tmp);
-  }
-
-  /* Looking for appname on the path */
-  for (s = suffixes, go_on = TRUE; go_on; *s++) {
-    if (SearchPath(env_path,    /* Address of search path */
-                   app_name,    /* Address of filename */
-                   *s,          /* Address of extension */
-                   MAXPATHLEN,  /* Size of destination buffer */
-                   pname,       /* Address of destination buffer */
-                   &fp)         /* File part of app_name */
-        != 0) {
-#ifdef TRACE
-      fprintf(stderr, "%s found with suffix %s\nin %s\n", app_name, *s, pname);
-#endif
-      free(app_name);
-      app_name = xstrdup(pname);
-      break;
-    }
-    go_on = (*s != NULL);
-  }
-  if (go_on == FALSE) {
-    /* the app_name was not found */
-#ifdef TRACE
-    fprintf(stderr, "%s not found, concatenating comspec\n", app_name);
-#endif
-    free(app_name);
-    app_name = NULL;
-  }
-  if (env_path) free(env_path);
-
-  *app = app_name;
-
-  return TRUE;
-
-}
-
 /* special TeXLive Ghostscript */
 
 static int is_dir (char *buff)
 {
-  HANDLE h;
-  WIN32_FIND_DATA w32fd;
+  struct stat stats;
 
-  if (((h = FindFirstFile (buff, &w32fd))
-       != INVALID_HANDLE_VALUE) &&
-      (w32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-    FindClose (h);
-    return (1);
-  } else {
-    FindClose (h);
-    return (0);
-  }
+  return stat (buff, &stats) == 0 && S_ISDIR (stats.st_mode);
 }
 
 /*
@@ -513,27 +404,34 @@ void texlive_gs_init(void)
   char *nptr, *path;
   char tlgsbindir[512];
   char tlgslibdir[512];
-  nptr = kpse_var_value("SELFAUTOPARENT");
-  if (nptr) {
-    strcpy(tlgsbindir, nptr);
-    strcat(tlgsbindir,"/tlpkg/tlgs");
-    if(is_dir(tlgsbindir)) {
-      strcpy(tlgslibdir, tlgsbindir);
-      strcat(tlgslibdir, "/lib;");
-      strcat(tlgslibdir, tlgsbindir);
-      strcat(tlgslibdir, "/fonts");
-      strcat(tlgsbindir, "/bin;");
-      free(nptr);
-      for(nptr = tlgsbindir; *nptr; nptr++) {
-        if(*nptr == '/') *nptr = '\\';
+  nptr = kpse_var_value("TEXLIVE_WINDOWS_EXTERNAL_GS");
+  if (nptr == NULL || !strcmp(nptr, "0") || !strcmp(nptr, "n") || !strcmp(nptr, "f")) {
+    if (nptr)
+      free (nptr);
+    nptr = kpse_var_value("SELFAUTOPARENT");
+    if (nptr) {
+      strcpy(tlgsbindir, nptr);
+      strcat(tlgsbindir,"/tlpkg/tlgs");
+      if(is_dir(tlgsbindir)) {
+        strcpy(tlgslibdir, tlgsbindir);
+        strcat(tlgslibdir, "/lib;");
+        strcat(tlgslibdir, tlgsbindir);
+        strcat(tlgslibdir, "/fonts");
+        strcat(tlgsbindir, "/bin;");
+        free(nptr);
+        for(nptr = tlgsbindir; *nptr; nptr++) {
+          if(*nptr == '/') *nptr = '\\';
+        }
+        nptr = getenv("PATH");
+        path = (char *)malloc(strlen(nptr) + strlen(tlgsbindir) + 6);
+        strcpy(path, tlgsbindir);
+        strcat(path, nptr);
+        xputenv("PATH", path);
+        xputenv("GS_LIB", tlgslibdir);
       }
-      nptr = getenv("PATH");
-      path = (char *)malloc(strlen(nptr) + strlen(tlgsbindir) + 6);
-      strcpy(path, tlgsbindir);
-      strcat(path, nptr);
-      xputenv("PATH", path);
-      xputenv("GS_LIB", tlgslibdir);
     }
+  } else {
+    free (nptr);
   }
 }
 

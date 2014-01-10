@@ -1,6 +1,6 @@
 /* cnf.c: read config files.
 
-   Copyright 1994, 1995, 1996, 1997, 2008, 2009, 2011 Karl Berry.
+   Copyright 1994, 1995, 1996, 1997, 2008, 2009, 2011, 2012 Karl Berry.
    Copyright 1997-2005 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@
 #include <kpathsea/line.h>
 #include <kpathsea/paths.h>
 #include <kpathsea/pathsearch.h>
-#include <kpathsea/progname.h>
 #include <kpathsea/tex-file.h>
 #include <kpathsea/variable.h>
 
@@ -193,7 +192,7 @@ read_all_cnf (kpathsea kpse)
           string next_line = read_line (cnf_file);
           line[len - 1] = 0;
           if (!next_line) {
-            WARNING1 ("%s: Last line ends with \\", *cnf);
+            WARNING1 ("kpathsea: %s: Last line of file ends with \\", *cnf);
           } else {
             string new_line;
             new_line = concat (line, next_line);
@@ -215,7 +214,7 @@ read_all_cnf (kpathsea kpse)
     string warn = getenv ("KPATHSEA_WARNING");
     if (!(warn && STREQ (warn, "0"))) {
       WARNING1
- ("kpathsea: configuration file texmf.cnf not found in these directories: %s",
+  ("kpathsea: configuration file texmf.cnf not found in these directories: %s",
         cnf_path);
     }
   }
@@ -224,11 +223,11 @@ read_all_cnf (kpathsea kpse)
 /* Read the cnf files on the first call.  Return the first value in the
    returned list -- this will be from the last-read cnf file.  */
 
-string
+const_string
 kpathsea_cnf_get (kpathsea kpse, const_string name)
 {
-  string ret, ctry;
-  string *ret_list;
+  string ctry;
+  const_string ret, *ret_list;
 
   /* When we expand the compile-time value for DEFAULT_TEXMFCNF,
      we end up needing the value for TETEXDIR and other variables,
@@ -273,7 +272,7 @@ kpathsea_cnf_get (kpathsea kpse, const_string name)
 }
 
 #if defined(KPSE_COMPAT_API)
-string
+const_string
 kpse_cnf_get (const_string name)
 {
     return kpathsea_cnf_get(kpse_def, name);

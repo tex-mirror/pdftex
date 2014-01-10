@@ -3,7 +3,7 @@
 % to be applied to tex.web in order to define the
 % e-TeX program.
  
-% e-TeX is copyright (C) 1999-2011 by P. Breitenlohner (1994,98 by the NTS
+% e-TeX is copyright (C) 1999-2012 by P. Breitenlohner (1994,98 by the NTS
 % team); all rights are reserved. Copying of this file is authorized only if
 % (1) you are P. Breitenlohner, or if (2) you make absolutely no changes to
 % your copy. (Programs such as TIE allow the application of several change
@@ -29,7 +29,7 @@
 % TeX is a trademark of the American Mathematical Society.
 % METAFONT is a trademark of Addison-Wesley Publishing Company.
 @y
-% e-TeX is copyright (C) 1999-2011 by P. Breitenlohner (1994,98 by the NTS
+% e-TeX is copyright (C) 1999-2012 by P. Breitenlohner (1994,98 by the NTS
 % team); all rights are reserved. Copying of this file is authorized only if
 % (1) you are P. Breitenlohner, or if (2) you make absolutely no changes to
 % your copy. (Programs such as TIE allow the application of several change
@@ -98,6 +98,15 @@
 %             some rearrangements to reduce interferences between
 %                 e-TeX and pTeX, in part suggested by Hironori Kitagawa
 %                 <h_kitagawa2001@@yahoo.co.jp>, Mar 2011.
+% Version 2.4 fixed an uninitialized line number bug, released in May 2012.
+% Version 2.5 development was started in Aug 2012; released in Feb 2013.
+%             better tracing of font definitions, reported by
+%                 Bruno Le Floch <blflatex@@gmail.com>, Jul 2012.
+% Version 2.6 development was started in Mar 2013; released in ??? 201?.
+%             enable hyphenation of text between \beginL and \endL or
+%                 between \beginR and \endR, problem reported by
+%                 Vafa Khalighi <vafalgk@@gmail.com>, Nov 2013.
+%             better handling of right-to-left text -- to be done.
 
 % Although considerable effort has been expended to make the e-TeX program
 % correct and reliable, no warranty is implied; the author disclaims any
@@ -183,8 +192,8 @@ known as `\eTeX'.
 @d banner=='This is TeX, Version 3.1415926' {printed when \TeX\ starts}
 @y
 @d eTeX_version=2 { \.{\\eTeXversion} }
-@d eTeX_revision==".3" { \.{\\eTeXrevision} }
-@d eTeX_version_string=='-2.3' {current \eTeX\ version}
+@d eTeX_revision==".6" { \.{\\eTeXrevision} }
+@d eTeX_version_string=='-2.6' {current \eTeX\ version}
 @#
 @d eTeX_banner=='This is e-TeX, Version 3.1415926',eTeX_version_string
   {printed when \eTeX\ starts}
@@ -1906,7 +1915,7 @@ if do_last_line_fit then
 @x [39] m.866 l.17064 - e-TeX TeXXeT
 math_node: begin auto_breaking:=(subtype(cur_p)=after); kern_break;
 @y
-math_node: begin if subtype(cur_p)<L_code then auto_breaking:=end_LR(cur_p);
+math_node: begin if subtype(cur_p)<L_code then auto_breaking:=odd(subtype(cur_p));
   kern_break;
 @z
 %---------------------------------------
@@ -1998,11 +2007,25 @@ if TeXXeT_en then @<Insert LR nodes at the end of the current line@>;
     else pen:=pen+widow_penalty;
 @z
 %---------------------------------------
+@x [40] m.891 l.17455 - e-TeX TeXXeT
+implicit kern nodes, and $p_m$ is a glue or penalty or insertion or adjust
+@y
+implicit kern or text direction nodes, and $p_m$ is a glue or penalty or
+insertion or adjust
+@z
+%---------------------------------------
 @x [40] m.891 l.17494 - e-TeX hyph_codes
 cur_lang:=init_cur_lang; l_hyf:=init_l_hyf; r_hyf:=init_r_hyf;
 @y
 cur_lang:=init_cur_lang; l_hyf:=init_l_hyf; r_hyf:=init_r_hyf;
 set_hyph_index;
+@z
+%---------------------------------------
+@x [40] m.896 l.17557 - e-TeX TeXXeT
+  else if (type(s)=kern_node)and(subtype(s)=normal) then goto continue
+@y
+  else if (type(s)=kern_node)and(subtype(s)=normal) then goto continue
+  else if (type(s)=math_node)and(subtype(s)>=L_code) then goto continue
 @z
 %---------------------------------------
 @x [40] m.896 l.17563 - e-TeX hyph_codes
@@ -2034,6 +2057,13 @@ set_hyph_index;
   if hc[0]=0 then goto done3;
   if j=63 then goto done3;
   incr(j); hu[j]:=c; hc[j]:=hc[0];@/
+@z
+%---------------------------------------
+@x [40] m.899 l.17623 - e-TeX TeXXeT
+    othercases goto done1
+@y
+    math_node: if subtype(s)>=L_code then goto done4@+else goto done1;
+    othercases goto done1
 @z
 %---------------------------------------
 @x [42] m.934 l.18245 new_hyph_exceptions - e-TeX hyph_codes
@@ -2982,6 +3012,12 @@ set_shape: begin q:=cur_chr; scan_optional_equals; scan_int; n:=cur_val;
   define(q,shape_ref,p);
 @z
 %---------------------------------------
+@x [49] m.1260 l.23346 new_font - e-TeX tracing
+common_ending: equiv(u):=f; eqtb[font_id_base+f]:=eqtb[u]; font_id_text(f):=t;
+@y
+common_ending: define(u,set_font,f); eqtb[font_id_base+f]:=eqtb[u]; font_id_text(f):=t;
+@z
+%---------------------------------------
 @x [49] m.1292 l.23633 - e-TeX show_groups
   show_lists:print_esc("showlists");
 @y
@@ -3779,7 +3815,7 @@ MacKay in {\sl TUGboat\/} {\bf 8}, 14--25, 1987.
 In order to avoid confusion with \TeXeT\ the present implementation of
 mixed direction typesetting is called \TeXXeT.  It differs from \TeXeT\
 in several important aspects:  (1)~Right-to-left text is reversed
-explicitely by the |ship_out| routine and is written to a normal \.{DVI}
+explicitly by the |ship_out| routine and is written to a normal \.{DVI}
 file without any |begin_reflect| or |end_reflect| commands; (2)~a
 |math_node| is (ab)used instead of a |whatsit_node| to record the
 \.{\\beginL}, \.{\\endL}, \.{\\beginR}, and \.{\\endR} text direction
@@ -4040,7 +4076,8 @@ edge_dist(p):=cur_h; cur_dir:=reflected; cur_h:=save_h;
 goto reswitch;
 end
 
-@ The |reverse| function defined here is responsible to reverse the
+@ OLD VERSION.
+The |reverse| function defined here is responsible to reverse the
 nodes of an hlist (segment). The first parameter |this_box| is the enclosing
 hlist node, the second parameter |t| is to become the tail of the reversed
 list, and the global variable |temp_ptr| is the head of the list to be
@@ -4070,6 +4107,96 @@ loop@+  begin while p<>null do
   end;
 done:reverse:=l;
 end;
+
+@ NEW VERSION.
+The |reverse| function defined here is responsible to reverse (parts of)
+the nodes of an hlist.  The first parameter |this_box| is the enclosing
+hlist node, the second parameter |t| is to become the tail of the reversed
+list, and the global variable |temp_ptr| is the head of the list to be
+reversed.  Finally |cur_g| and |cur_glue| are the current glue rounding
+state variables, to be updated by this function.
+
+@<Declare procedures needed in |hlist_out|, |vlist_out|@>=
+@{
+@t\4@>@<Declare subprocedures for |reverse|@>@;
+function reverse(@!this_box,@!t:pointer; var cur_g:scaled;
+  var cur_glue:real):pointer;
+label reswitch,next_p,done;
+var l:pointer; {the new list}
+@!p:pointer; {the current node}
+@!q:pointer; {the next node}
+@!g_order: glue_ord; {applicable order of infinity for glue}
+@!g_sign: normal..shrinking; {selects type of glue}
+@!glue_temp:real; {glue value before rounding}
+@!m,@!n:halfword; {count of unmatched math nodes}
+begin g_order:=glue_order(this_box); g_sign:=glue_sign(this_box);
+@<Build a list of segments and determine their widths@>;
+l:=t; p:=temp_ptr; m:=min_halfword; n:=min_halfword;
+loop@+  begin while p<>null do
+    @<Move node |p| to the new list and go to the next node;
+    or |goto done| if the end of the reflected segment has been reached@>;
+  if (t=null)and(m=min_halfword)and(n=min_halfword) then goto done;
+  p:=new_math(0,info(LR_ptr)); LR_problems:=LR_problems+10000;
+    {manufacture one missing math node}
+  end;
+done:reverse:=l;
+end;
+@}
+
+@ We cannot simply remove nodes from the original list and add them to the
+head of the new one; this might reverse the order of whatsit nodes such
+that, e.g., a |write_node| for a stream appears before the |open_node|
+and\slash or after the |close_node| for that stream.
+
+All whatsit nodes as well as hlist and vlist nodes containing such nodes
+must not be permuted.  A sequence of hlist and vlist nodes not containing
+whatsit nodes as well as char, ligature, rule, kern, and glue nodes together
+with math nodes not changing the text direction can be explicitly reversed. 
+Embedded sections of left-to-right text are treated as a unit and all
+remaining nodes are irrelevant and can be ignored.
+
+In a first step we determine the width of various segments of the hlist to
+be reversed: (1)~embedded left-to-right text, (2)~sequences of permutable or
+irrelevant nodes, (3)~sequences of whatsit or irrelevant nodes, and
+(4)~individual hlist and vlist nodes containing whatsit nodes.
+
+@d segment_node=style_node
+@d segment_node_size=style_node_size {number of words in a segment node}
+@d segment_first(#)==info(#+2) {first node of the segment}
+@d segment_last(#)==link(#+2) {last node of the segment}
+
+@<Declare subprocedures for |reverse|@>=
+function new_segment(@!s:small_number;@!f:pointer):pointer;
+  {create a segment node}
+var p:pointer; {the new node}
+begin p:=get_node(segment_node_size); type(p):=segment_node; subtype(p):=s;
+width(p):=0; {the |width| field will be set later}
+segment_first(p):=f; segment_last(p):=f;
+new_segment:=p;
+end;
+
+@ @<Build a list of segments and determine their widths@>=
+begin
+end
+
+@ Here is a recursive subroutine that determines if the hlist or vlist
+node~|p| contains whatsit nodes.
+
+@<Declare subprocedures for |reverse|@>=
+function has_whatsit(@!p:pointer):boolean;
+label exit;
+begin p:=list_ptr(p); has_whatsit:=true;
+while p<>null do
+  begin if not is_char_node(p) then
+    case type(p) of
+    hlist_node, vlist_node: if has_whatsit(p) then goto exit;
+    whatsit_node: goto exit;
+    othercases do_nothing
+    endcases;@/
+  p:=link(p);
+  end;
+has_whatsit:=false;
+exit: end;
 
 @ @<Move node |p| to the new list...@>=
 reswitch: if is_char_node(p) then
@@ -4964,7 +5091,7 @@ f:=cur_val
 procedure@?scan_normal_glue; forward;@t\2@>@/
 procedure@?scan_mu_glue; forward;@t\2@>
 
-@ Here we declare to trivial procedures in order to avoid mutually
+@ Here we declare two trivial procedures in order to avoid mutually
 recursive procedures with parameters.
 
 @<Declare procedures needed for expressions@>=

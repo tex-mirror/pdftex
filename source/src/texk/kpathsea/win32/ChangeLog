@@ -1,3 +1,26 @@
+2012-12-08  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* getdestdir.c: Correct return value of getdestdir().
+
+2012-10-04  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* dirutil.c: Use stat in int is_dir ().
+	* Makefile.am: Avoid use of deprecated INCLUDES.
+
+2012-08-08  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am: Install texhash.exe as copy of mktexlsr.exe.
+
+2012-08-03  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* mktexfmt.c, mktexpk.c, mktextfm.c: Replace P_WAIT by _P_WAIT.
+
+2012-04-09  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* Makefile.am (AM_CPPFLAGS): Define WEB2C_KPSE_VERSION.
+	* mktexpk.c, mktextfm.c: Drop WINWEB2CVERSION, WINKPSEVERSION,
+	use WEB2C_KPSE_VERSION with versions from configure.
+
 2011-08-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* fmtutil.c: Add parens around assignment used as truth value.

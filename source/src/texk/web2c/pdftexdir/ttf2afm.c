@@ -29,7 +29,6 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <kpathsea/kpathsea.h>
 #include <time.h>
-#include <libgen.h>
 #include <pdftexdir/ptexmac.h>
 #include <pdftexdir/writettf.h>
 #include <string.h>
@@ -288,7 +287,7 @@ static void read_encoding(char *encname)
     if (*enc_line != '/' || (r = strchr(enc_line, '[')) == 0)
         ttf_fail("invalid encoding vector: name or `[' missing:\n%s", enc_line);
     for (i = 0; i < 256; i++)
-        enc_names[i] = (char *) notdef;
+        enc_names[i] = notdef;
     if (r[1] == 32)
         r += 2;
     else
@@ -522,15 +521,15 @@ static void read_font(void)
             }
         }
         break;
+    default:
+        ttf_warn("unsupported format (%.8X) of `post' table, assuming 3.0",
+                 post_format);
     case 0x00030000:
         if (print_glyph == AS_NAME) {
             ttf_warn
                 ("no names available in `post' table, print glyph names as indices");
             print_glyph = AS_INDEX;
         }
-        break;
-    default:
-        ttf_fail("unsupported format (%.8X) of `post' table", post_format);
     }
     ttf_seek_tab("loca", 0);
     if (loca_format == 1) {
@@ -1021,7 +1020,7 @@ int main(int argc, char **argv)
     char date[128], *s;
     time_t t = time(&t);
     int c;
-    kpse_set_program_name(argv[0], NULL);
+    kpse_set_program_name(argv[0], "ttf2afm");
     kpse_init_prog("ttf2afm", 0, 0, 0);
     while ((c = getopt(argc, argv, "iucve:o:m:")) != -1)
         switch (c) {

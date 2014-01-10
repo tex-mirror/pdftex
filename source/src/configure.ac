@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl
-dnl   Copyright (C) 2009-2012 Peter Breitenlohner <tex-live@tug.org>
+dnl   Copyright (C) 2009-2013 Peter Breitenlohner <tex-live@tug.org>
 dnl
 dnl   This file is free software; the copyright holder
 dnl   gives unlimited permission to copy and/or distribute it,
@@ -12,7 +12,7 @@ AC_INIT([TeX Live], tex_live_tardate, [tex-k@tug.org])
 AC_PREREQ([2.65])
 AC_CONFIG_SRCDIR([m4/kpse-pkgs.m4])
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_MACRO_DIRS([m4])
 
 dnl Prevent to configure the source tree by mistake.
 if test "x$srcdir" = x. && test "x$enable_build_in_source_tree" != xyes; then
@@ -56,7 +56,7 @@ dnl
 KPSE_SETUP([])
 
 dnl Common code for all programs using libkpathsea.
-KPSE_COMMON([TeX Live top-level], [dist-xz])
+KPSE_COMMON([TeX Live top-level], [tar-pax dist-xz no-dist-gzip])
 KPSE_CANONICAL_HOST
 
 AC_PROG_MKDIR_P
@@ -69,7 +69,7 @@ AC_PROG_LN_S
 AC_ARG_WITH([ln-s],
             AS_HELP_STRING([--without-ln-s],
                            [do build even if `ln -s' does not work]))[]dnl
-if test "x$LN_S" != "xln -s" && test "x$with_ln_s" != xno; then
+if test "x$LN_S" != "xln -s" && test "x$kpse_cv_have_win32" = xno && test "x$with_ln_s" != xno; then
   AC_MSG_ERROR([You could use `--without-ln-s' to build without working `ln -s'])
 fi
 
@@ -79,11 +79,11 @@ if test "x$enable_native_texlive_build" = xyes; then
     ac_configure_args="$ac_configure_args '--datarootdir=$datarootdir'"  
   fi
   if test "x$mandir" = 'x${datarootdir}/man'; then
-    mandir='${prefix}/texmf/doc/man'
+    mandir='${prefix}/texmf-dist/doc/man'
     ac_configure_args="$ac_configure_args '--mandir=$mandir'"  
   fi
   if test "x$infodir" = 'x${datarootdir}/info'; then
-    infodir='${prefix}/texmf/doc/info'
+    infodir='${prefix}/texmf-dist/doc/info'
     ac_configure_args="$ac_configure_args '--infodir=$infodir'"  
   fi
 fi
@@ -111,26 +111,7 @@ if test "x$enable_web2c" = xyes && test "x$with_system_kpathsea" = xyes; then
   fi
 fi
 
-AC_MSG_CHECKING([for TeX specific libraries to build])
-TEXLIBS=
-DIST_TEXLIBS=
-KPSE_FOR_PKGS([texlibs], [
-if test -x $srcdir/texk/Kpse_Pkg/configure; then
-  if test "x$with_system_[]Kpse_pkg" != xyes && \
-     test "x$need_[]Kpse_pkg" = xyes; then
-    TEXLIBS="texk/Kpse_Pkg $TEXLIBS"    
-  fi
-dnl Cause 'make dist' to recurse into all texlibs dirs
-  DIST_TEXLIBS="texk/Kpse_Pkg $DIST_TEXLIBS"
-dnl Cause 'configure -hr' and 'autoreconf' to recurse into all texlibs dirs
-  if false; then
-    AC_CONFIG_SUBDIRS([texk/]Kpse_Pkg)
-  fi
-fi
-])
-AC_SUBST([TEXLIBS])
-AC_SUBST([DIST_TEXLIBS])
-AC_MSG_RESULT([$TEXLIBS])
+KPSE_RECURSE_LIBS([texlibs], [TeX specific], [texk/])
 
 dnl We check that all required system libraries are usable, and may
 dnl reduce frustration if anything is wrong by doing this first.
@@ -154,12 +135,16 @@ AM_CONDITIONAL([cross], [test "x$cross_compiling" = xyes])
 
 AC_CONFIG_SUBDIRS([auxdir/auxsub libs utils texk])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile])
+
+dnl Try to detect GNU make early, '-v' is verbose for BSD make.
+rm -f Makefile
+kpse_GNU_make=`${MAKE-make} -v 2>/dev/null | grep GNU`
 
 AC_OUTPUT
 
 dnl Most probably we need GNU make.
-if test -z "`${MAKE-make} -v 2>/dev/null | grep GNU`"; then
+if test -z "$kpse_GNU_make"; then
   if test "x$enable_native_texlive_build" = xno; then
     AC_MSG_WARN([Building TeX Live may require GNU make])
   else

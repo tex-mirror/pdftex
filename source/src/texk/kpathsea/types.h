@@ -1,6 +1,6 @@
 /* types.h: general types for kpathsea.
 
-   Copyright 1993, 1995, 1996, 2005, 2008, 2009, 2010, 2011 Karl Berry.
+   Copyright 1993, 1995, 1996, 2005, 2008-2013 Karl Berry.
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -44,6 +44,31 @@ typedef int boolean;
 
 #include <stdio.h> /* for FILE* */
 
+/* Declare int64_t and uint64_t, and define PRId64 etc.  */
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
+#ifdef HAVE_STDINT_H
+# include <stdint.h>
+#endif
+#if (!defined __cplusplus || defined __STDC_FORMAT_MACROS) && !defined PRId64
+# if SIZEOF_LONG == 8
+#  define __PRI64_PREFIX	"l"
+# else
+#  define __PRI64_PREFIX	"ll"
+# endif
+# define PRId64		__PRI64_PREFIX "d"
+# define PRIi64		__PRI64_PREFIX "i"
+# define PRIo64		__PRI64_PREFIX "o"
+# define PRIu64		__PRI64_PREFIX "u"
+# define PRIx64		__PRI64_PREFIX "x"
+# define PRIX64		__PRI64_PREFIX "X"
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* The usual null-terminated string.  */
 typedef char *string;
 
@@ -58,8 +83,16 @@ typedef void *address;
 typedef void (*p_record_input) (const_string);
 typedef void (*p_record_output) (const_string);
 
+#ifdef __cplusplus
+}
+#endif
+
 /* the cache structure from elt-dirs.c */
 #include <kpathsea/str-llist.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct
 {
@@ -73,9 +106,17 @@ typedef struct {
   boolean expanding;
 } expansion_type;
 
+#ifdef __cplusplus
+}
+#endif
+
 
 #include <kpathsea/hash.h>
 #include <kpathsea/str-list.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* from old tex-file.h */
 
@@ -200,12 +241,6 @@ struct passwd {
   char *pw_dir;
   char *pw_shell;
 };
-
-struct _popen_elt {
-  FILE *f;                      /* File stream returned */
-  void *hp;                     /* Handle of associated process */
-  struct _popen_elt *next;      /* Next list element */
-};
 #endif /* WIN32 && !__MINGW32 */
 
 typedef struct kpathsea_instance *kpathsea;
@@ -277,8 +312,6 @@ typedef struct kpathsea_instance {
 #endif /* WIN32 || __CYGWIN__ */
 
 #if defined(WIN32) && !defined(__MINGW32__)
-    struct _popen_elt _z_p_open;
-    struct _popen_elt *_popen_list;
     char the_passwd_name[256];
     char the_passwd_passwd[256];
     char the_passwd_gecos[256];
@@ -317,5 +350,9 @@ extern KPSEDLL kpathsea kpse_def;
 #define kpse_invocation_short_name   kpse_def_inst.invocation_short_name
 
 #endif /* KPSE_COMPAT_API */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* not KPATHSEA_TYPES_H */
