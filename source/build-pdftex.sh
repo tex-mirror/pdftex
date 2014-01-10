@@ -1,65 +1,90 @@
-#!/bin/bash
-# script to build pdftex from a subset of TeX Live sources
+#!/bin/bash -e
+# $Id$
+# build pdftex from cut-down TeX Live sources (see sync-pdftex.sh).
+# public domain.
 
-set -e
-set -x
-
-topDir=$(cd $(dirname $0) && pwd)
-
-pdftexDir=$topDir/src/texk/web2c/pdftexdir
-if [ ! -d $pdftexDir ]; then
-    echo "$pdftexDir not found"
-    exit -1
+top_dir=$(cd $(dirname $0) && pwd)
+pdftex_dir=$top_dir/src/texk/web2c/pdftexdir
+if test ! -d $pdftex_dir; then
+    echo "$0: $pdftex_dir not found, goodbye"
+    exit 1
 fi
 
+# just build pdftex.
 CFG_OPTS="\
+    --without-x \
+    --disable-shared \
+    --disable-all-pkgs \
+    --enable-pdftex \
     --enable-native-texlive-build \
     --enable-cxx-runtime-hack \
-    --disable-shared \
-    --disable-largefile \
-    --without-x \
-    --disable-all-pkgs \
-    --disable-ptex \
-    --enable-pdftex \
 "
 
-## workaround to disable system libraries; --enable-native-texlive-build should do that but somehow it didn't
+# build with debugging only (no optimization).
+DEBUG_OPTS="\
+    CFLAGS=-g \
+    CXXFLAGS=-g \
+"
+
+# disable system libraries; --enable-native-texlive-build should do that
+# but currently doesn't.
 DISABLE_SYSTEM_LIBS="\
-    --without-system-freetype \
+    --without-system-cairo \
     --without-system-freetype2 \
     --without-system-gd \
-    --without-system-graphite \
+    --without-system-graphite2 \
+    --without-system-harfbuzz \
     --without-system-icu \
     --without-system-kpathsea \
+    --without-system-libgs \
     --without-system-libpng \
+    --without-system-paper \
+    --without-system-pixman \
+    --without-system-poppler \
+    --without-system-potrace \
     --without-system-ptexenc \
-    --without-system-t1lib \
     --without-system-teckit \
     --without-system-xpdf \
-    --without-system-poppler \
     --without-system-zlib \
     --without-system-zziplib \
 "
-CFG_OPTS="$CFG_OPTS $DISABLE_SYSTEM_LIBS"
-
-buildDir=$(pwd)/build-pdftex
-rm -rf $buildDir && mkdir $buildDir && cd $buildDir
+CFG_OPTS="$CFG_OPTS $DEBUG_OPTS $DISABLE_SYSTEM_LIBS"
 
 export CONFIG_SHELL=/bin/bash
-$topDir/src/configure $CFG_OPTS "$@" 2>&1 | tee configure.log
+build_dir=$(pwd)/build-pdftex
+
+set -x
+rm -rf $build_dir && mkdir $build_dir && cd $build_dir
+
+{
+  echo "starting `date`"
+  $top_dir/src/configure $CFG_OPTS "$@"
+} 2>&1 | tee configure.log
+if test ${PIPESTATUS[0]} -ne 0; then  # a bash feature
+  set +x
+  echo "$0: configure failed, goodbye (see log in $build_dir/configure.log)." >&2
+  exit 1
+fi
 
 # try to find gnu make; we may need it
 MAKE=make
 if make -v 2>&1| grep "GNU Make" >/dev/null; then
-    echo "Your make is a GNU-make; I will use that"
+    echo "$0: Your make is a GNU-make; I will use that."
 elif gmake -v >/dev/null 2>&1; then
     MAKE=gmake
-    echo "You have a GNU-make installed as gmake; I will use that"
+    echo "$0: You have a GNU-make installed as gmake; I will use that."
 else
-    echo "I can't find a GNU-make; I'll try to use make and hope that works."
-    echo "If it doesn't, please install GNU-make."
+    echo "$0: I can't find a GNU-make; I'll just use make and hope it works."
+    echo "$0: If it doesn't, please install GNU-make."
 fi
 
+export MAKE
+printf "\n\f\n$0: running $MAKE (`date`)\n"
 $MAKE | tee make.log
-(cd $buildDir/texk/web2c; $MAKE pdftex) 2>&1 | tee -a make.log
-ls -l $buildDir/texk/web2c/pdftex
+if test ${PIPESTATUS[0]} -ne 0; then
+  echo "$0: $MAKE failed, goodbye (see log in $build_dir/make.log)." >&2
+  exit 1
+fi
+
+(cd $build_dir/texk/web2c && $MAKE pdftex) 2>&1 | tee -a make.log
+ls -l $build_dir/texk/web2c/pdftex
