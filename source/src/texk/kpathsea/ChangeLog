@@ -1,3 +1,39 @@
+2014-02-08  TANAKA Takuji  <KXD02663@nifty.ne.jp>
+
+	* knj.[ch]: Add a new function win32_putc().
+	(Windows only)
+
+2014-01-25  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* kpsewhich.c : [WIN32 only] progname should be kpse->program_name
+	since progname can be NULL.
+
+2014-01-25  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* knj.c: Drop unused variable (avoid warning).
+
+2014-01-25  TANAKA Takuji  <KXD02663@nifty.ne.jp>
+
+	* knj.[ch]: Add a new function win32_getc(), win32_ungetc(),
+	win32_fputs(), and win32_puts(). (Windows only)
+	* kpsewhich.c, pathsearch.c, line.c:
+	Allow Unicode file name in kpsewhich. (Windows only)
+	* knj.c: Fix typo in error message. (Windows only)
+
+2014-01-14  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* knj.c: Add #include <wchar.h> as required for MinGW32.
+	Cast arg3 of fsyscp_spawnvp() to avoid warning.
+
+2014-01-14  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* knj.[ch]: Add new functions fsyscp_spawnvp(), and fsyscp_system().
+	(Windows only)
+
+2014-01-13  TANAKA Takuji  <KXD02663@nifty.ne.jp>
+
+	* knj.[ch]: Add a new function fsyscp_popen(). (Windows only)
+
 2014-01-08  TANAKA Takuji  <KXD02663@nifty.ne.jp>
 
 	* knj.c: Allow encoding name "" for non-utf8 command line.

@@ -1,6 +1,6 @@
 ## Makefile.am for the TeX Live subdirectory texk/web2c/
 ##
-## Copyright (C) 2009-2013 Peter Breitenlohner <tex-live@tug.org>
+## Copyright (C) 2009-2014 Peter Breitenlohner <tex-live@tug.org>
 ## You may freely use, modify and/or distribute this file.
 ##
 AM_CPPFLAGS = $(KPATHSEA_INCLUDES)
@@ -87,6 +87,8 @@ $(proglib): ${srcdir}/lib/*.c
 @ZLIB_RULE@
 ## Rebuild liblua52
 @LUA52_RULE@
+## Rebuild libluajit
+@LUAJIT_RULE@
 ## Rebuild libpng
 @LIBPNG_RULE@
 ## Rebuild libfreetype
@@ -206,6 +208,7 @@ include $(srcdir)/pdftexdir/am/pdftosrc.am
 ## luaTeX
 include $(srcdir)/luatexdir/am/luasocket.am
 include $(srcdir)/luatexdir/am/luamisc.am
+include $(srcdir)/luatexdir/am/libunilib.am
 include $(srcdir)/luatexdir/am/luafontforge.am
 include $(srcdir)/luatexdir/am/libluatex.am
 include $(srcdir)/luatexdir/am/luatex.am
