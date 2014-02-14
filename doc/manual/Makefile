@@ -15,6 +15,10 @@ distnopdf=pdftex-w.tex pdftex-t.txt pdftex-t.tex \
 	pdftex-i.tex syntaxform.awk Makefile makefiles.cmd \
 	pdftex-syntax.txt README ChangeLog
 
+context = texexec
+# context does not have \setupoutput.
+# texmfstart exits immediately.
+
 default: all
 
 all:	pdftex-a.pdf \
@@ -25,24 +29,24 @@ all:	pdftex-a.pdf \
 booklet:	pdftex-b.pdf pdftex-b-e.pdf pdftex-b-o.pdf
 
 pdftex-a.pdf a:	pdftex-t.tex pdftex-t.txt
-	texexec --result=$@ $<
+	$(context) --result=$@ $<
 
 pdftex-l.pdf l:	pdftex-t.tex pdftex-t.txt
-	texexec --mode=letter --result=$@ $<
+	$(context) --mode=letter --result=$@ $<
 
 pdftex-s.pdf s:	pdftex-t.tex pdftex-i.tex
-	texexec --mode=screen --result=$@ $<
+	$(context) --mode=screen --result=$@ $<
 
 pdftex-b.pdf b:	pdftex-a.pdf
-	texexec --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
+	$(context) --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
 	--result=$@ $<
 
 pdftex-b-e.pdf:	pdftex-a.pdf
-	texexec --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
+	$(context) --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
 	--pages=even --result=$@ $<
 
 pdftex-b-o.pdf:	pdftex-a.pdf
-	texexec --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
+	$(context) --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
 	--pages=odd --result=$@ $<
 
 pdftex-t.txt:	pdftex-w.pdf Makefile

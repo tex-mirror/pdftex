@@ -2009,6 +2009,10 @@ new Didot (1\,nd~=~0.375\,mm) and the new Cicero (1\,nc~=~12\,nd)
 \Tex {\pdfsuppresswarningdupmap} \Whatever{integer}
 }
 
+\Syntax {
+\Tex {\pdfsuppresswarningpagegroup} \Whatever{integer}
+}
+
 \stoppacked
 
 %%S NL
@@ -4189,6 +4193,23 @@ file loaded with \type{\pdfximage}, even if those fonts are available on
 disk. Bigger files might be created, but included \PDF\ files are sure to
 be embedded with the adequate fonts; indeed, the fonts on disk might be
 different from the embedded ones, and glyphs might be missing.
+
+\pdftexprimitive {\Syntax {\Tex {\pdfsuppresswarningpagegroup}
+\Whatever{integer}}}
+
+\bookmark{\tex{pdfsuppresswarningpagegroup}}
+
+Ordinarily, \PDFTEX\ gives a warning when more than one included \PDF\
+file has a so-called ``page group object'' (\type{/Group}), because only
+one can ``win''---that is, be propagated to the page level.  Usually the
+page groups are identical, but when they are not, the result is
+unpredictable.  It would be ideal if \PDFTEX\ in fact detected whether
+the page groups were the same and only gave the warning in the
+problematic case; unfortunately, this is not easy (a patch would be
+welcome).  Nevertheless, often one observes that there is no actual
+problem.  Then seeing the warnings on every run is just noise, and can
+be suppressed by setting this parameter to a positive number.
+\introduced{1.40.14}
 
 %***********************************************************************
 
