@@ -968,7 +968,7 @@ where the various bits and pieces are going.
 \NC font map files      \NC \type{TEXFONTMAPS}   \NC\NR
 \NC \TFM\ files         \NC \type{TFMFONTS}      \NC\NR
 \NC virtual fonts       \NC \type{VFFONTS}       \NC\NR
-\NC type1 fonts         \NC \type{T1FONTS}       \NC\NR
+\NC Type~1 fonts        \NC \type{T1FONTS}       \NC\NR
 \NC TrueType fonts      \NC \type{TTFONTS}       \NC\NR
 \NC OpenType fonts      \NC \type{OPENTYPEFONTS} \NC\NR
 \NC pixel fonts         \NC \type{PKFONTS}       \NC\NR
@@ -1503,8 +1503,8 @@ mentioned in the map line (see {\em fontfile} below). By this collecting
 mechanism Type~1 glyphs can be shared between several embedded \PDF\
 files and with text that is typeset by \PDFTEX, which helps keeping the
 resulting \PDF\ file size small, if many files with similar Type~1(C)
-fonts are embedded. Replacing Type1 fonts from embedded \PDF\ files
-requires that also a Type1 font file name is in the {\em fontfile} field
+fonts are embedded. Replacing Type~1 fonts from embedded \PDF\ files
+requires that also a Type~1 font file name is in the {\em fontfile} field
 (see below).
 
 Second, if a font file is not to be embedded into the \PDF\ output
@@ -1650,7 +1650,7 @@ which tells how to handle the font file:
        are embedded, including even the ones that are not used in the
        document. Apart from causing large size \PDF\ output, this option
        may cause troubles with TrueType fonts, so it is normally not
-       recommended for Type1 or TrueType fonts. But this is currently
+       recommended for Type~1 or TrueType fonts. But this is currently
        the only mode that allows the use of OpenType fonts. This mode
        might also be useful in case the font is atypical and can not be
        subsetted well by \PDFTEX. {\em Beware: some font vendors forbid
@@ -1735,7 +1735,7 @@ cmr10 CMR10 <cmr10.pfb
 \stoptyping
 
 A SlantFont is specified similarly as for \type{dvips}. The \type
-{SlantFont} or \type{ExtendFont} entries work only with embedded Type1
+{SlantFont} or \type{ExtendFont} entries work only with embedded Type~1
 fonts:
 
 \starttyping
@@ -2804,7 +2804,7 @@ producing files with \PDF\ version 1.5. If specified, this primitive must
 appear before any data is to be written to the generated \PDF\ file, so you
 should put it at the very start of your files. The command has been introduced
 in \PDFTEX\ 1.30.0 as a shortened synonym of \type{\pdfoptionpdfminorversion}
-command, that is obsolete by now.
+command, which is now obsolete.
 
 Distributions alter the default value here; for example, \TEXLIVE\ 2010
 sets \type{\pdfminorversion=5} when its formats are built, so object
@@ -3094,7 +3094,7 @@ ignored), as \PDFTEX\ generates expanded copies of the unexpanded \TFM\
 data structures and keeps them in its memory. Since \PDFTEX~1.40.0 the
 \type{autoexpand} mode happens within the page stream by modification of
 the text matrix (\PDF\ operator ``\type{Tm}''), and not anymore on font
-file level, giving the advantage that it now works not only with Type1
+file level, giving the advantage that it now works not only with Type~1
 but also with TrueType and OpenType fonts (and even without embedding
 a font file; but that's not recommended). In this mode \PDFTEX\ requires
 only unexpanded font files.
@@ -3314,7 +3314,8 @@ This primitive defines \Something{control sequence} as a synonym for
 
 This primitive inserts the \Something{general text} to the \type {/Font}
 dictionary. The text must conform to the specifications as laid down in
-the \PDFReference, otherwise the document can be invalid.
+the \PDFReference, otherwise the document can be invalid.  For examples,
+see the \type{cmap} and \type{CJK} packages.
 
 \pdftexprimitive {\Syntax {\Tex {\pdffontname} \Something{font} \Whatever
 {expandable}}}
@@ -3571,9 +3572,9 @@ value is \type{no_tag}, \type{1} if \type{lig_tag} is set, \type{2} if
 \pdftexprimitive {\Syntax {\Tex {\pdfgentounicode} \Whatever{integer}}}
 
 If set to \type{1} when the job ends, a mapping from glyph names to
-Unicode characters will be created for the fonts used in the documents
+Unicode characters will be created for the Type~1 fonts used in the documents
 (such a mapping is called a CMap), to allow \PDF\ readers to extract
-text content (e.g. for searching). Most fonts use standard names for
+text content (e.g.\ for searching). Most fonts use standard names for
 characters, so the mapping is generally automatic and shouldn't be set
 manually. Otherwise, the following command must be used.
 
@@ -3589,6 +3590,21 @@ numeric values denoting characters. For instance:
 
 \noindent maps the \type{ff} ligature to a pair of \type{f}'s (whose
 code is \type{U+0066}).
+
+\pdftexprimitive {\Syntax {\Tex {\pdfnobuiltintounicode} \Something{font}}}
+
+Do not perform the \type{\pdfgentounicode} mapping for the given
+\Something{font}.  Other Unicode mapping approaches, notably
+\type{\pdffontattr}, are not affected by this (or by
+\type{\pdfgentounicode}).  An unrealistic example:
+
+\starttyping
+\font\f=cmb10
+\pdfnobuiltintounicode\f
+\f No unicode mappings for this output.
+\stoptyping
+
+\introduced{1.40.11}
 
 %***********************************************************************
 
@@ -4090,7 +4106,7 @@ This controls the behaviour of \PDFTEX\ when a \PDF\ file is included
 that has a newer version than the one specified by this primitive: If it
 is set to~0, \PDFTEX\ gives only a warning; if it's~1, \PDFTEX\ raises
 an error. The command has been introduced in \PDFTEX\ 1.30.0 as
-a shortened synonym of \type{\pdfoptionpdfinclusionerrorlevel}, that is
+a shortened synonym of \type{\pdfoptionpdfinclusionerrorlevel}, which is
 now obsolete.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfimagehicolor} \Whatever{integer}}}
@@ -4201,8 +4217,8 @@ different from the embedded ones, and glyphs might be missing.
 
 Ordinarily, \PDFTEX\ gives a warning when more than one included \PDF\
 file has a so-called ``page group object'' (\type{/Group}), because only
-one can ``win''---that is, be propagated to the page level.  Usually the
-page groups are identical, but when they are not, the result is
+one can ``win'' --- that is, be propagated to the page level.  Usually
+the page groups are identical, but when they are not, the result is
 unpredictable.  It would be ideal if \PDFTEX\ in fact detected whether
 the page groups were the same and only gave the warning in the
 problematic case; unfortunately, this is not easy (a patch would be
