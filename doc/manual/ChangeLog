@@ -1,5 +1,8 @@
 2014-02-23  Karl Berry  <karl@gnu.org>
 
+	* pdftex-t.tex: small changes to the build process, copyright
+	year, no pool file any more, etc.
+
 	* pdftex-t.tex (\pdfnobuiltintounicode): belated doc.
 
 2014-02-14  Karl Berry  <karl@gnu.org>
