@@ -5,9 +5,6 @@ pdfTeX 3.14159265-1.40.14
   - sync for Knuth TeX 3.14159265
   - new warning-suppression parameter \pdfsuppresswarningpagegroup
 
-- manual now mentions \pdfnobuiltintounicode, introduced in 1.40.11
-(TeX Live 2010).
-
 ---------------------------------------------------
 pdfTeX 3.1415926-1.40.13 was released on 2012-04-21 (TeX Live 2012)
 ---------------------------------------------------
@@ -38,14 +35,11 @@ pdfTeX 3.1415926-1.40.11 was released on 2010-07-28
   - \pdfgentounicode conflicts with cmap+\pdffontattr [#4291]
   - \rightmarginkern doesn't work for last lines [#4292]
   - \pdfximagebbox wrong for PDF files with /Rotate != 0 [#939]
-  - \leftmarginkern & \rightmarginkern doesn't work with
-     box registers > 255 [#4312]
+  - \leftmarginkern & \rightmarginkern doesn't work with box registers > 255 [#4312]
 
 - changes:
-  - pdf inclusion: removed the requirement that named resources must be
-    indirect (#4299)
+  - pdf inclusion: removed the requirement that named resources must be indirect (#4299)
   - added debug messages for pdftex_fail()
-  - \pdfnobuiltintounicode added
 
 ---------------------------------------------------
 pdfTeX 3.1415926-1.40.10 was released on 2009-11-30
@@ -68,8 +62,7 @@ pdfTeX 3.1415926-1.40.10 was released on 2009-11-30
   - bugfix #3253: Bug in Type1 font subsetting
   - \show\pdfstartlink is wrong 
   - pdf_set_rule() uses incorrect variables
-  - bugfix #2090: enabling LFS breaks PDF inclusion on some systems
-    (warning: not heavily-tested yet)
+  - bugfix #2090: enabling LFS breaks PDF inclusion on some systems (warning: not heavily-tested yet)
   - t1_log() macro caused problem with some compilers
 
 --------------------------------------------------
@@ -170,8 +163,8 @@ pdfTeX 3.141592-1.40.4 was released on 2007-07-11
 -------------------------------------------------
 pdfTeX 3.141592-1.40.3 was released on 2007-02-04
 -------------------------------------------------
-- bugfix: documents which used type 1 and truetype or opentype fonts
-  resulted in broken pdfs (729)
+- bugfix: documents which used type 1 and truetype or opentype fonts resulted in
+  broken pdfs (729)
 
 -------------------------------------------------
 pdfTeX 3.141592-1.40.2 was released on 2007-01-31
@@ -438,8 +431,7 @@ pdfTeX 3.141592-1.30.0 was released on 2005-08-01
 pdfTeX 3.141592-1.21a was released on 2005-02-04
 ------------------------------------------------
 - ttf2afm 1.0:
-    - added support for refering to glyphs via unicode in encoding files
-      (ie 'uniXXX') 
+    - added support for refering to glyphs via unicode in encoding files (ie 'uniXXX')
     - added some more info to the AFM output
     - some minor bug fixes
     - a short documentation available
@@ -460,9 +452,8 @@ pdfTeX 3.141592-1.21a was released on 2005-02-04
     - \pdfximage supports a keyword "colorspace" following an object number
       representing a ColorSpace object
     - \pdfstrcmp compares two strings
-    - \pdfescapestring \pdflastescapedstring provide a way to escape string
-    - \pdffirstlineheight, \pdflastlinedepth,
-      \pdfeachlineheight, \pdfeachlinedepth,
+    - \pdfescapestring/\pdflastescapedstring provide a way to escape string
+    - \pdffirstlineheight/\pdflastlinedepth/\pdfeachlineheight/\pdfeachlinedepth
       allow fixing line dimen
     - patches from Taco
         - px dimen unit
@@ -577,9 +568,8 @@ pdfTeX 3.141592-1.11a was released on 2003-08-02
   See http://www.ntg.nl/pipermail/ntg-pdftex/2003-June/000165.html
 - The syntax of \pdfobj has been extended:
   \pdfobj <object type spec>                              (h, v, m)
-  <object type spec> -->
-     reserveobjnum
-   | [useobjnum <number>] [<attr spec>] [stream [<attr spec>]] <object contents>
+  <object type spec> --> reserveobjnum
+                       | [useobjnum <number>] [<attr spec>] [stream [<attr spec>]] <object contents>
   <object contents> --> <file spec>
                       | <general text>
   When the optional keyword `reserveobjnum' and `useobjnum' is not given, the
@@ -661,8 +651,7 @@ pdfTeX 3.14159-1.10a was released on 2003-01-16
 - It is now possible to specify the pdf page box to use when including pdfs.
   The syntax has been extended:
     \pdfximage [<image attr spec>] <general text>           (h, v, m)
-    <image attr spec> -->
-      [<rule spec>] [<attr spec>] [<page spec>] [<pdf box spec>]
+    <image attr spec> --> [<rule spec>] [<attr spec>] [<page spec>] [<pdf box spec>]
     <pdf box spec> --> mediabox|cropbox|bleedbox|trimbox|artbox
   The default is cropbox (which defaults to mediabox), to be compatible with
   previous versions of pdfTeX.
