@@ -49,7 +49,7 @@ dvidvi - ?
 
 dviljk - maintained here, by Joachim Schrod
 
-dvipdfm-x - maintained here, by Khaled Hosny, Peter Breitenlohner, contains
+dvipdfm-x - maintained here, by Khaled Hosny, Jonathan Kew, contains
   dvipdfmx
   xdvipdfmx
 
@@ -89,6 +89,8 @@ ptexenc - maintained here, by us (akira et al.)
 
 seetexk - ?
 
+tetex - scripts maintained here, by us
+
 tex4htk - checked 25apr11
   http://tug.org/tex4ht/
 
@@ -101,6 +103,8 @@ ttfdump - ?
 web2c - maintained here, by us - core web2c, plain tex, etc.
         The TeX variant dirs (pdftexdir, xetexdir, etc.)
         updated here by their respective maintainers.
+
+xdv2pdf - maintained here, by Khaled Hosny, Jonathan Kew
 
 xdvik 22.86 - checked 7apr13
   http://sourceforge.net/projects/xdvi/files/xdvik/

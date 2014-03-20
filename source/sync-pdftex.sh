@@ -46,6 +46,9 @@ if test ! -d $tldir/texk; then
   exit 1
 fi
 
+if $chicken; then
+  echo "$0: just showing, not updating (--real to do it for real)."
+fi
 
 #  handle major subdirectory $1 (libs, texk, utils).  For these, we
 # only want to sync the entries we have, not copying everything from TL.
