@@ -12,19 +12,15 @@
 %D to generate an A4, letter and screen version.
 %D
 %D Default A4 size manual:
-%D
 %D texexec --result=pdftex-a.pdf pdftex-t
 %D
 %D Letter size manual:
-%D
 %D texexec --mode=letter --result=pdftex-l.pdf pdftex-t
 %D
 %D Booklet (given that A4 document is available):
-%D
 %D texexec --pdfarrange --paper=a5a4 --print=up --addempty=1,2 --result=pdftex-b.pdf pdftex-a
 %D
 %D Screen version
-%D
 %D texexec --mode=screen pdftex-t
 
 %D This is the \PDFTEX\ manual, so it makes sense to force \PDF\ output here.
@@ -3544,12 +3540,19 @@ value is \type{no_tag}, \type{1} if \type{lig_tag} is set, \type{2} if
 
 \pdftexprimitive {\Syntax {\Tex {\pdfgentounicode} \Whatever{integer}}}
 
-If set to \type{1} when the job ends, a mapping from glyph names to
-Unicode characters will be created for the Type~1 fonts used in the documents
-(such a mapping is called a CMap), to allow \PDF\ readers to extract
-text content (\eg\ for searching). Most fonts use standard names for
-characters, so the mapping is generally automatic and shouldn't be set
-manually. Otherwise, the following command must be used.
+By default, \PDFTEX\ does not include a \type{/ToUnicode} dictionary,
+which maps glyph names to Unicode characters, in its PDF output.  As a
+result, it is the PDF reader which determines how and whether searching
+in the PDF file works.  Generally, searching for basic text characters
+works, but searching for anything beyond basic ASCII characters,
+including ligatures such as `fi', fails.
+
+If \type{\pdfgentounicode} is set to \type{1} when the job ends,
+\type{/ToUnicode} will be included in the output, with mappings for
+Type~1 fonts used in the documents; such a mapping is called a CMap.
+Again, the mapping that is created automatically by \PDFTEX\ generally
+suffices for basic letters, but not for ligatures, etc.  To handle more,
+the following command must be used.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfglyphtounicode} \Something{general text} \Something{general text}}}
 
@@ -3558,11 +3561,23 @@ numeric values denoting characters. For instance:
 
 \starttyping
 \pdfgentounicode=1
-\pdfglyphtounicode{ff}{0066066}
+\pdfglyphtounicode{ff}{0066 0066}
 \stoptyping
 
 \noindent maps the \type{ff} ligature to a pair of \type{f}'s (whose
 code is \type{U+0066}).
+
+The \type{glyphtounicode.tex} file (distributed with \PDFTEX\ and other
+software) contains thousands of such definitions.  So, for practical
+purposes, one would probably want:
+\starttyping
+\input glyphtounicode
+\pdfgentounicode=1
+\stoptyping
+
+\LATEX\ users should load the \type{cmap} package to achieve the same
+effect.
+
 
 \pdftexprimitive {\Syntax {\Tex {\pdfnobuiltintounicode} \Something{font}}}
 
@@ -5691,4 +5706,7 @@ as a draft) by the Free Software Foundation.
 
 %D And then we're done.
 
+% Evidently ConTeXt somewhere sets \pdfgentounicode=1.  Or something.
+% So insert the mappings.  Seems like a good thing anyway.
+\input glyphtounicode
 \stoptext

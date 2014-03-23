@@ -1,3 +1,9 @@
+2014-03-23  Karl Berry  <karl@gnu.org>
+
+	* pdftex-t.tex (\pdfgentounicode, \pdfglyphtounicode): be a bit
+	less terse; mention failure of ligatures to be searchable by default.
+	(glyphtounicode.tex): \input this at the end, why not.
+
 2014-02-23  Karl Berry  <karl@gnu.org>
 
 	* pdftex-t.tex: small changes to the build process, copyright
