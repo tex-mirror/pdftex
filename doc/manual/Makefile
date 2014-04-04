@@ -1,6 +1,5 @@
 # $Id$
-#
-# Makefile for pdfTeX documentation
+# Makefile for pdfTeX documentation.  Public domain.
 
 mandir=manual
 distdate=`date +%y%m%d`
@@ -15,7 +14,7 @@ distnopdf=pdftex-w.tex pdftex-t.txt pdftex-t.tex \
 	pdftex-i.tex syntaxform.awk Makefile makefiles.cmd \
 	pdftex-syntax.txt README ChangeLog
 
-context = texexec
+context = texexec --batchmode
 # context does not have \setupoutput.
 # texmfstart exits immediately.
 
