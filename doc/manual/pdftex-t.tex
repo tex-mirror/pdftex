@@ -3597,7 +3597,6 @@ Minimal example:
 \pdfnobuiltintounicode\f
 \f No unicode mappings for this output.
 \stoptyping
-
 \introduced{1.40.11}
 
 
@@ -3608,7 +3607,13 @@ These commands create corresponding whatsit nodes which turn on/off
 generation of faked interword spaces in the output.  This allows for
 better reflowing of text on the fly by \PDF\ readers, better extraction
 of textual content, and is required by \PDF/A.  It does not affect the
-normal \TeX\ justification with glue.  Example:
+normal \TeX\ justification with glue.
+
+This requires finding and reading font files \type{dummy-space.tfm} and
+\type{pfb}; the font is included in the \PDF\ output and character 32 is
+inserted from it as the ``fake'' space.
+
+Example of usage:
 
 \starttyping
 Text with no interword spaces.
