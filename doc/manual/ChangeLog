@@ -1,3 +1,15 @@
+2014-04-23  Karl Berry  <karl@gnu.org>
+
+	* pdftex-t.tex (\currentpdftex): 1.40.15.  (Update TeX Live.)
+
+2014-04-04  Karl Berry  <karl@gnu.org>
+
+	* pdftex-t.tex (\pdfinterwordspace...): mention dummy-space font.
+
+2014-03-23  Han The Thanh  <hanthethanh@gmail.com>
+
+	* pdftex-t.tex (\pdfinterwordspace...): add new sections.
+
 2014-03-23  Karl Berry  <karl@gnu.org>
 
 	* pdftex-t.tex (\pdfgentounicode, \pdfglyphtounicode): be a bit
