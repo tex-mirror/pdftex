@@ -26,8 +26,12 @@ DEBUG_OPTS="\
     CXXFLAGS=-g \
 "
 
-# disable system libraries; --enable-native-texlive-build should do that
-# but currently doesn't.
+# disable system libraries; --enable-native-texlive-build can't
+# easily do that for cut-down source trees like this one.  For example,
+# our tree does not include teckit, therefore configure thinks the
+# system teckit should be used, therefore teckit dependencies should
+# also be taken from the system, and that includes zlib -- even though
+# we do have zlib present in the source tree here, and want to use it.  Sigh.
 DISABLE_SYSTEM_LIBS="\
     --without-system-cairo \
     --without-system-freetype2 \
