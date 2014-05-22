@@ -33,8 +33,7 @@
 \pdfminorversion=3
 
 %D First we define ourselves some abbreviations, if only to force
-%D consistency and to save typing. We use real small capitals, not pseudo
-%D ones.
+%D consistency and to save typing. We use real small capitals, not pseudo.
 
 \setupsynonyms
   [abbreviation]
@@ -3600,8 +3599,8 @@ Minimal example:
 \introduced{1.40.11}
 
 
-\pdftexprimitive {\Syntax {\Tex {\pdfinterwordspaceon} \Whatever{integer}}}
-\pdftexprimitive {\Syntax {\Tex {\pdfinterwordspaceoff} \Whatever{integer}}}
+\pdftexprimitive {\Syntax {\Tex {\pdfinterwordspaceon}}}
+\pdftexprimitive {\Syntax {\Tex {\pdfinterwordspaceoff}}}
 
 These commands create corresponding whatsit nodes which turn on/off
 generation of faked interword spaces in the output.  This allows for
@@ -3613,11 +3612,13 @@ This requires finding and reading font files \type{dummy-space.tfm} and
 \type{pfb}; the font is included in the \PDF\ output and character 32 is
 inserted from it as the ``fake'' space.
 
-Example of usage:
+Example of usage (see also the \type{fake-interword-space.tex} test file):
 
 \starttyping
 Text with no interword spaces.
 
+\pdfmapline{+dummy-space <dummy-space.pfb}
+\pdfglyphtounicode{space}{0020}
 \pdfinterwordspaceon
 
 Switch to text with faked interword spaces.
