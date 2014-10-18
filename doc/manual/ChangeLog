@@ -1,3 +1,9 @@
+2014-10-18  Karl Berry  <karl@gnu.org>
+
+	* pdftex-t.tex (\pdfminorversion): better explain the compiled
+	default (4) vs. the typical format default (5).  Report from Heiko
+	on ntg-pdftex, 20 Sep 2014 23:51:01.
+
 2014-04-23  Karl Berry  <karl@gnu.org>
 
 	* pdftex-t.tex (\currentpdftex): 1.40.15.  (Update TeX Live.)

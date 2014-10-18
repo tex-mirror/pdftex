@@ -2764,19 +2764,23 @@ is \DVI.
 
 \bookmark{\tex{pdfminorversion}}
 
-This primitive sets the \PDF\ version of the generated file and the latest
-allowed \PDF\ version of included \PDF{}s. \Eg, \type{\pdfminorversion=3} tells
-\PDFTEX\ to set the \PDF\ version to 1.3 and allows only included \PDF\ files
-with versions numbers up to 1.3. The default for \type{\pdfminorversion} is 5,
-producing files with \PDF\ version 1.5. If specified, this primitive must
-appear before any data is to be written to the generated \PDF\ file, so you
-should put it at the very start of your files. The command has been introduced
-in \PDFTEX\ 1.30.0 as a shortened synonym of \type{\pdfoptionpdfminorversion}
-command, which is now obsolete.
+This primitive sets the \PDF\ version of the generated file and the
+highest \PDF\ version of included \PDF{}s allowed without warning (see
+\type{\pdfinclusionerrorlevel}).  The default compiled into the \PDFTEX\
+program is \type{\pdfminorversion=4}, setting the \PDF\ version to~1.4
+and allowing included \PDF\ files with versions up to~1.4.  If
+specified, this primitive must appear before any data is to be written
+to the generated \PDF\ file.
 
-Distributions alter the default value here; for example, \TEXLIVE\ 2010
-sets \type{\pdfminorversion=5} when its formats are built, so object
+Distributions typically alter the engine's compiled default of~4 when
+building formats; for example, as of 2010, \TEXLIVE\ sets
+\type{\pdfminorversion=5} when formats are built.  This is so object
 compression can be enabled (described below).
+
+It was originally a shortened synonym of
+\type{\pdfoptionpdfminorversion} command, which is now obsolete.
+\introduced{1.30.0}
+
 
 \pdftexprimitive {\Syntax {\Tex {\pdfcompresslevel} \Whatever{integer}}}
 
@@ -2789,7 +2793,7 @@ and re-compressed during the embedding process); all done by the
 9~means best, $2..8$ means something in between. A value outside this
 range will be adjusted to the nearest meaningful value. This parameter
 is read each time \PDFTEX\ starts a stream. Setting
-\type{\pdfcompresslevel=0} is great for \PDF\ stream debugging.
+\type{\pdfcompresslevel=0} is useful for \PDF\ stream debugging.
 
 \pdftexprimitive {\Syntax {\Tex {\pdfobjcompresslevel} \Whatever{integer}}}
 
@@ -4136,11 +4140,14 @@ now considered obsolete --- a mixture of \type{\pdfpagebox} and
 \bookmark{\tex{pdfinclusionerrorlevel}}
 
 This controls the behaviour of \PDFTEX\ when a \PDF\ file is included
-that has a newer version than the one specified by this primitive: If it
-is set to~0, \PDFTEX\ gives only a warning; if it's~1, \PDFTEX\ raises
-an error. The command has been introduced in \PDFTEX\ 1.30.0 as
-a shortened synonym of \type{\pdfoptionpdfinclusionerrorlevel}, which is
-now obsolete.
+that has a newer version than the one specified by
+\type{\pdfminorversion}.  If \type{\pdfinclusionerrorlevel} is set to~0
+(the default), \PDFTEX\ gives only a warning; if 1, \PDFTEX\ raises an
+error.
+
+It was originally a shortened synonym of
+\type{\pdfoptionpdfinclusionerrorlevel}, which is now obsolete.
+\introduced{1.30.0}
 
 \pdftexprimitive {\Syntax {\Tex {\pdfimagehicolor} \Whatever{integer}}}
 
@@ -4258,7 +4265,7 @@ problematic case; unfortunately, this is not easy (a patch would be
 welcome).  Nevertheless, often one observes that there is no actual
 problem.  Then seeing the warnings on every run is just noise, and can
 be suppressed by setting this parameter to a positive number.
-\introduced{1.40.14}
+\introduced{1.40.15}
 
 %***********************************************************************
 
