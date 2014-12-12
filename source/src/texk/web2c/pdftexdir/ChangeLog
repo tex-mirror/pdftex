@@ -1,3 +1,9 @@
+2014-12-12  Karl Berry  <karl@gnu.org>
+
+	* pdftoepdf.cc (read_pdf_info): do not even warn if
+	pdf_inclusion_errorlevel (aka \pdfinclusionerrorlevel) is negative.
+	Discussed with Thanh, 31 May 2011 10:17:35.
+
 2014-03-18  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
 
 	* pdftex.web and writefont.c: Import from r704.

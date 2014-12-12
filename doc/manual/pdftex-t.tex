@@ -2765,19 +2765,19 @@ is \DVI.
 \bookmark{\tex{pdfminorversion}}
 
 This primitive sets the \PDF\ version of the generated file and the
-highest \PDF\ version of included \PDF{}s allowed without warning (see
-\type{\pdfinclusionerrorlevel}).  The default compiled into the \PDFTEX\
-program is \type{\pdfminorversion=4}, setting the \PDF\ version to~1.4
-and allowing included \PDF\ files with versions up to~1.4.  If
-specified, this primitive must appear before any data is to be written
-to the generated \PDF\ file.
+highest \PDF\ version of included \PDF{}s allowed without warning, by
+default (see \type{\pdfinclusionerrorlevel}).  The default compiled into
+the \PDFTEX\ program is \type{\pdfminorversion=4}, setting the \PDF\
+version to~1.4 and allowing included \PDF\ files with versions up
+to~1.4.  If specified, this primitive must appear before any data is to
+be written to the generated \PDF\ file.
 
 Distributions typically alter the engine's compiled default of~4 when
 building formats; for example, as of 2010, \TEXLIVE\ sets
 \type{\pdfminorversion=5} when formats are built.  This is so object
 compression can be enabled (described below).
 
-It was originally a shortened synonym of
+This was originally a shortened synonym of the
 \type{\pdfoptionpdfminorversion} command, which is now obsolete.
 \introduced{1.30.0}
 
@@ -4143,7 +4143,7 @@ This controls the behaviour of \PDFTEX\ when a \PDF\ file is included
 that has a newer version than the one specified by
 \type{\pdfminorversion}.  If \type{\pdfinclusionerrorlevel} is set to~0
 (the default), \PDFTEX\ gives only a warning; if 1, \PDFTEX\ raises an
-error.
+error; if negative, no diagnostic at all is given.
 
 It was originally a shortened synonym of
 \type{\pdfoptionpdfinclusionerrorlevel}, which is now obsolete.
