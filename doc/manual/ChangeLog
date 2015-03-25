@@ -1,3 +1,7 @@
+2015-03-25  Karl Berry  <karl@gnu.org>
+
+	* pdftex-t.tex (\currentpdftex): 1.40.16.  (Update TeX Live.)
+
 2014-12-12  Karl Berry  <karl@gnu.org>
 
 	* pdftex-t.tex (\pdfinclusionerrorlevel): if negative, no diagnostic.
