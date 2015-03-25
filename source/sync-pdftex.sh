@@ -4,7 +4,7 @@
 # --karl, 9jan14.
 
 chicken=true  # do nothing by default
-tldir=/r/tug/home/texlive/karl/Build/source
+: ${tldir=/r/tug/home/texlive/karl/Build/source}
 
 while test $# -gt 0; do
   if test "x$1" = x--version; then
@@ -15,7 +15,7 @@ while test $# -gt 0; do
     echo "Sync from TL source tree given as the first arg."
     echo "By default, just show (approximately) what would be done."
     echo "To actually execute the sync, specify --real."
-    echo "More hints will be given at the end of output."
+    echo "More hints are given at the end of output."
     exit 0
   elif test "x$1" = x--real; then
     chicken=false

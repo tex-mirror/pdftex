@@ -1,24 +1,22 @@
 ## Proxy Makefile.am to build poppler for TeX Live.
 ##
-##   Copyright (C) 2011-2013 Peter Breitenlohner <tex-live@tug.org>
+##   Copyright (C) 2011-2015 Peter Breitenlohner <tex-live@tug.org>
 ##
 ##   This file is free software; the copyright holder
 ##   gives unlimited permission to copy and/or distribute it,
 ##   with or without modifications, as long as this notice is preserved.
 ##
-ACLOCAL_AMFLAGS = -I ../../m4
-
-## We want to re-distribute the whole original poppler source tree.
+## We want to re-distribute the whole poppler source tree.
 ##
 EXTRA_DIST = $(POPPLER_TREE)
 
-## Patches applied to the original source tree
+## Changes applied to the original source tree
 ##
 EXTRA_DIST += $(POPPLER_TREE)-PATCHES
 
-# in case of an SVN repository
-dist-hook:
-	rm -rf `find $(distdir) -name .svn -o -name .deps -o -name .dirstamp -o -name '*.$(OBJEXT)'`
+# Files not to be distributed
+include $(srcdir)/../../am/dist_hook.am
+NEVER_NAMES += $(NEVER_NAMES_SUB)
 
 SUBDIRS = . include
 
@@ -28,8 +26,8 @@ POPPLER_SRC = $(top_srcdir)/$(POPPLER_TREE)/poppler
 
 AM_CPPFLAGS = -I$(top_srcdir)/$(POPPLER_TREE) -I$(GOO_SRC) $(ZLIB_INCLUDES)
 AM_CPPFLAGS += -DPOPPLER_DATADIR='"."'
-AM_CFLAGS = $(WARNING_CFLAGS)
-AM_CXXFLAGS = $(NO_WARN_CXXFLAGS)
+AM_CFLAGS = $(VISIBILITY_CFLAGS) $(WARNING_CFLAGS)
+AM_CXXFLAGS = $(VISIBILITY_CXXFLAGS) $(NO_WARN_CXXFLAGS)
 
 noinst_LIBRARIES = libpoppler.a
 

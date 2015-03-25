@@ -1,5 +1,5 @@
 # $Id$
-# public domain.
+# public domain.  Originally written by Karl Berry.
 
 default:
 	@echo "make build  to build, synctest or syncreal to sync,"
@@ -18,5 +18,8 @@ syncreal:
 
 svnstatus:
 	svn status >/tmp/sat
+	grep -v '^[MDA]' /tmp/sat >/tmp/sun  # unknown
+	ls -l /tmp/sun
 	sed -n 's/^\?//p' /tmp/sat >/tmp/sad # add these
 	sed -n 's/^!//p'  /tmp/sat >/tmp/srm # remove these
+

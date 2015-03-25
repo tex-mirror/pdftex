@@ -1,5 +1,5 @@
 # Private macros for the TeX Live (TL) tree.
-# Copyright (C) 2009-2014 Peter Breitenlohner <tex-live@tug.org>
+# Copyright (C) 2009-2015 Peter Breitenlohner <tex-live@tug.org>
 #
 # This file is free software; the copyright holder
 # gives unlimited permission to copy and/or distribute it,
@@ -30,6 +30,8 @@ graphite2
 zziplib
 xpdf
 poppler
+mpfr
+gmp
 cairo
 pixman
 potrace
@@ -62,6 +64,8 @@ AC_REQUIRE([KPSE_GD_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_POTRACE_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_PIXMAN_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_CAIRO_SYSTEM_FLAGS])[]dnl
+AC_REQUIRE([KPSE_GMP_SYSTEM_FLAGS])[]dnl
+AC_REQUIRE([KPSE_MPFR_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_POPPLER_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_XPDF_SYSTEM_FLAGS])[]dnl
 AC_REQUIRE([KPSE_ZZIPLIB_SYSTEM_FLAGS])[]dnl
@@ -76,7 +80,8 @@ AC_REQUIRE([KPSE_HARFBUZZ_SYSTEM_FLAGS])[]dnl
 # Define the list of utility sub-packages, i.e., subdirs 'utils/*'.
 AC_DEFUN([KPSE_UTILS_PKGS], [dnl
 m4_define([kpse_utils_pkgs], [dnl
-biber
+devnag
+lacheck
 m-tx
 pmx
 ps2eps
@@ -100,7 +105,6 @@ bibtex-x
 chktex
 cjkutils
 detex
-devnag
 dtl
 dvi2tty
 dvidvi
@@ -111,12 +115,12 @@ dvipos
 dvipsk
 dvisvgm
 gsftopk
-lacheck
 lcdf-typetools
 makeindexk
 makejvf
 mendexk
-ps2pkm
+musixtnt
+ps2pk
 psutils
 seetexk
 tex4htk

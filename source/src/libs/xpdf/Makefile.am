@@ -1,6 +1,6 @@
 ## Proxy Makefile.am to build xpdf for TeX Live.
 ##
-##   Copyright (C) 2009-2013 Peter Breitenlohner <tex-live@tug.org>
+##   Copyright (C) 2009-2015 Peter Breitenlohner <tex-live@tug.org>
 ##
 ##   This file is free software; the copyright holder
 ##   gives unlimited permission to copy and/or distribute it,
@@ -32,10 +32,9 @@ EXTRA_DIST += $(XPDF_TREE)-foolabs
 ##
 EXTRA_DIST += $(XPDF_TREE)-PATCHES
 
-# in case of an SVN repository
-dist-hook:
-	rm -rf `find $(distdir) -name .svn -o -name .deps -o -name .dirstamp -o -name '*.$(OBJEXT)'`
-	rm -f $(distdir)/$(XPDF_TREE)/install-sh
+# Files not to be distributed
+include $(srcdir)/../../am/dist_hook.am
+NEVER_NAMES += $(NEVER_NAMES_SUB)
 
 SUBDIRS = . goo fofi splash xpdf
 
@@ -62,9 +61,9 @@ goo_libGoo_a_sources = \
 	@XPDF_TREE@/goo/GHash.cc \
 	@XPDF_TREE@/goo/GList.cc \
 	@XPDF_TREE@/goo/GString.cc \
+	@XPDF_TREE@/goo/gfile.cc \
 	@XPDF_TREE@/goo/gmem.cc \
-	@XPDF_TREE@/goo/gmempp.cc \
-	@XPDF_TREE@/goo/gfile.cc
+	@XPDF_TREE@/goo/gmempp.cc
 
 fofi_libfofi_a_sources = \
 	@XPDF_TREE@/fofi/FoFiBase.cc \
@@ -75,6 +74,8 @@ fofi_libfofi_a_sources = \
 	@XPDF_TREE@/fofi/FoFiType1C.cc
 
 xpdf_libxpdf_a_sources = \
+	@XPDF_TREE@/xpdf/AcroForm.cc \
+	@XPDF_TREE@/xpdf/Annot.cc \
 	@XPDF_TREE@/xpdf/Array.cc \
 	@XPDF_TREE@/xpdf/BuiltinFont.cc \
 	@XPDF_TREE@/xpdf/BuiltinFontTables.cc \
@@ -85,7 +86,9 @@ xpdf_libxpdf_a_sources = \
 	@XPDF_TREE@/xpdf/Dict.cc \
 	@XPDF_TREE@/xpdf/Error.cc \
 	@XPDF_TREE@/xpdf/FontEncodingTables.cc \
+	@XPDF_TREE@/xpdf/Form.cc \
 	@XPDF_TREE@/xpdf/Function.cc \
+	@XPDF_TREE@/xpdf/Gfx.cc \
 	@XPDF_TREE@/xpdf/GfxFont.cc \
 	@XPDF_TREE@/xpdf/GfxState.cc \
 	@XPDF_TREE@/xpdf/GlobalParams.cc \
@@ -106,8 +109,11 @@ xpdf_libxpdf_a_sources = \
 	@XPDF_TREE@/xpdf/Parser.cc \
 	@XPDF_TREE@/xpdf/SecurityHandler.cc \
 	@XPDF_TREE@/xpdf/Stream.cc \
+	@XPDF_TREE@/xpdf/TextString.cc \
 	@XPDF_TREE@/xpdf/UnicodeMap.cc \
-	@XPDF_TREE@/xpdf/XRef.cc
+	@XPDF_TREE@/xpdf/XFAForm.cc \
+	@XPDF_TREE@/xpdf/XRef.cc \
+	@XPDF_TREE@/xpdf/Zoox.cc
 
 # Rebuild
 rebuild_prereq =

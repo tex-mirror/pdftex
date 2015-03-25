@@ -1,13 +1,11 @@
 ## Makefile.am for the TeX Live subdirectory texk/kpathsea/
 ##
-## Copyright (C) 2009-2013 Peter Breitenlohner <tex-live@tug.org>
+## Copyright (C) 2009-2015 Peter Breitenlohner <tex-live@tug.org>
 ## You may freely use, modify and/or distribute this file.
 ##
-ACLOCAL_AMFLAGS = -I ../../m4
-
 SUBDIRS = . doc man
 
-EXTRA_DIST = BUGS PROJECTS
+EXTRA_DIST = PROJECTS
 
 AM_CPPFLAGS = -I$(top_builddir)/.. -I$(top_srcdir)/..
 AM_CFLAGS = $(WARNING_CFLAGS)
@@ -80,11 +78,11 @@ libkpathsea_la_SOURCES = \
 	xstat.c \
 	xstrdup.c
 
-if !CYGWIN_OR_MINGW
+if !MINGW32
 libkpathsea_la_SOURCES += \
 	getopt.c \
 	getopt1.c
-endif !CYGWIN_OR_MINGW
+endif !MINGW32
 
 if WIN32
 if MINGW32
@@ -108,67 +106,70 @@ endif !WIN32
 $(libkpathsea_la_OBJECTS): paths.h kpathsea.h
 
 EXTRA_DIST += \
-	putenv.c \
-	strcasecmp.c \
-	strtol.c \
-	strstr.c
+	putenv.c
 
 kpseincludedir = ${includedir}/kpathsea
 
 nodist_kpseinclude_HEADERS = \
-	c-auto.h \
 	kpathsea.h \
 	paths.h
 
-kpseinclude_HEADERS = $(special_headers) $(normal_headers)
+kpseinclude_HEADERS = config.h $(direct_headers) $(indirect_headers)
 
-# Headers treated specially when building kpathsea.h
+kpselibdir = ${libdir}/kpathsea
+
+nodist_kpselib_HEADERS = \
+	c-auto.h
+
+# Headers included directly into kpathsea.h
 #
-special_headers = \
-	config.h \
-	knj.h \
-	mingw32.h \
-	win32lib.h
-
-normal_headers = \
+direct_headers = \
 	absolute.h \
-	c-ctype.h \
 	c-dir.h \
-	c-errno.h \
 	c-fopen.h \
-	c-limits.h \
-	c-memstr.h \
-	c-minmax.h \
 	c-namemx.h \
 	c-pathch.h \
 	c-pathmx.h \
-	c-proto.h \
 	c-stat.h \
-	c-std.h \
-	c-unistd.h \
 	cnf.h \
 	concatn.h \
-	debug.h \
 	expand.h \
 	getopt.h \
-	hash.h \
-	lib.h \
 	line.h \
 	magstep.h \
 	pathsearch.h \
 	proginit.h \
-	progname.h \
 	readable.h \
+	tex-glyph.h \
+	tex-hush.h \
+	tex-make.h \
+	variable.h \
+	version.h
+
+# Headers included indirectly into kpathsea.h
+#
+indirect_headers = \
+	c-ctype.h \
+	c-errno.h \
+	c-limits.h \
+	c-memstr.h \
+	c-minmax.h \
+	c-proto.h \
+	c-std.h \
+	c-unistd.h \
+	debug.h \
+	hash.h \
+	knj.h \
+	lib.h \
+	mingw32.h \
+	progname.h \
+	simpletypes.h \
 	str-list.h \
 	str-llist.h \
 	systypes.h \
 	tex-file.h \
-	tex-glyph.h \
-	tex-hush.h \
-	tex-make.h \
 	types.h \
-	variable.h \
-	version.h
+	win32lib.h
 
 noinst_HEADERS = \
 	db.h \
@@ -178,6 +179,10 @@ noinst_HEADERS = \
 	tilde.h \
 	xopendir.h \
 	xstat.h
+
+pkgconfigdir = ${libdir}/pkgconfig
+
+pkgconfig_DATA = kpathsea.pc
 
 ## Handle backslash continuations, then null out comments and
 ## leading/trailing whitespace.  An awk script does the rest.
@@ -214,17 +219,15 @@ stamp-kpathsea: Makefile paths.h
 	$(AM_V_GEN)rm -f $@; \
 	( echo '/* This is a generated file */'; \
 	  echo '/* collecting all public kpathsea headers. */'; \
-	  for f in config.h c-auto.h paths.h $(normal_headers); do \
+	  for f in config.h paths.h $(direct_headers); do \
 	    echo "#include <kpathsea/$$f>"; \
-	  done ) >kpathsea.tmp
-	@if cmp -s kpathsea.h kpathsea.tmp 2>/dev/null; then \
+	  done ) >kpathsea.tmp && \
+	if cmp -s kpathsea.h kpathsea.tmp 2>/dev/null; then \
 	  echo "kpathsea.h is unchanged"; \
 	else \
-	  echo "cp kpathsea.tmp kpathsea.h"; \
+	  echo "generated kpathsea.h"; \
 	  cp kpathsea.tmp kpathsea.h; \
-	fi
-	rm -f kpathsea.tmp
-	date >$@
+	fi && rm -f kpathsea.tmp && date >$@
 
 EXTRA_DIST += bsnl.awk cnf-to-paths.awk
 
