@@ -55,7 +55,11 @@ GString *getHomeDir() {
   char *s;
   GString *ret;
 
+#ifdef _WIN32
+  if ((s = getenv("USERPROFILE")))
+#else
   if ((s = getenv("HOME")))
+#endif
     ret = new GString(s);
   else
     ret = new GString(".");
@@ -559,7 +563,7 @@ GBool openTempFile(GString **name, FILE **f,
 
 GBool createDir(char *path, int mode) {
 #ifdef _WIN32
-  return !mkdir(path);
+  return !_mkdir(path);
 #else
   return !mkdir(path, mode);
 #endif

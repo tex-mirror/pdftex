@@ -1636,8 +1636,8 @@ Optional Features:
   --disable-upmp            do not compile and install upMetaPost
   --disable-xetex           do not compile and install XeTeX
   --disable-xetex-synctex     build XeTeX without SyncTeX support
-  --disable-mf              do not build METAFONT
-  --disable-mf-nowin          do not build a separate non-windows-capable
+  --disable-mf              do not compile and install METAFONT
+  --disable-mf-nowin          do not build a separate non-window-capable
                               METAFONT
   --enable-epsfwin            include EPSF pseudo window support
   --enable-hp2627win          include HP 2627 window support
@@ -4682,6 +4682,13 @@ test "x$enable_web2c:$enable_xetex" = xyes:yes && {
 if test "${enable_mf+set}" = set; then :
   enableval=$enable_mf;
 fi
+case $enable_mf in #(
+  yes | no) :
+     ;; #(
+  *) :
+    enable_mf=yes ;;
+esac
+
 # Check whether --enable-mf-nowin was given.
 if test "${enable_mf_nowin+set}" = set; then :
   enableval=$enable_mf_nowin;
@@ -21377,9 +21384,7 @@ else
 fi
 if $ICU_CONFIG --version >/dev/null 2>&1; then
   ICU_INCLUDES=`$ICU_CONFIG --cppflags`
-  # Work around bug in icu-config version 4.4
-  ICU_LIBS=`$ICU_CONFIG --ldflags-searchpath `
-  ICU_LIBS="$ICU_LIBS `$ICU_CONFIG --ldflags-libsonly --ldflags-system`"
+  ICU_LIBS=`$ICU_CONFIG --ldflags-searchpath --ldflags-libsonly --ldflags-system`
 elif test "x$need_icu:$with_system_icu" = xyes:yes; then
   as_fn_error $? "did not find icu-config required for system icu libraries" "$LINENO" 5
 fi
@@ -24617,11 +24622,11 @@ msg_compiling="$msg_compiling
 test "x$srcdir" = x. || msg_compiling="$msg_compiling
       from sources in $kpse_src"
 { $as_echo "$as_me:${as_lineno-$LINENO}: result:
-** Configuration summary for $PACKAGE_STRING (2015/dev$with_banner_add):
+** Configuration summary for $PACKAGE_STRING (2015$with_banner_add):
 
    $msg_compiling" >&5
 $as_echo "
-** Configuration summary for $PACKAGE_STRING (2015/dev$with_banner_add):
+** Configuration summary for $PACKAGE_STRING (2015$with_banner_add):
 
    $msg_compiling" >&6; }
 case $kpse_src$kpse_bld in
