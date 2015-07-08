@@ -1,4 +1,4 @@
-/* mktexupdmain.c
+/* mktex.h
 
    Copyright 2000, 2015 Akira Kakuto.
 
@@ -16,31 +16,39 @@
    along with this library; if not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <kpathsea/kpathsea.h>
-#include "mktex.h"
+#ifndef MKTEX_H
+#define MKTEX_H
 
-int main(int argc, char **argv)
-{
-  char dir[256];
-  char file[256];
-  char path[256];
-  size_t i;
-
-  kpse_set_program_name (argv[0], NULL);
-  if(argc != 3) {
-    fprintf(stderr, "%s:: usage: %s DIR FILE\n", argv[0], argv[0]);
-    return 1;
+static inline void
+normalize (char *p) {
+  for (; *p; p++) {
+    if (IS_KANJI(p))
+      p++;
+    else if (*p == '\\')
+      *p = '/';
   }
-  strcpy(dir, argv[1]);
-  strcpy(file, argv[2]);
-  normalize (dir);
-  i = strlen(dir);
-  while(dir[i-1] == '/')
-    i--;
-  dir[i] = '\0';
-  strcpy(path, dir);
-  strcat(path, "/");
-  strcat(path, file);
-  mktexupd(path);
-  return 0;
 }
+
+/* dirutil.c */
+extern int is_dir (char *buff);
+extern int make_dir (char *buff);
+extern int make_dir_p (char *buff);
+
+/* getdestdir.c
+
+   from mktexmf:
+   argv[0] = "Dummy", argv[1] = "source", argv[2] = path
+   from mktexpk:
+   argv[0] = "Dummy", argv[1] = "pk", argv[2] = path, argv[3] = mode
+   from mktextfm:
+   argv[0] = "Dummy", argv[1] = "tfm", argv[2] = path
+*/
+extern char *getdestdir (int ac, char **av);
+
+/* mkpaths.c */
+extern char **mkpaths (int *numptr);
+
+/* mktexupd.c*/
+extern void mktexupd (char *s);
+
+#endif

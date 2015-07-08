@@ -89,6 +89,11 @@
 #define edit_var "TEXEDIT"
 #endif /* TeX */
 #ifdef MF
+#if defined(MFLua)
+#include <mfluadir/mfluaextra.h>
+#elif defined(MFLuaJIT)
+#include <mfluajitdir/mfluajitextra.h>
+#else
 #define BANNER "This is Metafont, Version 2.7182818"
 #define COPYRIGHT_HOLDER "D.E. Knuth"
 #define AUTHOR NULL
@@ -105,6 +110,7 @@
 #define INPUT_FORMAT kpse_mf_format
 #define INI_PROGRAM "inimf"
 #define VIR_PROGRAM "virmf"
+#endif
 #define edit_var "MFEDIT"
 #endif /* MF */
 
@@ -724,9 +730,21 @@ maininit (int ac, string *av)
   kpse_set_program_name (argv[0], user_progname);
 #endif
 
+#if defined(MF)
+#if defined(MFLua)
+  /* If the program name is "mflua-nowin", then reset the name as "mflua". */
+  if (strncasecmp (kpse_invocation_name, "mflua-nowin", 11) == 0)
+    kpse_reset_program_name ("mflua");
+#elif defined(MFLuaJIT)
+  /* If the program name is "mfluajit-nowin", then reset the name as "mfluajit". */
+  if (strncasecmp (kpse_invocation_name, "mfluajit-nowin", 14) == 0)
+    kpse_reset_program_name ("mfluajit");
+#else
   /* If the program name is "mf-nowin", then reset the name as "mf". */
   if (strncasecmp (kpse_invocation_name, "mf-nowin", 8) == 0)
     kpse_reset_program_name ("mf");
+#endif
+#endif
 
   /* FIXME: gather engine names in a single spot. */
   xputenv ("engine", TEXMFENGINENAME);
@@ -2818,6 +2836,7 @@ makesrcspecial (strnumber srcfilename, int lineno)
 #if defined (pdfTeX) || defined (epTeX) || defined (eupTeX)
 
 #include <kpathsea/c-stat.h>
+#include "md5.h"
 
 #define check_nprintf(size_get, size_want) \
     if ((unsigned)(size_get) >= (unsigned)(size_want)) \
@@ -3117,7 +3136,82 @@ void getfiledump(integer s, int offset, int length)
     }
     xfree(file_name);
 }
-#endif /* e-pTeX or e-upTeX */
+
+
+/* Converts any given string in into an allowed PDF string which is
+ * hexadecimal encoded;
+ * sizeof(out) should be at least lin*2+1.
+ */
+void convertStringToHexString(const char *in, char *out, int lin)
+{
+    int i, j, k;
+    char buf[3];
+    j = 0;
+    for (i = 0; i < lin; i++) {
+        k = snprintf(buf, sizeof(buf),
+                     "%02X", (unsigned int) (unsigned char) in[i]);
+        check_nprintf(k, sizeof(buf));
+        out[j++] = buf[0];
+        out[j++] = buf[1];
+    }
+    out[j] = '\0';
+}
+
+#define DIGEST_SIZE 16
+#define FILE_BUF_SIZE 1024
+
+void getmd5sum(strnumber s, boolean file)
+{
+    md5_state_t state;
+    md5_byte_t digest[DIGEST_SIZE];
+    char outbuf[2 * DIGEST_SIZE + 1];
+    int len = 2 * DIGEST_SIZE;
+
+    if (file) {
+        char file_buf[FILE_BUF_SIZE];
+        int read = 0;
+        FILE *f;
+
+        char *file_name = kpse_find_tex(makecfilename(s));
+        if (file_name == NULL) {
+            return;             /* empty string */
+        }
+        /* in case of error the empty string is returned,
+           no need for xfopen that aborts on error.
+         */
+        f = fopen(file_name, FOPEN_RBIN_MODE);
+        if (f == NULL) {
+            xfree(file_name);
+            return;
+        }
+        recorder_record_input(file_name);
+        md5_init(&state);
+        while ((read = fread(&file_buf, sizeof(char), FILE_BUF_SIZE, f)) > 0) {
+            md5_append(&state, (const md5_byte_t *) file_buf, read);
+        }
+        md5_finish(&state, digest);
+        fclose(f);
+
+        xfree(file_name);
+    } else {
+        /* s contains the data */
+        md5_init(&state);
+        md5_append(&state,
+                   (const md5_byte_t *) &strpool[strstart[s]],
+                   strstart[s + 1] - strstart[s]);
+        md5_finish(&state, digest);
+    }
+
+    if (poolptr + len >= poolsize) {
+        /* error by str_toks that calls str_room(1) */
+        return;
+    }
+    convertStringToHexString((char *) digest, outbuf, DIGEST_SIZE);
+    memcpy(&strpool[poolptr], outbuf, len);
+    poolptr += len;
+}
+
+#endif /* pdfTeX or e-pTeX or e-upTeX */
 #endif /* TeX */
 
 /* Metafont/MetaPost fraction routines. Replaced either by assembler or C.

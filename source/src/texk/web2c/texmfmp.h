@@ -1,4 +1,4 @@
-/* texmf.h: Main include file for TeX and Metafont in C. This file is
+/* texmf.h: Main include file for TeX and MF in C. This file is
    included by {tex,mf}d.h, which is the first include in the C files
    output by web2c.  */
 
@@ -89,8 +89,16 @@ typedef void* voidpointer;
 #define OUT_BUF dvibuf
 #endif /* TeX */
 #ifdef MF
+#if defined(MFLua)
+#define TEXMFPOOLNAME "mflua.pool"
+#define TEXMFENGINENAME "mflua"
+#elif defined(MFLuaJIT)
+#define TEXMFPOOLNAME "mfluajit.pool"
+#define TEXMFENGINENAME "mfluajit"
+#else
 #define TEXMFPOOLNAME "mf.pool"
 #define TEXMFENGINENAME "metafont"
+#endif
 #define DUMP_FILE basefile
 #define DUMP_FORMAT kpse_base_format
 #define writegf WRITE_OUT
@@ -122,6 +130,8 @@ extern void getcreationdate(void);
 extern void getfilemoddate(integer s);
 extern void getfilesize(integer s);
 extern void getfiledump(integer s, int offset, int length);
+extern void convertStringToHexString(const char *in, char *out, int lin);
+extern void getmd5sum(integer s, int file);
 #endif
 
 /* pdftex etc. except for tex use these for pipe support */

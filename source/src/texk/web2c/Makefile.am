@@ -138,6 +138,8 @@ tie_silent = $(tie_silent_@AM_V@)
 tie_silent_ = $(tie_silent_@AM_DEFAULT_V@)
 tie_silent_0 = @echo "  TIE     " $@; $(SHELL) ./silent-sh $@ #
 tie_silent_1 =
+tie_c = $(tie) -c $@
+tie_m = $(tie) -m $@
 
 # Calling tangle & Co. via tangle-sh (several output files)
 texmf_tangle = WEBINPUTS=.:$(srcdir) AM_V_P=$(AM_V_P) $(SHELL) ./tangle-sh $@ $(TANGLE)
@@ -181,6 +183,12 @@ include $(srcdir)/am/cweb.am
 
 ## TeX and MF
 include $(srcdir)/am/texmf.am
+
+## MFLua
+include $(srcdir)/mfluadir/am/mflua.am
+
+## MFLuaJIT
+include $(srcdir)/mfluajitdir/am/mfluajit.am
 
 ## MetaPost
 include $(srcdir)/mplibdir/am/mplib.am
