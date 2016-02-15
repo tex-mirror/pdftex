@@ -2,6 +2,8 @@
 # $Id$
 # build pdftex from cut-down TeX Live sources (see sync-pdftex.sh).
 # public domain.
+# The only intended bash-ism is the use of PIPESTATUS near the end.
+# Could rewrite, but no requests to do so ...
 
 top_dir=$(cd $(dirname $0) && pwd)
 pdftex_dir=$top_dir/src/texk/web2c/pdftexdir
@@ -26,23 +28,29 @@ DEBUG_OPTS="\
     CXXFLAGS=-g \
 "
 
-# disable system libraries; --enable-native-texlive-build can't
-# easily do that for cut-down source trees like this one.  For example,
-# our tree does not include teckit, therefore configure thinks the
-# system teckit should be used, therefore teckit dependencies should
-# also be taken from the system, and that includes zlib -- even though
-# we do have zlib present in the source tree here, and want to use it.  Sigh.
+# disable system libraries for everything, so that configure does not
+# report any "Assuming installed ...", only "Using ... from TL tree".
+# 
+# Sadly, --enable-native-texlive-build can't easily do it for cut-down
+# source trees like this one.  For example, our tree does not include
+# teckit, therefore configure thinks the system teckit should be used,
+# therefore teckit dependencies should also be taken from the system,
+# and that includes zlib -- even though we do have zlib present in the
+# source tree here, and want to use it.  Sigh.
+#
 DISABLE_SYSTEM_LIBS="\
     --without-system-cairo \
     --without-system-freetype2 \
     --without-system-gd \
+    --without-system-gmp \
     --without-system-graphite2 \
     --without-system-harfbuzz \
     --without-system-icu \
     --without-system-kpathsea \
     --without-system-libgs \
+    --without-system-libpaper \
     --without-system-libpng \
-    --without-system-paper \
+    --without-system-mpfr \
     --without-system-pixman \
     --without-system-poppler \
     --without-system-potrace \
@@ -83,12 +91,20 @@ else
 fi
 
 export MAKE
-printf "\n\f\n$0: running $MAKE (`date`)\n"
+printf "\n\f\n$0: running general $MAKE (`date`)\n"
 $MAKE | tee make.log
 if test ${PIPESTATUS[0]} -ne 0; then
-  echo "$0: $MAKE failed, goodbye (see log in $build_dir/make.log)." >&2
+  echo "$0: general $MAKE failed, goodbye (see $build_dir/make.log)." >&2
   exit 1
 fi
 
+printf "\n\f\n$0: running pdftex $MAKE (`date`)\n"
 (cd $build_dir/texk/web2c && $MAKE pdftex) 2>&1 | tee -a make.log
-ls -l $build_dir/texk/web2c/pdftex
+if test ${PIPESTATUS[0]} -ne 0; then
+  echo "$0: pdftex $MAKE failed, goodbye (see $build_dir/make.log)." >&2
+  exit 1
+fi
+
+printf "\n\f\n$0: running final binary (`date`)\n"
+ls -l $build_dir/texk/web2c/pdftex | tee -a make.log
+(cd $build_dir/texk/web2c && ./pdftex --version) | tee -a make.log

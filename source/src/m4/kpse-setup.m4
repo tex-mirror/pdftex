@@ -53,9 +53,9 @@ AS_CASE([$enable_libtool_hack],
                    [enable_libtool_hack=no],
                  [enable_libtool_hack=yes])
          ac_configure_args="$ac_configure_args '--enable-libtool-hack=$enable_libtool_hack'"])
-AS_CASE([$enable_shared],
-        [no], [:],
-        [yes ], [AS_IF([test "x$enable_native_texlive_build" = xyes],
+AS_CASE([$enable_shared:$host_os],
+        [no:* | yes:mingw* | yes:cygwin*], [:],
+        [yes:* ], [AS_IF([test "x$enable_native_texlive_build" = xyes],
                        [AC_MSG_ERROR([you can not use a shared Kpathsea library for a native TeX Live build])])],
         [enable_shared=no
          ac_configure_args="$ac_configure_args '--disable-shared'"])
@@ -85,7 +85,7 @@ AC_FOREACH([Kpse_Pkg], [luajittex mfluajit], [dnl
 AS_CASE([$enable_]Kpse_Pkg,
         [yes | no], [:],
           [AS_CASE([$host],
-                   [alpha* | sparc* | x86_64-*-cygwin | powerpc-*-darwin* ],
+                   [alpha* | sparc* | powerpc-*-darwin* ],
                      [AC_MSG_NOTICE([$host -> `--disable-]Kpse_Pkg['])
                       ac_configure_args="$ac_configure_args '--disable-]Kpse_Pkg['"])])
 ])

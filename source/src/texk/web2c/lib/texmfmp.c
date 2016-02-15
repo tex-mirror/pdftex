@@ -179,8 +179,7 @@ Isspace (char c)
 
      Internally, all arguments are quoted by ' (Unix) or " (Windows)
      before calling the system() function in order to forbid execution
-     of any embedded command.  In addition, on Windows, special
-     characters of cmd.exe are escaped by using (^).
+     of any embedded command.
 
    If the --shell-escape option is given, we set
      shellenabledp = 1 and restrictedshell = 0, i.e., any command is allowed.
@@ -279,6 +278,7 @@ init_shell_escape (void)
 #define QUOTE '\''
 #endif
 
+#if 0
 #ifdef WIN32
 static int
 char_needs_quote (int c)
@@ -289,6 +289,7 @@ char_needs_quote (int c)
           c == '>' || c == ';' || c == ',' || c == '(' ||
           c == ')');
 }
+#endif
 #endif
 
 /* return values:
@@ -381,11 +382,20 @@ shell_cmd_is_allowed (const char *cmd, char **safecmd, char **cmdname)
            example:
            --format="other text files" becomes
            '--format=''other text files' (Unix)
-           "--format=""other text files" (Windows) */
+           "--format"="other text files" (Windows) */
 
-        if (pre == 0)
+        if (pre == 0) {
+#ifdef WIN32
+          if (*(s-1) == '=') {
+            *(d-1) = QUOTE;
+            *d++ = '=';
+          } else {
+            *d++ = QUOTE;
+          }
+#else
           *d++ = QUOTE;
-
+#endif
+        }
         pre = 0;
         /* output the quotation mark for the quoted argument */
         *d++ = QUOTE;
@@ -395,9 +405,15 @@ shell_cmd_is_allowed (const char *cmd, char **safecmd, char **cmdname)
           /* Illegal use of ', or closing quotation mark is missing */
           if (*s == '\'' || *s == '\0')
             return -1;
+#if 0
+/*
+  The following in WIN32 may not be necessary, because
+  all arguments are quoted.
+*/
 #ifdef WIN32
           if (char_needs_quote (*s))
             *d++ = '^';
+#endif
 #endif
           *d++ = *s++;
         }
@@ -415,9 +431,15 @@ shell_cmd_is_allowed (const char *cmd, char **safecmd, char **cmdname)
       } else if (pre == 1 && !Isspace (*s)) {
         pre = 0;
         *d++ = QUOTE;
+#if 0
+/*
+  The following in WIN32 may not be necessary, because
+  all arguments are quoted.
+*/
 #ifdef WIN32
         if (char_needs_quote (*s))
           *d++ = '^';
+#endif
 #endif
         *d++ = *s++;
         /* Ending of a usual argument */
@@ -429,9 +451,15 @@ shell_cmd_is_allowed (const char *cmd, char **safecmd, char **cmdname)
         *d++ = *s++;
       } else {
         /* Copy a character from cmd to *safecmd. */
+#if 0
+/*
+  The following in WIN32 may not be necessary, because
+  all arguments are quoted.
+*/
 #ifdef WIN32
         if (char_needs_quote (*s))
           *d++ = '^';
+#endif
 #endif
         *d++ = *s++;
       }
@@ -508,6 +536,7 @@ runsystem (const char *cmd)
   int allow = 0;
   char *safecmd = NULL;
   char *cmdname = NULL;
+  int status = 0;
 
   if (shellenabledp <= 0) {
     return 0;
@@ -520,9 +549,13 @@ runsystem (const char *cmd)
     allow = shell_cmd_is_allowed (cmd, &safecmd, &cmdname);
 
   if (allow == 1)
-    (void) system (cmd);
+    status = system (cmd);
   else if (allow == 2)
-    (void) system (safecmd);
+    status =  system (safecmd);
+
+  /* Not really meaningful, but we have to manage the return value of system. */
+  if (status != 0)
+    fprintf(stderr,"system returned with code %d\n", status); 
 
   if (safecmd)
     free (safecmd);
@@ -2255,12 +2288,13 @@ input_line (FILE *f)
     long position = ftell (f);
 
     if (position == 0L) {  /* Detect and skip Byte order marks.  */
-      int k1 = getc (f);
+      int k1, k2, k3, k4;
+      k1 = getc (f);
 
       if (k1 != 0xff && k1 != 0xfe && k1 != 0xef)
         rewind (f);
       else {
-        int k2 = getc (f);
+        k2 = getc (f);
 
         if (k2 != 0xff && k2 != 0xfe && k2 != 0xbb)
           rewind (f);
@@ -2268,10 +2302,11 @@ input_line (FILE *f)
                  (k1 == 0xfe && k2 == 0xff))   /* UTF-16(BE) */
           ;
         else {
-          int k3 = getc (f);
-
-          if (k1 == 0xef && k2 == 0xbb && k3 == 0xbf) /* UTF-8 */
-            ;
+          k3 = getc (f);
+          k4 = getc (f);
+          if (k1 == 0xef && k2 == 0xbb && k3 == 0xbf &&
+              k4 >= 0 && k4 <= 0x7e) /* UTF-8 */
+            ungetc (k4, f);
           else
             rewind (f);
         }
@@ -2888,8 +2923,8 @@ void pdftex_fail(const char *fmt, ...)
 }
 #endif /* not pdfTeX */
 
-static boolean start_time_set = false;
 #if !defined(XeTeX)
+static boolean start_time_set = false;
 static time_t start_time = 0;
 #define TIME_STR_SIZE 30
 char start_time_str[TIME_STR_SIZE];
@@ -2949,10 +2984,14 @@ static void makepdftime(time_t t, char *time_str, boolean utc)
     }
 }
 
+#if defined(_MSC_VER)
+#define strtoll _strtoi64
+#endif
+
 void initstarttime(void)
 {
     char *source_date_epoch;
-    long long epoch;
+    int64_t epoch;
     char *endptr;
     if (!start_time_set) {
         start_time_set = true;
@@ -2965,11 +3004,11 @@ void initstarttime(void)
                 uexit(EXIT_FAILURE);
             }
             start_time = epoch;
-            makepdftime(start_time, start_time_str, /*utc=*/true);
+            makepdftime(start_time, start_time_str, /* utc= */true);
         }
         else {
             start_time = time((time_t *) NULL);
-            makepdftime(start_time, start_time_str, /*utc=*/false);
+            makepdftime(start_time, start_time_str, /* utc= */false);
         }
     }
 }
@@ -3057,7 +3096,7 @@ void getfilemoddate(integer s)
     if (stat(file_name, &file_data) == 0) {
         size_t len;
 
-        makepdftime(file_data.st_mtime, time_str, /*utc=*/false);
+        makepdftime(file_data.st_mtime, time_str, /* utc= */false);
         len = strlen(time_str);
         if ((unsigned) (poolptr + len) >= (unsigned) (poolsize)) {
             poolptr = poolsize;

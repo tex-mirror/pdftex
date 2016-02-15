@@ -1,3 +1,30 @@
+2015-12-18  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* Makefile.am: remove txt2zlib.am for LuaTeX.
+
+2015-12-16  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* Makefile.in: Rewritten by hand for LuaTeX beta-0.87.0.
+	It should be recreated by autotool.
+
+2015-11-27  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* dvicopy.ch: Avoid to crash and abort with an error message when
+	the character size >= 2048 pt.
+
+2015-09-22  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* triptest.test: Also check tripos.tex.
+
+2015-09-01  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: Check poppler for Object::initCmd(const char*).
+
+2015-08-29  Peter Breitenlohner  <peb@mppmu.mpg.de>
+
+	* configure.ac: Drop check for <StructTreeRoot.h>, we now
+	require poppler 0.30 better.
+	
 2015-08-10  Peter Breitenlohner  <peb@mppmu.mpg.de>
 
 	* pltotf.ch, vptovf.ch: Send also real numbers to stderr,
@@ -265,7 +292,7 @@
 
 	* trap.test (removed): Renamed ...
 	* mftraptest (new): ... into this.
-	* trp.test (removed): Renamed ...
+	* trip.test (removed): Renamed ...
 	* triptest (new): ... into this.
 	* am/texmf.am, triptrap-sh: Adapted.
 
