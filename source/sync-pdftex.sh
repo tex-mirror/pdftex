@@ -129,5 +129,6 @@ echo "  make svnstatus at the top level makes three temp files for this job;"
 echo "    see comments there."
 echo
 echo "  Then do a build (probably more necessary updates will be discovered)"
-echo "  And when all is well, commit."
+echo "  When all looks good, commit."
+echo "  When the commit succeeds, do svn update afterward, due to removals."
 echo "Good luck."

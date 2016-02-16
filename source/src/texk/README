@@ -1,4 +1,4 @@
-$Id: README 39658 2016-02-10 16:33:02Z kakuto $
+$Id: README 39724 2016-02-15 19:00:21Z karl $
 Copyright 2006-2015 TeX Users Group.
 You may freely use, modify and/or distribute this file.
 
@@ -104,8 +104,23 @@ upmendex 0.50 -
   http://www.t-lab.opal.ne.jp/tex/uptex_en.html
 
 web2c - maintained here, by us - core web2c, plain tex, etc.
-        The TeX variant dirs (pdftexdir, xetexdir, etc.)
-        updated here by their respective maintainers.
-
+  The TeX variant dirs (pdftexdir, xetexdir, etc.)
+  updated here by their respective maintainers.  More info:
+       aleph - maintained here
+        ctie - CTAN
+        cweb - knuth, ftp://ftp.cs.stanford.edu/pub/cweb/
+       eptex - https://osdn.jp/projects/eptex/
+        etex - maintained here
+      euptex - https://texwiki.texjp.org/?e-pTeX
+  mflua[jit] - https://github.com/luigiScarso/mflua
+    mplibdir - http://tug.org/metapost
+      luatex - http://luatex.org
+      pdftex - http://pdftex.org
+      pmpost - none
+        ptex - nothing current, old info: http://ascii.asciimw.jp/pb/ptex/
+     synctex - maintained here
+       uptex - https://texwiki.texjp.org/?upTeX%2CupLaTeX
+       xetex - http://tug.org/xetex/
+   
 xdvik 22.87 - checked 14apr14
   http://sourceforge.net/projects/xdvi/files/xdvik/
