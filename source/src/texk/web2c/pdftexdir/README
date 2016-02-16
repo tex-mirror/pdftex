@@ -1,4 +1,6 @@
-pdfTeX is an extended version of eTeX that can create PDF directly from
+$Id$
+
+pdfTeX is an extended version of e-TeX that can create PDF directly from
 TeX source files and enhance the result of TeX typesetting with the help
 of PDF. When PDF output is not selected, pdfTeX produces normal DVI
 output, otherwise it produces PDF output that looks essentially
@@ -32,10 +34,10 @@ details.
 You should have received a copy of the GNU General Public License along
 with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-pdfTeX uses code from TeX; for these parts the original copyright by Don
-Knuth applies. See the source files for details.
+pdfTeX uses code from TeX; for these parts the original public domain
+statement by Donald Knuth applies. See the source files for details.
 
-pdfeTeX uses code from eTeX; for these parts the original copyright by
+pdfTeX uses code from eTeX; for these parts the original copyright by
 Peter Breitenlohner applies. See the source files for details.
 
 CONTRIBUTORS
@@ -51,6 +53,6 @@ Schröder, Petr Sojka, Ralf Utermann, Olaf Weber, Jiri Zlatuska.
 Some companies have supported the developement of pdfTeX: Adobe Systems
 Inc., ArtCom GmbH, Pragma ADE, QuinScape GmbH.
 
-pdfTeX is built on top of TeX, written by Donald Knuth cum suis (Frank
-Liang et al.), and e-TeX, written by Peter Breitenlohner cum suis; 
-the advanced paragraph optimization is inspired by the work of Hermann Zapf.
+pdfTeX is built on top of TeX, written by Donald Knuth, and e-TeX,
+written by Peter Breitenlohner et al.; the advanced paragraph
+optimization is inspired by the work of Hermann Zapf.
