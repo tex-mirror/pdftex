@@ -601,7 +601,7 @@ TEXMF_RESTRICTED_SCRIPTS = \
 openin_any = a
 openout_any = p
 
-% Write .log/.dvi/etc. files here, if the current directory is unwritable.
+% Write .log/.dvi/.aux/etc. files here, if the current directory is unwritable.
 %TEXMFOUTPUT = /tmp
 
 % If a dynamic file creation fails, log the command to this file, in
