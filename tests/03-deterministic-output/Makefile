@@ -1,22 +1,40 @@
+# $Id$
+# Public domain.
+
+include ../Common.mak
+
 test1:
-	../../source/build-pdftex/texk/web2c/pdftex -ini test-no-date-id.tex
+	$(prog) test-no-date-id.tex
 
 test2:
-	../../source/build-pdftex/texk/web2c/pdftex -ini test-fixed-date-id.tex
+	$(prog) test-fixed-date-id.tex
 
-test3:
-	-SOURCE_DATE_EPOCH=abc123 ../../source/build-pdftex/texk/web2c/pdftex -ini -interaction=batchmode test-SOURCE_DATE_EPOCH.tex
-	-SOURCE_DATE_EPOCH=123abc ../../source/build-pdftex/texk/web2c/pdftex -ini -interaction=batchmode test-SOURCE_DATE_EPOCH.tex
-	-SOURCE_DATE_EPOCH=10 ../../source/build-pdftex/texk/web2c/pdftex -ini -interaction=batchmode test-SOURCE_DATE_EPOCH.tex
-	-SOURCE_DATE_EPOCH=0 ../../source/build-pdftex/texk/web2c/pdftex -ini -interaction=batchmode test-SOURCE_DATE_EPOCH.tex
-	-SOURCE_DATE_EPOCH=0.0 ../../source/build-pdftex/texk/web2c/pdftex -ini -interaction=batchmode test-SOURCE_DATE_EPOCH.tex
-	-SOURCE_DATE_EPOCH=-1 ../../source/build-pdftex/texk/web2c/pdftex -ini -interaction=batchmode test-SOURCE_DATE_EPOCH.tex
-	-SOURCE_DATE_EPOCH="" ../../source/build-pdftex/texk/web2c/pdftex -ini -interaction=batchmode test-SOURCE_DATE_EPOCH.tex
-	# -SOURCE_DATE_EPOCH=1439928155 ../../source/build-pdftex/texk/web2c/pdftex -ini -interaction=batchmode test-SOURCE_DATE_EPOCH.tex
+test = test-SOURCE_DATE_EPOCH
+test3-invalid:
+	-SOURCE_DATE_EPOCH=" "    $(prog) $(test).tex
+	-SOURCE_DATE_EPOCH=abc123 $(prog) $(test).tex
+	-SOURCE_DATE_EPOCH=0.0    $(prog) $(test).tex
+	-SOURCE_DATE_EPOCH=-1     $(prog) $(test).tex
+	-SOURCE_DATE_EPOCH=123abc $(prog) $(test).tex
+	-SOURCE_DATE_EPOCH=994399281551439928155 $(prog) $(test).tex
+
+test3-orig.pdf:
+	$(prog) $(test).tex && mv $(test).pdf $@
+
+test3-valid: test3-orig.pdf test3-repro.pdf
+	SOURCE_DATE_EPOCH=0  $(prog) $(test).tex
+	SOURCE_DATE_EPOCH="" $(prog) $(test).tex # same as 0
+	SOURCE_DATE_EPOCH=10 $(prog) $(test).tex
+	$(diff) $< $(test).pdf               # shows differences
+	$(diff) test3-repro.pdf $(test).pdf  # should be identical
+#	SOURCE_DATE_EPOCH=1439928155 $(prog) $(test).tex
+
+test3-repro.pdf:
+	SOURCE_DATE_EPOCH=10 $(prog) $(test).tex && mv $(test).pdf $@
 
 clean:
 	rm -f *.log *.pdf *.fmt *.aux
 
 fmt:
-	../../source/build-pdftex/texk/web2c/pdftex -ini *pdflatex.ini
-	../../source/build-pdftex/texk/web2c/pdftex -ini *pdfetex.ini
+	$(prog) *pdflatex.ini
+	$(prog) *pdfetex.ini
