@@ -3002,7 +3002,6 @@ void initstarttime(void)
             if (epoch < 0 || *endptr != '\0' || errno != 0) {
        FATAL1 ("invalid value for environment variable $SOURCE_DATE_EPOCH: %s",
                 source_date_epoch);
-                uexit(EXIT_FAILURE);
             }
             start_time = epoch;
             makepdftime(start_time, start_time_str, /* utc= */true);
