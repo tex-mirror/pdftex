@@ -118,17 +118,35 @@ for f in *; do
   fi
 done  
 
+if $chicken; then
+  cat <<CHICKEN
+$0: Before doing this for real,
+  ensure that any changes in the pdftex repo have been preserved;
+  they will be overwritten with the TL versions.
+CHICKEN
+fi
+
 printf "$0: "
 $chicken && printf "would be "
-echo "done."
-echo "  Now try a svn status:"
-echo "    specifically, ! entries from svn status should be svn removed,"
-echo "    and ? entries should be svn added."
-echo "  Do not do svn update first, or removes will be lost."
-echo "  make svnstatus at the top level makes three temp files for this job;"
-echo "    see comments there."
-echo
-echo "  Then do a build (probably more necessary updates will be discovered)"
-echo "  When all looks good, commit."
-echo "  When the commit succeeds, do svn update afterward, due to removals."
-echo "Good luck."
+cat <<TRAILER
+done.
+
+After doing for real, try a svn status:
+  specifically, ! entries from svn status should be svn removed,
+  and ? entries should be svn added.
+make svnstatus at the top level makes three temp files for this job;
+  see comments there.
+Do not do svn update first, or the removes just done will be lost.
+
+Sadly, the sync script does not remove directories, only all the files
+inside.  Please fix.  Need to remove by hand until fixed.
+
+After svn looks good, do make build (more needed updates may be discovered).
+make version will check on the resulting binary --version.
+
+When the build looks good, commit.
+
+When the commit succeeds, do svn update afterward, due to removals.
+
+Good luck.
+TRAILER
