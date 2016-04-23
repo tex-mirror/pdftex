@@ -12,29 +12,32 @@ distall=$(distnopdf) pdftex-a.pdf pdftex-l.pdf pdftex-s.pdf
 
 distnopdf=pdftex-w.tex pdftex-t.txt pdftex-t.tex \
 	pdftex-i.tex syntaxform.awk Makefile makefiles.cmd \
-	pdftex-syntax.txt README ChangeLog
+	pdftex-syntax.txt pdftex-help.txt README ChangeLog
 
 context = texexec --batchmode
 # context does not have \setupoutput.
 # texmfstart exits immediately.
 
-default: all
+default: pdftex-a.pdf
 
 all:	pdftex-a.pdf \
 	pdftex-l.pdf \
 	pdftex-s.pdf \
 	pdftex-syntax.txt
 
-booklet:	pdftex-b.pdf pdftex-b-e.pdf pdftex-b-o.pdf
-
-pdftex-a.pdf a:	pdftex-t.tex pdftex-t.txt
+common_deps = pdftex-t.tex pdftex-t.txt pdftex-help.txt
+pdftex-a.pdf a:	$(common_deps)
 	$(context) --result=$@ $<
 
-pdftex-l.pdf l:	pdftex-t.tex pdftex-t.txt
+pdftex-l.pdf l:	$(common_deps)
 	$(context) --mode=letter --result=$@ $<
 
-pdftex-s.pdf s:	pdftex-t.tex pdftex-i.tex
+pdftex-s.pdf s:	$(common_deps) pdftex-i.tex
 	$(context) --mode=screen --result=$@ $<
+
+
+# booklet version is not made by default.
+booklet:	pdftex-b.pdf pdftex-b-e.pdf pdftex-b-o.pdf
 
 pdftex-b.pdf b:	pdftex-a.pdf
 	$(context) --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
@@ -48,20 +51,33 @@ pdftex-b-o.pdf:	pdftex-a.pdf
 	$(context) --pdfarrange --paper=a5a4 --print=up --addempty=1,2 \
 	--pages=odd --result=$@ $<
 
-pdftex-t.txt:	pdftex-w.pdf Makefile
+
+# 
+# TeXable text for the title page.
+pdftex-t.txt: pdftex-w.pdf Makefile
 	cat $< \
 	| expand \
 	| fmt -s -w36 \
-	| env GREP_OPTIONS=--text grep . \
-	| expand \
-	| cat > $@
+	| grep --text . \
+	| expand > $@
+	wc -l pdftex-t.txt # titlepagelines=half of this
 
+# PDF for the title page.
 pdftex-w.pdf:	pdftex-w.tex
 	pdftex $<
 
-pdftex-syntax.txt:	pdftex-t.tex syntaxform.awk
+
+# Help text is too annoying to remake every time, check by hand when needed.
+pdftex-help.txt:
+	$(pdftex_build_binary) --help >$@
+pdftex_build_binary = ../../source/build-pdftex/texk/web2c/pdftex
+
+# Syntax list.
+pdftex-syntax.txt: pdftex-t.tex syntaxform.awk
 	gawk -f syntaxform.awk $< > $@
 
+
+# 
 # tar/zip including pdftex-a.pdf, pdftex-l.pdf, pdftex-s.pdf:
 
 alltar:	$(distall)
@@ -71,6 +87,7 @@ alltar:	$(distall)
 allzip:	$(distall)
 	cd .. && zip $(mandir)/pdftex-$(pdftexversion)-userman-$(distrev).zip \
 	$(patsubst %, $(mandir)/%, $(distall))
+
 
 # tar/zip without PDF files:
 
@@ -83,14 +100,14 @@ zip:	$(distnopdf)
 	cd .. && zip $(mandir)/pdftex-$(pdftexversion)-userman-$(distrev)-src.zip \
 	$(patsubst %, $(mandir)/%, $(distnopdf))
 
+
 clean:
-	texutil --purge
+	rm -f *.log *.tuo *.tui *.top *.tmp *-mpgraph.mp
 
-allclean:
-	- rm -f pdftex-a.pdf pdftex-l.pdf pdftex-s.pdf
-	- rm -f pdftex-b.pdf pdftex-b-e.pdf pdftex-b-o.pdf
-	- rm -f pdftex-syntax.txt
-	- rm -f pdftex-w.pdf pdftex-t.txt
-	make clean
+maintainer-clean: clean
+	rm -f pdftex-a.pdf pdftex-l.pdf pdftex-s.pdf
+	rm -f pdftex-b.pdf pdftex-b-e.pdf pdftex-b-o.pdf
+	rm -f pdftex-help.txt pdftex-syntax.txt
+	rm -f pdftex-w.pdf pdftex-t.txt
 
-clobber: allclean
+clobber allclean realclean distclean: maintainer-clean

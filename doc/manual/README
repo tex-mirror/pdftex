@@ -1,5 +1,7 @@
 $Id$
 
+(This README file public domain.)
+
 1. List of pdfTeX documentation files
 =====================================
 
@@ -9,6 +11,7 @@ pdftex-s.pdf (screen format)
 pdftex-b.pdf (A5 booklet made from pdftex-a.pdf)
 pdftex-b-e.pdf (A5 booklet, even pages)
 pdftex-b-o.pdf (A5 booklet, odd pages)
+pdftex-help.txt
 pdftex-syntax.txt
 
 
@@ -22,21 +25,19 @@ makefiles.cmd.
 2.1 Unix Style
 --------------
 
-See the Makefile.  To re-generate the manual PDFs from their sources,
-type:
-
-make allclean; make
+See the Makefile.  To re-generate the manual PDFs from their sources:
+  make allclean; make
 
 To get also the A5 booklet PDFs, type:
-
-make booklet
+  make booklet
 
 Finally you might type:
-
-make clean
+  make clean
 
 to remove all unneeded stuff that has accumulated during processing.
-Only the sources, the PDFs, and file pdftex-syntax.txt will be kept.
+Only the sources, the PDFs, and generated files will be kept.
+make maintainer-clean will remove those.
+
 
 2.2 Windows Style
 -----------------
