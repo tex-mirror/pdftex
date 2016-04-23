@@ -142,7 +142,7 @@ Sadly, the sync script does not remove directories, only all the files
 inside.  Please fix.  Need to remove by hand until fixed.
 
 After svn looks good, do make build (more needed updates may be discovered).
-make version will check on the resulting binary --version.
+make versionhelp will run --version and --help on the resulting binary.
 
 When the build looks good, commit.
 

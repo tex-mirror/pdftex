@@ -11,8 +11,8 @@ build:
 	./build-pdftex.sh
 
 # impractical to get real make check to work without the whole tree.
-version:
-	cd build-pdftex/texk/web2c && ./pdftex --version
+versionhelp:
+	cd build-pdftex/texk/web2c && ./pdftex --version && ./pdftex --help
 
 synctest:
 	./sync-pdftex.sh  # does not actually change anything.
