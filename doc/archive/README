@@ -1,0 +1,7 @@
+(This README file is public domain.  Originally written by Karl Berry, 2016.)
+
+These directories were distributed as part of the pdfTeX documentation
+in TeX Live for many years, but have been unnecessary for almost as
+long.  The information in pdftex-pdfkeys is in the main manual,
+and the thanh/ext example files have been superseded by pervasive
+support in distributed packages.
