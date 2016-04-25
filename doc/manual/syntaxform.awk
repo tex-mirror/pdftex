@@ -1,5 +1,6 @@
-#$Id$
-# pdftex-t.tex --> pdftex-syntax.txt
+# $Id$
+# Public domain.  Originally written by Petr Olsak.
+# pdftex-syntax.tex and pdftex-t.tex --> pdftex-syntax.txt
 # requires gawk due to gensub() function
 
 BEGIN{
@@ -88,12 +89,16 @@ BEGIN{
   gsub(/\\Next /, "");
 }
 
-/\\Whatever/ {
+/\\unkern/ {
+  gsub(/\\unkern */, "");
+}
+
+/\\(Whatever|Modelist)/ {
   whatind = 57;
-  whatpos = match($0, /\\Whatever/);
+  whatpos = match($0, /\\(Whatever|Modelist)/);
   b = substr($0, 0, whatpos - 1)
   c = substr($0, whatpos)
-  c = gensub(/\\Whatever *{([^}]*)}/, "(\\1)", "g", c);
+  c = gensub(/\\(Whatever|Modelist) *{([^}]*)}/, "(\\2)", "g", c);
   $0 = b;
   for(i = whatpos; i < whatind; i++)
     $0 = $0 " ";
