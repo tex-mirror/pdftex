@@ -43,7 +43,7 @@ pdftex-b-o.pdf:	pdftex-a.pdf
 
 # 
 # TeXable text for the title page.
-pdftex-t.txt: pdftex-w.pdf Makefile
+pdftex-t.txt: pdftex-w.pdf
 	cat $< \
 	| expand \
 	| fmt -s -w36 \
@@ -64,7 +64,7 @@ pdftex_build_binary = ../../source/build-pdftex/texk/web2c/pdftex
 
 # Primitives and syntax, in TeX for the printed manual, and then in
 # plain text for human convenience.
-pdftex-syntax.tex:
+pdftex-syntax.tex: pdftex-t.tex syntaxform.pl
 	perl syntaxform.pl pdftex-t.tex >pdftex-syntax.tex || rm -f $@
 
 pdftex-syntax.txt: pdftex-t.tex pdftex-syntax.tex syntaxform.awk

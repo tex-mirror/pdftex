@@ -21,7 +21,7 @@ sub main {
   }
   
   print <<END_HEADER;
-%%S $Id$
+%%S \$Id: syntaxform.pl 742 2016-04-25 17:30:55Z karl \$
 %%S This is the list of new or extended primitives provided by pdftex.
 %%S Don't edit this file, as it is now auto-generated from the
 %%S pdfTeX manual source pdftex-t.tex (and the generated
