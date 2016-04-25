@@ -6,14 +6,25 @@
 	(\Modelist): new macro for the (h,v,m) listings,
 	so we can autogenerate complete primitive/syntax info.
 	(\pdfpageresources): document this, previously missing.
-	
-	
+
 	* syntaxform.pl: new script to generate pdftex-syntax.tex.
 	* syntaxform.awk: handle \Modelist, discard \unkern.
 	* Makefile (default): build only what we distribute in TL.
 	(all): build everything else.
 	(pdftex-syntax.tex): new rule using syntaxform.pl; related changes.
 	* README: bring up to date, avoid redundancies.
+
+2016-04-25  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-w.txt: rename from pdftex-t.txt.
+	* pdftex-t.tex: change \typefile call.
+	* Makefile: change calls and dependencies.
+	
+	* pdftex-t.tex: use \type{-}\type{-help}, etc., to work
+	with both older and newer ConTeXt.
+	
+	* Makefile (pdftex_binary): use "pdftex" if no binary
+	in the build path.
 
 2016-04-23  Karl Berry  <karl@freefriends.org>
 
@@ -138,3 +149,5 @@
 	
 	* pdftex-t.tex: update intro information about distributions,
         etc., to be somewhat more accurate.
+
+(This ChangeLog file is public domain.)

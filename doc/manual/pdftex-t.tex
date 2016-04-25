@@ -533,7 +533,7 @@
     \setuplayout[titlepage]
 
     \startcolumnset[titlepage]
-      \typefile{pdftex-t.txt}
+      \typefile{pdftex-w.txt}
     \stopcolumnset
 
     \page
@@ -1272,8 +1272,7 @@ getting started:
        \filename {texmf.cnf} contains the path to \filename {pdftex.fmt}
        or \filename {pdflatex.fmt}.
 
-\head  \type{---! xx.fmt was written by tex} \crlf
-       \type{Fatal format file error; I'm stymied}
+\head \type{Fatal format file error; I'm stymied}
 
        This appears \eg\ if you forgot to regenerate the \type{.fmt}
        files after installing a new version of the \PDFTEX\ binary.
@@ -1326,7 +1325,7 @@ documents.  (See also \type{\pdfinfoomitdate},
 \type{\pdfsuppressptexinfo}, et al.)
 
 Just to have the list of options and basic invocation at hand, here is a
-verbatim listing of the \type{-{}-help} output.  All options can be
+verbatim listing of the \type{-}\type{-help} output.  All options can be
 specified with one or two dashes and unambiguously abbreviated.
 
 \startnotmode[screen]
@@ -2476,7 +2475,7 @@ gaps is acceptable. This glyph stretching and shrinking is called
 
 There are two different modes for font expansion:
 
-First, if the \type{autoexpand} option is there --- which is the
+First, if the \type{autoexpand} option is given --- which is the
 recommended mode --- only a single map entry is needed for all expanded
 font versions, using the name of the unexpanded \TFM\ file ({\em
 tfmname}). No expanded {\em tfmname} versions need to mentioned (they are
@@ -4662,7 +4661,7 @@ texexec --pdfarrange --paper=a5a4 --print=up --addempty=1,2
 \stoptyping
 
 Odd and even page sets for non-duplex printers can be generated using
-\type{--pages=odd} and \type{--pages=even} options
+\type{-}\type{-pages=odd} and \type{-}\type{-pages=even} options
 (which might require some disciplined shuffling of sheet).
 
 This also demonstrates that \PDFTEX\ can be used for page imposition
@@ -4671,9 +4670,6 @@ purposes (given that \PDFTEX\ and the fonts are set up properly).
 %***********************************************************************
 
 \page
-
-% The next section is sponsored by the paper producing industry -)
-% I will make this proper \quotation's some day
 
 \definehead[gnusection][subsection]
 \definehead[gnusubject][subsubject]
