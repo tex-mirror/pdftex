@@ -41,7 +41,8 @@ pdftex-b-o.pdf:	pdftex-a.pdf
 	--pages=odd --result=$@ $<
 
 
-# 
+#  Creating the subsidiary/dependent files.
+
 # TeXable text for the title page.
 pdftex-w.txt: pdftex-w.pdf
 	cat $< \
@@ -77,7 +78,21 @@ pdftex-syntax.txt: pdftex-t.tex pdftex-syntax.tex syntaxform.awk
 	gawk -f syntaxform.awk pdftex-syntax.tex $< >$@ || rm -f $@
 
 
-# 
+#  Install from this source directory to TL.
+
+tltree = /home/texlive/karl/Master/texmf-dist
+dest = $(tltree)/doc/pdftex/manual
+
+INSTALL_DATA = cp -p
+
+install: default
+	$(INSTALL_DATA) ChangeLog Makefile README makefiles.cmd $(dest)
+	$(INSTALL_DATA) pdftex-a.pdf pdftex-syntax.txt $(dest)
+	$(INSTALL_DATA) pdftex-t.tex pdftex-w.tex pdftex-i.tex $(dest)
+	$(INSTALL_DATA) syntaxform.awk syntaxform.pl $(dest)
+
+
+#  Dist and clean.
 # tar/zip including pdftex-a.pdf, pdftex-l.pdf, pdftex-s.pdf,
 # although we don't ever make such distributions any more.
 
