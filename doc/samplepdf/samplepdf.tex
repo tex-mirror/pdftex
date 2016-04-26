@@ -1,8 +1,12 @@
-% This example shows how to use pdfTeX primitives. High-level macros are provided
-% by macros packages like LaTeX or ConTeXt. We present basic set of commands,
-% extended with some more sophisticated issues (like MP to PDF conversion). All
-% the functionality other than provided by pdfTeX itself is commented by default.
-% Please follow the code below and uncomment fragments you want.
+% $Id$
+% (This samplepdf.tex file is public domain.)
+%
+% This example shows how to use pdfTeX primitives. High-level macros are
+% provided by macros packages like LaTeX or ConTeXt. We present basic
+% set of commands, extended with some more sophisticated issues (like MP
+% to PDF conversion). All the functionality other than provided by
+% pdfTeX itself is commented by default.  Please follow the code below
+% and uncomment fragments you want.
 
 % Many new features has been implemented since the first release of pdfTeX. To
 % make this sample version independent, we use compatibility sections.
@@ -403,6 +407,7 @@ We may change it, lets say to \the\pdfrandomseed.\par
 \repeat.\par
 
 10 normally distributed random numbers:
+
 \count100=0 \loop
  \dimen0=\pdfnormaldeviate sp
  $\withoutpt\the\dimen0$%
@@ -491,8 +496,8 @@ The previous page has been written as object \pdfpageref1.
 %
 % Sorry, TIFF files are no longer supported.
 %
-% pdfTeX itself does not support EPS and Postscript codes at all, however
-% it's possible to include Metapost output. EPS files can be converted to
+% pdfTeX itself does not support EPS and Postscript codes at all, but
+% it iss possible to include Metapost output. EPS files can be converted to
 % PDF for use with pdfTeX. See below for further info about using Metapost
 % and EPS.
 
@@ -685,9 +690,7 @@ Hacked image color space.
 
 \endfeature
 
-\newpage
-
-% Thanks to Hans Hagen pictures created by Metapost can be easily used with
+% Thanks to Hans Hagen, pictures created by Metapost can be used directly with
 % pdftex. The following files come from ConTeXt distribution. Another
 % place to get them is http://www.tug.org/applications/pdftex/, where
 % is also possible to get the latest driver file for using LaTeX graphicx
@@ -755,10 +758,12 @@ Shell escape (via \cs{ifeof}) seems to be
 
 \feature 1.30.0 {Shell escape detection (via \cs\pdfshellescape)}
 Shell escape (via \cs\pdfshellescape) seems to be
-\ifnum\pdfshellescape=1 disabled\else enabled\fi.
+\ifnum\pdfshellescape=2 enabled (restricted)\fi%
+\ifnum\pdfshellescape=1 enabled\fi%
+\ifnum\pdfshellescape=0 disabled\fi.
 \endfeature
 
-% Uncomment line below, if there is Metapost available in your system (should be!)
+% Uncomment line below, if Metapost is available on your system (should be!)
 % \immediate \write 18 {mpost \jobname.mp} % call Metapost on \jobname.mp
 \convertMPtoPDF{\jobname.0}{1}{1}
 \convertMPtoPDF{\jobname.1}{1}{1}
@@ -766,12 +771,10 @@ Shell escape (via \cs\pdfshellescape) seems to be
 \newpage
 
 % EPS pictures cannot be inserted directly by pdfTeX, but it's possible to
-% convert them to PDF using a Postscript-to-PDF converter, like Acrobat
-% Distiller or Ghostscript. The below example calls epstopdf (available
+% convert them to PDF using a Postscript-to-PDF converter, like
+% Ghostscript. The below example calls epstopdf (available
 % from http://www.tug.org/applications/pdftex), which preprocess the EPS
-% and afterwards uses Ghostscript to convert to PDF. In order to convert
-% EPS with embedded Type 1 fonts, a later version (beta) of Ghostscript is
-% required.
+% and afterwards uses Ghostscript to convert to PDF.
 
 % Uncomment line below, if there is epstopdf utility available in your system
 
@@ -1208,9 +1211,9 @@ The link is object \the\pdflastlink.
 % pdfTeX 1.40.0 comes with three extra primitives that fixes this problem.
 % \pdfsetmatrix primitive inserts first four numbers of the afine
 % transformation matrix into the page content stream and updates annotations
-% accordingly. \pdfsave saves the current matrix, \pdfrestore resores the
+% accordingly. \pdfsave saves the current matrix, \pdfrestore restores the
 % previously saved matrix.
-
+\hrule height 0pt depth 0pt width 0pt
 \bigskip
 
 \feature 1.40.0 {Saving/restoring transformation matrix}
