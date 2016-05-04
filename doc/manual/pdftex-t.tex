@@ -1313,20 +1313,36 @@ engines as implemented in \WEBC\ (\from [web2c] has the manual).
 
 The same commonality holds for environment variables; see the section
 ``Setting search paths'' above for an overview.  However, \PDFTEX\ looks
-for one additional environment variable: \type{SOURCE_DATE_EPOCH}
+for two additional environment variables: first, \type{SOURCE_DATE_EPOCH}
 (introduced in version 1.40.17, 2016).  If this is set, it must be a
 positive integer (with one trivial exception: if it is set but empty,
 that is equivalent to 0).  Non-integer values cause a fatal error.  The
 value is used as the current time in seconds since the usual Unix
-``epoch'', the beginning of 1970-01-01, UTC.  Thus, a value of \type{32}
+``epoch'': the beginning of 1970-01-01, UTC.  Thus, a value of \type{32}
 would result in a \type{/CreationDate} and \type{/ModDate} values of
 \type{19700101000032Z}.  This is useful for reproducible builds of
 documents.  (See also \type{\pdfinfoomitdate},
 \type{\pdfsuppressptexinfo}, et al.)
 
-Just to have the list of options and basic invocation at hand, here is a
-verbatim listing of the \type{-}\type{-help} output.  All options can be
-specified with one or two dashes and unambiguously abbreviated.
+The second \PDFTEX-specific environment variable is
+\type{SOURCE_DATE_EPOCH_TEX_PRIMITIVES}.  If this is set to~\type{1},
+\TEX's time-related primitives are also initialized from the value of
+\type{SOURCE_DATE_EPOCH}.  These primitives are \type{\year},
+\type{\month}, \type{day}, and \type{\time}.  If
+\type{SOURCE_DATE_EPOCH} is not set, setting
+\type{SOURCE_DATE_EPOCH_TEX_PRIMITIVES} has no effect.  If
+\type{SOURCE_DATE_EPOCH_TEX_PRIMITIVES} is unset, set to the empty
+string, or set to~\type{0}, the primitives reflect the current time as
+usual.  Any other value elicits a warning, and the current time is used.
+(This is useful only if one wants to make reproducible \PDF{}s for a set
+of documents without changing them in any way, e.g., an operating system
+distribution with manuals that use \type{\today}.  Except in such
+unusual circumstances, it is better not to set this, and let the \TEX\
+primitives have the meaning they have always had.)
+
+Now, just to have the list of options and basic invocation at hand, here
+is a verbatim listing of the \type{-}\type{-help} output.  All options
+can be specified with one or two dashes and unambiguously abbreviated.
 
 \startnotmode[screen]
   \switchtobodyfont[9pt] % squeeze everything on one page

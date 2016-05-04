@@ -58,8 +58,9 @@ pdftex-w.pdf: pdftex-w.tex
 
 
 # Too annoying to remake help text every time; check by hand when needed.
-pdftex-help.txt:
+pdftex-help.txt: force
 	$(pdftex_binary) --help >$@ || rm -f $@
+force:
 
 # if we don't have a build tree around, just try from the path.
 build_binary := ../../source/build-pdftex/texk/web2c/pdftex

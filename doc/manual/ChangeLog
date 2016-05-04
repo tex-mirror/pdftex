@@ -1,3 +1,8 @@
+2016-05-04  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (Invoking \PDFTEX): describe
+	SOURCE_DATE_EPOCH_TEX_PRIMITIVES, with caveats.
+
 2016-04-25  Karl Berry  <karl@freefriends.org>
 
 	* samplepdf: move subdir up a level for more visibility.
