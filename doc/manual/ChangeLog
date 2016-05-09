@@ -1,3 +1,7 @@
+2016-05-05  Karl Berry  <karl@tug.org>
+
+	* pdftex-t.tex: missed \
+
 2016-05-04  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (Invoking \PDFTEX): describe

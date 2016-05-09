@@ -1312,19 +1312,19 @@ options, they are all inherited from the common framework for \TeX\
 engines as implemented in \WEBC\ (\from [web2c] has the manual).
 
 The same commonality holds for environment variables; see the section
-``Setting search paths'' above for an overview.  However, \PDFTEX\ looks
-for two additional environment variables: first, \type{SOURCE_DATE_EPOCH}
-(introduced in version 1.40.17, 2016).  If this is set, it must be a
-positive integer (with one trivial exception: if it is set but empty,
-that is equivalent to 0).  Non-integer values cause a fatal error.  The
-value is used as the current time in seconds since the usual Unix
-``epoch'': the beginning of 1970-01-01, UTC.  Thus, a value of \type{32}
-would result in a \type{/CreationDate} and \type{/ModDate} values of
-\type{19700101000032Z}.  This is useful for reproducible builds of
-documents.  (See also \type{\pdfinfoomitdate},
+``Setting search paths'' above for an overview.  Two additional
+environment variables need more description here: first,
+\type{SOURCE_DATE_EPOCH} (introduced in version 1.40.17, 2016).  If this
+is set, it must be a positive integer (with one trivial exception: if it
+is set but empty, that is equivalent to 0).  Non-integer values cause a
+fatal error.  The value is used as the current time in seconds since the
+usual Unix ``epoch'': the beginning of 1970-01-01, UTC.  Thus, a value
+of \type{32} would result in a \type{/CreationDate} and \type{/ModDate}
+values of \type{19700101000032Z}.  This is useful for reproducible
+builds of documents.  (See also \type{\pdfinfoomitdate},
 \type{\pdfsuppressptexinfo}, et al.)
 
-The second \PDFTEX-specific environment variable is
+The second, related, environment variable is
 \type{SOURCE_DATE_EPOCH_TEX_PRIMITIVES}.  If this is set to~\type{1},
 \TEX's time-related primitives are also initialized from the value of
 \type{SOURCE_DATE_EPOCH}.  These primitives are \type{\year},
@@ -1338,11 +1338,12 @@ usual.  Any other value elicits a warning, and the current time is used.
 of documents without changing them in any way, e.g., an operating system
 distribution with manuals that use \type{\today}.  Except in such
 unusual circumstances, it is better not to set this, and let the \TEX\
-primitives have the meaning they have always had.)
+primitives retain the meaning they have always had.)
 
-Now, just to have the list of options and basic invocation at hand, here
-is a verbatim listing of the \type{-}\type{-help} output.  All options
-can be specified with one or two dashes and unambiguously abbreviated.
+Finally, just to have the list of options and basic invocation at hand,
+here is a verbatim listing of the \type{-}\type{-help} output.  All
+options can be specified with one or two dashes and unambiguously
+abbreviated.
 
 \startnotmode[screen]
   \switchtobodyfont[9pt] % squeeze everything on one page
