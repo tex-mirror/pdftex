@@ -2,9 +2,10 @@
 # public domain.  Originally written by Karl Berry.
 
 default:
-	@echo "make build to build, make version to see built --version."
-	@echo "make synctest or syncreal to sync,"
-	@echo "  and svnstatus to make file lists to help with syncing." 
+	@echo "make build to build,"
+	@echo "make version to see built --version."
+	@echo "make synctest or syncreal to sync with TL,"
+	@echo "  and make svnstatus for file lists to help with syncing." 
 	@echo "But read/understand the scripts before doing anything."
 
 build:
