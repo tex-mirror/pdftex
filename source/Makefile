@@ -3,7 +3,7 @@
 
 default:
 	@echo "make build to build,"
-	@echo "make version to see built --version."
+	@echo "make versionhelp to see built --version and --help."
 	@echo "make synctest or syncreal to sync with TL,"
 	@echo "  and make svnstatus for file lists to help with syncing." 
 	@echo "But read/understand the scripts before doing anything."

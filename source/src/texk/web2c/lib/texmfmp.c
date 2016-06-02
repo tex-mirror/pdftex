@@ -2200,6 +2200,10 @@ catch_interrupt (int arg)
 }
 #endif /* not WIN32 */
 
+#if defined(_MSC_VER)
+#define strtoull _strtoui64
+#endif
+
 static boolean start_time_set = false;
 static time_t start_time = 0;
 
@@ -2209,6 +2213,7 @@ void init_start_time() {
     char *endptr;
     if (!start_time_set) {
         start_time_set = true;
+#ifndef onlyTeX
         source_date_epoch = getenv("SOURCE_DATE_EPOCH");
         if (source_date_epoch) {
             errno = 0;
@@ -2217,8 +2222,14 @@ void init_start_time() {
 FATAL1 ("invalid epoch-seconds-timezone value for environment variable $SOURCE_DATE_EPOCH: %s",
                       source_date_epoch);
             }
+#if defined(_MSC_VER)
+            if (epoch > 32535291599ULL)
+                epoch = 32535291599ULL;
+#endif
             start_time = epoch;
-        } else {
+        } else
+#endif /* not onlyTeX */
+        {
             start_time = time((time_t *) NULL);
         }
     }
@@ -2235,22 +2246,27 @@ get_date_and_time (integer *minutes,  integer *day,
                    integer *month,  integer *year)
 {
   struct tm *tmptr;
+#ifndef onlyTeX
   string sde_texprim = getenv ("SOURCE_DATE_EPOCH_TEX_PRIMITIVES");
   if (sde_texprim && STREQ (sde_texprim, "1")) {
     init_start_time ();
     tmptr = gmtime (&start_time);
-  } else {
+  } else
+#endif /* not onlyTeX */
+    {
     /* whether the envvar was not set (usual case) or invalid,
        use current time.  */
     time_t myclock = time ((time_t *) 0);
     tmptr = localtime (&myclock);
 
+#ifndef onlyTeX
     /* warn if they gave an invalid value, empty (null string) ok.  */
     if (sde_texprim && strlen (sde_texprim) > 0
         && !STREQ (sde_texprim, "0")) {
 WARNING1 ("invalid value (expected 0 or 1) for environment variable $SOURCE_DATE_EPOCH_TEX_PRIMITIVES: %s", 
           sde_texprim);
     }
+#endif /* not onlyTeX */
   }
 
   *minutes = tmptr->tm_hour * 60 + tmptr->tm_min;
@@ -3028,10 +3044,6 @@ static void makepdftime(time_t t, char *time_str, boolean utc)
         check_nprintf(i, 9);
     }
 }
-
-#if defined(_MSC_VER)
-#define strtoll _strtoi64
-#endif
 
 void initstarttime(void)
 {
