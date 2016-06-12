@@ -10,7 +10,7 @@ test2:
 	$(prog) test-fixed-date-id.tex
 
 testprim:
-	SOURCE_DATE_EPOCH=120 SOURCE_DATE_EPOCH_TEX_PRIMITIVES=1 \
+	SOURCE_DATE_EPOCH=120 FORCE_SOURCE_DATE=1 \
 	  $(prog) test-prim.tex
 	
 test = test-SOURCE_DATE_EPOCH

@@ -1324,21 +1324,20 @@ values of \type{19700101000032Z}.  This is useful for reproducible
 builds of documents.  (See also \type{\pdfinfoomitdate},
 \type{\pdfsuppressptexinfo}, et al.)
 
-The second, related, environment variable is
-\type{SOURCE_DATE_EPOCH_TEX_PRIMITIVES}.  If this is set to~\type{1},
-\TEX's time-related primitives are also initialized from the value of
-\type{SOURCE_DATE_EPOCH}.  These primitives are \type{\year},
-\type{\month}, \type{\day}, and \type{\time}.  If
-\type{SOURCE_DATE_EPOCH} is not set, setting
-\type{SOURCE_DATE_EPOCH_TEX_PRIMITIVES} has no effect.  If
-\type{SOURCE_DATE_EPOCH_TEX_PRIMITIVES} is unset, set to the empty
-string, or set to~\type{0}, the primitives reflect the current time as
-usual.  Any other value elicits a warning, and the current time is used.
-(This is useful only if one wants to make reproducible \PDF{}s for a set
-of documents without changing them in any way, e.g., an operating system
-distribution with manuals that use \type{\today}.  Except in such
-unusual circumstances, it is better not to set this, and let the \TEX\
-primitives retain the meaning they have always had.)
+The second, related, environment variable is \type{FORCE_SOURCE_DATE}.
+If this is set to~\type{1}, \TEX's time-related primitives are also
+initialized from the value of \type{SOURCE_DATE_EPOCH}.  These
+primitives are \type{\year}, \type{\month}, \type{\day}, and
+\type{\time}.  If \type{SOURCE_DATE_EPOCH} is not set, setting
+\type{FORCE_SOURCE_DATE} has no effect.  If \type{FORCE_SOURCE_DATE} is
+unset, set to the empty string, or set to~\type{0}, the primitives
+reflect the current time as usual.  Any other value elicits a warning,
+and the current time is used.  (This is useful only if one wants to make
+reproducible \PDF{}s for a set of documents without changing them in any
+way, e.g., an operating system distribution with manuals that use
+\type{\today}.  Except in such unusual circumstances, it is better not
+to set this, and let the \TEX\ primitives retain the meaning they have
+always had.)
 
 Finally, just to have the list of options and basic invocation at hand,
 here is a verbatim listing of the \type{-}\type{-help} output.  All
