@@ -4025,23 +4025,29 @@ to \type{1} otherwise.  \introduced{1.30.0}
 \bookmark{\tex{pdfmatch}}
 
 This command implements pattern matching (using the syntax of \POSIX\
-regular expressions). The first \Something{general text} is a pattern,
-the second is a string, and the command expands to \type{-1} if the
-pattern is invalid, to \type{0} if no match is found, and to \type{1} if
-a match is found. With the \type{icase} option, the matching is
-case-insensitive.  The \type{subcount} option sets the size of the table
-storing found (sub)patterns.  \introduced{1.30.0}
+extended regular expressions). The first \Something{general text} is a
+pattern and the second is a string.  The command expands to \type{-1} if
+the pattern is invalid, to \type{0} if no match is found, and to
+\type{1} if a match is found. With the \type{icase} option, the matching
+is case-insensitive.  The \type{subcount} option sets the size of the
+table storing the found (sub)patterns; its default is 10.
+\introduced{1.30.0}
 
 \pdftexprimitive{\Syntax{\Tex{\pdflastmatch} \Something{integer}
   \Whatever{expandable}}}
 \bookmark{\tex{pdflastmatch}}
 
-The matches found with \type{\pdfmatch} are stored in a table. This command
-returns the entry \Something{integer}. Entry~0 contains the match, and
-the following entries contain submatches corresponding to the subpatterns
-(up to \type{subcount-1}); all matches are preceded by their positions,
-separated by \type{->}. If the position is \type{-1} and the match is
-empty, it means that the subpattern corresponding to that entry wasn't found.
+The matches found with \type{\pdfmatch} are stored in a table. This
+command returns the entry for \Something{integer}, in the format
+\Something{position}\type{->}\Something{string}; \Something{position} is
+the position of the match (starting at zero) or \type{-1} if no match
+was found, and \Something{string} is the matched substring.
+
+Entry~0 contains the match as a whole; the subsequent entries contain
+submatches corresponding to the subpatterns, up to \type{subcount-1}.
+
+If \Something{integer} is less than zero, an error is given.
+
 For instance:
 
 \starttyping
@@ -4053,7 +4059,7 @@ For instance:
 \stoptyping
 
 Entry~1 is empty because no match was found for \type{cd}, and entry~3
-is empty because it exceeds the table's size, as set by \type{subcount}.
+is empty because it exceeds the table's size as set by \type{subcount}.
 \introduced{1.30.0}
 
 %***********************************************************************

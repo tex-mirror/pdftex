@@ -1,0 +1,22 @@
+% $Id$
+% This file public domain.  Bug report of \pdflastmatch crash:
+% http://tug.org/pipermail/tex-live/2016-June/038664.html
+%
+\catcode`\{=1 \catcode`\}=2 \catcode`^=7 \newlinechar=`^^J
+%
+\message{^^Jpdflastmatch0 before any match: \pdflastmatch0}
+\message{^^J}%
+%
+\message{^^Jmatch a to b: \pdfmatch{a}{b}}
+\message{^^J}%
+\message{pdflastmatch0: \pdflastmatch0}
+\message{^^J}%
+%
+\message{^^Jmatch example: \pdfmatch subcount 3 {ab(cd)*ef(gh)(ij)}{abefghij}}
+\message{^^J}%
+\message{pdflastmatch0 (0->abefghij): \pdflastmatch0 ^^J}
+\message{pdflastmatch1 (-1->): \pdflastmatch1 ^^J}
+\message{pdflastmatch2 (4->gh): \pdflastmatch2 ^^J}
+\message{pdflastmatch3 (-1->): \pdflastmatch3}
+\message{^^J}%
+\end

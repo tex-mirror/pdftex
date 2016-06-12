@@ -1,3 +1,15 @@
+2016-06-12  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\pdfmatch): mention default subcount 10; wording.
+	(\pdflastmatch): clarify match position, wording;
+	
+	* pdftex-t.tex (Invoking \PDFTEX): new name FORCE_SOURCE_DATE for
+	SOURCE_DATE_EPOCH_TEX_PRIMITIVES.
+
+2016-05-20  Karl Berry  <karl@tug.org>
+
+	* TeX Live 2016 release.
+
 2016-05-05  Karl Berry  <karl@tug.org>
 
 	* pdftex-t.tex: missed \
