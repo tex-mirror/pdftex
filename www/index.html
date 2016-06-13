@@ -1,212 +1,92 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-"http://www.w3.org/TR/html4/strict.dtd">
-<html>
-  <head>
-     <META HTTP-EQUIV="Content-Type"  CONTENT="text/html; charset=iso-8859-1">
-     <meta http-equiv="Content-Style-Type" content="text/css">
-     <meta name="keywords" content="TeX, PDF, typesetting">
-     
-     <title>pdfTeX</title>
-<style type="text/css">
- body.c1 {
-  background-color: white; color:black
- }
- h1.c1 {text-align:center}
- img.c1 {border:0;width:88px;height:31px}
-</style>
-  </head>
+<html><head>
+<!-- $Id$ -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>pdfTeX - TeX Users Group</title>
+<link rel="stylesheet" href="/tugstyle.css">
+</head><body>
 
-  <body class="c1">
-    <h1 class="c1">pdfTeX</h1>
+<h2>pdfTeX</h2>
 
-    <h2>Distribution</h2>
-    
-    <p>The latest stable version of pdfTeX is <em>1.40.17</em></p>
-    
-    <ol>
-      <li><a href="NEWS">NEWS</a></li>
-        
-      <li><a href="README">README</a></li>
-        
-      <li><a href="http://tug.org/pipermail/pdftex/2009-December/008183.html">Release announcement</a></li>
-        
-      <li><a href=
-      "http://sarovar.org/frs/download.php/1300/pdftex-1.40.11.tar.bz2">pdftex-1.40.11.tar.bz2</a> 
-      contains all the source from the TeXlive
-      distribution needed for pdfTeX.
-      Those not wanting to upgrade pdfTeX alone are strongly advised to get a
-      version of their TeX distribution which has it, e.g. of <a
-      href="http://www.tug.org/tex-live/">TeX Live</a> or <a href="http://www.miktex.org">MikTeX</a>.
-      </li>
-      
-    </ol>
+<p><a href="http://ctan.org/pkg/pdftex">pdfTeX</a> is an extension of <a
+href="http://ctan.org/pkg/tex">TeX</a> which can produce PDF directly
+from TeX source, as well as original DVI files.  pdfTeX incorporates the
+<a href="http://ctan.org/pkg/etex">e-TeX</a> extensions.
 
-    <h2>Bugs etc.</h2>
+<p>pdfTeX also has a variety of other extensions, perhaps most notably
+for <a
+href="https://en.wikipedia.org/wiki/Microtypography">microtypography</a>
+line breaking features.  The <a
+href="http://ctan.org/pkg/microtype">microtype</a> package provides a
+convenient interface for LaTeX.
 
-    <p>Please report bugs etc. at our <a href="http://sarovar.org/projects/pdftex/">sarovar</a> site.
-    
-    <h2>Latest sources</h2>
+<p>pdfTeX is released as part of <a href="/texlive/">TeX Live</a>, and
+also included in all TeX distributions, notably <a
+href="http://miktex.org">MiKTeX</a>.  Current release: <a
+href="/texlive/Contents/live/texmf-dist/doc/pdftex/NEWS">NEWS</a>, <a
+href="/texlive/Contents/live/texmf-dist/doc/pdftex/manual/pdftex-a.pdf"
+>manual</a>, <a href="/texlive/Contents/live/source/">sources</a>.
 
-    <p>We have a <a href="http://foundry.supelec.fr/scm/?group_id=23">subversion repository</a>.
+<p>The principal author, and still active maintainer, of pdfTeX is 
+H&agrave;n Th&#x1ebf; Th&agrave;nh.
 
-    <h2>Some documentation</h2>
 
-    <ol>
-      <li>
-      <a href="http://sarovar.org/docman/view.php/106/66/pdftex-s.pdf">screen-designed</a>,
-      <a href="http://sarovar.org/docman/view.php/106/64/pdftex-a.pdf.pdf">A4 size</a>,
-      <a href="http://sarovar.org/docman/view.php/106/65/pdftex-l.pdf">letter size</a> and 
-      <a href="http://sarovar.org/docman/view.php/106/68/pdftex-1.40.manual.zip">(TeX
-      source)</a> User Manual for pdfTeX (Han The Thanh, Hans Hagen, and
-      Sebastian Rahtz)</li>
+<h3 id="lists">Mailing lists</h3>
 
-      <li>
-      <a href="http://sarovar.org/docman/view.php/106/67/pdftex-syntax.txt">pdftex-syntax.txt</a>
-      List of new or extended primitives provided by pdfTeX.</li>
+<ul>
+<li><a href="http://lists.tug.org/pdftex">pdftex@tug.org</a> -
+general pdftex discussion, support requests, etc.
 
-      <li>
-      <a href="http://tug.org/mailman/listinfo/pdftex">pdfTeX mailing list</a> with 
-      <a href="http://tug.org/pipermail/pdftex/">searchable archive</a>.
-      </li>
+<li><a
+href="https://mailman.ntg.nl/mailman/listinfo/ntg-pdftex">ntg-pdftex@ntg.nl</a>
+- development discussion and bug reports (please include a runnable
+example).
 
-      <li><a href= "http://www.ntg.nl/mailman/listinfo/ntg-pdftex">pdfTeX
-      developer mailing list</a>.
-      </li>
+<li><a href="http://lists.tug.org/pdftex-commits">pdftex-commits@tug.org</a> -
+archive of commits to the <a href="#dev">source repository</a>.
 
-      <li>Entries for pdfTeX in the <a href=
-      "http://www.tex.ac.uk/cgi-bin/texfaq2html?keyword=pdftex">UK-TeX-FAQ</a>.</li>
-    </ol>
+</ul>
 
-    <h2>Useful material</h2>
 
-    <ol>
-      <li>epstopdf (Sebastian Rahtz). A Perl script to convert EPS files
-      directly to encapsulated PDF, using Ghostscript; or make EPS files
-      suitable for Distiller. You can find it on <a href=
-      "http://www.ctan.org">CTAN</a> in <a href=
-      "http://www.ctan.org/tex-archive/support/epstopdf/?action=/tex-archive/support/">
-      support/epstopdf</a></li>
+<h3 id="dev">Development</h3>
 
-      <li><a href="http://pdftex-def.berlios.de/">pdftex.def</a>
-      (originally by Sebastian Rahtz and David Carlisle, now maintained on
-      berlios by the pdfTeX community). LaTeX graphics package config file
-      for pdfTeX, with improved functionality.</li>
+<p>Upstream pdfTeX is a <a
+href="https://foundry.supelec.fr/scm/?group_id=23">Subversion source
+repository</a> at supelec.fr.  For historical reasons, current
+development happens in the <a
+href="https://foundry.supelec.fr/scm/viewvc.php/branches/stable/?root=pdftex"
+>branches/stable</a> area; perhaps this will change to the usual trunk/
+in the future.
 
-      <li><a href="supp-mis.tex">supp-mis.tex</a>, current version of
-      Context file used in pdftex.def</li>
+<p>The <a href="/texlive/svn/">TeX Live source repository</a> also
+contains pdfTeX; libraries, infrastructure, and other related updates
+are generally made there.  The TL <a
+href="/svn/texlive/trunk/Build/source/texk/web2c/pdftexdir/"
+>pdftexdir</a> source directory itself may or may not be in sync with
+the upstream.
 
-      <li><a href="supp-pdf.tex">supp-pdf.tex</a>, current version of
-      Context file used in pdftex.def</li>
 
-      <li><a href=
-      "http://www-sp.iti.informatik.tu-darmstadt.de/software/ppower4/">PPower4</a>,
-      a post-processor to make PDF files with Powerpoint-like effects</li>
-    </ol>
+<h3 id="resources">Resources</h3>
 
-    <h2>A set of examples prepared with pdfTeX</h2>
+<ul>
+<li><a href="http://www.tex.ac.uk/">TeX FAQ</a> (search for pdftex).
 
-    <ol>
-      <li><a href="http://www.pragma-ade.com">The Pragma Home
-      Site</a>, the company that produces Context (i.e. Hans Hagen) is
-      probably the richest set of pdfTeX examples</li>
+<li><a href="/TUGboat/Contents/listauthor.html#Han,ThanhThe">TUGboat
+articles</a> by Th&agrave;nh, notably including his <a
+href="/TUGboat/tb21-4/tb69thanh.pdf">full thesis</a> and an article on
+<a href="/TUGboat/tb30-1/tb94thanh.pdf">using TrueType fonts</a> in
+pdfTeX.
 
-      <li><a href="calculat.pdf">calculat.pdf</a> (Hans Hagen) A complete
-      calculator written in PDF and Javascript
-      </li>
+<li>Many other articles in TUGboat relate to pdfTeX (and more are
+welcome).  The <a href="/TUGboat/">TUGboat home page</a> has a search
+field for the entire journal.
 
-      <li><a href="cmyk-rgb.pdf">cmyk-rgb.pdf</a> (Hans Hagen) This one
-      was made to ease the choice of colors. It also shows the clever way
-      in which Adobe manages color. I also have a DVIWINDO version, but
-      its colors cannot cope. BTW, the Distiller version also shows HSB. I
-      can generate pantones too, but they are (I believe)
-      copyrighted.</li>
+<li>Adobe has published the <a
+href="http://www.adobe.com/devnet/pdf/pdf_reference.html">PDF
+Reference</a> and <a
+href="http://partners.adobe.com/public/developer/en/font/T1_SPEC.PDF"
+>Type 1 font format</a> specification.
 
-      <li><a href="cweb-scr.pdf">cweb-scr.pdf</a> (Hans Hagen) Here is the
-      cweb demo. This version is a bit stripped because of pdfTeX/reader
-      bugs. The original one is cross linked to the A4 version.</li>
+</ul>
 
-      <li><a href="gentlesgml.pdf">gentlesgml.pdf</a> (CV Radhakrishnan)
-      The TEI Gentle Introduction to SGML, nicely designed for the screen
-      in a style reminiscient of HTML frames</li>
-
-      <li><a href="lgcmp.pdf">lamp.pdf</a> (Sebastian Rahtz) All the
-      MetaPost examples from <a
-      href="http://www.aw-bc.com/catalog/academic/product/0,1144,0201854694,00.html">The
-      LaTeX Graphics Companion</a>, and the examples from the Feynmf
-package</li>
-
-      <li><a href="scherer-src.pdf">scherer-src.pdf</a> (Andreas Scherer)
-      Some excellent examples of MetaPost programming and pdfTeX output,
-      with MP source; plus some more <a href=
-      "scherer-misc.pdf">scherer-misc.pdf</a>, without source.</li>
-
-      <li>A couple of examples on Allin Cottrell's site: <a href=
-      "http://www.wfu.edu/~cottrell/eea97.pdf">(paper in MathTime with
-      diagrams, etc.)</a> and <a href=
-      "http://www.wfu.edu/~cottrell/maya.pdf">(poem by Mayakovsky in
-      Russian, antiqua cyrillic font)</a></li>
-    </ol>
-
-    <h2>Articles about pdfTeX</h2>
-
-    <ol>
-      <li><a
-      href="http://www.gutenberg.eu.org/pub/GUTenberg/publicationsPDF/28-29-han.pdf">Han
-      The Thanh: The pdfTEX Program. EuroTeX 1998</a>. One of the first
-      papers about pdfTeX. It has changed quite a bit since then&hellip;</li>
-    </ol>
-    
-    <h2>Encryption</h2>
-
-    <p>Encryption support has been removed from pdfTeX starting with
-    v1.10a, since it made the code too hard to maintain. Here are some
-    tools and links for freely encrypting PDFs:</p>
-
-    <ul>
-      <li><a href="http://www.accesspdf.com/pdftk/">pdftk</a> is a
-      command-line tool that can (among other features) encrypt and decrypt
-      PDFs.</li>
-      
-      <li><a
-      href="http://maddingue.free.fr/softwares/pdftrans.html.en">PDFTrans</a> is a
-      PDF utility based on the <a
-      href="http://www.lowagie.com/iText/">iText</a> Java library. It can add
-      metadata and encrypt a PDF file.</li>
-      
-    </ul>
-      
-    <h2>Miscellaneous links</h2>
-    
-    <ul>
-      <li><a
-      href="http://partners.adobe.com/public/developer/pdf/index_reference.html">PDF
-      Reference</a> at Adobe.</li>
-
-      <li><a href="http://www.radamir.com/tex/ttf-tex.htm">Using TrueType
-      fonts with TeX (LaTeX) and pdfTeX (pdfLaTeX)</a> probably outdated,
-      but still useful.</li>
-
-      <li><a href="http://ipe.compgeom.org/pdftex.html">Using TTF fonts in
-      Pdflatex</a>.</li>
-
-      <li><a href="http://freshmeat.net/projects/pdftex/">pdfTeX
-      project</a> at <a href="http://freshmeat.net">freshmeat</a>. You can
-      subscribe to get informed about new versions here. And you can vote
-      on pdfTeX, too.</li>
-    </ul>
-
-    <hr>
-    <p><a href="http://validator.w3.org/check?uri=referer"><img src=
-    "valid-html401.png" alt="Valid HTML 4.01 Strict"
-    height="31" width= "88"></a>
-    <a href=
-    "http://jigsaw.w3.org/css-validator/check/referer">
-    <img class="c1" src="http://jigsaw.w3.org/css-validator/images/vcss"
-    alt="Valid CSS!"></a></p>
-
-    <address>
-      Last updated $Date$
-     <a href= "mailto:hanthethanh@gmail.com">Han The Thanh</a>
-    </address>
-  </body>
-</html>
+<hr><small>$Date$;</small>
+<!--#include virtual="/footer.html"-->
