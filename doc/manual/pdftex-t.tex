@@ -1941,11 +1941,6 @@ new Didot (1\,nd~=~0.375\,mm) and the new Cicero (1\,nc~=~12\,nd)
 }
 
 \Syntax{
-\Something{open-action spec} \Means %
-  \Literal{openaction} \Something{action spec}
-}
-
-\Syntax{
 \Something{colorspace spec} \Means %
   \Literal{colorspace} \Something{number}
 }
@@ -2331,20 +2326,20 @@ beginning of 1970-01-01 UTC, in this format: \type{19700101000000Z}
 Multiple appearances of \type{\pdfinfo} are concatenated. Usually if a
 key is given more than once, the first appearance will be used, but this
 is viewer||dependent. Except for standard \TeX\ expansion, \PDFTEX\ does
-not perform any further operations on \Something{general text} provided
-by the user.
+not perform any further operations in the \Something{general text}
+provided by the user.
 
 Here is an example of using \type{\pdfinfo} to include the
 information not supplied by \PDFTEX:
 
-\startesctyping
+\starttyping
 \pdfinfo {
     /Title        (example.pdf)
     /Author       (Tom and Jerry)
     /Subject      (Example)
     /Keywords     (mouse, cat)
 }
-\stopesctyping
+\stoptyping
 
 For more details on all this, see the \PDFReference.
 
@@ -2358,7 +2353,7 @@ making reproducible \PDF{}s.  \introduced{1.40.17}
 \pdftexprimitive{\Syntax{\Tex{\pdfsuppressptexinfo} \Whatever{integer}}}
 \bookmark{\tex{pdfsuppressptexinfo}}
 
-Treated as a bitmask, specifying which \type{PTEX.} keys to omit from
+Treated as a bitmask, specifying which \type{PTEX.*} keys to omit from
 the output:
 
 \startbuffer
@@ -2375,7 +2370,7 @@ the output:
 \stopbuffer
 
 \placetable
-  [here][pagemode]
+  [here][suppressptexinfo]
   {\type{\pdfsuppressptexinfo} bit meanings.}
   {\getbuffer}
 
@@ -2385,25 +2380,24 @@ everything.
 \type{PTEX.Fullbanner} is included by default in the general document
 info dictionary, as mentioned under \type{\pdfinfo} above.  The other
 \type{PTEX.*} keys are included when a \PDF\ is included in the document
-(and not otherwise), as described in \in{section}[sec.addpdfkeys]
+(and not otherwise), as described in \in{section}[sec.addpdfkeys].
 
 This conditional suppression can be useful in making reproducible
 \PDF{}s.  \introduced{1.40.17}
 
-\pdftexprimitive{\Syntax{\Tex{\pdfcatalog} \Something{general text}
-  \Optional{\Something{open-action spec}}}}
+\pdftexprimitive{\Syntax{\Tex{\pdfcatalog} \Something{general text}}}
 \bookmark{\tex{pdfcatalog}}
 
-Similar to the document info section is the document catalog, where keys
-are \type{/URI}, which provides the base \URL\ of the document, and \type
-{/PageMode}, which determines how the \PDF\ viewer displays the document
-on startup. The possibilities for the latter are explained in \in {Table}
-[pagemode]:
+Similar to the document info section is the document catalog, where
+possible keys are \type{/URI}, which specifies the base \URL\ of the
+document, and \type {/PageMode}, which determines how the \PDF\ viewer
+displays the document on startup. The possibilities for the latter are
+explained in \in {table} [pagemode]:
 
 \startbuffer
 \starttabulate[|l|l|]
 \HL
-\NC \bf value        \NC \bf meaning                            \NC\NR
+\NC \bf value        \NC \bf meaning                  \NC\NR
 \HL
 \NC \tt /UseNone     \NC neither outline nor thumbnails visible \NC\NR
 \NC \tt /UseOutlines \NC outline visible                        \NC\NR
@@ -2418,13 +2412,27 @@ on startup. The possibilities for the latter are explained in \in {Table}
   {Supported \type{/PageMode} values.}
   {\getbuffer}
 
-In full||screen mode, there is no menu bar, window controls, nor any other
-window present. The default setting is \type{/UseNone}.
+The default \type{/PageMode} setting is \type{/UseNone}.  In
+full||screen mode, there is no menu bar, window controls, nor any other
+window present.
 
-The \Something{openaction} is the action provided when opening the
-document and is specified in the same way as internal links, see \in
-{section} [linking]. Instead of using this method, one can also write the
-open action directly into the catalog.
+One other construct allowed in the \Something{general text} is
+\Literal{openaction} \Something{action spec}, where \Literal{openaction}
+is a \PDFTEX\ keyword, and \Something{action spec} specifies the action
+to be taken when opening the document.  This \Something{action spec} is
+the same as for internal links; see \in {section} [linking].  (Instead
+of using this method, one can also write the open action directly into
+the catalog.)
+
+Several settings can be made in one \type{\pdfcatalog} call, for
+example:
+
+\starttyping
+\pdfcatalog{
+  /PageMode /FullScreen
+  openaction goto page 2 {/Fit}
+}
+\stoptyping
 
 \pdftexprimitive{\Syntax{\Tex{\pdfnames} \Something{general text}}}
 \bookmark{\tex{pdfnames}}
@@ -2438,7 +2446,8 @@ otherwise the document can be invalid.
 \bookmark{\tex{pdftrailer}}
 
 This command puts its argument text verbatim into the file trailer
-dictionary. \introduced{1.11a}
+dictionary. Example: \type{\pdftrailer {/mytrlrkey /mytrlrval}}.
+\introduced{1.11a}
 
 \pdftexprimitive{\Syntax{\Tex{\pdftrailerid} \Something{general text}}}
 \bookmark{\tex{pdftrailerid}}
@@ -2446,8 +2455,8 @@ dictionary. \introduced{1.11a}
 Use the \Something{general text} to seed the \type{/ID} value in the
 trailer, instead of the default combination of the absolute input file
 name and starting time.  If the argument is empty, the \type{/ID} is
-omitted entirely.  This can be useful in making reproducible
-\PDF{}s.  \introduced{1.40.17}
+omitted entirely.  Example: \type{\pdftrailerid{}}.  This can be useful
+in making reproducible \PDF{}s.  \introduced{1.40.17}
 
 %***********************************************************************
 
