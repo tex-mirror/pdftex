@@ -1,8 +1,11 @@
 2016-07-05  Karl Berry  <karl@freefriends.org>
 
-	* pdftex-t.tex (\pdfcatalog): explain "openaction <action-spec>"
-	within the text, since the BNF was incorrect.
+	* pdftex-t.tex (\pdfcatalog): show "openaction <action spec>"
+	after the <general text>, instead of creating an <open-action spec>,
+	for (hopefully) more clarity.
 	(open-action spec): remove \Syntax item.
+	Report from Douglas McKenna to pdftex list, 3 Jul 2016 12:46:59.
+	
 	(\pdftrailer, \pdftrailerid): give simple examples.
 
 2016-06-12  Karl Berry  <karl@freefriends.org>

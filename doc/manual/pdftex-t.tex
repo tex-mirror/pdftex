@@ -2385,7 +2385,8 @@ info dictionary, as mentioned under \type{\pdfinfo} above.  The other
 This conditional suppression can be useful in making reproducible
 \PDF{}s.  \introduced{1.40.17}
 
-\pdftexprimitive{\Syntax{\Tex{\pdfcatalog} \Something{general text}}}
+\pdftexprimitive{\Syntax{\Tex{\pdfcatalog} \Something{general text}
+  \Optional{\Literal{openaction} \Something{action spec}}}}
 \bookmark{\tex{pdfcatalog}}
 
 Similar to the document info section is the document catalog, where
@@ -2416,13 +2417,13 @@ The default \type{/PageMode} setting is \type{/UseNone}.  In
 full||screen mode, there is no menu bar, window controls, nor any other
 window present.
 
-One other construct allowed in the \Something{general text} is
-\Literal{openaction} \Something{action spec}, where \Literal{openaction}
-is a \PDFTEX\ keyword, and \Something{action spec} specifies the action
-to be taken when opening the document.  This \Something{action spec} is
-the same as for internal links; see \in {section} [linking].  (Instead
-of using this method, one can also write the open action directly into
-the catalog.)
+After the \Something{general text}, a construct \Literal{openaction}
+\Something{action spec} can be given, where \Literal{openaction} is a
+\PDFTEX\ keyword, and \Something{action spec} specifies the action to be
+taken when opening the document.  This \Something{action spec} is the
+same as for internal links; see \in {section} [linking].  (Instead of
+using this method, one can also write the open action directly into the
+catalog.)
 
 Several settings can be made in one \type{\pdfcatalog} call, for
 example:
@@ -2430,8 +2431,7 @@ example:
 \starttyping
 \pdfcatalog{
   /PageMode /FullScreen
-  openaction goto page 2 {/Fit}
-}
+} openaction goto page 2 {/Fit}
 \stoptyping
 
 \pdftexprimitive{\Syntax{\Tex{\pdfnames} \Something{general text}}}
