@@ -121,8 +121,8 @@ done
 if $chicken; then
   cat <<CHICKEN
 $0: Before doing this for real,
-  ensure that any changes in the pdftex repo have been preserved;
-  they will be overwritten with the TL versions.
+  merge any changes in the pdftex repo into TL or otherwise preserve them;
+  all files will be overwritten with the TL versions.
 CHICKEN
 fi
 
@@ -131,12 +131,12 @@ $chicken && printf "would be "
 cat <<TRAILER
 done.
 
-After doing for real, try a svn status:
-  specifically, ! entries from svn status should be svn removed,
-  and ? entries should be svn added.
+After doing for real, run svn status:
+  ! entries from svn status should be svn removed, and
+  ? entries should be svn added.
 make svnstatus at the top level makes three temp files for this job;
   see comments there.
-Do not do svn update first, or the removes just done will be lost.
+Do not do svn update before committing, or the rm's just done will be lost.
 
 Sadly, the sync script does not remove directories, only all the files
 inside.  Please fix.  Need to remove by hand until fixed.

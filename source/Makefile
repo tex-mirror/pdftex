@@ -16,6 +16,7 @@ versionhelp:
 	cd build-pdftex/texk/web2c && ./pdftex --version && ./pdftex --help
 
 synctest:
+	svn status	  # if not clean, commit first or changes will be lost
 	./sync-pdftex.sh  # does not actually change anything.
 
 syncreal:

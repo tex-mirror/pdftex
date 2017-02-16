@@ -3,7 +3,7 @@
     no changes in functionality.
 
 - bugfixes:
-  - \pdflastmatch more reliable when there was no preceding match.
+  - \pdflastmatch more reliable when there was no match
 ---------------------------------------------------
 pdfTeX 3.14159265-2.6-1.40.17 (TeX Live 2016)  (May 20, 2016)
 - changes:
