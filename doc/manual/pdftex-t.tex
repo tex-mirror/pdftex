@@ -785,7 +785,7 @@ In this simple file we don't specify in what way the file should be opened,
 for instance full screen or clipped. A closer look at the page object no.~2
 (\typ{/Type /Page}) shows that a mediabox (\typ{/MediaBox}) is part of the
 page description. A mediabox acts like the (high-resolution) bounding box
-in a \POSTSCRIPT\ file. \PDFTEX\ users can add dictionary stuff to page
+in a \POSTSCRIPT\ file. \PDFTEX\ users can add dictionary entries to page
 objects with the \type{\pdfpageattr} primitive.
 
 Although in most cases macro packages will shield users from these
@@ -1580,12 +1580,14 @@ features of bold characters may be thickened at small text sizes.
 
 \stopnarrower
 
-If the {\em fontflags} field is not given, \PDFTEX\ treats it as being~4,
-a symbolic font. If you do not know the correct value, it is best not
-to specify it at all, as specifying a bad value of font flags may cause
-trouble in viewers. On the other hand this option is not absolutely
-useless because it provides backward compatibility with older map files
-(see the {\em fontfile} description below).
+If the {\em fontflags} field is not given, and the font is embedded,
+\PDFTEX\ treats it as being~4 (decimal, that is, bit position 3 is set),
+a symbolic font. For non-embedded fonts, the default value is
+\type{0x22}, a non-symbolic serif font. If you do not know the correct
+value, it is best not to specify it at all, as specifying a bad value of
+font flags may cause trouble in viewers. On the other hand this option
+is not absolutely useless because it provides backward compatibility
+with older map files (see the {\em fontfile} description below).
 
 \stopdescription
 
@@ -3248,7 +3250,7 @@ specifying the region of the page being displayed and printed, and
 \type{/Rotate}, the number of degrees (in multiples of 90) the page
 should be rotated clockwise when it is displayed or printed.
 
-% /MediaBox is not a good example, since will never take an effect
+% /MediaBox is not a good example, since will never take effect
 
 \starttyping
 \pdfpagesattr
@@ -3261,8 +3263,14 @@ should be rotated clockwise when it is displayed or printed.
 
 This is similar to \type{\pdfpagesattr}, but has priority over it.
 It can be used to override any attribute given by \type{\pdfpagesattr}
-for individual pages. The token list is expanded when \PDFTEX\ ships out
+for an individual page. The token list is expanded when \PDFTEX\ ships out
 a page. The contents are added to the attributes of the current page.
+
+If the \type{\pdfpageattr} value contains the string \type{/MediaBox},
+then \PDFTEX\ omits outputting its own \type{/MediaBox} value (which is
+\type{[0 0 }\Something{\it page\_width} \Something{\it
+page\_height}\type{]}).  (This behaviour was introduced in version
+1.40.18.)
 
 \pdftexprimitive{\Syntax{\Tex{\pdfpageresources} \Whatever{tokens}}}
 \bookmark{\tex{pdfpageresources}}

@@ -16,7 +16,7 @@ all: pdftex-l.pdf pdftex-s.pdf booklet
 
 common_deps = pdftex-t.tex pdftex-w.txt pdftex-help.txt pdftex-syntax.tex
 pdftex-a.pdf a:	$(common_deps)
-	$(context) --result=$@ $<
+	$(context) --mode=a4 --result=$@ $<
 
 pdftex-l.pdf l:	$(common_deps)
 	$(context) --mode=letter --result=$@ $<

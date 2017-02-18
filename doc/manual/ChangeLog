@@ -1,3 +1,15 @@
+2017-02-18  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\pdfpageattr): document new behavior of
+	omitting our /MediaBox if "/MediaBox" is present in this token list.
+
+2017-02-01  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (Map files): clarify that decimal 4 = bit position 3
+	= symbolic, for embedded fonts, and specify the 0x22 default for
+	non-embedded fonts.
+	Report from Gernot Hassenpflug to pdftex, 1 Dec 2016 14:01:30.
+
 2016-07-05  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (\pdfcatalog): show "openaction <action spec>"
