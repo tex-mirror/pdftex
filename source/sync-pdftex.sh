@@ -32,7 +32,7 @@ mydir=`dirname $0`
 cd "$mydir/src" || exit 1
 
 # use rsync instead of cp so we can get local deletion for free.
-copy="rsync -ari --delete --exclude=.svn"
+copy="rsync -ari --delete --exclude=.svn --exclude=autom4te.cache"
 if $chicken; then
   copy="$copy -n"
 fi

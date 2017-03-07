@@ -12,12 +12,18 @@ if test ! -d $pdftex_dir; then
     exit 1
 fi
 
-# just build pdftex.
+# just build pdftex; normally disable poppler here since typically we
+# want to build/debug with our own libxpdf.
+# 
+able_poppler=--disable-poppler
+#
 CFG_OPTS="\
     --without-x \
     --disable-shared \
     --disable-all-pkgs \
     --enable-pdftex \
+    --disable-synctex \
+    $able_poppler \
     --enable-native-texlive-build \
     --enable-cxx-runtime-hack \
 "
@@ -60,10 +66,10 @@ DISABLE_SYSTEM_LIBS="\
     --without-system-zlib \
     --without-system-zziplib \
 "
-CFG_OPTS="$CFG_OPTS $DEBUG_OPTS $DISABLE_SYSTEM_LIBS"
+CFG_OPTS="-C $CFG_OPTS $DEBUG_OPTS $DISABLE_SYSTEM_LIBS"
 
 export CONFIG_SHELL=/bin/bash
-build_dir=$(pwd)/build-pdftex
+build_dir=`pwd`/build-pdftex
 
 set -x
 rm -rf $build_dir && mkdir $build_dir && cd $build_dir

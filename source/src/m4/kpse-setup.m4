@@ -276,10 +276,20 @@ CONF_SUBDIRS=
 MAKE_SUBDIRS=
 KPSE_FOR_PKGS([$1], [dnl
 m4_ifdef([have_]Kpse_pkg, [dnl
-if test -x $srcdir/$4Kpse_Pkg/configure && $3; then
+if test -x $srcdir/$4Kpse_Pkg/configure; then
+  $3 && Kpse_add([MAKE_SUBDIRS])
   Kpse_add([CONF_SUBDIRS])
-  Kpse_add([MAKE_SUBDIRS])
 fi
+#
+#old if test -x $srcdir/$4Kpse_Pkg/configure; then
+#old   $3 && Kpse_add([MAKE_SUBDIRS])
+#old   Kpse_add([CONF_SUBDIRS])
+#old fi
+#
+#new if test -x $srcdir/$4Kpse_Pkg/configure && $3; then
+#new   Kpse_add([CONF_SUBDIRS])
+#new   Kpse_add([MAKE_SUBDIRS])
+#new fi
 ])[]dnl m4_ifdef
 ])
 AC_SUBST([CONF_SUBDIRS])[]dnl

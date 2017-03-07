@@ -21080,14 +21080,34 @@ fi
 $as_echo_n "checking for TeX specific libraries to build... " >&6; }
 CONF_SUBDIRS=
 MAKE_SUBDIRS=
-if test -x $srcdir/texk/ptexenc/configure && test "x$with_system_ptexenc" != xyes && test "x$need_ptexenc" = xyes; then
+if test -x $srcdir/texk/ptexenc/configure; then
+  test "x$with_system_ptexenc" != xyes && test "x$need_ptexenc" = xyes && MAKE_SUBDIRS="texk/ptexenc $MAKE_SUBDIRS"
   CONF_SUBDIRS="texk/ptexenc $CONF_SUBDIRS"
-  MAKE_SUBDIRS="texk/ptexenc $MAKE_SUBDIRS"
 fi
-if test -x $srcdir/texk/kpathsea/configure && test "x$with_system_kpathsea" != xyes && test "x$need_kpathsea" = xyes; then
+#
+#old if test -x $srcdir/texk/Kpse_Pkg/configure; then
+#old   test "x$with_system_[]Kpse_pkg" != xyes && test "x$need_[]Kpse_pkg" = xyes && Kpse_add([MAKE_SUBDIRS])
+#old   Kpse_add([CONF_SUBDIRS])
+#old fi
+#
+#new if test -x $srcdir/texk/Kpse_Pkg/configure && test "x$with_system_[]Kpse_pkg" != xyes && test "x$need_[]Kpse_pkg" = xyes; then
+#new   Kpse_add([CONF_SUBDIRS])
+#new   Kpse_add([MAKE_SUBDIRS])
+#new fi
+if test -x $srcdir/texk/kpathsea/configure; then
+  test "x$with_system_kpathsea" != xyes && test "x$need_kpathsea" = xyes && MAKE_SUBDIRS="texk/kpathsea $MAKE_SUBDIRS"
   CONF_SUBDIRS="texk/kpathsea $CONF_SUBDIRS"
-  MAKE_SUBDIRS="texk/kpathsea $MAKE_SUBDIRS"
 fi
+#
+#old if test -x $srcdir/texk/Kpse_Pkg/configure; then
+#old   test "x$with_system_[]Kpse_pkg" != xyes && test "x$need_[]Kpse_pkg" = xyes && Kpse_add([MAKE_SUBDIRS])
+#old   Kpse_add([CONF_SUBDIRS])
+#old fi
+#
+#new if test -x $srcdir/texk/Kpse_Pkg/configure && test "x$with_system_[]Kpse_pkg" != xyes && test "x$need_[]Kpse_pkg" = xyes; then
+#new   Kpse_add([CONF_SUBDIRS])
+#new   Kpse_add([MAKE_SUBDIRS])
+#new fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MAKE_SUBDIRS" >&5
 $as_echo "$MAKE_SUBDIRS" >&6; }
