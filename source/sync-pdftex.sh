@@ -66,7 +66,6 @@ sync_dir ()
     # If we erroneously specify a directory here that no longer exists
     # in TL, rsync will complain about not being able to change_dir there.
     elif test $f = texk/web2c \
-         || test $f = texk/web2c/doc \
          || test $f = texk/web2c/luatexdir \
          || test $f = texk/web2c/luatexdir/luafontloader \
          || test $f = texk/web2c/man \
