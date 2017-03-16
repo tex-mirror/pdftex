@@ -2578,7 +2578,7 @@ Font expansion can be activated in two modes. When
 \type{\pdfadjustspacing} is set to~1, font expansion is applied {\em
 after} \TEX's normal paragraph breaking routines have broken the paragraph
 into lines. In this case, line breaks are identical to standard \TEX\
-behaviour.
+behavior.
 
 When set to~2, the width changes that are the result of stretching and
 shrinking are taken into account {\em while} the paragraph is broken into
@@ -2859,7 +2859,7 @@ If a modifier is given, the mechanism is so that before reading the
 items given as arguments to \type{\pdfmapfile} or \type{\pdfmapline}
 the default map file will be read first --- if this hasn't already
 been done or been prevented by the above blocking cases. This should
-be mostly compatible with the traditional behaviour. If you want to add
+be mostly compatible with the traditional behavior. If you want to add
 support for a new font through an additional font map file while keeping
 all the existing mappings, don't use the primitive versions without
 modifier, but instead type either \type{\pdfmapfile{+myfont.map}} or
@@ -3285,7 +3285,7 @@ a page. The contents are added to the attributes of the current page.
 If the \type{\pdfpageattr} value contains the string \type{/MediaBox},
 then \PDFTEX\ omits outputting its own \type{/MediaBox} value (which is
 \type{[0 0 }\Something{\it page\_width} \Something{\it
-page\_height}\type{]}).  (This behaviour was introduced in version
+page\_height}\type{]}).  (This behavior was introduced in version
 1.40.18.)
 
 \pdftexprimitive{\Syntax{\Tex{\pdfpageresources} \Whatever{tokens}}}
@@ -3453,7 +3453,7 @@ the \Something{page spec} is irrelevant for the other two image
 formats. Starting from \PDFTEX\ 1.11 one may also decide in the \PDF\
 image case, which page box of the image is to be treated as a final
 bounding box. If \Something{pdf box spec} is present, it overrides the
-default behaviour specified by the \type{\pdfpagebox} parameter, and is
+default behavior specified by the \type{\pdfpagebox} parameter, and is
 overridden by the (obsolete) \type{\pdfforcepagebox} parameter. This
 option is irrelevant for non||\PDF\ inclusions.
 
@@ -3578,7 +3578,7 @@ now considered obsolete --- a mixture of \type{\pdfpagebox} and
 \pdftexprimitive{\Syntax{\Tex{\pdfinclusionerrorlevel} \Whatever{integer}}}
 \bookmark{\tex{pdfinclusionerrorlevel}}
 
-This controls the behaviour of \PDFTEX\ when a \PDF\ file is included
+This controls the behavior of \PDFTEX\ when a \PDF\ file is included
 that has a newer version than the one specified by
 \type{\pdfminorversion}.  If \type{\pdfinclusionerrorlevel} is set to~0
 (the default), \PDFTEX\ gives only a warning; if 1, \PDFTEX\ raises an
@@ -3837,7 +3837,7 @@ text}\unkern. A destination can be performed in another \PDF\ file by
 specifying \Something{file spec}\unkern, in which case
 \Something{newwindow spec} specifies whether the file should be opened
 in a new window. A \Something{file spec} can be either a \type{(string)}
-or a \type{<<dictionary>>}. The default behaviour of the
+or a \type{<<dictionary>>}. The default behavior of the
 \Something{newwindow spec} depends on the browser setting.
 
 A \Something{thread-action spec} performs an article thread reading. The
@@ -3928,7 +3928,7 @@ Note that during output runtime if there are other newly created
 boxes which have the same nesting level as the vbox/vboxes containing
 \type{\pdfstartthread} and \type{\pdfendthread}, they will be also added
 into the thread, which is probably not what you want. To avoid such
-unconsidered behaviour, it's often enough to wrap boxes that shouldn't
+unconsidered behavior, it's often enough to wrap boxes that shouldn't
 belong to the thread by a box to change their box nesting level.
 
 \pdftexprimitive{\Syntax{\Tex{\pdfendthread} \Modelist{v, m}}}
@@ -3965,7 +3965,7 @@ is expanded when the whatsit node is created and not when it is shipped
 out, as with \type{\special}.
 
 Starting from version 1.30.0, \PDFTEX\ allows to use a new keyword
-\type{page} instead of \type{direct}. Both modify the default behaviour
+\type{page} instead of \type{direct}. Both modify the default behavior
 of \type{\pdfliteral}, avoiding translation of the coordinates space
 before inserting the literal code. The difference is that the \type{page}
 keyword instructs \PDFTEX\ to close a \type{BT ET} text block before
