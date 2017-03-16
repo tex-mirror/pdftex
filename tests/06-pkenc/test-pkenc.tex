@@ -1,0 +1,25 @@
+% $Id$
+% Public domain.
+% Test encoding files with bitmap (i.e., Type 3) fonts.
+% See thread starting here:
+%   http://tug.org/pipermail/pdftex/2016-July/009064.html
+% and continuing here:
+%   http://tug.org/pipermail/pdftex/2016-August/009065.html
+%
+% For comparison, the PDF made before the patch was applied is saved
+% here as prepatch.pdf.
+% 
+% The default PK resolution is 72, so we made cmb10.72pk in this directory.
+% (mf-nowin '\mode:=mactrue; input cmb10' && gftopk cmb10.72gf)
+%
+\pdfoutput=1 \catcode`\{=1 \catcode`\}=2 \hsize=4pc
+
+\pdfglyphtounicode{ffi}{0066 0066 0069} %no need for all: \input glyphtounicode
+\pdfgentounicode=1
+
+\pdfmapline{cmb10 <7t.enc}
+\font\cmb=cmb10
+
+\noindent \cmb ffi
+\hbadness=10000 % line is underfull for some reason
+\end

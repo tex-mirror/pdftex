@@ -37,4 +37,4 @@ testtrailer-diff: $(testptex)-orig.pdf $(testtrailer).pdf
 	-$(diff) $^  # new /mytrlrkey, dates+id should be different
 
 clean:
-	rm -f *.log *.pdf *.fmt *.aux
+	$(clean)

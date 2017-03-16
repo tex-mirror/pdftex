@@ -6,3 +6,5 @@ include ../Common.mak
 testpdfmatch:
 	$(prog) test-pdfmatch.tex
 
+clean:
+	$(clean)

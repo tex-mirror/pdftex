@@ -14,11 +14,5 @@ test-omit-mediabox:
 	grep -q /MediaBox.*271 test-omit-mediabox.pdf   # should be there
 	! grep -q /MediaBox.*314 test-omit-mediabox.pdf # should not
 
-force:
-
 clean:
-	rm -f *.log *.pdf *.fmt *.aux
-
-fmt:
-	$(prog) \*pdflatex.ini
-	$(prog) \*pdfetex.ini
+	$(clean)

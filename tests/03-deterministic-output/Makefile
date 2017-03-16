@@ -41,7 +41,7 @@ test3-repro.pdf: force
 force:
 
 clean:
-	rm -f *.log *.pdf *.fmt *.aux
+	$(clean)
 
 fmt:
 	$(prog) \*pdflatex.ini

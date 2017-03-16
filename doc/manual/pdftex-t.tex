@@ -1604,20 +1604,36 @@ instruction must be enclosed by double quotes \type{"}.
 
 \startdescription {encodingfile}
 specifies the name of the file containing the external encoding vector
-to be used for the font. The encoding file must have name extension
+to be used for the font. The encoding file name must have the extension
 \type{.enc}, and the full file name including this extension must be given
-with preceding~\type{<} character. The format of the encoding vector is
+with a preceding~\type{<} character. The format of the encoding vector is
 identical to that used by \type{dvips}. If no encoding is specified,
 the font's built||in default encoding is used. The {\em encodingfile}
 field may be omitted if you are sure that the font resource has the
 correct built||in encoding. In general this option is highly recommended,
 and it is {\em required} when subsetting a TrueType font.
 
+As of version 1.40.18, the encoding file can be specified also for
+bitmap \PK\ fonts. In this case, it assigns the glyph names from the
+given encoding vector, which can be used with the
+\type{\pdfgentounicode} primitive (q.v.).  For example: 
+
+\starttyping
+\pdfglyphtounicode{ffi}{0066 0066 0069} % normally: \input glyphtounicode
+\pdfgentounicode=1
+\pdfmapline{cmb10 <7t.enc}
+\font\cmb=cmb10 \cmb ffi
+\stoptyping
+
+The result is a \PDF\ file with a correctly-labeled \type{/ffi}
+character instead of the numeric character position in the
+\type{cmb10.tfm} (decimal 14).
+
 \stopdescription
 
 \startdescription {fontfile}
 sets the name of the font file to be embedded into the \PDF\ output for a
-given \TeX\ font (the {\em tfmname}~$\longleftrightarrow$~{\em fontfile}
+given \TeX\ font (the {\em tfmname}~$\leftrightarrow$~{\em fontfile}
 mapping is the most prominent use of the \filename{pdftex.map} file).
 The font file name must belong to a Type~1 or TrueType font file. If
 the {\em fontfile} field is missing, no font embedding can take place;
@@ -2951,7 +2967,7 @@ This disables all ligatures in the loaded font \Something{font}.
 \introduced{1.30.0}
 
 \pdftexprimitive{\Syntax{\Tex{\tagcode} \Something{font}
-  \Something{character code} \Whatever{integer}}}
+  \Something{8-bit number} \Whatever{integer}}}
 \bookmark{\tex{tagcode}}
 
 This primitive accesses a character's \type{char_tag} info. It is meant
