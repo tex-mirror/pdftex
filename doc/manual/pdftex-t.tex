@@ -812,9 +812,9 @@ content reuse. We will come to that later.
 
 Of course, this is just the barest introduction to \PDF\ format.  For
 those who want to learn more about the gory \PDF\ details, the best bet
-is to read the \PDFReference. As of the time of writing you can download
-this book as a big \PDF\ file from Adobe's \PDF\ Technology Center,
-\from[pdfreference] --- or get the heavy paper version.
+is to read the \PDFReference. You can download this book as a big \PDF\
+file from Adobe's \PDF\ Technology Center, \from[pdfreference] --- or
+get the heavy paper version.
 
 We now turn to specifics of \PDFTEX.
 
@@ -1611,10 +1611,10 @@ field may be omitted if you are sure that the font resource has the
 correct built||in encoding. In general this option is highly recommended,
 and it is {\em required} when subsetting a TrueType font.
 
-As of version 1.40.18, the encoding file can be specified also for
-bitmap \PK\ fonts. In this case, it assigns the glyph names from the
+Starting with version 1.40.18, the encoding file can be specified also
+for bitmap \PK\ fonts. In this case, it assigns the glyph names from the
 given encoding vector, which can be used with the
-\type{\pdfgentounicode} primitive (q.v.).  For example: 
+\type{\pdfgentounicode} primitive (q.v.).  For example:
 
 \starttyping
 \pdfglyphtounicode{ffi}{0066 0066 0069} % normally: \input glyphtounicode
@@ -3463,14 +3463,14 @@ or \JBIG2\ bitmaps and \PDF\ images.
 While working with \PDF\ or \JBIG2\ images, \Something{page spec}
 allows to decide which page of the document is to be included;
 the \Something{page spec} is irrelevant for the other two image
-formats. Starting from \PDFTEX\ 1.11 one may also decide in the \PDF\
+formats. Starting with \PDFTEX\ 1.11 one may also decide in the \PDF\
 image case, which page box of the image is to be treated as a final
 bounding box. If \Something{pdf box spec} is present, it overrides the
 default behavior specified by the \type{\pdfpagebox} parameter, and is
 overridden by the (obsolete) \type{\pdfforcepagebox} parameter. This
 option is irrelevant for non||\PDF\ inclusions.
 
-Starting from \PDFTEX\ 1.21, \type{\pdfximage} command supports
+Starting with \PDFTEX\ 1.21, \type{\pdfximage} command supports
 \type{colorspace} keyword followed by an object number (user||defined
 colorspace for the image being included). This feature works for \JPEG\
 images only. \PNG s are \RGB\ palettes, \JBIG2 s are bitonal, and \PDF\
@@ -3583,7 +3583,7 @@ page box defaults to the value of \type{\pdfpagebox} as follows:
 The integer primitive \type{\pdfforcepagebox} allows globally
 overriding the choice of the page box used with \type{\pdfximage}. It
 takes the same values as \type{\pdfpagebox}. The command is available
-starting from \PDFTEX\ 1.30.0, as a shortened synonym of obsolete
+starting with \PDFTEX\ 1.30.0, as a shortened synonym of obsolete
 \type{\pdfoptionalwaysusepdfpagebox} instruction, but is itself
 now considered obsolete --- a mixture of \type{\pdfpagebox} and
 \Something{image attr spec} is better.
@@ -3684,7 +3684,7 @@ density of 72\,dpi. This primitive is completely independent from the
 \type{\pdfimageresolution} and \type{\pdfpkresolution} parameters.
 \introduced{1.30.0} It used to be an integer register that gave
 the dimension 1\,px as number of scaled points, defaulting to 65536
-(1\,px equal to 65536\,sp~$=$~1\,pt). Starting from \PDFTEX\ 1.40.0,
+(1\,px equal to 65536\,sp~$=$~1\,pt). Starting with \PDFTEX\ 1.40.0,
 \type{\pdfpxdimen} is now a real dimension parameter.
 
 \pdftexprimitive{\Syntax{\Tex{\pdfinclusioncopyfonts} \Whatever{integer}}}
@@ -3977,7 +3977,7 @@ appends a whatsit node to the list being built. \Something{general text}
 is expanded when the whatsit node is created and not when it is shipped
 out, as with \type{\special}.
 
-Starting from version 1.30.0, \PDFTEX\ allows to use a new keyword
+Starting with version 1.30.0, \PDFTEX\ allows to use a new keyword
 \type{page} instead of \type{direct}. Both modify the default behavior
 of \type{\pdfliteral}, avoiding translation of the coordinates space
 before inserting the literal code. The difference is that the \type{page}
@@ -4019,7 +4019,7 @@ This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{page} \Lbrace
   \Whatever{expandable}}}
 \bookmark{\tex{pdfescapestring}}
 
-Starting from version 1.30.0, \PDFTEX\ provides a mechanism for converting
+Starting with version 1.30.0, \PDFTEX\ provides a mechanism for converting
 a general text into \PDF\ string. Many characters that may be needed inside
 such a text (especially parenthesis), have a special meaning inside a \PDF\
 string object and thus, can't be used literally. The primitive replaces each
