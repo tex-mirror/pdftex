@@ -1,4 +1,16 @@
+2017-03-17  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\efcode, \rpcode, \lpcode, \knbscode, \knstcode,
+	\knshcode, \knbccode, \knaccode): state that changes to these
+	tables are global, not affected by TeX's grouping, and only to the
+	particular <font> specified. Report from Doug McKenna.
+
 2017-03-16  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex: behavior, not behaviour, for consistency with
+	seemingly all else (color, math, etc.).
+
+	* pdftex-t.tex: behavior, not behaviour. Nothing else here is UK.Eng.
 
 	* pdftex-t.tex (Map files) <encodingfile>: can be specified for
 	bitmap PK fonts now also.

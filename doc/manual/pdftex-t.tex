@@ -864,9 +864,7 @@ can be described best by example. Assuming that the file \filename
 needed to compile \PDFTEX:
 
 \startesctyping
-cd $HOME/pdftex
-unzip pdftex-@currentpdftex.zip
-cd pdftex-@currentpdftex/source
+cd pdftex.../source
 ./build-pdftex.sh
 \stopesctyping
 
@@ -2602,7 +2600,7 @@ setting from the \type{\pdffontexpand} primitive. The syntax is similar
 to \type{\sfcode} (but with the \Something{font} required), and it
 defaults to~1000, meaning 100\,\% expandability. The given integer value
 is clipped to the range $0..1000$, corresponding to a usable
-expandability range of 0..100\,\%. Example:
+expandability range of $0..100$\,\%. Example:
 
 \starttyping
 \efcode\somefont`A=800
@@ -2614,6 +2612,9 @@ value for that font, and expansion for the~O is disabled. The actual
 expansion is still bound to the steps as defined by \type{\pdffontexpand}
 primitive, otherwise one would end up with more possible font inclusions
 than would be comfortable.
+
+Changes to this table are global, i.e., ignore \TeX's usual grouping,
+and apply only to the given \Something{font}.
 
 \pdftexprimitive{\Syntax{\Tex{\pdfprotrudechars} \Whatever{integer}}}
 \bookmark{\tex{pdfprotrudechars}}
@@ -2656,13 +2657,19 @@ Remark: old versions of \PDFTEX\ use the character width as measure. This
 was changed to a proportion of the em-width after \THANH\ finished his
 master's thesis.
 
+Changes to this table are global, i.e., ignore \TeX's usual grouping,
+and apply only to the given \Something{font}.
+
 \pdftexprimitive{\Syntax{\Tex{\lpcode} \Something{font}
   \Something{8-bit number} \Whatever{integer}}}
 \bookmark{\tex{lpcode}}
 
 This is similar to \type{\rpcode}, but affects the amount by which
-characters may protrude into the left margin. Also here the given integer
+characters may protrude into the left margin. Here also the given integer
 value is clipped to the range $-1000..1000$.
+
+Changes to this table are global, i.e., ignore \TeX's usual grouping,
+and apply only to the given \Something{font}.
 
 \pdftexprimitive{\Syntax{\Tex{\leftmarginkern} \Something{box number}
   \Whatever{expandable}}}
@@ -3092,8 +3099,12 @@ Text with no interword \pdffakespace\pdffakespace spaces.
 
 \subsection{Spacing}
 
-Controlling spacing before and after characters was introduced in version 1.30,
-mostly to handle punctuation rules in different languages.
+Controlling spacing before and after characters was introduced in
+version 1.30, mostly to handle punctuation rules in different
+languages. The \type{\...code} tables here, like those in the previous
+section, operate globally, i.e., ignore \TeX's usual grouping, and apply
+only to the given \Something{font}, not other instances of the
+underlying font.
 
 \pdftexprimitive{\Syntax{\Tex{\pdfadjustinterwordglue} \Whatever{integer}}}
 \bookmark{\tex{pdfadjustinterwordglue}}
@@ -3105,9 +3116,11 @@ following three primitives.
   \Something{8-bit number} \Whatever{integer}}}
 \bookmark{\tex{knbscode}}
 
-The amount of space, in thousandths of an em, added to the glue following
-a character. This amounts is clipped to the range \type{-1000}||\type{1000}.
-For instance, the following example means that glues after periods will be
+The amount of space, in thousandths of an em, added to the natural width
+of the glue following a character (the name stands for ``kern before
+space'', although technically it is looking at glue items, not kern
+items). This amounts is clipped to the range $-1000..1000$.  For
+instance, the following example means that glues after periods will be
 increased by .2\,em.
 
 \starttyping
@@ -3138,7 +3151,7 @@ If positive, automatic insertion of kerns before characters is enabled.
 \bookmark{\tex{knbccode}}
 
 The width of the kern, in thousandths of an em, inserted before a character.
-It is clipped to the range \type{-1000}||\type{1000}. For instance, with the
+It is clipped to the range $-1000..1000$. For instance, with the
 following code, a .15\,em-kern will be inserted before all question marks
 (useful for \eg\ French punctuation):
 
@@ -3532,7 +3545,7 @@ for both $x$ and $y$ resolution, when calculating the image size. And
 if the \type{\pdfimageresolution} is zero, finally a default resolution
 of 72\,dpi would be taken. The \type{\pdfimageresolution} is read when
 \PDFTEX\ creates an image via \type{\pdfximage}. The given value is
-clipped to the range 0..65535\,[dpi].
+clipped to the range $0..65535$\,(dpi).
 
 Currently this parameter is used particularly for calculating the
 dimensions of \JPEG\ images in \EXIF\ format (unless at least one
@@ -3567,8 +3580,8 @@ page box defaults to the value of \type{\pdfpagebox} as follows:
 %  object, i.\,e.\ the value used at \pdfximage is remembered.
 %    See the PDF Reference for an explanation of the boxes.
 
-The integer primitive \type{\pdfforcepagebox} allows to globally
-override the choice of the page box used with \type{\pdfximage}. It
+The integer primitive \type{\pdfforcepagebox} allows globally
+overriding the choice of the page box used with \type{\pdfximage}. It
 takes the same values as \type{\pdfpagebox}. The command is available
 starting from \PDFTEX\ 1.30.0, as a shortened synonym of obsolete
 \type{\pdfoptionalwaysusepdfpagebox} instruction, but is itself
