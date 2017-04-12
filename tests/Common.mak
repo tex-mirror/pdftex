@@ -4,7 +4,7 @@
 # Common Makefile definitions to run pdftex from test hierarchy,
 # but use support files from an installation.
 
-tl = /usr/local/texmf
+tl = /usr/local/texlive-rel
 tl_dist = $(tl)/texmf-dist
 #
 plain = $(tl_dist)/tex/plain/base
