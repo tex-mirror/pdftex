@@ -1,3 +1,19 @@
+2017-04-20  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\currentpdftex): 1.40.18 (for TeX Live 2017).
+	
+	* pdftex-t.tex (Map files): omit description of tfm-only map
+	entries (and pgc), since the behavior might change. Use "psname"
+	instead of "basename" for possible clarity. Various other rewordings.
+
+	*pdftex-t.tex (--version, --pdf): do not erroneously output a tt
+	ligature.
+
+2017-03-18  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex: starting from -> starting with
+	* pdftex-t.tex: starting from -> starting with.
+
 2017-03-17  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (\efcode, \rpcode, \lpcode, \knbscode, \knstcode,

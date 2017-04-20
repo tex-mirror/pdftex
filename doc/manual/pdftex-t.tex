@@ -40,7 +40,7 @@
 
 \svnscan $Id$
 
-\def\currentpdftex{1.40.17}
+\def\currentpdftex{1.40.18}
 
 %***********************************************************************
 
@@ -88,7 +88,6 @@
 \abbreviation [PERL]       {Perl}       {Perl programming environment}
 \abbreviation [PFA]        {PFA}        {Adobe PostScript Font format (ASCII)}
 \abbreviation [PFB]        {PFB}        {Adobe PostScript Font format (Binary)}
-\abbreviation [PGC]        {pgc}        {\PDF\ Glyph Container}
 \abbreviation [PK]         {pk}         {Packed bitmap font}
 \abbreviation [PNG]        {png}        {Portable Network Graphics}
 \abbreviation [POSIX]      {posix}      {Portable Operating System Interface}
@@ -682,7 +681,7 @@ Please send questions or suggestions by email to \from[ptex_bugs].
 
 \subsection{Legal Notice}
 
-Copyright \copyright\ 1996||2016  \THANH.
+Copyright \copyright\ 1996||2017  \THANH.
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
 or any later version published by the Free Software Foundation;
@@ -1410,7 +1409,7 @@ to turn on \PDFTEX\ support explicitly.
        for \PDFTEX\ in its generalized hypertext features. Support for
        \PDFTEX\ is implemented as a special driver, and is invoked by
        typing \type{\setupoutput[pdftex]} or feeding \TEXEXEC\ with the
-       \type{-{}-pdf} option.
+       \hbox{\tt -{}-pdf} option.
 
 \item  \PDF\ from \TEXINFO\ documents can be created by running \PDFTEX\ on
        the \TEXINFO\ file, instead of \TEX.  Alternatively, run the shell
@@ -1444,50 +1443,48 @@ fonts, there is rarely a need to use bitmap fonts in \PDFTEX.
 \subsection[mapfile]{Map files}
 
 Font map files provide the connection between \TEX\ \TFM\ font files
-and the outline font file names. They contain also information about
+and outline font file names. They contain also information about
 re||encoding arrays, partial font embedding (``subsetting''), and
 character transformation parameters (like SlantFont and ExtendFont). Those
 map files were first created for \DVI\ postprocessors. But, as \PDFTEX\
 in \PDF\ output mode includes all \PDF\ processing steps, it also needs
 to know about font mapping, and therefore reads in one or more map files.
-Map files are not read in when \PDFTEX\ is in \DVI\ mode. Pixel fonts
-can be used without being listed in the map file.
+Map files are not read in when \PDFTEX\ is in \DVI\ mode. Bitmap fonts
+can (and normally should) be used without being listed in the map file.
 
 By default, \PDFTEX\ reads the map file \filename{pdftex.map}.  In \WEBC,
 map files are searched for using the \type{TEXFONTMAPS} config file value
 and environment variable.  By default, the current directory and various
 system directories are searched.
 
-Within the map file, each font is listed on an individual line.  The syntax of
+Within the map file, each font is listed on a single line.  The syntax of
 each line is upward||compatible with \type{dvips} map files and can contain
 the following fields (some are optional; explanations follow):
 
 \startnarrower
-{\em tfmname basename fontflags special encodingfile fontfile}
+{\em tfmname psname fontflags special encodingfile fontfile}
 \stopnarrower
 
-It is mandatory that {\em tfmname} is the first field. If
-a {\em basename} is given, it must be the second field. Similarly if
-{\em fontflags} is given it must be the third field (if {\em basename}
-is present) or the second field (if {\em basename} is left out). It is
-possible to mix the positions of {\em special}, {\em encodingfile},
-and {\em fontfile}, however the first three fields must be given in
-fixed order.
+It is mandatory that {\em tfmname} is the first field. If a {\em
+psname} is given, it must be the second field. Similarly if {\em
+fontflags} is given it must be the third field (if {\em psname} is
+present) or the second field (if {\em psname} is left out). The
+positions of {\em special}, {\em encodingfile}, and {\em fontfile} can
+be mixed.
 
 \startdescription {tfmname}
-sets the name of the \TFM\ file for a font --- the name \TEX\ sees.
-This name must always
-be given.
+sets the name of the \TFM\ file for a font --- the file name given in a
+\TEX\ \type{\font} command.  This name must always be given.
 
 \stopdescription
 
-\startdescription {basename}
+\startdescription {psname}
 sets the (\POSTSCRIPT) base font name, which has two uses:
 
 First, when a \PDF\ file is embedded by \type{\pdfximage}, the
 \type{/BaseFont} names in the font dictionaries of Type~1 and Type~1C
 (CFF) fonts from the embedded \PDF\ file are checked against this {\em
-basename} field. If names match, the glyphs of that font will not be
+psname} field. If names match, the glyphs of that font will not be
 copied from the embedded \PDF\ file, but instead a local font is opened,
 and all needed glyphs will be taken from the Type~1 font file that is
 mentioned in the map line (see {\em fontfile} below). By this collecting
@@ -1499,18 +1496,18 @@ requires that also a Type~1 font file name is in the {\em fontfile} field
 (see below).
 
 Second, if a font file is not to be embedded into the \PDF\ output
-({\em fontfile} field missing), then the {\em basename} field will be
+({\em fontfile} field missing), then the {\em psname} field will be
 copied to the \type{/BaseFont} and \type{/FontName} dictionary entries
 in the \PDF\ file, so that the \POSTSCRIPT\ font name will be known to
-the consumer application (\eg\ viewer).
+reading applications (\eg\ viewers).
 
-It is highly recommended to always use the {\em basename} field (but
-strictly speaking it's optional).
+It is highly recommended to use the {\em psname} field, but
+strictly speaking it is optional.
 
 \stopdescription
 
 \startdescription {fontflags}
-specify some characteristics of the font. The following description of
+optionally specify some characteristics of the font. The following description of
 these flags is taken, with slight modification, from the \PDFReference\
 (the section on font descriptor flags). Viewers can adapt their rendering
 to these flags, especially when they substitute a non-embedded font by
@@ -1579,7 +1576,7 @@ features of bold characters may be thickened at small text sizes.
 \stopnarrower
 
 If the {\em fontflags} field is not given, and the font is embedded,
-\PDFTEX\ treats it as being~4 (decimal, that is, bit position 3 is set),
+\PDFTEX\ treats it as the value~4 (decimal, that is, bit position 3 is set),
 a symbolic font. For non-embedded fonts, the default value is
 \type{0x22}, a non-symbolic serif font. If you do not know the correct
 value, it is best not to specify it at all, as specifying a bad value of
@@ -1590,42 +1587,26 @@ with older map files (see the {\em fontfile} description below).
 \stopdescription
 
 \startdescription {special}
-specifies instructions to manipulate fonts similar to the way
-\type{dvips} does. Currently only the keywords \type{SlantFont}
-and \type{ExtendFont} are interpreted, other instructions (as
-\type{ReEncodeFont} with parameters, see {\em encoding} below) are
+specifies font manipulations in the same way as
+\type{dvips}. Currently only the keywords \type{SlantFont}
+and \type{ExtendFont} are interpreted, other instructions (notably
+\type{ReEncodeFont} and its parameters, see {\em encoding} below) are
 just ignored.  The permitted \type{SlantFont} range is $-$1..1;
 for \type{ExtendFont} it's $-$2..2.  The block of {\em special}
-instruction must be enclosed by double quotes \type{"}.
+instruction must be enclosed by double quote characters: \type{"}.
 
 \stopdescription
 
-\startdescription {encodingfile}
-specifies the name of the file containing the external encoding vector
-to be used for the font. The encoding file name must have the extension
-\type{.enc}, and the full file name including this extension must be given
-with a preceding~\type{<} character. The format of the encoding vector is
-identical to that used by \type{dvips}. If no encoding is specified,
-the font's built||in default encoding is used. The {\em encodingfile}
-field may be omitted if you are sure that the font resource has the
-correct built||in encoding. In general this option is highly recommended,
-and it is {\em required} when subsetting a TrueType font.
-
-Starting with version 1.40.18, the encoding file can be specified also
-for bitmap \PK\ fonts. In this case, it assigns the glyph names from the
-given encoding vector, which can be used with the
-\type{\pdfgentounicode} primitive (q.v.).  For example:
-
-\starttyping
-\pdfglyphtounicode{ffi}{0066 0066 0069} % normally: \input glyphtounicode
-\pdfgentounicode=1
-\pdfmapline{cmb10 <7t.enc}
-\font\cmb=cmb10 \cmb ffi
-\stoptyping
-
-The result is a \PDF\ file with a correctly-labeled \type{/ffi}
-character instead of the numeric character position in the
-\type{cmb10.tfm} (decimal 14).
+\startdescription {encodingfile} specifies the name of the file
+containing the external encoding vector to be used for the font. The
+encoding file name must have the extension \type{.enc}, and the file
+name including extension must be given with either a preceding~\type{<}
+character or a preceding~\type{<[}. The format of the encoding vector is
+identical to that used by \type{dvips}. If no encoding is specified, the
+font's built||in default encoding is used. The {\em encodingfile} field
+may be omitted if you are sure that the font resource has the correct
+built||in encoding. In general this option is highly recommended, and it
+is {\em required} when subsetting a TrueType font.
 
 \stopdescription
 
@@ -1635,102 +1616,84 @@ given \TeX\ font (the {\em tfmname}~$\leftrightarrow$~{\em fontfile}
 mapping is the most prominent use of the \filename{pdftex.map} file).
 The font file name must belong to a Type~1 or TrueType font file. If
 the {\em fontfile} field is missing, no font embedding can take place;
-in case the {\em basename} field does not contain one of the 14 standard
+in case the {\em psname} field does not contain one of the 14 standard
 font names also a warning will be given. Not embedding a font into a \PDF\
 file might be troublesome, as it requires that the font or some similar
 looking replacement font is available within the \PDF\ viewer, so that
 it can render the glyphs with its own font version.
 
 The font file name should be preceded by one or two special characters,
-which tells how to handle the font file:
+specifying how to handle the font file:
 
 \startitemize
 
 \item  If the font file name is preceded by a \type{<} character, the
-       font file will be only partially embedded  into the \PDF\ file
-       (``subsetted''), meaning that only used glyphs are going into
+       font file will be only partially embedded in the \PDF\ output
+       (``subsetted''), meaning that only used glyphs are written to
        the \PDF\ file. This is the most common use and is {\em strongly
        recommended} for any font, as it ensures the portability and
        reduces the size of the \PDF\ output. Subsetted fonts are included
        in such a way that name and cache clashes are minimized.
 
 \item  If the font file name is preceded by a double \type{<<}, the font
-       file will be included entirely --- all glyphs of the font
-       are embedded, including even the ones that are not used in the
-       document. Apart from causing large size \PDF\ output, this option
-       may cause troubles with TrueType fonts, so it is normally not
-       recommended for Type~1 or TrueType fonts. But this is currently
-       the only mode that allows the use of OpenType fonts. This mode
-       might also be useful in case the font is atypical and can not be
-       subsetted well by \PDFTEX. {\em Beware: some font vendors forbid
-       full font inclusion.}
+       file will be included entirely --- all glyphs of the font are
+       embedded, including even those not used in the document. Apart
+       from causing large size \PDF\ output, this option may cause
+       troubles with TrueType fonts, so it is normally not recommended
+       for Type~1 or TrueType fonts. But this is currently the only mode
+       that allows the use of OpenType fonts. This mode might also be
+       useful in case the font is atypical and cannot be subsetted well
+       by \PDFTEX. {\em Beware: proprietary font vendors typically
+       forbid full font inclusion.}
 
-\item  The case that no special character precedes the font file name
-       is deprecated since \PDFTEX\ version 1.40.0. These font files are
-       now completely ignored, and a corresponding warning is given. You
-       achieve exactly the same \PDF\ result if you just remove the
-       font file name from the map entry. Then the glyph widths that go
-       into the \PDF~file are extracted from the \TFM~file, and a font
-       descriptor object is created that contains approximations of the
-       font metrics for the selected font.
+\item  If no special character precedes the font file name, it is
+       ignored, with a warning (this case was deprecated in \PDFTEX\
+       version 1.40.0). You achieve exactly the same \PDF\ result if you
+       just remove the font file name from the map entry. Then the glyph
+       widths that go into the \PDF~file are extracted from the
+       \TFM~file, and a font descriptor object is created that contains
+       approximations of the font metrics for the selected font.
 
-       This option is useful only as fallback when you do not want to
-       embed the font (\eg\ due to font license restrictions), but wish to
-       use the font metrics and let the \PDF\ viewer generate instances
-       that look close to the used font in case the font resource is not
-       installed on the system where the \PDF\ output will be viewed
-       or printed. To use this feature, the font flags {\em must} be
+\item  Specifying the {\em psname} and no font file name is only useful
+       as a last-ditch fallback when you do not want to embed the font
+       (\eg\ due to font license restrictions), but wish to use the font
+       metrics and let the \PDF\ viewer generate instances that look
+       close to the used font in case the font resource is not installed
+       on the system where the \PDF\ output will be viewed or
+       printed. To use this feature, the font flags {\em must} be
        specified, and it must have the bit~6 set on, which means that
        only fonts with the Adobe Standard Roman Character Set can be
-       simulated. The only exception is the case of a Symbolic font,
+       simulated. The only exception is the case of a symbolic font,
        which is not very useful.
 
 \stopitemize
 
-When one suffers from invalid lookups, for instance when \PDFTEX\ tries
-to open a \type{.pfa} file instead of a \type{.pfb} one, one can add
+If you encounter problematic lookups, for instance if \PDFTEX\ tries
+to open a \type{.pfa} file instead of a \type{.pfb}, you can add
 the suffix to the filename.  In this respect, \PDFTEX\ completely relies
 on the \type{kpathsea} library.
 
 \stopdescription
 
-If a used font is not present in the map files, first \PDFTEX\ will
-look for a source with suffix \type{.pgc}, which is a so||called \PGC\
-source (\PDF\ Glyph Container) \footnote {This is a text file containing
-a \PDF\ Type~3 font, created by \METAPOST\ using some utilities by Hans
-Hagen. In general \PGC\ files can contain whatever is allowed in a \PDF\ page
-description, which may be used to support fonts that are not available
-in \METAFONT. \PGC\ fonts are not widely useful, as vector Type~3 fonts
-are not displayed very well in older versions of Acrobat Reader, but may
-be more useful when better Type~3 font handling is more common.}. If no
-\PGC\ source is available, \PDFTEX\ will try to use \PK~fonts as \DVI\
-drivers do, creating \PK~fonts on||the||fly if needed.
-
-Lines containing nothing apart from {\em tfmname} stand for scalable
-Type~3 fonts. For scalable fonts as Type~1, TrueType and scalable Type~3
-font, all the fonts loaded from a \TFM\ at various sizes will be included
-only once in the \PDF\ output. Thus if a font, let's say \type{csr10}, is
-described in one of the map files, then it will be treated as scalable. As
-a result the font source for csr10 will be included only once for
-\type{csr10}, \type{csr10 at 12pt} etc. So \PDFTEX\ tries to do its best
-to avoid multiple embedding of identical font sources. Thus vector \PGC\
-fonts should be specified as scalable Type~3 in map files like:
+For Type~1 and TrueType fonts, the font file will be included only once
+in the \PDF\ output, regardless of how many \TeX\ \type{\font} instances
+are used in the document. For instance, given
 
 \starttyping
-csr10
+\font\a = cmr12
+\font\b = cmr12 at 11pt
 \stoptyping
 
-It doesn't hurt much if a scalable Type~3 font is not given in map files,
-except that the font source will be embedded into the \PDF\ file multiple
-times for various sizes, which causes a much larger \PDF\ output. On
-the other hand if a font in the map files is defined as scalable Type~3
-font and its \PGC\ source is not scalable or not available, \PDFTEX\
-will use \PK\ fonts instead; the \PDF\ output is still valid but some
-fonts may look ugly because of the scaled bitmap.
+the outline file \type{cmr12.pfb} will only be included once in the
+\PDF, and merely scaled down to create the instance for \type{\b}.
 
-To summarize this rather confusing story, we include some example lines.
-The most common way is to embed only a glyph subset from a font like this,
-with re||encoding:
+If a used font is not present in the map files, \PDFTEX\ will try to use
+\PK~fonts as most \DVI\ drivers do, creating \PK~fonts on||the||fly if
+needed. This is the normal, and recommended, way to use bitmap fonts.
+
+To summarize this rather confusing story, we include some example map
+lines.  The most common way is to embed only a subset of glyphs from a
+font for a particular desired encoding, like this:
 
 \starttyping
 ptmri8r Times-Italic <8r.enc <ptmri8a.pfb
@@ -1742,16 +1705,17 @@ Without re||encoding it looks like this:
 cmr10 CMR10 <cmr10.pfb
 \stoptyping
 
-A SlantFont is specified similarly as for \type{dvips}. The \type
-{SlantFont} or \type{ExtendFont} entries work only with embedded Type~1
-fonts:
+\type{SlantFont} and \type{ExtendFont} fields are specified as with
+\type{dvips}. \type{SlantFont} and \type{ExtendFont} work only with
+embedded Type~1 fonts:
 
 \starttyping
 psyro   StandardSymL ".167 SlantFont"         <usyr.pfb
 pcrr8rn Courier      ".85 ExtendFont" <8r.enc <pcrr8a.pfb
 \stoptyping
 
-Entirely embed a font into the \PDF\ file without and with re||encoding:
+Entirely embed a font into the \PDF\ file without and with re||encoding
+(not typically useful):
 
 \starttyping
 fmvr8x MarVoSym         <<marvosym.pfb
@@ -1764,7 +1728,7 @@ A TrueType font can be used in the same way as a Type~1 font:
 verdana8r Verdana <8r.enc <verdana.ttf
 \stoptyping
 
-Now follow a few cases with non-embedded fonts. If the fontfile is
+Finally, a few cases with non-embedded fonts. If the fontfile is
 missing, the viewer application will have to use its own approximation
 of the missing font (with and without re||encoding):
 
@@ -1783,7 +1747,7 @@ pgsr8r GillSans 32 <8r.enc
 \stoptyping
 
 Not embedding fonts is rather risky and should generally be avoided.
-If in doubt, always embed all fonts, even the 14 standard ones.
+The recommendation these days is to embed all fonts, even the 14 standard ones.
 
 %***********************************************************************
 
@@ -4692,7 +4656,7 @@ the \PDFReference. The following key ends up in the document catalog.
 \NC \bf key         \NC \bf type   \NC meaning \NC \NR
 \HL
 \NC PTEX.Fullbanner \NC string     \NC The full version of the \pt binary that
-produced the file as displayed by \typ {pdftex -{}-version}, \eg\
+produced the file as displayed by {\tt pdftex \hbox{-{}-version}}, \eg\
 {\tt\pdftexbanner}.  This is necessary because the string in the
 \type{Producer} key in the info dictionary is rather short,
 namely {\tt pdfTeX-\currentpdftex}. \NC \NR
@@ -5033,7 +4997,7 @@ These titles must be distinct from any other section titles.
 
 You may add a section Entitled ``Endorsements'', provided it contains
 nothing but endorsements of your Modified Version by various
-parties--for example, statements of peer review or that the text has
+parties---for example, statements of peer review or that the text has
 been approved by an organization as the authoritative definition of
 a standard.
 

@@ -27,6 +27,7 @@ env = TEXINPUTS=.:$(plain):$(plain_config):$(generic_config):$(generic_hyphen)\
 diff = diff --text -c0
 
 pdftex = ../../source/build-pdftex/texk/web2c/pdftex
+pdftex = $(W)/texk/web2c/pdftex
 prog = $(env) $(pdftex) -ini -interaction=nonstopmode
 
 # can't make the clean: target here since then it would be the default.
