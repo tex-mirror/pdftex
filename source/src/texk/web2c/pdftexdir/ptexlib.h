@@ -1,5 +1,5 @@
 /*
-Copyright 1996-2014 Han The Thanh, <thanh@pdftex.org>
+Copyright 1996-2017 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -307,7 +307,7 @@ extern void writet1(fd_entry *);
 extern void t1_free(void);
 
 /* writet3.c */
-extern void writet3(fm_entry *, int, internalfontnumber);
+extern void writet3(int, internalfontnumber);
 extern scaled getpkcharwidth(internalfontnumber, scaled);
 
 /* writettf.c */

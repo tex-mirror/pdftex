@@ -1,3 +1,54 @@
+2017-05-03  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXMFAUXTREES): new variable (default value empty
+	string via empty braces), for tlmgr conf auxtrees.
+	(TEXMF): include $TEXMFAUXTREES, but don't assume it is nonempty.
+
+2017-04-22  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c, mingw32.c: Update texlive_gs_init() (w32 only). 
+
+2017-04-21  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* win32lib.c, mingw32.c: Update texlive_gs_init() (w32 only). 
+
+2017-04-14  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (shell_escape_commands): add texosquery-jre8.
+
+2017-04-13  Karl Berry  <karl@tug.org>
+
+	* texmf.cnf (TEXMF, TEXMFDBS): move TEXMFLOCAL to before TEXMFSYS*,
+	so, e.g., config.ps in TEXMFLOCAL overrides TEXMFSYSCONFIG.
+	Report from Michael Shell:
+	http://tug.org/pipermail/tex-live/2016-July/039062.html
+
+2017-04-05  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
+
+	* texmf.cnf: mendex requires the variable INDEXDICTIONARY.
+
+2017-03-27  Karl Berry  <karl@freefriends.org>
+
+	* Makefile.am (AM_TESTS_ENVIRONMENT): use instead of TESTS_ENVIRONMENT.
+
+2017-03-18  Karl Berry  <karl@tug.org>
+
+	* version.ac,
+	* NEWS,
+	* kpsewhich.c,
+	* texmf.cnf,
+	* doc/kpathsea.texi: version 6.2.3 for TL17.
+
+	* Makefile.am (nodist_kpseinclude_HEADERS): include c-auto.h here.
+	(kpseinclude_HEADERS): not here.
+	(nodist_kpselib_HEADERS): and not here; variable no longer needed.
+	Ken Brown on tldistro, 18 Mar 2017 16:50:41.
+
+2017-03-14  Karl Berry  <karl@tug.org>
+
+	* Makefile.am (kpseinclude_HEADERS): add c-auto.h. Report from
+	Ken Brown on tldistro, 14 Mar 2017 12:16:56.
+
 2017-03-02  Karl Berry  <karl@tug.org>
 
 	* texmf.cnf (TEXINPUTS.luajitlatex): add, same as lualatex.

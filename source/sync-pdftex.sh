@@ -5,6 +5,7 @@
 
 chicken=true  # do nothing by default
 : ${tldir=/r/tug/home/texlive/karl/Build/source}
+#tldir=/usr/local/texlive/2017/source # sync from release
 
 while test $# -gt 0; do
   if test "x$1" = x--version; then
@@ -32,7 +33,7 @@ mydir=`dirname $0`
 cd "$mydir/src" || exit 1
 
 # use rsync instead of cp so we can get local deletion for free.
-copy="rsync -ari --delete --exclude=.svn --exclude=autom4te.cache"
+copy="rsync -ari --delete --no-p --exclude=.svn --exclude=autom4te.cache"
 if $chicken; then
   copy="$copy -n"
 fi
@@ -42,7 +43,7 @@ if test ! -d $tldir; then
   exit 1
 fi
 if test ! -d $tldir/texk; then
-  echo "$0: the TL source directory should have subdir texk, etc." >&2
+  echo "$0: the TL source directory should have subdir texk, etc.: $tldir" >&2
   exit 1
 fi
 
