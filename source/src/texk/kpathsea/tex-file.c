@@ -1,7 +1,7 @@
 /* tex-file.c: high-level file searching by format.
 
    Copyright 1993, 1994, 1995, 1996, 1997, 2007, 2008, 2009, 2010, 2011
-             2012, 2014, 2016 Karl Berry.
+             2012, 2014, 2016, 2017 Karl Berry.
    Copyright 1998-2005 Olaf Weber.
 
    This library is free software; you can redistribute it and/or
@@ -1011,6 +1011,9 @@ kpathsea_find_file_generic (kpathsea kpse, const_string const_name,
                             kpse_file_format_type format,
                             boolean must_exist, boolean all)
 {
+#if defined(_WIN32)
+  char tmpbuffer[512];
+#endif
   string *target, name;
   const_string *ext;
   unsigned count;
@@ -1133,7 +1136,26 @@ kpathsea_find_file_generic (kpathsea kpse, const_string const_name,
   }
 
   free (name);
-
+#if defined(_WIN32)
+  if (ret && *ret) {
+    size_t cplen;
+    if (all) {
+      for (count = 0; ret[count] != NULL; count++) {
+        if ((cplen = GetLongPathName (ret[count], tmpbuffer, 500))) {
+          if (cplen > strlen (ret[count]))
+            ret[count] = realloc (ret[count], cplen + 1);
+          strcpy (ret[count], tmpbuffer);
+        }
+      }
+    } else {
+      if ((cplen = GetLongPathName (*ret, tmpbuffer, 500))) {
+        if (cplen > strlen (*ret))
+          *ret = realloc (*ret, cplen + 1);
+        strcpy (*ret, tmpbuffer);
+      }
+    } 
+  }
+#endif
   return ret;
 }
 

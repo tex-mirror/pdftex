@@ -1,4 +1,4 @@
-## $Id: Makefile.am 43617 2017-03-27 18:00:45Z karl $
+## $Id: Makefile.am 45031 2017-08-13 07:14:48Z kakuto $
 ## Proxy Makefile.am to build xpdf for TeX Live.
 ##
 ##   Copyright 2016-2017 Karl Berry <tex-live@tug.org>
@@ -112,6 +112,7 @@ xpdf_libxpdf_a_sources = \
 	@XPDF_TREE@/xpdf/Stream.cc \
 	@XPDF_TREE@/xpdf/TextString.cc \
 	@XPDF_TREE@/xpdf/UnicodeMap.cc \
+	@XPDF_TREE@/xpdf/UTF8.cc \
 	@XPDF_TREE@/xpdf/XFAForm.cc \
 	@XPDF_TREE@/xpdf/XRef.cc \
 	@XPDF_TREE@/xpdf/Zoox.cc
