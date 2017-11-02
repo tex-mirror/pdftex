@@ -2307,7 +2307,7 @@ uninstall-local:
 	  else :; fi; \
 	done
 
-# $Id: Makefile.in 44682 2017-06-24 21:21:08Z karl $
+# $Id: bin_links.am 43248 2017-02-16 21:38:29Z karl $
 # am/bin_links.am: Makefile fragment for bindir links.
 .PHONY: install-bin-links uninstall-bin-links
 
