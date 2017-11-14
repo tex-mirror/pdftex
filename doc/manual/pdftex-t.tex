@@ -2433,7 +2433,7 @@ dictionary. Example: \type{\pdftrailer {/mytrlrkey /mytrlrval}}.
 \bookmark{\tex{pdftrailerid}}
 
 Use the \Something{general text} to seed the \type{/ID} value in the
-trailer, instead of the default combination of the absolute input file
+trailer, instead of the default combination of the input file
 name and starting time.  If the argument is empty, the \type{/ID} is
 omitted entirely.  Example: \type{\pdftrailerid{}}.  This can be useful
 in making reproducible \PDF{}s.  \introduced{1.40.17}
@@ -4326,11 +4326,11 @@ Completely analogous to \type{\pdflastxpos}, returning the $y$ coordinate.
 \bookmark{\tex{pdfprimitive}}
 
 This command executes the primitive meaning of the following control
-sequence, if it has been redefined or made undefined. If the following
-control sequence is undefined and never was a primitive, nothing happens
-and no error is raised.  If the control sequence was initially
-expandable, \type{\pdfprimitive} expands either. Otherwise
-\type{\pdfprimitive} doesn't expand. \introduced{1.40.0}
+sequence, regardless of whether the control sequence has been redefined
+or made undefined. On the other hand, if the following control sequence
+never was a primitive, nothing happens and no error is raised.  If the
+control sequence was initially expandable, \type{\pdfprimitive} expands
+also. \introduced{1.40.0}
 
 
 \pdftexprimitive{\Syntax{\Tex{\pdfretval} \Whatever{read||only integer}}}

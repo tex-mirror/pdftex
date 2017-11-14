@@ -1,3 +1,9 @@
+2017-11-14  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\pdftrailerid): absolute file name is no longer
+	used in the /ID seed, just the base name, for reproducibility.
+	(\pdfprimitive): clarify.
+
 2017-04-20  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (\currentpdftex): 1.40.18 (for TeX Live 2017).
