@@ -1,0 +1,9 @@
+% $Id$
+% Public domain.
+
+\catcode`\{=1 \catcode`\}=2
+
+% Check that \pdfprimitive works at all.
+\let\message=\relax
+\pdfprimitive\message{hello}%
+\end
