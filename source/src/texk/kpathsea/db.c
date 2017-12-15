@@ -296,6 +296,7 @@ match (const_string filename,  const_string path_elt)
    That is, the question is whether to try the db for a file looked up
    in PATH_ELT.  If PATH_ELT == ".", for example, the answer is no. If
    PATH_ELT == "/usr/local/lib/texmf/fonts//tfm", the answer is yes.
+   If either string is NULL or empty, return false.
 
    In practice, ls-R is only needed for lengthy subdirectory
    comparisons, but there's no gain to checking PATH_ELT to see if it is
@@ -307,6 +308,15 @@ elt_in_db (const_string db_dir,  const_string path_elt)
 {
   boolean found = false;
 
+  /* If both strings are empty or null return false on the grounds that
+     it's useless to do anything further with such a strange case (which
+     likely never happens).  In theory one could argue that the empty
+     string is a prefix of any other string, but let's just declare the
+     result otherwise.  */
+  if (db_dir == NULL || *db_dir == 0
+      || path_elt == NULL || *path_elt == 0)
+    return false;
+     
   while (!found && FILECHARCASEEQ (*db_dir++, *path_elt++)) {
     /* If we've matched the entire db directory, it's good.  */
     if (*db_dir == 0)
@@ -772,7 +782,7 @@ kpathsea_db_search_list (kpathsea kpse, string* names,
               /* If we have a real file, add it to the list, maybe done.  */
               if (found) {
                 str_list_add (ret, found);
-                if (!all && found)
+                if (!all)
                   done = true;
               }
             } else { /* no match in the db */
