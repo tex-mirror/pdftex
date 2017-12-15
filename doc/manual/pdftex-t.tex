@@ -2300,8 +2300,13 @@ keys are:\crlf
 \type{D:YYYYMMDDhhmmssTZ}, where \type{YYYY} is the year, \type{MM} is
 the month, \type{DD} is the day, hh is the hour, \type{mm} is the
 minutes, \type{ss} is the seconds, and \type{TZ} is an optional string
-denoting the time zone.  For example, this is the Unix epoch, the
-beginning of 1970-01-01 UTC, in this format: \type{19700101000000Z}
+denoting the time zone, \type{Z} for universal time.  For example, this
+is the Unix epoch, the beginning of 1970-01-01 UTC, in this format:
+\type{19700101000000Z}. If the time zone is not UTC, it is given as
+\type{+HH'mm'} or \type{-HH'mm'}, indicating an offset of the given
+hours and minutes from UTC, with the given either later (\type{+}) or
+earlier (\type{-}) than UTC. (This syntax is specified by the PDF
+definition.)
 
 Multiple appearances of \type{\pdfinfo} are concatenated. Usually if a
 key is given more than once, the first appearance will be used, but this
