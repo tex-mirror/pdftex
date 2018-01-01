@@ -3,7 +3,7 @@
 % Load plain if necessary, i.e., if running under initex.
 \expandafter\ifx\csname fmtname\endcsname\relax\input plain\fi
 %
-\def\texinfoversion{2017-12-01.13}
+\def\texinfoversion{2017-12-26.21}
 %
 % Copyright 1985, 1986, 1988, 1990, 1991, 1992, 1993, 1994, 1995,
 % 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
@@ -2503,25 +2503,13 @@ end
 
 
 % In order for the font changes to affect most math symbols and letters,
-% we have to define the \textfont of the standard families.
+% we have to define the \textfont of the standard families.  We don't
+% bother to reset \scriptfont and \scriptscriptfont; awaiting user need.
 %
 \def\resetmathfonts{%
   \textfont0=\rmfont \textfont1=\ifont \textfont2=\syfont
   \textfont\itfam=\itfont \textfont\slfam=\slfont \textfont\bffam=\bffont
   \textfont\ttfam=\ttfont \textfont\sffam=\sffont
-  %
-  \scriptfont0=\rmfont \scriptfont1=\ifont \scriptfont2=\syfont
-  \scriptfont\itfam=\itfont \scriptfont\slfam=\slfont \scriptfont\bffam=\bffont
-  \scriptfont\ttfam=\ttfont \scriptfont\sffam=\sffont
-  %
-  \scriptscriptfont0=\rmfont
-  \scriptscriptfont1=\ifont
-  \scriptscriptfont2=\syfont
-  \scriptscriptfont\itfam=\itfont
-  \scriptscriptfont\slfam=\slfont
-  \scriptscriptfont\bffam=\bffont
-  \scriptscriptfont\ttfam=\ttfont
-  \scriptscriptfont\sffam=\sffont
 }
 
 %
@@ -2631,26 +2619,11 @@ end
 % Markup style infrastructure.  \defmarkupstylesetup\INITMACRO will
 % define and register \INITMACRO to be called on markup style changes.
 % \INITMACRO can check \currentmarkupstyle for the innermost
-% style and the set of \ifmarkupSTYLE switches for all styles
-% currently in effect.
-\newif\ifmarkupvar
-\newif\ifmarkupsamp
-\newif\ifmarkupkey
-%\newif\ifmarkupfile % @file == @samp.
-%\newif\ifmarkupoption % @option == @samp.
-\newif\ifmarkupcode
-\newif\ifmarkupkbd
-%\newif\ifmarkupenv % @env == @code.
-%\newif\ifmarkupcommand % @command == @code.
-\newif\ifmarkuptex % @tex (and part of @math, for now).
-\newif\ifmarkupexample
-\newif\ifmarkupverb
-\newif\ifmarkupverbatim
+% style.
 
 \let\currentmarkupstyle\empty
 
 \def\setupmarkupstyle#1{%
-  \csname markup#1true\endcsname
   \def\currentmarkupstyle{#1}%
   \markupstylesetup
 }
@@ -2712,11 +2685,15 @@ end
 % lilypond developers report.  xpdf does work with the regular 0x27.
 %
 \def\codequoteright{%
-  \expandafter\ifx\csname SETtxicodequoteundirected\endcsname\relax
-    \expandafter\ifx\csname SETcodequoteundirected\endcsname\relax
-      '%
+  \ifmonospace
+    \expandafter\ifx\csname SETtxicodequoteundirected\endcsname\relax
+      \expandafter\ifx\csname SETcodequoteundirected\endcsname\relax
+        '%
+      \else \char'15 \fi
     \else \char'15 \fi
-  \else \char'15 \fi
+   \else
+     '%
+   \fi
 }
 %
 % and a similar option for the left quote char vs. a grave accent.
@@ -2724,13 +2701,17 @@ end
 % the code environments to do likewise.
 %
 \def\codequoteleft{%
-  \expandafter\ifx\csname SETtxicodequotebacktick\endcsname\relax
-    \expandafter\ifx\csname SETcodequotebacktick\endcsname\relax
-      % [Knuth] pp. 380,381,391
-      % \relax disables Spanish ligatures ?` and !` of \tt font.
-      \relax`%
+  \ifmonospace
+    \expandafter\ifx\csname SETtxicodequotebacktick\endcsname\relax
+      \expandafter\ifx\csname SETcodequotebacktick\endcsname\relax
+        % [Knuth] pp. 380,381,391
+        % \relax disables Spanish ligatures ?` and !` of \tt font.
+        \relax`%
+      \else \char'22 \fi
     \else \char'22 \fi
-  \else \char'22 \fi
+   \else
+     \relax`%
+   \fi
 }
 
 % Commands to set the quote options.
