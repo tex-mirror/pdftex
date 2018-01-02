@@ -1,3 +1,7 @@
+2018-01-01  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (encodingfile): supported for Type 3 fonts.
+
 2017-12-14  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (\pdfinfo): describe [+-]HH'mm' time zone

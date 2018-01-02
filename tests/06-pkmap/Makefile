@@ -5,20 +5,26 @@ include ../Common.mak
 
 default: test-pkmap
 
-test-pkenc: # cmr10.3600pk - not used
+test-pkmap: cmr10.360pk cmr10.72pk cmb10.72pk
 	$(prog) test-pkmap.tex
-#
-# should work when and if patch is applied:
-#	grep -q /ffi test-pkenc.pdf # should end up with this encoded char
-#	grep -a ToUnicode test-pkenc.pdf
+	grep -q /ffi test-pkmap.pdf # should end up with this encoded char
+	grep -a ToUnicode test-pkmap.pdf
 #
 # dev convenience:
 #	pdffonts test-big.pdf
 #	pdftotext test-big.pdf -
 
-cmr10.3600pk:
-	mf-nowin '\mode:=ljfour;mag:=6;input cmr10'
-	gftopk cmr10.3600gf
+cmr10.360pk:
+	mf-nowin '\mode:=ljfour; mag:=0.6; input cmr10'
+	gftopk cmr10.360gf
+
+cmr10.72pk:
+	mf-nowin '\mode:=mactrue; input cmr10'
+	gftopk cmr10.72gf
+
+cmb10.72pk:
+	mf-nowin '\mode:=mactrue; input cmb10'
+	gftopk cmb10.72gf
 
 clean:
 	$(clean)

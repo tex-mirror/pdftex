@@ -1428,15 +1428,13 @@ Some nice samples of \PDFTEX\ output can be found at
 
 \section{Setting up fonts}
 
-\PDFTEX\ can work with Type~1 and TrueType fonts (and to some extent also
-with OpenType fonts). Font files should be available and embedded for all
-fonts used in the document. It is possible to use \METAFONT||generated
-fonts in \PDFTEX\ --- but it is strongly recommended not to use these
-fonts if an equivalent is available in Type~1 or TrueType format, if
-only because bitmap Type~3 fonts render very poorly in (older versions
-of) Adobe Reader. Given the free availability of Type~1 versions of all
-the Computer Modern fonts, and the ability to use standard \POSTSCRIPT\
-fonts, there is rarely a need to use bitmap fonts in \PDFTEX.
+\PDFTEX\ can work with Type~1 and TrueType fonts (and to some extent
+also with OpenType fonts). Font files should be available and embedded
+for all fonts used in the generated PDF. It is possible to use
+\METAFONT||generated fonts in \PDFTEX\ --- but it is strongly
+recommended not to use these fonts if an equivalent is available in
+Type~1 or TrueType format, if only because bitmap Type~3 fonts render
+poorly under enlargement.
 
 %***********************************************************************
 
@@ -1607,6 +1605,22 @@ font's built||in default encoding is used. The {\em encodingfile} field
 may be omitted if you are sure that the font resource has the correct
 built||in encoding. In general this option is highly recommended, and it
 is {\em required} when subsetting a TrueType font.
+
+Starting with version 1.40.19, an encoding file can also be specified
+for bitmap \PK\ fonts. In this case, it assigns the glyph names from the
+given encoding vector, which can be used with the
+\type{\pdfglyphtounicode} primitive (q.v.).  For example:
+
+\starttyping
+\pdfglyphtounicode{ffi}{0066 0066 0069} % normally: \input glyphtounicode
+\pdfgentounicode=1
+\pdfmapline{cmb10 <7t.enc}
+\font\cmb=cmb10 \cmb ffi
+\stoptyping
+
+The result is a \PDF\ file with a correctly-labeled \type{/ffi}
+character instead of the numeric character position in the
+\type{cmb10.tfm} (decimal 14).
 
 \stopdescription
 
@@ -2983,7 +2997,7 @@ entries are added to the table using the following command:
   \Something{general text}}}
 
 The first argument is the name of a glyph, the second is a string of Unicode
-numeric values denoting characters. For instance:
+numeric values denoting characters, separated by spaces. For instance:
 
 \starttyping
 \pdfgentounicode=1
