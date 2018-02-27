@@ -1,8 +1,3 @@
-2018-02-27  Karl Berry  <karl@freefriends.org>
-
-	* pdftex.web (pdftex_revision): now 19.
-	(pdftex_version_string): now '-1.40.19'. For TL 2018.
-
 2018-01-25  Hironobu Yamashita <h.y.acetaminophen@gmail.com>
         and Karl Berry  <karl@freefriends.org>
 
