@@ -27,11 +27,11 @@ syncreal:
 # rerun this.  Repeat until all files are empty.
 svnstatus:
 	svn status >/tmp/sat
-	-grep -v '^[MDA?]' /tmp/sat >/tmp/sun  # unknown
+	-grep -v '^[MDA?!]' /tmp/sat >/tmp/sun # unknown
 	ls -l /tmp/sun
 	@echo
-	sed -n 's/^\?//p' /tmp/sat >/tmp/sad  # add these
+	sed -n 's/^\?//p'   /tmp/sat >/tmp/sad # add these
 	ls -l /tmp/sad
 	@echo
-	sed -n 's/^!//p'  /tmp/sat >/tmp/srm  # remove these
+	sed -n 's/^!//p'    /tmp/sat >/tmp/srm # remove these
 	ls -l /tmp/srm
