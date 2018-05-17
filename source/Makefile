@@ -2,14 +2,20 @@
 # public domain.  Originally written by Karl Berry.
 
 default:
-	@echo "make build to build,"
+	@echo "make build to rebuild completely,"
+	@echo "make remake to make the binary,"
 	@echo "make versionhelp to see built --version and --help."
 	@echo "make synctest or syncreal to sync with TL,"
 	@echo "  and make svnstatus for file lists to help with syncing." 
 	@echo "But read/understand the scripts before doing anything."
 
+# full build.
 build:
 	./build-pdftex.sh
+#
+# just remake binary; can only build pdftex in our stripped-down-tree.
+remake:
+	make -C build-pdftex/texk/web2c pdftex
 
 # impractical to get real make check to work without the whole tree.
 versionhelp:

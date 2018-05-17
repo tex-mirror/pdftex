@@ -4278,6 +4278,15 @@ and end at the same group level. \introduced{1.40.0}
 
 \subsection{Miscellaneous}
 
+\pdftexprimitive{\Syntax{\tex {expanded} \Something{tokens}
+  \Whatever{expandable}}}
+\bookmark{\tex{expanded}}
+
+Expands \Something{tokens} in exactly the same way as \type{\message}.
+In contrast to \type{\edef}, macro parameter characters do not need to
+be doubled. \type{\protected} macros are not expanded.
+\introduced{1.40.20}
+
 \pdftexprimitive{\Syntax{\tex {ifincsname} \Whatever{expandable}}}
 \bookmark{\tex{ifincsname}}
 
