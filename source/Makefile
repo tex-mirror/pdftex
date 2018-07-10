@@ -17,9 +17,18 @@ build:
 remake:
 	make -C build-pdftex/texk/web2c pdftex
 
-# impractical to get real make check to work without the whole tree.
+# simple check that binary works.
 versionhelp:
 	cd build-pdftex/texk/web2c && ./pdftex --version && ./pdftex --help
+#
+# full make check, painful because the cut-down tree means we have to
+# remove all dependencies (= we can't build the other engines).
+# The list might change in the future with Makefile or automake changes.
+recheck:
+	make -C build-pdftex/texk/web2c TESTS='$$(pdftex_tests)' \
+	  SUBDIRS=. PROGRAMS="" LIBRARIES="" LTLIBRARIES="" \
+	  MANS="" DATA="" HEADERS="" \
+	  check
 
 synctest:
 	svn status	  # if not clean, commit first or changes will be lost
