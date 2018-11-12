@@ -1,4 +1,4 @@
-$Id: README 48164 2018-07-08 08:06:14Z kakuto $
+$Id: README 49020 2018-10-29 22:11:07Z karl $
 Copyright 2006-2018 TeX Users Group.
 You may freely use, modify and/or distribute this file.
 
@@ -34,7 +34,7 @@ chktex 1.7.6 - checked 15sep16
 cjkutils 4.8.4 - checked 18apr15
   http://cjk.ffii.org/cjk-4.8.4.tar.gz
 
-detex 2.8.3 - checked 20jun18
+detex 2.8.4 - checked 16oct18
   https://github.com/pkubowicz/opendetex
     old info: http://www.cs.purdue.edu/homes/trinkle/detex/
 
@@ -46,6 +46,10 @@ dvi2tty 6.0.0 - checked 05mar16
 dvidvi - maintained here
 
 dviljk - maintained here, by Joachim Schrod
+
+dviout-util - by Japanese TeX Development Community (Hironobu, Takuji et al.)
+  https://github.com/texjporg/tex-jp-build
+  but also: https://github.com/aminophen/dviout-util
 
 dvipdfm-x - maintained here, by us, contains
   dvipdfmx
@@ -60,8 +64,8 @@ dvipos - maintained here, by us
 
 dvipsk - maintained here, by us
 
-dvisvgm 2.4.1 - checked 08jul18
-  http://dvisvgm.bplaced.net/Downloads
+dvisvgm 2.6.1 - checked 29oct18
+  https://dvisvgm.de/Downloads/
 
 gregorio 5.1.1 - checked 25mar18
   CTAN/support/gregoriotex/gregorio-5.1.1.zip

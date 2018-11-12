@@ -79,6 +79,9 @@ sync_dir ()
       echo "$0: recursively syncing directory $f"
       sync_dir $f
     
+    elif test $f = autom4te.cache; then
+      :
+
     elif test -d $f; then  # other directories
       if test -d $tldir/$f; then
         echo "$0: syncing directory $f"
