@@ -1,3 +1,9 @@
+2018-11-13  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (Invoking \PDFTEX),
+	(\pdffilemoddate): if SOURCE_DATE_EPOCH and FORCE_SOURCE_DATE are
+	both set, return UTC.
+
 2018-01-01  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (encodingfile): supported for Type 3 fonts.

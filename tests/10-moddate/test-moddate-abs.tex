@@ -1,0 +1,9 @@
+% $Id$
+% Public domain.
+
+\catcode`\{=1 \catcode`\}=2
+
+% Check that \pdffilemoddate fails on system filenames
+% with openin_any=p; see Makefile.
+\message{\pdffilemoddate{/etc/issue}}
+\end
