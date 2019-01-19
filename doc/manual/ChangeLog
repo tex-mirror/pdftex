@@ -1,8 +1,16 @@
+2019-01-19  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\currentpdftex): 1.40.20 (for TeX Live 2019).
+
 2018-11-13  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (Invoking \PDFTEX),
 	(\pdffilemoddate): if SOURCE_DATE_EPOCH and FORCE_SOURCE_DATE are
 	both set, return UTC.
+
+2019-05-17  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\expanded): primitive imported from 1.50 branch.
 
 2018-01-01  Karl Berry  <karl@freefriends.org>
 
