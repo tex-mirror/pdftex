@@ -2786,19 +2786,18 @@ text} as if they were used with \Something{font}\unkern, which means that the
 corresponding glyphs will be embedded into the font resources in the \PDF\
 output. Nothing is appended to the list being built.
 
-\pdftexprimitive{\Syntax{\Tex{\pdfincludecharset} \Whatever{integer}}}
-\bookmark{\tex{pdfincludecharset}}
+\pdftexprimitive{\Syntax{\Tex{\pdfomitcharset} \Whatever{integer}}}
+\bookmark{\tex{pdfomitcharset}}
 
 If this primitive parameter is zero (the default), the \type{/CharSet}
-entry is omitted from fonts in the \PDF\ output; if it is set to 1, then
-\type{/CharSet} is included. (Other values may have other meanings in
-the future, so do not rely on them.)
+entry is included as usual for fonts in the \PDF\ output; if it is set
+to 1, then \type{/CharSet} is omitted. (Other values may have other
+meanings in the future, so do not rely on them.)
 
 Explanation: This parameter was created because the \PDFA-1 standard
 requires \type{/CharSet}, whereas \PDFA-2 and \PDFA-3 allow it to be
-omitted but have extraordinary requirements if it is included. Viewers
-in general do not care one way or the other, this is only about
-satisfying the standards. \introduced{1.40.20}
+omitted but have extraordinary requirements, which \PDFTEX\ does not
+currently meet, if it is included.\introduced{1.40.20}
 
 \pdftexprimitive{\Syntax{\Tex{\pdfuniqueresname} \Whatever{integer}}}
 \bookmark{\tex{pdfuniqueresname}}
