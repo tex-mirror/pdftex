@@ -36,6 +36,7 @@ synctest:
 
 syncreal:
 	./sync-pdftex.sh --real | tee /tmp/pdfsync.out # read trailing info!
+	$(MAKE) svnstatus
 
 # The idea is to run this, do the needed svn adds and svn removes,
 # then (if something fails, which usually happens), deal with it, then

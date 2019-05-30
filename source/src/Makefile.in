@@ -492,7 +492,7 @@ DIST_SUBDIRS = auxdir/auxsub doc $(CONF_SUBDIRS) libs utils texk
 recurse_this = 
 recurse_top = 
 
-# $Id: Makefile.in 49640 2019-01-08 18:57:53Z karl $
+# $Id: recurse.am 43261 2017-02-17 22:37:44Z karl $
 #
 # Requires $(recurse_this) and $(recurse_top).
 # Uses CONF_SUBDIRS and MAKE_SUBDIRS (set by kpse-setup.m4).

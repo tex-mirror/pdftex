@@ -83,10 +83,10 @@ TEXMFSYSCONFIG = $TEXMFROOT/texmf-config
 TEXMFHOME = ~/texmf
 
 % TEXMFVAR, where texconfig/updmap/fmtutil store cached runtime data.
-TEXMFVAR = ~/.texlive2018/texmf-var
+TEXMFVAR = ~/.texlive2019/texmf-var
 
 % TEXMFCONFIG, where texconfig/updmap/fmtutil store configuration data.
-TEXMFCONFIG = ~/.texlive2018/texmf-config
+TEXMFCONFIG = ~/.texlive2019/texmf-config
 
 % This is the value manipulated by tlmgr's auxtrees subcommand in the
 % root texmf.cnf. Kpathsea warns about a literally empty string for a
@@ -109,12 +109,12 @@ TEXMFAUXTREES = {}
 % the search paths. tlmgr takes care to end any value with a trailing comma.
 TEXMF = {$TEXMFAUXTREES$TEXMFCONFIG,$TEXMFVAR,$TEXMFHOME,!!$TEXMFLOCAL,!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$TEXMFDIST}
 
-% Where to look for ls-R files.  There need not be an ls-R in the
-% directories in this path, but if there is one, Kpathsea will use it.
-% By default, this is only the !! elements of TEXMF, so that mktexlsr
-% does not create ls-R files in the non-!! elements -- because if an
-% ls-R is present, it will be used, and the disk will not be searched.
-% This is arguably a bug in kpathsea.
+% Where to look for, and where mktexlsr creates, ls-R files. By default,
+% this is all and only the !! elements of TEXMF, so that mktexlsr does not
+% create ls-R files in the non-!! elements -- because if an ls-R is
+% present, it will be used, and the disk will not (usually) be searched,
+% regardless of !!.  Although in principle a directory listed here need
+% not contain an ls-R file, in practice they all should.
 TEXMFDBS = {!!$TEXMFLOCAL,!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$TEXMFDIST}
 
 % The system trees.  These are the trees that are shared by all users.
@@ -429,6 +429,11 @@ FC_CACHEDIR = $TEXMFSYSVAR/fonts/cache
 % TeX documentation and source files, for use with texdoc and kpsewhich.
 TEXDOCS = $TEXMF/doc//
 TEXSOURCES = $TEXMFDOTDIR;$TEXMF/source//
+
+% Top-level directory for any string translations for the binaries, in
+% the same structure as the usual system locale/ directories. This is a
+% single directory, not a path.
+TEXMFLOCALEDIR = $TEXMFMAIN/locale
 
 % Web and CWeb input paths.
 WEBINPUTS = $TEXMFDOTDIR;$TEXMF/web//

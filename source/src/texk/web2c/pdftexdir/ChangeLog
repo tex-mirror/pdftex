@@ -1,3 +1,17 @@
+2019-04-07  Karl Berry  <karl@freefriends.org>
+
+	* TeX Live 2019.
+
+2019-03-30  Akira Kakuto  <kakuto@w32tex.org>
+
+	* epdf.c: Allow spaces in CharSet.
+	Reported by Robert:
+	https://tug.org/pipermail/pdftex/2019-March/009146.html
+
+2019-03-21  Akira Kakuto  <kakuto@w32tex.org>
+
+	* pdftoepdf-poppler0.75.0.cc: Support poppler-0.75.0.
+
 2019-01-27  Karl Berry  <karl@gnu.org>
 
 	* pdftex.web (pdf_omit_charset_code, pdf_omit_charset
@@ -269,9 +283,9 @@
 	pdftosrc-newpoppler.cc, respectively, in order to use these
 	files.
 	The current pdftoepdf.cc and pdftosrc.cc support
-	xpdf-4.00 by default, xpdf-3.04 if XPDF304 is defined, and
-	poppler 0.57.0 or older versions if POPPLER_VERSION is
-	defined.
+	xpdf-4.00 or newer by default, xpdf-3.04 if XPDF304 is
+	defined, and poppler 0.57.0 or older versions if
+	POPPLER_VERSION is defined.
 
 2017-10-10  Shreevatsa R <shreevatsa.public@gmail.com>
 

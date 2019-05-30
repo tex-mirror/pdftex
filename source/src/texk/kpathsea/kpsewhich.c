@@ -1,7 +1,7 @@
 /* kpsewhich -- standalone path lookup and variable expansion for Kpathsea.
    Ideas from Thomas Esser, Pierre MacKay, and many others.
 
-   Copyright 1995-2018 Karl Berry & Olaf Weber.
+   Copyright 1995-2019 Karl Berry & Olaf Weber.
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -632,7 +632,7 @@ read_command_line (kpathsea kpse, int argc, string *argv)
     assert (g == 0); /* We have no short option names.  */
 
     if (ARGUMENT_IS ("casefold-search")) {
-      /* We can't just a boolean for casefold-search because we want to
+      /* We can't use a boolean for casefold-search because we want to
          distinguish it being set with an option vs. leaving the default
          (by default).  */
       xputenv ("texmf_casefold_search", "1");      
@@ -705,7 +705,7 @@ read_command_line (kpathsea kpse, int argc, string *argv)
 
     } else if (ARGUMENT_IS ("version")) {
       puts (kpathsea_version_string);
-      puts ("Copyright 2018 Karl Berry & Olaf Weber.\n\
+      puts ("Copyright 2019 Karl Berry & Olaf Weber.\n\
 License LGPLv2.1+: GNU Lesser GPL version 2.1 or later <https://gnu.org/licenses/lgpl.html>\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n");
