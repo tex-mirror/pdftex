@@ -1,0 +1,10 @@
+% $Id$
+% Public domain.
+% PDF2 document, include PDF1 image.
+\pdfcompresslevel=0 \pdfobjcompresslevel=0 % get greppable output
+\pdfoutput=1
+\pdfmajorversion=2 \pdfminorversion=0
+\catcode`\{=1 \catcode`\}=2
+\pdfximage{incl1.pdf}
+\hbox{\pdfrefximage\pdflastximage}
+\end

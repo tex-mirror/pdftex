@@ -1,0 +1,12 @@
+% $Id$
+% Public domain.
+% Check that PDF 2.0 allows object compression.
+% 
+% We should also check \pdfimagehicolor, but since its setting and
+% resetting depending on version is silent, too painful.
+% 
+\pdfoutput=1
+\pdfmajorversion=2 \pdfminorversion=0
+\pdfobjcompresslevel=2
+\hrule width1pt height1pt depth0pt
+\end
