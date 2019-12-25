@@ -47,6 +47,7 @@
 \def\eTeX{{$\varepsilon$}-\kern-.125em\TeX}
 \def\eg{e.g.}
 \def\Eg{E.g.}
+\def\MDFIVE{MD5} % not oldstyle 5, capital MD
 \def\PDFReference{{\sl PDF Reference}} % PDF with capital letters
 
 \abbreviation [AFM]        {afm}        {Adobe Font Metrics}
@@ -74,7 +75,6 @@
 \abbreviation [MAC]        {Macintosh}  {Macintosh hardware platform}
 \abbreviation [MACOSX]     {Mac\,OS\,X} {Macintosh operating system version 10}
 \abbreviation [MACTEX]     {Mac\TeX}   {\MAC\ \WEBC\ distribution}
-\abbreviation [MDFIVE]     {md5}        {MD5 message-digest algorithm}
 \abbreviation [METAFONT]   {\MetaFont}  {graphic programming environment, bitmap output}
 \abbreviation [METAPOST]   {\MetaPost}  {graphic programming environment, vector output}
 \abbreviation [MIKTEX]     {MiK\TeX}    {\WIN\ distribution}
@@ -152,7 +152,7 @@
 \let\ifpdfabsnum\relax
 \let\ifpdfabsdim\relax
 
-\def\Syntax   #1{\strut\kern-.25em{#1}\kern-.25em}
+\def\Syntax   #1{\strut\kern-.25em{#1}\kern-.25em\relax}
 \def\Next       {\crlf\hbox to 2em{}\nobreak}
 \def\Sugar    #1{\unskip\unskip\unskip\kern.25em{#1}\kern.25em\ignorespaces}
 %
@@ -164,11 +164,17 @@
 \def\Or         {\Sugar{\mathematics{\vert}}}
 \def\Rbrace     {\Sugar{\tttf\rightargument}}
 \def\Tex      #1{\Sugar{\type{#1}}}
-\def\Whatever #1{\Sugar{\mathematics{(\hbox{#1})}}}
+\def\Whatever #1{\Sugar{\kern.75em\mathematics{(\hbox{#1})}}} % parens
+                        % a full quad before, more of a separator on
+                        % syntax lines.
 
-% hyphenates
+% hyphenates, angle brackets
 \def\Something#1{\Sugar{\mathematics{\langle}\prewordbreak
                         {#1}\prewordbreak\mathematics{\rangle}}}
+%
+% undoes the .25em spacing of \Sugar, letting before and after spaces in
+% the input stand.
+\def\Somethingtext#1{\Syntax{\Something{#1}}}
 
 \hbadness=10000 % don't care
 
@@ -4231,25 +4237,32 @@ Expands to the size of file \Something{general text}, \eg\ it's {\tt
 \pdffilesize {./pdftex-t.tex}} for the source of this manual.
 \introduced{1.30.0}
 
-\pdftexprimitive{\Syntax{\Tex{\pdfmdfivesum} file \Something{general text}
-  \Whatever{expandable}}}
+\pdftexprimitive{\Syntax{\Tex{\pdfmdfivesum}
+  \Optional{\Literal{file}}
+  \Something{general text} \Whatever{expandable}}}
 \bookmark{\tex{pdfmdfivesum\ file}}
 
-Expands to the \MDFIVE\ of file \Something{general text} in uppercase
-hexadecimal format (same as \type{\pdfescapehex}), \eg\ it's {\tt
-\pdfmdfivesum file {./pdftex-t.tex}} for the source of this manual.
+If the keyword \type{file} is given, expands to the \MDFIVE\ of file
+\Somethingtext{general text} in uppercase hexadecimal format (same as
+\type{\pdfescapehex}). Without \type{file}, expands to the \MDFIVE\ of
+the \Somethingtext{generaltext} taken as a string. For example, it's
+{\tt \pdfmdfivesum file {./pdftex-t.tex}} for the source of this manual.
 \introduced{1.30.0}
 
-\pdftexprimitive{\Syntax{\Tex{\pdffiledump} \Optional{\Literal{offset}
-  \Something{number}} \Optional{\Literal{length}
-  \Something{number}} \Something{general text} \Whatever{expandable}}}
+\pdftexprimitive{\Syntax{\Tex{\pdffiledump}
+  \Optional{\Literal{offset} \Something{integer}}
+  \Optional{\Literal{length} \Something{integer}}
+  \Something{general text} \Whatever{expandable}}}
 \bookmark{\tex{pdffiledump}}
 
-Expands to the dump of the file \Something{general text} in uppercase
-hexadecimal format (same as \type{\pdfescapehex}), starting at offset
-\Something{number} or 0 with length \Something{number}, if given. The first ten
-bytes of the source of this manual are {\tt \pdffiledump length 10
-{./pdftex-t.tex}}. \introduced{1.30.0}
+Expands to the dump of the first \type{length} \Somethingtext{integer}
+bytes of the file \Somethingtext{general text}, in uppercase hexadecimal
+format (same as \type{\pdfescapehex}), starting at offset
+\type{offset}~\Somethingtext{number}, or the beginning of the file if
+\type{offset}. If \type{length} is not given, the default is zero, so
+expands to nothing. Both \Somethingtext{integer}s must be $\ge0$. For
+example, the first ten bytes of the source of this manual are {\tt
+\pdffiledump length 10 {./pdftex-t.tex}}. \introduced{1.30.0}
 
 %***********************************************************************
 

@@ -1,3 +1,17 @@
+2019-12-25  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\pdfmdfivesum): explain the non-file (string) form too.
+	(\pdffiledump): explain that length defaults to zero.
+	Report from Bruno Le Floch,
+	https://tug.org/pipermail/pdftex/2015-July/008948.html.
+	
+	Also:
+	(\MDFIVE): avoid oldstyle numbers.
+	(\Syntax): don't swallow spaces after final \kern.
+	(\Whatever): \kern.75em before, for more separation.
+	(\Somethingtext): new \Something that keeps surrounding spaces in
+	input, to be used in text (vs. syntax lines).
+
 2019-11-25  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex: document \pdfmajorversion. Besides the new
