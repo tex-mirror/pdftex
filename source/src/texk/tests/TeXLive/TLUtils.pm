@@ -1,11 +1,11 @@
 # TeXLive::TLUtils.pm - the inevitable utilities for TeX Live.
-# Copyright 2007-2019 Norbert Preining, Reinhard Kotucha
+# Copyright 2007-2020 Norbert Preining, Reinhard Kotucha
 # This file is licensed under the GNU General Public License version 2
 # or any later version.
 
 package TeXLive::TLUtils;
 
-my $svnrev = '$Revision: 52815 $';
+my $svnrev = '$Revision: 53343 $';
 my $_modulerevision = ($svnrev =~ m/: ([0-9]+) /) ? $1 : "unknown";
 sub module_revision { return $_modulerevision; }
 
@@ -13,7 +13,7 @@ sub module_revision { return $_modulerevision; }
 
 =head1 NAME
 
-C<TeXLive::TLUtils> -- utilities used in TeX Live infrastructure
+C<TeXLive::TLUtils> - utilities used in TeX Live infrastructure
 
 =head1 SYNOPSIS
 
@@ -88,6 +88,7 @@ C<TeXLive::TLUtils> -- utilities used in TeX Live infrastructure
   TeXLive::TLUtils::log($str1, ...);     # only to log file
   TeXLive::TLUtils::tlwarn($str1, ...);  # warn on stderr and log
   TeXLive::TLUtils::tldie($str1, ...);   # tlwarn and die
+  TeXLive::TLUtils::debug_hash_str($label, HASH); # stringified HASH
   TeXLive::TLUtils::debug_hash($label, HASH);   # warn stringified HASH
   TeXLive::TLUtils::backtrace();                # return call stack as string
   TeXLive::TLUtils::process_logging_options($texdir); # handle -q -v* -logfile
@@ -215,7 +216,8 @@ BEGIN {
     &SshURIRegex
   );
   @EXPORT = qw(setup_programs download_file process_logging_options
-               tldie tlwarn info log debug ddebug dddebug debug_hash
+               tldie tlwarn info log debug ddebug dddebug debug
+               debug_hash_str debug_hash
                win32 xchdir xsystem run_cmd system_pipe sort_archs);
 }
 
@@ -830,7 +832,7 @@ sub dir_creatable {
 
 Tests whether its argument is writable by trying to write to
 it. This function is necessary because the built-in C<-w> test just
-looks at mode and uid/guid, which on Windows always returns true and
+looks at mode and uid/gid, which on Windows always returns true and
 even on Unix is not always good enough for directories mounted from
 a fileserver.
 
@@ -1317,6 +1319,7 @@ sub collapse_dirs {
 
       my $item = "$d/$dirent";  # prepend directory for comparison
       if (! exists $seen{$item}) {
+        ddebug("   no collapse of $d because of: $dirent\n");
         $ok_to_collapse = 0;
         last;  # no need to keep looking after the first.
       }
@@ -1333,21 +1336,25 @@ sub collapse_dirs {
 
 =item C<removed_dirs(@files)>
 
-returns all the directories from which all content will be removed
+Returns all the directories from which all content will be removed.
 
+Here is the idea:
+
+=over 4
+
+=item create a hashes by_dir listing all files that should be removed
+   by directory, i.e., key = dir, value is list of files
+
+=item for each of the dirs (keys of by_dir and ordered deepest first)
+   check that all actually contained files are removed
+   and all the contained dirs are in the removal list. If this is the
+   case put that directory into the removal list
+
+=item return this removal list
+
+=back
 =cut
 
-# return all the directories from which all content will be removed
-#
-# idea:
-# - create a hashes by_dir listing all files that should be removed
-#   by directory, i.e., key = dir, value is list of files
-# - for each of the dirs (keys of by_dir and ordered deepest first)
-#   check that all actually contained files are removed
-#   and all the contained dirs are in the removal list. If this is the
-#   case put that directory into the removal list
-# - return this removal list
-#
 sub removed_dirs {
   my (@files) = @_;
   my %removed_dirs;
@@ -1512,6 +1519,7 @@ sub install_packages {
     $totalsize += $tlpsizes{$p};
   }
   my $starttime = time();
+  my @packs_again; # packages that we failed to download and should retry later
   foreach my $package (@packs) {
     my $tlpobj = $tlpobjs{$package};
     my $reloc = $tlpobj->relocated;
@@ -1524,7 +1532,21 @@ sub install_packages {
     foreach my $h (@::install_packages_hook) {
       &$h($n,$totalnr);
     }
-    # return false if something went wrong
+    # push $package to @packs_again if download failed
+    if (!$fromtlpdb->install_package($package, $totlpdb)) {
+      tlwarn("TLUtils::install_packages: Failed to install $package\n"
+             ."Will be retried later.\n");
+      push @packs_again, $package;
+    } else {
+      $donesize += $tlpsizes{$package};
+    }
+  }
+  # try to download packages in @packs_again again
+  foreach my $package (@packs_again) {
+    my $infostr = sprintf("Retrying to install: $package [%dk]",
+                     int($tlpsizes{$package}/1024) + 1);
+    info("$infostr\n");
+    # return false if download failed again
     if (!$fromtlpdb->install_package($package, $totlpdb)) {
       return 0;
     }
@@ -2182,7 +2204,7 @@ sub check_file_and_remove {
     if ($tlchecksum ne $checksum) {
       tlwarn("TLUtils::check_file: checksums differ for $xzfile:\n");
       tlwarn("TLUtils::check_file:   tlchecksum=$tlchecksum, arg=$checksum\n");
-      (undef,$check_file_tmpdir) = File::Temp::tempdir("tlcheckfileXXXXXXXX");
+      $check_file_tmpdir = File::Temp::tempdir("tlcheckfileXXXXXXXX");
       tlwarn("TLUtils::check_file:   removing $xzfile, "
              . "but saving copy in $check_file_tmpdir\n");
       copy($xzfile, $check_file_tmpdir);
@@ -2557,10 +2579,10 @@ sub setup_one {
 sub setup_system_one {
   my ($p, $arg) = @_;
   my $nulldev = nulldev();
-  debug("trying to set up system $p, arg $arg\n");
+  ddebug("trying to set up system $p, arg $arg\n");
   my $ret = system("$p $arg >$nulldev 2>&1");
   if ($ret == 0) {
-    debug("program $p found in the path\n");
+    debug("program $p found in path\n");
     $::progs{$p} = $p;
     return(1);
   } else {
@@ -3288,6 +3310,8 @@ sub parse_AddFormat_line {
 
 Logging and debugging messages.
 
+=over 4
+
 =item C<logit($out,$level,@rest)>
 
 Internal routine to write message to both C<$out> (references to
@@ -3461,14 +3485,19 @@ sub tldie {
   }
 }
 
-=item C<debug_hash ($label, HASH)>
+=item C<debug_hash_str($label, HASH)>
 
-Write LABEL followed by HASH elements, all on one line, to stderr.
-If HASH is a reference, it is followed.
+Return LABEL followed by HASH elements, followed by a newline, as a
+single string. If HASH is a reference, it is followed (but no recursive
+derefencing).
+
+=item C<debug_hash($label, HASH)>
+
+Write the result of C<debug_hash_str> to stderr.
 
 =cut
 
-sub debug_hash {
+sub debug_hash_str {
   my ($label) = shift;
   my (%hash) = (ref $_[0] && $_[0] =~ /.*HASH.*/) ? %{$_[0]} : @_;
 
@@ -3476,6 +3505,7 @@ sub debug_hash {
   my @items = ();
   for my $key (sort keys %hash) {
     my $val = $hash{$key};
+    $val = ".undef" if ! defined $val;
     $key =~ s/\n/\\n/g;
     $val =~ s/\n/\\n/g;
     push (@items, "$key:$val");
@@ -3483,7 +3513,11 @@ sub debug_hash {
   $str .= join (",", @items);
   $str .= "}";
 
-  warn "$str\n";
+  return "$str\n";
+}
+
+sub debug_hash {
+  warn &debug_hash_str(@_);
 }
 
 =item C<backtrace()>
@@ -3582,7 +3616,7 @@ sub process_logging_options {
 
 =head2 Miscellaneous
 
-Some ideas from Fabrice Popineau's C<FileUtils.pm>.
+A few ideas from Fabrice Popineau's C<FileUtils.pm>.
 
 =over 4
 
@@ -3610,15 +3644,20 @@ sub sort_uniq {
 
 =item C<push_uniq(\@list, @new_items)>
 
-The C<push_uniq> function pushes the last argument @ITEMS to the $LIST
-referenced by the first argument, if they are not already in the list.
+The C<push_uniq> function pushes each element in the last argument
+@ITEMS to the $LIST referenced by the first argument, if it is not
+already in the list.
 
 =cut
 
 sub push_uniq {
   my ($l, @new_items) = @_;
   for my $e (@new_items) {
-    if (! &member($e, @$l)) {
+   # turns out this is one of the most-used functions when updating the
+   # tlpdb, with hundreds of thousands of calls. So let's write it out
+   # to eliminate the sub overhead.
+   #if (! &member($e, @$l)) {
+    if (! scalar grep($_ eq $e, @$l)) {
       push (@$l, $e);
     }
   }
@@ -3655,38 +3694,67 @@ sub merge_into {
 
 =item C<texdir_check($texdir)>
 
-Test whether installation with TEXDIR set to $texdir would succeed due to
-writing permissions.
+Test whether installation with TEXDIR set to $texdir should be ok, e.g.,
+would be a creatable directory. Return 1 if ok, 0 if not.
 
 Writable or not, we will not allow installation to the root
 directory (Unix) or the root of a drive (Windows).
 
+We also do not allow paths containing various special characters, and
+print a message about this if second argument WARN is true. (We only
+want to do this for the regular text installer, since spewing output in
+a GUI program wouldn't be good; the generic message will have to do for
+them.)
+
 =cut
 
 sub texdir_check {
-  my $texdir = shift;
-  return 0 unless defined $texdir;
+  my ($orig_texdir,$warn) = @_;
+  return 0 unless defined $orig_texdir;
+
   # convert to absolute, for safer parsing.
+  # also replaces backslashes with slashes on w32.
   # The return value may still contain symlinks,
   # but no unnecessary terminating '/'.
-  $texdir = tl_abs_path($texdir);
+  my $texdir = tl_abs_path($orig_texdir);
   return 0 unless defined $texdir;
-  # also reject the root of a drive,
+
+  # reject the root of a drive,
   # assuming that only the canonical form of the root ends with /
   return 0 if $texdir =~ m!/$!;
-  # win32: for now, reject the root of a samba share
-  return 0 if win32() && $texdir =~ m!^//[^/]+/[^/]+$!;
-  my $texdirparent;
-  my $texdirpparent;
 
+  # Unfortunately we have lots of special characters.
+  # On Windows, backslashes are normal but will already have been changed
+  # to slashes by tl_abs_path. And we should only check for : on Unix.
+  my $colon = win32() ? "" : ":";
+  if ($texdir =~ /[,$colon;\\{}\$]/) {
+    if ($warn) {
+      print "     !! TEXDIR value has problematic characters: $orig_texdir\n";
+      print "     !! (such as comma, colon, semicolon, backslash, braces\n";
+      print "     !!  and dollar sign; sorry)\n";
+    }
+    # although we could check each character individually and give a
+    # specific error, it seems plausibly useful to report all the chars
+    # that cause problems, regardless of which was there. Simpler too.
+    return 0;
+  }
+  # w32: for now, reject the root of a samba share
+  return 0 if win32() && $texdir =~ m!^//[^/]+/[^/]+$!;
+
+  # if texdir already exists, make sure we can write into it.
   return dir_writable($texdir) if (-d $texdir);
-  ($texdirparent = $texdir) =~ s!/[^/]*$!!;
+
+  # if texdir doesn't exist, make sure we can write the parent.
+  (my $texdirparent = $texdir) =~ s!/[^/]*$!!;
   #print STDERR "Checking $texdirparent".'[/]'."\n";
-  return  dir_creatable($texdirparent) if -d dir_slash($texdirparent);
-  # try another level up the tree
-  ($texdirpparent = $texdirparent) =~ s!/[^/]*$!!;
+  return dir_creatable($texdirparent) if -d dir_slash($texdirparent);
+  
+  # ditto for the next level up the tree
+  (my $texdirpparent = $texdirparent) =~ s!/[^/]*$!!;
   #print STDERR "Checking $texdirpparent".'[/]'."\n";
   return dir_creatable($texdirpparent) if -d dir_slash($texdirpparent);
+  
+  # doesn't look plausible.
   return 0;
 }
 
@@ -4037,17 +4105,20 @@ sub download_to_temp_or_file {
   return;
 }
 
-# compare_tlpobjs 
-# returns a hash
-#   $ret{'revision'} = "leftRev:rightRev"     if revision differ
-#   $ret{'removed'} = \[ list of files removed from A to B ]
-#   $ret{'added'} = \[ list of files added from A to B ]
-#
+
+=item C<< compare_tlpobjs($tlpA, $tlpB) >>
+
+Compare the two passed L<TLPOBJ> objects.  Returns a hash:
+
+  $ret{'revision'}  = "revA:revB" # if revisions differ
+  $ret{'removed'}   = \[ list of files removed from A to B ]
+  $ret{'added'}     = \[ list of files added from A to B ]
+
+=cut
+
 sub compare_tlpobjs {
   my ($tlpA, $tlpB) = @_;
   my %ret;
-  my @rem;
-  my @add;
 
   my $rA = $tlpA->revision;
   my $rB = $tlpB->revision;
@@ -4067,20 +4138,27 @@ sub compare_tlpobjs {
   for my $f (@fA) { $removed{$f} = 1; }
   for my $f (@fB) { delete($removed{$f}); $added{$f} = 1; }
   for my $f (@fA) { delete($added{$f}); }
-  @rem = sort keys %removed;
-  @add = sort keys %added;
+  my @rem = sort keys %removed;
+  my @add = sort keys %added;
   $ret{'removed'} = \@rem if @rem;
   $ret{'added'} = \@add if @add;
+
   return %ret;
 }
 
-#
-# compare_tlpdbs
-# return several hashes
-# @{$ret{'removed_packages'}} = list of removed packages from A to B
-# @{$ret{'added_packages'}} = list of added packages from A to B
-# $ret{'different_packages'}->{$package} = output of compare_tlpobjs
-#
+
+=item C<< compare_tlpdbs($tlpdbA, $tlpdbB, @more_ignored_pkgs) >>
+
+Compare the two passed L<TLPDB> objects, ignoring the packages
+C<00texlive.installer>, C<00texlive.image>, and any passed
+C<@more_ignore_pkgs>. Returns a hash:
+
+  $ret{'removed_packages'} = \[ list of removed packages from A to B ]
+  $ret{'added_packages'}   = \[ list of added packages from A to B ]
+  $ret{'different_packages'}->{$package} = output of compare_tlpobjs
+
+=cut
+
 sub compare_tlpdbs {
   my ($tlpdbA, $tlpdbB, @add_ignored_packs) = @_;
   my @ignored_packs = qw/00texlive.installer 00texlive.image/;
@@ -4406,7 +4484,7 @@ sub setup_sys_user_mode {
     print STDERR "" .
       "$prg [ERROR]: Either -sys or -user mode is required.\n" .
       "$prg [ERROR]: In nearly all cases you should use $prg -sys.\n" .
-      "$prg [ERROR]: For special cases see http://tug.org/texlive/scripts-sys-user.html\n" ;
+      "$prg [ERROR]: For special cases see https://tug.org/texlive/scripts-sys-user.html\n" ;
     exit(1);
   }
   return ($texmfconfig, $texmfvar);
@@ -4476,6 +4554,12 @@ sub repository_to_array {
 }
 
 
+=back
+
+=head2 JSON
+
+=over 4
+
 =item C<encode_json($ref)>
 
 Returns the JSON representation of the object C<$ref> is pointing at.
@@ -4498,11 +4582,14 @@ bless $TLFalse, 'TLBOOLEAN';
 
 our $jsonmode = "";
 
+=pod
+
 =item C<True()>
+
 =item C<False()>
 
-these two function must be used to get proper JSON C<true> and C<false> 
-in the output independent of the backend used.
+These two crazy functions must be used to get proper JSON C<true> and
+C<false> in the output independent of the backend used.
 
 =cut
 
@@ -4647,9 +4734,10 @@ sub array_to_json {
   return($ret);
 }
 
-
+=pod
 
 =back
+
 =cut
 
 1;
@@ -4657,14 +4745,14 @@ __END__
 
 =head1 SEE ALSO
 
-The modules L<TeXLive::TLConfig>, L<TeXLive::TLCrypto>,
-L<TeXLive::TLDownload>, L<TeXLive::TLWinGoo>, etc., and the
-documentation in the repository: C<Master/tlpkg/doc/>.
+The other modules in C<Master/tlpkg/TeXLive/> (L<TeXLive::TLConfig> and
+the rest), and the scripts in C<Master/tlpg/bin/> (especially
+C<tl-update-tlpdb>), the documentation in C<Master/tlpkg/doc/>, etc.
 
 =head1 AUTHORS AND COPYRIGHT
 
 This script and its documentation were written for the TeX Live
-distribution (L<http://tug.org/texlive>) and both are licensed under the
+distribution (L<https://tug.org/texlive>) and both are licensed under the
 GNU General Public License Version 2 or later.
 
 =cut
