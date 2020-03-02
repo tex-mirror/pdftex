@@ -1,3 +1,9 @@
+2020-03-02  Karl Berry  <karl@freefriends.org>
+
+	* Makefile (common_deps): don't include pdftex-help.txt,
+	then we always rebuild.
+	* pdftex-w.tex: insert \hfil since this is ini.
+
 2020-03-01  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (\input): new entry for \input{...}.

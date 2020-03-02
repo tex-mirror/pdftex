@@ -14,7 +14,7 @@ default: pdftex-a.pdf pdftex-syntax.txt
 # the other formats (everything that can be built).
 all: pdftex-l.pdf pdftex-s.pdf booklet
 
-common_deps = pdftex-t.tex pdftex-w.txt pdftex-help.txt pdftex-syntax.tex
+common_deps = pdftex-t.tex pdftex-w.txt pdftex-syntax.tex # pdftex-help.txt
 pdftex-a.pdf a:	$(common_deps)
 	$(context) --mode=a4 --result=$@ $<
 
@@ -83,7 +83,8 @@ pdftex-syntax.txt: pdftex-t.tex pdftex-syntax.tex syntaxform.awk
 
 #  Install from this source directory to TL.
 
-tltree = /home/texlive/karl/Master/texmf-dist
+# svn co svn://u:pw@tug.org/texlive/trunk/Master/texmf-dist/doc/pdftex
+tltree = /r/tug/home/texlive/karl/Master/texmf-dist
 dest = $(tltree)/doc/pdftex/manual
 
 INSTALL_DATA = cp -p
