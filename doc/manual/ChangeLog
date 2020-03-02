@@ -1,3 +1,9 @@
+2020-03-01  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\input): new entry for \input{...}.
+	(History): describe current situation better.
+	Remove teTeX references. Use https.
+
 2019-12-25  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (\pdfmdfivesum): explain the non-file (string) form too.

@@ -53,8 +53,10 @@ pdftex-w.txt: pdftex-w.pdf
 	wc -l pdftex-w.txt  # set titlepagelines=half of this
 
 # PDF for the title page.
-pdftex-w.pdf: pdftex-w.tex
-	pdftex $<
+pdftex_binary = ../../source/build-pdftex/texk/web2c/pdftex
+pdftex-w.pdf: pdftex-w.tex Makefile
+	TEXFONTS=/usr/local/texlive/dev/texmf-dist/fonts// \
+	$(pdftex_binary) -ini '\nonstopmode\input $<'
 
 
 # Too annoying to remake help text every time; check by hand when needed.
