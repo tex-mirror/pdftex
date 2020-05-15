@@ -1,3 +1,62 @@
+2020-05-07  Andreas Scherer  <https://ascherer.github.io>
+
+	* texinputs/Xcwebmac.tex: Amend macros from knuth.drv (n
+	github.com/oberdiek/latex-tds) to move table-of-contents
+	up front in PDF output (on second TeX run).
+
+2020-04-30  Andreas Scherer  <https://ascherer.github.io>
+
+	* comm-w2c.ch: Clarify §95 and fix missing type format.
+
+2020-04-29  Andreas Scherer  <https://ascherer.github.io>
+
+	* comm-w2c.ch: Purge irrelevant mention of .web extension.
+
+2020-04-28  Andreas Scherer  <https://ascherer.github.io>
+
+	* comm-w2c.ch: Purge standard headers already in KPathSea.
+
+2020-04-27  Andreas Scherer  <https://ascherer.github.io>
+
+	* comm-w2c.ch,
+	* comm-w2c.h: Use enum'erated program identifiers.
+	Reshuffle typedef's to fix formatting in §7 of COMMON.
+
+2020-04-16  Andreas Scherer  <https://ascherer.github.io>
+
+	* cweav-w2c.ch,
+	* ctwill-w2c.ch: Fix missing hyphen.
+
+2020-04-14  Andreas Scherer  <https://ascherer.github.io>
+
+	* cweav-w2c.ch,
+	* ctwill-w2c.ch: Fix uppercase spelling for COMMON module.
+
+2020-04-13  Andreas Scherer  <https://ascherer.github.io>
+
+	* ctwill-w2c.ch: Print CTWILL user manual on two pages.
+
+2020-04-13  Andreas Scherer  <https://ascherer.github.io>
+
+	* cweav-w2c.ch,
+	* ctwill-w2c.ch: Move reference to global variable 'use_language'
+	from 'main' to section 'Extensions'.
+
+2020-04-13  Andreas Scherer  <https://ascherer.github.io>
+
+	* comm-w2c.h: Add comment for section 6 in CWEB programs.
+
+2020-04-11  Andreas Scherer  <https://ascherer.github.io>
+
+	* comm-w2c.ch, comm-w2c.h: Rearrange 'common variables'.
+
+2020-03-30  Andreas Scherer  <https://ascherer.github.io>
+
+	* comm-w2c.ch, comm-w2c.h, ctang-w2c.ch, ctwill-w2c.ch, cweav-w2c.ch,
+	* po/de/cweb.po, po/de/web2c-help.po,
+	* po/it/cweb.po,
+	* po/web2c-help.pot: Add new option '-t'.
+
 2020-02-01  Andreas Scherer  <https://ascherer.github.io>
 
 	* ctang-w2c.ch: Fix verbosity bug in ctangle.
