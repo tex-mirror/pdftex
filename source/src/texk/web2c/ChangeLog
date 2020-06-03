@@ -1,3 +1,40 @@
+2020-06-02  Andreas Scherer  <https://ascherer.github.io>
+
+	* gftopk.ch: Preserve internal section numbering.
+
+2020-05-30  Andreas Scherer  <https://ascherer.github.io>
+
+	* bibtex.ch,
+	* dvicopy.ch,
+	* dvitype.ch,
+	* gftodvi.ch,
+	* gftopk.ch,
+	* gftype.ch,
+	* mft.ch,
+	* pktogf.ch,
+	* pltotf.ch,
+	* tangle.ch,
+	* tftopl.ch,
+	* vftovp.ch,
+	* vptovf.ch,
+	* weave.ch: 'do_nothing' for something; this improves the
+	typographic output of the WEB sources with changes applied.
+
+2020-05-25  Andreas Scherer  <https://ascherer.github.io>
+
+	* bibtex.ch,
+	* mft.ch,
+	* tangle.ch,
+	* weave.ch: Spell checking with 'aspell -l en_US'.
+
+2020-05-24  Andreas Scherer  <https://ascherer.github.io>
+
+	* dvicopy.web,
+	* patgen.web,
+	* pktogf.web,
+	* pktype.web: Update convention to indicate 'not a titlepage, add
+	headline to table-of-contents page.'
+
 2020-05-14  Karl Berry  <karl@freefriends.org>
 
 	* Makefile.am (POPPLER_RULE): remove.

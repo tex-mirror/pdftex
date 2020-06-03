@@ -1,3 +1,24 @@
+2020-06-01  Andreas Scherer  <https://ascherer.github.io>
+
+	* texinputs/pdfwebtocfront.tex: Adapt to 'pwebmac.tex 4.5.2.
+
+2020-05-31  Andreas Scherer  <https://ascherer.github.io>
+
+	* comm-w2c.ch: Sanitize command for PDF outlines.
+
+2020-05-26  Andreas Scherer  <https://ascherer.github.io>
+
+	* texinputs/pdfwebtocfront.tex: Fake headline on page after TOC.
+
+2020-05-23  Andreas Scherer  <https://ascherer.github.io>
+
+	* texinputs/pdfwebtocfront.tex: Add treatment for {pdf,xe}tex.web.
+
+2020-05-22  Andreas Scherer  <https://ascherer.github.io>
+
+	* texinputs/Xcwebmac.tex: Activate alternative assignment operator.
+	* texinputs/pdfwebtocfront.tex: Add comments to the macro code.
+
 2020-05-07  Andreas Scherer  <https://ascherer.github.io>
 
 	* texinputs/Xcwebmac.tex: Amend macros from knuth.drv (n
