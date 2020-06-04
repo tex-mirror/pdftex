@@ -1,4 +1,7 @@
-if [ ! -e ./pdftex]; then
+# $Id$
+# Public domain.
+
+if [ ! -e ./pdftex ]; then
   ln -s ../../source/build-pdftex/texk/web2c/pdftex .
 fi
 

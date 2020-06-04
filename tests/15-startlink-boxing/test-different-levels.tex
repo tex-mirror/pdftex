@@ -1,0 +1,47 @@
+% $Id$
+% Public domain.
+
+\catcode`\{=1 \catcode`\}=2 \pdfoutput=1
+
+x\hbox{\pdfstartlink
+    attr {/Border[0 0 1]}
+    user{
+        /Subtype/Link%
+        /A<<%
+         /Type/Action%
+         /S/URI%
+         /URI(foo)%
+         >>%
+        } Linktext}  
+\pdfendlink
+\end
+
+% https://tug.org/pipermail/tex-live/2018-November/042759.html
+% Date: Wed, 28 Nov 2018 12:31:25 +0100
+% From: Ulrike Fischer <news3@nililand.de>
+% To: tex-live@tug.org
+% Subject: [tex-live] pdfstartlink/pdfendlink and boxing level problems
+%
+% 1. Currently the commands give a fatal error if used in different
+% boxing levels:
+%
+% [example program above]
+% 
+% ! pdfTeX error (ext4): \pdfendlink ended up in different nesting
+% level than \pdfstartlink.
+% !  ==> Fatal error occurred, no output PDF file produced!
+% 
+% This doesn't happen very often in documents, but if the galley is
+% split and reboxed it is possible that long links end in different
+% levels. One example involving two column mode and top floats has
+% been discussed on the latex2e github:
+% https://github.com/latex3/latex2e/issues/94
+% 
+% Is the fatal error really sensible here? Couldn't the engines close
+% the last annotation with some more or less sensible coordinate and
+% continue with a warning? A pdf with a wrong link area seems better
+% than no pdf at all (and would release the format and packages from
+% the need to carefully keep track of boxing levels when splitting and
+% reassembling stuff).
+%
+% [see ../16-nolink-special/*.tex for other request.]
