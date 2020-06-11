@@ -1,19 +1,22 @@
 # $Id$
 # Public domain.
 
+# set texlive location; can be done here, or via env. variable
+# tl = ~/IdeaProjects/texlive/Master
+
 include ../Common.mak
 
 default: #test-nolink-not-yet-written
 
-#test-nolink:
-#	$(prog) test-nolink.tex
-
-# to see the LaTeX example.
-nolink-example:
-# footline is wrongly linked:
-	pdflatex nolink-example && mv nolink-example.pdf nolink-pdftex.pdf
+nolink-xetex:
 # footline is correctly not linked:
-	xelatex nolink-example && mv nolink-example.pdf nolink-xetex.pdf
+	xelatex nolink-xetex
+
+nolink-pdftex:
+	$(pdftex) -progname=pdflatex nolink-pdftex
+
+fmt:
+	$(pdftex) -ini -etex -env pdflatex.ini
 
 clean:
 	$(clean)

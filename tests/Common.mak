@@ -4,7 +4,7 @@
 # Common Makefile definitions to run pdftex from test hierarchy,
 # but use support files from an installation.
 
-tl = /usr/local/texlive-rel
+tl ?= /usr/local/texlive-rel
 tl_dist = $(tl)/texmf-dist
 #
 plain = $(tl_dist)/tex/plain/base
@@ -31,4 +31,4 @@ pdftex = ../../source/build-pdftex/texk/web2c/pdftex
 prog = $(env) $(pdftex) -ini -interaction=nonstopmode
 
 # can't make the clean: target here since then it would be the default.
-clean = rm -f *.log *.pdf *.fmt *.aux
+clean = rm -f *.log *.pdf *.fmt *.aux *.out
