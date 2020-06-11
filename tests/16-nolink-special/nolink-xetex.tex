@@ -1,0 +1,58 @@
+% $Id: nolink-example.tex 831 2020-06-04 18:07:54Z karl $
+% Public domain.
+
+\documentclass[a4paper]{article}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+%\cfoot{some footline text that should not be linked}
+%\usepackage{ifxetex}
+%\ifxetex
+  \cfoot{\special{pdf:nolink}some footline text that should not be
+linked but is unless xetex\special{pdf:link}}
+ %\fi
+\usepackage{hyperref}
+
+\begin{document}
+\vspace*{48\baselineskip}
+xxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxx
+\href{xxxxx}{link link link link }
+\end{document}
+
+% https://tug.org/pipermail/tex-live/2018-November/042759.html
+% Date: Wed, 28 Nov 2018 12:31:25 +0100
+% From: Ulrike Fischer <news3@nililand.de>
+% To: tex-live@tug.org
+% Subject: [tex-live] pdfstartlink/pdfendlink and boxing level problems
+%
+% [see ../15-startlink-boxing/*.tex for other request.]
+% 
+% 2. The engines interrupts linking if the boxing level of
+% intermediate text is less than the boxing level at the start of the
+% link:
+% 
+% [example program above]
+% 
+% This allows to some extend to exclude e.g. header and footer from
+% link areas. But doesn't work e.g. with fancyhdr which adds an
+% additional box level to the footer. xetex/xdvidfpmx has here a quite
+% useful special \special{pdf:nolink} which can be used to suppress
+% the unwanted link area:
+% 
+% \documentclass[a4paper]{article}
+% \usepackage{fancyhdr}
+% \pagestyle{fancy}
+% \cfoot{some longer text that should not be linked}
+% \usepackage{ifxetex}
+%  \ifxetex
+%   %\cfoot{\special{pdf:nolink}some longer text that should not be
+% linked\special{pdf:link}}
+%  \fi
+% \usepackage{hyperref}
+% 
+% \begin{document}
+% \vspace*{48\baselineskip}
+% xxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxx
+% \href{xxxxx}{link link link link }
+% \end{document}
+% 
+% Would it be possible to add to pdftex/luatex something similar?

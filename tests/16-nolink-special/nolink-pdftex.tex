@@ -1,0 +1,14 @@
+% $Id: nolink-example.tex 831 2020-06-04 18:07:54Z karl $
+% Public domain.
+
+\documentclass[a4paper]{article}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\cfoot{some footline text that should not be linked but is unless xetex}
+\usepackage{hyperref}
+
+\begin{document}
+\vspace*{48\baselineskip}
+xxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxx
+\href{xxxxx}{link link link link }
+\end{document}
