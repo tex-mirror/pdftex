@@ -3926,6 +3926,35 @@ and fixing the macros may well not be trivial.  Then seeing the warnings
 on every run is just noise, and can be suppressed by setting this
 parameter to a positive number.  \introduced{1.40.13}
 
+\pdftexprimitive{\Syntax{\Tex{\pdfrunninglinkoff}}}
+\pdftexprimitive{\Syntax{\Tex{\pdfrunninglinkon}}}
+
+These commands create corresponding whatsit nodes which turn on/off generation
+of running links. Typical usage is to turn off generation of running
+links in header or footer of a page. Generation of running links is
+on when the shipout routine begins.
+
+The generation of running links works roughly like this: \PDFTEX\ keeps
+a stack of links created by \type{\pdfstartlink}, called \type{pdf_link_stack}. When writing
+out an hbox to pdf, \PDFTEX\ checks if the nesting level of the box is the same
+as the nesting level of the top entry in \type{pdf_link_stack}; if yes that box would
+become a link, too.
+
+The whatsit nodes created by the above primitives will turn on/off a flag, which controls if a hbox being shipped can become a link (in addition to the condition described above).
+
+The commands must be inserted before the hbox in question. For example:
+
+\starttyping
+% (1) good:
+\hbox{\pdfrunninglinkoff
+  \hbox{this is a line that would become a link otherwise}
+}
+
+% (2) bad:
+\hbox{\pdfrunninglinkoff this is a line that would become a link} 
+% too late; \pdfrunninglinkoff must be inserted before the box
+\stoptyping
+
 %***********************************************************************
 
 \subsection{Bookmarks}
