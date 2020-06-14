@@ -2528,19 +2528,19 @@ will try to scale (shrink) the glyphs in that line using fixed steps,
 until the line fits. When lines are too spacy, the opposite happens:
 \PDFTEX\ starts scaling (stretching) the glyphs until the white space
 gaps is acceptable. This glyph stretching and shrinking is called
-{\em font expansion}. To enable font expansion, don't forget to set
-\type{\pdfadjustspacing} to a value greater than zero.
+{\em font expansion}. To enable font expansion, \type{\pdfadjustspacing}
+must be set to a value greater than zero.
 
 There are two different modes for font expansion:
 
 First, if the \type{autoexpand} option is given --- which is the
 recommended mode --- only a single map entry is needed for all expanded
 font versions, using the name of the unexpanded \TFM\ file ({\em
-tfmname}). No expanded {\em tfmname} versions need to mentioned (they are
-ignored), as \PDFTEX\ generates expanded copies of the unexpanded \TFM\
+tfmname}). No expanded {\em tfmname} versions need be mentioned (they are
+ignored), as \PDFTEX\ generates expanded instances of the unexpanded \TFM\
 data structures and keeps them in its memory. Since \PDFTEX~1.40.0 the
 \type{autoexpand} mode happens within the page stream by modification of
-the text matrix (\PDF\ operator ``\type{Tm}''), and not anymore on font
+the text matrix (\PDF\ operator ``\type{Tm}''), and not at the font
 file level, giving the advantage that it now works not only with Type~1
 but also with TrueType and OpenType fonts (and even without embedding
 a font file; but that's not recommended). In this mode \PDFTEX\ requires
@@ -2552,17 +2552,25 @@ in all required expansion values. The expanded {\em tfmname} variants
 are constructed by adding the font expansion value to the {\em tfmname}
 of the base font, \eg\ there must be a map entry with {\em tfmname}
 \type{sometfm+10} for 1\,\% stretch or \type{sometfm-15} for 1.5\,\%
-shrink. This also means, that for each expanded font variant a \TFM\
+shrink. This also means that for each expanded font variant a \TFM\
 file with properly expanded metrics must exist. Having several map
-entries for the various expansion values of a font requires to provide
+entries for the various expansion values of a font requires providing
 for each expansion value an individually crafted font file with expanded
 glyphs. Depending on how these glyphs are generated, this might give
 slightly better glyph forms than the rather simple glyph stretching
 used in \type{autoexpand mode}. The drawback is that several font
 files will be embedded in the \PDF\ output for each expanded font,
 leading to significantly larger \PDF\ files than in \type{autoexpand}
-mode. For moderate expansion values going without \type{autoexpand}
-mode is not worth the trouble.
+mode. For moderate expansion values, going without \type{autoexpand}
+mode is typically not worth the trouble.
+
+A caveat: when \type{\pdffontexpand} is executed, \PDFTEX\ immediately
+loads two fonts, at the maximum stretch and shrink; in our example,
+\type{sometfm+30} and \type{sometfm-20}. (If they aren't available,
+\type{mktextfm} may be uselessly called, and then an error message
+issued.) This happens even if those fonts never end up being used, which
+is arguably undesirable, but hard to change. It is not a problem when
+using \type{autoexpand}.
 
 The font expansion mechanism is inspired by an optimization first
 introduced by Prof.~Hermann Zapf, which in itself goes back to
@@ -2571,7 +2579,8 @@ glyphs to optimize the grayness of a page. So, there are many, slightly
 different~a's, e's, etc. For practical reasons \PDFTEX\ does not use
 such huge glyph collections; it uses horizontal scaling instead. This is
 sub||optimal, and for many fonts, possibly offensive to the design. But,
-when using \PDF, it's not illogical: \PDF\ viewers use so||called
+when using \PDF, it's not illogical: \PDF\ viewers support arbitrary
+scaling, after all. (Also, they used to use so||called
 Multiple Master fonts when no fonts are embedded and|/|or can be found
 on the target system. Such fonts are designed to adapt their design to
 the different scaling parameters. It is up to the user to determine
@@ -2579,7 +2588,8 @@ to what extent mixing slightly remastered fonts can be used without
 violating the design. Think of an O: when geometrically stretched, the
 vertical part of the glyph becomes thicker, and looks incompatible with
 an unscaled original.  With a Multiple Master situation, one can stretch
-while keeping this thickness compatible.
+while keeping this thickness compatible. Perhaps something similar
+happens with TrueType and OpenType fonts nowadays.)
 
 \pdftexprimitive{\Syntax{\Tex{\pdfadjustspacing} \Whatever{integer}}}
 \bookmark{\tex{pdfadjustspacing}}
@@ -3029,16 +3039,17 @@ including fonts in the output. Such a resource (also called a CMap
 resource) maps glyph names to Unicode characters in a \PDF\ file.
 Lacking such a resource, it is the \PDF\ reader which determines how and
 whether searching in the \PDF\ file works.  In practice, searching for
-basic ASCII characters generally works, but searching for anything
+basic \ASCII\ characters generally works, but searching for anything
 beyond those, including ligatures such as `fi', fails in some versions
-of some PDF browsers (most notably Adobe Reader).
+of some \PDF\ browsers (most notably Adobe Reader).
 
 If \type{\pdfgentounicode} is set to \type{1} when the job ends, the
 \type{/ToUnicode} resource will be included in the output, with mappings
 for Type~1 fonts used in the documents. The mapping is created as
 follows: for each glyph in the font, look for its \type{ToUnicode} value
-in a global hash table.  By default that global hash table is empty;
-entries are added to the table using the following command:
+in a global hash table. By default that global hash table is empty, in
+which case \PDFTEX\ merely emits a warning. Entries are added to the
+table using the following command:
 
 \pdftexprimitive{\Syntax{\Tex{\pdfglyphtounicode} \Something{general text}
   \Something{general text}}}
@@ -3054,9 +3065,15 @@ numeric values denoting characters, separated by spaces. For instance:
 \noindent maps the \type{ff} ligature to a pair of \type{f}'s (whose
 code is \type{U+0066}).
 
-The \type{glyphtounicode.tex} file (distributed with \PDFTEX\ and other
-software) contains thousands of such definitions, covering most common
-glyph names.  So, for practical purposes, one would probably want:
+Once a single \type{\pdfglyphtounicode} definition is made, whether it
+is used or not, another feature comes into play: glyph names of the form
+\type{uniXXXX} or \type{uXXXX} are mapped to the natural \type{U+XXXX}.
+Many fonts use this style of naming.
+
+In addition, the \type{glyphtounicode.tex} file (distributed with
+\PDFTEX\ and other software) contains thousands of such definitions,
+covering most common glyph names. So, for practical purposes, one would
+probably want:
 
 \starttyping
 \input glyphtounicode
@@ -3929,20 +3946,23 @@ parameter to a positive number.  \introduced{1.40.13}
 \pdftexprimitive{\Syntax{\Tex{\pdfrunninglinkoff}}}
 \pdftexprimitive{\Syntax{\Tex{\pdfrunninglinkon}}}
 
-These commands create corresponding whatsit nodes which turn on/off generation
-of running links. Typical usage is to turn off generation of running
-links in header or footer of a page. Generation of running links is
-on when the shipout routine begins.
+These commands create corresponding whatsit nodes which turn off/on
+generation of running links. Their typical usage is to turn off
+generation of running links in the header or footer of a page.
+Generation of running links is on when the shipout routine begins.
 
 The generation of running links works roughly like this: \PDFTEX\ keeps
-a stack of links created by \type{\pdfstartlink}, called \type{pdf_link_stack}. When writing
-out an hbox to pdf, \PDFTEX\ checks if the nesting level of the box is the same
-as the nesting level of the top entry in \type{pdf_link_stack}; if yes that box would
-become a link, too.
+a stack of links created by \type{\pdfstartlink}, called
+\type{pdf_link_stack}. When writing out an hbox to \PDF, \PDFTEX\ checks
+if the nesting level of the box is the same as the nesting level of the
+top entry in \type{pdf_link_stack}; if yes that box would become a link,
+too.
 
-The whatsit nodes created by the above primitives will turn on/off a flag, which controls if a hbox being shipped can become a link (in addition to the condition described above).
+The whatsit nodes created by the above primitives turn off/on a flag
+which controls if a hbox being shipped can become a link, in addition to
+the previous condition.
 
-The commands must be inserted before the hbox in question. For example:
+Thus, the commands must be inserted before the hbox in question. For example:
 
 \starttyping
 % (1) good:
@@ -4952,19 +4972,19 @@ drawing editor, and that is suitable for input to text formatters or
 for automatic translation to a variety of formats suitable for input
 to text formatters. A copy made in an otherwise Transparent file
 format whose markup, or absence of markup, has been arranged to thwart
-or discourage subsequent modification by \PDF\ viewers is not Transparent.
+or discourage subsequent modification by PDF viewers is not Transparent.
 An image format is not Transparent if used for any substantial amount
 of text. A copy that is not ``Transparent'' is called {\bf ``Opaque''}.
 
 Examples of suitable formats for Transparent copies include plain
 ASCII without markup, Texinfo input format, LaTeX input format, SGML
 or XML using a publicly available DTD, and standard-conforming simple
-HTML, \POSTSCRIPT\ or \PDF\ designed for human modification.  Examples of
+HTML, \POSTSCRIPT\ or PDF designed for human modification.  Examples of
 transparent image formats include PNG, XCF and JPG.  Opaque formats
 include proprietary formats that can be read and edited only by
 proprietary word processors, SGML or XML for which the DTD and/or
 processing tools are not generally available, and the
-machine-generated HTML, \POSTSCRIPT\ or \PDF\ produced by some word
+machine-generated HTML, \POSTSCRIPT\ or PDF produced by some word
 processors for output purposes only.
 
 The {\bf ''Title Page''} means, for a printed book, the title page itself,

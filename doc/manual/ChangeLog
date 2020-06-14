@@ -1,3 +1,17 @@
+2020-06-14  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex: small tweaks throughout.
+	
+	(\pdffontexpand): warn about pdftex immediately loading the
+	non-autoexpanded fonts at maximum stretch and shrink, even if
+	they never used. Report from Robert Schlict,
+	https://tug.org/pipermail/tex-live/2020-March/045099.html
+	https://mailman.ntg.nl/pipermail/ntg-pdftex/2020-March/004307.html.
+
+	(\pdfgentounicode): mention the automapping of uniXXXX.
+	Suggestion by Ulrike Fischer,
+	https://tug.org/pipermail/tex-live/2020-May/045763.html
+
 2020-03-02  Karl Berry  <karl@freefriends.org>
 
 	* Makefile (common_deps): don't include pdftex-help.txt,
