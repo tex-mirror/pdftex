@@ -27,8 +27,10 @@ env = TEXINPUTS=.:$(plain):$(plain_config):$(generic_config):$(generic_hyphen)\
 diff = diff --text -c0
 
 pdftex = ../../source/build-pdftex/texk/web2c/pdftex
+ttf2afm = ../../source/build-pdftex/texk/web2c/ttf2afm
 #pdftex = $(W)/texk/web2c/pdftex
 prog = $(env) $(pdftex) -ini -interaction=nonstopmode
+rebuild = cd ../../source/build-pdftex/texk/web2c && make pdftex ttf2afm
 
 # can't make the clean: target here since then it would be the default.
 clean = rm -f *.log *.pdf *.fmt *.aux *.out
