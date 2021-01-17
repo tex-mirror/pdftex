@@ -54,7 +54,7 @@
   \def\?##1]{\hbox to 1in{\hfil##1.\ }}
   }
 @y 83
-  \def\?##1]{\hbox{Changes to \hbox to 1em{\hfil##1}.\ }}
+  \def\?##1]{\hbox{Changes to ##1.\ }}
   }
 \let\maybe=\iffalse
 @z
@@ -822,11 +822,29 @@ else
 % under Unix.  We call it `uexit' because there's a WEB symbol called
 % `exit' already.  We use a C macro to change `uexit' back to `exit'.
 @x [6.81] l.1852 - Eliminate nonlocal goto, since C doesn't have them.
+@ The |jump_out| procedure just cuts across all active procedure levels and
+goes to |end_of_TEX|. This is the only nontrivial |@!goto| statement in the
+whole program. It is used when there is no recovery from a particular error.
+
+Some \PASCAL\ compilers do not implement non-local |goto| statements.
+@^system dependencies@>
+In such cases the body of |jump_out| should simply be
+`|close_files_and_terminate|;\thinspace' followed by a call on some system
+procedure that quietly terminates the program.
+
 @<Error hand...@>=
 procedure jump_out;
 begin goto end_of_TEX;
 end;
 @y
+@ The |jump_out| procedure just cuts across all active procedure levels.
+The body of |jump_out| simply calls
+`|close_files_and_terminate|;\thinspace' followed by a call on some system
+procedure that quietly terminates the program.
+@^system dependencies@>
+
+@f noreturn==procedure
+
 @d do_final_end==begin
    update_terminal;
    ready_already:=0;
@@ -853,7 +871,26 @@ if (halt_on_error_p) then begin
 end;
 @z
 
-@x [6.84] l.1888 - Implement the switch-to-editor option.
+% Original reports:
+%   https://tex.stackexchange.com/questions/551313/
+%   https://tug.org/pipermail/tex-live/2020-June/045876.html
+%
+% This will probably be fixed by DEK in the 2021 tuneup in a different
+% way (so we'll have to remove or alter this change), but the interaction
+% sequence in the reports above causes a segmentation fault in web2c -
+% writing to the closed \write15 stream because we wrongly decrement
+% selector from 16 to 15 in term_input, due to the lack of this check in
+% a recursive error() call.
+%
+@x [6.83] l.1893 - avoid wrong interaction 
+loop@+begin continue: clear_for_error_prompt; prompt_input("? ");
+@y
+loop@+begin continue:
+if interaction<>error_stop_mode then return;
+clear_for_error_prompt; prompt_input("? ");
+@z
+
+@x [6.84] l.1904 - Implement the switch-to-editor option.
 line ready to be edited. But such an extension requires some system
 wizardry, so the present implementation simply types out the name of the
 file that should be
@@ -4423,6 +4460,16 @@ var j:small_number; {write stream number}
 
 @x [54.1376] l.24903 - Add editor-switch variables to globals.
 @* \[54] System-dependent changes.
+This section should be replaced, if necessary, by any special
+modifications of the program
+that are necessary to make \TeX\ work at a particular installation.
+It is usually best to design your change file so that all changes to
+previous sections preserve the section numbering; then everybody's version
+will be consistent with the published program. More extensive changes,
+which introduce new sections, can be inserted here; then only the index
+itself will get a new section number.
+@^system dependencies@>
+
 @y
 @* \[54/web2c] System-dependent changes for Web2c.
 Here are extra variables for Web2c.  (This numbering of the
@@ -4598,8 +4645,77 @@ slow_make_string:=t;
 exit:end;
 
 
-@* \[54/ML\TeX] System-dependent changes for ML\TeX.
+@* \[54/web2c] More changes for Web2c.
+% Related to [25.366] expansion depth check
+Sometimes, recursive calls to the |expand| routine may
+cause exhaustion of the run-time calling stack, resulting in
+forced execution stops by the operating system. To diminish the chance
+of this happening, a counter is used to keep track of the recursion
+depth, in conjunction with a constant called |expand_depth|.
 
+This does not catch all possible infinite recursion loops, just the ones
+that exhaust the application calling stack. The actual maximum value of
+|expand_depth| is outside of our control, but the initial setting of
+|10000| should be enough to prevent problems.
+@^system dependencies@>
+
+@<Global...@>=
+expand_depth_count:integer;
+
+@ @<Set init...@>=
+expand_depth_count:=0;
+
+@ % Related to [29.526] expansion depth check
+When |scan_file_name| starts it looks for a |left_brace|
+(skipping \.{\\relax}es, as other \.{\\toks}-like primitives).
+If a |left_brace| is found, then the procedure scans a file
+name contained in a balanced token list, expanding tokens as
+it goes. When the scanner finds the balanced token list, it
+is converted into a string and fed character-by-character to
+|more_name| to do its job the same as in the ``normal'' file
+name scanning.
+
+@p procedure scan_file_name_braced;
+var
+  @!save_scanner_status: small_number; {|scanner_status| upon entry}
+  @!save_def_ref: pointer; {|def_ref| upon entry, important if inside `\.{\\message}}
+  @!save_cur_cs: pointer;
+  @!s: str_number; {temp string}
+  @!p: pointer; {temp pointer}
+  @!i: integer; {loop tally}
+  @!save_stop_at_space: boolean; {this should be in tex.ch}
+  @!dummy: boolean;
+    {Initializing}
+begin save_scanner_status := scanner_status; {|scan_toks| sets |scanner_status| to |absorbing|}
+  save_def_ref := def_ref; {|scan_toks| uses |def_ref| to point to the token list just read}
+  save_cur_cs := cur_cs; {we set |cur_cs| back a few tokens to use in runaway errors}
+    {Scanning a token list}
+  cur_cs := warning_index; {for possible runaway error}
+  {mimick |call_func| from pdfTeX}
+  if scan_toks(false, true) <> 0 then do_nothing; {actually do the scanning}
+  {|s := tokens_to_string(def_ref);|}
+  old_setting := selector; selector:=new_string;
+  show_token_list(link(def_ref),null,pool_size-pool_ptr);
+  selector := old_setting;
+  s := make_string;
+  {turns the token list read in a string to input}
+    {Restoring some variables}
+  delete_token_ref(def_ref); {remove the token list from memory}
+  def_ref := save_def_ref; {and restore |def_ref|}
+  cur_cs := save_cur_cs; {restore |cur_cs|}
+  scanner_status := save_scanner_status; {restore |scanner_status|}
+    {Passing the read string to the input machinery}
+  save_stop_at_space := stop_at_space; {save |stop_at_space|}
+  stop_at_space := false; {set |stop_at_space| to false to allow spaces in file names}
+  begin_name;
+  for i:=str_start[s] to str_start[s+1]-1 do
+    dummy := more_name(str_pool[i]); {add each read character to the current file name}
+  stop_at_space := save_stop_at_space; {restore |stop_at_space|}
+end;
+
+
+@* \[54/ML\TeX] System-dependent changes for ML\TeX.
+@^system dependencies@>
 The boolean variable |mltex_p| is set by web2c according to the given
 command line option (or an entry in the configuration file) before any
 \TeX{} function is called.
@@ -4866,16 +4982,15 @@ if x<>@"4D4C5458 then goto bad_fmt;
 undump_int(x);   {undump |mltex_p| flag into |mltex_enabled_p|}
 if x=1 then mltex_enabled_p:=true
 else if x<>0 then goto bad_fmt;
-
-
-@* \[54] System-dependent changes.
 @z
 
 @x [54.1379] l.24916 - extra routines
 @* \[55] Index.
 @y
 
-@ @<Declare action procedures for use by |main_control|@>=
+@* \[54] System-dependent changes.
+
+@<Declare action procedures for use by |main_control|@>=
 
 procedure insert_src_special;
 var toklist, p, q : pointer;
@@ -4918,75 +5033,6 @@ end;
 @p function get_nullstr: str_number;
 begin
     get_nullstr := "";
-end;
-
-
-@* \[54/web2c] More changes for Web2c.
-% Related to [25.366] expansion depth check
-Sometimes, recursive calls to the |expand| routine may
-cause exhaustion of the run-time calling stack, resulting in
-forced execution stops by the operating system. To diminish the chance
-of this happening, a counter is used to keep track of the recursion
-depth, in conjunction with a constant called |expand_depth|.
-
-This does not catch all possible infinite recursion loops, just the ones
-that exhaust the application calling stack. The actual maximum value of
-|expand_depth| is outside of our control, but the initial setting of
-|10000| should be enough to prevent problems.
-@^system dependencies@>
-
-@<Global...@>=
-expand_depth_count:integer;
-
-@ @<Set init...@>=
-expand_depth_count:=0;
-
-@ % Related to [29.526] expansion depth check
-When |scan_file_name| starts it looks for a |left_brace|
-(skipping \.{\\relax}es, as other \.{\\toks}-like primitives).
-If a |left_brace| is found, then the procedure scans a file
-name contained in a balanced token list, expanding tokens as
-it goes. When the scanner finds the balanced token list, it
-is converted into a string and fed character-by-character to
-|more_name| to do its job the same as in the ``normal'' file
-name scanning.
-
-@p procedure scan_file_name_braced;
-var
-  @!save_scanner_status: small_number; {|scanner_status| upon entry}
-  @!save_def_ref: pointer; {|def_ref| upon entry, important if inside `\.{\\message}}
-  @!save_cur_cs: pointer;
-  @!s: str_number; {temp string}
-  @!p: pointer; {temp pointer}
-  @!i: integer; {loop tally}
-  @!save_stop_at_space: boolean; {this should be in tex.ch}
-  @!dummy: boolean;
-    {Initializing}
-begin save_scanner_status := scanner_status; {|scan_toks| sets |scanner_status| to |absorbing|}
-  save_def_ref := def_ref; {|scan_toks| uses |def_ref| to point to the token list just read}
-  save_cur_cs := cur_cs; {we set |cur_cs| back a few tokens to use in runaway errors}
-    {Scanning a token list}
-  cur_cs := warning_index; {for possible runaway error}
-  {mimick |call_func| from pdfTeX}
-  if scan_toks(false, true) <> 0 then do_nothing; {actually do the scanning}
-  {|s := tokens_to_string(def_ref);|}
-  old_setting := selector; selector:=new_string;
-  show_token_list(link(def_ref),null,pool_size-pool_ptr);
-  selector := old_setting;
-  s := make_string;
-  {turns the token list read in a string to input}
-    {Restoring some variables}
-  delete_token_ref(def_ref); {remove the token list from memory}
-  def_ref := save_def_ref; {and restore |def_ref|}
-  cur_cs := save_cur_cs; {restore |cur_cs|}
-  scanner_status := save_scanner_status; {restore |scanner_status|}
-    {Passing the read string to the input machinery}
-  save_stop_at_space := stop_at_space; {save |stop_at_space|}
-  stop_at_space := false; {set |stop_at_space| to false to allow spaces in file names}
-  begin_name;
-  for i:=str_start[s] to str_start[s+1]-1 do
-    dummy := more_name(str_pool[i]); {add each read character to the current file name}
-  stop_at_space := save_stop_at_space; {restore |stop_at_space|}
 end;
 
 

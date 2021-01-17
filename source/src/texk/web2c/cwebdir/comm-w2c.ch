@@ -29,11 +29,37 @@
 @z
 
 @x
+\def\botofcontents{\vfill
+@y
+\def\covernote{\vbox{%
+@z
+
+@x
+}
+@y
+}}
+\datecontentspage
+@z
+
+@x
 @s not_eq normal @q unreserve a C++ keyword @>
 @y
 @s boolean int
 @s uint8_t int
 @s uint16_t int
+@z
+
+@x
+to both \.{CTANGLE} and \.{CWEAVE}, which roughly concerns the following
+@y
+to \.{CTANGLE}, \.{CWEAVE}, and \.{CTWILL},
+which roughly concerns the following
+@z
+
+@x
+sometimes use \.{CWEB} to refer to either of the two component
+@y
+sometimes use \.{CWEB} to refer to any of the three component
 @z
 
 @x
@@ -56,7 +82,7 @@ typedef uint16_t sixteen_bits;
 boolean program; /* \.{CWEAVE} or \.{CTANGLE}? */
 @y
 typedef enum {
-  ctangle, cweave, ctwill
+  @!ctangle, @!cweave, @!ctwill
 } cweb;
 cweb program; /* \.{CTANGLE} or \.{CWEAVE} or \.{CTWILL}? */
 @z
@@ -333,6 +359,7 @@ double quotes.
 The actual file lookup is done with the help of the \Kpathsea/ library;
 see section~\X90:File lookup with \Kpathsea/\X~for details. % FIXME
 The remainder of the \.{@@i} line after the file name is ignored.
+@^system dependencies@> @.CWEBINPUTS@>
 @z
 
 @x
@@ -345,6 +372,12 @@ The remainder of the \.{@@i} line after the file name is ignored.
 @<Include...@>=
 #include <stdlib.h> /* declaration of |getenv| and |exit| */
 @y
+@z
+
+@x
+@ @<Try to open...@>= {
+@y
+@ @.CWEBINPUTS@>@<Try to open...@>= {
 @z
 
 @x
@@ -802,7 +835,7 @@ int wrap_up() {
   putchar('\n');
 @y
 int wrap_up(void) {
-  if (show_progress) new_line;
+  if (show_progress || show_happiness || (history > spotless)) new_line;
 @z
 
 @x
@@ -862,7 +895,7 @@ fatal(
 @x
   if (*s) printf(s);
 @y
-  if (*s) fputs(s,stdout);
+  if (*s) err_print(s);
 @z
 
 @x
@@ -1122,6 +1155,10 @@ else {
 @ @<Scan arguments and open output files@>=
 scan_args();
 if (program==ctangle) {
+  if ((C_file=fopen(C_file_name,"a"))==NULL)
+    fatal(_("! Cannot open output file "), C_file_name);
+@.Cannot open output file@>
+  else fclose(C_file); /* Test accessability */
   strcpy(check_file_name,C_file_name);
   if(check_file_name[0]!='\0') {
     char *dot_pos=strrchr(check_file_name,'.');
@@ -1133,6 +1170,9 @@ if (program==ctangle) {
 @.Cannot open output file@>
 }
 else {
+  if ((tex_file=fopen(tex_file_name,"a"))==NULL)
+    fatal(_("! Cannot open output file "), tex_file_name);
+  else fclose(tex_file); /* Test accessability */
   strcpy(check_file_name,tex_file_name);
   if(check_file_name[0]!='\0') {
     char *dot_pos=strrchr(check_file_name,'.');
@@ -1166,12 +1206,10 @@ functions |strlen|, |strcmp|, |strcpy|, |strncmp|, and |strncpy|.
 @x
 @** Index.
 @y
-@** Extensions for modern \.{CWEB}.
-
-The following sections introduce code changes and extensions that have been
-created by numerous contributors over the course of a quarter century. They
-make \.{CWEB} adhere to modern coding standards and introduce new or improved
-features.
+@** Extensions for modern \.{CWEB}.  The following sections introduce changes
+and extensions to the code that have been created by numerous contributors over
+the course of a quarter century. They make \.{CWEB} adhere to modern coding
+standards and introduce new or improved features.
 
 Care has been taken to keep the original section numbering intact, so this new
 section should have the same number as the original ``\&{82.~Index},'' and
@@ -1204,7 +1242,7 @@ static void prime_the_change_buffer(void);@/
 
 @* Standard C library interfaces.  This updated version of \.{CWEB} uses
 standard C types for boolean values, pointers, and objects with fixed sizes
-(already in \Kpathsea/).
+(|@!uint8_t|, |@!uint16_t|; already in \Kpathsea/).
 
 @<Include files@>=
 #include <stdbool.h> /* type definition of |bool| */
@@ -1212,8 +1250,6 @@ standard C types for boolean values, pointers, and objects with fixed sizes
 
 @ The |scan_args| and |cb_show_banner| routines and the |bindtextdomain|
 argument string need a few extra variables.
-
-@s string int
 
 @d max_banner 50
 
@@ -1241,11 +1277,11 @@ if(strlen(check_file_name)) /* Delete the temporary file in case of a break */
 
 @* Internationalization.  You may have noticed that almost all \.{"strings"}
 in the \.{CWEB} sources are placed in the context of the `|_|'~macro.
-This is just a shortcut for the `|gettext|' function from the ``GNU~gettext
+This is just a shortcut for the `|@!gettext|' function from the ``GNU~gettext
 utilities.'' For systems that do not have this library installed, we wrap
 things for neutral behavior without internationalization.
 
-@d _(STRING) gettext(STRING)
+@d _(S) gettext(S)
 
 @<Include files@>=
 #ifndef HAVE_GETTEXT
@@ -1253,7 +1289,7 @@ things for neutral behavior without internationalization.
 #endif
 @#
 #if HAVE_GETTEXT
-#include <locale.h>
+#include <locale.h> /* |@!LC_MESSAGES|, |@!LC_CTYPE| */
 #include <libintl.h>
 #else
 #define setlocale(A,B) ""
@@ -1334,23 +1370,26 @@ The directories to be searched for come from three sources:
 \item{(c)} compile-time default directories (specified in
     \.{texmf.in}),\hfil\break
     i.e., \.{\$TEXMFDOTDIR:\$TEXMF/texmf/cweb//}.\par}
+@.CWEBINPUTS@>
+
+@s const_string int
+@s string int
 
 @d kpse_find_cweb(name) kpse_find_file(name,kpse_cweb_format,true)
 
 @<Include files@>=
 typedef bool boolean;
 #define HAVE_BOOLEAN
-#include <kpathsea/kpathsea.h> /* include every \Kpathsea/ header */
+#include <kpathsea/kpathsea.h> /* include every \Kpathsea/ header;
+  |@!kpathsea_debug|, |@!const_string|, |@!string| */
 #include <w2c/config.h> /* \&{integer} */
-#include <lib/lib.h> /* |versionstring| */
-@#
-#define CWEB
-#include "help.h"
+#include <lib/lib.h> /* |@!versionstring| */
 
 @ We set |kpse_program_name| to `\.{cweb}'.  This means if the variable
 \.{CWEBINPUTS.cweb} is present in \.{texmf.cnf} (or \.{CWEBINPUTS\_cweb}
 in the environment) its value will be used as the search path for filenames.
 This allows different flavors of \.{CWEB} to have different search paths.
+@.CWEBINPUTS@>
 
 @<Set up |PROGNAME| feature and initialize the search path mechanism@>=
 kpse_set_program_name(argv[0], "cweb");
@@ -1375,16 +1414,21 @@ Debugging output is always written to |stderr|, and begins with the string
 
 @* System dependent changes. The most volatile stuff comes at the very end.
 
-@ Modules for dealing with help messages and version info.
+Modules for dealing with help messages and version info.
 
-@<Display help message and |exit|@>=
+@<Include files@>=
+#define CWEB
+#include "help.h" /* |@!CTANGLEHELP|, |@!CWEAVEHELP|, |@!CTWILLHELP| */
+
+@ @<Display help message and |exit|@>=
 cb_usagehelp(program==ctangle ? CTANGLEHELP :
   program==cweave ? CWEAVEHELP : CTWILLHELP, NULL);
 @.--help@>
 
-@ Special variants from Web2c's `\.{lib/usage.c}', adapted for \.{i18n}/\.{t10n}.
-We simply filter the strings through the catalogs (if available).
-@s const_string int
+@ Special variants from Web2c's `\.{lib/usage.c}', adapted for
+\.{i18n}/\.{t10n}.  We simply filter the strings through the catalogs
+(if available).
+
 @c
 static void cb_usage (const_string str)
 {

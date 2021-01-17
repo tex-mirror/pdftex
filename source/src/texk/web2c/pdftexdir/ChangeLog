@@ -1,13 +1,109 @@
+2021-01-11  Karl Berry  <karl@freefriends.org>
+
+	* ttf2afm.c (make_name): better to use unsigned char.
+
+2021-01-10  Karl Berry  <karl@freefriends.org>
+
+	* ttf2afm.c (make_name): go back to copying all characters
+	to try to placate NetBSD. No harm in it?
+	https://tug.org/pipermail/tlbuild/2021q1/004780.html
+
+2021-01-06  Karl Berry  <karl@freefriends.org>
+
+	* ttf2afm.c (make_name): let's exclude iscntrl() per Thanh,
+	but accept crlf and tab.
+
+2021-01-05  Karl Berry  <karl@freefriends.org>
+
+	* ttf2afm.c (make_name): copy all characters, not just isprint().
+	From Akira/Mojca.
+
+2021-01-04  Thanh Han The  <hanthethanh@gmail.com>
+
+	* ttf2afm.c (make_name): new fn.
+	(read_font): output FontName etc. in afm.
+	Request from Doug McAllaster, mail to Thanh of 4 Jan 2021 14:17:40.
+
+2020-10-31  Thanh Han The  <hanthethanh@gmail.com>
+
+	* pdftex.web (pdf_begin_string): don't output fake space
+	unless pdf_doing_string. pdftex r838-839.
+	Report from Ulrike Fischer, 18oct20.
+
+2020-08-31  Marcel Fabian Krueger  <tex@2krueger.de>
+
+	* pdftex.web (Scan the argument for command |c|) <expanded_code>:
+	free_avail(def_ref) to avoid memory exhaustion with many \expanded.
+
+2020-08-04  Andreas Scherer  <https://ascherer.github.io>
+
+	* pdftex.web: Pick a few obvious nits.
+
+2020-08-03  Andreas Scherer  <https://ascherer.github.io>
+
+	* pdftex.ch: Move pdfTeX variants of MLTeX code next to originals.
+
+2020-07-22  Akira Kakuto  <kakuto@w32tex.org>
+
+	* pdftex.web, writeimg.c: Show unfound file names in
+	fatal error messages.
+	https://tug.org/pipermail/pdftex/2020-July/009203.html
+
+2020-07-20  Andreas Scherer  <https://ascherer.github.io>
+
+	* pdftex.ch: Avoid overful hboxes in table-of-contents.
+
+2020-07-19  Karl Berry  <karl@freefriends.org>
+
+	* char-warning-pdftex.ch: new file to implement new feature;
+	if \tracinglostchars>=3, missing characters cause an error and not
+	just a diagnostic message. Also, always report the hex code of the
+	missing character. From David Jones, tex-implements 30jun2020.
+	* am/pdftex.am (pdftex_ch_srcs): add it.
+	* change-files.txt: update.
+
+2020-07-17  Andreas Scherer  <https://ascherer.github.io>
+
+	* am/pdftex.am: Avoid changefile ambiguity.
+
+2020-06-11  Thanh Han The  <hanthethanh@gmail.com>
+
+	* pdftex.web (Create link annotations...): check for gen_running_link.
+	(pdf_running_link_{off,on}_node): new @d for new primitives.
+	(Put each ...): define them.
+	(Cases of |print_cmd_chr|...): print them.
+	(Declare act...): switch on them.
+	(Implement \.{\\pdfrunninglinkoff}, ...on): new modules to
+	implement them.
+	(Display the whatsit...),
+	(Mark a partial copy...),
+	(Wipe out the whatsit...): handle them as whatsits.
+	(gen_running_link): new global, define and initialize.
+	(Output the whatsit...): set gen_running_link according
+	to the new primitives.
+	pdftex r835. Following suggestion from Ulrike Fischer,
+	https://tug.org/pipermail/tex-live/2018-November/042759.html.
+
+2020-06-10  Thanh Han The  <hanthethanh@gmail.com>
+
+	* pdftex.web (end_link): warn instead of fatal for
+	"\pdfendlink ended up in different nesting level than \pdfstartlink".
+	pdftex r832. Suggestion from Ulrike Fischer,
+	https://tug.org/pipermail/tex-live/2018-November/042759.html.
+
 2020-06-03  Thanh Han The  <hanthethanh@gmail.com>
 
-	* pdftex.web: Initialize save_tail to avoid a value of 0 given at compile
-	time. Remove unnecessary codes. (from Hironobu Yamashita). pdftex r829.
+	* pdftex.web: Initialize save_tail to avoid a value of 0 given at
+	compile time. Remove unnecessary codes. (from Hironobu
+	Yamashita). pdftex r829.
+	https://mailman.ntg.nl/pipermail/ntg-pdftex/2020-May/004330.html
 
 2020-06-02  Thanh Han The  <hanthethanh@gmail.com>
 
 	* pdftex.web (auto_kern): @d=3, rather than "explicit".
 	(Display kern |p|): report auto_kern message; avoid link(r)
-	when r=null. pdftex r828.
+	when r=null. pdftex r828. Report from Robert Schlict,
+	https://mailman.ntg.nl/pipermail/ntg-pdftex/2020-May/004317.html
 
 2020-05-31  Hironobu Yamashita  <h.y.acetaminophen@gmail.com>
 

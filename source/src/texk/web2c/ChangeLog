@@ -1,3 +1,141 @@
+2020-10-27  Karl Berry  <karl@freefriends.org>
+
+	* pktogf.web: TFM widths are 2^20 times the ratio, not 2^24.
+	Report from Richard Sandberg, 2 Jul 2019 10:49:50.
+
+2020-08-31  Karl Berry  <karl@freefriends.org>
+
+	* tests/expanded-overflow.tex: new (unused) informational file
+	for \expanded overflow.
+
+2020-08-01  Andreas Scherer  <https://ascherer.github.io>
+
+	* dvicopy.ch,
+	* dvitype.ch,
+	* gftodvi.ch,
+	* gftopk.ch,
+	* gftype.ch,
+	* mf.ch,
+	* mft.ch,
+	* patgen.ch,
+	* pktogf.ch,
+	* pktype.ch,
+	* tangle.ch,
+	* tex.ch,
+	* weave.ch: Purge non-local 'goto' labels and 'jump_out' leftovers.
+
+2020-07-25  Andreas Scherer  <https://ascherer.github.io>
+
+	* mft.ch: Swap \MF and \MP to match meaning of 'metapost' flag.
+
+2020-07-20  Andreas Scherer  <https://ascherer.github.io>
+
+	* tex.ch: Place Web2c changes together;
+	avoid overful hboxes in the amended table-of-contents.
+
+2020-07-19  Karl Berry  <karl@freefriends.org>
+
+	* doc/web2c.texi (TeX extensions): add [e][u]pTeX. Other small
+	additions to the engine descriptions.
+
+	* NEWS: mention new \tracinglostchars>=3 causing an error.
+	See pdftexdir/ChangeLog for details.
+
+2020-07-17  Andreas Scherer  <https://ascherer.github.io>
+
+	* Makefile.am,
+	* Makefile.in: Avoid changefile ambiguity.
+
+2020-07-15  Andreas Scherer  <https://ascherer.github.io>
+
+	* ctangleboot.cin,
+	* cwebboot.cin: Recreate CWEB boot modules.
+
+2020-07-08  Andreas Scherer  <https://ascherer.github.io>
+
+	* cwebboot.cin,
+	* help.h: Add /old/ option '-dN' to 'help' message.
+
+2020-07-06  Karl Berry  <karl@freefriends.org>
+
+	* tex.ch (<Get user's advice...>): return early if
+	interaction<>error_stop_mode; else a nested error()
+	call in unusual interactive sequences can mess up
+	the selector value, ultimately causing a segmentation fault
+	from writing to a closed stream \write15. Fix primarily
+	from David Fuchs. Original report from Xiao Zhang,
+	https://tex.stackexchange.com/questions/551313/
+	https://tug.org/pipermail/tex-live/2020-June/045876.html
+
+2020-06-22  Karl Berry  <karl@freefriends.org>
+
+	* doc/web2c.texi (Runtime options): move from install.texi,
+	and mention expand_depth and texmf_casefold_search.
+	(Three programs): make its own chapter to reduce sectioning depth.
+	Various historical and current updates, e.g., mention (u)pTeX.
+	* doc/install.texi (Runtime options): moved.
+	* doc/ref.txi: remove some older references, use https for urls.
+
+2020-06-20  Andreas Scherer  <https://ascherer.github.io>
+
+	* cwebboot.cin: Regenerate boot module.
+
+2020-06-16  Andreas Scherer  <https://ascherer.github.io>
+
+	* ctangleboot.cin: Regenerate boot module.
+
+2020-06-15  Hironobu Yamashita  <h.y.acetaminophen@gmail.com>
+
+	* gftodvi.ch: Suppress a compiler warning.
+
+2020-06-10  Andreas Scherer  <https://ascherer.github.io>
+
+	* bibtex.ch,
+	* gftodvi.ch,
+	* gftopk.ch,
+	* pktogf.ch,
+	* pltotf.ch,
+	* tftopl.ch,
+	* vftovp.ch: Avoid line breaks in sections with empty TeX part.
+
+2020-06-10  Andreas Scherer  <https://ascherer.github.io>
+
+	* weave.ch: Missing forced line break.
+
+2020-06-09  Andreas Scherer  <https://ascherer.github.io>
+
+	* weave.ch: Max out array sizes similar to CWEB.
+
+2020-06-07  Karl Berry  <karl@freefriends.org>
+
+	* ac/web2c.ac: omit $Id$ from output.
+
+2020-06-07  Andreas Scherer  <https://ascherer.github.io>
+
+	* ctangleboot.cin,
+	* cwebboot.cin: Add date to table-of-contents page.
+
+2020-06-07  Andreas Scherer  <https://ascherer.github.io>
+
+	* ctangleboot.cin: Handle special 'files' as secondary output.
+
+2020-06-07  Andreas Scherer  <https://ascherer.github.io>
+
+	* ctangleboot.cin,
+	* cwebboot.cin: Check accessibility to output files.
+
+2020-06-06  Andreas Scherer  <https://ascherer.github.io>
+
+	* cwebboot.cin: Add index entries for the CWEBINPUTS envvar.
+
+2020-06-05  Andreas Scherer  <https://ascherer.github.io>
+
+	* cwebboot.cin: Fix newline blunder in case of error.
+
+2020-06-04  Andreas Scherer  <https://ascherer.github.io>
+
+	* bibtex.ch: Purge 'active E' chunk completely.
+
 2020-06-02  Andreas Scherer  <https://ascherer.github.io>
 
 	* gftopk.ch: Preserve internal section numbering.

@@ -30,6 +30,7 @@ entire resulting derived work is distributed under the terms of a
 permission notice identical to this one.
 }
 @y
+\let\maybe=\iftrue
 \def\covernote{\vbox{\noindent
 Copyright \copyright~1989, 1992
    by Technische Hochschule Darmstadt,\hfill\break
@@ -48,6 +49,21 @@ program under the conditions for verbatim copying, provided that the
 entire resulting derived work is distributed under the terms of a
 permission notice identical to this one.
 }}
+\datecontentspage
+@z
+
+Section 1.
+
+@x l.96
+E.g.\ it will not use the |enum| type declarations.
+@y
+@z
+
+@x l.105
+@d banner  "This is TIE, CWEB Version 2.4."
+@y
+@d banner  "This is TIE, CWEB Version 2.4."
+  /* will be extended by the \TeX~Live |versionstring| */
 @z
 
 Section 2
@@ -76,8 +92,8 @@ Section 4
 typedef int boolean;
 typedef char* string;
 @y
-@ The types |boolean| (with values |false| and |true|) and
-|string| come from \.{<kpathsea/simpletypes.h>}.
+@ The types |@!boolean| (with values |@!false| and |@!true|) and
+|@!string| come from \.{<kpathsea/simpletypes.h>}.
 @s boolean int
 @s string int
 @z
@@ -105,9 +121,9 @@ static int history=spotless;
 @y
 @<Global variables@>=
 typedef enum {
-    spotless,
-    troublesome,
-    fatal } return_code;
+    @!spotless,
+    @!troublesome,
+    @!fatal } return_code;
 static return_code history=spotless;
 @z
 
@@ -142,7 +158,7 @@ Section 15
 #include <stdio.h>
 @y
 @<Global \&{\#include}s@>=
-#include "cpascal.h" /* |decr| and |incr| */
+#include "cpascal.h" /* |@!decr| and |@!incr| */
 #include <kpathsea/kpathsea.h>
 #define usage tieusage /* Also redefine |usage| to avoid clash with function from lib. */
 @z
@@ -161,12 +177,23 @@ This should cause no trouble in any \Cl\ program.
 #endif
 @y
 This should cause no trouble in any \Cl\ program.
-The \.{kpathsea} include files handle the definition of |malloc()|,
-too.
+The \.{kpathsea} include files handle the definition of |@!malloc|, too.
 @^system dependencies@>
 @z
 
 Sections 18 and 19: use enum as requested in tie.w
+
+@x l.522
+\leavevmode |file_types| is used to describe whether a file
+@y
+\leavevmode \&{file\_types} is used to describe whether a file
+@z
+
+@x l.526 Fix case glitch.
+the kind of output. (this would even be necessary if we
+@y
+the kind of output. (This would even be necessary if we
+@z
 
 @x l.530
 #define search 0
@@ -180,14 +207,20 @@ typedef int in_file_modes; /* should be |enum(search,test,reading,ignore)| */
 typedef int file_types; /* should be |enum(unknown,master,chf)| */
 @y
 typedef enum {
-    search,
-    test,
-    reading,
-    ignore } in_file_modes;
+    @!search,
+    @!test,
+    @!reading,
+    @!ignore } in_file_modes;
 typedef enum {
-    unknown,
-    master,
-    chf } file_types;
+    @!unknown,
+    @!master,
+    @!chf } file_types;
+@z
+
+@x l.541
+@ A variable of type |out_md_type| will tell us in what state the output
+@y
+@ A variable of type \&{out\_md\_type} will tell us in what state the output
 @z
 
 @x l.548
@@ -197,9 +230,9 @@ typedef enum {
 typedef int out_md_type; /* should be |enum(normal,pre,post)| */
 @y
 typedef enum {
-    normal,
-    pre,
-    post } out_md_type;
+    @!normal,
+    @!pre,
+    @!post } out_md_type;
 @z
 
 Section 24
@@ -385,6 +418,35 @@ change files.  The names of the file parameters will be inserted into
 @z
 
 Section 59
+
+@x l.1233
+\noindent Here is where \.{TIE} starts, and where it ends.
+@y
+\noindent Here is where \.{TIE} starts, and where it ends.
+\def\Kpathsea/{{\mc KPATHSEA\spacefactor1000}}
+
+This version of the \.{TIE} program uses the \Kpathsea/ library for searching
+files.  Firstly, we use the |kpse_web_format| when opening input files, which
+triggers the inspection of the \.{WEBINPUTS} environment variable.  Secondly,
+we set |kpse_program_name| to `\.{tie}'.  This means if the variable
+\.{WEBINPUTS.tie} is present in \.{texmf.cnf} (or \.{WEBINPUTS\_tie} in the
+environment) its value will be used as the search path for filenames.  This
+allows different flavors of \.{TIE} (or other \.{WEB} programs) to have
+different search paths.@.WEBINPUTS@> In all, the directories to be searched for
+come from at least two sources:
+\smallskip
+{\parindent1.5em
+\item{(a)} a user-set environment variable \.{WEBINPUTS}
+    (overridden by \.{WEBINPUTS\_tie});
+\item{(b)} a line in \Kpathsea/ configuration file \.{texmf.cnf},\hfil\break
+    e.g., \.{WEBINPUTS=\$TEXMFDOTDIR:\$TEXMF/texmf/web//}\hfil\break
+    or \.{WEBINPUTS.tie=\$TEXMFDOTDIR:\$TEXMF/texmf/web//}.\par}
+\smallskip
+Note that, although \.{WEBINPUTS} might suggest otherwise, \.{TIE} is more or
+less language-agnostic and that it is perfectly capable of handling \.{CWEB}
+files as input as well, as long as the ``change files'' adhere to the general
+\.{@@x}, \.{@@y}, \.{@@z} convention.
+@z
 
 @x l.1236
 main(argc,argv)
