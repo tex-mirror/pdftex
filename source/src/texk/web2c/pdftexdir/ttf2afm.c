@@ -1,5 +1,5 @@
 /*
-Copyright 1996-2014 Han The Thanh, <thanh@pdftex.org>
+Copyright 1996-2021 Han The Thanh, <thanh@pdftex.org>
 
 This file is part of pdfTeX.
 
@@ -444,15 +444,17 @@ static char *make_name(long platform_id, int len)
             *p = (unsigned char) get_char();
             i++;
         }
-        /* sometime a UTF-16BE string will contain chars where the 1st or 2nd byte is in range (0..32) */
+        /* sometime a UTF-16BE string will contain chars where the 1st
+           or 2nd byte is in range (0..32) */
         if (*p < 32
             && *p != '\r'
             && *p != '\n'
             && *p != '\t'
-           )
-            ttf_warn("skip unsafe character: %i", *p);
-        else
+           ) {
+            ttf_warn("skipping unsafe character: %i", *p);
+        } else {
             p++;
+        }
     }
     *p = 0;
     return xstrdup(buf);

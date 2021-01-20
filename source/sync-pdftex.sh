@@ -34,7 +34,7 @@ cd "$mydir/src" || exit 1
 
 # use rsync instead of cp so we can get local deletion for free.
 # don't bother preserving permissions, original might be readonly.
-copy="rsync -ari --delete --no-p --exclude=.svn --exclude=autom4te.cache"
+copy="rsync -ari --delete --no-p --exclude=*~ --exclude=.svn --exclude=autom4te.cache"
 if $chicken; then
   copy="$copy -n"
 fi
@@ -79,7 +79,7 @@ sync_dir ()
       echo "$0: recursively syncing directory $f"
       sync_dir $f
     
-    elif test $f = autom4te.cache; then
+    elif echo $f | grep 'autom4te.cache$' >/dev/null; then
       :
 
     elif test -d $f; then  # other directories
@@ -110,6 +110,9 @@ for f in *; do
     # Major subdirectory, handle what we've got, only.
     printf "\n\f\n$0: syncing major directory $f\n"
     sync_dir $f
+
+  elif test $f = autom4te.cache; then
+    :
 
   elif test -d $f; then
     # Other subdirectories (build-aux, etc.), copy in their entirety,
