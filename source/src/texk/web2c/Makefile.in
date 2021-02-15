@@ -3680,6 +3680,32 @@ AM_TESTS_ENVIRONMENT = abs_srcdir=$(abs_srcdir); export abs_srcdir; \
 	DIFF='$(DIFF)'; export DIFF; DIFFFLAGS='$(DIFFFLAGS)'; export \
 	DIFFFLAGS; LN_S='$(LN_S)'; export LN_S; \
 	KPSEWHICH='$(KPSEWHICH)'; export KPSEWHICH;
+
+# To run, e.g., just the original trip test, in the build directory:
+#   make -C $ww TRIPTRAP=trip.diffs triptrap
+# where $ww is the web2c build directory.   
+# 
+# This will run the triptrap-sh script
+#   which then runs make TEST=triptest.test check-am,
+#   which then runs the (srcdir file) triptest.test script;
+#   its output will be in (builddir file) trip.diffs,
+#   and triptest.out if the test failed,   
+#   plus various created files in the tripdir/ subdirectory.
+# The triptest.diffs file will have the actual abs_srcdir value replaced
+#  with the constant string "SRCDIR" to minimize differences, and "../"
+#  replaced with "./" to match the canonical output. Confusing. For the
+#  real output, see triptest.log.
+# 
+# To build only tex, make -C $ww tex (i.e., in builddir) should do it.
+# Unfortunately the check-am target depends on all-am, so all engines
+# are built before any tests are run. If this is a problem, just have to
+# edit the generated Makefile in builddir to remove the dependency.
+# 
+# Other per-engine invocations (see triptrap-sh for complete list):
+#   make -C $ww mf && make -C $ww TRIPTRAP=mftrap.diffs triptrap
+#   make -C $ww etex && make -C $ww TRIPTRAP=etrip.diffs triptrap   
+#   make -C $ww ptex && make -C $ww TRIPTRAP=ptrip.diffs triptrap   
+#   
 triptrap_diffs = $(AM_V_GEN)srcdir=$(srcdir) abs_srcdir=$(abs_srcdir) MAKE=$(MAKE) $(SHELL) $(srcdir)/triptrap-sh
 
 # The environment for making dumps.
@@ -3748,7 +3774,9 @@ tex_prereq = texd.h $(am__append_127)
 tex_ch_srcs = \
 	tex.web \
 	tex.ch \
-	enctex.ch \
+	enctexdir/enctex1.ch \
+	enctexdir/enctex-tex.ch \
+	enctexdir/enctex2.ch \
 	$(tex_ch_synctex) \
 	tex-binpool.ch
 
@@ -4241,7 +4269,9 @@ etex_ch_srcs = \
 	etexdir/tex.ch0 \
 	tex.ch \
 	zlib-fmt.ch \
-	enctex.ch \
+	enctexdir/enctex1.ch \
+	enctexdir/enctex-tex.ch \
+	enctexdir/enctex2.ch \
 	$(etex_ch_synctex) \
 	etexdir/tex.ch1 \
 	etexdir/tex.ech \
@@ -4276,6 +4306,7 @@ ptex_prereq = ptexd.h ptexdir/ptex_version.h $(am__append_135)
 ptex_web_srcs = \
 	tex.web \
 	tex.ch \
+	tracingstacklevels.ch \
 	zlib-fmt.ch
 
 ptex_ch_srcs = \
@@ -4335,6 +4366,7 @@ eptex_web_srcs = \
 	etexdir/etex.ch \
 	etexdir/tex.ch0 \
 	tex.ch \
+	tracingstacklevels.ch \
 	zlib-fmt.ch \
 	etexdir/tex.ech
 
@@ -4379,6 +4411,7 @@ uptex_prereq = uptexd.h ptexdir/ptex_version.h \
 uptex_web_srcs = \
 	tex.web \
 	tex.ch \
+	tracingstacklevels.ch \
 	zlib-fmt.ch
 
 uptex_ch_srcs = \
@@ -4443,6 +4476,7 @@ euptex_web_srcs = \
 	etexdir/etex.ch \
 	etexdir/tex.ch0 \
 	tex.ch \
+	tracingstacklevels.ch \
 	zlib-fmt.ch \
 	etexdir/tex.ech
 
@@ -4513,8 +4547,11 @@ pdftex_ch_srcs = \
 	pdftexdir/pdftex.web \
 	pdftexdir/tex.ch0 \
 	tex.ch \
+	tracingstacklevels.ch \
 	zlib-fmt.ch \
-	enctex.ch \
+	enctexdir/enctex1.ch \
+	enctexdir/enctex-pdftex.ch \
+	enctexdir/enctex2.ch \
 	$(pdftex_ch_synctex) \
 	pdftexdir/pdftex.ch \
 	pdftexdir/char-warning-pdftex.ch \
@@ -5202,6 +5239,7 @@ xetex_ch_srcs = \
 	xetexdir/xetex.web \
 	xetexdir/tex.ch0 \
 	tex.ch \
+	tracingstacklevels.ch \
 	$(xetex_ch_synctex) \
 	xetexdir/xetex.ch \
 	$(xetex_post_ch_synctex) \

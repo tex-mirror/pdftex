@@ -1,3 +1,16 @@
+2021-02-13  Karl Berry  <karl@freefriends.org>
+
+	* am/pdftex.am (pdftex_ch_srcs): adjust for split enctex changes.
+
+2021-02-06  Akira Kakuto  <kakuto@w32tex.org>
+
+	* pdftex.web: sync \tracingparagraphs fix from tex.web.
+
+2021-01-28  Marcel Fabian Krueger  <tex@2krueger.de>
+
+	* tounicode.c ((un)dumptounicode): use integer, not size_t,
+	so .fmt files work across platforms.
+
 2021-01-20  Karl Berry  <karl@freefriends.org>
 
 	* NEWS: update.
