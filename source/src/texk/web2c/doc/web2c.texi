@@ -63,7 +63,7 @@ This file documents the installation and use of the programs in Web2c,
 an implementation of Donald Knuth's TeX system.
 
 Copyright @copyright{} 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-2004, 2005, 2007, 2008, 2009, 2010-2021 Karl Berry & Olaf Weber.
+2004, 2005, 2007, 2008, 2009, 2010-2020 Karl Berry & Olaf Weber.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -93,7 +93,7 @@ except that this permission notice may be stated in a translation
 @subtitle @value{month-year}
 @author Karl Berry
 @author Olaf Weber
-@author @url{https://tug.org/web2c}
+@author @url{http://tug.org/web2c}
 
 @page
 @vskip 0pt plus 1filll
@@ -162,6 +162,7 @@ Therefore, it will not work without change on an arbitrary WEB program.
 @cindex licensing terms
 @cindex freedom of Web2c
 @cindex ice cream
+@cindex Henry, Patrick
 Availability: All of Web2c is freely available---``free'' both in the
 sense of no cost (free ice cream) and of having the source code to
 modify and/or redistribute (free speech).  @xref{unixtex.ftp,,,
@@ -315,12 +316,6 @@ Print the version number to standard output, then exit successfully.
 common:
 
 @table @samp
-@item -cnf-line=@var{str}
-@opindex -cnf-line
-Parse @var{str} as if it were a line in the @file{texmf.cnf}
-configuration file, overriding all other settings.  @xref{Path
-searching options,,,kpathsea,Kpathsea}.
-
 @item -file-line-error
 @opindex -file-line-error
 @itemx -no-file-line-error
@@ -444,8 +439,7 @@ This is the recommended method for portability reasons.
 @flindex 8 bit clean output, specifying
 This option specifies that by default all characters should be
 considered printable.  If @samp{-translate-file} was given as well, then the
-TCX file may mark characters as non-printable.  This is a no-op in
-engines supporting native Unicode.
+TCX file may mark characters as non-printable.
 
 @end table
 
