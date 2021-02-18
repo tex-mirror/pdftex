@@ -40,7 +40,7 @@
 
 \svnscan $Id$
 
-\def\currentpdftex{1.40.21}
+\def\currentpdftex{1.40.22}
 
 %***********************************************************************
 
@@ -1018,11 +1018,12 @@ needed for building a ready \PDF\ page must be available during the
 graphics files for embedding, and font information (font files,
 encodings).
 
-When \TEX\ builds a page, it places items relative to the top left page
-corner (the \DVI\ reference point). Separate \DVI\ postprocessors allow
-specifying the paper size (\eg\ \quote {A4} or \quote{letter}), so
-that this reference point is moved to the correct position on the paper,
-and the text ends up at the right place.
+When \TEX\ builds a page, it places items relative to the (1in,1in)
+offset from the top left page corner (the \DVI\ reference point).
+Separate \DVI\ postprocessors allow specifying the paper size (\eg\
+\quote {A4} or \quote{letter}), so that this reference point is moved to
+the correct position on the paper, and the text ends up at the right
+place.
 
 In \PDF, the paper dimensions are part of the page definition, and
 \PDFTEX\ therefore requires that they be defined at the beginning of
@@ -1127,10 +1128,11 @@ even without setting any parameters.
   {\getbuffer}
 
 Independent of whether such a configuration file is read or not, the
-first action in a \PDFTEX\ run is that the program reads the global \WEBC\
-configuration file (\filename{texmf.cnf}), which is common to all programs
-in the \WEBC\ system. This file mainly defines file search paths, the
-memory layout (\eg\ string pool and hash size), and other general parameters.
+first action in a \PDFTEX\ run is that the program reads the global
+\WEBC\ configuration file (\filename{texmf.cnf}), which is common to all
+programs in the \WEBC\ system. This file mainly defines file search
+paths, the memory layout (\eg\ string pool and hash size), and a few
+other general parameters.
 
 %***********************************************************************
 
@@ -1190,15 +1192,16 @@ memory layout (\eg\ string pool and hash size), and other general parameters.
   {\getbuffer}
 
 The \PDFTEX\ engine supports building formats for \DVI\ and \PDF\ output
-in the same way as the classical \TEX\ engine does for \DVI.  Format
-generation is enabled by the \type{-ini} option. The default mode (\DVI\
-or \PDF) can be chosen either on the command line by setting the option
-\type{-output-format} to \type{dvi} or \type{pdf}, or by setting the
-\type{\pdfoutput} parameter. The format file then inherits this setting,
-so that a later invocation of \PDFTEX\ with this format starts in the
-preselected mode (which still can be overridden). A format file can be
-read in only by the engine that has generated it; a format incompatible
-with an engine leads to a fatal error.
+in the same way as the classical \TEX\ engine does for \DVI. Format
+generation (and other \type{initex} features) is enabled by the
+\type{-ini} option. The default mode (\DVI\ or \PDF) can be chosen
+either on the command line by setting the option \type{-output-format}
+to \type{dvi} or \type{pdf}, or by setting the \type{\pdfoutput}
+parameter. The format file then inherits this setting, so that a later
+invocation of \PDFTEX\ with this format starts in the preselected mode
+(which still can be overridden). A format file can be read in only by
+the engine that has generated it; a format incompatible with an engine
+leads to a fatal error.
 
 It is customary to package the configuration and macro file input
 into a \type{.ini} file.  \Eg, the file \type{etex.ini} in
@@ -1225,10 +1228,14 @@ pdftex -ini *pdflatex.ini
 
 These calls produce format files \filename{etex.fmt},
 \filename{pdfetex.fmt}, and \filename{pdflatex.fmt}, as the default
-format file name is taken from the input file name. You can overrule
+format file name is taken from the input file name. You can override
 this with the \type{-jobname} option. The asterisk \type{*} before the
-file name is a unusual feature, only in \type{-ini} mode, which causes
-the \PDFTEX\ engine to enable \ETEX\ features.
+file name is an unusual flag, only used in \type{-ini} mode, which
+causes the \PDFTEX\ engine to enable \ETEX's features.
+
+Incidentally, as of \PDFTEX\ 1.40.21 (\TEX\ Live 2020), \filename{.fmt}
+files are compressed with \type{zlib}. This makes for a considerable
+savings in space, and consequently in time.
 
 \subsection{Testing the installation}
 
@@ -1315,10 +1322,10 @@ the object table size is now obsolete and ignored).
 
 \section{Invoking \PDFTEX}
 
-\PDFTEX\ has many command line options.  With the exception of the
-simple and rarely-used \type{-draftmode} and \type{-output-format}
-options, they are all inherited from the common framework for \TeX\
-engines as implemented in \WEBC\ (\from [web2c] has the manual).
+\PDFTEX\ has many command line options. Except for the simple and
+rarely-used \type{-draftmode} and \type{-output-format} options, they
+are all inherited from the common framework for \TeX\ engines as
+implemented in \WEBC\ (its manual is available at \from [web2c]).
 
 The same commonality holds for environment variables; see the section
 ``Setting search paths'' above for an overview.  Two additional
@@ -1341,11 +1348,11 @@ are \type{\year}, \type{\month}, \type{\day}, and \type{\time}. If
 has no effect. If \type{FORCE_SOURCE_DATE} is unset, set to the empty
 string, or set to~\type{0}, the primitives reflect the current time as
 usual. Any other value elicits a warning, and the current time is used.
-(This is useful only if one wants to make reproducible \PDF{}s for a set
+This is useful if one wants to make reproducible \PDF{}s for a set
 of documents without changing them in any way, e.g., an operating system
 distribution with manuals that use \type{\today}. Except in such unusual
 circumstances, it is better not to set this, and let the \TEX\
-primitives retain the meaning they have always had.)
+primitives retain the meaning they have always had.
 
 In addition, if both \type{SOURCE_DATE_EPOCH} and
 \type{FORCE_SOURCE_DATE} are set, \type{\pdffilemoddate} returns a value
@@ -4323,8 +4330,8 @@ example, the first ten bytes of the source of this manual are {\tt
 As of \TEXLIVE\ 2020, the \type{\input} primitive in all \TEX\ engines,
 including \PDFTEX, now also accepts a group-delimited filename argument,
 as a system-dependent extension, as in \type{\input\Lbrace
-foo.tex\Rbrace}. The usage with a standard space/token-delimited
-filename is completely unchanged.
+foo.tex\Rbrace}. The usage of \type{\input} with a standard
+space/token-delimited filename is completely unchanged.
 
 This group-delimited argument was previously implemented in Lua\TEX; now
 it is available in all engines. \ASCII\ double quote characters
@@ -4337,9 +4344,11 @@ primitive, command line option, etc. This is allowed because additional
 methods of recognizing filenames are explicitly mentioned in
 \type{tex.web} as acceptable system-dependent extensions.
 
-Incidentally, this does not currently
-affect \LATEX's \type{\input} command, as that is a macro redefinition
-of the standard \type{\input} primitive. \introduced{1.40.21}
+Incidentally, this does not directly affect \LATEX's \type{\input}
+command, as that is a macro redefinition of the standard \type{\input}
+primitive.
+
+\introduced{1.40.21}
 
 %***********************************************************************
 
@@ -4524,10 +4533,8 @@ in \DVI\ mode.
 \pdftexprimitive{\Syntax{\Tex{\pdfshellescape} \Whatever{read||only integer}}}
 \bookmark{\tex{pdfshellescape}}
 
-This primitive is~1 if \type{\write18} is enabled, 2 if it is
-restricted, and 0 otherwise.  (\type{\write18} was
-\ifnum\pdfshellescape=0\relax not \fi enabled when this manual was
-typeset.)  \introduced{1.30.0}
+This primitive is~1 if \type{\write18} is enabled, 2 if its operation is
+restricted to known-safe programs, and 0 otherwise. \introduced{1.30.0}
 
 
 \pdftexprimitive{\Syntax{\Tex{\pdftexbanner} \Whatever{expandable}}}
@@ -4551,19 +4558,108 @@ this document), it returns the number {\tt \pdftexrevision}.
 \bookmark{\tex{pdftexversion}}
 
 Returns the version of \PDFTEX\ multiplied by 100, \eg\ for \PDFTEX\
-version \expandafter\versplit\the\pdftexversion.\pdftexrevision\ used to
-produce this document, it returns {\tt \number\pdftexversion}.
+version \expandafter\versplit\the\pdftexversion.\pdftexrevision\ (used to
+produce this document), it returns {\tt \number\pdftexversion}.
 
 
 \pdftexprimitive{\Syntax{\Tex{\quitvmode}}}
 \bookmark{\tex{quitvmode}}
 
 The primitive instructs \PDFTEX\ to quit vertical mode and start
-typesetting a paragraph. \type{\quitvmode} has the same effect as
-\type{\leavevmode} definition from \type{plain} macro package. Note
-however, that \type{\leavevmode} may conflict with \type{\everypar}
-tokens list. No such risk while using \type{\quitvmode} instead.
-\introduced{1.21a}
+typesetting a paragraph. Thus, \type{\quitvmode} has the same basic
+effect as the \type{\leavevmode} macro from \type{plain.tex}. However,
+\type{\leavevmode} expands the \type{\everypar} tokens list, which may
+or may not be desired. \type{\quitvmode} does not expand
+\type{\everypar}. \introduced{1.21a}
+
+
+\pdftexprimitive{\Syntax{\Tex{\tracinglostchars} \Whatever{integer}}}
+\bookmark{\tex{tracinglostchars}}
+
+This primitive parameter has always been part of \TEX, and its operation
+with values $\le2$ is unchanged. In addition, if its value is
+$\ge3$, then \quote{Missing character} reports become full errors
+(ordinarily they are only logged), and the character code is reported in
+hex. For example:
+
+\starttyping
+\tracinglostchars=3
+\font\x=logo10 \x \char99 \end
+\stoptyping
+
+will result in this error message:
+\starttyping
+! Missing character: There is no c ("63) in font logo10.
+\stoptyping
+
+(The \type{logo10} font only defines the capital letters used in the
+\METAFONT\ and \METAPOST\ logos, so there is no lowercase.)
+
+This new behavior is essentially the same in all \TeX\ engines except
+the original \TEX\ and \eTeX, where the behavior of
+\type{\tracinglostchars} remains unchanged.
+
+\introduced{1.40.22}
+
+\pdftexprimitive{\Syntax{\Tex{\tracingstacklevels} \Whatever{integer}}}
+\bookmark{\tex{tracingstacklevels}}
+
+If this primitive parameter is $>0$, and \type{\tracingmacros}$\,>0$,
+macro expansion logging is truncated at the specified depth. Also, and
+more importantly, each relevant log line is given a prefix beginning
+with \type{~}, either followed by a \type{.} character for each
+expansion level or only another \type{~} if the expansion was truncated.
+For example:
+
+\starttyping
+\tracingmacros=1      % so macro expansion is logged at all
+\tracingstacklevels=2 % cut off at level 2
+\def\a#1{\relax}      % argument to show parameter logging is affected too
+\def\b#1{\a{#1}}
+\b1
+\stoptyping
+
+\noindent logs the following:
+
+\starttyping
+~.\b #1->\a {#1}
+#1<-1
+~~\a 
+\stoptyping
+
+Thus, the expansion of \type{\b} is logged normally, with the addition
+of the \type{~.} prefix. The expansion of \type{\a} is truncated
+(level~2), hence neither the parameters nor body expansion are shown.
+
+Furthermore, an \type{\input} file counts as an expansion level, and the
+input filename is logged. So, if we add this to our example above:
+\starttyping
+\input anotherfile
+\stoptyping
+
+where \type{anotherfile.tex} simply contains \type{\b2}, the log will
+get:
+
+\starttyping
+~.INPUT anotherfile.tex
+~~\b 
+~~\a 
+\stoptyping
+
+Now the \type{\b} expansion is not logged either, since the expansion
+depth is higher than the \type{\tracingstacklevels} value.
+
+The intended use of \type{\tracingstacklevels} is not so much to
+truncate logging as to indicate the expansion levels for detailed
+debugging. Thus normally it would be set to a large number
+(\type{\maxdimen}, say), so that everything is fully logged, with the
+addition of the expansion level indication with the number of dots in
+the prefix.
+
+The behavior is the same in all \TeX\ engines except the original \TEX\
+and \eTeX, where \type{\tracingstacklevels} remains undefined.
+
+\introduced{1.40.22}
 
 
 \pdftexprimitive{\Syntax{\Tex{\vadjust}
@@ -4578,7 +4674,7 @@ The \type{\vadjust} implementation of \PDFTEX\ adds an optional
 qualifier \Something{pre spec}, which is simply the string \type{pre}, to
 the original \TEX\ primitive with the same name. If
 no \type{pre} is given, \type{\vadjust} behaves exactly as the original
-(see the \TEX book, p.~281): it appends an adjustment item created
+(see {\em The \TEX book}, p.~281): it appends an adjustment item created
 from \Something{vertical mode material} to the current list {\em after}
 the line in which \type{\vadjust} appears. However, with the qualifier
 \type{pre}, the adjustment item is put {\em before} the line in which

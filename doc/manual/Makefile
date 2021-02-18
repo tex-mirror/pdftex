@@ -52,11 +52,15 @@ pdftex-w.txt: pdftex-w.pdf
 	| expand >$@ || rm -f $@
 	wc -l pdftex-w.txt  # set titlepagelines=half of this
 
-# PDF for the title page.
+# PDF for the title page. This should be updated every year;
+# - update version numbers
+# - make new binary
+# - run this target
+# Also check pdftex-help.txt for updates.
 pdftex_binary = ../../source/build-pdftex/texk/web2c/pdftex
 pdftex-w.pdf: pdftex-w.tex Makefile
 	TEXFONTS=/usr/local/texlive/dev/texmf-dist/fonts// \
-	$(pdftex_binary) -ini '\nonstopmode\input $<'
+	$(pdftex_binary) -ini '$<'
 
 
 # Too annoying to remake help text every time; check by hand when needed.
