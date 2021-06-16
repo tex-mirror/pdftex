@@ -33,4 +33,4 @@ prog = $(env) $(pdftex) -ini -interaction=nonstopmode
 rebuild = cd ../../source/build-pdftex/texk/web2c && make pdftex ttf2afm
 
 # can't make the clean: target here since then it would be the default.
-clean = rm -f *.log *.pdf *.fmt *.aux *.out
+clean = rm -f *.log *.pdf *.fmt *.aux *.out *.dvi
