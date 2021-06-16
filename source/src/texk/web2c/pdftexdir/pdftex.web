@@ -17652,7 +17652,6 @@ begin
             font_info[width_base[k] + i].sc + round_xn_over_d(quad(k), e, 1000);
 
     {append, e.g., '+100ls' to font name}
-    flush_str(font_name[k]);
     str_room(length(font_name[k]) + 7); {|abs(e) <= 1000|}
     old_setting := selector;
     selector := new_string;
