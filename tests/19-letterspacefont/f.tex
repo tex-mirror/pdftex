@@ -1,0 +1,20 @@
+\parindent=0pt
+\pdfprotrudechars2
+
+H
+
+\font\x=FdSymbolB-Regular at 10pt
+\x
+\lpcode\x`b=500
+bye % no protrusion
+
+\fontdimen6\x=10pt
+bye % protrusion fixed
+
+% here it doesn't work
+\letterspacefont\xy\x 300
+% \fontdimen6\xy=10pt % no difference
+\lpcode\xy`b=500
+\xy
+bye
+\end
