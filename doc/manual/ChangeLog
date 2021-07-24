@@ -1,3 +1,12 @@
+2021-07-24  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (Installation): rename this section from "Getting
+	started", and move to the end.
+	(Macro programming, Typesetting, Tracing, \PDFTEX\ execution
+	environment): split "Miscellanous" primitives subsection into these.
+	(Character translation): move to before Abbreviations.
+	No substantive changes to the content in any of this.
+
 2021-02-18  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex: update for 2021:

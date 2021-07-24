@@ -73,17 +73,17 @@
 \abbreviation [JPEG]       {jpeg}       {Joint Photographic Experts Group}
 \abbreviation [LATEX]      {\LaTeX}     {general purpose macro package}
 \abbreviation [MAC]        {Macintosh}  {Macintosh hardware platform}
-\abbreviation [MACOSX]     {Mac\,OS\,X} {Macintosh operating system version 10}
-\abbreviation [MACTEX]     {Mac\TeX}   {\MAC\ \WEBC\ distribution}
+\abbreviation [MACOSX]     {Mac\,OS\,X} {Macintosh operating system version 10+}
+\abbreviation [MACTEX]     {Mac\TeX}    {\MAC\ \TEXLIVE\ distribution}
 \abbreviation [METAFONT]   {\MetaFont}  {graphic programming environment, bitmap output}
 \abbreviation [METAPOST]   {\MetaPost}  {graphic programming environment, vector output}
 \abbreviation [MIKTEX]     {MiK\TeX}    {\WIN\ distribution}
 \abbreviation [MLTEX]      {ml\TeX}     {ML\TeX\ extension to \TEX}
 \abbreviation [MPTOPDF]    {mptopdf}    {\METAPOST\ to \PDF\ conversion tool}
 \abbreviation [MSDOS]      {ms-dos}     {Microsoft DOS platform (Intel)}
-\abbreviation [PDFETEX]    {pdfe\TeX}   {\ETEX\ extension producing \PDF\ output}
-\abbreviation [PDFLATEX]   {pdf\LaTeX}  {\TEX\ extension producing \PDF\ output (\LATEX\ format loaded)}
-\abbreviation [PDFTEX]     {pdf\TeX}    {\TEX\ extension producing \PDF\ output}
+\abbreviation [PDFETEX]    {pdfe\TeX}   {\ETEX\ extension supporting \PDF\ output}
+\abbreviation [PDFLATEX]   {pdf\LaTeX}  {\LATEX\ format using \PDFTEX, producing \PDF}
+\abbreviation [PDFTEX]     {pdf\TeX}    {\TEX\ extension supporting \PDF\ output}
 \abbreviation [PDF]        {pdf}        {Portable Document Format}
 \abbreviation [PDFA]       {pdf/\kern-.16em a}      {PDF A/ standards}
 \abbreviation [PERL]       {Perl}       {Perl programming environment}
@@ -100,19 +100,18 @@
 \abbreviation [TCX]        {tcx}        {\TEX\ Character Translation}
 \abbreviation [TDS]        {tds}        {\TEX\ Directory Standard}
 \abbreviation [TEXEXEC]    {\TeX exec}  {\CONTEXT\ command line interface}
-\abbreviation [TEXINFO]    {Texinfo}    {generate typeset documentation from info pages}
+\abbreviation [TEXINFO]    {Texinfo}    {\GNU\ documentation format}
 \abbreviation [TEXUTIL]    {\TeX util}  {\CONTEXT\ utility tool}
 \abbreviation [TEX]        {\TeX}       {typographic language and program}
-\abbreviation [TEXLIVE]    {\TeX\ Live} {\TeX\ Live distribution (multiple platform)}
+\abbreviation [TEXLIVE]    {\TeX\ Live} {\TeX\ Live distribution (cross-platform)}
 \abbreviation [TFM]        {tfm}        {\TEX\ Font Metrics}
 \abbreviation [TIF]        {tiff}       {Tagged Interchange File format}
 \abbreviation [TUG]        {tug}        {\TEX\ Users Group}
 \abbreviation [UNIX]       {Unix}       {Unix platform}
 \abbreviation [URL]        {url}        {Uniform Resource Locator}
-\abbreviation [WEBC]       {Web2c}      {official multi||platform \WEB\ environment}
+\abbreviation [WEBC]       {Web2c}      {Implementation framework for \TEX\ and friends}
 \abbreviation [WEB]        {web}        {literate programming environment}
 \abbreviation [WIN]        {Windows}    {Microsoft Windows platform}
-\abbreviation [ZIP]        {zip}        {compressed file format}
 
 %D It makes sense to predefine the name of the author of \PDFTEX, doesn't it?
 
@@ -827,496 +826,6 @@ file from Adobe's \PDF\ Technology Center, \from[pdfreference] --- or
 get the heavy paper version.
 
 We now turn to specifics of \PDFTEX.
-
-%***********************************************************************
-
-\section{Getting started}
-
-This section describes the steps needed to get \PDFTEX\ running on
-a system where \PDFTEX\ is not yet installed. Nowadays virtually all
-\TEX\ distributions have \PDFTEX\ as a component, such as \TEXLIVE,
-\MIKTEX, \PROTEXT, and \MACTEX. The ready to run
-\TEXLIVE\ distribution comes with \PDFTEX\ versions for many \UNIX,
-\WIN, and \MACOSX\ systems; more information can be found at
-\hbox{\from[texlive].}  There are also \WIN-specific distributions which
-contain \PDFTEX, under \from[win32]: \MIKTEX\ by Christian Schenk, and
-\PROTEXT\ (based on \MIKTEX) by Thomas Feuerstack. When you use any
-of these distributions, you don't need to bother with the \PDFTEX\
-installation procedure in the next sections.
-
-If there is no precompiled \PDFTEX\ binary for your system, or the version
-coming with a distribution is not the current one and you would like to
-try out a fresh \PDFTEX\ immediately, you will need to build \PDFTEX\
-from sources; read on. You should already have a working \TEX\ system,
-\eg\ \TEXLIVE, into which the freshly compiled \PDFTEX\ will
-be integrated. Note that the installation description in this manual
-is \WEBC||specific.
-
-%***********************************************************************
-
-\subsection{Getting sources and binaries}
-
-The latest sources of \PDFTEX\ are distributed for compilation on \UNIX\
-systems (including \GNU/Linux), and \WIN\ systems.  The primary home
-page is \from[ptex_org], where you also find bug tracking information.
-Development sources are at \from[ptex_devel].  Precompiled \PDFTEX\
-binaries for various systems might be available in subdirectories below
-\from[ctan_systems], or via \TEX\ distribution web pages.
-
-%***********************************************************************
-
-\subsection{Compiling}
-
-The compilation is expected to be easy on \UNIX||like systems and
-can be described best by example. Assuming that the file \filename
-{pdftex.zip} is downloaded to some working directory, \eg\
-\filename {\$HOME/pdftex}, on a \UNIX\ system the following steps are
-needed to compile \PDFTEX:
-
-\startesctyping
-cd pdftex.../source
-./build-pdftex.sh
-\stopesctyping
-
-The binary \filename{pdftex} is then built in the subdirectory
-\filename{build/texk/web2c}. 
-
-The obsolescent binary \filename{pdfetex} is still generated for backward
-compatibility, but since version 1.40 it is just a symbolic link to or copy
-of the file \filename{pdftex}.
-
-As well as the main \filename{pdftex} binary, binaries for the utilities
-\filename{pdftosrc} and \filename{ttf2afm} are generated.
-
-Incidentally, for \PDFTEX\ maintains, a sibling script to
-\type{build-pdftex.sh} is included, namely \type{sync-pdftex.sh}, which
-syncs changes from a \TEXLIVE\ source repository to a \PDFTEX\ source
-repository.  Read the script before using it.  And don't use it unless
-you understand what you read.
-
-%***********************************************************************
-
-\subsection{Placing files}
-
-The next step is to put the freshly compiled \filename{pdftex},
-\filename{pdftosrc}, and \filename{ttf2afm} binaries into the binary
-directory (\eg\ for a typical \TEXLIVE\ system, and on the appropriate
-platform) \filename{/usr/local/texlive/\rcsyear/bin/x86_64-linux}.
-
-If you're doing this into a live hierarchy, don't forget to do a
-\type{texconfig-sys init} afterwards, so that all formats are
-regenerated system-wide with the fresh \filename{pdftex} binary.
-
-%***********************************************************************
-
-\subsection{Setting search paths}
-
-\WEBC||based programs, including \PDFTEX, use the \WEBC\ run||time
-configuration file called \filename {texmf.cnf}.  The location
-of this file is the appropriate position within the \TDS\ tree
-relative to the place of the \PDFTEX\ binary; on a \TEXLIVE\ system,
-\filename{texmf.cnf} is typically located either in the directory
-\filename{texmf-dist/web2c}.  The path to
-file \filename{texmf.cnf} can also be set up by the environment variable
-\type{TEXMFCNF}.
-
-The configuration files in the major \TEX\ distributions (such as
-\filename{texmf.cnf} in \TEXLIVE) should already be set up for normal
-use, so you shouldn't need to edit it. You might still like to read it
-to see where the various bits and pieces are going.
-
-\PDFTEX\ uses the search path variables shown in
-\in{table}[tbl:spathvar], among others.
-
-\startbuffer
-\starttabulate[|l|l|]
-\HL
-\NC \bf used for        \NC \bf texmf.cnf        \NC\NR
-\HL
-\NC output files        \NC \type{TEXMFOUTPUT}   \NC\NR
-\NC input files, images \NC \type{TEXINPUTS}     \NC\NR
-\NC format files        \NC \type{TEXFORMATS}    \NC\NR
-\NC \TeX\ pool files    \NC \type{TEXPOOL}       \NC\NR
-\NC encoding files      \NC \type{ENCFONTS}      \NC\NR
-\NC font map files      \NC \type{TEXFONTMAPS}   \NC\NR
-\NC \TFM\ files         \NC \type{TFMFONTS}      \NC\NR
-\NC virtual fonts       \NC \type{VFFONTS}       \NC\NR
-\NC Type~1 fonts        \NC \type{T1FONTS}       \NC\NR
-\NC TrueType fonts      \NC \type{TTFONTS}       \NC\NR
-\NC OpenType fonts      \NC \type{OPENTYPEFONTS} \NC\NR
-\NC bitmap fonts        \NC \type{PKFONTS}       \NC\NR
-\HL
-\stoptabulate
-\stopbuffer
-
-\placetable[here][tbl:spathvar]
-  {The principal \WEBC\ variables.}
-  {\getbuffer}
-
-\PathDescription {TEXMFOUTPUT} Normally, \PDFTEX\ puts its output files
-in the current directory, overridden by the \type{-output-directory}
-option. If any output file cannot be opened there, it tries to open it
-in the environment variable \type{TEXMFOUTPUT}, if that is set. There is
-no default value for that variable. For example, if \type{TEXMFOUTPUT}
-has the value \type{/tmp}, and you run \type{pdftex paper} when the
-current directory is not writable, \PDFTEX\ attempts to create
-\type{/tmp/paper.log} (and \type{/tmp/paper.pdf}, etc.)
-
-\PathDescription {TEXINPUTS} This variable specifies where \PDFTEX\ finds
-its input files. Image files are considered
-input files and searched for along this path.
-
-\PathDescription {TEXFORMATS} Search path for format (\type{.fmt}) files.
-
-\PathDescription {TEXPOOL} Search path for pool (\type{.pool}) files; no
-longer used, since the pool file (program strings) are compiled into
-the binary.
-
-\PathDescription {ENCFONTS} Search path for encoding (\type{.enc}) files.
-
-\PathDescription {TEXFONTMAPS} Search path for font map (\type{.map}) files.
-
-\PathDescription {TFMFONTS} Search path for font metric (\type{.tfm}) files.
-
-\PathDescription {VFFONTS} Search path for virtual font (\type{.vf})
-files.  Virtual fonts are fonts made up of other fonts.
-Because \PDFTEX\ produces the
-final output code, it must consult those files.
-
-\PathDescription {T1FONTS} Search path for Type~1 font files (\type{.pfa}
-and \type{.pfb}).  These outline (vector) fonts are to be preferred over
-bitmap \PK\ fonts. In most cases Type~1 fonts are used and this variable
-tells \PDFTEX\ where to find them.
-
-\PathDescription {TTFONTS,\hfil\break \hbox{OPENTYPEFONTS}} Search paths
-for TrueType (\type{.ttf}) and OpenType (\type{.otf}) font files.  Like
-Type~1 fonts, TrueType and OpenType fonts are also outlines.
-
-\PathDescription {PKFONTS} Search path for packed (bitmap) font
-(\type{.pk}) files.
-Unfortunately bitmap fonts are still displayed poorly by some \PDF\
-viewers, so when possible one should use outline fonts. When no outline
-is available, \PDFTEX\ tries to locate a suitable \PK\ font (or invoke
-a process that generates it).
-
-\PathDescription{TEXFONTS} Fallback for all the font paths, so that if
-you want to look in a particular directory for fonts on a given run, you
-can set that one variable.
-
-Many more variables may be consulted, and there are many details to
-file name lookups.  See the Kpathsea manual (\from [kpathsea]).
-
-%***********************************************************************
-
-\subsection[cfg]{The \PDFTEX\ configuration}
-
-We must keep in mind that, as opposed to \TEX\ with its \DVI\ output,
-the \PDFTEX\ program does not have a separate postprocessing stage to
-transform the \TEX\ input into final \PDF. As a consequence, all data
-needed for building a ready \PDF\ page must be available during the
-\PDFTEX\ run, in particular information on media dimensions and offsets,
-graphics files for embedding, and font information (font files,
-encodings).
-
-When \TEX\ builds a page, it places items relative to the (1in,1in)
-offset from the top left page corner (the \DVI\ reference point).
-Separate \DVI\ postprocessors allow specifying the paper size (\eg\
-\quote {A4} or \quote{letter}), so that this reference point is moved to
-the correct position on the paper, and the text ends up at the right
-place.
-
-In \PDF, the paper dimensions are part of the page definition, and
-\PDFTEX\ therefore requires that they be defined at the beginning of
-the \PDFTEX\ run. As with pages described by \POSTSCRIPT, the \PDF\
-reference point is in the lower||left corner.
-
-Formerly, these dimensions and other \PDFTEX\ parameters were read
-in from a configuration file named \filename{pdftex.cfg}, which had
-a special (non-\TEX) format, at the start of processing.  Nowadays such
-a file is ignored by \PDFTEX.  Instead, the page dimensions and offsets,
-as well as many other parameters, can be set by \PDFTEX\ primitives
-during the \PDFTEX\ format building process, so that the settings are
-dumped into the fresh format and consequently will be used when \PDFTEX\
-is later called with that format. All settings from the format can
-still be overridden during a \PDFTEX\ run by using the same primitives.
-This new configuration concept is a more unified approach, as it avoids
-the configuration file with a special format.
-
-A list of \PDFTEX\ primitives relevant to setting up the \PDFTEX\ engine
-is given in \in{table}[tbl:configparms]. All primitives are described in
-detail within later sections. \in{Figure}[in:pdftexconfig] shows a recent
-configuration file (\type{pdftexconfig.tex}) in \TEX\ format, using the
-primitives from \in{table}[tbl:configparms], which typically is read
-in during the format building process. It enables \PDF\ output, sets paper
-dimensions and the default pixel density for \PK\ font inclusion. The default
-values are chosen so that \PDFTEX\ often can be used (\eg\ in \type{-ini} mode)
-even without setting any parameters.
-
-\startbuffer
-\starttabulate[|l|l|l|l|l|]
-\HL
-\NC \bf internal name              \NC \bf type  \NC\bf default\NC\bf comment\NC\NR
-\HL
-\NC \type{\pdfoutput}              \NC integer   \NC      0 \NC \DVI                 \NC\NR
-\NC \type{\pdfadjustspacing}       \NC integer   \NC      0 \NC off                  \NC\NR
-\NC \type{\pdfcompresslevel}       \NC integer   \NC      9 \NC best                 \NC\NR
-\NC \type{\pdfobjcompresslevel}    \NC integer   \NC      0 \NC no object streams    \NC\NR
-\NC \type{\pdfdecimaldigits}       \NC integer   \NC      4 \NC max.                 \NC\NR
-\NC \type{\pdfimageresolution}     \NC integer   \NC     72 \NC dpi                  \NC\NR
-\NC \type{\pdfpkresolution}        \NC integer   \NC      0 \NC 72\,dpi              \NC\NR
-\NC \type{\pdfpkmode}              \NC token reg.\NC  empty \NC mode set in \type{mktex.cnf} \NC\NR
-\NC \type{\pdfuniqueresname}       \NC integer   \NC      0 \NC                      \NC\NR
-\NC \type{\pdfprotrudechars}       \NC integer   \NC      0 \NC                      \NC\NR
-\NC \type{\pdfgentounicode}        \NC integer   \NC      0 \NC                      \NC\NR
-\NC \type{\pdfmajorversion}        \NC integer   \NC      1 \NC output \PDF\ 1.4 by default            \NC\NR
-\NC \type{\pdfminorversion}        \NC integer   \NC      4 \NC \PDF\ 1.4            \NC\NR
-\NC \type{\pdfpagebox}             \NC integer   \NC      0 \NC                      \NC\NR
-\NC \type{\pdfforcepagebox}        \NC integer   \NC      0 \NC                      \NC\NR
-\NC \type{\pdfinclusionerrorlevel} \NC integer   \NC      0 \NC                      \NC\NR
-%-----------------------------------------------------------------------
-\NC \type{\pdfhorigin}             \NC dimension \NC  1\,in \NC                      \NC\NR
-\NC \type{\pdfvorigin}             \NC dimension \NC  1\,in \NC                      \NC\NR
-\NC \type{\pdfpagewidth}           \NC dimension \NC  0\,pt \NC                      \NC\NR
-\NC \type{\pdfpageheight}          \NC dimension \NC  0\,pt \NC                      \NC\NR
-%\NC \type{\pdffirstlineheight}     \NC dimention \NC  -1000\,pt \NC                  \NC\NR
-%\NC \type{\pdflastlinedepth}       \NC dimention \NC  -1000\,pt \NC                  \NC\NR
-%\NC \type{\pdfeachlineheight}      \NC dimention \NC  -1000\,pt \NC                  \NC\NR
-%\NC \type{\pdfeachlinedepth}       \NC dimention \NC  -1000\,pt \NC                  \NC\NR
-\NC \type{\pdflinkmargin}          \NC dimension \NC  0\,pt \NC                      \NC\NR
-\NC \type{\pdfdestmargin}          \NC dimension \NC  0\,pt \NC                      \NC\NR
-\NC \type{\pdfthreadmargin}        \NC dimension \NC  0\,pt \NC                      \NC\NR
-\NC \type{\pdfmapfile}             \NC text      \NC \filename{pdftex.map} \NC not dumped\NC\NR
-\HL
-\stoptabulate
-\stopbuffer
-
-\placetable[here][tbl:configparms]
-  {The set of \PDFTEX\ configuration parameters.}
-  {\getbuffer}
-
-\startbuffer
-\tx\setupinterlinespace
-\startframedtext
-\starttyping
-% tex-ini-files 2016-04-15: pdftexconfig.tex
-
-% Load shared (PDF) settings in pdfTeX
-
-% Enable PDF output
-\pdfoutput           = 1
-
-% Paper size: dimensions given in absolute terms
-\pdfpageheight       = 11 true in
-\pdfpagewidth        = 8.5 true in
-
-% Enable PDF 1.5 output and thus more compression
-\pdfminorversion     = 5
-\pdfobjcompresslevel = 2
-
-% Low-level settings unlikely ever to need to change
-\pdfcompresslevel    = 9
-\pdfdecimaldigits    = 3
-\pdfpkresolution     = 600
-\pdfhorigin          = 1 true in
-\pdfvorigin          = 1 true in
-\stoptyping
-\stopframedtext
-\stopbuffer
-
-\placefigure[here][in:pdftexconfig]
-  {\PDFTEX\ configuration file for \TEXLIVE\ (\filename{pdftexconfig.tex}).}
-  {\getbuffer}
-
-Independent of whether such a configuration file is read or not, the
-first action in a \PDFTEX\ run is that the program reads the global
-\WEBC\ configuration file (\filename{texmf.cnf}), which is common to all
-programs in the \WEBC\ system. This file mainly defines file search
-paths, the memory layout (\eg\ string pool and hash size), and a few
-other general parameters.
-
-%***********************************************************************
-
-\subsection{Creating format files}
-
-\startbuffer
-\tx\setupinterlinespace
-\startframedtext
-\starttyping
-% Thomas Esser, 1998. public domain.
-\input etex.src
-\dump
-\endinput
-\stoptyping
-\stopframedtext
-\stopbuffer
-
-\placefigure[here][in:etexini]
-  {File \type{etex.ini} for the plain \ETEX\ format with \DVI\ output.}
-  {\getbuffer}
-
-\startbuffer
-\tx\setupinterlinespace
-\startframedtext
-\starttyping
-% Thomas Esser, 1998. public domain.
-% This is used for pdftex and pdfetex, which are now identical: both
-% with e-TeX extensions, both with pdf output.
-\input pdftexconfig.tex
-\input etex.src
-\input pdftexmagfix.tex
-\dump
-\endinput
-\stoptyping
-\stopframedtext
-\stopbuffer
-
-\placefigure[here][in:pdfetexini]
-  {File \type{pdfetex.ini} for plain \ETEX\ with \PDF\ output.}
-  {\getbuffer}
-
-\startbuffer
-\tx\setupinterlinespace
-\startframedtext
-\starttyping
-% Thomas Esser, 1998. public domain.
-\input pdftexconfig.tex
-\scrollmode
-\input latex.ltx
-\endinput
-\stoptyping
-\stopframedtext
-\stopbuffer
-
-\placefigure[here][in:pdflatexini]
-  {File \type{pdflatex.ini} for the \LATEX\ format with \PDF\ output.}
-  {\getbuffer}
-
-The \PDFTEX\ engine supports building formats for \DVI\ and \PDF\ output
-in the same way as the classical \TEX\ engine does for \DVI. Format
-generation (and other \type{initex} features) is enabled by the
-\type{-ini} option. The default mode (\DVI\ or \PDF) can be chosen
-either on the command line by setting the option \type{-output-format}
-to \type{dvi} or \type{pdf}, or by setting the \type{\pdfoutput}
-parameter. The format file then inherits this setting, so that a later
-invocation of \PDFTEX\ with this format starts in the preselected mode
-(which still can be overridden). A format file can be read in only by
-the engine that has generated it; a format incompatible with an engine
-leads to a fatal error.
-
-It is customary to package the configuration and macro file input
-into a \type{.ini} file.  \Eg, the file \type{etex.ini} in
-\in{figure}[in:etexini] is for generating an \ETEX\ format with \DVI\
-output.  It has been traditional for many years to generate
-\type{etex.fmt} with \PDFTEX\ rather than the original \ETEX, because
-\PDFTEX\ contains a few additional programming and other
-non-\PDF-related features on which people have come to rely.
-
-The \type{pdfetex.ini} file \in{figure}[in:etexini] shows the
-corresponding format with \PDF\ output by default; this is what creates
-the format file read when \type{pdftex} is normally invoked.
-
-Finally, \type{pdflatex.ini} \in{figure}[in:pdflatexini] shows how the
-\LATEX\ format with \PDF\ output by default is generated.
-
-The corresponding \PDFTEX\ calls for format generation are:
-
-\starttyping
-pdftex -ini *etex.ini
-pdftex -ini *pdfetex.ini
-pdftex -ini *pdflatex.ini
-\stoptyping
-
-These calls produce format files \filename{etex.fmt},
-\filename{pdfetex.fmt}, and \filename{pdflatex.fmt}, as the default
-format file name is taken from the input file name. You can override
-this with the \type{-jobname} option. The asterisk \type{*} before the
-file name is an unusual flag, only used in \type{-ini} mode, which
-causes the \PDFTEX\ engine to enable \ETEX's features.
-
-Incidentally, as of \PDFTEX\ 1.40.21 (\TEX\ Live 2020), \filename{.fmt}
-files are compressed with \type{zlib}. This makes for a considerable
-savings in space, and consequently in time.
-
-\subsection{Testing the installation}
-
-When everything is set up, you can test the installation.  A simple test
-of plain \PDFTEX\ is:
-
-\starttyping
-pdftex story \\end
-\stoptyping
-
-This should typeset the famous one-page short story by A.U. Thor.
-
-A more thorough and descriptive test is the plain \TEX\ test file
-\filename{samplepdf.tex}, available in the distribution in the
-\type{samplepdftex/} directory. Process this file by typing:
-
-\starttyping
-pdftex samplepdf
-\stoptyping
-
-If the installation is ok, this should produce a file called
-\filename{samplepdf.pdf}. The file \filename {samplepdf.tex} is a good
-place to look for examples of how to use \PDFTEX's primitives.
-
-%***********************************************************************
-
-\subsection{Common problems}
-
-The most common problem with installations is that \PDFTEX\ complains
-that something cannot be found. In such cases make sure that
-\type{TEXMFCNF} is set correctly, so \PDFTEX\ can find \filename
-{texmf.cnf}. The next best place to look|/|edit is the file
-\type{texmf.cnf}. When still in deep trouble, set
-\type{KPATHSEA_DEBUG=255} before running \PDFTEX\ or use the option
-\type{-kpathsea-debug 255}. This will cause \PDFTEX\ to write a lot of
-debugging information that can be useful to trace problems. More options
-can be found in the \WEBC\ documentation.
-
-Variables in \filename {texmf.cnf} can be overwritten by environment
-variables. Here are some of the most common problems you can encounter when
-getting started:
-
-\startitemize
-
-\head  \type{I can't find the format file `pdftex.fmt'!} \crlf
-       \type{I can't find the format file `pdflatex.fmt'!}
-
-       The format file is not created (see above how to do that) or
-       is not properly placed. Make sure that \type{TEXFORMATS} in
-       \filename {texmf.cnf} contains the path to \filename {pdftex.fmt}
-       or \filename {pdflatex.fmt}.
-
-\head \type{Fatal format file error; I'm stymied}
-
-       This appears \eg\ if you forgot to regenerate the \type{.fmt}
-       files after installing a new version of the \PDFTEX\ binary.
-       The first line tells by which engine the offending format was generated.
-
-\head  \PDFTEX\ cannot find one or more map files (\type{*.map}),
-       encoding vectors (\type{*.enc}), virtual fonts, Type~1 fonts,
-       TrueType or OpenType fonts, or some image file.
-
-       Make sure that the required file exists and the corresponding variable
-       in \filename {texmf.cnf} contains a path to the file. See above which
-       variables \PDFTEX\ needs apart from the ones \TEX\ uses.
-
-       When you have installed new fonts, and your \PDF\ viewer complains
-       about missing fonts, you should take a look at the log file produced
-       by \PDFTEX. Missing fonts, map files, encoding vectors as well as
-       missing characters (glyphs) are reported there.
-
-\stopitemize
-
-Normally the page content takes one object. This means that one seldom
-finds more than a few hundred objects in a simple file. This \PDFTEX\
-manual for instance uses approx.~750 objects. In more complex applications
-this number can grow quite rapidly, especially when one uses a lot of
-widget annotations, shared annotations or other shared things. In any
-case \PDFTEX's internal object table size will automatically grow to the
-required size (the parameter \type{obj_tab_size} for manual control of
-the object table size is now obsolete and ignored).
 
 %***********************************************************************
 
@@ -2328,7 +1837,7 @@ the wished true page height.
 
 %***********************************************************************
 
-\subsection[sec.docinfocatalog]{The document info and catalog}
+\subsection[sec.docinfocatalog]{Document info and catalog}
 
 \pdftexprimitive{\Syntax{\Tex{\pdfinfo} \Something{general text}}}
 \bookmark{\tex{pdfinfo}}
@@ -2473,6 +1982,13 @@ example:
   /PageMode /FullScreen
 } openaction goto page 2 {/Fit}
 \stoptyping
+
+\pdftexprimitive{\Syntax{\Tex{\pdfcreationdate} \Whatever{expandable}}}
+\bookmark{\tex{pdfcreationdate}}
+
+Expands to the date string \PDFTEX\ uses in the info dictionary of the
+document, \eg\ for this file {\tt\pdfcreationdate}. \introduced{1.30.0}
+
 
 \pdftexprimitive{\Syntax{\Tex{\pdfnames} \Something{general text}}}
 \bookmark{\tex{pdfnames}}
@@ -3317,6 +2833,14 @@ This command appends a whatsit node to the list being built. When the whatsit
 node is searched at shipout time, \PDFTEX\ will write the object
 \Something{object number}
 to the \PDF\ output if it has not been written yet.
+
+\pdftexprimitive{\Syntax{\Tex{\pdfretval} \Whatever{read||only integer}}}
+\bookmark{\tex{pdfretval}}
+
+Set to $-1$ if \type{\pdfobj} ignores an invalid object number.  Perhaps
+this will be used to store the error status of other primitives in the
+future.
+
 
 %***********************************************************************
 
@@ -4380,6 +3904,8 @@ current. \Literal{set} keyword replaces the current value with
 \Literal{current} keyword instructs just to use the current stack value
 without modifying the stack at all. \introduced{1.40.0}
 
+%***********************************************************************
+
 \subsection{Transformations}
 
 Since the content of \Tex{\pdfliteral} is not interpreted anyhow, any
@@ -4419,7 +3945,9 @@ and end at the same group level. \introduced{1.40.0}
 
 %***********************************************************************
 
-\subsection{Miscellaneous}
+\subsection{Macro programming}
+
+Expansion-related.
 
 \pdftexprimitive{\Syntax{\tex {expanded} \Something{tokens}
   \Whatever{expandable}}}
@@ -4429,6 +3957,7 @@ Expands \Something{tokens} in exactly the same way as \type{\message}.
 In contrast to \type{\edef}, macro parameter characters do not need to
 be doubled. \type{\protected} macros are not expanded.
 \introduced{1.40.20}
+
 
 \pdftexprimitive{\Syntax{\tex {ifincsname} \Whatever{expandable}}}
 \bookmark{\tex{ifincsname}}
@@ -4447,25 +3976,20 @@ any other case (redefined, made \type{\undefined}, has never been
 primitive) false is returned.  \introduced{1.40.0}
 
 
-\pdftexprimitive{\Syntax{\Tex{\pdfcreationdate} \Whatever{expandable}}}
-\bookmark{\tex{pdfcreationdate}}
+\pdftexprimitive{\Syntax{\tex {pdfprimitive} \Something{control sequence}}}
+\bookmark{\tex{pdfprimitive}}
 
-Expands to the date string \PDFTEX\ uses in the info dictionary of the
-document, \eg\ for this file {\tt\pdfcreationdate}. \introduced{1.30.0}
-
-
-\pdftexprimitive{\Syntax{\tex {pdfdraftmode} \Whatever{integer}}}
-\bookmark{\tex{pdfdraftmode}}
-
-When set to 1 (or set by the command-line switch \type{-draftmode})
-\PDFTEX\ doesn't write the output \PDF\ file and doesn't actually read any
-images but does everything else (including writing auxiliary files),
-thus speeding up compilations when you know you need an extra run but
-don't care about the output, \eg\ just to get the \BIBTEX\ references
-right.  If specified, the parameter must appear before any data is written to the
-\PDF\ output.
+This command executes the primitive meaning of the following control
+sequence, regardless of whether the control sequence has been redefined
+or made undefined. If the primitive was expandable, \type{\pdfprimitive}
+expands also. On the other hand, if the following control sequence never
+was a primitive, nothing happens and no error is raised. (In some
+versions of \PDFTEX\ prior to 1.40.19, an error was wrongly given.)
 \introduced{1.40.0}
 
+%***********************************************************************
+
+\subsection{Typesetting}
 
 \pdftexprimitive{\Syntax{\Tex{\pdfinsertht} \Something{integer}
   \Whatever{expandable}}}
@@ -4495,26 +4019,6 @@ coordinate of the last point marked by \type{\pdfsavepos}. The unit is
 Completely analogous to \type{\pdflastxpos}, returning the $y$ coordinate.
 
 
-\pdftexprimitive{\Syntax{\tex {pdfprimitive} \Something{control sequence}}}
-\bookmark{\tex{pdfprimitive}}
-
-This command executes the primitive meaning of the following control
-sequence, regardless of whether the control sequence has been redefined
-or made undefined. If the primitive was expandable, \type{\pdfprimitive}
-expands also. On the other hand, if the following control sequence never
-was a primitive, nothing happens and no error is raised. (In some
-versions of \PDFTEX\ prior to 1.40.19, an error was wrongly given.)
-\introduced{1.40.0}
-
-
-\pdftexprimitive{\Syntax{\Tex{\pdfretval} \Whatever{read||only integer}}}
-\bookmark{\tex{pdfretval}}
-
-Set to $-1$ if \type{\pdfobj} ignores an invalid object number.  Perhaps
-this will be used to store the error status of other primitives in the
-future.
-
-
 \pdftexprimitive{\Syntax{\Tex{\pdfsavepos} \Modelist{h, v, m}}}
 \bookmark{\tex{pdfsavepos}}
 
@@ -4530,38 +4034,6 @@ runs are required to utilize these primitives. Starting with
 in \DVI\ mode.
 
 
-\pdftexprimitive{\Syntax{\Tex{\pdfshellescape} \Whatever{read||only integer}}}
-\bookmark{\tex{pdfshellescape}}
-
-This primitive is~1 if \type{\write18} is enabled, 2 if its operation is
-restricted to known-safe programs, and 0 otherwise. \introduced{1.30.0}
-
-
-\pdftexprimitive{\Syntax{\Tex{\pdftexbanner} \Whatever{expandable}}}
-\bookmark{\tex{pdftexbanner}}
-
-Returns the \PDFTEX\ banner message, \eg\ for the version used here:
-{\tt \pdftexbanner}. \introduced{1.20a}
-
-
-\pdftexprimitive{\Syntax{\Tex{\pdftexrevision} \Whatever{expandable}}}
-\bookmark{\tex{pdftexrevision}}
-
-\def\versplit#1#2#3{#1.#2#3}
-
-Returns the revision number of \PDFTEX, \eg\ for \PDFTEX\ version
-\expandafter\versplit\the\pdftexversion.\pdftexrevision\ (used to produce
-this document), it returns the number {\tt \pdftexrevision}.
-
-
-\pdftexprimitive{\Syntax{\Tex{\pdftexversion} \Whatever{read||only integer}}}
-\bookmark{\tex{pdftexversion}}
-
-Returns the version of \PDFTEX\ multiplied by 100, \eg\ for \PDFTEX\
-version \expandafter\versplit\the\pdftexversion.\pdftexrevision\ (used to
-produce this document), it returns {\tt \number\pdftexversion}.
-
-
 \pdftexprimitive{\Syntax{\Tex{\quitvmode}}}
 \bookmark{\tex{quitvmode}}
 
@@ -4572,6 +4044,28 @@ effect as the \type{\leavevmode} macro from \type{plain.tex}. However,
 or may not be desired. \type{\quitvmode} does not expand
 \type{\everypar}. \introduced{1.21a}
 
+
+\pdftexprimitive{\Syntax{\Tex{\vadjust}
+  \Optional{\Something{pre spec}}
+  \Something{filler}
+  \Lbrace \Something{vertical mode material} \Rbrace
+  \Modelist{h, m}
+}}
+\bookmark{\tex{vadjust}}
+
+The \type{\vadjust} implementation of \PDFTEX\ adds an optional
+qualifier \Something{pre spec}, which is simply the string \type{pre}, to
+the original \TEX\ primitive with the same name. If
+no \type{pre} is given, \type{\vadjust} behaves exactly as the original
+(see {\em The \TEX book}, p.~281): it appends an adjustment item created
+from \Something{vertical mode material} to the current list {\em after}
+the line in which \type{\vadjust} appears. In contrast, with the qualifier
+\type{pre}, the adjustment item is put {\em before} the line in which
+\type{\vadjust pre} appears.
+
+%***********************************************************************
+
+\subsection{Tracing}
 
 \pdftexprimitive{\Syntax{\Tex{\tracinglostchars} \Whatever{integer}}}
 \bookmark{\tex{tracinglostchars}}
@@ -4661,24 +4155,53 @@ and \eTeX, where \type{\tracingstacklevels} remains undefined.
 
 \introduced{1.40.22}
 
+%***********************************************************************
 
-\pdftexprimitive{\Syntax{\Tex{\vadjust}
-  \Optional{\Something{pre spec}}
-  \Something{filler}
-  \Lbrace \Something{vertical mode material} \Rbrace
-  \Modelist{h, m}
-}}
-\bookmark{\tex{vadjust}}
+\subsection{\PDFTEX\ execution environment}
 
-The \type{\vadjust} implementation of \PDFTEX\ adds an optional
-qualifier \Something{pre spec}, which is simply the string \type{pre}, to
-the original \TEX\ primitive with the same name. If
-no \type{pre} is given, \type{\vadjust} behaves exactly as the original
-(see {\em The \TEX book}, p.~281): it appends an adjustment item created
-from \Something{vertical mode material} to the current list {\em after}
-the line in which \type{\vadjust} appears. However, with the qualifier
-\type{pre}, the adjustment item is put {\em before} the line in which
-\type{\vadjust pre} appears.
+\pdftexprimitive{\Syntax{\tex {pdfdraftmode} \Whatever{integer}}}
+\bookmark{\tex{pdfdraftmode}}
+
+When set to 1 (or set by the command-line switch \type{-draftmode})
+\PDFTEX\ doesn't write the output \PDF\ file and doesn't actually read any
+images but does everything else (including writing auxiliary files),
+thus speeding up compilations when you know you need an extra run but
+don't care about the output, \eg\ just to get the \BIBTEX\ references
+right.  If specified, the parameter must appear before any data is
+written to the \PDF\ output.
+\introduced{1.40.0}
+
+
+\pdftexprimitive{\Syntax{\Tex{\pdfshellescape} \Whatever{read||only integer}}}
+\bookmark{\tex{pdfshellescape}}
+
+This primitive is~1 if \type{\write18} is enabled, 2 if its operation is
+restricted to known-safe programs, and 0 otherwise. \introduced{1.30.0}
+
+
+\pdftexprimitive{\Syntax{\Tex{\pdftexbanner} \Whatever{expandable}}}
+\bookmark{\tex{pdftexbanner}}
+
+Returns the \PDFTEX\ banner message, \eg\ for the version used here:
+{\tt \pdftexbanner}. \introduced{1.20a}
+
+
+\pdftexprimitive{\Syntax{\Tex{\pdftexrevision} \Whatever{expandable}}}
+\bookmark{\tex{pdftexrevision}}
+
+\def\versplit#1#2#3{#1.#2#3}
+
+Returns the revision number of \PDFTEX, \eg\ for \PDFTEX\ version
+\expandafter\versplit\the\pdftexversion.\pdftexrevision\ (used to produce
+this document), it returns the number {\tt \pdftexrevision}.
+
+
+\pdftexprimitive{\Syntax{\Tex{\pdftexversion} \Whatever{read||only integer}}}
+\bookmark{\tex{pdftexversion}}
+
+Returns the version of \PDFTEX\ multiplied by 100, \eg\ for \PDFTEX\
+version \expandafter\versplit\the\pdftexversion.\pdftexrevision\ (used to
+produce this document), it returns {\tt \number\pdftexversion}.
 
 %***********************************************************************
 
@@ -4781,100 +4304,6 @@ lacks any programming language commands, and cannot deal with arbitrary
 
 %***********************************************************************
 
-\section{Character translation}
-
-Characters that are input to \PDFTEX\ are subject to optional
-\TEX\ character translation (\TCX) under control of a \TCX\ file.
-The \TCX\ maps the input character codes (\eg\ from \type{\input} or
-\type{\read}) to the character codes as seen by \PDFTEX.  This mapping
-takes place before the characters enter \PDFTEX's `mouth'.  If no \TCX\
-file is read, the input characters enter \PDFTEX\ directly; no mapping
-is done.
-
-\TCX\ files consist of lines each containing one or two integer numbers
-in the range 0..255, either in decimal or hex notation.
-% strtol() C-function
-A comment sign \type{%} in a \TCX\ line starts a comment until the
-end of line.  The first number in each line is for matching the input
-character code, the second, optional number is the corresponding \TEX\
-character code.  If a line contains only one number, characters with
-this code enter \PDFTEX\ unchanged; no mapping is done.
-
-\TCX\ mapping also influences \PDFTEX\ output streams for \type{\message} and
-\type{\write}.  Without \TCX\ mapping, only characters that are within
-the range 32..126 are flagged as `printable', meaning that these
-characters are output directly by \type{\message} and \type{\write}
-primitives.  Characters outside the range 32..126 are instead output
-in escaped form, \eg\ as \type{^^A} for a character with code
-\type{0x01}.  When a character code is mentioned in the 2nd column of the
-\TCX\ file, or as the only value in a line, it is flagged as `printable'.
-During \type{\message} and \type{\write}, output characters are mapped
-in reverse direction: they are looked up in the 2nd column of the \TCX\
-file and the corresponding values from the 1st column are output.  Again,
-if a \PDFTEX\ character code is found as the only number in a line, no
-mapping is done.  Mentioning a character code as the only number on
-a line has the sole purpose to flag this code `printable'; remember that
-character within the range 32..126 are `printable' anyway.
-
-The characters output into the \PDF\ file, \eg\ by \type{\pdfliteral}
-or \type{\special} primitives, are not subject to \TCX\ output remapping.
-
-Beware: Character translation interferes with the \ENCTEX\ primitives; to
-avoid surprises, don't use \ENCTEX\ and \TCX\ mapping at the same time.
-Further details about \TCX\ file loading can be found in the \WEBC\
-manual.
-
-%***********************************************************************
-
-\stopbodymatter
-
-%D We did use some abbreviations. Only those really used will end up in the
-%D following list.
-
-\startbackmatter
-
-\writebetweenlist[section]{\blank[line]}
-
-%***********************************************************************
-
-\section{Abbreviations}
-
-In this document we use numerous abbreviations. For convenience we mention
-their meaning here.
-
-\placelistofabbreviations
-
-%***********************************************************************
-
-\start \setupalign[nothanging,nohz]
-
-\section{Examples of HZ and protruding}
-
-In the following sections we will demonstrate \PDFTEX's protruding and
-\HZ\ features, using a text from E.~Tufte. This sample text has a lot
-of punctuation and often needs hyphenation. Former \PDFTEX\ versions
-had sometimes problems with combining these features, but from version
-1.21a on it should be ok. If you still encounter problems, please try
-to prepare a small test file that demonstrates the problem and send it
-to one of the maintainers.
-
-\startbuffer
-    \input tufte
-    \blank[big]
-    \startcolumns
-        \input tufte
-    \stopcolumns
-\stopbuffer
-
-\subsection{Normal}     \start                         \getbuffer \stop
-\subsection{HZ}         \start \setupalign[hz]         \getbuffer \stop
-\subsection{Protruding} \start \setupalign[hanging]    \getbuffer \stop
-\subsection{Both}       \start \setupalign[hz,hanging] \getbuffer \stop
-
-\stop
-
-%***********************************************************************
-
 \section[sec.addpdfkeys]{Additional \PDF\ keys}
 
 {\em This section is based on the manual on keys written by Martin
@@ -4927,6 +4356,585 @@ namely {\tt pdfTeX-\currentpdftex}. \NC \NR
 Any or all of these keys can be suppressed with the
 \type{\pdfsuppressptexinfo} primitive, described in
 \in{section}[sec.docinfocatalog].
+
+%***********************************************************************
+
+\section{Character translation}
+
+Characters that are input to \PDFTEX\ are subject to optional
+\TEX\ character translation (\TCX) under control of a \TCX\ file.
+The \TCX\ maps the input character codes (\eg\ from \type{\input} or
+\type{\read}) to the character codes as seen by \PDFTEX.  This mapping
+takes place before the characters enter \PDFTEX's `mouth'.  If no \TCX\
+file is read, the input characters enter \PDFTEX\ directly; no mapping
+is done.
+
+\TCX\ files consist of lines each containing one or two integer numbers
+in the range 0..255, either in decimal or hex notation.
+% strtol() C-function
+A comment sign \type{%} in a \TCX\ line starts a comment until the
+end of line.  The first number in each line is for matching the input
+character code, the second, optional number is the corresponding \TEX\
+character code.  If a line contains only one number, characters with
+this code enter \PDFTEX\ unchanged; no mapping is done.
+
+\TCX\ mapping also influences \PDFTEX\ output streams for \type{\message} and
+\type{\write}.  Without \TCX\ mapping, only characters that are within
+the range 32..126 are flagged as `printable', meaning that these
+characters are output directly by \type{\message} and \type{\write}
+primitives.  Characters outside the range 32..126 are instead output
+in escaped form, \eg\ as \type{^^A} for a character with code
+\type{0x01}.  When a character code is mentioned in the 2nd column of the
+\TCX\ file, or as the only value in a line, it is flagged as `printable'.
+During \type{\message} and \type{\write}, output characters are mapped
+in reverse direction: they are looked up in the 2nd column of the \TCX\
+file and the corresponding values from the 1st column are output.  Again,
+if a \PDFTEX\ character code is found as the only number in a line, no
+mapping is done.  Mentioning a character code as the only number on
+a line has the sole purpose to flag this code `printable'; remember that
+character within the range 32..126 are `printable' anyway.
+
+The characters output into the \PDF\ file, \eg\ by \type{\pdfliteral}
+or \type{\special} primitives, are not subject to \TCX\ output remapping.
+
+Beware: Character translation interferes with the \ENCTEX\ primitives; to
+avoid surprises, don't use \ENCTEX\ and \TCX\ mapping at the same time.
+Further details about \TCX\ file loading can be found in the \WEBC\
+manual.
+
+%***********************************************************************
+
+\section{Installation}
+
+This section describes the steps needed to get \PDFTEX\ running on
+a system where \PDFTEX\ is not yet installed. Nowadays essentially all
+\TEX\ distributions include \PDFTEX\ already as a component, such as \TEXLIVE,
+\MIKTEX, \PROTEXT, and \MACTEX. For example, the
+\TEXLIVE\ distribution comes with \PDFTEX\ versions for many \UNIX,
+\WIN, and \MACOSX\ systems; more information can be found at
+\hbox{\from[texlive].}  There are also \WIN-specific distributions which
+contain \PDFTEX, under \from[win32]: \MIKTEX\ by Christian Schenk, and
+\PROTEXT\ (based on \MIKTEX) by Thomas Feuerstack. When you use any
+of these distributions, you don't need to bother with the \PDFTEX\
+installation procedure in the next sections.
+
+If there is no precompiled \PDFTEX\ binary for your system, or the version
+coming with a distribution is not the current one and you would like to
+try out a fresh \PDFTEX\ immediately, you will need to build \PDFTEX\
+from sources; read on. You should already have a working \TEX\ system,
+\eg\ \TEXLIVE, into which the freshly compiled \PDFTEX\ will
+be integrated. Note that the installation description in this manual
+is \WEBC||specific.
+
+\subsection{Getting sources and binaries}
+
+The latest sources of \PDFTEX\ are distributed for compilation on \UNIX\
+systems (including \GNU/Linux), and \WIN\ systems.  The primary home
+page is \from[ptex_org], where you also find bug tracking information.
+Development sources are at \from[ptex_devel].  Precompiled \PDFTEX\
+binaries for various systems might be available in subdirectories below
+\from[ctan_systems], or via \TEX\ distribution web pages.
+
+%***********************************************************************
+
+\subsection{Compiling}
+
+The compilation is expected to be easy on \UNIX||like systems and
+can be described best by example. Assuming that the file \filename
+{pdftex.zip} is downloaded to some working directory, \eg\
+\filename {\$HOME/pdftex}, on a \UNIX\ system the following steps are
+needed to compile \PDFTEX:
+
+\startesctyping
+cd pdftex.../source
+./build-pdftex.sh
+\stopesctyping
+
+The binary \filename{pdftex} is then built in the subdirectory
+\filename{build/texk/web2c}. 
+
+The obsolescent binary \filename{pdfetex} is still generated for backward
+compatibility, but since version 1.40 it is just a symbolic link to or copy
+of the file \filename{pdftex}.
+
+As well as the main \filename{pdftex} binary, binaries for the utilities
+\filename{pdftosrc} and \filename{ttf2afm} are generated.
+
+Incidentally, for \PDFTEX\ maintains, a sibling script to
+\type{build-pdftex.sh} is included, namely \type{sync-pdftex.sh}, which
+syncs changes from a \TEXLIVE\ source repository to a \PDFTEX\ source
+repository.  Read the script before using it.  And don't use it unless
+you understand what you read.
+
+%***********************************************************************
+
+\subsection{Placing files}
+
+The next step is to put the freshly compiled \filename{pdftex},
+\filename{pdftosrc}, and \filename{ttf2afm} binaries into the binary
+directory (\eg\ for a typical \TEXLIVE\ system, and on the appropriate
+platform) \filename{/usr/local/texlive/\rcsyear/bin/x86_64-linux}.
+
+If you're doing this into a live hierarchy, don't forget to do a
+\type{texconfig-sys init} afterwards, so that all formats are
+regenerated system-wide with the fresh \filename{pdftex} binary.
+
+%***********************************************************************
+
+\subsection{Setting search paths}
+
+\WEBC||based programs, including \PDFTEX, use the \WEBC\ run||time
+configuration file called \filename {texmf.cnf}.  The location
+of this file is the appropriate position within the \TDS\ tree
+relative to the place of the \PDFTEX\ binary; on a \TEXLIVE\ system,
+\filename{texmf.cnf} is typically located either in the directory
+\filename{texmf-dist/web2c}.  The path to
+file \filename{texmf.cnf} can also be set up by the environment variable
+\type{TEXMFCNF}.
+
+The configuration files in the major \TEX\ distributions (such as
+\filename{texmf.cnf} in \TEXLIVE) should already be set up for normal
+use, so you shouldn't need to edit it. You might still like to read it
+to see where the various bits and pieces are going.
+
+\PDFTEX\ uses the search path variables shown in
+\in{table}[tbl:spathvar], among others.
+
+\startbuffer
+\starttabulate[|l|l|]
+\HL
+\NC \bf used for        \NC \bf texmf.cnf        \NC\NR
+\HL
+\NC output files        \NC \type{TEXMFOUTPUT}   \NC\NR
+\NC input files, images \NC \type{TEXINPUTS}     \NC\NR
+\NC format files        \NC \type{TEXFORMATS}    \NC\NR
+\NC \TeX\ pool files    \NC \type{TEXPOOL}       \NC\NR
+\NC encoding files      \NC \type{ENCFONTS}      \NC\NR
+\NC font map files      \NC \type{TEXFONTMAPS}   \NC\NR
+\NC \TFM\ files         \NC \type{TFMFONTS}      \NC\NR
+\NC virtual fonts       \NC \type{VFFONTS}       \NC\NR
+\NC Type~1 fonts        \NC \type{T1FONTS}       \NC\NR
+\NC TrueType fonts      \NC \type{TTFONTS}       \NC\NR
+\NC OpenType fonts      \NC \type{OPENTYPEFONTS} \NC\NR
+\NC bitmap fonts        \NC \type{PKFONTS}       \NC\NR
+\HL
+\stoptabulate
+\stopbuffer
+
+\placetable[here][tbl:spathvar]
+  {The principal \WEBC\ variables.}
+  {\getbuffer}
+
+\PathDescription {TEXMFOUTPUT} Normally, \PDFTEX\ puts its output files
+in the current directory, overridden by the \type{-output-directory}
+option. If any output file cannot be opened there, it tries to open it
+in the environment variable \type{TEXMFOUTPUT}, if that is set. There is
+no default value for that variable. For example, if \type{TEXMFOUTPUT}
+has the value \type{/tmp}, and you run \type{pdftex paper} when the
+current directory is not writable, \PDFTEX\ attempts to create
+\type{/tmp/paper.log} (and \type{/tmp/paper.pdf}, etc.)
+
+\PathDescription {TEXINPUTS} This variable specifies where \PDFTEX\ finds
+its input files. Image files are considered
+input files and searched for along this path.
+
+\PathDescription {TEXFORMATS} Search path for format (\type{.fmt}) files.
+
+\PathDescription {TEXPOOL} Search path for pool (\type{.pool}) files; no
+longer used, since the pool file (program strings) are compiled into
+the binary.
+
+\PathDescription {ENCFONTS} Search path for encoding (\type{.enc}) files.
+
+\PathDescription {TEXFONTMAPS} Search path for font map (\type{.map}) files.
+
+\PathDescription {TFMFONTS} Search path for font metric (\type{.tfm}) files.
+
+\PathDescription {VFFONTS} Search path for virtual font (\type{.vf})
+files.  Virtual fonts are fonts made up of other fonts.
+Because \PDFTEX\ produces the
+final output code, it must consult those files.
+
+\PathDescription {T1FONTS} Search path for Type~1 font files (\type{.pfa}
+and \type{.pfb}).  These outline (vector) fonts are to be preferred over
+bitmap \PK\ fonts. In most cases Type~1 fonts are used and this variable
+tells \PDFTEX\ where to find them.
+
+\PathDescription {TTFONTS,\hfil\break \hbox{OPENTYPEFONTS}} Search paths
+for TrueType (\type{.ttf}) and OpenType (\type{.otf}) font files.  Like
+Type~1 fonts, TrueType and OpenType fonts are also outlines.
+
+\PathDescription {PKFONTS} Search path for packed (bitmap) font
+(\type{.pk}) files.
+Unfortunately bitmap fonts are still displayed poorly by some \PDF\
+viewers, so when possible one should use outline fonts. When no outline
+is available, \PDFTEX\ tries to locate a suitable \PK\ font (or invoke
+a process that generates it).
+
+\PathDescription{TEXFONTS} Fallback for all the font paths, so that if
+you want to look in a particular directory for fonts on a given run, you
+can set that one variable.
+
+Many more variables may be consulted, and there are many details to
+file name lookups.  See the Kpathsea manual (\from [kpathsea]).
+
+%***********************************************************************
+
+\subsection[cfg]{The \PDFTEX\ configuration}
+
+We must keep in mind that, as opposed to \TEX\ with its \DVI\ output,
+the \PDFTEX\ program does not have a separate postprocessing stage to
+transform the \TEX\ input into final \PDF. As a consequence, all data
+needed for building a ready \PDF\ page must be available during the
+\PDFTEX\ run, in particular information on media dimensions and offsets,
+graphics files for embedding, and font information (font files,
+encodings).
+
+When \TEX\ builds a page, it places items relative to the (1in,1in)
+offset from the top left page corner (the \DVI\ reference point).
+Separate \DVI\ postprocessors allow specifying the paper size (\eg\
+\quote {A4} or \quote{letter}), so that this reference point is moved to
+the correct position on the paper, and the text ends up at the right
+place.
+
+In \PDF, the paper dimensions are part of the page definition, and
+\PDFTEX\ therefore requires that they be defined at the beginning of
+the \PDFTEX\ run. As with pages described by \POSTSCRIPT, the \PDF\
+reference point is in the lower||left corner.
+
+Formerly, these dimensions and other \PDFTEX\ parameters were read
+in from a configuration file named \filename{pdftex.cfg}, which had
+a special (non-\TEX) format, at the start of processing.  Nowadays such
+a file is ignored by \PDFTEX.  Instead, the page dimensions and offsets,
+as well as many other parameters, can be set by \PDFTEX\ primitives
+during the \PDFTEX\ format building process, so that the settings are
+dumped into the fresh format and consequently will be used when \PDFTEX\
+is later called with that format. All settings from the format can
+still be overridden during a \PDFTEX\ run by using the same primitives.
+This new configuration concept is a more unified approach, as it avoids
+the configuration file with a special format.
+
+A list of \PDFTEX\ primitives relevant to setting up the \PDFTEX\ engine
+is given in \in{table}[tbl:configparms]. All primitives are described in
+detail within later sections. \in{Figure}[in:pdftexconfig] shows a recent
+configuration file (\type{pdftexconfig.tex}) in \TEX\ format, using the
+primitives from \in{table}[tbl:configparms], which typically is read
+in during the format building process. It enables \PDF\ output, sets paper
+dimensions and the default pixel density for \PK\ font inclusion. The default
+values are chosen so that \PDFTEX\ often can be used (\eg\ in \type{-ini} mode)
+even without setting any parameters.
+
+\startbuffer
+\starttabulate[|l|l|l|l|l|]
+\HL
+\NC \bf internal name              \NC \bf type  \NC\bf default\NC\bf comment\NC\NR
+\HL
+\NC \type{\pdfoutput}              \NC integer   \NC      0 \NC \DVI                 \NC\NR
+\NC \type{\pdfadjustspacing}       \NC integer   \NC      0 \NC off                  \NC\NR
+\NC \type{\pdfcompresslevel}       \NC integer   \NC      9 \NC best                 \NC\NR
+\NC \type{\pdfobjcompresslevel}    \NC integer   \NC      0 \NC no object streams    \NC\NR
+\NC \type{\pdfdecimaldigits}       \NC integer   \NC      4 \NC max.                 \NC\NR
+\NC \type{\pdfimageresolution}     \NC integer   \NC     72 \NC dpi                  \NC\NR
+\NC \type{\pdfpkresolution}        \NC integer   \NC      0 \NC 72\,dpi              \NC\NR
+\NC \type{\pdfpkmode}              \NC token reg.\NC  empty \NC mode set in \type{mktex.cnf} \NC\NR
+\NC \type{\pdfuniqueresname}       \NC integer   \NC      0 \NC                      \NC\NR
+\NC \type{\pdfprotrudechars}       \NC integer   \NC      0 \NC                      \NC\NR
+\NC \type{\pdfgentounicode}        \NC integer   \NC      0 \NC                      \NC\NR
+\NC \type{\pdfmajorversion}        \NC integer   \NC      1 \NC output \PDF\ 1.4 by default            \NC\NR
+\NC \type{\pdfminorversion}        \NC integer   \NC      4 \NC \PDF\ 1.4            \NC\NR
+\NC \type{\pdfpagebox}             \NC integer   \NC      0 \NC                      \NC\NR
+\NC \type{\pdfforcepagebox}        \NC integer   \NC      0 \NC                      \NC\NR
+\NC \type{\pdfinclusionerrorlevel} \NC integer   \NC      0 \NC                      \NC\NR
+%-----------------------------------------------------------------------
+\NC \type{\pdfhorigin}             \NC dimension \NC  1\,in \NC                      \NC\NR
+\NC \type{\pdfvorigin}             \NC dimension \NC  1\,in \NC                      \NC\NR
+\NC \type{\pdfpagewidth}           \NC dimension \NC  0\,pt \NC                      \NC\NR
+\NC \type{\pdfpageheight}          \NC dimension \NC  0\,pt \NC                      \NC\NR
+%\NC \type{\pdffirstlineheight}     \NC dimention \NC  -1000\,pt \NC                  \NC\NR
+%\NC \type{\pdflastlinedepth}       \NC dimention \NC  -1000\,pt \NC                  \NC\NR
+%\NC \type{\pdfeachlineheight}      \NC dimention \NC  -1000\,pt \NC                  \NC\NR
+%\NC \type{\pdfeachlinedepth}       \NC dimention \NC  -1000\,pt \NC                  \NC\NR
+\NC \type{\pdflinkmargin}          \NC dimension \NC  0\,pt \NC                      \NC\NR
+\NC \type{\pdfdestmargin}          \NC dimension \NC  0\,pt \NC                      \NC\NR
+\NC \type{\pdfthreadmargin}        \NC dimension \NC  0\,pt \NC                      \NC\NR
+\NC \type{\pdfmapfile}             \NC text      \NC \filename{pdftex.map} \NC not dumped\NC\NR
+\HL
+\stoptabulate
+\stopbuffer
+
+\placetable[here][tbl:configparms]
+  {The set of \PDFTEX\ configuration parameters.}
+  {\getbuffer}
+
+\startbuffer
+\tx\setupinterlinespace
+\startframedtext
+\starttyping
+% tex-ini-files 2016-04-15: pdftexconfig.tex
+
+% Load shared (PDF) settings in pdfTeX
+
+% Enable PDF output
+\pdfoutput           = 1
+
+% Paper size: dimensions given in absolute terms
+\pdfpageheight       = 11 true in
+\pdfpagewidth        = 8.5 true in
+
+% Enable PDF 1.5 output and thus more compression
+\pdfminorversion     = 5
+\pdfobjcompresslevel = 2
+
+% Low-level settings unlikely ever to need to change
+\pdfcompresslevel    = 9
+\pdfdecimaldigits    = 3
+\pdfpkresolution     = 600
+\pdfhorigin          = 1 true in
+\pdfvorigin          = 1 true in
+\stoptyping
+\stopframedtext
+\stopbuffer
+
+\placefigure[here][in:pdftexconfig]
+  {\PDFTEX\ configuration file for \TEXLIVE\ (\filename{pdftexconfig.tex}).}
+  {\getbuffer}
+
+Independent of whether such a configuration file is read or not, the
+first action in a \PDFTEX\ run is that the program reads the global
+\WEBC\ configuration file (\filename{texmf.cnf}), which is common to all
+programs in the \WEBC\ system. This file mainly defines file search
+paths, the memory layout (\eg\ string pool and hash size), and a few
+other general parameters.
+
+%***********************************************************************
+
+\subsection{Creating format files}
+
+\startbuffer
+\tx\setupinterlinespace
+\startframedtext
+\starttyping
+% Thomas Esser, 1998. public domain.
+\input etex.src
+\dump
+\endinput
+\stoptyping
+\stopframedtext
+\stopbuffer
+
+\placefigure[here][in:etexini]
+  {File \type{etex.ini} for the plain \ETEX\ format with \DVI\ output.}
+  {\getbuffer}
+
+\startbuffer
+\tx\setupinterlinespace
+\startframedtext
+\starttyping
+% Thomas Esser, 1998. public domain.
+% This is used for pdftex and pdfetex, which are now identical: both
+% with e-TeX extensions, both with pdf output.
+\input pdftexconfig.tex
+\input etex.src
+\input pdftexmagfix.tex
+\dump
+\endinput
+\stoptyping
+\stopframedtext
+\stopbuffer
+
+\placefigure[here][in:pdfetexini]
+  {File \type{pdfetex.ini} for plain \ETEX\ with \PDF\ output.}
+  {\getbuffer}
+
+\startbuffer
+\tx\setupinterlinespace
+\startframedtext
+\starttyping
+% Thomas Esser, 1998. public domain.
+\input pdftexconfig.tex
+\scrollmode
+\input latex.ltx
+\endinput
+\stoptyping
+\stopframedtext
+\stopbuffer
+
+\placefigure[here][in:pdflatexini]
+  {File \type{pdflatex.ini} for the \LATEX\ format with \PDF\ output.}
+  {\getbuffer}
+
+The \PDFTEX\ engine supports building formats for \DVI\ and \PDF\ output
+in the same way as the classical \TEX\ engine does for \DVI. Format
+generation (and other \type{initex} features) is enabled by the
+\type{-ini} option. The default mode (\DVI\ or \PDF) can be chosen
+either on the command line by setting the option \type{-output-format}
+to \type{dvi} or \type{pdf}, or by setting the \type{\pdfoutput}
+parameter. The format file then inherits this setting, so that a later
+invocation of \PDFTEX\ with this format starts in the preselected mode
+(which still can be overridden). A format file can be read in only by
+the engine that has generated it; a format incompatible with an engine
+leads to a fatal error.
+
+It is customary to package the configuration and macro file input
+into a \type{.ini} file.  \Eg, the file \type{etex.ini} in
+\in{figure}[in:etexini] is for generating an \ETEX\ format with \DVI\
+output.  It has been traditional for many years to generate
+\type{etex.fmt} with \PDFTEX\ rather than the original \ETEX, because
+\PDFTEX\ contains a few additional programming and other
+non-\PDF-related features on which people have come to rely.
+
+The \type{pdfetex.ini} file \in{figure}[in:etexini] shows the
+corresponding format with \PDF\ output by default; this is what creates
+the format file read when \type{pdftex} is normally invoked.
+
+Finally, \type{pdflatex.ini} \in{figure}[in:pdflatexini] shows how the
+\LATEX\ format with \PDF\ output by default is generated.
+
+The corresponding \PDFTEX\ calls for format generation are:
+
+\starttyping
+pdftex -ini *etex.ini
+pdftex -ini *pdfetex.ini
+pdftex -ini *pdflatex.ini
+\stoptyping
+
+These calls produce format files \filename{etex.fmt},
+\filename{pdfetex.fmt}, and \filename{pdflatex.fmt}, as the default
+format file name is taken from the input file name. You can override
+this with the \type{-jobname} option. The asterisk \type{*} before the
+file name is an unusual flag, only used in \type{-ini} mode, which
+causes the \PDFTEX\ engine to enable \ETEX's features.
+
+Incidentally, as of \PDFTEX\ 1.40.21 (\TEX\ Live 2020), \filename{.fmt}
+files are compressed with \type{zlib}. This makes for a considerable
+savings in space, and consequently in time.
+
+\subsection{Testing the installation}
+
+When everything is set up, you can test the installation.  A simple test
+of plain \PDFTEX\ is:
+
+\starttyping
+pdftex story \\end
+\stoptyping
+
+This should typeset the famous one-page short story by A.U. Thor.
+
+A more thorough and descriptive test is the plain \TEX\ test file
+\filename{samplepdf.tex}, available in the distribution in the
+\type{samplepdftex/} directory. Process this file by typing:
+
+\starttyping
+pdftex samplepdf
+\stoptyping
+
+If the installation is ok, this should produce a file called
+\filename{samplepdf.pdf}. The file \filename {samplepdf.tex} is a good
+place to look for examples of how to use \PDFTEX's primitives.
+
+%***********************************************************************
+
+\subsection{Common problems}
+
+The most common problem with installations is that \PDFTEX\ complains
+that something cannot be found. In such cases make sure that
+\type{TEXMFCNF} is set correctly, so \PDFTEX\ can find \filename
+{texmf.cnf}. The next best place to look|/|edit is the file
+\type{texmf.cnf}. When still in deep trouble, set
+\type{KPATHSEA_DEBUG=255} before running \PDFTEX\ or use the option
+\type{-kpathsea-debug 255}. This will cause \PDFTEX\ to write a lot of
+debugging information that can be useful to trace problems. More options
+can be found in the \WEBC\ documentation.
+
+Variables in \filename {texmf.cnf} can be overwritten by environment
+variables. Here are some of the most common problems you can encounter when
+getting started:
+
+\startitemize
+
+\head  \type{I can't find the format file `pdftex.fmt'!} \crlf
+       \type{I can't find the format file `pdflatex.fmt'!}
+
+       The format file is not created (see above how to do that) or
+       is not properly placed. Make sure that \type{TEXFORMATS} in
+       \filename {texmf.cnf} contains the path to \filename {pdftex.fmt}
+       or \filename {pdflatex.fmt}.
+
+\head \type{Fatal format file error; I'm stymied}
+
+       This appears \eg\ if you forgot to regenerate the \type{.fmt}
+       files after installing a new version of the \PDFTEX\ binary.
+       The first line tells by which engine the offending format was generated.
+
+\head  \PDFTEX\ cannot find one or more map files (\type{*.map}),
+       encoding vectors (\type{*.enc}), virtual fonts, Type~1 fonts,
+       TrueType or OpenType fonts, or some image file.
+
+       Make sure that the required file exists and the corresponding variable
+       in \filename {texmf.cnf} contains a path to the file. See above which
+       variables \PDFTEX\ needs apart from the ones \TEX\ uses.
+
+       When you have installed new fonts, and your \PDF\ viewer complains
+       about missing fonts, you should take a look at the log file produced
+       by \PDFTEX. Missing fonts, map files, encoding vectors as well as
+       missing characters (glyphs) are reported there.
+
+\stopitemize
+
+Normally the page content takes one object. This means that one seldom
+finds more than a few hundred objects in a simple file. This \PDFTEX\
+manual for instance uses approx.~750 objects. In more complex applications
+this number can grow quite rapidly, especially when one uses a lot of
+widget annotations, shared annotations or other shared things. In any
+case \PDFTEX's internal object table size will automatically grow to the
+required size (the parameter \type{obj_tab_size} for manual control of
+the object table size is now obsolete and ignored).
+
+%***********************************************************************
+
+\stopbodymatter
+
+%D Only abbreviations actually used will end up in the following list.
+
+\startbackmatter
+
+\writebetweenlist[section]{\blank[line]}
+
+\section{Abbreviations}
+
+In this document we use numerous abbreviations. For convenience we give
+their meanings here.
+
+\placelistofabbreviations
+
+%***********************************************************************
+
+\start \setupalign[nothanging,nohz]
+
+\section{Examples of HZ and protruding}
+
+In the following sections we will demonstrate \PDFTEX's protruding and
+\HZ\ features, using a text from E.~Tufte. This sample text has a lot
+of punctuation and often needs hyphenation. Former \PDFTEX\ versions
+had sometimes problems with combining these features, but from version
+1.21a on it should be ok. If you still encounter problems, please try
+to prepare a small test file that demonstrates the problem and send it
+to one of the maintainers.
+
+\startbuffer
+    \input tufte
+    \blank[big]
+    \startcolumns
+        \input tufte
+    \stopcolumns
+\stopbuffer
+
+\subsection{Normal}     \start                         \getbuffer \stop
+\subsection{HZ}         \start \setupalign[hz]         \getbuffer \stop
+\subsection{Protruding} \start \setupalign[hanging]    \getbuffer \stop
+\subsection{Both}       \start \setupalign[hz,hanging] \getbuffer \stop
+
+\stop
 
 %***********************************************************************
 
