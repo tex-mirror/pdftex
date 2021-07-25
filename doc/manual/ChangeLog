@@ -1,3 +1,8 @@
+2021-07-25  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\partokenname, \partokencontext): document these
+	new primitives.
+
 2021-07-24  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (Installation): rename this section from "Getting
