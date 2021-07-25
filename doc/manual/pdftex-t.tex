@@ -3976,12 +3976,64 @@ any other case (redefined, made \type{\undefined}, has never been
 primitive) false is returned.  \introduced{1.40.0}
 
 
+flapping\pdftexprimitive{\Syntax{\tex{partokencontext} \Something{number}}}
+\bookmark{\tex{partokencontext}}
+
+The {\em par-token} (i.e., the token with the name given by
+\type{\partokenname}, or \type{\par} by default; see
+\type{\partokenname}, next) is inserted into the input stream in
+different places, according to the \type{\partokencontext} value. This
+value can be:
+
+0: {\em par-token} is inserted at empty lines (more exactly, when a
+   token category~5 is seen in state~$N$, reading a line); before
+   \type{\end}, \type{\vskip}, \type{\hrule}, \type{\unvbox}, and
+   \type{\halign}, if \TeX{} is in horizontal mode when those commands
+   are seen; and in various error recovery situations. These are the
+   standard cases, and this is the default value.
+
+1: {\em par-token} is inserted as above, and also at the end of
+   \type{\vbox}, \type{\vtop}, and \type{\vcenter}, if \TeX{} is in
+   horizontal mode at the time.
+
+2: {\em par-token} is inserted as above, and also at the end of
+  \type{\insert}, \type{\vadjust}, \type{\output}, \type{\noalign}, and
+  items of \type{\valign}, again if \TeX{} is in horizontal mode at the
+  time.
+
+With the default \type{\partokencontext=0}, \TEX\ behaves in its normal
+way: the situations in cases 1 and 2 are processed by a direct call of
+{\em end-paragraph} routine, with no emitted {\em par-token}.
+
+If \type{\partokencontext=1} then \TeX\ inserts the {\em par-token} in
+additional cases: when vertical boxes are completed but horizontal mode
+is not finished. Since vboxes are not uncommonly inserted directly by
+users, with horizontal mode material, this allows macro programmers to
+control all such boxes being finished by a {\em par-token}. An example:
+
+\starttyping
+\partokenname\_mypar
+\partokencontext=1
+\def\_mypar{Hi there!\endgraf}
+\vbox{Vbox text.}
+\stoptyping
+
+This will output ``\type{Hi there!''}\ after ``\type{Vbox text.}''.
+
+Finally, with \type{\partokencontext=2}, all cases where classical \TeX\
+uses the direct {\em end-paragraph} routine are changed to emit the {\em
+par-token} instead. In contrast to case~1, these commands are rarely
+invoked directly by users with horizontal mode material.
+
+The setting of the register \type{\partokencontext} is local.
+\introduced{1.40.24}
+
 \pdftexprimitive{\Syntax{\tex{partokenname} \Something{control sequence}}}
 \bookmark{\tex{partokenname}}
 
 \TeX{} internally inserts a control sequence, named \type{\par} by
 default, into the input stream at empty lines, the end of vboxes, and
-various places (see \type{\partokencontext}, next). Let's call this
+various other places (see \type{\partokencontext}, above). Let's call this
 control sequence the {\em par-token}.
 
 Executing \type{\partokenname}\Something{control-sequence} changes the
@@ -3989,9 +4041,9 @@ name of the {\em par-token} from \type{\par} to the given
 \Something{control-sequence}. The setting performed by
 \type{\partokenname} is global.
 
-This makes it possible to release the name \type{\par} to the ``user
+This makes it possible to release the name \type{\par} to the ``user's
 name space'', i.e., after \type{\partokenname}, users can define and use
-\type{\par} as they need without changing the behavior of anything
+\type{\par} as they wish without changing the behavior of anything
 internal to \TeX{}. For example:
 
 \starttyping
@@ -4039,58 +4091,6 @@ same example):
 \amac{long test, gives error: \_mypar}
 \stoptyping
 
-\introduced{1.40.24}
-
-\pdftexprimitive{\Syntax{\tex{partokencontext} \Something{number}}}
-\bookmark{\tex{partokencontext}}
-
-The {\em par-token} (i.e., the token with the name given by
-\type{\partokenname}, or \type{\par} by default; see
-\type{\partokenname} above) is inserted into the input stream in
-different places, according to the \type{\partokencontext} value. This
-value can be:
-
-0: {\em par-token} is inserted at empty lines (more exactly, when a
-   token category~5 is seen in state~$N$, reading a line); before
-   \type{\end}, \type{\vskip}, \type{\hrule}, \type{\unvbox}, and
-   \type{\halign}, if \TeX{} is in horizontal mode when those commands
-   are seen; and in various error recovery situations. These are the
-   standard cases, and this is the default value.
-
-1: {\it par-token} is inserted as above, and also at the end of
-   \type{\vbox}, \type{\vtop}, and \type{\vcenter}, if \TeX{} is in
-   horizontal mode at the time.
-
-2: {\it par-token} is inserted as above, and also at the end of
-  \type{\insert}, \type{\vadjust}, \type{\output}, \type{\noalign}, and
-  items of \type{\valign}, again if \TeX{} is in horizontal mode at the
-  time.
-
-With the default \type{\partokencontext=0}, \TEX\ behaves in its normal
-way: the situations in cases 1 and 2 are processed by a direct call of
-{\it end-paragraph} routine, with no emitted {\em par-token}.
-
-If \type{\partokencontext=1} then \TeX\ inserts the {\em par-token} in
-additional cases: when vertical boxes are completed but horizontal mode
-is not finished. Since vboxes are not uncommonly inserted directly by
-users, with horizontal mode material, this allows macro programmers to
-control all such boxes being finished by a {\em par-token}. An example:
-
-\starttyping
-\partokenname\_mypar
-\partokencontext=1
-\def\_mypar{Hi there!\endgraf}
-\vbox{Vbox text.}
-\stoptyping
-
-This will output ``\type{Hi there!''}\ after ``\type{Vbox text.}''.
-
-Finally, with \type{\partokencontext=2}, all cases where classical \TeX\
-uses the direct {\it end-paragraph} routine are changed to emit the {\it
-par-token} instead. In contrast to case~1, these commands are rarely
-invoked directly by users with horizontal mode material.
-
-The setting of the register \type{\partokencontext} is local.
 \introduced{1.40.24}
 
 \pdftexprimitive{\Syntax{\tex {pdfprimitive} \Something{control sequence}}}
