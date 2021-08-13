@@ -1,9 +1,0 @@
-% $Id$
-% Public domain.
-
-% Check that \pdfprimitive does not swallow following (possibly
-% undefined) control sequences. So this should output three \vrules and
-% give an undefined error:
-\pdfprimitive\vrule\vrule
-\pdfprimitive\vrule\undefinedjunky
-\end
