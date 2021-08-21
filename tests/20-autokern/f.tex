@@ -1,0 +1,32 @@
+\hsize=7cm
+\parindent=0pt
+\tracingoutput1
+\showboxdepth\maxdimen
+\showboxbreadth\maxdimen
+\def\test#1{%
+   \vbox to 0pt{\vrule height 1cm\hfill\vrule height 1cm \vss}
+   \leavevmode\llap{#1 }\ignorespaces}
+
+\test1
+\pdfappendkern=1
+\pdfprependkern=1
+\pdfprotrudechars=2
+\knbccode\font`\A=150
+\knaccode\font`\A=150
+\lpcode\font`\A=500
+\rpcode\font`\A=500
+text text text text text
+text text text AtextA AtextA
+
+\test2
+\pdfprotrudechars=0
+\knbccode\font`\-=250
+\knaccode\font`\-=250
+text text text text text text
+text text text-text-text
+
+\test3
+text text text text text text
+text text-text\-text-text
+
+\bye
