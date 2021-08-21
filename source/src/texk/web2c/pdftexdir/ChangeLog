@@ -1,3 +1,26 @@
+2021-08-21  Thanh Han The  <hanthethanh@gmail.com>
+
+	* pdftex.web (cp_skipable): make autokerns "skipable", so character
+	protrusion works with chars having autokern
+	(\pdfprependkern/\pdfappendkern).
+	https://mailman.ntg.nl/pipermail/ntg-pdftex/2021-August/004338.html
+
+2021-07-13  Hironobu Yamashita  <h.y.acetaminophen@gmail.com>
+
+	* regex/regexec.c: Avoid MSVC compiler error.
+	-> error C2059: syntax error: ':'
+	MSVC does not allow empty expression for ternary
+	conditional operator (?:) which is a GNU C extension.
+	https://gcc.gnu.org/onlinedocs/gcc/Conditionals.html
+	https://stackoverflow.com/questions/3319075/
+
+2021-02-17  Karl Berry  <karl@tug.org>
+
+        * NEWS,
+        * pdftex_version.h,
+        * pdftex.web (pdftex_revision, pdftex_version_string):
+        version [1.40.]23 for post-TL21 fmt fix.
+	
 2021-01-04  Thanh Han The  <hanthethanh@gmail.com>
 
 	* pdftex.web (letter_space_font): use explicit \fontdimen6 (quad)
