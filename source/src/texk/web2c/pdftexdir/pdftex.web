@@ -30044,10 +30044,27 @@ but it starts out as 1000 in the subsidiary lists.
 @<Declare act...@>=
 procedure append_discretionary;
 var c:integer; {hyphen character}
+    app_kern, pre_kern, p, c_node: pointer;
 begin tail_append(new_disc);
 if cur_chr=1 then
   begin c:=hyphen_char[cur_font];
-  if c>=0 then if c<256 then pre_break(tail):=new_character(cur_font,c);
+  if c>=0 then if c<256 then begin
+    pre_kern := get_auto_kern(cur_font, non_char, c);
+    app_kern := get_auto_kern(cur_font, c, non_char);
+    c_node := new_character(cur_font,c);
+    if (app_kern = null) and (pre_kern = null) then {no auto-kern}
+        pre_break(tail) := c_node
+    else begin
+        if pre_kern = null then
+            pre_break(tail) := c_node
+        else begin
+            pre_break(tail) := pre_kern;
+            link(pre_kern) := c_node;
+        end;
+        if app_kern <> null then
+            link(c_node) := app_kern;
+    end;
+  end;
   end
 else  begin incr(save_ptr); saved(-1):=0; new_save_level(disc_group);
   scan_left_brace; push_nest; mode:=-hmode; space_factor:=1000;
