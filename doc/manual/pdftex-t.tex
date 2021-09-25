@@ -3417,26 +3417,59 @@ is for the sake of speed optimization. The main disadvantage is that these
 annotations do {\em not} obey transformations issued by \type
 {\pdfliteral}'s.
 
-The \Something{action spec} specifies the action that should be performed
-when the hyperlink is activated while the \Something{user-action spec}
-performs a user||defined action. A typical use of the latter is to specify
-a \URL, like \typ {/S /URI /URI (https://tug.org/)}, or a named action like
-\typ {/S /Named /N /NextPage}.
+The \Something{action spec} specifies the action that should be
+performed when the hyperlink is activated, one of (see the syntax
+rules) \Literal{user} \Something{user-action spec}, 
+\Literal{goto} \Something{goto-action spec},
+\Literal{thread} \Something{thread-action spec}.
 
-A \Something{goto-action spec} performs a GoTo action. Here \Something
-{numid} and \Something{nameid} specify the destination identifier (see
-below). The \Something{page spec} specifies the page number of the
-destination, in this case the zoom factor is given by \Something{general
-text}\unkern. A destination can be performed in another \PDF\ file by
-specifying \Something{file spec}\unkern, in which case
-\Something{newwindow spec} specifies whether the file should be opened
-in a new window. A \Something{file spec} can be either a \type{(string)}
-or a \type{<<dictionary>>}. The default behavior of the
-\Something{newwindow spec} depends on the browser setting.
+\startitemize
 
-A \Something{thread-action spec} performs an article thread reading. The
-thread identifier is similar to the destination identifier. A thread can be
-performed in another \PDF\ file by specifying a \Something{file spec}\unkern.
+\item A \Something{user-action spec} (\type{user {...}}) performs a
+user||defined action. Examples: a \URL, like
+\typ {/S /URI /URI (https://tug.org/)};
+or a named action, like \typ {/S /Named /N /NextPage}.
+
+\item A \Something{goto-action spec} (\type{goto ...}) performs various goto
+actions, and is by far the most complex action. Here is a copy of the
+syntax, for easier reference:
+
+\Syntax{
+\Something{goto-action spec} \Means %
+  \Something{numid}
+  \Or \Next \Optional{\Something{file spec}} \Something{nameid}
+  \Or \Next \Optional{\Something{file spec}} \Optional{\Something{page spec}} \Something{general text}
+  \Or \Next \Something{file spec} \Something{nameid} \Something{newwindow spec}
+  \Or \Next \Something{file spec} \Optional{\Something{page spec}} \Something{general text} \Something{newwindow spec}
+}
+
+\startitemize
+
+\item The \Something {numid} and \Something{nameid} alternatives specify a
+destination identifier.
+
+\item The \Something{page spec} alternative specifies a page number for the
+destination. In this case, the zoom factor is given by
+\Something{general text}\unkern.
+
+\item A destination in another \PDF\ file can be specified with
+\Something{file spec}\unkern, in which case \Something{newwindow spec}
+specifies whether the file should be opened in a new window. A
+\Something{file spec} can be either a \type{(string)} or a
+\type{<<}\type{dictionary}\type{>>}.
+
+\item The default behavior of the \Something{newwindow
+spec} depends on the browser setting.
+
+\stopitemize
+
+\item A \Something{thread-action spec} (\type{thread ...}) performs
+article thread reading. The thread identifier, \Something{numid} or
+\Something{nameid}, is similar to the destination identifier. A thread
+can be performed in another \PDF\ file by specifying a \Something{file
+spec}\unkern.
+
+\stopitemize
 
 \pdftexprimitive{\Syntax{\Tex{\pdfendlink} \Modelist{h, m}}}
 \bookmark{\tex{pdfendlink}}

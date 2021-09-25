@@ -1,5 +1,10 @@
+2021-09-25  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\pdfstartlink): organize into lists.
+
 2021-07-25  Karl Berry  <karl@freefriends.org>
 
+	* pdftex-t.tex: oops, \partokencontext sorts before \partokenname.
 	* pdftex-t.tex (\partokenname, \partokencontext): document these
 	new primitives.
 
