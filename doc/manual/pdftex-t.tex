@@ -141,9 +141,6 @@
 \useURL [thanh_truetype_tub] [https://tug.org/TUGboat/tb30-1/tb94thanh.pdf]
 \useURL [jbig2enc]           [https://github.com/agl/jbig2enc]
 
-%D The primitive definitions are specified a bit fuzzy using the next set of
-%D commands. Some day I'll write some proper macros to deal with this.
-
 % keep next 2 lines as temporary kludge for a while to make \type{} of
 % older ConTeXt versions handle these two new primitives; the original
 % problem with \type{} is already solved in ConTeXt as of 2006-02-14.
@@ -152,7 +149,8 @@
 
 \def\Syntax   #1{\strut\kern-.25em{#1}\kern-.25em\relax}
 \def\Next       {\crlf\hbox to 2em{}\nobreak}
-\def\Sugar    #1{\unskip\unskip\unskip\kern.25em{#1}\kern.25em\ignorespaces}
+\def\Sugar    #1{\unskip\unskip\unskip\kern.25em{#1}\kern.25em
+                 \penalty0 \ignorespaces} % allow break
 %
 \def\Lbrace     {\Sugar{\tttf\leftargument}}
 \def\Literal  #1{\Sugar{\type{#1}}}
@@ -346,7 +344,7 @@
   \usetypescript [palatino][\defaultencoding]
 
   \setupbodyfont
-    [palatino,10pt]
+    [palatino,11pt]
 
   \definefontsynonym[TitleFont][SerifBold]
 
@@ -873,15 +871,14 @@ here is a verbatim listing of the \type{-}\type{-help} output.  All
 options can be specified with one or two dashes and unambiguously
 abbreviated.
 
+\begingroup
 \startnotmode[screen]
-  \switchtobodyfont[9pt] % squeeze everything on one page
+  \switchtobodyfont[10pt] % keep line lengths shorter
 \stopnotmode
 
 \typefile{pdftex-help.txt}
 
-\startnotmode[screen]
-  \switchtobodyfont[10pt] % squeeze everything on one page
-\stopnotmode
+\endgroup
 
 %***********************************************************************
 
@@ -1450,14 +1447,19 @@ new Didot (1\,nd~=~0.375\,mm) and the new Cicero (1\,nc~=~12\,nd)
   \Something{general text}
 }
 
-%HE Check:
+\Syntax{
+\Something{goto-action struct spec} \Means %
+  \Literal{struct} (\Something{numid} \Or \Literal{nameid} \Or \Something{general text})
+}
+
+% keep in sync with redundant copy below.
 \Syntax{
 \Something{goto-action spec} \Means %
-  \Something{numid}
-  \Or \Next \Optional{\Something{file spec}} \Something{nameid}
-  \Or \Next \Optional{\Something{file spec}} \Optional{\Something{page spec}} \Something{general text}
-  \Or \Next \Something{file spec} \Something{nameid} \Something{newwindow spec}
-  \Or \Next \Something{file spec} \Optional{\Something{page spec}} \Something{general text} \Something{newwindow spec}
+  \Optional{\Something{goto-action struct spec}} \Something{numid}
+  \Or \Next \Optional{\Something{file spec}} \Optional{\Something{goto-action struct spec}} \Something{nameid}
+  \Or \Next \Optional{\Something{file spec}} \Optional{\Something{goto-action struct spec}} \Optional{\Something{page spec}} \Something{general text}
+  \Or \Next \Something{file spec} \Optional{\Something{goto-action struct spec}} \Something{nameid} \Something{newwindow spec}
+  \Or \Next \Something{file spec} \Optional{\Something{goto-action struct spec}} \Optional{\Something{page spec}} \Something{general text} \Something{newwindow spec}
 }
 
 \Syntax{
@@ -1508,8 +1510,9 @@ new Didot (1\,nd~=~0.375\,mm) and the new Cicero (1\,nc~=~12\,nd)
 
 \Syntax{
 \Something{dest spec} \Means %
-  \Something{numid} \Something{dest type}
-  \Or \Something{nameid} \Something{dest type}
+  \Optional{\Literal{struct} \Something{number}} \\
+  (\Something{numid} \Or \Something{nameid})
+  \Something{dest type}
 }
 
 \Syntax{
@@ -3352,7 +3355,11 @@ This primitive appends a whatsit node which establishes a destination
 for links and bookmark outlines; the link is identified by either
 a number or a symbolic name, and the way the viewer is to display the
 page must be specified in \Something{dest type}\unkern, which must be
-one of those mentioned in \in{table}[appearance].
+one of those mentioned in \in{table}[appearance]. If \Literal{struct}
+\Something{number} is used, a structure destination is created instead of a
+regular destination, referring to the structure element defined in object
+\Something{number}. Structure destinations use a separate namespace and
+therefore may have the same identifiers as a regular destination.
 
 \startbuffer
 \starttabulate[|l|l|]
@@ -3436,11 +3443,11 @@ syntax, for easier reference:
 
 \Syntax{
 \Something{goto-action spec} \Means %
-  \Something{numid}
-  \Or \Next \Optional{\Something{file spec}} \Something{nameid}
-  \Or \Next \Optional{\Something{file spec}} \Optional{\Something{page spec}} \Something{general text}
-  \Or \Next \Something{file spec} \Something{nameid} \Something{newwindow spec}
-  \Or \Next \Something{file spec} \Optional{\Something{page spec}} \Something{general text} \Something{newwindow spec}
+  \Optional{\Something{goto-action struct spec}} \Something{numid}
+  \Or \Next \Optional{\Something{file spec}} \Optional{\Something{goto-action struct spec}} \Something{nameid}
+  \Or \Next \Optional{\Something{file spec}} \Optional{\Something{goto-action struct spec}} \Optional{\Something{page spec}} \Something{general text}
+  \Or \Next \Something{file spec} \Optional{\Something{goto-action struct spec}} \Something{nameid} \Something{newwindow spec}
+  \Or \Next \Something{file spec} \Optional{\Something{goto-action struct spec}} \Optional{\Something{page spec}} \Something{general text} \Something{newwindow spec}
 }
 
 \startitemize
@@ -3452,14 +3459,24 @@ destination identifier.
 destination. In this case, the zoom factor is given by
 \Something{general text}\unkern.
 
+\item The default behavior of the \Something{newwindow
+spec} depends on the browser setting.
+
 \item A destination in another \PDF\ file can be specified with
 \Something{file spec}\unkern, in which case \Something{newwindow spec}
 specifies whether the file should be opened in a new window. A
 \Something{file spec} can be either a \type{(string)} or a
 \type{<<}\type{dictionary}\type{>>}.
 
-\item The default behavior of the \Something{newwindow
-spec} depends on the browser setting.
+\item If a \Something{goto-action spec} contains a
+\Something{goto-action struct spec}, then a structure destination is
+referenced in addition to the regular destination. The form with
+\Something{general text} is used if and only if a \Something{file spec}
+is present; then the \Something{general text} should expand to a literal
+\PDF\ dictionary describing a structure destination. Otherwise, the
+\Something{numid} or \Something{nameid} directly after the
+\Literal{struct} keyword identify a destination which must have been
+created with \type{\pdfdest} \Literal{struct}\unskip.
 
 \stopitemize
 
@@ -4881,8 +4898,8 @@ other general parameters.
 \startframedtext
 \starttyping
 % Thomas Esser, 1998. public domain.
-% This is used for pdftex and pdfetex, which are now identical: both
-% with e-TeX extensions, both with pdf output.
+% This is used for pdftex and pdfetex, which are now identical:
+% both with e-TeX extensions, both with pdf (and dvi) output.
 \input pdftexconfig.tex
 \input etex.src
 \input pdftexmagfix.tex
@@ -5115,9 +5132,6 @@ Odd and even page sets for non-duplex printers can be generated using
 \type{-}\type{-pages=odd} and \type{-}\type{-pages=even} options
 (which might require some disciplined shuffling of sheet).
 
-This also demonstrates that \PDFTEX\ can be used for page imposition
-purposes (given that \PDFTEX\ and the fonts are set up properly).
-
 %***********************************************************************
 
 \page
@@ -5132,7 +5146,7 @@ purposes (given that \PDFTEX\ and the fonts are set up properly).
 \section{GNU Free Documentation License}
 
 \startnotmode[screen]
-    \switchtobodyfont[4.6pt] % squeeze everything on one page :-}
+    \switchtobodyfont[6.4pt] % squeeze everything onto two pages}
     \setuplayout[grid=yes]
     \setupcolumns[n=7]
 \stopnotmode

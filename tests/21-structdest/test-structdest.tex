@@ -1,0 +1,39 @@
+% $Id$
+% Public domain. Originally by Marcel Kr\"uger, 2021.
+% Make some structured destinations with various syntax combinations.
+% Output is just checked by hand.
+
+\pdfcompresslevel=0 \pdfobjcompresslevel=0
+\pdfoutput=1
+\catcode`\{=1 \catcode`\}=2
+\output={\global\advance\count0 by 1 \shipout\box255 }
+
+\def\eject{\par\penalty-10000 }
+\def\space{ }
+
+\pdfdest num 42 fit
+% Assuming that 12345 0 R is a valid reference to the non-existing
+% structure element at this location...
+\pdfdest struct 12345 num 42 fit 
+Hello
+
+\hfill\eject
+\pdfdest name {earth} fit
+\pdfdest struct 1337 name {earth} fit 
+World
+
+\vfill\eject
+\noindent
+\pdfstartlink goto struct num 42 num 42 First\pdfendlink
+\space
+\pdfstartlink goto struct name {earth} num 42 Combination 1\pdfendlink
+\space
+\pdfstartlink goto struct num 42 name {earth} Combination 1\pdfendlink
+\space
+\pdfstartlink goto struct name {earth} name {earth} Second\pdfendlink
+\space
+\pdfstartlink goto struct name {i_dont_exists} name {me neither} Third\pdfendlink
+\space
+\pdfstartlink goto file {f.pdf} struct {[(external_element_id) /Fit]}
+                   name {marcel} Forth\pdfendlink
+\end
