@@ -1,3 +1,8 @@
+2021-11-06  Marcel Kr\"uger  <tex@2krueger.de>
+
+	* pdftex-t.tex: missed bookmarks for \pdfgentounicode and
+	a few other primitives.
+
 2021-11-04  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex: size GFDL for two pages, since it was spilling over.

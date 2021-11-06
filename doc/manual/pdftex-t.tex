@@ -2559,6 +2559,7 @@ value is \type{no_tag}, \type{1} if \type{lig_tag} is set, \type{2} if
 \type{list_tag} is set or \type{4} (not~3) if \type{ext_tag} is set.
 
 \pdftexprimitive{\Syntax{\Tex{\pdfgentounicode} \Whatever{integer}}}
+\bookmark{\tex{pdfgentounicode}}
 
 By default, \PDFTEX\ does not include a \type{/ToUnicode} resource when
 including fonts in the output. Such a resource (also called a CMap
@@ -2579,6 +2580,7 @@ table using the following command:
 
 \pdftexprimitive{\Syntax{\Tex{\pdfglyphtounicode} \Something{general text}
   \Something{general text}}}
+\bookmark{\tex{pdfglyphtounicode}}
 
 The first argument is the name of a glyph, the second is a string of Unicode
 numeric values denoting characters, separated by spaces. For instance:
@@ -2611,6 +2613,7 @@ effect.
 
 
 \pdftexprimitive{\Syntax{\Tex{\pdfnobuiltintounicode} \Something{font}}}
+\bookmark{\tex{pdfnobuiltintounicode}}
 
 The primary purpose of this command is to prevent \PDFTEX\ from
 generating the \type{ToUnicode}/CMap resource for the given font when
@@ -2629,7 +2632,9 @@ Minimal example:
 
 
 \pdftexprimitive{\Syntax{\Tex{\pdfinterwordspaceon}}}
+\bookmark{\tex{pdfinterwordspaceon}}
 \pdftexprimitive{\Syntax{\Tex{\pdfinterwordspaceoff}}}
+\bookmark{\tex{pdfinterwordspaceoff}}
 
 These commands create corresponding whatsit nodes which turn on/off
 generation of faked interword spaces in the output.  This allows for
@@ -2659,6 +2664,7 @@ Back to text with no interword spaces.
 \introduced{1.40.15}
 
 \pdftexprimitive{\Syntax{\Tex{\pdffakespace}}}
+\bookmark{\tex{pdffakespace}}
 
 Insert a faked interword space to the output, regardless of the value of
 \type{\pdfinterwordspaceon} and \type{\pdfinterwordspaceoff}.  Example:
@@ -3525,7 +3531,9 @@ on every run is just noise, and can be suppressed by setting this
 parameter to a positive number.  \introduced{1.40.13}
 
 \pdftexprimitive{\Syntax{\Tex{\pdfrunninglinkoff}}}
+\bookmark{\tex{pdfrunninglinkoff}}
 \pdftexprimitive{\Syntax{\Tex{\pdfrunninglinkon}}}
+\bookmark{\tex{pdfrunninglinkon}}
 
 These commands create corresponding whatsit nodes which turn off/on
 generation of running links. Their typical usage is to turn off
