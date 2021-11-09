@@ -1,0 +1,29 @@
+% $Id$
+% Public domain. Originally by Marcel Kr\"uger, 2021.
+%
+% Test basic \showstream output and that it doesn't interfere with
+% regular \show commands when inactive.
+% It should print the meaning of \stillVisible and \backToNormal while the
+% remaining \show commands should not lead to any terminal interaction but
+% get written to the .xray file.
+
+\pdfcompresslevel=0 \pdfobjcompresslevel=0
+\pdfoutput=1
+\catcode`\{=1 \catcode`\}=2
+%\output={\global\advance\count0 by 1 \shipout\box255 }
+
+\begingroup
+\chardef\showout=1 % \newwrite\showout
+\showstream=\showout
+\show\stillVisible
+\immediate\openout\showout"\jobname.xray"
+\count0=42
+\showthe\count0
+\show\undefined
+\show\par
+\setbox0\hbox{Hello world}
+\showbox0
+\immediate\closeout\showout
+\endgroup
+\show\backToNormal
+\end

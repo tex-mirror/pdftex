@@ -1,5 +1,9 @@
 2021-11-06  Marcel Kr\"uger  <tex@2krueger.de>
 
+	* pdftex-t.tex (\showstream): document.
+
+2021-11-06  Marcel Kr\"uger  <tex@2krueger.de>
+
 	* pdftex-t.tex: missed bookmarks for \pdfgentounicode and
 	a few other primitives.
 
@@ -11,7 +15,7 @@
 	
 2021-11-04  Marcel Kr\"uger  <tex@2krueger.de>
 
-	* pdftex-t.tex: document structured destinations.
+	* pdftex-t.tex: document structured destinations (\pdfdest struct NNN).
 	Also bump document font size to 11pt.
 
 2021-09-25  Karl Berry  <karl@freefriends.org>

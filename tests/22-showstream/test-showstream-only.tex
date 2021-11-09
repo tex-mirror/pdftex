@@ -1,0 +1,26 @@
+% $Id$
+% Public domain. Originally by Marcel Kr\"uger, 2021.
+%
+% Test basic \showstream output, and that no error code is returned if
+% only redirected \show commands occurred in a run.
+
+\pdfcompresslevel=0 \pdfobjcompresslevel=0
+\pdfoutput=1
+\catcode`\{=1 \catcode`\}=2
+\output={\global\advance\count0 by 1 \shipout\box255 }
+
+\begingroup
+\chardef\showout=1 % \newwrite\showout
+\showstream=\showout
+% \show\stillVisible
+\immediate\openout\showout"\jobname.xray"
+\count0=42
+\showthe\count0
+\show\undefined
+\show\par
+\setbox0\hbox{Hello world}
+\showbox0
+\immediate\closeout\showout
+\endgroup
+% \show\backToNormal
+\end

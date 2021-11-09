@@ -4327,8 +4327,45 @@ the prefix.
 
 The behavior is the same in all \TeX\ engines except the original \TEX\
 and \eTeX, where \type{\tracingstacklevels} remains undefined.
-
 \introduced{1.40.22}
+
+\pdftexprimitive{\Syntax{\Tex{\showstream} \Whatever{integer}}}
+\bookmark{\tex{showstream}}
+
+If this primitive parameter has a value corresponding to an open output
+stream (which has been opened with \type{\openout}), then any
+\type{\show}, \type{\showthe}, \type{\showbox} or \type{\showlists}
+commands do not write output to the terminal, but instead write to only
+the refereced output stream, as if they were written with
+\type{\immediate\write}.
+
+For example:
+\starttyping
+\newwrite\myoutstream
+\immediate\openout\myoutstream="infofile"
+\showstream=\myoutstream
+% From now on, \show... commands are redirected to "infofile.tex".
+\show\TeX
+%
+\showstream=-1
+% -1 is never a open file and therefore restores
+% normal \show... behavior.
+\immediate\closeout\myoutstream
+\stoptyping
+
+This example would not generate any special output to the terminal or
+log file (except for any logging done by \type{\newwrite}. It writes
+this text to \type{infofile.tex}, including the initial blank line,
+since that is what \type{\show} does:
+
+\starttyping
+
+> \TeX=macro:
+->T\kern -.1667em\lower .5ex\hbox {E}\kern -.125emX
+\stoptyping
+
+The behavior is the same in all \TeX\ engines except the original \TEX\
+and \eTeX, where \type{\showstream} remains undefined. \introduced{1.40.24}
 
 %***********************************************************************
 
