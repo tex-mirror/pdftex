@@ -17,16 +17,16 @@
 @q Please send comments, suggestions, etc. to tex-k@@tug.org.            @>
 
 @x
-\def\title{Common code for CTANGLE and CWEAVE (Version 4.5)}
+\def\title{Common code for CTANGLE and CWEAVE (Version 4.7)}
 @y
 \def\Kpathsea/{{\mc KPATHSEA\spacefactor1000}} \ifacro\sanitizecommand\Kpathsea{KPATHSEA}\fi
-\def\title{Common code for CTANGLE and CWEAVE (4.5 [\TeX~Live])}
+\def\title{Common code for CTANGLE and CWEAVE (4.7 [\TeX~Live])}
 @z
 
 @x
-  \centerline{(Version 4.5)}
+  \centerline{(Version 4.7)}
 @y
-  \centerline{(Version 4.5 [\TeX~Live])}
+  \centerline{(Version 4.7 [\TeX~Live])}
 @z
 
 @x
@@ -203,7 +203,7 @@ stop reading it and start reading from the named include file.  The
 \.{@@i} line should give a complete file name with or without
 double quotes.
 The actual file lookup is done with the help of the \Kpathsea/ library;
-see section~\X91:File lookup with \Kpathsea/\X~for details. % FIXME
+see section~\X93:File lookup with \Kpathsea/\X~for details. % FIXME
 The remainder of the \.{@@i} line after the file name is ignored.
 @^system dependencies@> @.CWEBINPUTS@>
 @z
@@ -826,7 +826,7 @@ Modules for dealing with help messages and version info.
 
 @ @<Display help message and |exit|@>=
 cb_usagehelp(program==ctangle ? CTANGLEHELP :
-  program==cweave ? CWEAVEHELP : CTWILLHELP, NULL);
+  program==cweave ? CWEAVEHELP : CTWILLHELP);
 @.--help@>
 
 @ Special variants from Web2c's `\.{lib/usage.c}', adapted for
@@ -835,7 +835,7 @@ cb_usagehelp(program==ctangle ? CTANGLEHELP :
 
 @<Predecl...@>=
 static void cb_usage (const_string str);@/
-static void cb_usagehelp (const_string *message, const_string bug_email);@/
+static void cb_usagehelp (const_string *message);@/
 
 @ @c
 static void cb_usage (const_string str)
@@ -850,10 +850,8 @@ static void cb_usage (const_string str)
   history=fatal_message; exit(wrap_up());
 }
 
-static void cb_usagehelp (const_string *message, const_string bug_email)
+static void cb_usagehelp (const_string *message)
 {
-  if (!bug_email)
-    bug_email = "tex-k@@tug.org";
   textdomain("web2c-help");
 @.web2c-help.mo@>
   while (*message) {
@@ -863,7 +861,7 @@ static void cb_usagehelp (const_string *message, const_string bug_email)
   }
   textdomain("cweb-tl");
 @.cweb-tl.mo@>
-  printf(_("\nEmail bug reports to %s.\n"), bug_email);
+  printf(_("\nPackage home page: %s.\n"), "https://ctan.org/pkg/cweb");
   textdomain("cweb");
 @.cweb.mo@>
   history=spotless; exit(wrap_up());

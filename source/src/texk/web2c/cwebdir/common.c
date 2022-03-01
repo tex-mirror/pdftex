@@ -82,13 +82,13 @@
 #define new_line putchar('\n') 
 #define term_write(a,b) fflush(stdout) ,fwrite(a,sizeof(char) ,b,stdout)  \
 
-#define buf_size 100
+#define buf_size 200
 #define longest_name 10000 \
 
 #define long_buf_size (buf_size+longest_name) 
-#define max_bytes 90000 \
+#define max_bytes 100000 \
 
-#define max_names 4000 \
+#define max_names 5000 \
 
 #define max_sections 2000 \
 
@@ -732,8 +732,10 @@ else{
 if((l= strlen(CWEBINPUTS))> max_file_name_length-2)too_long();
 strcpy(temp_file_name,CWEBINPUTS);
 #else
-l= 0;
+#line 474 "common.w"
+ l= 0;
 #endif 
+#line 476 "common.w"
 }
 if(l> 0){
 if(k+l+2>=cur_file_name_end)too_long();

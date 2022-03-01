@@ -2,7 +2,7 @@
 % This program by Silvio Levy and Donald E. Knuth
 % is based on a program by Knuth.
 % It is distributed WITHOUT ANY WARRANTY, express or implied.
-% Version 4.5 --- July 2021
+% Version 4.7 --- February 2022
 
 % Copyright (C) 1987,1990,1993,2000 Silvio Levy and Donald E. Knuth
 
@@ -32,11 +32,11 @@
 \def\skipxTeX{\\{skip\_\TEX/}}
 \def\copyxTeX{\\{copy\_\TEX/}}
 
-\def\title{CWEAVE (Version 4.5)}
+\def\title{CWEAVE (Version 4.7)}
 \def\topofcontents{\null\vfill
   \centerline{\titlefont The {\ttitlefont CWEAVE} processor}
   \vskip 15pt
-  \centerline{(Version 4.5)}
+  \centerline{(Version 4.7)}
   \vfill}
 \def\botofcontents{\vfill
 \noindent
@@ -67,7 +67,7 @@ Crusius, and others who have contributed improvements.
 The ``banner line'' defined here should be changed whenever \.{CWEAVE}
 is modified.
 
-@d banner "This is CWEAVE (Version 4.5)"
+@d banner "This is CWEAVE (Version 4.7)"
 
 @c
 @<Include files@>@/
@@ -82,7 +82,7 @@ three phases: First it inputs the source file and stores cross-reference
 data, then it inputs the source once again and produces the \TEX/ output
 file, finally it sorts and outputs the index.
 
-Please read the documentation for \.{common}, the set of routines common
+Please read the documentation for \.{COMMON}, the set of routines common
 to \.{CTANGLE} and \.{CWEAVE}, before proceeding further.
 
 @c
@@ -111,13 +111,13 @@ possible changes from this \.{COMMON} interface consistently.
 
 @i common.h
 
-@ The following parameters were sufficient in the original \.{WEAVE} to
-handle \TEX/, so they should be sufficient for most applications of \.{CWEAVE}.
+@ The following parameters are sufficient to handle \TEX/ (converted to
+\.{CWEB}), so they should be sufficient for most applications of \.{CWEAVE}.
 
 @d line_length 80 /* lines of \TEX/ output have at most this many characters;
   should be less than 256 */
-@d max_refs 20000 /* number of cross-references; must be less than 65536 */
-@d max_scraps 2000 /* number of tokens in \CEE/ texts being parsed */
+@d max_refs 30000 /* number of cross-references; must be less than 65536 */
+@d max_scraps 5000 /* number of tokens in \CEE/ texts being parsed */
 
 @* Data structures exclusive to {\tt CWEAVE}.
 As explained in \.{common.w}, the field of a |name_info| structure
@@ -335,9 +335,9 @@ that is unoccupied by replacement text is called |tok_ptr|, and the first
 unused location of |tok_start| is called |text_ptr|.
 Thus, we usually have |*text_ptr==tok_ptr|.
 
-@d max_toks 20000 /* number of symbols in \CEE/ texts being parsed;
+@d max_toks 30000 /* number of symbols in \CEE/ texts being parsed;
   must be less than 65536 */
-@d max_texts 4000 /* number of phrases in \CEE/ texts being parsed;
+@d max_texts 8000 /* number of phrases in \CEE/ texts being parsed;
   must be less than 10240 */
 
 @<Private...@>=
@@ -600,8 +600,8 @@ ccode['\'']=ord;
 @<Special control codes for debugging@>@;
 
 @ Users can write
-\.{@@2}, \.{@@1}, and \.{@@0} to turn tracing fully on, partly on,
-and off, respectively.
+\.{@@2}, \.{@@1}, and \.{@@0} to turn tracing |fully| on, |partly| on,
+and |off|, respectively.
 
 @<Special control codes...@>=
 ccode['0']=ccode['1']=ccode['2']=trace;
@@ -1838,7 +1838,7 @@ static char cat_name[256][12]; /* |12==strlen("struct_head")+1| */
 
 @ This code allows \.{CWEAVE} to display its parsing steps.
 
-@d print_cat(c) fputs(cat_name[c],stdout)
+@d print_cat(c) fputs(cat_name[c],stdout) /* symbolic printout of a category */
 
 @ The token lists for translated \TEX/ output contain some special control
 symbols as well as ordinary characters. These control symbols are
@@ -2316,7 +2316,18 @@ checks whether there can be a conflict between math and non-math
 tokens, and intercalates a `\.{\$}' token if necessary.  When in
 doubt what to use, use |big_app|.
 
-The |mathness| is an attribute of scraps that says whether they are
+@d app(a) *(tok_ptr++)=(token)(a)
+@d big_app2(a) big_app1(a);@+big_app1(a+1)
+@d big_app3(a) big_app2(a);@+big_app1(a+2)
+@d big_app4(a) big_app3(a);@+big_app1(a+3)
+@d big_app1_insert(p,c) big_app1(p);@+big_app(c);@+big_app1(p+1)
+
+@<Predecl...@>=
+static void app_str(const char *);@/
+static void big_app(token);@/
+static void big_app1(scrap_pointer);
+
+@ The |mathness| is an attribute of scraps that says whether they are
 to be printed in a math mode context or not.  It is separate from the
 ``part of speech'' (the |cat|) because to make each |cat| have
 a fixed |mathness| (as in the original \.{WEAVE}) would multiply the
@@ -2333,29 +2344,19 @@ irreducible scrap has a |yes_math| boundary the scrap gets preceded
 or followed by a~\.{\$}. The left boundary is |maybe_math| if and
 only if the right boundary is.
 
-The code below is an exact translation of the production rules into
-\CEE/, using such macros, and the reader should have no difficulty
-understanding the format by comparing the code with the symbolic
-productions as they were listed earlier.
-
 @d no_math 2 /* should be in horizontal mode */
 @d yes_math 1 /* should be in math mode */
 @d maybe_math 0 /* works in either horizontal or math mode */
-@d big_app2(a) big_app1(a);@+big_app1(a+1)
-@d big_app3(a) big_app2(a);@+big_app1(a+2)
-@d big_app4(a) big_app3(a);@+big_app1(a+3)
-@d big_app1_insert(p,c) big_app1(p);@+big_app(c);@+big_app1(p+1)
-@d app(a) *(tok_ptr++)=(token)(a)
 
 @<Private...@>=
 static int cur_mathness, init_mathness;
 
-@ @<Predecl...@>=
-static void app_str(const char *);@/
-static void big_app(token);@/
-static void big_app1(scrap_pointer);
+@ The code below is an exact translation of the production rules into
+\CEE/, using such macros, and the reader should have no difficulty
+understanding the format by comparing the code with the symbolic
+productions as they were listed earlier.
 
-@ @c
+@c
 static void
 app_str(
 const char *s)
@@ -3764,7 +3765,7 @@ typedef struct {
 } output_state;
 typedef output_state *stack_pointer;
 
-@ @d stack_size 400 /* number of simultaneous output levels */
+@ @d stack_size 2000 /* number of simultaneous output levels */
 @d cur_end cur_state.end_field /* current ending location in |tok_mem| */
 @d cur_tok cur_state.tok_field /* location of next output token in |tok_mem| */
 @d cur_mode cur_state.mode_field /* current mode of interpretation */

@@ -2,7 +2,7 @@
 % This program by Silvio Levy and Donald E. Knuth
 % is based on a program by Knuth.
 % It is distributed WITHOUT ANY WARRANTY, express or implied.
-% Version 4.5 --- July 2021
+% Version 4.7 --- February 2022
 
 % Copyright (C) 1987,1990,1993,2000 Silvio Levy and Donald E. Knuth
 
@@ -27,11 +27,11 @@
 \mathchardef\RA="3221 % right arrow
 \mathchardef\BA="3224 % double arrow
 
-\def\title{CTANGLE (Version 4.5)}
+\def\title{CTANGLE (Version 4.7)}
 \def\topofcontents{\null\vfill
   \centerline{\titlefont The {\ttitlefont CTANGLE} processor}
   \vskip 15pt
-  \centerline{(Version 4.5)}
+  \centerline{(Version 4.7)}
   \vfill}
 \def\botofcontents{\vfill
 \noindent
@@ -61,7 +61,7 @@ Joachim Schrod, Lee Wittenberg, and others who have contributed improvements.
 The ``banner line'' defined here should be changed whenever \.{CTANGLE}
 is modified.
 
-@d banner "This is CTANGLE (Version 4.5)"
+@d banner "This is CTANGLE (Version 4.7)"
 
 @c
 @<Include files@>@/
@@ -75,7 +75,7 @@ is modified.
 two phases: First it reads the source file, saving the \CEE/ code in
 compressed form; then it shuffles and outputs the code.
 
-Please read the documentation for \.{common}, the set of routines common
+Please read the documentation for \.{COMMON}, the set of routines common
 to \.{CTANGLE} and \.{CWEAVE}, before proceeding further.
 
 @c
@@ -126,7 +126,7 @@ typedef struct {
 } text;
 typedef text *text_pointer;
 
-@ @d max_texts 2500 /* number of replacement texts, must be less than 10240 */
+@ @d max_texts 4000 /* number of replacement texts, must be less than 10240 */
 @d max_toks 270000 /* number of bytes in compressed \CEE/ code */
 @<Private...@>=
 static text text_info[max_texts];
@@ -157,7 +157,7 @@ boolean names_match(
 name_pointer p, /* points to the proposed match */
 const char *first, /* position of first character of string */
 size_t l, /* length of identifier */
-eight_bits t) /* not used by \.{TANGLE} */
+eight_bits t) /* not used by \.{CTANGLE} */
 {@+(void)t;@/
   return length(p)==l && strncmp(first,p->byte_start,l)==0;
 }
@@ -1242,7 +1242,14 @@ file name.
 }
 
 @ @<In cases that |a| is...@>=@t\1\quad@>
-case identifier: store_id(a); break;
+case identifier: store_id(a);
+  if (*buffer=='#' && @| (
+      ( id_loc-id_first==5 && strncmp("endif",id_first,5)==0 ) || @|
+      ( id_loc-id_first==4 && strncmp("else",id_first,4)==0 ) || @|
+      ( id_loc-id_first==4 && strncmp("elif",id_first,4)==0 ) ) )
+      /* Avoid preprocessor calamities */
+    print_where=true;
+  break;
 case section_name: if (t!=section_name) goto done;
   else {
     @<Was an `\.{@@}' missed here?@>@;

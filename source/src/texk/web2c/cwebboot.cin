@@ -2,17 +2,7 @@
 #line 62 "cwebdir/common.w"
 
 /*3:*/
-#line 51 "cwebdir/comm-w2c.h"
-
-#ifndef HAVE_GETTEXT
-#define HAVE_GETTEXT 0
-#endif
-
-#if HAVE_GETTEXT
-#include <libintl.h> 
-#else
-#define gettext(a) a
-#endif
+#line 54 "cwebdir/comm-w2c.h"
 
 #include <ctype.h>  
 #include <kpathsea/simpletypes.h>  
@@ -22,16 +12,31 @@
 #include <stdlib.h>  
 #include <string.h>  
 
+#ifndef HAVE_GETTEXT
+#define HAVE_GETTEXT 0
+#endif
+#line 66 "cwebdir/comm-w2c.h"
+
+#if HAVE_GETTEXT
+#include <libintl.h> 
+#else
+#line 70 "cwebdir/comm-w2c.h"
+#define gettext(a) a
+#endif
+#line 72 "cwebdir/comm-w2c.h"
+
 /*:3*//*91:*/
 #line 739 "cwebdir/comm-w2c.ch"
 
 #if HAVE_GETTEXT
 #include <locale.h>  
 #else
+#line 743 "cwebdir/comm-w2c.ch"
 #define setlocale(a,b) ""
 #define bindtextdomain(a,b) ""
 #define textdomain(a) ""
 #endif
+#line 747 "cwebdir/comm-w2c.ch"
 
 /*:91*//*93:*/
 #line 786 "cwebdir/comm-w2c.ch"
@@ -184,7 +189,7 @@ extern cweb program;
 extern int phase;
 
 /*:2*//*4:*/
-#line 91 "cwebdir/comm-w2c.h"
+#line 94 "cwebdir/comm-w2c.h"
 
 extern char section_text[];
 extern char*section_text_end;
@@ -192,7 +197,7 @@ extern char*id_first;
 extern char*id_loc;
 
 /*:4*//*5:*/
-#line 109 "cwebdir/comm-w2c.h"
+#line 112 "cwebdir/comm-w2c.h"
 
 extern char buffer[];
 extern char*buffer_end;
@@ -200,7 +205,7 @@ extern char*loc;
 extern char*limit;
 
 /*:5*//*6:*/
-#line 126 "cwebdir/comm-w2c.h"
+#line 129 "cwebdir/comm-w2c.h"
 
 extern int include_depth;
 extern FILE*file[];
@@ -217,7 +222,7 @@ extern boolean changing;
 extern boolean web_file_open;
 
 /*:6*//*8:*/
-#line 147 "cwebdir/comm-w2c.h"
+#line 150 "cwebdir/comm-w2c.h"
 
 extern sixteen_bits section_count;
 extern boolean changed_section[];
@@ -225,7 +230,7 @@ extern boolean change_pending;
 extern boolean print_where;
 
 /*:8*//*9:*/
-#line 161 "cwebdir/comm-w2c.h"
+#line 164 "cwebdir/comm-w2c.h"
 
 typedef struct name_info{
 char*byte_start;
@@ -250,12 +255,12 @@ extern hash_pointer hash_end;
 extern hash_pointer h;
 
 /*:9*//*11:*/
-#line 205 "cwebdir/comm-w2c.h"
+#line 208 "cwebdir/comm-w2c.h"
 
 extern int history;
 
 /*:11*//*13:*/
-#line 222 "cwebdir/comm-w2c.h"
+#line 225 "cwebdir/comm-w2c.h"
 
 extern int argc;
 extern char**argv;
@@ -267,7 +272,7 @@ extern boolean flags[];
 extern const char*use_language;
 
 /*:13*//*14:*/
-#line 237 "cwebdir/comm-w2c.h"
+#line 240 "cwebdir/comm-w2c.h"
 
 extern FILE*C_file;
 extern FILE*tex_file;
@@ -408,20 +413,21 @@ string texmf_locale;
 #ifndef SEPARATORS
 #define SEPARATORS "://"
 #endif
-char separators[]= SEPARATORS;
+#line 648 "cwebdir/comm-w2c.ch"
+ char separators[]= SEPARATORS;
 
 /*:87*/
 #line 66 "cwebdir/common.w"
 
 /*7:*/
-#line 141 "cwebdir/comm-w2c.h"
+#line 144 "cwebdir/comm-w2c.h"
 
 extern boolean get_line(void);
 extern void check_complete(void);
 extern void reset_input(void);
 
 /*:7*//*10:*/
-#line 184 "cwebdir/comm-w2c.h"
+#line 187 "cwebdir/comm-w2c.h"
 
 extern boolean names_match(name_pointer,const char*,size_t,eight_bits);
 extern name_pointer id_lookup(const char*,const char*,eight_bits);
@@ -434,7 +440,7 @@ extern void print_section_name(name_pointer);
 extern void sprint_section_name(char*,name_pointer);
 
 /*:10*//*12:*/
-#line 208 "cwebdir/comm-w2c.h"
+#line 211 "cwebdir/comm-w2c.h"
 
 extern int wrap_up(void);
 extern void err_print(const char*);
@@ -442,7 +448,7 @@ extern void fatal(const char*,const char*);
 extern void overflow(const char*);
 
 /*:12*//*15:*/
-#line 246 "cwebdir/comm-w2c.h"
+#line 249 "cwebdir/comm-w2c.h"
 
 extern void common_init(void);
 extern void print_stats(void);
@@ -480,7 +486,7 @@ static void scan_args(void);
 #line 836 "cwebdir/comm-w2c.ch"
 
 static void cb_usage(const_string str);
-static void cb_usagehelp(const_string*message,const_string bug_email);
+static void cb_usagehelp(const_string*message);
 
 /*:98*/
 #line 67 "cwebdir/common.w"
@@ -1416,12 +1422,14 @@ strcpy(change_file_name,"/dev/null");
 strncpy(change_file_name,DEV_NULL,max_file_name_length-2);
 change_file_name[max_file_name_length-2]= '\0';
 #elif defined _DEV_NULL
-strncpy(change_file_name,_DEV_NULL,max_file_name_length-2);
+#line 482 "cwebdir/comm-w2c.ch"
+ strncpy(change_file_name,_DEV_NULL,max_file_name_length-2);
 change_file_name[max_file_name_length-2]= '\0';
 #endif
+#line 485 "cwebdir/comm-w2c.ch"
 
 #line 1168 "cwebdir/common.w"
-while(--argc> 0){
+ while(--argc> 0){
 if((**(++argv)=='-'||**argv=='+')&&*(*argv+1))/*80:*/
 #line 1247 "cwebdir/common.w"
 
@@ -1433,7 +1441,7 @@ if(strcmp("-help",*argv)==0||strcmp("--help",*argv)==0)
 #line 827 "cwebdir/comm-w2c.ch"
 
 cb_usagehelp(program==ctangle?CTANGLEHELP:
-program==cweave?CWEAVEHELP:CTWILLHELP,NULL);
+program==cweave?CWEAVEHELP:CTWILLHELP);
 
 
 /*:97*/
@@ -1442,7 +1450,7 @@ program==cweave?CWEAVEHELP:CTWILLHELP,NULL);
 if(strcmp("-version",*argv)==0||strcmp("--version",*argv)==0)
 
 /*100:*/
-#line 875 "cwebdir/comm-w2c.ch"
+#line 873 "cwebdir/comm-w2c.ch"
 
 printversionandexit(cb_banner,
 program==ctwill?"Donald E. Knuth":"Silvio Levy and Donald E. Knuth",
@@ -1630,10 +1638,8 @@ textdomain("cweb");
 history= fatal_message;exit(wrap_up());
 }
 
-static void cb_usagehelp(const_string*message,const_string bug_email)
+static void cb_usagehelp(const_string*message)
 {
-if(!bug_email)
-bug_email= "tex-k@tug.org";
 textdomain("web2c-help");
 
 while(*message){
@@ -1643,14 +1649,14 @@ printf("%s\n",strcmp("",*message)?_(*message):*message);
 }
 textdomain("cweb-tl");
 
-printf(_("\nEmail bug reports to %s.\n"),bug_email);
+printf(_("\nPackage home page: %s.\n"),"https://ctan.org/pkg/cweb");
 textdomain("cweb");
 
 history= spotless;exit(wrap_up());
 }
 
 /*:99*//*101:*/
-#line 883 "cwebdir/comm-w2c.ch"
+#line 881 "cwebdir/comm-w2c.ch"
 
 void cb_show_banner(void)
 {

@@ -35,9 +35,9 @@
 @z
 
 @x
-\def\title{CWEAVE (Version 4.5)}
+\def\title{CWEAVE (Version 4.7)}
 @y
-\def\title{CTWILL (Version 4.5 [\TeX~Live])}
+\def\title{CTWILL (Version 4.7 [\TeX~Live])}
 @z
 
 @x
@@ -47,9 +47,9 @@
 @z
 
 @x
-  \centerline{(Version 4.5)}
+  \centerline{(Version 4.7)}
 @y
-  \centerline{(Version 4.5 [\TeX~Live])}
+  \centerline{(Version 4.7 [\TeX~Live])}
 @z
 
 @x
@@ -76,7 +76,7 @@ Crusius, and others who have contributed improvements.
 The ``banner line'' defined here should be changed whenever \.{CWEAVE}
 is modified.
 
-@d banner "This is CWEAVE (Version 4.5)"
+@d banner "This is CWEAVE (Version 4.7)"
 @y
 This is the \.{CTWILL} program by D. E. Knuth, based
 on \.{CWEAVE} by Silvio Levy and D.~E. Knuth. It is also based on
@@ -84,7 +84,7 @@ on \.{CWEAVE} by Silvio Levy and D.~E. Knuth. It is also based on
 Volumes B and~D of {\sl Computers {\char`\&} Typesetting\/} in 1985.
 \.{CTWILL} was hacked together hastily in June, 1992, to generate pages for
 Knuth's book about the Stanford GraphBase, and updated even more hastily
-in March, 1993 to generate final copy for that book.  The main idea was to
+in March, 1993, to generate final copy for that book.  The main idea was to
 extend \.{CWEAVE} so that ``mini-indexes'' could appear.
 No time was available to make \.{CTWILL} into a refined or complete system,
 nor even to fully update the program documentation below. Subsequent changes
@@ -93,14 +93,14 @@ can be found in Knuth's article ``Mini-indexes for literate programs,''
 reprinted in {\sl Digital Typography\/} (1999), 225--245.
 
 A kind of ``user manual'' for \.{CTWILL} can be found in the appendix
-{\bf 271.~Mogrify \.{CWEAVE} into \.{CTWILL}} and beyond, together
-with additional material specific to \.{CTWILL}. % FIXME
+\X271:Mogrify \.{CWEAVE} into \.{CTWILL}\X~and beyond, together with
+additional material specific to \.{CTWILL}. % FIXME
 Until then, \.{CWEAVE}'s sequence of sections will be preserved.
 
 The ``banner line'' defined here should be changed whenever \.{CTWILL} is
 modified. The version number parallels the corresponding version of \.{CWEAVE}.
 
-@d banner "This is CTWILL, Version 4.5"
+@d banner "This is CTWILL, Version 4.7"
   /* will be extended by the \TeX~Live |versionstring| */
 @z
 
@@ -123,8 +123,8 @@ modified. The version number parallels the corresponding version of \.{CWEAVE}.
 @z
 
 @x
-@d max_refs 20000 /* number of cross-references; must be less than 65536 */
-@d max_scraps 2000 /* number of tokens in \CEE/ texts being parsed */
+@d max_refs 30000 /* number of cross-references; must be less than 65536 */
+@d max_scraps 5000 /* number of tokens in \CEE/ texts being parsed */
 @y
 @d max_refs 65535 /* number of cross-references; must be less than 65536 */
 @d max_scraps 5000 /* number of tokens in \CEE/ texts being parsed */
@@ -146,9 +146,9 @@ turned on during the first phase---NOT!
 @z
 
 @x
-@d max_toks 20000 /* number of symbols in \CEE/ texts being parsed;
+@d max_toks 30000 /* number of symbols in \CEE/ texts being parsed;
   must be less than 65536 */
-@d max_texts 4000 /* number of phrases in \CEE/ texts being parsed;
+@d max_texts 8000 /* number of phrases in \CEE/ texts being parsed;
   must be less than 10240 */
 @y
 @d max_toks 65535 /* number of symbols in \CEE/ texts being parsed;
