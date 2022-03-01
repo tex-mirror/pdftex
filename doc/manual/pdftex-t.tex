@@ -122,7 +122,7 @@
 
 \useURL [ptex_org]      [http://www.pdftex.org] % links to ptex_examples
 \useURL [ptex_ctan]     [https://ctan.org/pkg/pdftex]
-\useURL [ptex_devel]    [http://foundry.supelec.fr/projects/pdftex]
+\useURL [ptex_devel]    [svn://tug.org/pdftex/branches/stable]
 
 % where bug reports should go:
 \useURL [ptex_bugs]     [mailto:pdftex@tug.org] [] [pdftex@tug.org]
@@ -334,8 +334,6 @@
   \setupfontsynonym [SerifBoldSlanted] [handling=quality]
   \setupfontsynonym [SerifBoldItalic]  [handling=quality]
 
-  %setupfontsynonym [Mono]             [handling=quality] % sloooow
-
   % We use adobe metrics instead of urw metrics because tetex only
   % ships the former. Beware, these metrics differ!
 
@@ -360,8 +358,6 @@
   \setupfontsynonym [SansItalic]      [handling=quality]
   \setupfontsynonym [SansBoldSlanted] [handling=quality]
   \setupfontsynonym [SansBoldItalic]  [handling=quality]
-
-  %setupfontsynonym [Mono]             [handling=quality] % sloooow
 
   \definetypeface[optima][ss][sans][optima-nova] [default][encoding=\defaultencoding]
   \definetypeface[optima][tt][mono][latin-modern][default][encoding=\defaultencoding,rscale=1.1]
@@ -689,7 +685,7 @@ Please send questions or suggestions by email to \from[ptex_bugs].
 
 \subsection{Legal Notice}
 
-Copyright \copyright\ 1996||2020  \THANH.
+Copyright \copyright\ 1996||2022  \THANH.
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
 or any later version published by the Free Software Foundation;
@@ -4336,7 +4332,7 @@ If this primitive parameter has a value corresponding to an open output
 stream (which has been opened with \type{\openout}), then any
 \type{\show}, \type{\showthe}, \type{\showbox} or \type{\showlists}
 commands do not write output to the terminal, but instead write to only
-the refereced output stream, as if they were written with
+the referenced output stream, as if they were written with
 \type{\immediate\write}.
 
 For example:

@@ -88,7 +88,7 @@ pdftex-syntax.txt: pdftex-t.tex pdftex-syntax.tex syntaxform.awk
 #  Install from this source directory to TL.
 
 # svn co svn://u:pw@tug.org/texlive/trunk/Master/texmf-dist/doc/pdftex
-tltree = /r/tug/home/texlive/karl/Master/texmf-dist
+tltree = /v/texlive/karl/Master/texmf-dist
 dest = $(tltree)/doc/pdftex/manual
 
 INSTALL_DATA = cp -p
@@ -145,3 +145,6 @@ maintainer-clean: clean
 	rm -f pdftex-w.pdf pdftex-w.txt
 
 clobber allclean realclean distclean: maintainer-clean
+
+spell:
+	myspell pdftex-t.tex

@@ -1,3 +1,7 @@
+2022-02-28  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (ptex_devel): svn://tug.org url.
+
 2021-11-06  Marcel Kr\"uger  <tex@2krueger.de>
 
 	* pdftex-t.tex (\showstream): document.
