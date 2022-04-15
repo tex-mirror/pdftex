@@ -27,9 +27,9 @@ env = TEXINPUTS=.:$(plain):$(plain_config):$(generic_config):$(generic_hyphen)\
 diff = diff --text -c0
 
 pdftex = ../../source/build-pdftex/texk/web2c/pdftex
-pdftex2 ?= /usr/local/texlive/2021basic/bin/local/pdftex2
+pdftex2 ?= /opt/texlive/2020/bin/local/pdftex2
 # pdftex2 is a copy of $(pdftex)
-# why? to be able to use the texmf tree from mactex basic with minimal fuss
+# why? to be able to use the default texmf tree with minimal fuss
 ttf2afm = ../../source/build-pdftex/texk/web2c/ttf2afm
 #pdftex = $(W)/texk/web2c/pdftex
 prog = $(env) $(pdftex) -ini -interaction=nonstopmode
