@@ -60,6 +60,7 @@ pdftex-w.txt: pdftex-w.pdf
 pdftex_binary = ../../source/build-pdftex/texk/web2c/pdftex
 pdftex-w.pdf: pdftex-w.tex Makefile
 	TEXFONTS=/usr/local/texlive/dev/texmf-dist/fonts// \
+	KPATHSEA_WARNING=0 \
 	$(pdftex_binary) -ini '$<'
 
 
@@ -68,7 +69,7 @@ pdftex-help.txt: force
 	$(pdftex_binary) --help >$@ || rm -f $@
 force:
 
-# if we don't have a build tree around, just try from the path.
+# if we don't have a build tree around, try from PATH.
 build_binary := ../../source/build-pdftex/texk/web2c/pdftex
 ifneq "$(realpath $(build_binary))" ""
 pdftex_binary := $(build_binary)

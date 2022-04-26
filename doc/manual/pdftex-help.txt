@@ -57,4 +57,4 @@ Usage: pdftex [OPTION]... [TEXNAME[.tex]] [COMMANDS]
 
 pdfTeX home page: <http://pdftex.org>
 
-Email bug reports to pdftex@tug.org.
+Email bug reports to pdftex@tug.org (https://lists.tug.org/pdftex).

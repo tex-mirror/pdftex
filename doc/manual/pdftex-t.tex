@@ -729,9 +729,9 @@ unused). The actual starting point of the file's object structure is
 defined after the \type{trailer}: the \type{/Root} entry points to the
 \type{/Catalog} object (no.~9). In this object the viewer can find the
 pointer \type{/Pages} to the page list object (no.~5). In our example we
-have only one page. The trailer also holds an \type{/Info} entry, which
-points to an object (no.~10) with a bit more about the document. Just
-follow the thread:
+have only one page. The trailer also usually holds an \type{/Info}
+entry, which points to an object (no.~10) with a bit more about the
+document. We can follow the thread:
 
 \startnarrower
 \type{/Root}     $\longrightarrow$ object~9 $\longrightarrow$
@@ -1837,6 +1837,12 @@ the wished true page height.
 %***********************************************************************
 
 \subsection[sec.docinfocatalog]{Document info and catalog}
+
+\pdftexprimitive{\Syntax{\Tex{\pdfinfoomitdict} \Whatever{integer}}}
+\bookmark{\tex{pdfinfoomitdict}}
+
+If nonzero, omit the \type{/Info} dictionary completely, as required by
+the \PDF\ A-4 standard. \introduced{1.40.25}
 
 \pdftexprimitive{\Syntax{\Tex{\pdfinfo} \Something{general text}}}
 \bookmark{\tex{pdfinfo}}

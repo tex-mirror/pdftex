@@ -1,3 +1,12 @@
+2022-04-26  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\pdfinfoomitdict): document.
+
+	* pdfhelp-help.txt: regenerate for mailing list url.
+
+	* Makefile (pdftex-w.pdf): set KPATHSEA_WARNING=0 since we run
+	this with -ini.
+
 2022-02-28  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (ptex_devel): svn://tug.org url.
