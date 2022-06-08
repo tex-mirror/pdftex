@@ -1,0 +1,89 @@
+% $Id$
+% Public domain. Originally written by Han The THanh.
+% Example \efcode ("expansion factor code") settings
+% for per-glyph tuning of font expansions.
+% 
+% Also includes a basic macro to enable font expansion, adjusting for
+% LuaTeX and pdfTeX.
+% 
+% As written, this file does nothing but make definitions.
+% Adapt and adjust for your needs.
+%
+% Much more in the LaTeX microtype package (https://ctan.org/pkg/microtype).
+
+\newcount\temploopefcode
+\def\resetefcode#1{% reset all to 1000
+    \temploopefcode=0
+    \loop
+        \efcode#1\temploopefcode=1000
+        \advance\temploopefcode 1
+    \ifnum\temploopefcode < 256 \repeat
+}
+
+\def\setefcode#1{%
+    \efcode#1`\2=700
+    \efcode#1`\3=700
+    \efcode#1`\6=700
+    \efcode#1`\8=700
+    \efcode#1`\9=700
+    \efcode#1`\A=500
+    \efcode#1`\B=700
+    \efcode#1`\C=700
+    \efcode#1`\D=500
+    \efcode#1`\E=700
+    \efcode#1`\F=700
+    \efcode#1`\G=500
+    \efcode#1`\H=700
+    \efcode#1`\K=700
+    \efcode#1`\M=700
+    \efcode#1`\N=700
+    \efcode#1`\O=500
+    \efcode#1`\P=700
+    \efcode#1`\Q=500
+    \efcode#1`\R=700
+    \efcode#1`\S=700
+    \efcode#1`\U=700
+    \efcode#1`\W=700
+    \efcode#1`\Z=700
+    \efcode#1`\a=700
+    \efcode#1`\b=700
+    \efcode#1`\c=700
+    \efcode#1`\d=700
+    \efcode#1`\e=700
+    \efcode#1`\g=700
+    \efcode#1`\h=700
+    \efcode#1`\k=700
+    \efcode#1`\m=700
+    \efcode#1`\n=700
+    \efcode#1`\o=700
+    \efcode#1`\p=700
+    \efcode#1`\q=700
+    \efcode#1`\s=700
+    \efcode#1`\u=700
+    \efcode#1`\w=700
+    \efcode#1`\z=700
+}
+
+% emacs-page
+% Different primitives for LuaTeX and pdfTeX.
+% This fragment courtesy of Robert Schlicht,
+% https://tex.stackexchange.com/questions/646769. Public domain.
+% 
+\input iftex.sty
+\ifluatex
+  \adjustspacing=2
+  \def\mtplnfontexpand#1{%
+    \expandglyphsinfont #1 20 20 1\relax}
+\else
+  \pdfadjustspacing=2
+  \def\mtplnfontexpand#1{%
+    \pdffontexpand #1 20 20 1 autoexpand\relax}
+\fi 
+% enable for these fonts.
+%\mtplnfontexpand\tenrm
+%\mtplnfontexpand\tensl
+%\mtplnfontexpand\tenbf
+
+%\hsize=2.2in
+%\input story
+%\bye

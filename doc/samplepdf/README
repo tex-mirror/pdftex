@@ -1,0 +1,24 @@
+$Id$
+This samplepdf directory contains a few plain TeX example files. They
+are not meant to be used as-is, and may interfere with any real document.
+Please take them and adapt them as you see fit.
+
+The pdftex manual (texdoc pdftex ==
+http://mirrors.ctan.org/systems/doc/pdftex/manual/pdftex-a.pdf)
+is the reference documentation for pdfTeX.
+
+samplepdf.tex - document exhibiting many pdfTeX features. 
+Please peruse both the output and the source.
+
+pdfcolor.tex - defining and using colors. (Used in samplepdf.tex)
+
+efcode.tex - sample \efcode settings and macros for font expansion.
+protcode.tex - sample \efcode settings and macros for character protrusion.
+(These two not used by samplepdf.tex. See the LaTeX package microtype
+for much more sophisticated support -- https://ctan.org/pkg/microtype.)
+
+Additionally, the standalone macro file supp-pdf.tex (-> supp-pdf.mkii)
+can read MetaPost output directly in pdftex while generating PDF. No
+need for eps-to-pdf conversion. It comes from ConTeXt and is included in
+the TeX distributions.
+

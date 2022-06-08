@@ -1782,7 +1782,7 @@ precision.  This parameter is read when \PDFTEX\ writes a real number to
 the \PDF\ output.
 
 When including huge \METAPOST\ images using \filename {supp-pdf.tex}, one can
-limit the accuracy to two digits by typing: \type{\twodigitMPoutput}.
+limit the accuracy to two digits with: \type{\twodigitMPoutput}.
 
 \pdftexprimitive{\Syntax{\Tex{\pdfhorigin} \Whatever{dimen}}}
 \bookmark{\tex{pdfhorigin}}
@@ -4500,19 +4500,16 @@ uses its own Type~1 fonts, and needs no special attention.
 macro packages) can be redefined to produce literal \PDF, using some macros
 written by Hans Hagen.
 
-\description {\METAPOST} Although the output of \METAPOST\ is \POSTSCRIPT,
-it is in a highly simplified form, and a \METAPOST\ to \PDF\ conversion
-(\MPTOPDF, written by Hans Hagen and Tanmoy Bhattacharya) is implemented
-as a set of macros which reads \METAPOST\ output and supports all of
-its features.
-
-For new work, the \METAPOST\ route is highly recommended. For the future,
-Adobe has announced that they will define a specification for \quote
-{encapsulated \PDF}.
+\description {\METAPOST} Although the output of \METAPOST\ is
+\POSTSCRIPT, it is in a highly simplified form, and a \METAPOST\ to
+\PDF\ conversion (\MPTOPDF, available as \type{supp-pdf.tex} and
+\type{supp-pdf.mkii}, written by Hans Hagen and Tanmoy Bhattacharya) is
+implemented as a set of macros which reads \METAPOST\ output and
+supports all of its features.
 
 The inclusion of raw \POSTSCRIPT\ commands |<|a technique utilized
 by for instance the \type{pstricks} package|>| cannot directly be
-supported. Although \PDF\ is direct a descendant of \POSTSCRIPT, it
+supported. Although \PDF\ is a direct descendant of \POSTSCRIPT, it
 lacks any programming language commands, and cannot deal with arbitrary
 \POSTSCRIPT.
 
