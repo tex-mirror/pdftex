@@ -1,3 +1,7 @@
+2022-12-22  Karl Berry  <karl@freefriends.org>
+
+	* pdftex-t.tex (\pdfomitprocset): document.
+
 2022-06-08  Karl Berry  <karl@freefriends.org>
 
 	* pdftex-t.tex (Graphics): never mind about "encapsulated PDF";

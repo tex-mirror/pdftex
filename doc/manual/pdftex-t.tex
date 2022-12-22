@@ -771,18 +771,19 @@ example only a \type{/Font} object (no.~4) is referenced, which in turn
 tells that the text is typeset in \type{/Font} \type{/Times-Roman}. The
 \type{/Font} object points also to a \type{/Widths} array (object no.~7)
 that tells for each character by how much the viewer must move forward
-horizontally after typesetting a glyph. More details about the font
-can be found in the \type{/FontDescriptor} object (no.~8); if a font
-file is embedded, this object points to the font program stream. But as
-the Times-Roman font used for our example is one of the 14 so||called
-standard fonts that should always be present in any \PDF\ viewer and
-therefore need not be embedded in the \PDF\ file, it is left out here
-for brevity. However, when we use for instance a Computer Modern Roman
-font, we have to make sure that this font is later available to the \PDF\
-viewer, and the best way to do this is to embed the font.
-It's highly recommended nowadays to embed even the standard fonts;
-you can't know how it looks exactly at the viewer side unless you embed
-every font.
+horizontally after typesetting a glyph.
+
+More details about the font can be found in the \type{/FontDescriptor}
+object (no.~8); if a font file is embedded, this object points to the
+font program stream. But as the Times-Roman font used for our example is
+one of the 14 so||called standard fonts that should always be present in
+any \PDF\ viewer and therefore need not be embedded in the \PDF\ file,
+it is left out here for brevity. However, when we use for instance a
+Computer Modern Roman font, we have to make sure that this font is later
+available to the \PDF\ viewer, and the best way to do this is to embed
+the font. It's highly recommended nowadays to embed even the standard
+fonts; you can't know how it looks exactly at the viewer side unless you
+embed every font.
 
 In this simple file we don't specify in what way the file should be opened,
 for instance full screen or clipped. A closer look at the page object no.~2
@@ -955,7 +956,7 @@ Some nice samples of \PDFTEX\ output can be found at
 
 \PDFTEX\ can work with Type~1 and TrueType fonts (and to some extent
 also with OpenType fonts). Font files should be available and embedded
-for all fonts used in the generated PDF. It is possible to use
+for all fonts used in the generated \PDF. It is possible to use
 \METAFONT||generated fonts in \PDFTEX\ --- but it is strongly
 recommended not to use these fonts if an equivalent is available in
 Type~1 or TrueType format, if only because bitmap Type~3 fonts render
@@ -2894,7 +2895,7 @@ page\_height}\type{]}).  (This behavior was introduced in version
 \bookmark{\tex{pdfpageresources}}
 
 These tokens are added to the resource dictionary for all pages, before
-the font, XOBject, and other resources.
+the font, XOBject, and ProcSet resources.
 
 \starttyping
 \pdfpageresources{/MyPageResourceAttribute /MyValue}
@@ -2912,6 +2913,20 @@ will expand to that object number.
 
 \Eg, if the dictionary for page~5 of the \TEX\ document is contained in
 \PDF\ object no.~18, \tex{pdfpageref5} expands to the number 18.
+
+\pdftexprimitive{\Syntax{\Tex{\pdfomitprocset} \Whatever{integer}}}
+\bookmark{\tex{pdfomitprocset}}
+
+If this primitive parameter is zero (the default), the \type{/ProcSet}
+array is included if \type{\pdfmajorversion} is~1, and omitted if
+\type{\pdfmajorversion}$\,\ge\,2$. If this parameter is $>0$,
+\type{/ProcSet} is always omitted. And if it is $<0$, \type{/ProcSet} is
+always included. For information about what \type{/ProcSet} is, see the
+\PDFReference\ or other documentation.
+
+\type{\ProcSet} was considered obsolete as of \PDF~1.4, but conforming
+writers should continue to output it. It was formally deprecated in
+\PDF~2.0.\introduced{1.40.25}
 
 %***********************************************************************
 
@@ -5158,7 +5173,7 @@ the source code by typing:
 texexec --result=pdftex-a.pdf pdftex-t
 \stoptyping
 
-Or in letter size:
+Or for letter size:
 
 \starttyping
 texexec  --mode=letter --result=pdftex-l.pdf pdftex-t
