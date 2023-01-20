@@ -1087,12 +1087,12 @@ flush_buffer(out_ptr,false,false);
 @x
 @.Improper macro definition@>
   else {
-    app_cur_id(false);
+    app('$'); app_cur_id(false);
 @y
 @.Improper macro definition@>
   else {
     id_being_defined=id_lookup(id_first,id_loc,normal);
-    app_cur_id(false);
+    app('$'); app_cur_id(false);
     def_diff=(*loc!='(');
 @z
 
@@ -1918,7 +1918,7 @@ It advances |loc| past the title found.
 @c static sixteen_bits title_lookup(void)
 {
   char *first=loc,*last; /* boundaries */
-  register name_pointer *p;
+  name_pointer *p;
   if (*loc=='"') {
     while (++loc<=limit && *loc!='"') if (*loc=='\\') loc++;
   } else if (*loc=='{') {
