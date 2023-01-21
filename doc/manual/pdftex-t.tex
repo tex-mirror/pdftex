@@ -40,7 +40,8 @@
 
 \svnscan $Id$
 
-\def\currentpdftex{1.40.22}
+\def\versplit#1#2#3{#1.#2#3}% 140 -> 1.40
+\def\currentpdftex{\expandafter\versplit\the\pdftexversion.\pdftexrevision}
 
 %***********************************************************************
 
@@ -1572,11 +1573,6 @@ new Didot (1\,nd~=~0.375\,mm) and the new Cicero (1\,nc~=~12\,nd)
 \Syntax{
 \Something{pre spec} \Means %
   \Literal{pre}
-}
-
-\Syntax{
-\Something{pdfliteral spec} \Means %
-  \Literal{direct} \Or \Literal{page}
 }
 
 \Syntax{
@@ -3445,7 +3441,7 @@ While all graphics and text in a \PDF\ document have relative positions,
 annotations have internally hard||coded absolute positions. Again this
 is for the sake of speed optimization. The main disadvantage is that these
 annotations do {\em not} obey transformations issued by \type
-{\pdfliteral}'s.
+{\pdfliteral}s.
 
 The \Something{action spec} specifies the action that should be
 performed when the hyperlink is activated, one of (see the syntax
@@ -3648,33 +3644,39 @@ an article thread.
 \subsection{Literals and specials}
 
 \pdftexprimitive{\Syntax{\Tex{\pdfliteral}
-  \Optional{\Something{pdfliteral spec}}
+  \Optional{\Literal{shipout}}
+  \Optional{\Literal{direct} \Or \Literal{page}}
   \Something{general text}
   \Modelist{h, v, m}
   }}
 \bookmark{\tex{pdfliteral}}
 
-Like \type{\special} in normal \TEX, this command inserts raw
-\PDF\ code into the output. This allows support of color and text
-transformation. This primitive is heavily used in the \METAPOST\
-inclusion macros. Normally \PDFTEX\ ends a text section in the \PDF\
-output and sets the transformation matrix to the current location on the
-page before inserting \Something{general text}\unkern, however this can be
-turned off by giving the optional keyword \Literal{direct}. This command
-appends a whatsit node to the list being built. \Something{general text}
-is expanded when the whatsit node is created and not when it is shipped
-out, as with \type{\special}.
+Analogous to \type{\special} in the original \TEX, this command inserts
+raw \PDF\ code into the output, appending a whatsit node to the list
+being built. This allows support of color and text transformation, among
+other things.
 
-Starting with version 1.30.0, \PDFTEX\ allows to use a new keyword
-\type{page} instead of \type{direct}. Both modify the default behavior
-of \type{\pdfliteral}, avoiding translation of the coordinates space
-before inserting the literal code. The difference is that the \type{page}
+By default, \Something{general text} is expanded immediately, when the
+whatsit node is created, as with \type{\special}. Starting with version
+1.40.25, the optional keyword \Literal{shipout} can be used to delay
+expansion of \Something{general text} until the whatsit node is shipped
+out, as with non-\type{\immediate} \type{\write}.
+
+Normally, \PDFTEX\ ends a text section in the \PDF\ output and sets the
+transformation matrix to the current location on the page before
+inserting \Something{general text}\unkern; this can be turned off by
+giving the optional keyword \Literal{direct}.
+
+Starting with version 1.30.0, \PDFTEX\ supports the keyword \type{page}
+in addition to \type{direct}. Both modify the default behavior of
+\type{\pdfliteral}, avoiding translation of the coordinate space before
+inserting the literal code. The difference is that the \type{page}
 keyword instructs \PDFTEX\ to close a \type{BT ET} text block before
-inserting anything. It means that the literal code inserted refers to the
-origin (lower||left corner of the page) and can be safely enclosed with
-\type{q Q}. Note, that in most cases using \type{q Q} operators inside
-\type{\pdfliteral} with \type{direct} keyword will produce corrupted
-\PDF\ output, as the \PDF\ standard doesn't allow to do anything like
+inserting anything. This means that the literal code inserted refers to
+the \PDF\ origin (lower-left corner of the page) and can be safely
+enclosed with \type{q Q}. In contrast, using \type{q Q} operators inside
+\type{\pdfliteral} with the \type{direct} keyword will produce corrupted
+\PDF\ output, as the \PDF\ standard doesn't allow doing anything like
 this within a \type{BT ET} block.
 
 % HE: \unkern is a kludge here; wanted to have tight "{pdf:"
@@ -3698,6 +3700,20 @@ This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{direct} \Lbrace
 
 This is equivalent to \Syntax{\Tex{\pdfliteral} \Literal{page} \Lbrace
 \Something{text} \Rbrace}.
+
+\pdftexprimitive{\Syntax{\Tex{\special} \Optional{\Literal{shipout}}
+  \Lbrace\unkern \Something{general text} \Rbrace}}
+\bookmark{\tex{special\ shipout}}
+
+Starting with version 1.40.25, \PDFTEX\ extends the \type{\special}
+primitive to support the optional keyword \Literal{shipout}. This delays
+expansion of \Something{general text} until the page is shipped out, as
+with non-\type{\immediate} \type{\write}. By default, \Something{general
+text} is expanded immediately.
+
+\Syntax{\Tex{\special} \Literal{shipout} \Lbrace \unkern\Literal{pdf:}
+\Something{text} \Rbrace} is equivalent to \Syntax{\Tex{\pdfliteral}
+\Literal{shipout} \Lbrace \Something{text} \Rbrace}.
 
 %***********************************************************************
 
@@ -4336,11 +4352,10 @@ Now the \type{\b} expansion is not logged either, since the expansion
 depth is higher than the \type{\tracingstacklevels} value.
 
 The intended use of \type{\tracingstacklevels} is not so much to
-truncate logging as to indicate the expansion levels for detailed
-debugging. Thus normally it would be set to a large number
-(\type{\maxdimen}, say), so that everything is fully logged, with the
-addition of the expansion level indication with the number of dots in
-the prefix.
+truncate logging as to indicate expansion levels for detailed debugging.
+Thus normally it would be set to a large number (\type{\maxdimen}, say),
+so that everything is fully logged, with the addition of the expansion
+level indication with the number of dots in the prefix.
 
 The behavior is the same in all \TeX\ engines except the original \TEX\
 and \eTeX, where \type{\tracingstacklevels} remains undefined.
@@ -4352,8 +4367,8 @@ and \eTeX, where \type{\tracingstacklevels} remains undefined.
 If this primitive parameter has a value corresponding to an open output
 stream (which has been opened with \type{\openout}), then any
 \type{\show}, \type{\showthe}, \type{\showbox} or \type{\showlists}
-commands do not write output to the terminal, but instead write to only
-the referenced output stream, as if they were written with
+commands do not write output to the terminal, but instead write to the
+referenced output stream only, as if they were written with
 \type{\immediate\write}.
 
 For example:
@@ -4418,19 +4433,17 @@ Returns the \PDFTEX\ banner message, \eg\ for the version used here:
 \pdftexprimitive{\Syntax{\Tex{\pdftexrevision} \Whatever{expandable}}}
 \bookmark{\tex{pdftexrevision}}
 
-\def\versplit#1#2#3{#1.#2#3}
-
 Returns the revision number of \PDFTEX, \eg\ for \PDFTEX\ version
-\expandafter\versplit\the\pdftexversion.\pdftexrevision\ (used to produce
-this document), it returns the number {\tt \pdftexrevision}.
+\currentpdftex\ (used to produce this document), it returns the number
+{\tt \pdftexrevision}.
 
 
 \pdftexprimitive{\Syntax{\Tex{\pdftexversion} \Whatever{read||only integer}}}
 \bookmark{\tex{pdftexversion}}
 
 Returns the version of \PDFTEX\ multiplied by 100, \eg\ for \PDFTEX\
-version \expandafter\versplit\the\pdftexversion.\pdftexrevision\ (used to
-produce this document), it returns {\tt \number\pdftexversion}.
+version \currentpdftex\ (used to produce this document), it returns {\tt
+\number\pdftexversion}.
 
 %***********************************************************************
 

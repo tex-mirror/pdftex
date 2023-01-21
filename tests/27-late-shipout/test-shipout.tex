@@ -1,0 +1,38 @@
+% $Id$
+% Public domain. Originally by Phelype Oleinik, 2023.
+% Test `shipout' keyword on \special and \pdfliteral to delay expansion.
+
+\catcode`\{=1 \catcode`\}=2
+\output={\global\advance\count0 by 1 \shipout\box255 }
+
+\pdfoutput=1
+\pdfcompresslevel-0
+\pdfobjcompresslevel=0
+\hsize=4.6cm
+  \pdfpagewidth=\hsize
+  \hoffset=-1in
+\topskip=10pt
+\baselineskip=12pt
+\vsize=\dimexpr\topskip+3\baselineskip\relax
+  \pdfpageheight=\vsize
+  \voffset=-1in
+\parindent=0pt
+
+\font\f = cmr10 \f
+
+\def\!{\ifodd\count0 0\else 1\fi}
+\def\0{\pdfliteral {0 g}}
+
+\def\text{%
+  \pdfliteral         direct {\! 1 0 0 k}1hello\01 %
+  \special              {PDF:direct:\! g}2hello\02 %
+  \pdfliteral shipout direct {\! 1 0 0 k}3hello\03 %
+  \special    shipout   {PDF:direct:\! g}4hello\04 %
+}
+
+\text \text \text \text
+\text \text \text \text
+\text \text \text \text
+\text \text \text \text
+
+\end
