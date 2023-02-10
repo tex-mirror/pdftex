@@ -1,15 +1,31 @@
 \input plain.tex
 \input pdftexconfig.tex
 \input pdftexmagfix.tex
-\font\f=texnansi-lmr10\f
 
 \pdfcompresslevel=0
 \pdfobjcompresslevel=0
+\footline={}
+
+% \pdfspacefont{texnansi-lmr10} % if not specified then `pdftexspace` will be used
+
+
 \long\def\lorem{
+\par
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin risus nisl, rutrum vel erat et, sollicitudin rutrum mauris. Donec fermentum sem ut nibh consectetur placerat. Cras et dui lacus. Vivamus in turpis aliquet, porta massa ut, bibendum erat. Nulla in bibendum nisi. Nunc egestas tellus augue, vel auctor metus venenatis non. Ut viverra gravida neque a eleifend. Morbi ipsum nisl, finibus sed nisl vitae, aliquet viverra nunc.\par
 }
 
+\font\fa=cmr10\fa cmr10
+
+\pdfinterwordspaceoff pdfinterwordspaceoff
 \lorem
-\pdfinterwordspaceon
+\pdfinterwordspaceon pdfinterwordspaceon
 \lorem
+
+\font\fb=texnansi-lmr10\fb texnansi-lmr10
+
+\pdfinterwordspaceoff pdfinterwordspaceoff
+\lorem
+\pdfinterwordspaceon pdfinterwordspaceon
+\lorem
+
 \bye
