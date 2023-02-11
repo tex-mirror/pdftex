@@ -2649,10 +2649,10 @@ a movement within some limits in horizontal direction. Such a movement could be
 caused for example by the interword glue. If yes, pdftex will insert a space
 char to the page description and make adjustment to the next movement, so that
 the next char/word would be rendered in the expected position. If the current
-font has a real space char (determined from the corresponding enc file), it
-will be used. If space char is not available in the current font, pdftex will
-use the space char from a special font named pdftexspace. pdftex automatically
-creates a map entry for this font which looks as follows:
+font has a real space char, it will be used. If space char is not available in
+the current font, pdftex will use the space char from a special font named
+pdftexspace. pdftex automatically creates a map entry for this font which looks
+as follows:
 
 \starttyping
 \pdfmapline{=pdftexspace PdfTeX-Space <pdftexspace.pfb}
@@ -2669,13 +2669,16 @@ and the corresponding map entry exists. For example:
                               % current font has no space char
 \stoptyping
 
+pdftex checks if a font has a real space char as follows: if the font
+has an enc file in corresponding map entry, and the enc file
+has a glyph named space at slot 32, then it's considered as a font with 
+real space char.
 
 Example of usage (see also the \type{fake-interword-space.tex} test file):
 
 \starttyping
 Text with no interword spaces.
 
-\pdfmapline{+dummy-space <dummy-space.pfb}
 \pdfglyphtounicode{space}{0020}
 \pdfinterwordspaceon
 
