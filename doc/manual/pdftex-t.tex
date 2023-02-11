@@ -2634,6 +2634,8 @@ Minimal example:
 \bookmark{\tex{pdfinterwordspaceon}}
 \pdftexprimitive{\Syntax{\Tex{\pdfinterwordspaceoff}}}
 \bookmark{\tex{pdfinterwordspaceoff}}
+\pdftexprimitive{\Syntax{\Tex{\pdfspacefont}}}
+\bookmark{\tex{pdfspacefont}}
 
 These commands create corresponding whatsit nodes which turn on/off
 generation of faked interword spaces in the output.  This allows for
@@ -2641,9 +2643,32 @@ better reflowing of text on the fly by \PDF\ readers, better extraction
 of textual content, and is required by \PDF/A.  It does not affect the
 normal \TeX\ justification with glue.
 
-This requires finding and reading font files \type{dummy-space.tfm} and
-\type{pfb}; the font is included in the \PDF\ output and character 32 is
-inserted from it as the ``fake'' space.
+This works roughly as follows: when pdfinterwordspaceon is on, pdftex will try
+to guess when an interword space should be inserted, for example if there is
+a movement within some limits in horizontal direction. Such a movement could be
+caused for example by the interword glue. If yes, pdftex will insert a space
+char to the page description and make adjustment to the next movement, so that
+the next char/word would be rendered in the expected position. If the current
+font has a real space char (determined from the corresponding enc file), it
+will be used. If space char is not available in the current font, pdftex will
+use the space char from a special font named pdftexspace. pdftex automatically
+creates a map entry for this font which looks as follows:
+
+\starttyping
+\pdfmapline{=pdftexspace PdfTeX-Space <pdftexspace.pfb}
+\stoptyping
+
+pdftexspace.tfm and pdftexspace.pfb is expected to be available to pdftex just
+like other fonts. 
+
+It is possible to choose another font instead of pdftexspace for this purpose.
+In this case, it is expected that the font has a real space char at slot 32,
+and the corresponding map entry exists. For example:
+\starttyping
+\pdfspacefont{texnansi-lmr10} % use the space char from this font if the
+                              % current font has no space char
+\stoptyping
+
 
 Example of usage (see also the \type{fake-interword-space.tex} test file):
 
