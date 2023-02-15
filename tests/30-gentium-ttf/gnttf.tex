@@ -1,0 +1,22 @@
+% $Id$
+% Public domain.
+% https://tug.org/pipermail/gentium/2023q1/000043.html
+
+\pdfmapline{gentium-8y GentiumPlus " TeXnANSIEncoding ReEncodeFont " %
+  <texnansi.enc <GentiumPlus-Regular.ttf}
+\output={\shipout\box255}
+\font\x = gentium-8y \x Hello Gentium. \end
+
+% https://tug.org/TUGboat/tb30-1/tb94thanh.pdf
+% ttf2afm -e texnansi.enc -o gentium-8y.afm GentiumPlus-Regular.ttf
+% afm2tfm gentium-8y.afm -T texnansi.enc
+% ->
+% !pdfTeX error: pdftex (file /u/texlive/karl/Master/texmf-dist/fonts/truetype/pu
+% blic/gentium-tug/GentiumPlus-Regular.ttf): unknown version of OS/2 table (0004)
+
+%% type 1 loads ok.
+%\documentclass{article}
+%\usepackage{gentium}
+%\begin{document}
+%\huge\bfseries Hello, World!
+%\end{document}
