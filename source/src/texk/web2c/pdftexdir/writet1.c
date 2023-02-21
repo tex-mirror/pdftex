@@ -1,5 +1,5 @@
 /*
-Copyright 1996-2018 Han The Thanh <thanh@pdftex.org>
+Copyright 1996-2023 Han The Thanh <thanh@pdftex.org>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -1247,8 +1247,11 @@ static void cs_mark(const char *cs_name, int subr)
                 mark_cs(standard_glyph_names[a1]);
                 mark_cs(standard_glyph_names[a2]);
                 if (fd_cur->gl_tree != NULL) {
-                    avl_probe(fd_cur->gl_tree, standard_glyph_names[a1]);
-                    avl_probe(fd_cur->gl_tree, standard_glyph_names[a2]);
+                    /* base and accent characters are needed in CharSet */
+                    avl_probe(fd_cur->gl_tree,
+                              (void *) standard_glyph_names[a1]);
+                    avl_probe(fd_cur->gl_tree,
+                              (void *) standard_glyph_names[a2]);
                 }
                 break;
             default:

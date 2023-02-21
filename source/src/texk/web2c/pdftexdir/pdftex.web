@@ -307,8 +307,8 @@ known as `\eTeX'.
   {printed when \eTeX\ starts}
 @#
 @d pdftex_version==140 { \.{\\pdftexversion} }
-@d pdftex_revision=="24" { \.{\\pdftexrevision} }
-@d pdftex_version_string=='-1.40.24' {current \pdfTeX\ version}
+@d pdftex_revision=="25" { \.{\\pdftexrevision} }
+@d pdftex_version_string=='-1.40.25' {current \pdfTeX\ version}
 @#
 @d pdfTeX_banner=='This is pdfTeX, Version 3.141592653',eTeX_version_string,pdftex_version_string
    {printed when \pdfTeX\ starts}
@@ -15967,8 +15967,6 @@ DVI}
 @!pdf_last_f: internal_font_number; {last font in PDF output page}
 @!pdf_last_fs: internal_font_number; {last font size in PDF output page}
 @!pdf_dummy_font: internal_font_number; {font used to insert artificial interword spaces}
-@!pdf_dummy_font: internal_font_number; {font used to insert artificial interword spaces}
-
 
 @ Following procedures implement low-level subroutines to convert \TeX{}
 internal structures to PDF page description.
@@ -18513,6 +18511,7 @@ need to declare some procedures needed in |pdf_hlist_out| and |pdf_vlist_out|.
 procedure pdf_out_literal(p:pointer);
 var old_setting:0..max_selector; {holds print |selector|}
     s: str_number;
+    h: halfword;
     @!q,@!r:pointer; {temporary variables for list manipulation}
     @!old_mode:integer; {saved |mode|}
 begin
@@ -18520,14 +18519,17 @@ begin
     if subtype(p)=pdf_lateliteral_node then
       begin @<Expand macros in the token list
         and make |link(def_ref)| point to the result@>;
-      pdf_literal_data(p):=def_ref;
-      end;
+      h:=def_ref;
+      end
+    else h:=pdf_literal_data(p);
     selector:=new_string;
-    show_token_list(link(pdf_literal_data(p)),null,pool_size-pool_ptr);
+    show_token_list(link(h),null,pool_size-pool_ptr);
     selector:=old_setting;
     s := make_string;
     literal(s, pdf_literal_mode(p), false);
     flush_str(s);
+    if subtype(p)=pdf_lateliteral_node then
+      flush_list(def_ref);
 end;
 
 procedure pdf_out_colorstack(p:pointer);
@@ -18638,6 +18640,7 @@ end;
 procedure pdf_special(p: pointer);
 var old_setting:0..max_selector; {holds print |selector|}
     s: str_number;
+    h: halfword;
     @!q,@!r:pointer; {temporary variables for list manipulation}
     @!old_mode:integer; {saved |mode|}
 begin
@@ -18646,14 +18649,17 @@ begin
     if subtype(p)=latespecial_node then
       begin @<Expand macros in the token list
         and make |link(def_ref)| point to the result@>;
-      write_tokens(p):=def_ref;
-      end;
+        h:=def_ref;
+      end
+    else h:=write_tokens(p);
     selector:=new_string;
-    show_token_list(link(write_tokens(p)),null,pool_size-pool_ptr);
+    show_token_list(link(h),null,pool_size-pool_ptr);
     selector:=old_setting;
     s := make_string;
     literal(s, scan_special, true);
     flush_str(s);
+    if subtype(p)=latespecial_node then
+      flush_list(def_ref);
 end;
 
 procedure pdf_print_toks(p: pointer); {print tokens list |p|}
@@ -34005,6 +34011,21 @@ end
 list as in \.{\\xdef} and \.{\\mark}.  When marked with \.{shipout}, we keep
 tokens unexpanded for now.
 
+Unfortunately, the |write_stream(tail):=null| done here is not a valid
+assignment in Web2C, because |null| (a.k.a.\ |min_halfword|) is a large
+negative number ($-268435455 = -@"FFFFFFF$, set in \.{tex.ch}); too
+large to fit in the {\bf short} structure element that's being assigned.
+The warning from gcc~8.5.0 was:
+
+\.{pdftex0.c: In function 'doextension':}
+\.{pdftex0.c:37849:40: warning: overflow in conversion from 'long int' to 'short int'}
+\.{changes value from '-268435455' to '1' [-Woverflow]}\hfil\break
+\.{  mem [curlist .tailfield + 1 ].hh.b0 = -268435455L ;}
+
+The correct thing to do is not immediately evident. However, for Web2C,
+it does not matter, because these lines are changed for enc\TeX, in
+\.{enctex2.ch}, and now zero is assigned, instead of |null|.
+
 @<Implement \.{\\special}@>=
 begin if scan_keyword("shipout") then
 begin new_whatsit(latespecial_node,write_node_size); write_stream(tail):=null;
@@ -35946,6 +35967,7 @@ that actually send out the requested data. Let's do \.{\\special} first
 procedure special_out(@!p:pointer);
 var old_setting:0..max_selector; {holds print |selector|}
 @!k:pool_pointer; {index into |str_pool|}
+@!h:halfword;
 @!q,@!r:pointer; {temporary variables for list manipulation}
 @!old_mode:integer; {saved |mode|}
 begin synch_h; synch_v;@/
@@ -35954,10 +35976,11 @@ selector:=old_setting;
 if subtype(p)=latespecial_node then
   begin @<Expand macros in the token list
     and make |link(def_ref)| point to the result@>;
-  write_tokens(p):=def_ref;
-  end;
+    h:=def_ref;
+  end
+else h:=write_tokens(p);
 selector:=new_string;
-show_token_list(link(write_tokens(p)),null,pool_size-pool_ptr);
+show_token_list(link(h),null,pool_size-pool_ptr);
 selector:=old_setting;
 str_room(1);
 if cur_length<256 then
@@ -35967,6 +35990,8 @@ else  begin dvi_out(xxx4); dvi_four(cur_length);
   end;
 for k:=str_start[str_ptr] to pool_ptr-1 do dvi_out(so(str_pool[k]));
 pool_ptr:=str_start[str_ptr]; {erase the string}
+if subtype(p)=latespecial_node then
+  flush_list(def_ref);
 end;
 
 @ To write a token list, we must run it through \TeX's scanner, expanding
