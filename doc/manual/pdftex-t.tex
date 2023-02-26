@@ -182,6 +182,7 @@
 
 % introduced
 \def\introduced#1{The primitive was introduced in \PDFTEX\ #1.}
+\def\introducedplural#1{The primitives were introduced in \PDFTEX\ #1.}
 
 % to get bookmarks for primitives like \ifpdfprimitive
 \appendtoks\def\tex#1{\string\\#1}\to\simplifiedcommands
@@ -2634,45 +2635,72 @@ Minimal example:
 \bookmark{\tex{pdfinterwordspaceon}}
 \pdftexprimitive{\Syntax{\Tex{\pdfinterwordspaceoff}}}
 \bookmark{\tex{pdfinterwordspaceoff}}
-\pdftexprimitive{\Syntax{\Tex{\pdfspacefont}}}
+\pdftexprimitive{\Syntax{\Tex{\pdfspacefont} \Something{general text}}}
 \bookmark{\tex{pdfspacefont}}
 
-These commands create corresponding whatsit nodes which turn on/off
-generation of faked interword spaces in the output.  This allows for
-better reflowing of text on the fly by \PDF\ readers, better extraction
-of textual content, and is required by \PDF/A.  It does not affect the
-normal \TeX\ justification with glue.
+The first two commands insert corresponding whatsit nodes which turn
+on/off generation of faked interword spaces in the \PDF\ output (they
+cause errors in \DVI\ output). This allows for better reflowing of text
+on the fly by \PDF\ readers, better extraction of textual content, and
+is required by \PDF/A. It does not affect the normal \TeX\ justification
+with glue of the typeset output.
 
-This works roughly as follows: when pdfinterwordspaceon is on, pdftex will try
-to guess when an interword space should be inserted, for example if there is
-a movement within some limits in horizontal direction. Such a movement could be
-caused for example by the interword glue. If yes, pdftex will insert a space
-char to the page description and make adjustment to the next movement, so that
-the next char/word would be rendered in the expected position. If the current
-font has a real space char, it will be used. If space char is not available in
-the current font, pdftex will use the space char from a special font named
-pdftexspace. pdftex automatically creates a map entry for this font which looks
-as follows:
+This works roughly as follows: with \type{\pdfinterwordspaceon},
+\PDFTEX\ will guess when an interword space should be inserted, based on
+movement within some limits in horizontal direction. When found,
+\PDFTEX\ inserts a true space character into the \PDF\ page description
+for the viewers, and adjusts the next movement so that the next
+character will be in the expected position, according to normal \TEX\
+behavior.
+
+Where does that \quotation{true space character} come from?
+There are two possibilities.
+
+\startitemize
+\item If the current font has a real space character, it is used. 
+\PDFTEX\ considers a font to have such a space character if 1)~the font
+has an encoding vector (\type{.enc} file) specified in its map entry,
+and 2)~the encoding has a glyph named \type{space} (that is, the
+PostScript name \type{/space}) at slot 32. For example, the font
+\type{texnansi-lmr10} uses the encoding file \type{lm-texnansi.enc},
+which has such an entry.
+
+\item
+If the current font does not have such a space character (this is the
+case for most traditional \TEX\ fonts, such as \type{cmr10} and
+\type{ec-lmr10}), \PDFTEX\ will use the space character from a special
+fallback font named (by default) \type{pdftexspace}[\type{.tfm}].
+\PDFTEX\ automatically defines a map entry for this font which looks as
+follows:
 
 \starttyping
 \pdfmapline{=pdftexspace PdfTeX-Space <pdftexspace.pfb}
 \stoptyping
 
-pdftexspace.tfm and pdftexspace.pfb is expected to be available to pdftex just
-like other fonts. 
+The \type{pdftexspace.tfm} and \type{pdftexspace.pfb} files are expected
+to be available to \PDFTEX\ just like any other font. (They are
+distributed with \PDFTEX.) The \type{pdftexspace} font was constructed
+by hand; it has a space character that is .333em (and no other
+characters).
 
-It is possible to choose another font instead of pdftexspace for this purpose.
-In this case, it is expected that the font has a real space char at slot 32,
-and the corresponding map entry exists. For example:
+It is possible to use a different fallback font for the space character
+by specifying \type{\pdfspacefont}\Lbrace \Something{somefont}\Rbrace.
+(This is most likely to be useful for testing or debugging.) In this
+case, \PDFTEX\ assumes that the given font has a real space character at
+slot 32, and that any necessary corresponding map entry exists. For
+example:
+
 \starttyping
-\pdfspacefont{texnansi-lmr10} % use the space char from this font if the
+\pdfspacefont{texnansi-lmr10} % use space char from this font if
                               % current font has no space char
 \stoptyping
+\stopitemize
 
-pdftex checks if a font has a real space char as follows: if the font
-has an enc file in corresponding map entry, and the enc file
-has a glyph named space at slot 32, then it's considered as a font with 
-real space char.
+History: Before \PDFTEX\ version 1.40.25, no check was made for a
+\type{space} character in the current font, the fallback font was named
+\type{dummy-space}, and its space character was tiny, 0.001em. It turned
+out that \PDF\ viewers were unhappy with this tiny space, especially
+with tagged \PDF.
 
 Example of usage (see also the \type{fake-interword-space.tex} test file):
 
@@ -2688,7 +2716,7 @@ Switch to text with faked interword spaces.
 
 Back to text with no interword spaces.
 \stoptyping
-\introduced{1.40.15}
+\introducedplural{1.40.15, 1.40.25}
 
 \pdftexprimitive{\Syntax{\Tex{\pdffakespace}}}
 \bookmark{\tex{pdffakespace}}
@@ -3972,8 +4000,8 @@ example, the first ten bytes of the source of this manual are {\tt
 
 As of \TEXLIVE\ 2020, the \type{\input} primitive in all \TEX\ engines,
 including \PDFTEX, now also accepts a group-delimited filename argument,
-as a system-dependent extension, as in \type{\input\Lbrace
-foo.tex\Rbrace}. The usage of \type{\input} with a standard
+as a system-dependent extension, as in \type{\input} \Lbrace
+\type{foo.tex} \Rbrace. The usage of \type{\input} with a standard
 space/token-delimited filename is completely unchanged.
 
 This group-delimited argument was previously implemented in Lua\TEX; now
