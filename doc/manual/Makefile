@@ -4,7 +4,7 @@
 # Get version we're documenting from the \def in the manual.
 pdftexversion=`sed -n 's,^.def.currentpdftex{\(.*\)},\1,p' manual/pdftex-t.tex`
 
-context = texexec --batchmode
+context = env PATH=/usr/local/texlive/dev/bin/x86_64-linux:$$PATH texexec --batchmode
 # context does not have \setupoutput.
 # texmfstart exits immediately.
 
@@ -89,7 +89,7 @@ pdftex-syntax.txt: pdftex-t.tex pdftex-syntax.tex syntaxform.awk
 #  Install from this source directory to TL.
 
 # svn co svn://u:pw@tug.org/texlive/trunk/Master/texmf-dist/doc/pdftex
-tltree = /v/texlive/karl/Master/texmf-dist
+tltree = /home/texlive/karl/Master/texmf-dist
 dest = $(tltree)/doc/pdftex/manual
 
 INSTALL_DATA = cp -p
